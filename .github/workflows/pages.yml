@@ -1,0 +1,75 @@
+# Tests every push to master, then publishes the website to GitHub Pages.
+# One-time setup: repository Settings > Pages > Build and deployment > Source: GitHub Actions.
+name: Test and deploy site
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pages-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Tests and backend bundle
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+      - run: npm test
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install -r scripts/requirements.txt
+      - run: python -m unittest discover -s tests -p "test_*.py"
+
+      # The backend is pasted into Apps Script by hand; this keeps a ready copy with every run.
+      - run: npm run build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: backend-dist
+          path: dist/
+          retention-days: 30
+
+  deploy:
+    name: Publish to GitHub Pages
+    needs: test
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      # Only the public website goes online: no backend, tests, scripts, or docs.
+      - name: Collect the site files
+        run: |
+          mkdir _site
+          cp index.html admin.html viewer.html _site/
+          cp -r assets shared _site/
+          touch _site/.nojekyll
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+      - id: deployment
+        uses: actions/deploy-pages@v4

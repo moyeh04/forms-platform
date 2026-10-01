@@ -174,6 +174,9 @@ npm run dev          # local preview on http://localhost:8080 (PIN 4321), in mem
 python3 -m unittest discover -s tests -p "test_*.py"   # 20 tests for the Excel export
 ```
 
+A push to `master` runs `.github/workflows/pages.yml`: the tests, then a GitHub
+Pages deploy of the website files. See [docs/DEPLOY.md](docs/DEPLOY.md#updating-later).
+
 Commit style is described in [docs/COMMIT_CONVENTION.md](docs/COMMIT_CONVENTION.md).
 Generated files (`dist/`, `node_modules/`) are not committed.
 
