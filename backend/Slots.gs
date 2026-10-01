@@ -23,7 +23,12 @@ function normalizeSlots_(slots) {
     if (!times.length) fail('bad_slots', '"' + label + '" has no time slots.');
     return { id: id, label: label, date: date, times: times };
   });
-  return { days: out, capacity: capacity };
+  var result = { days: out, capacity: capacity };
+  var p = slots && slots.pattern;
+  if (p && /^\d{1,2}:\d{2}$/.test(String(p.start)) && /^\d{1,2}:\d{2}$/.test(String(p.end))) {
+    result.pattern = { start: String(p.start), end: String(p.end), length: Math.max(1, parseInt(p.length, 10) || 20), gap: Math.max(0, parseInt(p.gap, 10) || 0) };
+  }
+  return result;
 }
 
 /** How many bookings each slot has: { "day|time": count }. No personal data. */

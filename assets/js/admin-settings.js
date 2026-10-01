@@ -34,7 +34,6 @@
     f.rules = f.rules || {};
     f.notifications = f.notifications || {};
     f.review = f.review || { steps: [] };
-    if (f.slots) f.slots.days.forEach(function (d) { d._timesText = d.times.join('\n'); d._gen = { start: '12:30', end: '15:30', length: '20', gap: '5' }; });
 
     var t = A.TYPES[f.type] || { label: f.type };
     var link = A.formLink(f.slug);
@@ -207,46 +206,146 @@
         h('thead', null, h('tr', null, h('th', null, 'Show'), h('th', null, 'English label'), h('th', null, 'Arabic label'), h('th', null, 'Required'), h('th', null, 'Name parts / type'))),
         h('tbody', null, rows))));
 
-    /* Slots ------------------------------------------------------ */
+    /* Slots: session hours once, then days as cards of time chips ---- */
     var slotsPanel = null;
     if (f.type === 'reservation') {
       f.slots = f.slots || { days: [], capacity: 1 };
-      var daysBox = h('div');
+      var pat = f.slots.pattern = Object.assign({ start: '12:30', end: '15:30', length: 20, gap: 5 }, f.slots.pattern || {});
+      var patternTimes = function () { return Rules.generateSlots({ start: pat.start, end: pat.end, length: pat.length, gap: pat.gap }); };
+      var autoLabel = function (date) {
+        var d = new Date(date + 'T12:00:00');
+        if (!date || isNaN(d)) return '';
+        try { return d.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'short' }); } catch (e) { return date; }
+      };
+      var addDays = function (date, n) {
+        var d = new Date(date + 'T12:00:00'); d.setDate(d.getDate() + n);
+        return d.getFullYear() + '-' + p2(d.getMonth() + 1) + '-' + p2(d.getDate());
+      };
+      f.slots.days.forEach(function (d) { d._auto = !d.label || d.label === autoLabel(d.date); });
+
+      /* Step 1: session hours */
+      var patPreview = h('div', { class: 'pattern-preview', 'aria-live': 'polite' });
+      var paintPattern = function () {
+        ui.clear(patPreview);
+        var times = patternTimes();
+        if (!times.length) return patPreview.appendChild(h('p', { class: 'error' }, 'These hours make no slots. The last slot must end after the first one starts.'));
+        patPreview.appendChild(h('p', { class: 'muted-note' }, times.length + ' slot' + (times.length > 1 ? 's' : '') + ' a day, from ' + times[0].split(' - ')[0] + ' to ' + times[times.length - 1].split(' - ')[1] + '.'));
+        patPreview.appendChild(h('div', { class: 'time-chips pattern-chips' }, times.map(function (tm) { return h('span', { class: 'time-chip' }, tm); })));
+      };
+      var quick = function (key, values, unit) {
+        var box = h('div', { class: 'toggle-chips', role: 'radiogroup' });
+        var input = h('input', { class: 'input num', type: 'number', min: '0', max: '240', name: 'pattern-' + key, value: String(pat[key]), 'aria-label': key === 'length' ? 'Minutes per slot' : 'Minutes between slots', oninput: function (e) { pat[key] = parseInt(e.target.value, 10) || 0; paint(); paintPattern(); } });
+        function paint() {
+          ui.clear(box);
+          values.forEach(function (v) {
+            var on = Number(pat[key]) === v;
+            box.appendChild(h('button', { type: 'button', class: 'toggle-chip sm', role: 'radio', 'aria-checked': on ? 'true' : 'false', 'aria-pressed': on ? 'true' : 'false', onclick: function () { pat[key] = v; input.value = String(v); paint(); paintPattern(); } }, v + unit));
+          });
+          box.appendChild(input);
+        }
+        paint();
+        return box;
+      };
+      var capVal = h('output', { class: 'stepper-val', name: 'capacity' }, String(f.slots.capacity || 1));
+      var step = function (d) { f.slots.capacity = Math.max(1, Math.min(50, (f.slots.capacity || 1) + d)); capVal.textContent = String(f.slots.capacity); };
+      var hoursCard = h('div', { class: 'tt-step' },
+        h('div', { class: 'tt-step-head' }, h('span', { class: 'tt-num' }, '1'), h('div', null, h('h3', null, 'Session hours'), h('p', { class: 'help' }, 'New days start with these slots. You can still change any single day below.'))),
+        h('div', { class: 'tt-hours' },
+          A.field('First slot starts', h('input', { class: 'input', type: 'time', name: 'pattern-start', value: pat.start, oninput: function (e) { pat.start = e.target.value; paintPattern(); } })),
+          A.field('Last slot ends by', h('input', { class: 'input', type: 'time', name: 'pattern-end', value: pat.end, oninput: function (e) { pat.end = e.target.value; paintPattern(); } })),
+          h('div', { class: 'field-row tt-wide' }, h('span', { class: 'label' }, 'Each slot'), quick('length', [10, 15, 20, 30], ' min')),
+          h('div', { class: 'field-row tt-wide' }, h('span', { class: 'label' }, 'Break between'), quick('gap', [0, 5, 10], ' min')),
+          h('div', { class: 'field-row tt-cap' }, h('span', { class: 'label' }, 'Teams per slot'),
+            h('div', { class: 'stepper' },
+              h('button', { type: 'button', class: 'icon-btn sm', 'aria-label': 'Fewer teams per slot', onclick: function () { step(-1); } }, '−'),
+              capVal,
+              h('button', { type: 'button', class: 'icon-btn sm', name: 'capacity-up', 'aria-label': 'More teams per slot', onclick: function () { step(1); } }, '+')))),
+        patPreview,
+        h('button', { type: 'button', class: 'btn btn-quiet sm', name: 'apply-all', onclick: function () {
+          var times = patternTimes();
+          if (!times.length) return toast('Fix the session hours first.', 'err');
+          if (!f.slots.days.length) return toast('Add a day first.', 'err');
+          f.slots.days.forEach(function (d) { d.times = times.slice(); });
+          paintDays(); toast('Every day now uses these hours. Save to keep it.', 'ok');
+        } }, 'Use these hours for every day'));
+
+      /* Step 2: days */
+      var daysBox = h('div', { class: 'tt-days' });
       var paintDays = function () {
         ui.clear(daysBox);
-        if (!f.slots.days.length) daysBox.appendChild(h('div', { class: 'empty' }, 'No days yet. Add a day, then fill its times.'));
+        if (!f.slots.days.length) daysBox.appendChild(h('div', { class: 'empty' }, 'No days yet. Add the first day: it gets the session hours above.'));
         f.slots.days.forEach(function (d, i) { daysBox.appendChild(dayCard(d, i)); });
       };
+      var newDay = function (date, times) {
+        return { label: autoLabel(date), date: date || '', times: times, _auto: true };
+      };
       var dayCard = function (d, i) {
-        var area = h('textarea', { class: 'textarea', rows: '6', name: 'times-' + i, 'aria-label': 'Times for ' + (d.label || 'day ' + (i + 1)), dir: 'ltr', oninput: function (e) { d._timesText = e.target.value; } });
-        area.value = d._timesText || '';
-        var gen = function (key, label, type) {
-          return A.field(label, h('input', { class: 'input', type: type, value: d._gen[key], oninput: function (e) { d._gen[key] = e.target.value; } }));
-        };
-        return h('div', { class: 'day-card', dataset: { day: String(i) } },
-          h('div', { class: 'row' },
-            A.field('Day name', A.text(d.label, function (v) { d.label = v; }, { name: 'dayLabel-' + i, placeholder: 'Week 11 - Sunday' })),
-            A.field('Date (optional)', h('input', { class: 'input', type: 'date', name: 'dayDate-' + i, value: d.date || '', onchange: function (e) { d.date = e.target.value; } }), 'Lets instructors see "today".')),
-          h('div', { class: 'gen' }, gen('start', 'First slot starts', 'time'), gen('end', 'Last slot ends by', 'time'), gen('length', 'Minutes per slot', 'number'), gen('gap', 'Minutes between', 'number'),
-            h('button', { type: 'button', class: 'btn btn-quiet sm', name: 'fill-' + i, onclick: function () {
-              var times = Rules.generateSlots({ start: d._gen.start, end: d._gen.end, length: d._gen.length, gap: d._gen.gap });
-              if (!times.length) return toast('Those times do not make any slots. Check the start, end, and length.', 'err');
-              d._timesText = times.join('\n');
-              area.value = d._timesText;
-            } }, 'Fill the times')),
-          A.field('Time slots (one per line)', area),
-          h('div', { class: 'actions' },
-            h('button', { type: 'button', class: 'btn btn-quiet sm', onclick: function () { f.slots.days.forEach(function (o) { o._timesText = d._timesText; }); paintDays(); toast('Copied to every day', 'ok'); } }, 'Use these times for every day'),
-            h('button', { type: 'button', class: 'btn btn-quiet sm', onclick: function () { f.slots.days.splice(i, 1); paintDays(); } }, icon('trash', 18), 'Remove day')));
+        var dt = d.date ? new Date(d.date + 'T12:00:00') : null;
+        var badge = h('div', { class: 'day-badge' + (dt ? '' : ' none') },
+          dt ? [h('span', { class: 'dow' }, dt.toLocaleDateString('en-GB', { weekday: 'short' })), h('span', { class: 'dom' }, String(dt.getDate())), h('span', { class: 'mon' }, dt.toLocaleDateString('en-GB', { month: 'short' }))] : h('span', { class: 'dow' }, 'No date'));
+        var label = A.text(d.label, function (v) { d.label = v; d._auto = false; }, { name: 'dayLabel-' + i, placeholder: 'Week 11 - Sunday', 'aria-label': 'Day name' });
+        var chips = h('ul', { class: 'time-chips', 'aria-label': 'Time slots for ' + (d.label || 'this day') },
+          d.times.map(function (tm, k) {
+            return h('li', { class: 'time-chip' }, tm, h('button', { type: 'button', name: 'drop-' + i + '-' + k, 'aria-label': 'Remove ' + tm, onclick: function () { d.times.splice(k, 1); paintDays(); } }, icon('x', 14)));
+          }));
+        var from = h('input', { class: 'input', type: 'time', name: 'add-from-' + i, 'aria-label': 'Starts' });
+        var to = h('input', { class: 'input', type: 'time', name: 'add-to-' + i, 'aria-label': 'Ends' });
+        var adder = h('div', { class: 'time-add', hidden: true }, from, h('span', null, 'to'), to,
+          h('button', { type: 'button', class: 'btn btn-quiet sm', name: 'add-time-' + i, onclick: function () {
+            var mins = function (v) { var m = String(v).match(/^(\d{1,2}):(\d{2})/); return m ? parseInt(m[1], 10) * 60 + parseInt(m[2], 10) : NaN; };
+            var a = mins(from.value), b = mins(to.value);
+            if (isNaN(a) || isNaN(b) || b <= a) return toast('Pick a start and a later end time.', 'err');
+            var tm = Rules.generateSlots({ start: from.value, end: to.value, length: b - a, gap: 0 })[0];
+            if (d.times.indexOf(tm) !== -1) return toast('That time is already there.', 'err');
+            d.times.push(tm);
+            d.times.sort(function (x, y) { return slotStart(x) - slotStart(y); });
+            paintDays();
+          } }, 'Add'));
+        return h('article', { class: 'day-card', dataset: { day: String(i) } },
+          badge,
+          h('div', { class: 'day-body' },
+            h('div', { class: 'day-fields' },
+              A.field('Date', h('input', { class: 'input', type: 'date', name: 'dayDate-' + i, value: d.date || '', onchange: function (e) {
+                d.date = e.target.value;
+                if (d._auto) d.label = autoLabel(d.date);
+                paintDays();
+              } }), 'Lets instructors open "today".'),
+              A.field('Name students see', label)),
+            h('div', { class: 'day-slots-head' }, h('span', { class: 'label' }, d.times.length + ' slot' + (d.times.length === 1 ? '' : 's')),
+              h('button', { type: 'button', class: 'link-btn', name: 'show-add-' + i, onclick: function (e) { adder.hidden = false; e.currentTarget.hidden = true; from.focus(); } }, '+ Add a time'),
+              h('button', { type: 'button', class: 'link-btn', name: 'reset-' + i, onclick: function () { var t = patternTimes(); if (!t.length) return toast('Fix the session hours first.', 'err'); d.times = t; paintDays(); } }, 'Reset to session hours')),
+            d.times.length ? chips : h('p', { class: 'error' }, 'This day has no slots. Add a time or reset it.'),
+            adder,
+            h('div', { class: 'actions day-actions' },
+              h('button', { type: 'button', class: 'btn btn-quiet sm', name: 'next-week-' + i, onclick: function () {
+                var copy = newDay(d.date ? addDays(d.date, 7) : '', d.times.slice());
+                if (!d.date) copy.label = d.label ? d.label + ' (copy)' : '';
+                f.slots.days.splice(i + 1, 0, copy); paintDays();
+              } }, icon('copy', 16), d.date ? 'Copy to next week' : 'Duplicate'),
+              h('button', { type: 'button', class: 'btn btn-quiet sm danger', name: 'remove-day-' + i, onclick: function () { f.slots.days.splice(i, 1); paintDays(); } }, icon('trash', 16), 'Remove day'))));
+      };
+      var slotStart = function (tm) {
+        // "1:15 - 1:35" is after "12:55": hours below 8 are read as afternoon.
+        var m = String(tm).match(/^(\d{1,2}):(\d{2})/); if (!m) return 0;
+        var hh = parseInt(m[1], 10); if (hh < 8) hh += 12;
+        return hh * 60 + parseInt(m[2], 10);
       };
       paintDays();
-      slotsPanel = panel('Days and time slots', 'Each slot can be booked by one team (or more if you raise the capacity). Students see taken slots crossed out.',
-        h('div', { class: 'row' }, A.field('Teams per slot', A.number(f.slots.capacity || 1, function (v) { f.slots.capacity = parseInt(v, 10) || 1; }, { name: 'capacity', min: '1' }))),
+      paintPattern();
+      var daysCard = h('div', { class: 'tt-step' },
+        h('div', { class: 'tt-step-head' }, h('span', { class: 'tt-num' }, '2'), h('div', null, h('h3', null, 'Days'), h('p', { class: 'help' }, 'Pick a date and the day is named for you. Remove a slot with its ×, or copy a whole day to the next week.'))),
         daysBox,
         h('button', { type: 'button', class: 'btn btn-quiet', name: 'addDay', onclick: function () {
-          f.slots.days.push({ label: '', date: '', times: [], _timesText: '', _gen: { start: '12:30', end: '15:30', length: '20', gap: '5' } });
+          var times = patternTimes();
+          if (!times.length) return toast('Fix the session hours first.', 'err');
+          var last = f.slots.days[f.slots.days.length - 1];
+          f.slots.days.push(newDay(last && last.date ? addDays(last.date, 1) : '', times));
           paintDays();
+          var cards = daysBox.querySelectorAll('.day-card');
+          var input = cards.length && cards[cards.length - 1].querySelector('input[type="date"]');
+          if (input && input.focus) input.focus();
         } }, icon('plus', 20), 'Add a day'));
+      slotsPanel = panel('Timetable', 'Each slot can be booked by the number of teams you set. Students see taken slots crossed out.', hoursCard, daysCard);
     }
 
     /* Review ----------------------------------------------------- */
@@ -292,9 +391,14 @@
           patch.rules = Object.assign({}, f.rules, { teamSize: { min: min, max: max, notice: nt && nt.sizes.length ? nt : null } });
         }
         if (f.slots) {
+          var unnamed = f.slots.days.filter(function (d) { return !String(d.label || '').trim(); }).length;
+          if (unnamed) return toast('Give every day a date or a name.', 'err');
+          var empty = f.slots.days.filter(function (d) { return !d.times.length; })[0];
+          if (empty) return toast('"' + empty.label + '" has no time slots.', 'err');
           patch.slots = {
             capacity: f.slots.capacity || 1,
-            days: f.slots.days.map(function (d) { return { id: d.id, label: d.label, date: d.date, times: String(d._timesText || '').split(/\r?\n/) }; })
+            pattern: f.slots.pattern,
+            days: f.slots.days.map(function (d) { return { id: d.id, label: d.label, date: d.date, times: d.times.slice() }; })
           };
         }
         var out = await A.call('admin.forms.update', { id: f.id, patch: patch });
