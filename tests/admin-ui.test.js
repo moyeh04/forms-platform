@@ -199,8 +199,8 @@ test('Reservation: add a day, generate its times, save, then bookings appear gro
   const p = await openAdmin(w, `#/f/${f.slug}/settings`);
   p.click('[name="addDay"]');
   p.type('[name="dayLabel-0"]', 'Week 11 - Sunday');
-  p.click('[name="fill-0"]');
-  assert.ok(p.$('[name="times-0"]').value.startsWith('12:30 - 12:50\n12:55 - 1:15'));
+  const chips = p.$$('.day-card[data-day="0"] .time-chip').map((c) => c.textContent);
+  assert.deepEqual(chips.slice(0, 2), ['12:30 - 12:50', '12:55 - 1:15'], 'a new day starts with the session hours');
   p.click('[name="save"]'); await settle(12);
   const days = w.admin({ action: 'admin.forms.get', id: f.id }).form.slots.days;
   assert.equal(days[0].id, 'week-11-sunday');
@@ -358,4 +358,29 @@ test('Who can register: picking one specialization saves it, All clears it', asy
   const q = await openAdmin(w, `#/f/${f.slug}/settings`);
   q.click('[name="major-all"]'); q.click('[name="save"]'); await settle(12);
   assert.deepEqual(w.admin({ action: 'admin.forms.get', id: f.id }).form.rules.majors, []);
+});
+
+test('Timetable: session hours, dates that name the day, removing and adding times, copy to next week', async () => {
+  const w = boot();
+  const f = w.make('reservation', 'Seminar');
+  const p = await openAdmin(w, `#/f/${f.slug}/settings`);
+  p.type('[name="pattern-start"]', '10:00'); p.type('[name="pattern-end"]', '11:00');
+  p.type('[name="pattern-length"]', '15'); p.type('[name="pattern-gap"]', '0');
+  assert.ok(p.text().includes('4 slots a day'), 'live preview counts the slots');
+  p.click('[name="addDay"]');
+  const date = p.$('[name="dayDate-0"]'); date.value = '2028-03-12'; p.fire(date, 'change');
+  assert.equal(p.$('[name="dayLabel-0"]').value, 'Sunday 12 Mar', 'the date names the day');
+  p.click('[name="drop-0-3"]');
+  p.click('[name="show-add-0"]');
+  p.type('[name="add-from-0"]', '11:30'); p.type('[name="add-to-0"]', '11:45'); p.click('[name="add-time-0"]');
+  p.click('[name="next-week-0"]');
+  assert.equal(p.$('[name="dayLabel-1"]').value, 'Sunday 19 Mar');
+  p.click('[name="capacity-up"]');
+  p.click('[name="save"]'); await settle(12);
+  const slots = w.admin({ action: 'admin.forms.get', id: f.id }).form.slots;
+  assert.equal(slots.capacity, 2);
+  assert.deepEqual(slots.pattern, { start: '10:00', end: '11:00', length: 15, gap: 0 });
+  assert.deepEqual(slots.days.map((d) => [d.date, d.label]), [['2028-03-12', 'Sunday 12 Mar'], ['2028-03-19', 'Sunday 19 Mar']]);
+  assert.deepEqual(slots.days[0].times, ['10:00 - 10:15', '10:15 - 10:30', '10:30 - 10:45', '11:30 - 11:45']);
+  assert.deepEqual(slots.days[1].times, slots.days[0].times, 'the copy keeps the edited times');
 });
