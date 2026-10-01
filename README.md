@@ -6,10 +6,59 @@ and its own Google Sheet. No server to rent: the website is static
 (GitHub Pages) and the backend is a Google Apps Script that stores
 everything in Google Sheets.
 
-```
-Student ──> index.html?f=<form>  ──┐
-Admin   ──> admin.html (PIN)     ──┼──> Apps Script web app ──> Google Sheets + Drive
-Teacher ──> viewer.html?t=<link> ──┘     (one backend/ folder)    (one Sheet per form)
+```mermaid
+%%{init: {
+  'theme': 'base',
+  'themeVariables': {
+    'fontFamily': 'ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif',
+    'fontSize': '15px',
+    'primaryColor': '#DCE9E2', 'primaryBorderColor': '#3F6B66', 'primaryTextColor': '#2F2418',
+    'secondaryColor': '#F0E4C8', 'secondaryBorderColor': '#C9A24A', 'secondaryTextColor': '#2F2418',
+    'tertiaryColor': '#F6EFDC', 'tertiaryBorderColor': '#CDBB94', 'tertiaryTextColor': '#2F2418',
+    'lineColor': '#3F6B66', 'textColor': '#2F2418', 'mainBkg': '#DCE9E2', 'nodeBorder': '#3F6B66',
+    'clusterBkg': '#F6EFDC', 'clusterBorder': '#CDBB94', 'titleColor': '#2F2418',
+    'edgeLabelBackground': '#F8F1DD',
+    'actorBkg': '#DCE9E2', 'actorBorder': '#3F6B66', 'actorTextColor': '#2F2418', 'actorLineColor': '#8FB3AB',
+    'signalColor': '#477A73', 'signalTextColor': '#477A73',
+    'labelBoxBkgColor': '#F0E4C8', 'labelBoxBorderColor': '#C9A24A', 'labelTextColor': '#2F2418', 'loopTextColor': '#6A5A44',
+    'noteBkgColor': '#FBEFC9', 'noteBorderColor': '#C9A24A', 'noteTextColor': '#2F2418',
+    'activationBkgColor': '#DCE9E2', 'activationBorderColor': '#3F6B66', 'sequenceNumberColor': '#F8F1DD',
+    'transitionColor': '#3F6B66', 'stateLabelColor': '#2F2418', 'stateBkg': '#DCE9E2', 'altBackground': '#F6EFDC',
+    'attributeBackgroundColorOdd': '#F8F1DD', 'attributeBackgroundColorEven': '#F0E4C8'
+  },
+  'flowchart': {'curve': 'basis', 'padding': 14, 'nodeSpacing': 40, 'rankSpacing': 46},
+  'sequence': {'mirrorActors': false, 'messageMargin': 34, 'boxMargin': 8}
+}}%%
+flowchart LR
+    student(["Student"]) --> idx["index.html<br/>?f=form"]
+    admin(["Admin"]) --> adm["admin.html<br/>PIN"]
+    teacher(["Instructor"]) --> vwr["viewer.html<br/>?t=private-link"]
+
+    subgraph pages["GitHub Pages: static files, free"]
+        idx
+        adm
+        vwr
+    end
+
+    subgraph google["Google account: runs as the owner"]
+        gas["Apps Script web app<br/>one backend folder"]
+        sheets[("Google Sheets<br/>one sheet per form")]
+        drive[("Drive<br/>PDFs and form files")]
+    end
+
+    idx -- "POST JSON" --> gas
+    adm -- "POST JSON + PIN" --> gas
+    vwr -- "POST JSON + token" --> gas
+    gas --> sheets
+    gas --> drive
+    classDef cDb fill:#F3E2B3,stroke:#B8892D,stroke-width:1.5px,color:#2F2418
+    classDef cActor fill:#F4D9D3,stroke:#9A3328,stroke-width:1.5px,color:#2F2418
+    classDef cDec fill:#FBEFC9,stroke:#C9A24A,stroke-width:1.5px,color:#2F2418
+    classDef cEnd fill:#2F2418,stroke:#2F2418,color:#F8F1DD
+    classDef cErr fill:#F6D5CF,stroke:#A12B1F,stroke-width:1.5px,color:#5A140C
+    classDef cOk fill:#BFD9CF,stroke:#2E5A55,stroke-width:1.5px,color:#17302D
+    class sheets,drive cDb
+    class student,admin,teacher cActor
 ```
 
 **To put it online, follow [docs/DEPLOY.md](docs/DEPLOY.md).** The only code you
@@ -120,3 +169,9 @@ python3 -m unittest discover -s tests -p "test_*.py"   # 20 tests for the Excel 
 
 Commit style is described in [docs/COMMIT_CONVENTION.md](docs/COMMIT_CONVENTION.md).
 Generated files (`dist/`, `node_modules/`) are not committed.
+
+## Documentation
+
+Start with [docs/README.md](docs/README.md). It links the architecture, the
+23 workarounds that make free hosting enough, what builds `dist/`, what GitHub
+and Google each do, the data model, security, and testing.
