@@ -121,6 +121,9 @@ body.admin { font-size: 1rem; }
 .time-add .input { width: auto; min-height: 38px; }
 .day-actions { margin-top: 12px; justify-content: flex-end; }
 .btn.danger { color: var(--err); }
+.card-delete { margin-inline-start: auto; }
+.danger-zone { border-color: var(--err); }
+.danger-zone h2 { color: var(--err); }
 @media (max-width: 640px) {
   .day-card { grid-template-columns: 1fr; }
   .day-badge { flex-direction: row; gap: 8px; padding: 6px 12px; align-self: stretch; }

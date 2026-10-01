@@ -239,6 +239,28 @@ function duplicateForm(id, o) {
   return saveForm(copy);
 }
 
+/**
+ * Deletes a form: its registry row goes, its spreadsheet moves to the Drive
+ * trash (restorable for 30 days), and private links stop listing it.
+ */
+function deleteForm(id) {
+  var form = requireForm(id);
+  formsSheet().deleteRow(form._row);
+  var trashed = false;
+  if (form.sheetId) {
+    try { DriveApp.getFileById(form.sheetId).setTrashed(true); trashed = true; } catch (e) { Logger.log('Sheet not trashed: ' + e.message); }
+  }
+  try { PropertiesService.getScriptProperties().deleteProperty('dirty:' + form.id); } catch (e) { /* nothing to clean */ }
+  if (typeof readClients_ === 'function') {
+    readClients_().forEach(function (c) {
+      if (c.forms.indexOf(form.slug) === -1) return;
+      c.forms = c.forms.filter(function (s) { return s !== form.slug; });
+      saveClient_(c);
+    });
+  }
+  return { deleted: true, sheetTrashed: trashed, title: form.title };
+}
+
 /** The specializations a form is limited to; empty means everyone. */
 function allowedMajors_(form) {
   var m = form && form.rules && form.rules.majors;
