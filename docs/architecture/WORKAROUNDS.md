@@ -681,7 +681,9 @@ their values into every form would make updates a chore and a risk.
 **What the platform does.** A form stores only the **name** of a list. The real
 options are resolved when the form is read (`resolveOptions_` in
 `Registry.gs`), both for students and for server-side validation. Edit the list
-once in the dashboard and every form updates immediately.
+once in the dashboard and every form updates immediately. The Lists page shows,
+for each list, which forms read it, and can be filtered to the lists one kind of
+form uses, so WhatsApp-only lists stay out of the way when editing team forms.
 
 A form can also narrow a list for itself: `rules.majors` keeps only the chosen
 specializations when the options are resolved, so a Computers-only form offers

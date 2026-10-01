@@ -265,13 +265,41 @@ test('Lists: editing a list updates the choices every form offers', async () => 
   const w = boot();
   const f = w.make('team_registration', 'Projects');
   const p = await openAdmin(w, '#/lists');
-  p.type('[name="list-groups"]', 'A\nB\nC');
-  p.click('[name="save-groups"]'); await settle(8);
-  assert.equal(w.admin({ action: 'admin.lists.get' }).lists.groups.length, 3);
-  p.type('[name="list-majors"]', 'حاسبات | Computers\nاتصالات | Communications\nكهرباء | Power');
-  p.click('[name="save-majors"]'); await settle(8);
+  // Groups is a plain list, shown as chips; add one with Enter and save.
+  p.click('[name="pick-groups"]');
+  assert.ok(p.$('.value-chips'), 'plain lists open in the compact view');
+  p.type('[name="new-value"]', 'C');
+  p.$('[name="new-value"]').dispatchEvent(new p.win.KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+  assert.ok(p.text().includes('Unsaved changes'));
+  p.click('[name="save-list"]'); await settle(8);
+  assert.deepEqual(w.admin({ action: 'admin.lists.get' }).lists.groups.map((o) => o.value), ['A', 'B', 'C']);
+  // Majors carry English names, so they open as a table; add a named one and reorder.
+  p.click('[name="pick-majors"]');
+  assert.ok(p.$('[name="en-0"]'), 'named lists open in the table view');
+  p.type('[name="new-value"]', 'كهرباء'); p.type('[name="new-en"]', 'Power');
+  p.click('[name="add-choice"]');
+  p.click('.choice[data-i="2"] [aria-label="Move up"]');
+  p.click('[name="save-list"]'); await settle(8);
   const major = w.api({ action: 'getForm', slug: f.slug }).form.fields.find((x) => x.id === 'major');
-  assert.deepEqual(major.options.map((o) => o.label.en), ['Computers', 'Communications', 'Power']);
+  assert.deepEqual(major.options.map((o) => o.label.en), ['Computers', 'Power', 'Communications']);
+});
+
+test('Lists: the type filter hides lists a kind of form does not use, and each list shows its forms', async () => {
+  const w = boot();
+  w.make('team_registration', 'Projects');
+  const p = await openAdmin(w, '#/lists');
+  p.click('[name="type-whatsapp_registration"]');
+  assert.equal(p.$('[name="pick-sections"]'), null, 'team sections are hidden for WhatsApp forms');
+  assert.ok(p.$('[name="pick-wa_sections"]'));
+  p.click('[name="type-team_registration"]');
+  assert.equal(p.$('[name="pick-wa_sections"]'), null);
+  p.click('[name="pick-levels"]');
+  assert.ok(p.$('.used-by').textContent.includes('Projects'), 'used-by names the form');
+  assert.equal(p.$('[name="pick-sections"]') && p.$('[name="range-to"]'), null, 'no number filler for non-numeric lists');
+  p.click('[name="type-whatsapp_registration"]');
+  p.click('[name="pick-wa_sections"]');
+  p.type('[name="range-to"]', '3'); p.click('[name="fill-range"]');
+  assert.equal(p.$$('.value-chip').length, 3, 'number fill replaces the list');
 });
 
 test('Questions: an admin adds a description and students read it under the question', async () => {
