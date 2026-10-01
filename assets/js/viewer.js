@@ -151,7 +151,7 @@
         h('div', { class: 'day-head' }, h('span', null, g.label + (g.date ? ' (' + g.date + ')' : '')), h('span', null, g.rows.length + ' booked')),
         h('div', { class: 'scroll-x' }, h('table', { class: 'mini' },
           h('thead', null, h('tr', null, cols.map(function (c) { return h('th', null, c.label); }))),
-          h('tbody', null, g.rows.map(function (r) { return h('tr', null, cols.map(function (c) { return cell(c.id, r); })); })))));
+          h('tbody', null, g.rows.map(function (r) { return h('tr', null, cols.map(function (c) { var td = cell(c.id, r); td.dataset.label = c.label; return td; })); })))));
     }));
   }
 
