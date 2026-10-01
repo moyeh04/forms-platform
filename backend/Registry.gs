@@ -158,6 +158,20 @@ function createForm(o) {
   return saveForm(form);
 }
 
+/** Merges new rule settings over the old ones and checks the team size range. */
+function normalizeRules_(current, next) {
+  var merged = Object.assign({}, current || {}, next || {});
+  if (merged.teamSize !== undefined) {
+    var min = parseInt(merged.teamSize && merged.teamSize.min, 10);
+    var max = parseInt(merged.teamSize && merged.teamSize.max, 10);
+    if (!(min >= 1) || !(max >= min) || max > 20) {
+      fail('bad_team_size', 'Team size must be between 1 and 20, and the maximum cannot be lower than the minimum.');
+    }
+    merged.teamSize = { min: min, max: max };
+  }
+  return merged;
+}
+
 var PATCHABLE_ = ['title', 'term', 'slug', 'status', 'opensAt', 'closesAt', 'lang', 'icon', 'steps', 'fields', 'slots', 'rules', 'review', 'matching', 'editKey', 'notifications', 'messages'];
 
 function updateForm(id, patch) {
@@ -165,6 +179,10 @@ function updateForm(id, patch) {
   PATCHABLE_.forEach(function (k) {
     if (patch[k] === undefined) return;
     if (k === 'status' && FORM_STATUSES.indexOf(patch[k]) === -1) fail('bad_status', 'Status must be draft, open, closed, or archived.');
+    if (k === 'rules') {
+      form.rules = normalizeRules_(form.rules, patch.rules);
+      return;
+    }
     if (k === 'slots') {
       form.slots = normalizeSlots_(patch.slots);
       return;
@@ -215,6 +233,7 @@ function publicForm(form) {
   PUBLIC_KEYS_.forEach(function (k) { if (full[k] !== undefined) out[k] = full[k]; });
   out.editKey = { enabled: !!full.editKey.enabled, days: full.editKey.days, allowEdit: !!full.editKey.allowEdit, allowDelete: !!full.editKey.allowDelete };
   out.rules = { maxSubmissions: full.rules ? full.rules.maxSubmissions : null };
+  if (full.rules && full.rules.teamSize) out.rules.teamSize = full.rules.teamSize;
   return out;
 }
 

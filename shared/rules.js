@@ -242,6 +242,26 @@
     return 'open';
   }
 
+  /* ── Team size ────────────────────────────────────────────────── */
+
+  /** Allowed total team size (leader included) from the form rules. */
+  function teamSizeRange(form) {
+    var ts = (form && form.rules && form.rules.teamSize) || {};
+    var min = parseInt(ts.min, 10);
+    var max = parseInt(ts.max, 10);
+    if (!(min >= 1)) min = 1;
+    if (!(max >= min)) max = Math.max(min, 6);
+    return { min: min, max: max };
+  }
+
+  function validateTeamSize(raw, form) {
+    var r = teamSizeRange(form);
+    var s = latinDigits(raw).trim();
+    var n = /^\d+$/.test(s) ? parseInt(s, 10) : NaN;
+    if (isNaN(n) || n < r.min || n > r.max) return { ok: false, error: 'invalid_team_size', params: { min: r.min, max: r.max } };
+    return { ok: true, value: String(n) };
+  }
+
   /* ── Field and submission validation ──────────────────────────── */
 
   function optionValues(field) {
@@ -261,6 +281,7 @@
     switch (t) {
       case 'arabic_name': r = validateArabicName(raw, { minParts: field.minParts }); break;
       case 'english_text': r = validateEnglishText(raw, { min: field.min, max: field.max }); break;
+      case 'team_size': r = validateTeamSize(raw, ctx.form); break;
       case 'phone': r = validatePhone(raw); break;
       case 'code': r = validateCode(raw, { length: field.length }); break;
       case 'email': r = validateEmail(raw); break;
@@ -298,10 +319,16 @@
 
   function validateMembers(field, raw, ctx) {
     var list = Array.isArray(raw) ? raw : [];
-    var min = field.min || 0;
-    var max = field.max == null ? 5 : field.max;
-    if (list.length < min) return { ok: false, error: 'too_few_members', params: { min: min } };
-    if (list.length > max) return { ok: false, error: 'too_many_members', params: { max: max } };
+    if (ctx.memberCount != null) {
+      // The team size the person chose decides exactly how many members are needed.
+      if (list.length !== ctx.memberCount) return { ok: false, error: 'members_count', params: { count: ctx.memberCount } };
+    } else {
+      var range = teamSizeRange(ctx.form);
+      var min = field.min == null ? range.min - 1 : field.min;
+      var max = field.max == null ? range.max - 1 : field.max;
+      if (list.length < min) return { ok: false, error: 'too_few_members', params: { min: min } };
+      if (list.length > max) return { ok: false, error: 'too_many_members', params: { max: max } };
+    }
     var errors = {};
     var clean = list.map(function (m, i) {
       var row = {};
@@ -324,10 +351,21 @@
   function validateSubmission(form, data, ctx) {
     ctx = ctx || {};
     ctx.form = form;
+    ctx.memberCount = null;
     var out = {};
     var errors = {};
+
+    // The chosen team size fixes how many member forms must be filled in.
+    var sizeField = fieldByRole(form, 'team_size');
+    var hasSize = !!(sizeField && sizeField.enabled !== false);
+    if (hasSize) {
+      var sz = validateField(sizeField, data ? data[sizeField.id] : undefined, ctx);
+      if (sz.ok) ctx.memberCount = parseInt(sz.value, 10) - 1;
+    }
+
     (form.fields || []).forEach(function (f) {
       if (f.enabled === false) return;
+      if (f.type === 'members' && hasSize && ctx.memberCount == null) return;
       var r = validateField(f, data ? data[f.id] : undefined, ctx);
       if (!r.ok) errors[f.id] = { error: r.error, params: r.params, nested: r.nested };
       else out[f.id] = r.value;
@@ -376,6 +414,7 @@
     formState: formState,
     validateField: validateField,
     validateSubmission: validateSubmission,
+    teamSizeRange: teamSizeRange,
     latinDigits: latinDigits,
     isEmpty: isEmpty
   };

@@ -2,7 +2,8 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const { createWorld } = require('./harness/appsscript-mock.js');
 
-const person = (o) => ({
+const sized = (d) => ({ team_size: String((d.members || []).length + 1), ...d });
+const person = (o) => sized({
   email: 'a@b.com', leader_name: 'أحمد محمد محمود أحمد', leader_code: '4230001', phone: '01012345678', major: 'حاسبات',
   level: 'صفر / الأولى', section: '4C-TH1', curriculum: '2020', ...o
 });
