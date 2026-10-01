@@ -399,17 +399,19 @@
       render();
       scrollToMembers();
     };
+    var note = cur ? Rules.teamSizeNotice(S.form, cur, App.i18n.lang) : '';
+    var noteEl = note ? h('p', { class: 'size-notice', role: 'status' }, icon('info', 18), h('span', null, note)) : null;
     if (sizes.length > 8) {
-      return h('select', { id: id, class: 'select', name: path, 'aria-describedby': id + '-help ' + id + '-err', onchange: function (e) { if (e.target.value) pick(parseInt(e.target.value, 10)); } },
+      return [h('select', { id: id, class: 'select', name: path, 'aria-describedby': id + '-help ' + id + '-err', onchange: function (e) { if (e.target.value) pick(parseInt(e.target.value, 10)); } },
         h('option', { value: '' }, t('choose')),
-        sizes.map(function (n) { return h('option', { value: String(n), selected: String(cur) === String(n) }, String(n)); }));
+        sizes.map(function (n) { return h('option', { value: String(n), selected: String(cur) === String(n) }, String(n)); })), noteEl];
     }
-    return h('div', { class: 'chips size-chips', role: 'radiogroup', id: id, 'aria-describedby': id + '-help ' + id + '-err' },
+    return [h('div', { class: 'chips size-chips', role: 'radiogroup', id: id, 'aria-describedby': id + '-help ' + id + '-err' },
       sizes.map(function (n) {
         return h('label', { class: 'chip' },
           h('input', { type: 'radio', name: path, value: String(n), checked: String(cur) === String(n), onchange: function () { pick(n); } }),
           h('span', null, String(n)));
-      }));
+      })), noteEl];
   }
 
   /* ── Team members ───────────────────────────────────────────── */
@@ -525,6 +527,10 @@
       }));
     }
     if (field.type === 'code') return h('span', { class: 'code' }, value);
+    if (field.type === 'team_size') {
+      var note = Rules.teamSizeNotice(S.form, value, App.i18n.lang);
+      return note ? h('span', null, String(value), h('span', { class: 'size-notice-inline' }, note)) : String(value);
+    }
     return String(value);
   }
 

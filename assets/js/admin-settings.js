@@ -75,14 +75,48 @@
         ui.clear(preview);
         if (!(min >= 1) || !(max >= min) || max > 20) return preview.appendChild(h('span', { class: 'muted-note' }, 'Enter a minimum of at least 1 and a maximum that is not lower, up to 20.'));
         preview.appendChild(h('span', { class: 'muted-note' }, 'Students will choose from: '));
-        for (var n = min; n <= max; n++) preview.appendChild(h('span', null, String(n)));
+        for (var n = min; n <= max; n++) preview.appendChild(h('span', { class: 'num-chip' }, String(n)));
       };
+      // A note shown to students who pick certain sizes, e.g. "others will be added to reach 5".
+      var notice = f.rules.teamSize.notice = f.rules.teamSize.notice || { sizes: [], text: { en: '', ar: '' } };
+      notice.text = notice.text || { en: '', ar: '' };
+      var noticeChips = h('div', { class: 'toggle-chips', role: 'group', 'aria-label': 'Show the note for these team sizes' });
+      var noticePreview = h('div', { class: 'notice-preview', 'aria-live': 'polite' });
+      var paintNotice = function () {
+        var min = parseInt(f.rules.teamSize.min, 10), max = parseInt(f.rules.teamSize.max, 10);
+        ui.clear(noticeChips);
+        ui.clear(noticePreview);
+        if (!(min >= 1) || !(max >= min) || max > 20) return;
+        notice.sizes = notice.sizes.filter(function (n) { return n >= min && n <= max; });
+        for (var n = min; n <= max; n++) (function (n) {
+          var on = notice.sizes.indexOf(n) !== -1;
+          noticeChips.appendChild(h('button', { type: 'button', class: 'toggle-chip', name: 'notice-size-' + n, 'aria-pressed': on ? 'true' : 'false', onclick: function () {
+            notice.sizes = on ? notice.sizes.filter(function (x) { return x !== n; }) : notice.sizes.concat([n]).sort(function (a, b) { return a - b; });
+            paintNotice();
+          } }, String(n)));
+        })(n);
+        var sample = notice.sizes[0];
+        var text = sample ? Rules.teamSizeNotice({ rules: { teamSize: { min: min, max: max, notice: notice } } }, sample, 'en') : '';
+        if (!notice.sizes.length) noticePreview.appendChild(h('span', { class: 'muted-note' }, 'Pick one or more sizes above to show the note.'));
+        else if (!text) noticePreview.appendChild(h('span', { class: 'muted-note' }, 'Write the note below.'));
+        else noticePreview.appendChild(h('div', null, h('span', { class: 'muted-note' }, 'A student who picks ' + sample + ' sees:'), h('p', { class: 'size-notice' }, icon('info', 18), h('span', null, text))));
+      };
+      var paintBoth = function () { paintPreview(); paintNotice(); };
       sizePanel = panel('Team size', 'Students must say how many people are in the team, then fill in exactly that many member forms. The number counts the leader, so a team of 1 works alone.',
         h('div', { class: 'row' },
-          A.field('Minimum team size', A.number(f.rules.teamSize.min, function (v) { f.rules.teamSize.min = v; paintPreview(); }, { name: 'teamMin', min: '1', max: '20' })),
-          A.field('Maximum team size', A.number(f.rules.teamSize.max, function (v) { f.rules.teamSize.max = v; paintPreview(); }, { name: 'teamMax', min: '1', max: '20' }))),
-        preview);
-      paintPreview();
+          A.field('Minimum team size', A.number(f.rules.teamSize.min, function (v) { f.rules.teamSize.min = v; paintBoth(); }, { name: 'teamMin', min: '1', max: '20' })),
+          A.field('Maximum team size', A.number(f.rules.teamSize.max, function (v) { f.rules.teamSize.max = v; paintBoth(); }, { name: 'teamMax', min: '1', max: '20' }))),
+        preview,
+        h('div', { class: 'subpanel' },
+          h('h3', null, 'Note for some team sizes'),
+          h('p', { class: 'help' }, 'Show a short note when a student picks one of the sizes you switch on, for example to say that other students will be added to small teams. Write {n} for the size they picked and {max} for the largest size.'),
+          h('span', { class: 'label' }, 'Show the note for teams of'),
+          noticeChips,
+          h('div', { class: 'desc-pair' },
+            A.field('Note in English', h('textarea', { class: 'textarea', rows: '2', name: 'noticeEn', placeholder: 'Other students will be added to your team to reach {max}.', oninput: function (e) { notice.text.en = e.target.value; paintNotice(); } }, notice.text.en || '')),
+            A.field('Note in Arabic', h('textarea', { class: 'textarea', rows: '2', name: 'noticeAr', dir: 'rtl', lang: 'ar', placeholder: 'هيتضاف طلاب تانيين لفريقك لحد ما يبقى {max}.', oninput: function (e) { notice.text.ar = e.target.value; } }, notice.text.ar || ''))),
+          noticePreview));
+      paintBoth();
     }
 
     /* Edit key --------------------------------------------------- */
@@ -217,7 +251,9 @@
         if (hasSize) {
           var min = parseInt(f.rules.teamSize.min, 10), max = parseInt(f.rules.teamSize.max, 10);
           if (!(min >= 1) || !(max >= min) || max > 20) return toast('Team size needs a minimum of at least 1 and a maximum that is not lower, up to 20.', 'err');
-          patch.rules = Object.assign({}, f.rules, { teamSize: { min: min, max: max } });
+          var nt = f.rules.teamSize.notice;
+          if (nt && nt.sizes.length && !(nt.text.en || '').trim() && !(nt.text.ar || '').trim()) return toast('Write the team size note, or switch off its sizes.', 'err');
+          patch.rules = Object.assign({}, f.rules, { teamSize: { min: min, max: max, notice: nt && nt.sizes.length ? nt : null } });
         }
         if (f.slots) {
           patch.slots = {
