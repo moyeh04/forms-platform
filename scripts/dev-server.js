@@ -7,6 +7,7 @@
  *   npm run dev            # http://localhost:8080  (admin PIN 4321)
  *   npm run dev -- 9000    # another port
  *   npm run dev -- --empty # no sample forms
+ *   npm run dev -- --folder <id>=<name>   # name a pretend Drive folder (repeatable)
  *
  * Everything lives in memory and disappears when the server stops.
  */
@@ -51,6 +52,8 @@ function seed(world) {
 function start(port, opts) {
   const world = createWorld();
   const info = opts.empty ? (world.setNow(Date.now()), world.call('setup'), world.call('setAdminPin', PIN), {}) : seed(world);
+  // Drive is pretend here: a folder's name is its id unless one is given, so demos can pass the naming rule.
+  (opts.folders || []).forEach(([id, name]) => world.drive.setFolderName(id, name));
 
   const server = http.createServer((req, res) => {
     const url = new URL(req.url, 'http://localhost');
@@ -90,7 +93,8 @@ function start(port, opts) {
 if (require.main === module) {
   const args = process.argv.slice(2);
   const port = parseInt(args.find((a) => /^\d+$/.test(a)) || process.env.PORT || '8080', 10);
-  start(port, { empty: args.includes('--empty') }).then(({ info }) => {
+  const folders = args.map((a, i) => (a === '--folder' ? args[i + 1] : null)).filter(Boolean).map((v) => [v.slice(0, v.indexOf('=')), v.slice(v.indexOf('=') + 1)]);
+  start(port, { empty: args.includes('--empty'), folders }).then(({ info }) => {
     const base = `http://localhost:${port}`;
     console.log(`Forms Platform preview on ${base}  (in memory, nothing reaches Google)`);
     console.log(`  Admin:    ${base}/admin.html   PIN ${PIN}`);
