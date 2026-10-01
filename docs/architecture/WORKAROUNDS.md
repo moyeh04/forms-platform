@@ -722,7 +722,7 @@ before accepting the submission. A clear error tells the student exactly what
 to change.
 
 The same visit reads the folder's **name**. When a form turns on
-`rules.folderName`, `Rules.checkFolderName` requires `Name_Project_Name_Subject`:
+`rules.folderName`, `Rules.checkFolderName` requires `Team_Leader_Name_Project_Name_Subject`:
 no spaces, at least three parts joined by single underscores, ending with the
 subject code. The page shows the rule beforehand with an example built from the
 project title the student typed, and the error repeats that example.

@@ -158,7 +158,7 @@
     return { ok: true, value: p.url, meta: { id: p.id, kind: p.kind } };
   }
 
-  /* ── Drive folder names: Name_Project_Name_Subject ─────────────── */
+  /* ── Drive folder names: Team_Leader_Name_Project_Name_Subject ─── */
 
   /** Turns free text into an underscore part: "Library System" -> "Library_System". */
   function folderPart(s) {
@@ -168,12 +168,12 @@
   /** An example of a correct folder name, built from what the student typed. */
   function folderNameExample(o) {
     o = o || {};
-    return [folderPart(o.name) || 'YourName', folderPart(o.project) || 'Project_Name', folderPart(o.subject) || 'SubjectName'].join('_');
+    return [folderPart(o.name) || 'Ahmed_Mohamed', folderPart(o.project) || 'Project_Name', folderPart(o.subject) || 'SubjectName'].join('_');
   }
 
   /**
-   * Checks a Drive folder name against Name_Project_Name_Subject:
-   * no spaces, at least three parts joined by single underscores, and,
+   * Checks a Drive folder name against Team_Leader_Name_Project_Name_Subject:
+   * no spaces, at least three parts (leader name, project, subject) joined by single underscores, and,
    * when a subject is given, ending with it (case does not matter).
    */
   function checkFolderName(name, opts) {
