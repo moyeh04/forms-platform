@@ -398,3 +398,17 @@ test('Delete form: one confirmation from the card removes it; cancelling keeps i
   assert.equal(w.admin({ action: 'admin.forms.list' }).forms.length, 0);
   assert.ok(p.text().includes('No forms yet'));
 });
+
+test('Details: the admin can show a student key and the email switch is saved', async () => {
+  const w = boot();
+  const f = w.make('team_registration', 'Projects');
+  const r = submit(w, f, person({ title: 'Library System', members: [] }));
+  const p = await openAdmin(w, `#/f/${f.slug}`);
+  p.click('[name="details"]'); await settle(2);
+  p.click('[name="show-key"]'); await settle(6);
+  assert.equal(p.$('.key-inline').textContent, r.key);
+  const q = await openAdmin(w, `#/f/${f.slug}/settings`);
+  const box = q.$('[name="confirmEmail"]'); box.checked = false; q.fire(box, 'change');
+  q.click('[name="save"]'); await settle(12);
+  assert.equal(w.admin({ action: 'admin.forms.get', id: f.id }).form.notifications.confirmEmail, false);
+});

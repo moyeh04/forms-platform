@@ -167,6 +167,7 @@ trash, where it can be restored for 30 days; the registry row is removed. Named 
 | `keyHash` | `sha256(pepper + ':key:' + form id + ':' + key)`. Empty after deletion. |
 | `keyExpires` | ISO expiry of the key |
 | `deleted` | `1` for a cancelled registration; the row stays |
+| `keySeal` | The key sealed for the admin: `S` plus five digits, each shifted by a pad from `sha256(pepper + ':seal:' + form id + ':' + row id)`. Empty after deletion, and on rows saved before this column existed (the header is added on the next save). |
 
 The readable columns are derived from `data` every time a row is saved
 (`applyDerived_`). If they ever disagree, `data` wins.
