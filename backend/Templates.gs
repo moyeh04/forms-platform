@@ -109,6 +109,7 @@ function templateFor(type) {
     cfg = commonConfig_('team', 'leader_code');
     cfg.rules.uniqueAcrossForm = true;
     cfg.rules.teamSize = { min: 1, max: 6 };
+    cfg.rules.folderName = { enabled: true, subject: '' };
     cfg.fields = personFields_().concat(studyFields_(), [
       teamSizeField_(),
       membersField_(),

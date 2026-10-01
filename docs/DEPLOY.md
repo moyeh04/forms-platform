@@ -153,6 +153,7 @@ Do these once with a test form:
 
 - [ ] Register a team with a real Drive link shared to "Anyone with the link": accepted.
 - [ ] Register another with a link set to private: refused with a clear message.
+- [ ] Register with a folder named with spaces (for example `My Project`): refused, and the message shows the expected name such as `YourName_My_Project_CMPn323`.
 - [ ] Check that the confirmation email arrived with the key.
 - [ ] Open the form's Google Sheet: teams show as tinted blocks with heavy borders.
 - [ ] In the dashboard click **Print team list**: a print tab and a PDF appear.
