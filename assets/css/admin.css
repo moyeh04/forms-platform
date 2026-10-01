@@ -299,6 +299,17 @@ body.admin { font-size: 1rem; }
   .savebar .btn { white-space: nowrap; flex: 1; }
 }
 
+/* Phones: each booking becomes a small card of labelled lines instead of a squeezed table. */
+@media (max-width: 600px) {
+  .block.single .scroll-x { overflow: visible; }
+  .block.single .mini thead { display: none; }
+  .block.single .mini, .block.single .mini tbody { display: block; }
+  .block.single .mini tr { display: block; padding: 10px 16px; border-top: 1px solid color-mix(in srgb, var(--line) 70%, transparent); }
+  .block.single .mini td { display: flex; align-items: baseline; gap: 10px; padding: 2px 0; border: 0; background: none !important; white-space: normal; }
+  .block.single .mini td[data-label]::before { content: attr(data-label); flex: none; min-width: 6.5rem; color: var(--mute); font-family: var(--font-body); font-size: .72rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+  .block.single .mini td.mono:first-child { font-size: 1.1rem; }
+}
+
 @media print {
   .admin-bar, .toolbar, .savebar, .block-side .actions, .no-print { display: none !important; }
   .block { break-inside: avoid; box-shadow: none; border-color: #999; }
