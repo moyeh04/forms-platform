@@ -11,6 +11,59 @@ You will use two files from this project:
 (If `dist/` is missing, run `npm install` then `npm run build` in the project
 folder and it appears.)
 
+## The whole thing at a glance
+
+```mermaid
+%%{init: {
+  'theme': 'base',
+  'themeVariables': {
+    'fontFamily': 'ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif',
+    'fontSize': '15px',
+    'primaryColor': '#DCE9E2', 'primaryBorderColor': '#3F6B66', 'primaryTextColor': '#2F2418',
+    'secondaryColor': '#F0E4C8', 'secondaryBorderColor': '#C9A24A', 'secondaryTextColor': '#2F2418',
+    'tertiaryColor': '#F6EFDC', 'tertiaryBorderColor': '#CDBB94', 'tertiaryTextColor': '#2F2418',
+    'lineColor': '#3F6B66', 'textColor': '#2F2418', 'mainBkg': '#DCE9E2', 'nodeBorder': '#3F6B66',
+    'clusterBkg': '#F6EFDC', 'clusterBorder': '#CDBB94', 'titleColor': '#2F2418',
+    'edgeLabelBackground': '#F8F1DD',
+    'actorBkg': '#DCE9E2', 'actorBorder': '#3F6B66', 'actorTextColor': '#2F2418', 'actorLineColor': '#8FB3AB',
+    'signalColor': '#477A73', 'signalTextColor': '#477A73',
+    'labelBoxBkgColor': '#F0E4C8', 'labelBoxBorderColor': '#C9A24A', 'labelTextColor': '#2F2418', 'loopTextColor': '#6A5A44',
+    'noteBkgColor': '#FBEFC9', 'noteBorderColor': '#C9A24A', 'noteTextColor': '#2F2418',
+    'activationBkgColor': '#DCE9E2', 'activationBorderColor': '#3F6B66', 'sequenceNumberColor': '#F8F1DD',
+    'transitionColor': '#3F6B66', 'stateLabelColor': '#2F2418', 'stateBkg': '#DCE9E2', 'altBackground': '#F6EFDC',
+    'attributeBackgroundColorOdd': '#F8F1DD', 'attributeBackgroundColorEven': '#F0E4C8'
+  },
+  'flowchart': {'curve': 'basis', 'padding': 14, 'nodeSpacing': 40, 'rankSpacing': 46},
+  'sequence': {'mirrorActors': false, 'messageMargin': 34, 'boxMargin': 8}
+}}%%
+flowchart TD
+    subgraph P1["Part 1: the backend, in Google"]
+        a1["1. Create the Forms Registry sheet"] --> a2["2. Paste dist/Code.gs and appsscript.json"]
+        a2 --> a3["3. Menu: First-time setup, allow permissions"]
+        a3 --> a4["4. Menu: Set admin PIN"]
+        a4 --> a5["5. Deploy as web app: Execute as Me, access Anyone"]
+    end
+    a5 -- "copy the address that ends in /exec" --> b1
+    subgraph P2["Part 2: the website, on GitHub"]
+        b1["6. Paste the address into assets/js/config.js"] --> b2["7. Push to GitHub"]
+        b2 --> b3["8. Settings, Pages: branch main, folder root"]
+        b3 --> b4["9. Back in the sheet: Set website address"]
+    end
+    b4 --> c1
+    subgraph P3["Part 3: use it"]
+        c1["Open admin.html and enter the PIN"] --> c2["New form, set it to Open"]
+        c2 --> c3["Copy the link and send it to students"]
+    end
+    classDef cDb fill:#F3E2B3,stroke:#B8892D,stroke-width:1.5px,color:#2F2418
+    classDef cActor fill:#F4D9D3,stroke:#9A3328,stroke-width:1.5px,color:#2F2418
+    classDef cDec fill:#FBEFC9,stroke:#C9A24A,stroke-width:1.5px,color:#2F2418
+    classDef cEnd fill:#2F2418,stroke:#2F2418,color:#F8F1DD
+    classDef cErr fill:#F6D5CF,stroke:#A12B1F,stroke-width:1.5px,color:#5A140C
+    classDef cOk fill:#BFD9CF,stroke:#2E5A55,stroke-width:1.5px,color:#17302D
+```
+
+The only code you edit is one line in `assets/js/config.js`.
+
 ---
 
 ## Part 1: The backend (Google)
@@ -134,3 +187,15 @@ Do these once with a test form:
 | "That PIN is not correct" | Wrong PIN, or too many tries: wait a few minutes. To reset, run **Forms Platform > 2. Set admin PIN...** again. |
 | Changes to the backend have no effect | You saved the code but did not create a **New version** of the deployment. |
 | The menu "Forms Platform" is missing | Reload the sheet and wait a few seconds. |
+
+---
+
+## Want to know why it works this way?
+
+| Question | Read |
+|---|---|
+| Why only one config line, and why no server? | [HOSTING.md](architecture/HOSTING.md) |
+| What exactly is `dist/Code.gs`, and who builds it? | [BUILD-PIPELINE.md](architecture/BUILD-PIPELINE.md) |
+| Why "Execute as Me" and "Anyone" is safe here | [WORKAROUNDS.md](architecture/WORKAROUNDS.md) and [SECURITY.md](reference/SECURITY.md) |
+| What is stored where? | [DATA-MODEL.md](reference/DATA-MODEL.md) |
+| The whole picture | [ARCHITECTURE.md](architecture/ARCHITECTURE.md) |
