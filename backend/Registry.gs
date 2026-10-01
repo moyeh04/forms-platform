@@ -295,7 +295,7 @@ function publicForm(form) {
   if (full.rules && full.rules.teamSize) out.rules.teamSize = full.rules.teamSize;
   if (allowedMajors_(full).length) out.rules.majors = allowedMajors_(full);
   if (full.rules && full.rules.folderName && full.rules.folderName.enabled) {
-    out.rules.folderName = { enabled: true, subject: String(full.rules.folderName.subject || full.subject || '') };
+    out.rules.folderName = { enabled: true, subject: String(full.rules.folderName.subject || '') };
   }
   return out;
 }
