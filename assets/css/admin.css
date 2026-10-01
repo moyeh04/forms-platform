@@ -193,24 +193,40 @@ body.admin { font-size: 1rem; }
 .stat { padding: 6px 14px; border: 1.5px solid var(--line); border-radius: 4px; background: var(--sheet); font-weight: 700; font-size: var(--fs-label); }
 .stat b { font-size: 1.15rem; margin-inline-end: 6px; }
 
-.block { display: grid; grid-template-columns: minmax(0, 1fr) minmax(200px, 300px); border: 3px solid var(--ink); border-radius: 2px; margin-bottom: 16px; }
-.block.tint-a { background: var(--tint-a); }
-.block.tint-b { background: var(--tint-b); }
-.block-main { min-width: 0; }
-.block-side { display: flex; flex-direction: column; gap: 10px; justify-content: center; padding: 12px 14px; border-inline-start: 2px solid var(--ink); background: rgba(0, 0, 0, .05); }
-.block-side .title { font-weight: 700; font-size: 1.1rem; overflow-wrap: anywhere; }
-.block-side .title a { color: var(--sea); }
+/* Team cards: neutral paper, a coloured band on the leading edge, and a header strip. */
+.team-list { display: flex; flex-direction: column; gap: 14px; }
+.block { --band: var(--sea); position: relative; background: var(--sheet); border: 1.5px solid var(--line); border-inline-start: 5px solid var(--band); border-radius: 6px; box-shadow: 0 1px 2px var(--shadow); overflow: hidden; margin-bottom: 14px; }
+.team-list > .block { margin-bottom: 0; }
+.block.tint-a { --band: var(--sea); }
+.block.tint-b { --band: var(--gold); }
+.block-head { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; padding: 10px 16px; background: color-mix(in srgb, var(--band) 9%, var(--sheet)); border-bottom: 1px solid var(--line); }
+.team-no { flex: none; padding: 2px 10px; border-radius: 999px; background: var(--band); color: var(--sheet); font-size: var(--fs-help); font-weight: 700; letter-spacing: .02em; }
+.block-title { display: flex; flex-direction: column; min-width: 0; flex: 1 1 220px; line-height: 1.25; }
+.block-title .kicker { font-size: .72rem; text-transform: uppercase; letter-spacing: .1em; color: var(--mute); }
+.block-title a, .block-title > span:last-child { font-weight: 700; font-size: 1.08rem; color: var(--ink); overflow-wrap: anywhere; }
+.block-title a { display: inline-flex; align-items: center; gap: 6px; text-decoration-color: color-mix(in srgb, var(--band) 60%, transparent); }
+.block-title a .icon { color: var(--band); }
+.block-meta { color: var(--mute); font-size: var(--fs-help); white-space: nowrap; }
+.block-meta .mono { font-family: var(--font-code); letter-spacing: .04em; }
+.block-actions { margin-inline-start: auto; }
+.block-actions .select { min-height: 34px; font-size: .95rem; width: auto; padding: 0 26px 0 6px; }
 .mini { width: 100%; border-collapse: collapse; }
-.mini th { text-align: start; font-size: var(--fs-help); color: var(--mute); padding: 6px 12px 2px; }
-.mini td { padding: 7px 12px; border-top: 1px solid rgba(47, 36, 24, .22); vertical-align: middle; }
-.mini tr:nth-child(even) td { background: rgba(255, 255, 255, .28); }
-:root[data-theme="dark"] .mini tr:nth-child(even) td { background: rgba(255, 255, 255, .05); }
+.mini th { text-align: start; font-size: .72rem; text-transform: uppercase; letter-spacing: .08em; color: var(--mute); font-weight: 700; padding: 8px 14px 4px; }
+.mini td { padding: 8px 14px; border-top: 1px solid color-mix(in srgb, var(--line) 70%, transparent); vertical-align: middle; }
+.mini tbody tr:nth-child(even) td { background: color-mix(in srgb, var(--ink) 3%, transparent); }
+.mini tr.leader td { background: color-mix(in srgb, var(--band) 10%, transparent); }
+.team-card .mini { table-layout: fixed; min-width: 560px; }
+.team-card .mini th:first-child { width: 3rem; }
+.team-card .mini th:nth-child(2) { width: 48%; }
+.mini td.num { width: 2.5rem; color: var(--mute); font-size: var(--fs-help); }
 .mini .nm { font-weight: 700; }
-.mini .nm .icon { color: var(--accent); vertical-align: -3px; margin-inline-start: 4px; }
+.lead-tag { display: inline-flex; align-items: center; gap: 3px; margin-inline-start: 10px; padding: 0 8px; border-radius: 999px; border: 1px solid var(--band); color: var(--band); font-size: .72rem; font-weight: 700; vertical-align: 2px; }
+.lead-tag .icon svg { fill: currentColor; }
 .mini .mono { font-family: var(--font-code); letter-spacing: .06em; white-space: nowrap; }
-.day-head { padding: 8px 14px; background: var(--ink); color: var(--sheet); font-weight: 700; display: flex; justify-content: space-between; gap: 8px; }
-.block.single { display: block; }
 .mini .select { min-height: 36px; font-size: .95rem; padding: 0 8px; width: auto; }
+.day-head { display: flex; justify-content: space-between; gap: 8px; padding: 10px 16px; background: color-mix(in srgb, var(--band) 12%, var(--sheet)); border-bottom: 1px solid var(--line); color: var(--ink); font-weight: 700; }
+.day-head span:last-child { color: var(--mute); font-weight: 400; font-size: var(--fs-help); }
+.block.single { display: block; }
 .empty { padding: 30px; text-align: center; color: var(--mute); border: 1.5px dashed var(--line); border-radius: 4px; }
 
 /* WhatsApp matching: requests on the left, the matched registration on the right. */
@@ -227,8 +243,7 @@ body.admin { font-size: 1rem; }
 .preview { width: 100%; height: 60vh; border: 1.5px solid var(--ink); border-radius: 2px; background: var(--sheet-2); }
 @media (max-width: 860px) {
   .split { grid-template-columns: 1fr; }
-  .block { grid-template-columns: 1fr; }
-  .block-side { border-inline-start: 0; border-top: 2px solid var(--ink); }
+  .block-actions { margin-inline-start: 0; width: 100%; }
 }
 
 .link-box { display: flex; gap: 8px; align-items: center; padding: 10px 12px; border: 1.5px dashed var(--ink); border-radius: 4px; background: var(--sheet-2); }
@@ -245,8 +260,21 @@ body.admin { font-size: 1rem; }
 .data-table tr:nth-child(even) td { background: var(--sheet-2); }
 .scroll-x { overflow-x: auto; }
 
+@media (max-width: 600px) {
+  .team-card .mini { min-width: 0; table-layout: auto; }
+  .team-card .mini thead { display: none; }
+  .team-card .mini tr { display: grid; grid-template-columns: 1.6rem minmax(0, 1fr) minmax(0, 1fr); column-gap: 8px; row-gap: 2px; padding: 9px 14px; border-top: 1px solid color-mix(in srgb, var(--line) 70%, transparent); }
+  .team-card .mini tbody tr:nth-child(even) { background: color-mix(in srgb, var(--ink) 3%, transparent); }
+  .team-card .mini tr.leader { background: color-mix(in srgb, var(--band) 10%, transparent); }
+  .team-card .mini td { padding: 0; border: 0; background: none !important; }
+  .team-card .mini td.num { grid-row: 1 / span 2; width: auto; padding-top: 3px; }
+  .team-card .mini td.nm { grid-column: 2 / 4; }
+  .team-card .mini td.mono { font-size: .88rem; color: var(--mute); }
+}
+
 @media print {
   .admin-bar, .toolbar, .savebar, .block-side .actions, .no-print { display: none !important; }
-  .block { break-inside: avoid; border-color: #000; }
-  .block.tint-a, .block.tint-b { background: #fff !important; }
+  .block { break-inside: avoid; box-shadow: none; border-color: #999; }
+  .block-head, .day-head { background: #f2f2f2 !important; }
+  .block-actions { display: none !important; }
 }
