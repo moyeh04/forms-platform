@@ -146,7 +146,7 @@ Back in the Forms Registry sheet: **Forms Platform > 3. Set website address...**
    - **Team size**: minimum and maximum people per team (counting the leader), and an optional note for some sizes (for example "other students will be added to reach 5" for 3 and 4).
    - **Questions**: rename, hide, or add a description under any question.
    - **Emails**: whether students get a confirmation email.
-   - **Limits and checks**: the Drive folder name rule `Team_Leader_Name_Project_Name_Subject` (on by default for new team forms).
+   - **Limits and checks**: the Drive folder name rule `Team_Leader_Name_Project_Name_Subject_Name` (on by default for new team forms). Type the subject name, for example `Software Engineering`, so folders must end with `_Software_Engineering`.
    - **Timetable** for reservations: set the session hours, then add days by date.
    - **Status**: set to **Open** and click **Save settings**.
 4. Click **Copy link** and send it to students. The link looks like `.../index.html?f=database-team-project-registration-form-fall-2027`.
@@ -158,7 +158,7 @@ Do these once with a test form:
 
 - [ ] Register a team with a real Drive link shared to "Anyone with the link": accepted.
 - [ ] Register another with a link set to private: refused with a clear message.
-- [ ] Register with a folder named with spaces (for example `My Project`): refused, and the message shows the expected name such as `Ahmed_Mohamed_My_Project_CMPn323`.
+- [ ] Register with a folder named with spaces (for example `My Project`): refused, and the message shows the expected name such as `Ahmed_Mohamed_My_Project_Software_Engineering`.
 - [ ] Check that the confirmation email arrived with the key.
 - [ ] Open the form's Google Sheet: teams show as tinted blocks with heavy borders.
 - [ ] In the dashboard click **Print team list**: a print tab and a PDF appear.
