@@ -90,7 +90,8 @@ step needs the real Google services (see "What could not be tested here").
 | Requirement | Status |
 |---|---|
 | English by default with an Arabic switch (RTL), mobile first, light and dark themes | Done |
-| Light paper palette with strong contrast, **no logo**, defined font sizes, bold labels, italic helper text | Done |
+| Light paper palette with strong contrast, **no logo on the page**, defined font sizes, bold labels, italic helper text | Done |
+| Branded tab icon: a form sheet whose red route ends in an X, the same trail students follow at the top of the form (SVG plus PNGs for phones) | Done |
 | Arabic-only name fields: English letters and digits are removed while typing and on paste, with a hint saying why; at least four name parts; checked again on the server | Done |
 | English-only project and task titles, Egyptian phone normalization, 7-digit codes | Done |
 | Drive links must open and be shared with anyone who has the link | Done, check live |
