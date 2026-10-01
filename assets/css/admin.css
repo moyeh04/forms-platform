@@ -39,7 +39,18 @@ body.admin { font-size: 1rem; }
 .card { background: var(--sheet); border: 1.5px solid var(--line); border-radius: 4px; padding: 16px 18px; display: flex; flex-direction: column; gap: 10px; }
 .card h3 { font-size: 1.25rem; line-height: 1.3; }
 .card-top { display: flex; align-items: flex-start; gap: 10px; }
-.card-top .icon { color: var(--accent); margin-top: 2px; }
+.card-top .icon { color: var(--accent); }
+.card-icon { flex: none; display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 10px; background: color-mix(in srgb, var(--accent) 10%, var(--sheet)); }
+.card-tags { margin-top: 2px; }
+.card { box-shadow: 0 1px 2px var(--shadow); border-radius: 6px; }
+.card-actions { margin-top: auto; }
+.more { position: relative; }
+.more > summary { list-style: none; cursor: pointer; }
+.more > summary::-webkit-details-marker { display: none; }
+.more-menu { position: absolute; z-index: 20; inset-inline-start: 0; top: calc(100% + 6px); min-width: 230px; padding: 6px; background: var(--sheet); border: 1.5px solid var(--ink); border-radius: 6px; box-shadow: 0 8px 22px var(--shadow); display: flex; flex-direction: column; }
+.more-menu a, .more-menu button { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border: 0; border-radius: 4px; background: none; color: var(--ink); text-decoration: none; font-weight: 700; font-size: .95rem; text-align: start; cursor: pointer; }
+.more-menu a:hover, .more-menu button:hover { background: var(--sheet-2); }
+.more-menu .danger { color: var(--err); border-top: 1px solid var(--line); border-radius: 0 0 4px 4px; margin-top: 4px; }
 .term-picker { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(110px, .6fr) minmax(0, 1fr); gap: 4px 18px; align-items: start; }
 .term-picker .toggle-chips { margin: 2px 0 0; }
 .term-picker .select:disabled { opacity: .45; }
@@ -121,7 +132,6 @@ body.admin { font-size: 1rem; }
 .time-add .input { width: auto; min-height: 38px; }
 .day-actions { margin-top: 12px; justify-content: flex-end; }
 .btn.danger { color: var(--err); }
-.card-delete { margin-inline-start: auto; }
 .danger-zone { border-color: var(--err); }
 .danger-zone h2 { color: var(--err); }
 @media (max-width: 640px) {

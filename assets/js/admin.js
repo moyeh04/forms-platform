@@ -203,7 +203,13 @@
   }
 
   A.start = function () {
-    if (!started) { started = true; window.addEventListener('hashchange', render); }
+    if (!started) {
+      started = true;
+      window.addEventListener('hashchange', render);
+      document.addEventListener('click', function (e) {
+        Array.prototype.forEach.call(document.querySelectorAll('details.more[open]'), function (d) { if (!d.contains(e.target)) d.open = false; });
+      });
+    }
     return render();
   };
   A.render = render;
@@ -255,18 +261,22 @@
   function formCard(f) {
     var t = A.TYPES[f.type] || { label: f.type, icon: 'task' };
     var link = A.formLink(f.slug);
+    var more = h('details', { class: 'more' },
+      h('summary', { class: 'btn btn-quiet sm', 'aria-label': 'More actions for ' + f.title }, icon('menu', 18), 'More'),
+      h('div', { class: 'more-menu', role: 'menu' },
+        f.sheetUrl ? h('a', { role: 'menuitem', href: f.sheetUrl, target: '_blank', rel: 'noopener' }, icon('task', 16), 'Open Google Sheet') : null,
+        h('button', { type: 'button', role: 'menuitem', onclick: function () { more.open = false; duplicateDialog(f); } }, icon('copy', 16), 'Duplicate for a new term'),
+        h('button', { type: 'button', role: 'menuitem', class: 'danger', name: 'delete-form', 'aria-label': 'Delete ' + f.title, onclick: function () { more.open = false; A.deleteForm(f); } }, icon('trash', 16), 'Delete form')));
     return h('article', { class: 'card', dataset: { slug: f.slug } },
-      h('div', { class: 'card-top' }, icon(t.icon, 24),
-        h('div', null, h('h3', null, f.title), A.termTags(f))),
+      h('div', { class: 'card-top' }, h('span', { class: 'card-icon' }, icon(t.icon, 22)),
+        h('div', null, h('h3', null, f.title), h('div', { class: 'card-tags' }, A.termTags(f)))),
       h('div', { class: 'actions' }, A.badge(A.STATUS_LABEL[f.status] || f.status, f.status), h('span', { class: 'muted-note' }, t.label)),
-      h('div', { class: 'actions' },
+      h('div', { class: 'actions card-actions' },
         h('a', { class: 'btn btn-primary sm', href: '#/f/' + encodeURIComponent(f.slug) }, 'Responses'),
         h('a', { class: 'btn btn-quiet sm', href: '#/f/' + encodeURIComponent(f.slug) + '/settings' }, 'Settings'),
         h('a', { class: 'btn btn-quiet sm', href: link, target: '_blank', rel: 'noopener' }, 'Open form'),
-        h('button', { type: 'button', class: 'btn btn-quiet sm', onclick: async function () { toast((await ui.copyText(link)) ? 'Form link copied' : 'Could not copy', 'ok'); } }, icon('link', 18), 'Copy link'),
-        f.sheetUrl ? h('a', { class: 'btn btn-quiet sm', href: f.sheetUrl, target: '_blank', rel: 'noopener' }, 'Google Sheet') : null,
-        h('button', { type: 'button', class: 'btn btn-quiet sm', onclick: function () { duplicateDialog(f); } }, 'Duplicate'),
-        h('button', { type: 'button', class: 'btn btn-quiet sm danger card-delete', name: 'delete-form', 'aria-label': 'Delete ' + f.title, onclick: function () { A.deleteForm(f); } }, icon('trash', 18), 'Delete')));
+        h('button', { type: 'button', class: 'btn btn-quiet sm', 'aria-label': 'Copy the link of ' + f.title, onclick: async function () { toast((await ui.copyText(link)) ? 'Form link copied' : 'Could not copy', 'ok'); } }, icon('link', 18), 'Copy link'),
+        more));
   }
 
   /** One confirmation, then the form is gone and its sheet is in the Drive trash. */
