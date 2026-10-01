@@ -317,3 +317,17 @@ test('Term: settings show the saved season and year, and switching season saves 
   const pub = w.api({ action: 'getForm', slug: saved.slug }).form;
   assert.equal(pub.subject, 'CMPn336', 'students get the subject code');
 });
+
+test('Who can register: picking one specialization saves it, All clears it', async () => {
+  const w = boot();
+  const f = w.make('team_registration', 'Projects');
+  const p = await openAdmin(w, `#/f/${f.slug}/settings`);
+  assert.equal(p.$('[name="major-all"]').getAttribute('aria-pressed'), 'true');
+  p.click('[name="major-حاسبات"]');
+  assert.ok(p.text().includes('Only Computers students can register'));
+  p.click('[name="save"]'); await settle(12);
+  assert.deepEqual(w.admin({ action: 'admin.forms.get', id: f.id }).form.rules.majors, ['حاسبات']);
+  const q = await openAdmin(w, `#/f/${f.slug}/settings`);
+  q.click('[name="major-all"]'); q.click('[name="save"]'); await settle(12);
+  assert.deepEqual(w.admin({ action: 'admin.forms.get', id: f.id }).form.rules.majors, []);
+});

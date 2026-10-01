@@ -64,6 +64,35 @@
         A.field('Header icon', A.select(f.icon || 'none', [['team', 'Team'], ['calendar', 'Calendar'], ['task', 'Task'], ['chat', 'Chat'], ['none', 'None']], function (v) { f.icon = v; })),
         h('div', { class: 'field-row' }, A.check('Show the language switch to students', f.lang.allowSwitch !== false, function (v) { f.lang.allowSwitch = v; }))));
 
+    /* Who can register --------------------------------------------- */
+    var majorsPanel = null;
+    var majorOptions = (res.lists && res.lists.majors) || [];
+    var hasMajor = (f.fields || []).some(function (x) { return x.list === 'majors' && x.enabled !== false; });
+    if (hasMajor && majorOptions.length) {
+      f.rules.majors = Array.isArray(f.rules.majors) ? f.rules.majors.slice() : [];
+      var majorChips = h('div', { class: 'toggle-chips', role: 'group', 'aria-label': 'Specializations allowed' });
+      var majorNote = h('p', { class: 'muted-note' });
+      var paintMajors = function () {
+        ui.clear(majorChips);
+        var all = !f.rules.majors.length;
+        majorChips.appendChild(h('button', { type: 'button', class: 'toggle-chip', name: 'major-all', 'aria-pressed': all ? 'true' : 'false', onclick: function () { f.rules.majors = []; paintMajors(); } }, 'All specializations'));
+        majorOptions.forEach(function (o) {
+          var on = f.rules.majors.indexOf(String(o.value)) !== -1;
+          majorChips.appendChild(h('button', { type: 'button', class: 'toggle-chip', name: 'major-' + o.value, 'aria-pressed': on ? 'true' : 'false', onclick: function () {
+            f.rules.majors = on ? f.rules.majors.filter(function (v) { return v !== String(o.value); }) : f.rules.majors.concat([String(o.value)]);
+            if (f.rules.majors.length === majorOptions.length) f.rules.majors = [];
+            paintMajors();
+          } }, (o.label && o.label.en) || o.value, o.label && o.label.ar && o.label.ar !== o.label.en ? h('span', { class: 'chip-sub', lang: 'ar' }, o.label.ar) : null));
+        });
+        var names = majorOptions.filter(function (o) { return f.rules.majors.indexOf(String(o.value)) !== -1; }).map(function (o) { return (o.label && o.label.en) || o.value; });
+        majorNote.textContent = !names.length ? 'Students of every specialization can register.'
+          : names.length === 1 ? 'Only ' + names[0] + ' students can register. The Major question is filled in for them and locked.'
+          : 'Only ' + names.join(' and ') + ' students can register.';
+      };
+      paintMajors();
+      majorsPanel = panel('Who can register', 'Limit this form to some specializations. The choices come from the Majors list. Students of other specializations cannot submit.', majorChips, majorNote);
+    }
+
     /* Team size -------------------------------------------------- */
     var sizePanel = null;
     if (hasSize) {
@@ -269,7 +298,7 @@
       });
     });
 
-    [general, sizePanel, fieldsPanel, slotsPanel, keyPanel, rulesPanel, reviewPanel].forEach(function (n) { if (n) mount.appendChild(n); });
+    [general, majorsPanel, sizePanel, fieldsPanel, slotsPanel, keyPanel, rulesPanel, reviewPanel].forEach(function (n) { if (n) mount.appendChild(n); });
     mount.appendChild(h('div', { class: 'savebar' }, h('span', { class: 'muted-note' }, 'Changes apply to students as soon as you save.'), saveBtn));
   };
 })(window.App = window.App || {});
