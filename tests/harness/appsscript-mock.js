@@ -219,6 +219,10 @@ function createWorld(options = {}) {
       getUuid: () => crypto.randomUUID(),
       computeDigest: (algo, value) => Array.from(crypto.createHash(algo).update(String(value), 'utf8').digest()).map((b) => (b > 127 ? b - 256 : b)),
       base64Encode: (v) => Buffer.from(typeof v === 'string' ? v : v.map((b) => (b + 256) % 256)).toString('base64'),
+      formatDate: (date, tz, pattern) => {
+        const p = Object.fromEntries(new Intl.DateTimeFormat('en-CA', { timeZone: tz, year: 'numeric', month: '2-digit', day: '2-digit' }).formatToParts(date).map((x) => [x.type, x.value]));
+        return pattern.replace('yyyy', p.year).replace('MM', p.month).replace('dd', p.day);
+      },
       newBlob: (data, type, name) => ({ data, type, name }),
       sleep: () => {}
     }
