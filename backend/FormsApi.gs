@@ -8,7 +8,9 @@ API.getForm = function (req) {
   if (state === 'draft' || state === 'archived') {
     return { state: state, form: { slug: form.slug, title: form.title, term: form.term, lang: form.lang, icon: form.icon, messages: form.messages } };
   }
-  return { state: state, form: publicForm(form), serverTime: nowIso() };
+  var out = { state: state, form: publicForm(form), serverTime: nowIso() };
+  if (form.type === 'reservation') out.taken = slotAvailability_(form);
+  return out;
 };
 
 API['admin.forms.list'] = admin(function () {
@@ -33,9 +35,11 @@ API['admin.forms.create'] = admin(function (req) {
 });
 
 API['admin.forms.update'] = admin(function (req) {
-  var f = clone(updateForm(req.id, req.patch || {}));
-  delete f._row;
-  return { form: f };
+  var f = updateForm(req.id, req.patch || {});
+  var out = { form: clone(f) };
+  delete out.form._row;
+  if (req.patch && req.patch.slots && f.type === 'reservation') out.orphanedBookings = orphanedBookings_(f);
+  return out;
 });
 
 API['admin.forms.duplicate'] = admin(function (req) {
