@@ -286,6 +286,19 @@ body.admin { font-size: 1rem; }
   .team-card .mini td.mono { font-size: .88rem; color: var(--mute); }
 }
 
+/* Phones: one header row with the actions, the section links underneath; menus and the save bar stay on screen. */
+@media (max-width: 600px) {
+  .admin-bar { gap: 10px; }
+  .admin-bar h1 { flex: 1 1 auto; font-size: 1.3rem; }
+  .admin-nav { order: 3; width: 100%; }
+  .admin-nav a { flex: 1; text-align: center; }
+  .admin-bar .btn-text { display: none; }
+  .more { flex-basis: 100%; }
+  .more-menu { position: static; margin-top: 6px; min-width: 0; box-shadow: none; }
+  .savebar .muted-note { display: none; }
+  .savebar .btn { white-space: nowrap; flex: 1; }
+}
+
 @media print {
   .admin-bar, .toolbar, .savebar, .block-side .actions, .no-print { display: none !important; }
   .block { break-inside: avoid; box-shadow: none; border-color: #999; }

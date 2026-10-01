@@ -192,7 +192,7 @@
         h('nav', { class: 'admin-nav', 'aria-label': 'Sections' },
           navLink('#/', 'Forms', group === 'forms'), navLink('#/clients', 'Clients', group === 'clients'), navLink('#/lists', 'Lists', group === 'lists')),
         h('button', { type: 'button', class: 'icon-btn', 'aria-label': 'Switch light and dark', onclick: function () { App.theme.toggle(); render(); } }, icon(App.theme.effective() === 'dark' ? 'sun' : 'moon', 20)),
-        h('button', { type: 'button', class: 'icon-btn', onclick: function () { App.api.setPin(''); render(); } }, icon('logout', 20), 'Log out')),
+        h('button', { type: 'button', class: 'icon-btn', 'aria-label': 'Log out', onclick: function () { App.api.setPin(''); render(); } }, icon('logout', 20), h('span', { class: 'btn-text' }, 'Log out'))),
       mount));
     var view = A.views[r.name];
     try { await view.apply(null, [mount].concat(r.args)); } catch (e) {
