@@ -165,6 +165,10 @@ function updateForm(id, patch) {
   PATCHABLE_.forEach(function (k) {
     if (patch[k] === undefined) return;
     if (k === 'status' && FORM_STATUSES.indexOf(patch[k]) === -1) fail('bad_status', 'Status must be draft, open, closed, or archived.');
+    if (k === 'slots') {
+      form.slots = normalizeSlots_(patch.slots);
+      return;
+    }
     if (k === 'slug') {
       var wanted = slugify(patch.slug);
       var clash = findForm(wanted);
