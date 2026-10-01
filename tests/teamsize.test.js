@@ -146,3 +146,16 @@ test('Size note: saved with the range, cleaned, kept on later saves, and public'
   assert.deepEqual(w.api({ action: 'getForm', slug: w.form.slug }).form.rules.teamSize.notice.sizes, [3, 4]);
   assert.equal(save({ min: 1, max: 4, notice: null }).form.rules.teamSize.notice, undefined, 'null removes it');
 });
+
+test('Specialization: a form limited to Computers only offers and accepts Computers', () => {
+  const w = boot();
+  w.admin({ action: 'admin.forms.update', id: w.form.id, patch: { rules: { majors: ['حاسبات'] } } });
+  const pub = w.api({ action: 'getForm', slug: w.form.slug }).form;
+  assert.deepEqual(pub.fields.find((f) => f.id === 'major').options.map((o) => o.value), ['حاسبات']);
+  assert.deepEqual(pub.rules.majors, ['حاسبات']);
+  const bad = w.submit({ ...leader, major: 'اتصالات', team_size: '1', members: [] });
+  assert.equal(bad.error.details.major.error, 'invalid_choice', 'the server refuses another specialization');
+  assert.equal(w.submit({ ...leader, major: 'حاسبات', team_size: '1', members: [] }).ok, true);
+  w.admin({ action: 'admin.forms.update', id: w.form.id, patch: { rules: { majors: [] } } });
+  assert.equal(w.api({ action: 'getForm', slug: w.form.slug }).form.fields.find((f) => f.id === 'major').options.length, 2, 'empty means everyone');
+});

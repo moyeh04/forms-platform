@@ -167,6 +167,7 @@ function createForm(o) {
 /** Merges new rule settings over the old ones and checks the team size range. */
 function normalizeRules_(current, next) {
   var merged = Object.assign({}, current || {}, next || {});
+  if (merged.majors !== undefined) merged.majors = Array.isArray(merged.majors) ? merged.majors.map(String).filter(Boolean) : [];
   if (merged.teamSize !== undefined) {
     var min = parseInt(merged.teamSize && merged.teamSize.min, 10);
     var max = parseInt(merged.teamSize && merged.teamSize.max, 10);
@@ -238,11 +239,22 @@ function duplicateForm(id, o) {
   return saveForm(copy);
 }
 
+/** The specializations a form is limited to; empty means everyone. */
+function allowedMajors_(form) {
+  var m = form && form.rules && form.rules.majors;
+  return Array.isArray(m) ? m.map(String).filter(Boolean) : [];
+}
+
 /** Lists are merged into select fields so the browser gets plain options. */
 function resolveOptions_(form, lists) {
+  var allowed = allowedMajors_(form);
   function fix(fields) {
     (fields || []).forEach(function (f) {
       if (f.list) f.options = lists[f.list] || [];
+      // A form limited to some specializations only offers (and only accepts) those.
+      if (f.list === 'majors' && allowed.length) {
+        f.options = f.options.filter(function (o) { return allowed.indexOf(String(o.value)) !== -1; });
+      }
       if (f.fields) fix(f.fields);
     });
   }
@@ -259,6 +271,7 @@ function publicForm(form) {
   out.editKey = { enabled: !!full.editKey.enabled, days: full.editKey.days, allowEdit: !!full.editKey.allowEdit, allowDelete: !!full.editKey.allowDelete };
   out.rules = { maxSubmissions: full.rules ? full.rules.maxSubmissions : null };
   if (full.rules && full.rules.teamSize) out.rules.teamSize = full.rules.teamSize;
+  if (allowedMajors_(full).length) out.rules.majors = allowedMajors_(full);
   return out;
 }
 

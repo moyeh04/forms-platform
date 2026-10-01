@@ -683,6 +683,10 @@ options are resolved when the form is read (`resolveOptions_` in
 `Registry.gs`), both for students and for server-side validation. Edit the list
 once in the dashboard and every form updates immediately.
 
+A form can also narrow a list for itself: `rules.majors` keeps only the chosen
+specializations when the options are resolved, so a Computers-only form offers
+and accepts only Computers, in the browser and on the server, from one setting.
+
 **Cost.** Changing a list also changes what old forms accept. Existing stored
 answers are not rewritten.
 

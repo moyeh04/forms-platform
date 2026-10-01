@@ -141,6 +141,18 @@
     return bar;
   }
 
+  /** "Computers students only", from the form's allowed specializations. */
+  function audience() {
+    var allowed = S.form && S.form.rules && S.form.rules.majors;
+    if (!allowed || !allowed.length) return null;
+    var mf = (S.form.fields || []).filter(function (f) { return f.list === 'majors'; })[0];
+    var names = allowed.map(function (v) {
+      var o = mf && (mf.options || []).filter(function (x) { return String(x.value) === String(v); })[0];
+      return o ? L(o.label) : v;
+    });
+    return h('p', { class: 'audience' }, icon('team', 18), h('span', null, t('onlyFor', { names: names.join(t('and')) })));
+  }
+
   function head() {
     var ic = S.form && S.form.icon !== 'none' ? App.ui.formIcon(S.form.icon) : null;
     return h('header', { class: 'form-head' },
@@ -148,7 +160,8 @@
       h('h1', { class: 'form-title' }, S.form ? S.form.title : ''),
       S.form && (S.form.term || S.form.subject) ? h('div', { class: 'tags' },
         S.form.subject ? h('span', { class: 'tag tag-subject', lang: 'en', dir: 'ltr' }, S.form.subject) : null,
-        S.form.term ? h('span', { class: 'tag' }, S.form.term) : null) : null
+        S.form.term ? h('span', { class: 'tag' }, S.form.term) : null) : null,
+      audience()
     );
   }
 
@@ -338,6 +351,8 @@
   function selectControl(field, path, id) {
     var opts = field.options || [];
     var cur = getVal(path) || '';
+    // Only one possible answer (a form limited to one specialization): fill it in.
+    if (opts.length === 1 && field.required !== false && String(cur) !== String(opts[0].value)) { cur = opts[0].value; setVal(path, cur); }
     var onPick = function (v) { setVal(path, v); if (S.errors[path]) { delete S.errors[path]; paintError(path); } saveDraft(); };
     if (opts.length <= 4 && opts.length > 0) {
       return h('div', { class: 'chips', role: 'radiogroup', id: id, 'aria-describedby': id + '-err' },
