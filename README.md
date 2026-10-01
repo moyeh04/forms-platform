@@ -93,6 +93,7 @@ step needs the real Google services (see "What could not be tested here").
 | Arabic-only name fields: English letters and digits are removed while typing and on paste, with a hint saying why; at least four name parts; checked again on the server | Done |
 | English-only project and task titles, Egyptian phone normalization, 7-digit codes | Done |
 | Drive links must open and be shared with anyone who has the link | Done, check live |
+| Project folders must be named `Name_Project_Name_Subject` (no spaces, underscores, ending with the subject code); students see the rule with an example built from their project title | Done, check live |
 | Two-step review before sending | Done |
 | Success ticket: reference, key with an arrow callout, expiry, "take a screenshot" note, Save as image, Save as PDF, Copy key | Done |
 | Duplicate leader code says "use your key" | Done |

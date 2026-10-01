@@ -158,6 +158,36 @@
     return { ok: true, value: p.url, meta: { id: p.id, kind: p.kind } };
   }
 
+  /* ── Drive folder names: Name_Project_Name_Subject ─────────────── */
+
+  /** Turns free text into an underscore part: "Library System" -> "Library_System". */
+  function folderPart(s) {
+    return String(s == null ? '' : s).trim().replace(/[^A-Za-z0-9\u0600-\u06FF\-]+/g, '_').replace(/_+/g, '_').replace(/^_|_$/g, '');
+  }
+
+  /** An example of a correct folder name, built from what the student typed. */
+  function folderNameExample(o) {
+    o = o || {};
+    return [folderPart(o.name) || 'YourName', folderPart(o.project) || 'Project_Name', folderPart(o.subject) || 'SubjectName'].join('_');
+  }
+
+  /**
+   * Checks a Drive folder name against Name_Project_Name_Subject:
+   * no spaces, at least three parts joined by single underscores, and,
+   * when a subject is given, ending with it (case does not matter).
+   */
+  function checkFolderName(name, opts) {
+    opts = opts || {};
+    var n = String(name == null ? '' : name).trim();
+    var subject = String(opts.subject || '').trim();
+    var params = { example: folderNameExample({ name: opts.example && opts.example.name, project: opts.example && opts.example.project, subject: subject }), subject: subject, name: n };
+    if (/\s/.test(n)) return { ok: false, error: 'folder_name_spaces', params: params };
+    var parts = n.split('_');
+    if (parts.length < 3 || parts.some(function (p) { return !p; })) return { ok: false, error: 'folder_name_format', params: params };
+    if (subject && parts[parts.length - 1].toLowerCase() !== subject.toLowerCase()) return { ok: false, error: 'folder_name_subject', params: params };
+    return { ok: true };
+  }
+
   /* ── Slots ────────────────────────────────────────────────────── */
 
   function toMinutes(hhmm) {
@@ -421,6 +451,8 @@
     parseDriveLink: parseDriveLink,
     validateDriveLink: validateDriveLink,
     generateSlots: generateSlots,
+    checkFolderName: checkFolderName,
+    folderNameExample: folderNameExample,
     slotKey: slotKey,
     fieldByRole: fieldByRole,
     valueByRole: valueByRole,

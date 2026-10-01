@@ -221,3 +221,25 @@ test('Admin: list, change status and review, reset key, delete', () => {
   assert.equal(w.admin({ action: 'admin.submissions', slug: w.form.slug }).submissions.length, 0);
   assert.equal(w.admin({ action: 'admin.submissions', slug: w.form.slug, includeDeleted: true }).submissions.length, 1);
 });
+
+test('Folder name: a team project folder must be named Name_Project_Name_Subject', () => {
+  const w = createWorld(); w.call('setup'); w.call('setAdminPin', '4321');
+  const admin = (b) => w.api({ ...b, admin: { pin: '4321' } });
+  const f = admin({ action: 'admin.forms.create', type: 'team_registration', title: 'DB Projects', term: 'Fall 2027', subject: 'CMPn323' }).form;
+  admin({ action: 'admin.forms.update', id: f.id, patch: { status: 'open' } });
+  assert.deepEqual(w.api({ action: 'getForm', slug: f.slug }).form.rules.folderName, { enabled: true, subject: 'CMPn323' }, 'on by default for team forms, using the subject code');
+  const data = (code, link) => ({ email: 'a@b.com', leader_name: 'أحمد محمد محمود أحمد', leader_code: code, phone: '01012345678', major: 'حاسبات', level: 'صفر / الأولى', section: '4C-TH1', curriculum: '2020', team_size: '1', members: [], title: 'Library System', link });
+  const id = ID('f');
+  const link = `https://drive.google.com/drive/folders/${id}`;
+  w.drive.setFolderName(id, 'Library System');
+  const bad = w.api({ action: 'submit', slug: f.slug, data: data('4230001', link) });
+  assert.equal(bad.error.details.link.error, 'folder_name_spaces');
+  assert.equal(bad.error.details.link.params.example, 'YourName_Library_System_CMPn323');
+  w.drive.setFolderName(id, 'Ahmed_Library_System_Database');
+  assert.equal(w.api({ action: 'submit', slug: f.slug, data: data('4230001', link) }).error.details.link.error, 'folder_name_subject');
+  w.drive.setFolderName(id, 'Ahmed_Library_System_CMPn323');
+  assert.equal(w.api({ action: 'submit', slug: f.slug, data: data('4230001', link) }).ok, true);
+  admin({ action: 'admin.forms.update', id: f.id, patch: { rules: { folderName: { enabled: false } } } });
+  w.drive.setFolderName(id, 'anything goes');
+  assert.equal(w.api({ action: 'submit', slug: f.slug, data: data('4230002', link) }).ok, true, 'the rule can be switched off');
+});
