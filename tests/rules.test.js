@@ -148,3 +148,15 @@ test('Submission: disabled fields are skipped, including inside members', () => 
   assert.equal(r.ok, true);
   assert.equal('link' in r.data, false);
 });
+
+test('Folder names: Name_Project_Name_Subject, no spaces, ending with the subject', () => {
+  assert.equal(R.checkFolderName('Ahmed_Library_System_CMPn323', { subject: 'CMPn323' }).ok, true);
+  assert.equal(R.checkFolderName('ahmed_library_cmpn323', { subject: 'CMPn323' }).ok, true, 'case does not matter');
+  assert.equal(R.checkFolderName('Ahmed Library_System_CMPn323', { subject: 'CMPn323' }).error, 'folder_name_spaces');
+  assert.equal(R.checkFolderName('Ahmed_CMPn323', { subject: 'CMPn323' }).error, 'folder_name_format', 'needs name, project and subject');
+  assert.equal(R.checkFolderName('Ahmed__Library_CMPn323', {}).error, 'folder_name_format', 'no empty parts');
+  assert.equal(R.checkFolderName('Ahmed_Library_System_Database', { subject: 'CMPn323' }).error, 'folder_name_subject');
+  assert.equal(R.checkFolderName('Ahmed_Library_System_Anything', {}).ok, true, 'without a subject any ending is fine');
+  assert.equal(R.folderNameExample({ project: 'Library System', subject: 'CMPn323' }), 'YourName_Library_System_CMPn323');
+  assert.equal(R.checkFolderName('My Folder', { subject: 'DB', example: { project: 'Smart Parking' } }).params.example, 'YourName_Smart_Parking_DB');
+});

@@ -219,3 +219,6 @@ ul.plain li { padding: 1px 0; }
 .size-notice-inline { display: block; margin-top: 4px; font-size: var(--fs-help); color: var(--sea); font-weight: 700; }
 .audience { display: inline-flex; align-self: flex-start; align-items: center; gap: 8px; margin: 0; padding: 4px 12px; border-radius: 999px; background: var(--tint-a); color: var(--ink); font-size: var(--fs-label); font-weight: 700; }
 .audience .icon { color: var(--sea); }
+.folder-rule { display: flex; gap: 8px; align-items: flex-start; margin: 6px 0 0; font-size: var(--fs-help); color: var(--ink); line-height: 1.5; }
+.folder-rule .icon { color: var(--sea); margin-top: 2px; }
+.folder-rule span { overflow-wrap: anywhere; }

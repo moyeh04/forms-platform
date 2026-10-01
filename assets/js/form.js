@@ -253,10 +253,28 @@
       // The description sits between the question and the answer, where it is read first.
       help ? h('p', { class: 'help field-desc', id: id + '-help' }, help) : null,
       control,
+      folderRule(field),
       h('p', { class: 'error', id: id + '-err', role: 'alert', hidden: true })
     );
     if (S.errors[path]) paintErrorNode(node, S.errors[path]);
     return node;
+  }
+
+  /** The folder naming rule under a Drive folder question, with an example from the project title. */
+  function folderExample() {
+    var fn = S.form.rules && S.form.rules.folderName;
+    return Rules.folderNameExample({ project: Rules.valueByRole(S.form, S.data, 'title'), subject: fn && fn.subject });
+  }
+
+  function folderRule(field) {
+    var fn = S.form.rules && S.form.rules.folderName;
+    if (!fn || !fn.enabled || field.type !== 'drive_link' || (field.kinds && field.kinds.indexOf('folder') === -1)) return null;
+    return h('p', { class: 'folder-rule' }, icon('info', 16), h('span', null, t('folderRule', { example: folderExample() })));
+  }
+
+  function paintFolderRule() {
+    var el = root.querySelector('.folder-rule span');
+    if (el) el.textContent = t('folderRule', { example: folderExample() });
   }
 
   function paintErrorNode(node, err) {
@@ -316,6 +334,7 @@
     }
     if (message) hint(input, message);
     setVal(path, input.value);
+    if (field.role === 'title') paintFolderRule();
     if (S.errors[path]) { delete S.errors[path]; paintError(path); }
   }
 
