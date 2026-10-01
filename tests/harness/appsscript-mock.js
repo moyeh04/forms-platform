@@ -254,6 +254,7 @@ function createWorld(options = {}) {
   world.call = (name, ...args) => vm.runInContext(name, ctx)(...args);
   world.sheet = (ssId, name) => { const s = world.spreadsheets.get(ssId).getSheetByName(name); return s; };
   world.drive.setAccess = (id, a) => world.drive.access.set(id, a);
+  world.drive.setFolderName = (id, name) => world.drive.folders.set(id, { name });
   return world;
 }
 
