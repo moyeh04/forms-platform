@@ -265,8 +265,25 @@
         h('a', { class: 'btn btn-quiet sm', href: link, target: '_blank', rel: 'noopener' }, 'Open form'),
         h('button', { type: 'button', class: 'btn btn-quiet sm', onclick: async function () { toast((await ui.copyText(link)) ? 'Form link copied' : 'Could not copy', 'ok'); } }, icon('link', 18), 'Copy link'),
         f.sheetUrl ? h('a', { class: 'btn btn-quiet sm', href: f.sheetUrl, target: '_blank', rel: 'noopener' }, 'Google Sheet') : null,
-        h('button', { type: 'button', class: 'btn btn-quiet sm', onclick: function () { duplicateDialog(f); } }, 'Duplicate')));
+        h('button', { type: 'button', class: 'btn btn-quiet sm', onclick: function () { duplicateDialog(f); } }, 'Duplicate'),
+        h('button', { type: 'button', class: 'btn btn-quiet sm danger card-delete', name: 'delete-form', 'aria-label': 'Delete ' + f.title, onclick: function () { A.deleteForm(f); } }, icon('trash', 18), 'Delete')));
   }
+
+  /** One confirmation, then the form is gone and its sheet is in the Drive trash. */
+  A.deleteForm = async function (f, after) {
+    var ok = await ui.confirm({
+      title: 'Delete "' + f.title + '"?',
+      body: 'Its link stops working right away and it leaves the dashboard and every instructor link. Its Google Sheet, with all registrations, moves to your Drive trash, where you can restore it for 30 days.',
+      confirmText: 'Delete form', cancelText: 'Keep it', danger: true
+    });
+    if (!ok) return false;
+    try {
+      var r = await A.call('admin.forms.delete', { id: f.id, confirm: f.slug });
+      toast(r.sheetTrashed ? 'Form deleted. Its sheet is in the Drive trash.' : 'Form deleted.', 'ok');
+      if (after) after(); else A.render();
+      return true;
+    } catch (e) { A.fail(e); return false; }
+  };
 
   function duplicateDialog(f) {
     var title = f.title, term = f.term, subject = f.subject || '';

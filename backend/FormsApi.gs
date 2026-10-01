@@ -49,6 +49,13 @@ API['admin.forms.duplicate'] = admin(function (req) {
   return { form: f };
 });
 
+API['admin.forms.delete'] = admin(function (req) {
+  var form = requireForm(req.id);
+  // The page sends the link name back as a deliberate second key, so a stray call cannot delete a form.
+  if (String(req.confirm || '') !== form.slug) fail('confirm_required', 'Confirm by sending the form link name.');
+  return withLock_(function () { return deleteForm(form.id); });
+});
+
 API['admin.lists.get'] = admin(function () {
   return { lists: readLists() };
 });

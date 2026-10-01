@@ -130,3 +130,19 @@ test('Router: unknown actions and bad JSON return clean errors', () => {
   assert.equal(JSON.parse(out.getContent()).error.code, 'bad_json');
   assert.equal(w.api({ action: 'getForm', slug: 'missing' }).error.code, 'form_not_found');
 });
+
+test('Forms: deleting needs the link name, removes the form, trashes its sheet, and unlists it from links', () => {
+  const w = boot();
+  const a = w.admin({ action: 'admin.forms.create', type: 'team_registration', title: 'Keep me', term: 'Fall 2027' }).form;
+  const b = w.admin({ action: 'admin.forms.create', type: 'reservation', title: 'Delete me', term: 'Fall 2027' }).form;
+  w.admin({ action: 'admin.clients.create', name: 'Dr. X', forms: [a.slug, b.slug], hiddenColumns: [], canReview: false });
+  assert.equal(w.admin({ action: 'admin.forms.delete', id: b.id }).error.code, 'confirm_required');
+  assert.equal(w.api({ action: 'admin.forms.delete', id: b.id, confirm: b.slug }).ok, false, 'needs the PIN');
+  const r = w.admin({ action: 'admin.forms.delete', id: b.id, confirm: b.slug });
+  assert.equal(r.deleted, true);
+  assert.equal(r.sheetTrashed, true);
+  assert.ok(w.drive.trashed.has(b.sheetId), 'the sheet is in the Drive trash, not destroyed');
+  assert.deepEqual(w.admin({ action: 'admin.forms.list' }).forms.map((f) => f.slug), [a.slug], 'the other form is untouched');
+  assert.equal(w.api({ action: 'getForm', slug: b.slug }).error.code, 'form_not_found', 'the link stops working');
+  assert.deepEqual(w.admin({ action: 'admin.clients.list' }).clients[0].forms, [a.slug]);
+});

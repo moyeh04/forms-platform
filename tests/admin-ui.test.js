@@ -384,3 +384,17 @@ test('Timetable: session hours, dates that name the day, removing and adding tim
   assert.deepEqual(slots.days[0].times, ['10:00 - 10:15', '10:15 - 10:30', '10:30 - 10:45', '11:30 - 11:45']);
   assert.deepEqual(slots.days[1].times, slots.days[0].times, 'the copy keeps the edited times');
 });
+
+test('Delete form: one confirmation from the card removes it; cancelling keeps it', async () => {
+  const w = boot();
+  w.make('team_registration', 'Old projects');
+  const p = await openAdmin(w);
+  p.click('[name="delete-form"]'); await settle(2);
+  assert.ok(p.text().includes('Delete "Old projects"?'));
+  p.clickText('Keep it'); await settle(4);
+  assert.equal(w.admin({ action: 'admin.forms.list' }).forms.length, 1);
+  p.click('[name="delete-form"]'); await settle(2);
+  p.clickText('Delete form'); await settle(12);
+  assert.equal(w.admin({ action: 'admin.forms.list' }).forms.length, 0);
+  assert.ok(p.text().includes('No forms yet'));
+});
