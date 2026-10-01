@@ -160,20 +160,24 @@
     if (!groups.length) return h('div', { class: 'empty' }, 'No teams to show.');
     var ids = colIds(d);
     var showName = ids.indexOf('name') !== -1, showCode = ids.indexOf('code') !== -1, showPhone = ids.indexOf('phone') !== -1;
-    return h('div', null, groups.map(function (g, i) {
-      var head = [showName ? 'Team member' : '#', showCode ? 'Code' : null, showPhone ? 'Phone' : null].filter(Boolean);
-      var side = g.title !== undefined || g.link !== undefined
-        ? h('aside', { class: 'block-side' }, h('div', { class: 'title' }, g.link ? h('a', { href: g.link, target: '_blank', rel: 'noopener' }, g.title || 'Open') : (g.title || '-')))
-        : null;
-      return h('article', { class: 'block ' + (i % 2 ? 'tint-b' : 'tint-a') + (side ? '' : ' single'), dataset: { ref: g.ref } },
-        h('div', { class: 'block-main' }, h('table', { class: 'mini' },
-          h('thead', null, h('tr', null, head.map(function (c) { return h('th', null, c); }))),
+    var third = d.form.type === 'task_submission' ? 'Task' : 'Project';
+    return h('div', { class: 'team-list' }, groups.map(function (g, i) {
+      var hasTitle = g.title !== undefined || g.link !== undefined;
+      var head = [h('th', null, '#'), showName ? h('th', null, 'Team member') : null, showCode ? h('th', null, 'Code') : null, showPhone ? h('th', null, 'Phone') : null];
+      return h('article', { class: 'block team-card ' + (i % 2 ? 'tint-b' : 'tint-a'), dataset: { ref: g.ref } },
+        h('header', { class: 'block-head' },
+          h('span', { class: 'team-no' }, 'Team ' + (i + 1)),
+          hasTitle ? h('div', { class: 'block-side block-title' }, h('span', { class: 'kicker' }, third),
+            g.link ? h('a', { href: g.link, target: '_blank', rel: 'noopener' }, g.title || 'Open', icon('link', 15)) : h('span', null, g.title || '-')) : h('div', { class: 'block-title' }),
+          h('span', { class: 'block-meta' }, g.members.length === 1 ? 'Solo' : g.members.length + ' members')),
+        h('div', { class: 'scroll-x' }, h('table', { class: 'mini' },
+          h('thead', null, h('tr', null, head)),
           h('tbody', null, g.members.map(function (m, k) {
             return h('tr', { class: m.leader ? 'leader' : null },
-              h('td', { class: 'nm' }, (k + 1) + '. ', showName ? bdi(m.name) : null, m.leader ? icon('star', 16) : null),
+              h('td', { class: 'num' }, String(k + 1)),
+              showName ? h('td', { class: 'nm' }, bdi(m.name), m.leader ? h('span', { class: 'lead-tag' }, icon('star', 13), 'Leader') : null) : null,
               showCode ? h('td', { class: 'mono' }, m.code) : null, showPhone ? h('td', { class: 'mono' }, m.phone) : null);
-          })))),
-        side);
+          })))));
     }));
   }
 

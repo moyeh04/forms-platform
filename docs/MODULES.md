@@ -125,7 +125,7 @@ no validation.
 | `viewer.html` | The read-only instructor and client page (`?t=private-token`). |
 | `assets/css/theme.css` | Colors, fonts, and the type scale as variables. Change the look here. |
 | `assets/css/app.css` | Components of the student page. |
-| `assets/css/admin.css` | Dashboard and instructor layout, including the tinted team blocks. |
+| `assets/css/admin.css` | Dashboard and instructor layout, including the team cards (a coloured band per team, header strip, leader tag). |
 | `assets/js/config.js` | **The one file you edit:** the web app address. |
 | `assets/js/api.js` | Sends requests to the backend as plain-text JSON (avoids browser CORS checks). |
 | `assets/js/form.js`, `ticket.js`, `i18n.js` | The student page, the success ticket, English and Arabic text. |
