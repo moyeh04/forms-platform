@@ -62,11 +62,15 @@ test('Create: pick a type, name it, and land on its settings as a draft', async 
   const p = await openAdmin(w, '#/new');
   p.pick('type', 'task_submission');
   p.type('[name="title"]', 'Database Tasks');
-  p.type('[name="term"]', 'Fall 2027');
+  p.click('[name="season-spring"]');
+  const year = p.$('[name="termYear"]'); year.value = String(new Date().getFullYear() + 1); p.fire(year, 'change');
+  p.type('[name="subject"]', 'CMP n323');
   p.submitForm(); await settle(12);
   const forms = w.admin({ action: 'admin.forms.list' }).forms;
   assert.equal(forms.length, 1);
   assert.equal(forms[0].type, 'task_submission');
+  assert.equal(forms[0].term, 'Spring ' + (new Date().getFullYear() + 1), 'season chip plus year');
+  assert.equal(forms[0].subject, 'CMPn323', 'spaces are removed from the subject code');
   assert.equal(forms[0].status, 'draft');
   assert.ok(p.win.location.hash.endsWith('/settings'));
   assert.ok(p.$('[name="teamMin"]'), 'settings page is showing');
@@ -296,4 +300,20 @@ test('Team size note: the admin picks sizes, writes the note, and it is saved', 
   assert.ok(p.$('.notice-preview').textContent.includes('Others join to reach 5.'), 'live preview fills the placeholders');
   p.click('[name="save"]'); await settle(12);
   assert.deepEqual(w.admin({ action: 'admin.forms.get', id: f.id }).form.rules.teamSize.notice, { sizes: [3, 4], text: { en: 'Others join to reach {max}.', ar: '' } });
+});
+
+test('Term: settings show the saved season and year, and switching season saves the new term', async () => {
+  const w = boot();
+  const f = w.make('team_registration', 'Projects');
+  const p = await openAdmin(w, `#/f/${f.slug}/settings`);
+  assert.equal(p.$('[name="season-fall"]').getAttribute('aria-pressed'), 'true');
+  assert.equal(p.$('[name="termYear"]').value, '2027');
+  p.click('[name="season-summer"]');
+  p.type('[name="subject"]', 'CMPn336');
+  p.click('[name="save"]'); await settle(12);
+  const saved = w.admin({ action: 'admin.forms.get', id: f.id }).form;
+  assert.equal(saved.term, 'Summer 2027');
+  assert.equal(saved.subject, 'CMPn336');
+  const pub = w.api({ action: 'getForm', slug: saved.slug }).form;
+  assert.equal(pub.subject, 'CMPn336', 'students get the subject code');
 });

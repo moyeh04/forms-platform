@@ -370,3 +370,9 @@ test('Size note: picking a size with a note shows it under the chips and on the 
   p.pick('team_size', '5'); await settle();
   assert.equal(p.$('.size-notice'), null, 'no note for 5');
 });
+
+test('Subject: the subject code is shown as a tag next to the term', async () => {
+  const w = boot('team_registration', { subject: 'CMPn323' });
+  const p = await open(w);
+  assert.deepEqual(p.$$('.form-head .tag').map((t) => t.textContent), ['CMPn323', 'Fall 2027']);
+});
