@@ -59,7 +59,7 @@ Google yourself. Everything below follows from that.
 | Job | How it helps |
 |---|---|
 | **Hosts the website (GitHub Pages)** | Serves `index.html`, `admin.html`, `viewer.html`, and `assets/` as static files over HTTPS, from a global CDN, for free. |
-| **Updates the site on every push** | Push to `main` and Pages republishes in about a minute. No server to restart, no upload tool. |
+| **Tests and publishes on every push** | A push to `master` runs the workflow in `.github/workflows/pages.yml`: all JavaScript and Python tests, then a Pages deploy of the website files only. A failing test keeps the old site online. |
 | **Keeps the full history** | Every change is a commit. A bad change is undone by reverting it. Old versions of any file are one click away. |
 | **Gives you a safety net** | The repository is a complete copy of the project. If your laptop dies, `git clone` brings everything back. |
 | **Documents why things changed** | The commit convention (`feat(admin): ...`, merge commits that summarise a branch) makes the history readable. |
@@ -72,7 +72,7 @@ Google yourself. Everything below follows from that.
 | Run backend code | Google Apps Script |
 | Store registrations | Google Sheets |
 | Keep secrets (PIN, keys, tokens) | Google (script properties and hashed values in sheets) |
-| Run `npm run build` or the tests | You, on your computer (an optional GitHub Action could run the tests) |
+| Deploy the backend | You paste `dist/Code.gs` into Apps Script (each Actions run keeps a built copy as the `backend-dist` artifact) |
 | Send email | Google MailApp |
 
 Because GitHub only serves files, **nothing secret ever belongs in the
@@ -107,13 +107,20 @@ since every visitor's browser calls it.
 }}%%
 sequenceDiagram
     actor Dev as You
-    participant Git as GitHub repository (main)
+    participant Git as GitHub repository (master)
+    participant CI as GitHub Actions
     participant Pages as GitHub Pages
     participant CDN as CDN edge
     actor Stu as Student
 
     Dev->>Git: git push
-    Git->>Pages: publish files from the repository root
+    Git->>CI: Test and deploy site
+    CI->>CI: npm test and Python tests
+    alt a test fails
+        CI-->>Dev: red cross, the old site stays online
+    else all pass
+        CI->>Pages: publish index, admin, viewer, assets, shared
+    end
     Note over Pages: No build. The files are served exactly as committed.
     Stu->>CDN: GET /forms/index.html?f=slug
     CDN-->>Stu: static HTML (cached, over HTTPS)
@@ -127,9 +134,11 @@ Why it suits this project:
 - **No build step on the site.** The pages are plain HTML, CSS, and JavaScript.
   What you commit is exactly what visitors get, so there is nothing that can
   differ between your computer and the live site.
-- **The root folder is the site.** The deployment setting is *Deploy from a
-  branch, main, / (root)*. That is why the HTML files sit at the top of the
-  repository instead of in a `public/` folder.
+- **The root folder is the site.** The HTML files sit at the top of the
+  repository, and the workflow copies just them, `assets/`, and `shared/` into
+  the published artifact. Backend code, tests, scripts, and docs never go online.
+- **Tested before it is public.** Pages' source is *GitHub Actions*, so a push
+  that breaks a test is never published.
 - **No special folders.** Nothing starts with an underscore, so GitHub's
   default processing does not hide or change any file.
 - **Free HTTPS.** The page talks to Google over HTTPS, and the clipboard

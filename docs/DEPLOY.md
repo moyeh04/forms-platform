@@ -46,7 +46,7 @@ flowchart TD
     a5 -- "copy the address that ends in /exec" --> b1
     subgraph P2["Part 2: the website, on GitHub"]
         b1["6. Paste the address into assets/js/config.js"] --> b2["7. Push to GitHub"]
-        b2 --> b3["8. Settings, Pages: branch main, folder root"]
+        b2 --> b3["8. Settings, Pages: Source GitHub Actions"]
         b3 --> b4["9. Back in the sheet: Set website address"]
     end
     b4 --> c1
@@ -121,14 +121,15 @@ The only code you edit is one line in `assets/js/config.js`.
 2. In the project folder run:
    ```
    git remote add origin https://github.com/YOUR-NAME/forms.git
-   git push -u origin main
+   git push -u origin master
    ```
    (Or use GitHub's **Add file > Upload files** and drag the project folder contents in. Do not upload `node_modules`.)
 
 ### 8. Turn on GitHub Pages
 1. In the repository click **Settings**, then **Pages** in the left list.
-2. Under **Build and deployment** choose **Deploy from a branch**. Set Branch to **main** and the folder to **/ (root)**. Click **Save**.
-3. Wait about a minute and refresh. The page shows your site address:
+2. Under **Build and deployment**, set **Source** to **GitHub Actions**. Nothing else to fill in: the workflow in `.github/workflows/pages.yml` does the rest.
+3. Open the **Actions** tab. The run **Test and deploy site** starts on every push to `master`: it runs all tests, and only if they pass it publishes `index.html`, `admin.html`, `viewer.html`, `assets/`, and `shared/`. If a run is not there yet, click **Test and deploy site**, then **Run workflow**.
+4. Wait for the green tick (about a minute) and refresh the Pages settings. It shows your site address:
    `https://YOUR-NAME.github.io/forms/`
 
 ### 9. Tell the sheet your website address (for emails)
@@ -175,9 +176,34 @@ Do these once with a test form:
 
 ## Updating later
 
-**Backend changed** (new `dist/Code.gs`): in Apps Script paste the new code over the old, save, then **Deploy > Manage deployments**, click the pencil, set **Version: New version**, and **Deploy**. The web app address does not change.
+```mermaid
+flowchart TD
+    q{"What changed?"}
+    q -- "website: html, assets, shared" --> w["git push to master"]
+    w --> ci["GitHub Actions: tests, then publish<br/>green tick in about 2 minutes"]
+    q -- "backend: backend/ or shared/rules.js" --> b["npm run build<br/>or download backend-dist from the Actions run"]
+    b --> p["Paste dist/Code.gs in Apps Script, save"]
+    p --> v["Deploy, Manage deployments, pencil,<br/>Version: New version, Deploy"]
+    q -- "forms, questions, lists, timetable" --> n["Nothing to deploy:<br/>change it in the dashboard"]
+    class q cDec
+    class ci,v cOk
+    classDef cDec fill:#FBEFC9,stroke:#C9A24A,stroke-width:1.5px,color:#2F2418
+    classDef cOk fill:#BFD9CF,stroke:#2E5A55,stroke-width:1.5px,color:#17302D
+```
 
-**Website changed**: push to GitHub; Pages updates in a minute.
+**Website changed**: commit and push to `master`. The **Test and deploy site**
+workflow runs the tests and publishes the site; the change is live when the run
+shows a green tick. A red cross means a test failed and the old site stays up:
+open the run to see which test. Hard-refresh the page (Ctrl+F5) if your browser
+still shows the old version.
+
+**Backend changed** (anything in `backend/` or `shared/rules.js`): run
+`npm run build`, or download the **backend-dist** artifact from the latest
+Actions run. In Apps Script paste the new `Code.gs` over the old, save, then
+**Deploy > Manage deployments**, click the pencil, set **Version: New version**,
+and **Deploy**. The web app address does not change. A change to
+`shared/rules.js` needs both: the push (browser copy) and the new version
+(server copy).
 
 ## If something goes wrong
 
@@ -187,6 +213,8 @@ Do these once with a test form:
 | Page says it could not reach the server | The web app was not deployed with **Who has access: Anyone**. Redeploy (step 5). |
 | "That PIN is not correct" | Wrong PIN, or too many tries: wait a few minutes. To reset, run **Forms Platform > 2. Set admin PIN...** again. |
 | Changes to the backend have no effect | You saved the code but did not create a **New version** of the deployment. |
+| The site did not change after a push | Open the **Actions** tab: a red run means a test failed and nothing was published. A green run means the browser cached the old file: press Ctrl+F5. |
+| Actions says Pages is not enabled | Settings, Pages, Source: **GitHub Actions**. |
 | The menu "Forms Platform" is missing | Reload the sheet and wait a few seconds. |
 
 ---
