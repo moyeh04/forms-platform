@@ -118,7 +118,7 @@ step needs the real Google services (see "What could not be tested here").
 | Requirement | Status |
 |---|---|
 | Google Sheets: every team is a block with a heavy border and alternating tints, a star on the leader, one merged project or task cell | Done |
-| Admin dashboard uses the same pattern: tinted blocks with heavy borders between teams | Done |
+| Dashboard and instructor links show each team as a card: a teal or gold band, a header with the team number, project, and size, and the leader marked; readable in light and dark and stacked on phones | Done |
 | Print team list and print a day's reservations from a sheet menu and from the dashboard, with PDF export | Done, check live |
 | WhatsApp split screen: pasted request numbers matched to registrations by phone, timetable preview, approve or reject, two review steps | Done |
 | CSV download of any form | Done |

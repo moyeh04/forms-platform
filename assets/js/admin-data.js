@@ -187,20 +187,24 @@
   function teams(form, rows, reload) {
     var sorted = rows.slice().sort(function (a, b) { return String(a.created).localeCompare(String(b.created)); });
     var third = form.type === 'task_submission' ? 'Task' : 'Project';
-    return h('div', null, sorted.map(function (s, i) {
+    return h('div', { class: 'team-list' }, sorted.map(function (s, i) {
       var members = Rules.membersOf(form, s.data);
       var title = s.title || '-';
-      return h('article', { class: 'block ' + (i % 2 ? 'tint-b' : 'tint-a'), dataset: { ref: s.ref } },
-        h('div', { class: 'block-main' },
-          h('table', { class: 'mini' },
-            h('thead', null, h('tr', null, h('th', null, 'Team member'), h('th', null, 'Code'), h('th', null, 'Phone'))),
-            h('tbody', null, members.map(function (m, k) {
-              return h('tr', { class: m.leader ? 'leader' : null }, h('td', { class: 'nm' }, (k + 1) + '. ', bdi(m.name), m.leader ? icon('star', 16) : null), h('td', { class: 'mono' }, m.code), h('td', { class: 'mono' }, m.phone));
-            })))),
-        h('aside', { class: 'block-side' },
-          h('div', null, h('span', { class: 'muted-note' }, third), h('div', { class: 'title' }, s.link ? h('a', { href: s.link, target: '_blank', rel: 'noopener' }, title) : title)),
-          h('div', { class: 'muted-note' }, s.ref + ' - team of ' + members.length),
-          h('div', { class: 'actions' }, statusSelect(form, s), detailsButton(form, s, reload))));
+      return h('article', { class: 'block team-card ' + (i % 2 ? 'tint-b' : 'tint-a'), dataset: { ref: s.ref } },
+        h('header', { class: 'block-head' },
+          h('span', { class: 'team-no' }, 'Team ' + (i + 1)),
+          h('div', { class: 'block-side block-title' }, h('span', { class: 'kicker' }, third),
+            s.link ? h('a', { href: s.link, target: '_blank', rel: 'noopener' }, title, icon('link', 15)) : h('span', null, title)),
+          h('span', { class: 'block-meta' }, h('span', { class: 'mono' }, s.ref), ' · ', members.length === 1 ? 'Solo' : members.length + ' members'),
+          h('div', { class: 'actions block-actions' }, statusSelect(form, s), detailsButton(form, s, reload))),
+        h('div', { class: 'scroll-x' }, h('table', { class: 'mini' },
+          h('thead', null, h('tr', null, h('th', null, '#'), h('th', null, 'Team member'), h('th', null, 'Code'), h('th', null, 'Phone'))),
+          h('tbody', null, members.map(function (m, k) {
+            return h('tr', { class: m.leader ? 'leader' : null },
+              h('td', { class: 'num' }, String(k + 1)),
+              h('td', { class: 'nm' }, bdi(m.name), m.leader ? h('span', { class: 'lead-tag' }, icon('star', 13), 'Leader') : null),
+              h('td', { class: 'mono' }, m.code), h('td', { class: 'mono' }, m.phone));
+          })))));
     }));
   }
 
