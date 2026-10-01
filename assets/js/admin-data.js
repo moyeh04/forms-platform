@@ -228,7 +228,8 @@
         h('div', { class: 'scroll-x' }, h('table', { class: 'mini' },
           h('thead', null, h('tr', null, h('th', null, 'Time'), h('th', null, 'Team leader'), h('th', null, 'Code'), h('th', null, 'Phone'), h('th', null, 'Project'), h('th', null, 'Status'), h('th', null))),
           h('tbody', null, g.rows.map(function (s) {
-            return h('tr', null, h('td', { class: 'mono' }, s.data.slot.time), h('td', { class: 'nm' }, bdi(s.name)), h('td', { class: 'mono' }, s.code), h('td', { class: 'mono' }, s.phone), h('td', null, s.title), h('td', null, statusSelect(form, s)), h('td', null, detailsButton(form, s, reload)));
+            var L = function (label, td) { td.dataset.label = label; return td; };
+            return h('tr', null, L('Time', h('td', { class: 'mono' }, s.data.slot.time)), L('Team leader', h('td', { class: 'nm' }, bdi(s.name))), L('Code', h('td', { class: 'mono' }, s.code)), L('Phone', h('td', { class: 'mono' }, s.phone)), L('Project', h('td', null, s.title)), L('Status', h('td', null, statusSelect(form, s))), h('td', null, detailsButton(form, s, reload)));
           })))));
     }));
   }
