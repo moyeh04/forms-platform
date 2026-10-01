@@ -269,11 +269,11 @@
   function folderRule(field) {
     var fn = S.form.rules && S.form.rules.folderName;
     if (!fn || !fn.enabled || field.type !== 'drive_link' || (field.kinds && field.kinds.indexOf('folder') === -1)) return null;
-    return h('p', { class: 'folder-rule' }, icon('info', 16), h('span', null, t('folderRule', { example: folderExample() })));
+    return h('p', { class: 'folder-rule' }, icon('info', 16), h('span', { class: 'folder-rule-text' }, t('folderRule', { example: folderExample() })));
   }
 
   function paintFolderRule() {
-    var el = root.querySelector('.folder-rule span');
+    var el = root.querySelector('.folder-rule-text');
     if (el) el.textContent = t('folderRule', { example: folderExample() });
   }
 
