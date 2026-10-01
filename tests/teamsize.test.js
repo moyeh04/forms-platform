@@ -127,3 +127,22 @@ test('Admin: editing a team through the dashboard keeps the size and members in 
   const good = w.admin({ action: 'admin.submission.update', slug: w.form.slug, submissionId: sub.id, patch: { data: { ...sub.data, team_size: '3', members: [member('4230002'), member('4230003')] } } });
   assert.equal(good.ok, true);
 });
+
+test('Size note: only the chosen sizes get it, with {n} and {max} filled in', () => {
+  const f = { rules: { teamSize: { min: 1, max: 5, notice: { sizes: [3, 4], text: { en: 'Teams of {n} grow to {max}.', ar: 'فريق {n} يكمل {max}' } } } } };
+  assert.equal(R.teamSizeNotice(f, '3', 'en'), 'Teams of 3 grow to 5.');
+  assert.equal(R.teamSizeNotice(f, 4, 'ar'), 'فريق 4 يكمل 5');
+  assert.equal(R.teamSizeNotice(f, '5', 'en'), '');
+  assert.equal(R.teamSizeNotice({ rules: { teamSize: { min: 1, max: 5 } } }, '3', 'en'), '');
+  assert.equal(R.teamSizeNotice({ rules: { teamSize: { min: 1, max: 5, notice: { sizes: [3], text: { en: 'Only English' } } } } }, '3', 'ar'), 'Only English', 'falls back to English');
+});
+
+test('Size note: saved with the range, cleaned, kept on later saves, and public', () => {
+  const w = boot();
+  const save = (teamSize) => w.admin({ action: 'admin.forms.update', id: w.form.id, patch: { rules: { teamSize } } });
+  const r = save({ min: 1, max: 5, notice: { sizes: ['4', 3, 3, 9], text: { en: '  Others join to reach {max}. ', ar: '' } } });
+  assert.deepEqual(r.form.rules.teamSize.notice, { sizes: [3, 4], text: { en: 'Others join to reach {max}.', ar: '' } }, 'sizes outside the range and repeats are dropped');
+  assert.deepEqual(save({ min: 1, max: 4 }).form.rules.teamSize.notice.sizes, [3, 4], 'a save without a note keeps the old one');
+  assert.deepEqual(w.api({ action: 'getForm', slug: w.form.slug }).form.rules.teamSize.notice.sizes, [3, 4]);
+  assert.equal(save({ min: 1, max: 4, notice: null }).form.rules.teamSize.notice, undefined, 'null removes it');
+});

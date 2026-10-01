@@ -254,6 +254,20 @@
     return { min: min, max: max };
   }
 
+  /**
+   * The note a student sees after choosing a team size, or '' when that size has none.
+   * {n} becomes the chosen size and {max} the largest allowed size.
+   */
+  function teamSizeNotice(form, size, lang) {
+    var ts = (form && form.rules && form.rules.teamSize) || {};
+    var n = ts.notice;
+    var v = parseInt(size, 10);
+    if (!n || !Array.isArray(n.sizes) || n.sizes.map(Number).indexOf(v) === -1) return '';
+    var text = (n.text && (n.text[lang] || n.text.en || n.text.ar)) || '';
+    var max = teamSizeRange(form).max;
+    return String(text).replace(/\{n\}/g, String(v)).replace(/\{max\}/g, String(max));
+  }
+
   function validateTeamSize(raw, form) {
     var r = teamSizeRange(form);
     var s = latinDigits(raw).trim();
@@ -415,6 +429,7 @@
     validateField: validateField,
     validateSubmission: validateSubmission,
     teamSizeRange: teamSizeRange,
+    teamSizeNotice: teamSizeNotice,
     latinDigits: latinDigits,
     isEmpty: isEmpty
   };
