@@ -232,10 +232,12 @@
       default: control = textControl(field, path, id);
     }
     var optional = field.required === false;
+    var help = field.help ? L(field.help) : '';
     var node = h('div', { class: 'field', dataset: { path: path } },
       h('label', { class: 'label' + (field.type === 'members' ? ' sr-only' : ''), for: field.type === 'select' && (field.options || []).length <= 4 ? null : id }, L(field.label), optional ? h('span', { class: 'opt' }, '(' + t('optional') + ')') : null),
+      // The description sits between the question and the answer, where it is read first.
+      help ? h('p', { class: 'help field-desc', id: id + '-help' }, help) : null,
       control,
-      field.help ? h('p', { class: 'help', id: id + '-help' }, L(field.help)) : null,
       h('p', { class: 'error', id: id + '-err', role: 'alert', hidden: true })
     );
     if (S.errors[path]) paintErrorNode(node, S.errors[path]);

@@ -57,6 +57,14 @@ body.admin { font-size: 1rem; }
 .fields-table .sub td:first-child { padding-inline-start: 28px; }
 .fields-table .input { min-height: 38px; font-size: 1rem; }
 .fields-table .num { width: 4.5rem; }
+.fields-table .desc-row td { border-top: 0; padding-top: 0; }
+.fields-table .add-desc { display: block; padding: 2px 0 0; font-size: var(--fs-help); }
+.desc-edit { padding: 8px 12px 10px; border-inline-start: 3px solid var(--sea); background: var(--sheet-2); border-radius: 2px; }
+.desc-edit .label { font-size: var(--fs-help); color: var(--mute); }
+.desc-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 4px 0 2px; }
+.desc-pair .textarea { min-height: 58px; font-size: .95rem; background: var(--sheet); }
+.desc-edit .link-btn { font-size: var(--fs-help); color: var(--err); padding: 2px 0; }
+@media (max-width: 700px) { .desc-pair { grid-template-columns: 1fr; } }
 .muted-note { color: var(--mute); font-size: var(--fs-help); font-style: italic; }
 .size-preview { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px; }
 .size-preview span { min-width: 2.2rem; text-align: center; padding: 2px 8px; border: 1.5px solid var(--line); border-radius: 4px; font-weight: 700; background: var(--sheet-2); }
