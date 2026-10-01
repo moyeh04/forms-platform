@@ -82,6 +82,7 @@ body.admin { font-size: 1rem; }
 .toggle-chip { min-width: 46px; min-height: 40px; padding: 4px 14px; border: 1.5px solid var(--line); border-radius: 999px; background: var(--sheet); color: var(--ink); font-weight: 700; cursor: pointer; }
 .toggle-chip:hover { border-color: var(--ink); }
 .toggle-chip[aria-pressed="true"] { background: var(--sea); border-color: var(--sea); color: var(--on-sea); }
+.toggle-chip .chip-sub { margin-inline-start: 8px; font-weight: 400; opacity: .8; }
 .notice-preview { margin-top: 6px; }
 .notice-preview .size-notice { margin-top: 6px; }
 .day-card { border: 1.5px solid var(--line); border-radius: 4px; padding: 12px 14px; margin-bottom: 12px; background: var(--sheet-2); }
