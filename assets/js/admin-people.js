@@ -95,42 +95,221 @@
 
   /* ── Lists ──────────────────────────────────────────────────── */
 
-  function linesOf(values) {
-    return (values || []).map(function (o) {
-      var en = o.label && o.label.en;
-      return en && en !== o.value ? o.value + ' | ' + en : o.value;
-    }).join('\n');
-  }
-
-  function valuesOf(text) {
-    return String(text).split(/\r?\n/).map(function (l) { return l.trim(); }).filter(Boolean).map(function (l) {
-      var i = l.indexOf('|');
-      return i === -1 ? l : [l.slice(0, i).trim(), l.slice(i + 1).trim()];
-    });
-  }
-
-  var LIST_NAMES = {
-    levels: 'Levels', curricula: 'Bylaws', majors: 'Majors', sections: 'Sections', groups: 'Groups', wa_sections: 'WhatsApp section numbers'
+  /** What each shared list is for, and which form types ask it by default. */
+  var LIST_INFO = {
+    levels: { name: 'Levels', about: 'The level or year question.', types: ['team_registration', 'task_submission', 'reservation', 'whatsapp_registration'] },
+    curricula: { name: 'Bylaws', about: 'The bylaw (curriculum year) question.', types: ['team_registration', 'task_submission', 'reservation'] },
+    majors: { name: 'Majors', about: 'Specializations. A form can also be limited to some of them in its settings.', types: ['team_registration', 'task_submission', 'reservation', 'whatsapp_registration'] },
+    sections: { name: 'Sections', about: 'Lecture sections such as 4C-TH1.', types: ['team_registration', 'task_submission', 'reservation'] },
+    groups: { name: 'Groups', about: 'WhatsApp group letters (A with Chemistry, B without).', types: ['whatsapp_registration'] },
+    wa_sections: { name: 'WhatsApp section numbers', about: 'The number next to TH in a student timetable.', types: ['whatsapp_registration'] }
   };
 
+  function listName(key) { return (LIST_INFO[key] && LIST_INFO[key].name) || key; }
+
+  /** Forms whose questions (or member questions) read this list. */
+  function formsUsing(forms, key) {
+    return forms.filter(function (f) {
+      var uses = function (fields) { return (fields || []).some(function (x) { return x.list === key || uses(x.fields); }); };
+      return f.status !== 'archived' && uses(f.fields);
+    });
+  }
+
+  function toRows(values) {
+    return (values || []).map(function (o) {
+      var label = o.label || {};
+      return { value: String(o.value), en: label.en && label.en !== String(o.value) ? label.en : '', ar: label.ar && label.ar !== String(o.value) ? label.ar : '' };
+    });
+  }
+
+  function fromRows(rows) {
+    return rows.filter(function (r) { return r.value.trim(); }).map(function (r) {
+      var v = r.value.trim();
+      return { value: v, label: { en: r.en.trim() || v, ar: r.ar.trim() || v } };
+    });
+  }
+
   A.views.lists = async function (mount) {
-    var lists = (await A.call('admin.lists.get')).lists;
-    ui.clear(mount);
-    mount.appendChild(h('div', { class: 'page-head' }, h('h2', null, 'Lists')));
-    mount.appendChild(h('p', { class: 'help' }, 'These are the choices behind the dropdowns. Write one choice per line. To show a different English name, write the stored value, a bar, then the English name. For example: الأول / الثانية | Level 1 / Year 2. Changes reach every form straight away.'));
-    Object.keys(lists).forEach(function (key) {
-      var ta = h('textarea', { class: 'textarea', rows: '7', name: 'list-' + key, 'aria-label': LIST_NAMES[key] || key });
-      ta.value = linesOf(lists[key]);
-      var btn = h('button', { type: 'button', class: 'btn btn-primary sm', name: 'save-' + key }, 'Save');
-      btn.addEventListener('click', function () {
-        A.busy(btn, async function () {
-          var vals = valuesOf(ta.value);
+    var both = await Promise.all([A.call('admin.lists.get'), A.call('admin.forms.list')]);
+    var lists = both[0].lists;
+    var forms = both[1].forms;
+    var keys = Object.keys(lists);
+    var st = { type: 'all', key: keys[0], rows: null, dirty: false, view: '' };
+
+    /** Plain lists (numbers, codes) read best as chips; named ones need the table. */
+    function plain() { return st.rows.every(function (r) { return !r.en && !r.ar; }); }
+
+    var side = h('nav', { class: 'list-nav', 'aria-label': 'Lists' });
+    var pane = h('section', { class: 'panel list-pane' });
+    var filter = h('div', { class: 'toggle-chips', role: 'radiogroup', 'aria-label': 'Show lists used by' });
+
+    function visibleKeys() {
+      if (st.type === 'all') return keys;
+      return keys.filter(function (k) {
+        var info = LIST_INFO[k];
+        return (info && info.types.indexOf(st.type) !== -1) || formsUsing(forms.filter(function (f) { return f.type === st.type; }), k).length;
+      });
+    }
+
+    function select(key) {
+      if (st.dirty && key !== st.key && !window.confirm('Leave ' + listName(st.key) + ' without saving your changes?')) return;
+      st.key = key; st.rows = toRows(lists[key]); st.dirty = false; st.view = '';
+      paint();
+    }
+
+    function paintFilter() {
+      ui.clear(filter);
+      [['all', 'All lists']].concat(Object.keys(A.TYPES).map(function (k) { return [k, A.TYPES[k].label]; })).forEach(function (o) {
+        var on = st.type === o[0];
+        filter.appendChild(h('button', { type: 'button', class: 'toggle-chip', name: 'type-' + o[0], role: 'radio', 'aria-checked': on ? 'true' : 'false', 'aria-pressed': on ? 'true' : 'false', onclick: function () {
+          st.type = o[0];
+          var vis = visibleKeys();
+          if (vis.indexOf(st.key) === -1 && vis.length) select(vis[0]); else paint();
+        } }, o[1]));
+      });
+    }
+
+    function paintSide() {
+      ui.clear(side);
+      visibleKeys().forEach(function (k) {
+        var users = formsUsing(forms, k).length;
+        side.appendChild(h('button', { type: 'button', class: 'list-nav-item', name: 'pick-' + k, 'aria-current': k === st.key ? 'true' : null, onclick: function () { select(k); } },
+          h('span', { class: 'list-nav-name' }, listName(k), k === st.key && st.dirty ? h('span', { class: 'dirty-dot', title: 'Unsaved changes' }) : null),
+          h('span', { class: 'list-nav-meta' }, (lists[k] || []).length + ' choices · ' + (users ? 'used by ' + users + ' form' + (users > 1 ? 's' : '') : 'not used yet'))));
+      });
+    }
+
+    function touch() { st.dirty = true; paintSide(); saveBar(); }
+
+    var bar = h('div', { class: 'list-save' });
+    function saveBar() {
+      ui.clear(bar);
+      var saveBtn = h('button', { type: 'button', class: 'btn btn-primary sm', name: 'save-list', disabled: !st.dirty }, 'Save ' + listName(st.key));
+      saveBtn.addEventListener('click', function () {
+        A.busy(saveBtn, async function () {
+          var vals = fromRows(st.rows);
           if (!vals.length) return toast('A list needs at least one choice.', 'err');
-          await A.call('admin.lists.set', { key: key, values: vals });
-          toast((LIST_NAMES[key] || key) + ' saved', 'ok');
+          var seen = {};
+          var dup = vals.filter(function (v) { var d = seen[v.value]; seen[v.value] = true; return d; })[0];
+          if (dup) return toast('"' + dup.value + '" is in the list twice.', 'err');
+          var out = await A.call('admin.lists.set', { key: st.key, values: vals });
+          lists = out.lists;
+          st.rows = toRows(lists[st.key]); st.dirty = false;
+          toast(listName(st.key) + ' saved. Every form using it shows the new choices.', 'ok');
+          paint();
         });
       });
-      mount.appendChild(h('section', { class: 'panel', dataset: { list: key } }, h('h2', null, LIST_NAMES[key] || key), ta, h('div', { class: 'actions', style: { marginTop: '8px' } }, btn)));
-    });
+      bar.appendChild(h('span', { class: 'muted-note' }, st.dirty ? 'Unsaved changes' : 'All changes saved'));
+      if (st.dirty) bar.appendChild(h('button', { type: 'button', class: 'btn btn-quiet sm', name: 'revert', onclick: function () { st.rows = toRows(lists[st.key]); st.dirty = false; paint(); } }, 'Undo changes'));
+      bar.appendChild(saveBtn);
+    }
+
+    function rowEl(r, i) {
+      var move = function (d) { var j = i + d; if (j < 0 || j >= st.rows.length) return; var t = st.rows[i]; st.rows[i] = st.rows[j]; st.rows[j] = t; touch(); paintRows(); };
+      return h('li', { class: 'choice', dataset: { i: String(i) } },
+        h('span', { class: 'choice-n' }, String(i + 1)),
+        A.text(r.value, function (v) { r.value = v; touch(); }, { class: 'input', name: 'value-' + i, 'aria-label': 'Saved value ' + (i + 1), dir: 'auto' }),
+        A.text(r.en, function (v) { r.en = v; touch(); }, { class: 'input', name: 'en-' + i, 'aria-label': 'English name ' + (i + 1), placeholder: 'Same as value', dir: 'ltr' }),
+        A.text(r.ar, function (v) { r.ar = v; touch(); }, { class: 'input', name: 'ar-' + i, 'aria-label': 'Arabic name ' + (i + 1), placeholder: 'نفس القيمة', dir: 'rtl', lang: 'ar' }),
+        h('span', { class: 'choice-tools' },
+          h('button', { type: 'button', class: 'icon-btn sm', 'aria-label': 'Move up', disabled: i === 0, onclick: function () { move(-1); } }, '↑'),
+          h('button', { type: 'button', class: 'icon-btn sm', 'aria-label': 'Move down', disabled: i === st.rows.length - 1, onclick: function () { move(1); } }, '↓'),
+          h('button', { type: 'button', class: 'icon-btn sm danger', name: 'remove-' + i, 'aria-label': 'Remove ' + (r.value || 'choice'), onclick: function () { st.rows.splice(i, 1); touch(); paintRows(); } }, icon('trash', 16))));
+    }
+
+    var rowsBox = h('div');
+    function chipEl(r, i) {
+      return h('li', { class: 'value-chip', dataset: { i: String(i) } }, h('span', { dir: 'auto' }, r.value),
+        h('button', { type: 'button', name: 'remove-' + i, 'aria-label': 'Remove ' + r.value, onclick: function () { st.rows.splice(i, 1); touch(); paintRows(); } }, icon('x', 14)));
+    }
+    function paintRows() {
+      ui.clear(rowsBox);
+      if (!st.rows.length) return rowsBox.appendChild(h('div', { class: 'empty' }, 'No choices yet. Add the first one below.'));
+      if (st.view === 'chips') return rowsBox.appendChild(h('ul', { class: 'value-chips' }, st.rows.map(chipEl)));
+      rowsBox.appendChild(h('div', { class: 'choice-head', 'aria-hidden': 'true' }, h('span'), h('span', null, 'Saved value'), h('span', null, 'English name'), h('span', null, 'Arabic name'), h('span')));
+      rowsBox.appendChild(h('ol', { class: 'choices' }, st.rows.map(rowEl)));
+    }
+
+    function adder() {
+      var v = h('input', { class: 'input', name: 'new-value', placeholder: 'New choice', dir: 'auto', 'aria-label': 'New choice' });
+      var en = h('input', { class: 'input', name: 'new-en', placeholder: 'English name (optional)', dir: 'ltr', 'aria-label': 'English name for the new choice' });
+      var add = function () {
+        if (!v.value.trim()) return v.focus();
+        st.rows.push({ value: v.value.trim(), en: en.value.trim(), ar: '' });
+        var named = !!en.value.trim();
+        v.value = ''; en.value = '';
+        touch();
+        if (named && st.view === 'chips') { st.view = 'table'; paintPane(); pane.querySelector('[name="new-value"]').focus(); return; }
+        paintRows(); v.focus();
+      };
+      [v, en].forEach(function (x) { x.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); add(); } }); });
+      return h('div', { class: 'choice-add' }, v, en, h('button', { type: 'button', class: 'btn btn-quiet sm', name: 'add-choice', onclick: add }, icon('plus', 18), 'Add'));
+    }
+
+    function tools() {
+      var numeric = st.rows.length > 0 && st.rows.every(function (r) { return /^\d+$/.test(r.value); });
+      var from = h('input', { class: 'input num', type: 'number', name: 'range-from', value: '1', 'aria-label': 'From' });
+      var to = h('input', { class: 'input num', type: 'number', name: 'range-to', value: String(Math.max(st.rows.length, 1)), 'aria-label': 'To' });
+      var range = numeric || !st.rows.length ? h('div', { class: 'list-tool' },
+        h('span', { class: 'label' }, 'Fill with numbers'), h('span', null, 'from'), from, h('span', null, 'to'), to,
+        h('button', { type: 'button', class: 'btn btn-quiet sm', name: 'fill-range', onclick: function () {
+          var a = parseInt(from.value, 10), b = parseInt(to.value, 10);
+          if (!(a >= 0) || !(b >= a) || b - a > 300) return toast('Use a range like 1 to 33.', 'err');
+          st.rows = []; for (var n = a; n <= b; n++) st.rows.push({ value: String(n), en: '', ar: '' });
+          touch(); paintRows();
+        } }, 'Replace the list')) : null;
+      var paste = h('textarea', { class: 'textarea', rows: '5', name: 'paste-list', placeholder: 'One choice per line. To give an English name, add a bar:\nحاسبات | Computers', 'aria-label': 'Paste many choices' });
+      var details = h('details', { class: 'list-tool paste-tool' }, h('summary', null, 'Paste many at once'),
+        paste,
+        h('div', { class: 'actions' },
+          h('button', { type: 'button', class: 'btn btn-quiet sm', name: 'paste-add', onclick: function () { st.rows = st.rows.concat(parse(paste.value)); paste.value = ''; touch(); paintRows(); } }, 'Add to the end'),
+          h('button', { type: 'button', class: 'btn btn-quiet sm', name: 'paste-replace', onclick: function () { st.rows = parse(paste.value); paste.value = ''; touch(); paintRows(); } }, 'Replace the list')));
+      return [range, details];
+    }
+
+    function parse(text) {
+      return String(text).split(/\r?\n/).map(function (l) { return l.trim(); }).filter(Boolean).map(function (l) {
+        var i = l.indexOf('|');
+        return i === -1 ? { value: l, en: '', ar: '' } : { value: l.slice(0, i).trim(), en: l.slice(i + 1).trim(), ar: '' };
+      });
+    }
+
+    function paintPane() {
+      ui.clear(pane);
+      var key = st.key;
+      if (!key) return pane.appendChild(h('div', { class: 'empty' }, 'No lists for this kind of form.'));
+      var info = LIST_INFO[key] || { about: '', types: [] };
+      var users = formsUsing(forms, key);
+      pane.dataset.list = key;
+      pane.appendChild(h('div', { class: 'list-head' },
+        h('h2', null, listName(key)),
+        h('p', { class: 'help' }, info.about),
+        h('div', { class: 'used-by' }, h('span', { class: 'label' }, 'Used by'),
+          users.length ? users.map(function (f) { return h('a', { class: 'used-chip', href: '#/f/' + encodeURIComponent(f.slug) + '/settings' }, icon((A.TYPES[f.type] || {}).icon || 'task', 14), f.title, f.term ? h('span', { class: 'muted-note' }, f.term) : null); })
+            : h('span', { class: 'muted-note' }, 'No form uses it yet. New ' + info.types.map(function (t) { return (A.TYPES[t] || { label: t }).label.toLowerCase(); }).join(', ') + ' forms will.'))));
+      if (!st.view) st.view = plain() ? 'chips' : 'table';
+      pane.appendChild(h('div', { class: 'view-switch', role: 'radiogroup', 'aria-label': 'Layout' },
+        h('span', { class: 'muted-note' }, st.rows.length + ' choices'),
+        [['chips', 'Compact'], ['table', 'With English and Arabic names']].map(function (v) {
+          return h('button', { type: 'button', class: 'toggle-chip sm', name: 'view-' + v[0], role: 'radio', 'aria-checked': st.view === v[0] ? 'true' : 'false', 'aria-pressed': st.view === v[0] ? 'true' : 'false', onclick: function () { st.view = v[0]; paintPane(); } }, v[1]);
+        })));
+      paintRows();
+      pane.appendChild(rowsBox);
+      pane.appendChild(adder());
+      tools().forEach(function (t) { if (t) pane.appendChild(t); });
+      pane.appendChild(h('p', { class: 'muted-note' }, 'Changes reach every form that uses this list as soon as you save. Answers already saved are not changed.'));
+      saveBar();
+      pane.appendChild(bar);
+    }
+
+    function paint() { paintFilter(); paintSide(); paintPane(); }
+
+    st.rows = toRows(lists[st.key]);
+    ui.clear(mount);
+    mount.appendChild(h('div', { class: 'page-head' }, h('h2', null, 'Lists')));
+    mount.appendChild(h('p', { class: 'help' }, 'The choices behind dropdown questions. Each list is shared by every form that asks that question. Show only the lists a kind of form uses:'));
+    mount.appendChild(filter);
+    mount.appendChild(h('div', { class: 'lists-layout' }, side, pane));
+    paint();
   };
 })(window.App = window.App || {});

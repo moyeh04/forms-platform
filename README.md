@@ -83,7 +83,7 @@ step needs the real Google services (see "What could not be tested here").
 | Term picked from Fall, Spring, or Summer chips plus a year list, and a subject code (for example CMPn323) shown as a tag | Done |
 | Title built from settings, e.g. "Database Team Project Registration Form" plus a term tag. No "Clean Code", no "Form Nº" | Done |
 | A form can be limited to some specializations (for example Computers only): the Major question locks to them and the server refuses others | Done |
-| Editable lists behind dropdowns (levels, bylaws, majors, sections, groups) | Done |
+| Editable lists behind dropdowns (levels, bylaws, majors, sections, groups): a list-by-list editor filtered by form type, showing which forms use each list, with compact chips for plain lists, named rows for the rest, number ranges, and bulk paste | Done |
 
 ### Student experience
 | Requirement | Status |
