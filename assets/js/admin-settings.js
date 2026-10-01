@@ -160,8 +160,8 @@
     f.rules.folderName = f.rules.folderName || { enabled: false, subject: '' };
     var folderBox = hasFolder ? h('div', { class: 'subpanel' },
       h('h3', null, 'Drive folder name'),
-      h('p', { class: 'help' }, 'When the Drive check is on, the folder name is read and must look like Name_Project_Name_Subject: no spaces, parts joined by underscores, ending with the subject. Students see the rule with an example.'),
-      A.check('Folder names must follow Name_Project_Name_Subject', f.rules.folderName.enabled, function (v) { f.rules.folderName.enabled = v; }),
+      h('p', { class: 'help' }, 'When the Drive check is on, the folder name is read and must look like Team_Leader_Name_Project_Name_Subject: no spaces, parts joined by underscores, ending with the subject. Students see the rule with an example.'),
+      A.check('Folder names must follow Team_Leader_Name_Project_Name_Subject', f.rules.folderName.enabled, function (v) { f.rules.folderName.enabled = v; }),
       A.field('Subject at the end of the name', A.text(f.rules.folderName.subject || '', function (v) { f.rules.folderName.subject = v.replace(/\s+/g, ''); }, { name: 'folderSubject', dir: 'ltr', placeholder: f.subject || 'SubjectName' }), 'Leave empty to use the subject code' + (f.subject ? ' (' + f.subject + ')' : '') + '.')) : null;
     var rulesPanel = panel('Limits and checks', null,
       h('div', { class: 'row' },

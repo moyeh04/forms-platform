@@ -222,7 +222,7 @@ test('Admin: list, change status and review, reset key, delete', () => {
   assert.equal(w.admin({ action: 'admin.submissions', slug: w.form.slug, includeDeleted: true }).submissions.length, 1);
 });
 
-test('Folder name: a team project folder must be named Name_Project_Name_Subject', () => {
+test('Folder name: a team project folder must be named Team_Leader_Name_Project_Name_Subject', () => {
   const w = createWorld(); w.call('setup'); w.call('setAdminPin', '4321');
   const admin = (b) => w.api({ ...b, admin: { pin: '4321' } });
   const f = admin({ action: 'admin.forms.create', type: 'team_registration', title: 'DB Projects', term: 'Fall 2027', subject: 'CMPn323' }).form;
@@ -234,7 +234,7 @@ test('Folder name: a team project folder must be named Name_Project_Name_Subject
   w.drive.setFolderName(id, 'Library System');
   const bad = w.api({ action: 'submit', slug: f.slug, data: data('4230001', link) });
   assert.equal(bad.error.details.link.error, 'folder_name_spaces');
-  assert.equal(bad.error.details.link.params.example, 'YourName_Library_System_CMPn323');
+  assert.equal(bad.error.details.link.params.example, 'Ahmed_Mohamed_Library_System_CMPn323');
   w.drive.setFolderName(id, 'Ahmed_Library_System_Database');
   assert.equal(w.api({ action: 'submit', slug: f.slug, data: data('4230001', link) }).error.details.link.error, 'folder_name_subject');
   w.drive.setFolderName(id, 'Ahmed_Library_System_CMPn323');
