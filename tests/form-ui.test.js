@@ -376,3 +376,14 @@ test('Subject: the subject code is shown as a tag next to the term', async () =>
   const p = await open(w);
   assert.deepEqual(p.$$('.form-head .tag').map((t) => t.textContent), ['CMPn323', 'Fall 2027']);
 });
+
+test('Specialization: a Communications-only form says so and fills in the major', async () => {
+  const w = boot('team_registration', { rules: { majors: ['اتصالات'] } });
+  const p = await open(w);
+  assert.equal(p.$('.audience').textContent, 'For Communications students only');
+  await fillAbout(p); p.submitForm(); await settle();
+  const radios = p.$$('input[name="major"]');
+  assert.equal(radios.length, 1);
+  assert.ok(radios[0].checked, 'the only choice is already picked');
+  assert.equal(p.win.App.form._state.data.major, 'اتصالات');
+});

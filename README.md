@@ -82,6 +82,7 @@ step needs the real Google services (see "What could not be tested here").
 | A note for chosen team sizes (for example "other students will be added to reach 5" on 3 and 4), written by the admin in English and Arabic | Done |
 | Term picked from Fall, Spring, or Summer chips plus a year list, and a subject code (for example CMPn323) shown as a tag | Done |
 | Title built from settings, e.g. "Database Team Project Registration Form" plus a term tag. No "Clean Code", no "Form Nº" | Done |
+| A form can be limited to some specializations (for example Computers only): the Major question locks to them and the server refuses others | Done |
 | Editable lists behind dropdowns (levels, bylaws, majors, sections, groups) | Done |
 
 ### Student experience
