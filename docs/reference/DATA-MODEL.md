@@ -112,7 +112,7 @@ The `config` cell is the reason new forms need no code:
 |---|---|
 | `lang` | Default language and whether students see the switch |
 | `icon` | `team`, `calendar`, `task`, `chat`, or `none` |
-| `fields` | The questions: id, type, role, labels in English and Arabic, required, enabled, list name, name parts |
+| `fields` | The questions: id, type, role, labels and an optional description (`help`) in English and Arabic, required, enabled, list name, name parts |
 | `steps` | How questions are grouped into pages |
 | `rules` | `uniqueBy`, `uniqueAcrossForm`, `driveCheck`, `maxSubmissions`, **`teamSize { min, max }`** |
 | `editKey` | `enabled`, `days`, `allowEdit`, `allowDelete` |
