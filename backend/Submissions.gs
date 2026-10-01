@@ -105,11 +105,19 @@ API['admin.submission.update'] = admin(function (req) {
     var live = readResponses(form);
     var r = live.filter(function (x) { return x.id === req.submissionId; })[0];
     if (!r) fail('submission_not_found', 'That submission does not exist.');
+    if (patch.review) {
+      var steps = (form.review && form.review.steps) || [];
+      Object.keys(patch.review).forEach(function (k) {
+        if (!steps.some(function (s) { return s.id === k; })) fail('bad_step', 'Unknown review step.');
+      });
+      steps.forEach(function (s) {
+        if (patch.review[s.id] !== undefined) setReviewStep_(form, r, s.id, patch.review[s.id]);
+      });
+    }
     if (patch.status !== undefined) {
       if (SUBMISSION_STATUSES.indexOf(patch.status) === -1) fail('bad_status', 'Unknown status.');
       r.status = patch.status;
     }
-    if (patch.review) r.review = Object.assign({}, r.review, patch.review);
     if (patch.data) {
       var v = Rules.validateSubmission(vform, patch.data);
       if (!v.ok) fail('invalid', 'Some answers need fixing.', v.errors);
