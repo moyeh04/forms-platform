@@ -65,7 +65,7 @@ page's checks give instant feedback; the server repeats every one of them.
 | Secret | Who holds it | Stored as | Protected by | If it leaks |
 |---|---|---|---|---|
 | Admin PIN | The admin | `sha256(pepper:admin:pin)` in script properties | Lockout after 8 wrong tries for 10 minutes | Full admin access. Run **Set admin PIN** from the sheet menu to replace it. |
-| Edit key (5 digits) | One student | `sha256(pepper:key:formId:key)` in the Responses row | Per-form throttle of 10 wrong tries a minute, expiry, shown once | One registration can be edited or cancelled. Admin: **Details, Reset key**. |
+| Edit key (5 digits) | One student, and the admin on request | `sha256(pepper:key:formId:key)` plus a sealed copy (`keySeal`, digits shifted by `sha256(pepper:seal:formId:responseId)`) in the Responses row | Per-form throttle of 10 wrong tries a minute, expiry; only the backend can unseal, only for the PIN | One registration can be edited or cancelled. Admin: **Details, Reset key**. |
 | Viewer token (24 characters) | One instructor or client | `sha256(pepper:client:token)` in the Clients tab | Random, throttled at 30 wrong tries a minute, revocable | Read access to the forms and columns of that link. Turn it off or make **New link**. |
 | Pepper | Apps Script only | Script property `PEPPER`, created once | Never leaves Google | Hashes could be attacked offline. Not exposed by any action. |
 | Web app address | Everyone | In `assets/js/config.js` | Not secret by design | Nothing: it is only an entry point. |
@@ -80,7 +80,7 @@ alone therefore reveals no PIN, key, or token that could be tested offline.
 | Anyone with a form link | Read the public form definition, submit if the form is open | See any other registration, or the admin pages' data |
 | Student with a key | Read, change, or cancel **their own** registration | Open anyone else's; the key identifies exactly one row |
 | Instructor with a link | Read chosen forms through chosen columns; review steps only if allowed | Edit data, delete, or see hidden columns |
-| Admin with the PIN | Everything through the dashboard | Read a key back (only replace it) |
+| Admin with the PIN | Everything through the dashboard, including reading a student's current key | Read a key without the PIN, or a key for a cancelled registration |
 | Sheet owner | Everything, directly in Google | n/a |
 
 ## Defences, layer by layer
@@ -150,6 +150,10 @@ flowchart LR
 - **Deleting a form** needs the PIN and the form's link name sent back as a
   second key (`confirm`), so a stray or replayed call cannot delete one. Its
   sheet goes to the Drive trash rather than being destroyed.
+- **Sealed keys.** The admin can read a key back because the row also holds a
+  sealed copy. It is useless without the pepper, which never leaves Apps Script,
+  and each registration has its own pad, so two sealed keys cannot be compared.
+  Cancelling clears it along with the hash.
 - **Cleaning up.** Cancelling clears the key hash, so a cancelled registration's
   key stops working at once.
 - **No cookies, no sessions.** Every request carries its own secret, so there is

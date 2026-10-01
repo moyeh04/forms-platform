@@ -240,8 +240,11 @@ Two details worth knowing:
 - The Drive check happens **before** the lock, because it is slow and does not
   touch the sheet. The lock is held only for the read-check-write sequence, so
   students are not queued behind network calls.
-- The key is returned **once**. Only a salted hash is stored. Nobody, including
-  the admin, can read a key back; the admin can only issue a new one.
+- The key is returned to the student **once**. The sheet stores a salted hash
+  (used to find the row) and a *sealed* copy: each digit shifted by a pad derived
+  from the private pepper, the form, and the registration. The sheet alone reveals
+  no key, but the backend can unseal it for an admin with the PIN (**Details,
+  Show key**), so a student who lost it can be helped without a reset.
 
 ## Editing or cancelling with a key
 

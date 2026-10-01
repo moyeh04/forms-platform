@@ -387,3 +387,15 @@ test('Specialization: a Communications-only form says so and fills in the major'
   assert.ok(radios[0].checked, 'the only choice is already picked');
   assert.equal(p.win.App.form._state.data.major, 'اتصالات');
 });
+
+test('Ticket: "a copy was sent" only appears when an email really went out', async () => {
+  const w = boot('team_registration', { notifications: { confirmEmail: false, alertEmail: '' } });
+  const p = await open(w);
+  await fillAbout(p); p.submitForm(); await settle();
+  await fillStudy(p); p.submitForm(); await settle();
+  p.pick('team_size', '1'); await settle(); p.submitForm(); await settle();
+  p.type('[name="title"]', 'Library System'); p.submitForm(); await settle();
+  p.submitForm(); await settle(8);
+  assert.equal(p.win.App.form._state.view, 'ticket', 'on the ticket');
+  assert.ok(!p.text().includes('A copy was sent'), 'no false email promise');
+});
