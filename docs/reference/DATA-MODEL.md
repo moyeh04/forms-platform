@@ -148,7 +148,8 @@ the form is read, so editing a list updates every form that uses it.
 ## A form's own spreadsheet
 
 Created automatically in the **Forms Platform** Drive folder when a form is
-created. Named like `Database Team Project Registration Form - Fall 2027`.
+created. Deleting the form from the dashboard moves this spreadsheet to the Drive
+trash, where it can be restored for 30 days; the registry row is removed. Named like `Database Team Project Registration Form - Fall 2027`.
 
 ### Responses tab (the raw data; do not edit by hand)
 

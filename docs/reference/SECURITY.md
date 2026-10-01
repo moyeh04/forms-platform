@@ -147,6 +147,9 @@ flowchart LR
   useless in another.
 - **Unique keys.** `issueKey_` refuses to issue a key whose hash already exists
   in the form, so a key always identifies exactly one registration.
+- **Deleting a form** needs the PIN and the form's link name sent back as a
+  second key (`confirm`), so a stray or replayed call cannot delete one. Its
+  sheet goes to the Drive trash rather than being destroyed.
 - **Cleaning up.** Cancelling clears the key hash, so a cancelled registration's
   key stops working at once.
 - **No cookies, no sessions.** Every request carries its own secret, so there is

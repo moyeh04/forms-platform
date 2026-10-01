@@ -118,7 +118,7 @@ function createWorld(options = {}) {
     cache: new Map(),
     mail: [],
     triggers: [],
-    drive: { access: new Map(), missing: new Set(), folders: new Map(), files: new Map() },
+    drive: { access: new Map(), missing: new Set(), folders: new Map(), files: new Map(), trashed: new Set() },
     logs: []
   };
   const uid = () => crypto.randomBytes(16).toString('hex');
@@ -132,6 +132,8 @@ function createWorld(options = {}) {
     getUrl: () => `https://drive.google.com/file/d/${id}/view`,
     getSharingAccess: () => world.drive.access.get(id) || 'ANYONE_WITH_LINK',
     moveTo: () => fileObj(id),
+    setTrashed: (v) => { if (v) world.drive.trashed.add(id); else world.drive.trashed.delete(id); return fileObj(id); },
+    isTrashed: () => world.drive.trashed.has(id),
     getBlob: () => ({ getName: () => id })
   });
   const folderObj = (id) => ({

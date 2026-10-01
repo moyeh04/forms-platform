@@ -76,6 +76,7 @@ step needs the real Google services (see "What could not be tested here").
 | Many forms from one admin dashboard, each with its own link (`?f=name`) and its own Google Sheet | Done |
 | Four form types: team registration, task submission, reservation, WhatsApp registration | Done |
 | Admin dashboard protected by a PIN (stored hashed, wrong guesses lock it for a while) | Done |
+| Delete a form with one confirmation: its link stops working and its Google Sheet moves to the Drive trash (restorable for 30 days) | Done |
 | Create, duplicate for a new term, open or close with dates, rename or hide questions, add a description under any question | Done |
 | **Team members are mandatory: admin sets the minimum and maximum team size per form** | Done |
 | **Students pick the total team size first; exactly that many member forms then appear** | Done |
