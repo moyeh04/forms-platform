@@ -30,7 +30,7 @@ function listBackend() {
     .map((f) => path.posix.join('backend', f));
 }
 
-function bundle() {
+function bundleSource() {
   const files = [];
   if (fs.existsSync(path.join(root, 'shared', 'rules.js'))) files.push('shared/rules.js');
   files.push(...listBackend());
@@ -40,7 +40,11 @@ function bundle() {
 
   // Fail loudly on syntax errors instead of discovering them in the editor.
   new vm.Script(code, { filename: 'Code.gs' });
+  return { code, files };
+}
 
+function bundle() {
+  const { code, files } = bundleSource();
   fs.mkdirSync(out, { recursive: true });
   fs.writeFileSync(path.join(out, 'Code.gs'), code);
   const manifest = path.join(root, 'backend', 'appsscript.json');
@@ -49,4 +53,6 @@ function bundle() {
   console.log(`Bundled ${files.length} files into dist/Code.gs (${code.length} chars).`);
 }
 
-bundle();
+if (require.main === module) bundle();
+
+module.exports = { bundleSource };
