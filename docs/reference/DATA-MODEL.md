@@ -99,7 +99,7 @@ spreadsheet the Apps Script is attached to, which is why the sheet menu exists.
 | `id` | Internal id, never changes |
 | `slug` | The link name used in `?f=` |
 | `type` | `team_registration`, `task_submission`, `reservation`, or `whatsapp_registration` |
-| `title`, `term` | Heading and the small tag beside it |
+| `title`, `term` | Heading and the small tag beside it. The dashboard writes the term as a season and a year, for example `Fall 2027` |
 | `status` | `draft`, `open`, `closed`, `archived` |
 | `opensAt`, `closesAt` | Optional ISO dates |
 | `sheetId`, `sheetUrl` | The form's own spreadsheet |
@@ -110,6 +110,7 @@ The `config` cell is the reason new forms need no code:
 
 | Key | Holds |
 |---|---|
+| `subject` | Subject code shown beside the title, such as `CMPn323` (letters, digits, dashes, no spaces) |
 | `lang` | Default language and whether students see the switch |
 | `icon` | `team`, `calendar`, `task`, `chat`, or `none` |
 | `fields` | The questions: id, type, role, labels and an optional description (`help`) in English and Arabic, required, enabled, list name, name parts |

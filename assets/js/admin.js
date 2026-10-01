@@ -73,6 +73,63 @@
       }));
   };
 
+  /* ── Term and subject ───────────────────────────────────────── */
+
+  A.SEASONS = ['Fall', 'Spring', 'Summer'];
+
+  /** "Fall 2027" -> { season: 'Fall', year: '2027' }; anything else is kept as custom text. */
+  A.parseTerm = function (term) {
+    var m = String(term || '').trim().match(/^(fall|spring|summer)\s+(\d{4})$/i);
+    if (!m) return { season: '', year: '', custom: String(term || '').trim() };
+    return { season: m[1].charAt(0).toUpperCase() + m[1].slice(1).toLowerCase(), year: m[2], custom: '' };
+  };
+
+  /**
+   * Season chips, a year list, and the subject code. o = { term, subject };
+   * onchange receives { term, subject } on every change.
+   */
+  A.termPicker = function (o, onchange) {
+    var st = A.parseTerm(o.term);
+    var subject = o.subject || '';
+    var now = new Date().getFullYear();
+    if (!st.year) st.year = String(now);
+    var years = [];
+    for (var y = now - 1; y <= now + 4; y++) years.push(String(y));
+    if (years.indexOf(st.year) === -1) years.unshift(st.year);
+
+    function term() { return st.season ? st.season + ' ' + st.year : st.custom; }
+    function emit() { onchange({ term: term(), subject: subject }); }
+
+    var chips = h('div', { class: 'toggle-chips season-chips', role: 'radiogroup', 'aria-label': 'Term' });
+    var custom = h('p', { class: 'muted-note' });
+    function paint() {
+      ui.clear(chips);
+      A.SEASONS.forEach(function (s) {
+        var on = st.season === s;
+        chips.appendChild(h('button', { type: 'button', class: 'toggle-chip', role: 'radio', name: 'season-' + s.toLowerCase(), 'aria-checked': on ? 'true' : 'false', 'aria-pressed': on ? 'true' : 'false', onclick: function () {
+          st.season = on ? '' : s; st.custom = '';
+          paint(); emit();
+        } }, s));
+      });
+      custom.textContent = !st.season && st.custom ? 'Current term: "' + st.custom + '". Pick a season to replace it.' : '';
+      yearSel.disabled = !st.season;
+    }
+    var yearSel = A.select(st.year, years, function (v) { st.year = v; emit(); });
+    yearSel.name = 'termYear';
+    yearSel.setAttribute('aria-label', 'Year');
+    var subj = A.text(subject, function (v) { subject = v.replace(/\s+/g, ''); emit(); }, { name: 'subject', placeholder: 'CMPn323', dir: 'ltr', autocomplete: 'off', spellcheck: 'false' });
+    paint();
+    return h('div', { class: 'term-picker' },
+      h('div', { class: 'field-row term-season' }, h('span', { class: 'label' }, 'Term'), chips, custom),
+      h('label', { class: 'field-row term-year' }, h('span', { class: 'label' }, 'Year'), yearSel),
+      h('label', { class: 'field-row term-subject' }, h('span', { class: 'label' }, 'Subject code'), subj, h('span', { class: 'help' }, 'Shown beside the title, for example CMPn323. No spaces.')));
+  };
+
+  /** Small tags for a form's subject code and term. */
+  A.termTags = function (f) {
+    return [f.subject ? h('span', { class: 'tag-sm tag-subject' }, f.subject) : null, f.term ? h('span', { class: 'tag-sm' }, f.term) : null];
+  };
+
   A.modal = function (title, body, buttons) {
     var overlay;
     var close = function () { if (overlay.parentNode) overlay.parentNode.removeChild(overlay); };
@@ -200,7 +257,7 @@
     var link = A.formLink(f.slug);
     return h('article', { class: 'card', dataset: { slug: f.slug } },
       h('div', { class: 'card-top' }, icon(t.icon, 24),
-        h('div', null, h('h3', null, f.title), f.term ? h('span', { class: 'tag-sm' }, f.term) : null)),
+        h('div', null, h('h3', null, f.title), A.termTags(f))),
       h('div', { class: 'actions' }, A.badge(A.STATUS_LABEL[f.status] || f.status, f.status), h('span', { class: 'muted-note' }, t.label)),
       h('div', { class: 'actions' },
         h('a', { class: 'btn btn-primary sm', href: '#/f/' + encodeURIComponent(f.slug) }, 'Responses'),
@@ -212,15 +269,15 @@
   }
 
   function duplicateDialog(f) {
-    var title = f.title, term = f.term;
+    var title = f.title, term = f.term, subject = f.subject || '';
     var body = h('div', null,
       h('p', { class: 'help' }, 'The copy keeps every setting, starts as a draft, and gets its own empty Google Sheet.'),
       A.field('Title', A.text(title, function (v) { title = v; })),
-      A.field('Term', A.text(term, function (v) { term = v; }), 'For example: Spring 2028'));
+      A.termPicker({ term: term, subject: subject }, function (v) { term = v.term; subject = v.subject; }));
     A.modal('Duplicate "' + f.title + '"', body, [
       { text: 'Cancel', kind: 'quiet' },
       { text: 'Make a copy', kind: 'primary', onclick: async function () {
-        var res = await A.call('admin.forms.duplicate', { id: f.id, title: title, term: term });
+        var res = await A.call('admin.forms.duplicate', { id: f.id, title: title, term: term, subject: subject });
         toast('Copy created as a draft', 'ok');
         window.location.hash = '#/f/' + encodeURIComponent(res.form.slug) + '/settings';
       } }
@@ -230,7 +287,7 @@
   /* ── Create ─────────────────────────────────────────────────── */
 
   A.views.create = async function (mount) {
-    var state = { type: 'team_registration', title: '', term: '' };
+    var state = { type: 'team_registration', title: '', term: A.SEASONS[0] + ' ' + new Date().getFullYear(), subject: '' };
     ui.clear(mount);
     var picks = Object.keys(A.TYPES).map(function (k) {
       var t = A.TYPES[k];
@@ -243,7 +300,7 @@
       e.preventDefault();
       if (!state.title.trim()) return toast('Give the form a title first.', 'err');
       A.busy(btn, async function () {
-        var res = await A.call('admin.forms.create', { type: state.type, title: state.title, term: state.term });
+        var res = await A.call('admin.forms.create', { type: state.type, title: state.title, term: state.term, subject: state.subject });
         toast('Form created as a draft. Check its settings, then open it.', 'ok');
         window.location.hash = '#/f/' + encodeURIComponent(res.form.slug) + '/settings';
       });
@@ -251,9 +308,8 @@
       h('div', { class: 'page-head' }, h('h2', null, 'New form')),
       h('div', { class: 'panel' }, h('h2', null, 'What does it collect?'), h('div', { class: 'type-pick' }, picks)),
       h('div', { class: 'panel' }, h('h2', null, 'Name it'),
-        h('div', { class: 'row' },
-          A.field('Title', A.text('', function (v) { state.title = v; }, { name: 'title', placeholder: 'Database Team Project Registration Form' }), 'This is the heading students see.'),
-          A.field('Term', A.text('', function (v) { state.term = v; }, { name: 'term', placeholder: 'Fall 2027' }), 'Shown as a small tag next to the title.'))),
+        A.field('Title', A.text('', function (v) { state.title = v; }, { name: 'title', placeholder: 'Database Team Project Registration Form' }), 'This is the heading students see.'),
+        A.termPicker({ term: state.term, subject: state.subject }, function (v) { state.term = v.term; state.subject = v.subject; })),
       h('div', { class: 'actions' }, btn, h('a', { class: 'btn btn-quiet', href: '#/' }, 'Cancel'))));
   };
 })(window.App = window.App || {});

@@ -6,7 +6,7 @@ API.getForm = function (req) {
   var form = requireForm(String(req.slug || ''));
   var state = Rules.formState(form);
   if (state === 'draft' || state === 'archived') {
-    return { state: state, form: { slug: form.slug, title: form.title, term: form.term, lang: form.lang, icon: form.icon, messages: form.messages } };
+    return { state: state, form: { slug: form.slug, title: form.title, term: form.term, subject: form.subject, lang: form.lang, icon: form.icon, messages: form.messages } };
   }
   var out = { state: state, form: publicForm(form), serverTime: nowIso() };
   if (form.type === 'reservation') out.taken = slotAvailability_(form);

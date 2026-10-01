@@ -59,6 +59,7 @@
     var d = S.data;
     var bar = h('header', { class: 'admin-bar' },
       h('h1', null, d ? d.form.title : 'Registrations'),
+      d && d.form.subject ? h('span', { class: 'tag-sm tag-subject' }, d.form.subject) : null,
       d && d.form.term ? h('span', { class: 'tag-sm' }, d.form.term) : null,
       h('span', { class: 'muted-note' }, 'Viewing as ' + S.me.client.name),
       h('button', { type: 'button', class: 'icon-btn', 'aria-label': 'Switch light and dark', onclick: function () { App.theme.toggle(); render(); } }, icon(App.theme.effective() === 'dark' ? 'sun' : 'moon', 20)));
