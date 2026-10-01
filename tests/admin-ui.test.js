@@ -394,7 +394,7 @@ test('Delete form: one confirmation from the card removes it; cancelling keeps i
   p.clickText('Keep it'); await settle(4);
   assert.equal(w.admin({ action: 'admin.forms.list' }).forms.length, 1);
   p.click('[name="delete-form"]'); await settle(2);
-  p.clickText('Delete form'); await settle(12);
+  p.click('.overlay .btn-danger'); await settle(12);
   assert.equal(w.admin({ action: 'admin.forms.list' }).forms.length, 0);
   assert.ok(p.text().includes('No forms yet'));
 });
