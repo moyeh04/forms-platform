@@ -277,12 +277,15 @@ enforces the old rule. The server is always the final judge.
 
 ## Does GitHub build anything?
 
-No. GitHub Pages only **serves** the repository files exactly as they are. It
-does not run `npm run build`, and it never sees `dist/` (which is git-ignored).
-The backend does not live on GitHub at all. That separation is explained in
+It tests and builds, but deploys only the website. On every push to `master`,
+`.github/workflows/pages.yml` runs `npm test`, the Python tests, and
+`npm run build`. It keeps the resulting `dist/` as a downloadable
+**backend-dist** artifact for 30 days and publishes the website files to Pages
+unchanged (no bundling, no minifying). It does not push the backend into Apps
+Script: that stays a paste, because it needs your Google login. See
 [HOSTING.md](HOSTING.md).
 
-## Optional improvements (not implemented)
+## Optional improvements
 
 These are real options if the manual paste ever becomes annoying. None are
 needed for the platform to work.
@@ -290,8 +293,9 @@ needed for the platform to work.
 | Idea | What it would give | Trade-off |
 |---|---|---|
 | [`clasp`](https://github.com/google/clasp) | Push `dist/` to Apps Script from the command line | Extra login and tool to install |
-| A GitHub Action that runs the tests on every push | Catches mistakes before deploy | A small workflow file to maintain |
-| An Action that attaches `dist/` to each release | Download the built files from GitHub | Releases to manage |
+| A GitHub Action that runs the tests on every push | Catches mistakes before deploy | **Done**: `.github/workflows/pages.yml` |
+| Keep a built `dist/` with every run | Download the built files from GitHub | **Done**: the `backend-dist` artifact |
+| Push the backend with `clasp` from the workflow | No manual paste | Needs a stored Google token as a repository secret |
 
 ## Troubleshooting
 
