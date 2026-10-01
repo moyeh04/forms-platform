@@ -135,3 +135,16 @@ test('Slot validation: day and time must exist on the form', () => {
   assert.equal(R.validateField(f, { day: 'w1', time: '9:00 - 9:10' }, { form }).error, 'invalid_slot');
   assert.equal(R.validateField(f, null, { form }).error, 'required');
 });
+
+test('Submission: disabled fields are skipped, including inside members', () => {
+  const form = {
+    fields: [
+      { id: 'a', type: 'text' },
+      { id: 'link', type: 'drive_link', enabled: false },
+      { id: 'members', type: 'members', max: 2, fields: [{ id: 'name', type: 'text' }, { id: 'extra', type: 'code', enabled: false }] }
+    ]
+  };
+  const r = R.validateSubmission(form, { a: 'x', members: [{ name: 'y' }] });
+  assert.equal(r.ok, true);
+  assert.equal('link' in r.data, false);
+});

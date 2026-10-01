@@ -306,6 +306,7 @@
     var clean = list.map(function (m, i) {
       var row = {};
       (field.fields || []).forEach(function (sf) {
+        if (sf.enabled === false) return;
         var r = validateField(sf, m ? m[sf.id] : undefined, ctx);
         if (!r.ok) errors[i + '.' + sf.id] = { error: r.error, params: r.params };
         else row[sf.id] = r.value;
@@ -326,6 +327,7 @@
     var out = {};
     var errors = {};
     (form.fields || []).forEach(function (f) {
+      if (f.enabled === false) return;
       var r = validateField(f, data ? data[f.id] : undefined, ctx);
       if (!r.ok) errors[f.id] = { error: r.error, params: r.params, nested: r.nested };
       else out[f.id] = r.value;
