@@ -38,6 +38,8 @@
   font-family: var(--font-title); font-style: italic; font-size: var(--fs-tag);
 }
 :lang(ar) .tag { font-style: normal; }
+.tags { display: flex; flex-wrap: wrap; gap: 8px; }
+.tag.tag-subject { font-family: var(--font-code); font-style: normal; letter-spacing: .05em; border-color: var(--ink); color: var(--ink); }
 
 /* Route progress: dots joined by a dashed trail that ends in an X. */
 .trail { list-style: none; margin: 4px 0 26px; padding: 0; display: flex; align-items: flex-start; }

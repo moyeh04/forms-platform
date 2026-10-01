@@ -91,7 +91,7 @@
 
     ui.clear(mount);
     mount.appendChild(h('div', { class: 'page-head' },
-      h('h2', null, form.title), form.term ? h('span', { class: 'tag-sm' }, form.term) : null, A.badge(A.STATUS_LABEL[form.status] || form.status, form.status),
+      h('h2', null, form.title), A.termTags(form), A.badge(A.STATUS_LABEL[form.status] || form.status, form.status),
       h('span', { class: 'muted-note' }, t.label),
       h('a', { class: 'btn btn-quiet sm', href: '#/f/' + encodeURIComponent(form.slug) + '/settings' }, 'Settings'),
       h('a', { class: 'btn btn-quiet sm', href: form.sheetUrl, target: '_blank', rel: 'noopener' }, 'Google Sheet'),

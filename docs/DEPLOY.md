@@ -139,7 +139,7 @@ Back in the Forms Registry sheet: **Forms Platform > 3. Set website address...**
 ## Part 3: Use it
 
 1. Open `https://YOUR-NAME.github.io/forms/admin.html` and enter your PIN.
-2. Click **New form**, choose a type, give it a title and a term, and click **Create form**.
+2. Click **New form**, choose a type, give it a title, pick the term (Fall, Spring, or Summer and the year), type the subject code, and click **Create form**.
 3. On the settings page check:
    - **Team size**: minimum and maximum people per team (counting the leader).
    - **Days and time slots** for reservations.

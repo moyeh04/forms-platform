@@ -44,16 +44,15 @@
 
     ui.clear(mount);
     mount.appendChild(h('div', { class: 'page-head' },
-      h('h2', null, f.title), A.badge(A.STATUS_LABEL[f.status] || f.status, f.status), h('span', { class: 'muted-note' }, t.label),
+      h('h2', null, f.title), A.termTags(f), A.badge(A.STATUS_LABEL[f.status] || f.status, f.status), h('span', { class: 'muted-note' }, t.label),
       h('a', { class: 'btn btn-quiet sm', href: '#/f/' + encodeURIComponent(f.slug) }, 'Responses'),
       h('a', { class: 'btn btn-quiet sm', href: link, target: '_blank', rel: 'noopener' }, 'Open form'),
       h('button', { type: 'button', class: 'btn btn-quiet sm', onclick: async function () { toast((await ui.copyText(link)) ? 'Form link copied' : 'Could not copy', 'ok'); } }, icon('link', 18), 'Copy link')));
 
     /* General ---------------------------------------------------- */
     var general = panel('General', 'Students can only submit while the status is Open and the current time is inside the dates below.',
-      h('div', { class: 'row' },
-        A.field('Title', A.text(f.title, function (v) { f.title = v; }, { name: 'title' }), 'The heading students see.'),
-        A.field('Term', A.text(f.term, function (v) { f.term = v; }, { name: 'term' }), 'A small tag, for example Fall 2027.')),
+      A.field('Title', A.text(f.title, function (v) { f.title = v; }, { name: 'title' }), 'The heading students see.'),
+      A.termPicker({ term: f.term, subject: f.subject }, function (v) { f.term = v.term; f.subject = v.subject; }),
       h('div', { class: 'row' },
         A.field('Link name', A.text(f.slug, function (v) { f.slug = v; }, { name: 'slug', dir: 'ltr' }), 'The form address ends with ?f= and this name. Changing it breaks links already shared.'),
         A.field('Status', A.select(f.status, [['draft', 'Draft (hidden)'], ['open', 'Open'], ['closed', 'Closed'], ['archived', 'Archived']], function (v) { f.status = v; }))),
@@ -243,7 +242,7 @@
     saveBtn.addEventListener('click', function () {
       A.busy(saveBtn, async function () {
         var patch = {
-          title: f.title, term: f.term, slug: f.slug, status: f.status, opensAt: f.opensAt || '', closesAt: f.closesAt || '',
+          title: f.title, term: f.term, subject: f.subject || '', slug: f.slug, status: f.status, opensAt: f.opensAt || '', closesAt: f.closesAt || '',
           lang: f.lang, icon: f.icon, editKey: f.editKey, rules: f.rules, notifications: f.notifications,
           fields: f.fields, review: f.review
         };
