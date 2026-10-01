@@ -204,6 +204,17 @@ function checkLimits_(form, data, rows, selfId) {
   }
 }
 
+/** How many saved teams fall outside the allowed team size range. */
+function teamSizeConflicts_(form) {
+  var range = Rules.teamSizeRange(form);
+  var field = Rules.fieldByRole(form, 'team_size');
+  if (!field) return 0;
+  return readResponses(form).filter(function (r) {
+    var n = parseInt(r.data[field.id], 10);
+    return isNaN(n) || n < range.min || n > range.max;
+  }).length;
+}
+
 /* ── Drive links ──────────────────────────────────────────────── */
 
 function checkDriveLink_(link) {

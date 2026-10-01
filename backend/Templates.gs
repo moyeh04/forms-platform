@@ -52,9 +52,16 @@ function studyFields_() {
   ];
 }
 
-function membersField_(max) {
+function teamSizeField_() {
+  return field_('team_size', 'team_size', 'Team size', 'عدد أعضاء الفريق', {
+    role: 'team_size',
+    help: { en: 'How many people are in the team, including you', ar: 'كام فرد في الفريق، شاملًا حضرتك' }
+  });
+}
+
+function membersField_() {
   return field_('members', 'members', 'Team members', 'أعضاء الفريق', {
-    role: 'members', required: false, min: 0, max: max,
+    role: 'members',
     fields: [
       field_('name', 'arabic_name', 'Full name', 'الاسم رباعي', { role: 'name', minParts: 4 }),
       field_('phone', 'phone', 'Phone', 'رقم التليفون', { role: 'phone' }),
@@ -101,21 +108,25 @@ function templateFor(type) {
   if (type === 'team_registration') {
     cfg = commonConfig_('team', 'leader_code');
     cfg.rules.uniqueAcrossForm = true;
+    cfg.rules.teamSize = { min: 1, max: 6 };
     cfg.fields = personFields_().concat(studyFields_(), [
-      membersField_(5),
+      teamSizeField_(),
+      membersField_(),
       field_('title', 'english_text', 'Project title', 'اسم المشروع (بالإنجليزي)', { role: 'title', help: { en: 'In English', ar: 'بالإنجليزي' } }),
       field_('link', 'drive_link', 'Project Drive folder link', 'لينك فولدر المشروع على Drive', { role: 'link', required: false, kinds: ['folder'] })
     ]);
     cfg.steps = [
       step_('you', ['email', 'leader_name', 'leader_code', 'phone']),
       step_('study', ['major', 'level', 'section', 'curriculum']),
-      step_('members', ['members']),
+      step_('members', ['team_size', 'members']),
       step_('project', ['title', 'link'])
     ];
   } else if (type === 'task_submission') {
     cfg = commonConfig_('task', 'leader_code');
+    cfg.rules.teamSize = { min: 1, max: 5 };
     cfg.fields = personFields_().concat(studyFields_(), [
-      membersField_(4),
+      teamSizeField_(),
+      membersField_(),
       field_('title', 'english_text', 'Task name', 'اسم التاسك (بالإنجليزي)', { role: 'title', help: { en: 'In English', ar: 'بالإنجليزي' } }),
       field_('link', 'drive_link', 'Task slides link', 'لينك التاسك (Drive أو Google Slides)', {
         role: 'link', kinds: ['file', 'slides'],
@@ -125,7 +136,7 @@ function templateFor(type) {
     cfg.steps = [
       step_('you', ['email', 'leader_name', 'leader_code', 'phone']),
       step_('study', ['major', 'level', 'section', 'curriculum']),
-      step_('members', ['members']),
+      step_('members', ['team_size', 'members']),
       step_('task', ['title', 'link'])
     ];
   } else if (type === 'reservation') {
