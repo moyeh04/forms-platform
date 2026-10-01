@@ -129,6 +129,7 @@ function createWorld(options = {}) {
   const fileObj = (id) => ({
     getId: () => id,
     getName: () => (world.drive.files.get(id) || {}).name || id,
+    getUrl: () => `https://drive.google.com/file/d/${id}/view`,
     getSharingAccess: () => world.drive.access.get(id) || 'ANYONE_WITH_LINK',
     moveTo: () => fileObj(id),
     getBlob: () => ({ getName: () => id })
@@ -142,7 +143,7 @@ function createWorld(options = {}) {
       const hits = [...world.drive.folders].filter(([, f]) => f.name === name).map(([id]) => folderObj(id));
       let i = 0; return { hasNext: () => i < hits.length, next: () => hits[i++] };
     },
-    createFile: (blobOrName) => { const nid = uid(); world.drive.files.set(nid, { name: String(blobOrName) }); return fileObj(nid); }
+    createFile: (blobOrName) => { const nid = uid(); world.drive.files.set(nid, { name: (blobOrName && blobOrName.name) || String(blobOrName) }); return fileObj(nid); }
   });
 
   const sandbox = {
@@ -202,7 +203,12 @@ function createWorld(options = {}) {
         return chain;
       }
     },
-    UrlFetchApp: { fetch: () => { throw new Error('Network is not available in tests'); } },
+    UrlFetchApp: {
+      fetch: (...a) => {
+        if (!world.fetch) throw new Error('Network is not available in tests');
+        return world.fetch(...a);
+      }
+    },
     ContentService: {
       MimeType: { JSON: 'JSON' },
       createTextOutput: (text) => ({ getContent: () => text, setMimeType() { return this; } })
