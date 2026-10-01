@@ -123,7 +123,7 @@ no validation.
 | `index.html` | The page students use. Shows any form from its saved definition (`?f=name`). |
 | `admin.html` | The admin dashboard (PIN). |
 | `viewer.html` | The read-only instructor and client page (`?t=private-token`). |
-| `assets/css/theme.css` | Colors, fonts, and the type scale as variables. Change the look here. |
+| `assets/css/theme.css` | Colors, fonts, and the type scale as variables. Change the look here; the contrast standard is in its header and enforced by `tests/contrast.test.js`. |
 | `assets/css/app.css` | Components of the student page. |
 | `assets/css/admin.css` | Dashboard and instructor layout, including the team cards (a coloured band per team, header strip, leader tag). |
 | `assets/img/` | The tab icon (`favicon.svg`), PNG sizes for phones and older browsers, and `site.webmanifest`. |
@@ -165,7 +165,7 @@ no validation.
 | `scripts/download_tasks.py` | Downloads task files and builds `Tasks.xlsx`. |
 | `tests/harness/appsscript-mock.js` | An in-memory Sheets, Drive, Mail, Cache, and clock, so the real backend code runs in tests. |
 | `tests/harness/dom.js` | Opens the real pages in jsdom wired to that backend. |
-| `tests/*.test.js` | 167 tests. |
+| `tests/*.test.js` | 171 tests. |
 | `tests/test_download_tasks.py` | 20 tests for the export, with a local server in place of Google. |
 
 ## Data model in one paragraph

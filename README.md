@@ -90,7 +90,7 @@ step needs the real Google services (see "What could not be tested here").
 | Requirement | Status |
 |---|---|
 | English by default with an Arabic switch (RTL), mobile first, light and dark themes | Done |
-| Light paper palette with strong contrast, **no logo on the page**, defined font sizes, bold labels, italic helper text | Done |
+| Light paper palette meeting WCAG 2.1 AA contrast in both themes (checked by a test), **no logo on the page**, defined font sizes, bold labels, italic helper text | Done |
 | Branded tab icon: a form sheet whose red route ends in an X, the same trail students follow at the top of the form (SVG plus PNGs for phones) | Done |
 | Arabic-only name fields: English letters and digits are removed while typing and on paste, with a hint saying why; at least four name parts; checked again on the server | Done |
 | English-only project and task titles, Egyptian phone normalization, 7-digit codes | Done |
@@ -168,7 +168,7 @@ and the Excel export; `tests/` holds the automated tests.
 
 ```
 npm install          # once, installs the browser test library
-npm test             # 167 tests: rules, backend, form page, dashboard, instructor page
+npm test             # 171 tests: rules, backend, form page, dashboard, instructor page
 npm run build        # writes dist/Code.gs and dist/appsscript.json to paste into Apps Script
 npm run dev          # local preview on http://localhost:8080 (PIN 4321), in memory, no Google needed
 python3 -m unittest discover -s tests -p "test_*.py"   # 20 tests for the Excel export

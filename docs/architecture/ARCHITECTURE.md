@@ -24,7 +24,7 @@ sheet, not code.
 | **One source of truth for rules** | `shared/rules.js` is used by the browser, the backend, and the tests. They cannot disagree. |
 | **Forms are data** | A form is a JSON definition in one cell. New questions and new form types need no code. |
 | **Boring technology** | Plain JavaScript, no framework, no bundler for the website, one concatenation script for the backend. Easy to read, easy to fix later. |
-| **Testable without Google** | An in-memory copy of Google's services runs the real backend code, so 167 JavaScript tests cover it without touching a real account. |
+| **Testable without Google** | An in-memory copy of Google's services runs the real backend code, so 171 JavaScript tests cover it without touching a real account. |
 
 ## System context
 
@@ -785,11 +785,29 @@ per form. It is not meant for tens of thousands.
 | A 5-digit key has 100,000 values | Chosen so students can type it | Safe because it is salted per form, throttled to 10 wrong tries a minute, and expires. |
 | Real Google behaviour is untested locally | Tests use a faithful copy, not Google | Run the first-run checklist in [DEPLOY.md](../DEPLOY.md) once. |
 
+## Colours and contrast
+
+All colours are variables in `assets/css/theme.css`, defined once for the light
+theme and once for dark (used both when the device prefers dark and when the
+toggle is on). The standard is **WCAG 2.1 AA in both themes**:
+
+| What | Minimum | Tokens |
+|---|---|---|
+| Text, including small bold labels, tags, and pills | 4.5:1 | `ink`, `mute`, `accent`, `sea`, `err`, `gold` on `sheet`, `sheet-2`, `desk`, tints; `on-accent` and `on-sea` on their buttons |
+| Outlines that show where a field or choice is | 3:1 | `field-line` on every background |
+| Focus ring | 3:1 | `focus` |
+| Decorative dividers and card borders | none | `line` |
+
+`tests/contrast.test.js` reads the tokens from `theme.css` and checks every
+pair above, so a colour change that breaks the standard fails CI and is never
+published. It also checks that the device dark theme and the dark toggle use
+identical colours.
+
 ## Where to change what
 
 | I want to... | Edit |
 |---|---|
-| Change a colour, font, or size | `assets/css/theme.css` (variables only) |
+| Change a colour, font, or size | `assets/css/theme.css` (variables only); `npm test` checks the contrast |
 | Reword a message or translate | `assets/js/i18n.js` |
 | Add a question to a form | Admin dashboard, or `backend/Templates.gs` for new forms by default |
 | Add a new form type | A new function in `backend/Templates.gs`, a label in `assets/js/admin.js` |
@@ -811,6 +829,6 @@ per form. It is not meant for tens of thousands.
 | [HOSTING.md](HOSTING.md) | What GitHub does, what Google does, and how they fit |
 | [DATA-MODEL.md](../reference/DATA-MODEL.md) | Every sheet, column, and stored property |
 | [SECURITY.md](../reference/SECURITY.md) | The secrets, who holds them, and what a leak would mean |
-| [TESTING.md](../reference/TESTING.md) | How 187 tests run without Google |
+| [TESTING.md](../reference/TESTING.md) | How 191 tests run without Google |
 | [DEPLOY.md](../DEPLOY.md) | Click-by-click setup |
 | [MODULES.md](../MODULES.md) | File-by-file reference |

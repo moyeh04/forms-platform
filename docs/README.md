@@ -11,7 +11,7 @@ whichever page answers your question.
 | [HOSTING.md](architecture/HOSTING.md) | What GitHub does, what Google does, how they fit, how updates flow |
 | [DATA-MODEL.md](reference/DATA-MODEL.md) | Every sheet, column, stored property, and browser key |
 | [SECURITY.md](reference/SECURITY.md) | The secrets, what protects them, and the honest weak spots |
-| [TESTING.md](reference/TESTING.md) | How 187 tests run without Google, and what they cannot prove |
+| [TESTING.md](reference/TESTING.md) | How 191 tests run without Google, and what they cannot prove |
 | [DEPLOY.md](DEPLOY.md) | Click-by-click setup and the first-run checklist |
 | [MODULES.md](MODULES.md) | File-by-file reference |
 | [COMMIT_CONVENTION.md](COMMIT_CONVENTION.md) | How commits and branches are written |
