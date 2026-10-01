@@ -39,6 +39,7 @@ API['admin.forms.update'] = admin(function (req) {
   var out = { form: clone(f) };
   delete out.form._row;
   if (req.patch && req.patch.slots && f.type === 'reservation') out.orphanedBookings = orphanedBookings_(f);
+  if (req.patch && req.patch.rules && req.patch.rules.teamSize) out.teamSizeConflicts = teamSizeConflicts_(f);
   return out;
 });
 

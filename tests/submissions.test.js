@@ -17,7 +17,8 @@ function boot(type = 'team_registration', patch = {}) {
   return w;
 }
 
-const team = (o = {}) => ({
+const sized = (d) => ({ team_size: String((d.members || []).length + 1), ...d });
+const team = (o = {}) => sized({
   email: 'Sara@Example.com', leader_name: 'أحمد محمد محمود أحمد', leader_code: '4230999', phone: '+201012345678',
   major: 'حاسبات', level: 'صفر / الأولى', section: '4C-TH1', curriculum: '2020',
   members: [{ name: 'سارة خالد حسن علي', phone: '01112345678', code: '4230998', level: 'صفر / الأولى', curriculum: '2020', section: '4C-TH1' }],

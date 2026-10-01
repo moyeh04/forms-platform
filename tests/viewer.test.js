@@ -19,7 +19,8 @@ function boot() {
   });
   w.team = mk('task_submission', 'Tasks');
   w.wa = mk('whatsapp_registration', 'Group A and B');
-  const person = (o) => ({ email: 'a@b.com', leader_name: 'أحمد محمد محمود أحمد', leader_code: '4230001', phone: '01012345678', major: 'حاسبات', level: 'صفر / الأولى', section: '4C-TH1', curriculum: '2020', ...o });
+  const sized = (d) => ({ team_size: String((d.members || []).length + 1), ...d });
+  const person = (o) => sized({ email: 'a@b.com', leader_name: 'أحمد محمد محمود أحمد', leader_code: '4230001', phone: '01012345678', major: 'حاسبات', level: 'صفر / الأولى', section: '4C-TH1', curriculum: '2020', ...o });
   const book = (code, day, time, title) => w.api({ action: 'submit', slug: w.res.slug, data: person({ leader_code: code, title, slot: { day, time } }) });
   book('4230001', 'week-11-sunday', '12:55 - 1:15', 'Second');
   book('4230002', 'week-11-sunday', '12:30 - 12:50', 'First');

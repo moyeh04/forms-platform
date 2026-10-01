@@ -18,7 +18,8 @@ function boot(type, patch = {}) {
 }
 
 const member = (name, code) => ({ name, phone: '01112345678', code, level: 'صفر / الأولى', curriculum: '2020', section: '4C-TH1' });
-const person = (o) => ({
+const sized = (d) => ({ team_size: String((d.members || []).length + 1), ...d });
+const person = (o) => sized({
   email: 'a@b.com', leader_name: 'أحمد محمد محمود أحمد', leader_code: '4230001', phone: '01012345678', major: 'حاسبات',
   level: 'صفر / الأولى', section: '4C-TH1', curriculum: '2020', ...o
 });
