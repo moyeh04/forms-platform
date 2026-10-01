@@ -401,12 +401,12 @@ test('Ticket: "a copy was sent" only appears when an email really went out', asy
 });
 
 test('Folder rule: typing the project title updates the example and keeps the icon', async () => {
-  const w = boot('team_registration', { subject: 'CMPn323' });
+  const w = boot('team_registration', { subject: 'CMPn323', rules: { folderName: { enabled: true, subject: 'Software_Engineering' } } });
   const p = await open(w);
   p.win.App.form._state.stepIndex = 3; p.win.App.form._state.data.team_size = '1';
   p.win.document.querySelector('.topbar button').click(); p.win.document.querySelector('.topbar button').click(); await settle();
   p.type('[name="title"]', 'Smart Parking');
   const rule = p.$('.folder-rule');
   assert.ok(rule.querySelector('.icon svg'), 'the icon is still an icon');
-  assert.ok(rule.querySelector('.folder-rule-text').textContent.includes('Ahmed_Mohamed_Smart_Parking_CMPn323'));
+  assert.ok(rule.querySelector('.folder-rule-text').textContent.includes('Ahmed_Mohamed_Smart_Parking_Software_Engineering'), 'ends with the subject name, not the code');
 });

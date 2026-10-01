@@ -271,7 +271,7 @@ function checkDriveLink_(link, naming) {
 function folderNaming_(form, data) {
   var fn = form.rules && form.rules.folderName;
   if (!fn || !fn.enabled) return null;
-  return { subject: String(fn.subject || form.subject || ''), example: { project: Rules.valueByRole(form, data || {}, 'title') } };
+  return { subject: String(fn.subject || ''), example: { project: Rules.valueByRole(form, data || {}, 'title') } };
 }
 
 function checkDriveFields_(form, data) {

@@ -160,9 +160,9 @@
     f.rules.folderName = f.rules.folderName || { enabled: false, subject: '' };
     var folderBox = hasFolder ? h('div', { class: 'subpanel' },
       h('h3', null, 'Drive folder name'),
-      h('p', { class: 'help' }, 'When the Drive check is on, the folder name is read and must look like Team_Leader_Name_Project_Name_Subject: no spaces, parts joined by underscores, ending with the subject. Students see the rule with an example.'),
-      A.check('Folder names must follow Team_Leader_Name_Project_Name_Subject', f.rules.folderName.enabled, function (v) { f.rules.folderName.enabled = v; }),
-      A.field('Subject at the end of the name', A.text(f.rules.folderName.subject || '', function (v) { f.rules.folderName.subject = v.replace(/\s+/g, ''); }, { name: 'folderSubject', dir: 'ltr', placeholder: f.subject || 'SubjectName' }), 'Leave empty to use the subject code' + (f.subject ? ' (' + f.subject + ')' : '') + '.')) : null;
+      h('p', { class: 'help' }, 'When the Drive check is on, the folder name is read and must look like Team_Leader_Name_Project_Name_Subject_Name, for example Ahmed_Mohamed_Library_System_Software_Engineering: no spaces, parts joined by underscores, ending with the subject name. Students see the rule with an example.'),
+      A.check('Folder names must follow Team_Leader_Name_Project_Name_Subject_Name', f.rules.folderName.enabled, function (v) { f.rules.folderName.enabled = v; }),
+      A.field('Subject name at the end', A.text(f.rules.folderName.subject || '', function (v) { f.rules.folderName.subject = Rules.folderPart(v); }, { name: 'folderSubject', dir: 'ltr', placeholder: 'Software_Engineering' }), 'The subject name, not the code. Spaces become underscores. Leave empty to accept any subject name.')) : null;
     var rulesPanel = panel('Limits and checks', null,
       h('div', { class: 'row' },
         A.field('Maximum submissions', A.number(f.rules.maxSubmissions == null ? '' : f.rules.maxSubmissions, function (v) { f.rules.maxSubmissions = v === '' ? null : parseInt(v, 10); }, { name: 'maxSubmissions', min: '1' }), 'Leave empty for no limit.'),
