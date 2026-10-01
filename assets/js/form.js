@@ -673,7 +673,7 @@
         S.result = { ref: res.ref, edited: true };
       } else {
         res = await App.api.call({ action: 'submit', slug: S.slug, data: v.data, lang: App.i18n.lang });
-        S.result = { ref: res.ref, key: res.key, keyExpires: res.keyExpires };
+        S.result = { ref: res.ref, key: res.key, keyExpires: res.keyExpires, emailed: !!res.emailed };
       }
       S.data = v.data;
       clearDraft();
@@ -803,7 +803,7 @@
     var em = Rules.valueByRole(S.form, S.data, 'email');
     var opts = {
       ref: S.result.ref, key: S.result.key, keyExpires: S.result.keyExpires, edited: !!S.result.edited,
-      email: !S.result.edited && S.form.editKey && S.form.editKey.enabled ? em : '', summary: ticketSummary()
+      email: !S.result.edited && S.result.emailed ? em : '', summary: ticketSummary()
     };
     return sheet(head(), App.ticket.render(opts), App.ticket.actions(opts));
   }

@@ -236,6 +236,8 @@ body.admin { font-size: 1rem; }
 .overlay { position: fixed; inset: 0; z-index: 50; display: flex; align-items: center; justify-content: center; padding: 16px; background: rgba(20, 16, 11, .55); overflow: auto; }
 .dialog { width: min(640px, 100%); max-height: 92vh; overflow: auto; background: var(--sheet); border: 2px solid var(--ink); border-radius: 4px; padding: 22px; }
 .dialog-title { font-size: 1.4rem; margin-bottom: 10px; }
+.key-cell { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.key-inline { font-family: var(--font-code); font-size: 1.5rem; letter-spacing: .3em; padding: 0 6px; border: 1.5px dashed var(--ink); border-radius: 3px; }
 .key-reveal { font-family: var(--font-code); font-size: 2.2rem; letter-spacing: .4em; text-align: center; padding: 10px; }
 .data-table { width: 100%; border-collapse: collapse; }
 .data-table th, .data-table td { text-align: start; padding: 8px 10px; border-top: 1px solid var(--line); vertical-align: middle; }

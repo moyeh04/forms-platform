@@ -142,12 +142,31 @@
       else node = String(v);
       rows.push(h('dt', null, f.label.en), h('dd', null, node));
     });
+    if (form.editKey && form.editKey.enabled) {
+      var keyBox = h('dd', { class: 'key-cell' });
+      var paintKey = function () {
+        ui.clear(keyBox);
+        keyBox.appendChild(h('button', { type: 'button', class: 'btn btn-quiet sm', name: 'show-key', onclick: function (e) {
+          A.busy(e.currentTarget, async function () {
+            var k = await A.call('admin.submission.key', { slug: form.slug, submissionId: s.id });
+            ui.clear(keyBox);
+            keyBox.appendChild(h('span', { class: 'key-inline' }, k.key));
+            keyBox.appendChild(h('button', { type: 'button', class: 'btn btn-quiet sm', onclick: async function () { toast((await ui.copyText(k.key)) ? 'Key copied' : 'Could not copy', 'ok'); } }, icon('copy', 16), 'Copy'));
+            keyBox.appendChild(h('span', { class: 'muted-note' }, (k.expired ? 'Expired on ' : 'Works until ') + A.fmtDate(k.keyExpires) + (k.expired ? '. Reset it to give a fresh one.' : '')));
+          });
+        } }, icon('eye', 16), 'Show key'));
+        if (!s.keyKnown) keyBox.appendChild(h('span', { class: 'muted-note' }, 'Issued before keys could be shown: use Reset key below.'));
+      };
+      paintKey();
+      rows.splice(4, 0, h('dt', null, 'Edit key'), keyBox);
+    }
     var steps = ((form.review && form.review.steps) || []).map(function (st) { return h('div', { class: 'row' }, A.field(st.label.en, reviewSelect(form, s, st))); });
     var body = h('div', { class: 'detail' }, h('dl', null, rows), steps);
     A.modal('Registration ' + s.ref, body, [
       { text: 'Reset key', kind: 'quiet', onclick: async function () {
         var r = await A.call('admin.submission.resetKey', { slug: form.slug, submissionId: s.id });
-        A.reveal('New key for ' + r.ref, 'Give this key to the student. They open the form link and choose "Edit or cancel with your key". It works until ' + A.fmtDate(r.keyExpires) + '. The old key stops working.', r.key, true);
+        s.keyKnown = true;
+        A.reveal('New key for ' + r.ref, 'Give this key to the student. They open the form link and choose "Edit or cancel with your key". It works until ' + A.fmtDate(r.keyExpires) + '. The old key stops working. You can see it again any time under Details.', r.key, true);
         return false;
       } },
       { text: 'Delete', kind: 'danger', onclick: async function (close) {

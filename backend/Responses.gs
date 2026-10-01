@@ -19,7 +19,7 @@ function rowToResponse_(r) {
     email: String(r.email), name: String(r.name), code: String(r.code), phone: String(r.phone),
     title: String(r.title), link: String(r.link), slot: String(r.slot), members: String(r.members),
     data: parseJson(r.data, {}), keyHash: String(r.keyHash), keyExpires: String(r.keyExpires),
-    deleted: String(r.deleted) === '1'
+    deleted: String(r.deleted) === '1', keySeal: String(r.keySeal || '')
   };
 }
 
@@ -39,12 +39,20 @@ function responseToRow_(r) {
 function saveResponse_(form, r) {
   r.updated = nowIso();
   var sh = responsesSheet(form);
+  ensureResponseHeader_(sh);
   if (r._row) writeRow(sh, r._row, RESPONSE_COLS, responseToRow_(r));
   else {
     sh.appendRow(rowValues(RESPONSE_COLS, responseToRow_(r)));
     r._row = sh.getLastRow();
   }
   return r;
+}
+
+/** Sheets made before a column was added get its header the first time a row is saved. */
+function ensureResponseHeader_(sh) {
+  var last = RESPONSE_COLS.length;
+  var cell = sh.getRange(1, last);
+  if (String(cell.getValue()) !== RESPONSE_COLS[last - 1]) cell.setValue(RESPONSE_COLS[last - 1]).setFontWeight('bold');
 }
 
 /** Fills the readable columns from the validated data. */
@@ -126,6 +134,27 @@ function setReviewStep_(form, r, stepId, status) {
 
 function keyHash_(form, key) {
   return sha256Hex(pepper() + ':key:' + form.id + ':' + key);
+}
+
+/**
+ * A sealed copy of a key that only this script can open, so the admin can
+ * look a lost key up. Each digit is shifted by a pad derived from the private
+ * pepper, the form, and the registration: the sheet alone reveals nothing.
+ */
+function keyPad_(form, responseId) {
+  return sha256Hex(pepper() + ':seal:' + form.id + ':' + responseId);
+}
+
+function sealKey_(form, responseId, key) {
+  var pad = keyPad_(form, responseId);
+  return 'S' + String(key).split('').map(function (d, i) { return String((parseInt(d, 10) + parseInt(pad.charAt(i), 16)) % 10); }).join('');
+}
+
+function unsealKey_(form, responseId, seal) {
+  var s = String(seal || '');
+  if (!/^S\d{5}$/.test(s)) return '';
+  var pad = keyPad_(form, responseId);
+  return s.slice(1).split('').map(function (d, i) { return String(((parseInt(d, 10) - parseInt(pad.charAt(i), 16)) % 10 + 10) % 10); }).join('');
 }
 
 function issueKey_(form, rows) {
@@ -264,11 +293,13 @@ function siteLink_(form) {
   return base ? base.replace(/\/+$/, '') + '/?f=' + form.slug : '';
 }
 
+/** Sends the student's copy and the admin's alert. Returns true when the student's email went out. */
 function sendConfirmation_(form, result, data) {
+  var sent = false;
   try {
     var to = Rules.valueByRole(form, data, 'email');
     var n = form.notifications || {};
-    if (n.confirmEmail && to && result.key) {
+    if (n.confirmEmail !== false && to && result.key) {
       var lines = [
         'Your registration was received.',
         '',
@@ -282,6 +313,7 @@ function sendConfirmation_(form, result, data) {
       }
       lines.push('', 'تم استلام تسجيلك. احتفظ بالرقم المرجعي والمفتاح.');
       MailApp.sendEmail({ to: to, subject: '[' + form.title + '] Registration received - ' + result.ref, body: lines.join('\n') });
+      sent = true;
     }
     if (n.alertEmail) {
       MailApp.sendEmail({ to: n.alertEmail, subject: '[' + form.title + '] New submission ' + result.ref, body: 'A new submission arrived: ' + result.ref });
@@ -289,6 +321,7 @@ function sendConfirmation_(form, result, data) {
   } catch (e) {
     Logger.log('Email not sent: ' + e.message);
   }
+  return sent;
 }
 
 /** Views are rebuilt by a later module when it is present. */

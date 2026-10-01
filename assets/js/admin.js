@@ -53,8 +53,8 @@
     return h('label', { class: 'field-row' }, h('span', { class: 'label' }, label), control, help ? h('span', { class: 'help' }, help) : null);
   };
 
-  A.check = function (label, checked, onchange, disabled) {
-    return h('label', { class: 'check' }, h('input', { type: 'checkbox', checked: !!checked, disabled: !!disabled, onchange: function (e) { onchange(e.target.checked); } }), label);
+  A.check = function (label, checked, onchange, disabled, name) {
+    return h('label', { class: 'check' }, h('input', { type: 'checkbox', name: name || null, checked: !!checked, disabled: !!disabled, onchange: function (e) { onchange(e.target.checked); } }), label);
   };
 
   A.text = function (value, onchange, attrs) {

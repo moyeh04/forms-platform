@@ -168,10 +168,11 @@
         A.field('Maximum submissions', A.number(f.rules.maxSubmissions == null ? '' : f.rules.maxSubmissions, function (v) { f.rules.maxSubmissions = v === '' ? null : parseInt(v, 10); }, { name: 'maxSubmissions', min: '1' }), 'Leave empty for no limit.'),
         hasDrive ? A.field('Google Drive links', A.select(f.rules.driveCheck || 'strict', [['strict', 'Must open and be shared with anyone who has the link'], ['off', 'Do not check']], function (v) { f.rules.driveCheck = v; })) : null),
       isTeam ? A.check('A student may appear in only one team of this form', f.rules.uniqueAcrossForm, function (v) { f.rules.uniqueAcrossForm = v; }) : null,
-      h('div', { class: 'row' },
-        h('div', { class: 'field-row' }, A.check('Email each student a confirmation', f.notifications.confirmEmail !== false, function (v) { f.notifications.confirmEmail = v; })),
-        A.field('Email me a note for every new submission', A.text(f.notifications.alertEmail || '', function (v) { f.notifications.alertEmail = v.trim(); }, { name: 'alertEmail', type: 'email', placeholder: 'you@example.com' }), 'Optional.')),
       folderBox);
+    var emailPanel = panel('Emails', 'Emails go out from your Google account. Students always see their key on the success page, and you can look any key up under Responses, Details.',
+      A.check('Send each student a confirmation email with their reference and key', f.notifications.confirmEmail !== false, function (v) { f.notifications.confirmEmail = v; }, false, 'confirmEmail'),
+      h('p', { class: 'muted-note' }, 'Turned off, nothing is emailed to students. If you do not need their email address at all, also untick Show for the Email question above.'),
+      A.field('Email me a note for every new submission', A.text(f.notifications.alertEmail || '', function (v) { f.notifications.alertEmail = v.trim(); }, { name: 'alertEmail', type: 'email', placeholder: 'you@example.com' }), 'Optional. Leave empty for no alerts.'));
 
     /* Fields ----------------------------------------------------- */
     var rows = [];
@@ -413,7 +414,7 @@
     var dangerPanel = h('section', { class: 'panel danger-zone' }, h('h2', null, 'Delete this form'),
       h('p', { class: 'help' }, 'The link stops working and the form leaves the dashboard. Its Google Sheet moves to the Drive trash for 30 days. To stop new registrations but keep everything, set the status to Closed or Archived instead.'),
       h('button', { type: 'button', class: 'btn btn-danger', name: 'delete-form', onclick: function () { A.deleteForm(f, function () { window.location.hash = '#/'; }); } }, icon('trash', 18), 'Delete form'));
-    [general, majorsPanel, sizePanel, fieldsPanel, slotsPanel, keyPanel, rulesPanel, reviewPanel, dangerPanel].forEach(function (n) { if (n) mount.appendChild(n); });
+    [general, majorsPanel, sizePanel, fieldsPanel, slotsPanel, keyPanel, emailPanel, rulesPanel, reviewPanel, dangerPanel].forEach(function (n) { if (n) mount.appendChild(n); });
     mount.appendChild(h('div', { class: 'savebar' }, h('span', { class: 'muted-note' }, 'Changes apply to students as soon as you save.'), saveBtn));
   };
 })(window.App = window.App || {});
