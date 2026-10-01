@@ -221,4 +221,4 @@ ul.plain li { padding: 1px 0; }
 .audience .icon { color: var(--sea); }
 .folder-rule { display: flex; gap: 8px; align-items: flex-start; margin: 6px 0 0; font-size: var(--fs-help); color: var(--ink); line-height: 1.5; }
 .folder-rule .icon { color: var(--sea); margin-top: 2px; }
-.folder-rule span { overflow-wrap: anywhere; }
+.folder-rule-text { overflow-wrap: anywhere; }
