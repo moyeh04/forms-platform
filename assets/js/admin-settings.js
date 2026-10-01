@@ -106,19 +106,33 @@
 
     /* Fields ----------------------------------------------------- */
     var rows = [];
+    function hasHelp(fd) { return !!(fd.help && ((fd.help.en || '').trim() || (fd.help.ar || '').trim())); }
     function fieldRow(fd, sub) {
       var locked = LOCKED_ROLES.indexOf(fd.role) !== -1;
+      // The description row stays hidden until it has text or the admin asks for it.
+      var descRow = h('tr', { class: 'desc-row' + (sub ? ' sub' : ''), dataset: { desc: fd.id }, hidden: !hasHelp(fd) },
+        h('td', null),
+        h('td', { colspan: '4' }, h('div', { class: 'desc-edit' },
+          h('span', { class: 'label' }, 'Description students see under this question'),
+          h('div', { class: 'desc-pair' },
+            h('textarea', { class: 'textarea', rows: '2', name: 'help-en-' + fd.id, 'aria-label': 'English description for ' + fd.id, placeholder: 'English, for example: In case of 3 or 4, other students will be added to reach 5', oninput: function (e) { fd.help = Object.assign({}, fd.help, { en: e.target.value }); } }, (fd.help && fd.help.en) || ''),
+            h('textarea', { class: 'textarea', rows: '2', name: 'help-ar-' + fd.id, 'aria-label': 'Arabic description for ' + fd.id, dir: 'rtl', lang: 'ar', placeholder: 'بالعربي', oninput: function (e) { fd.help = Object.assign({}, fd.help, { ar: e.target.value }); } }, (fd.help && fd.help.ar) || '')),
+          h('button', { type: 'button', class: 'link-btn', onclick: function () { fd.help = { en: '', ar: '' }; descRow.querySelectorAll('textarea').forEach(function (t) { t.value = ''; }); descRow.hidden = true; descBtn.hidden = false; } }, 'Remove description'))));
+      var descBtn = h('button', { type: 'button', class: 'link-btn add-desc', name: 'desc-' + fd.id, hidden: hasHelp(fd), onclick: function () {
+        descRow.hidden = false; descBtn.hidden = true;
+        var first = descRow.querySelector('textarea'); if (first) first.focus();
+      } }, '+ Description');
       var tr = h('tr', { class: sub ? 'sub' : null, dataset: { field: fd.id } },
         h('td', null, A.check('', fd.enabled !== false, function (v) { fd.enabled = v; }, locked)),
-        h('td', null, A.text(fd.label.en, function (v) { fd.label.en = v; }, { 'aria-label': 'English label for ' + fd.id })),
+        h('td', null, A.text(fd.label.en, function (v) { fd.label.en = v; }, { 'aria-label': 'English label for ' + fd.id }), descBtn),
         h('td', null, A.text(fd.label.ar, function (v) { fd.label.ar = v; }, { 'aria-label': 'Arabic label for ' + fd.id, dir: 'rtl', lang: 'ar' })),
         h('td', null, A.check('', fd.required !== false, function (v) { fd.required = v; }, locked)),
         h('td', null, fd.type === 'arabic_name' ? A.number(fd.minParts || 4, function (v) { fd.minParts = parseInt(v, 10) || 4; }, { class: 'input num', min: '2', max: '6', 'aria-label': 'Name parts for ' + fd.id }) : h('span', { class: 'muted-note' }, fd.type.replace('_', ' '))));
-      rows.push(tr);
+      rows.push(tr, descRow);
       if (fd.type === 'members') (fd.fields || []).forEach(function (sf) { fieldRow(sf, true); });
     }
     (f.fields || []).forEach(function (fd) { fieldRow(fd, false); });
-    var fieldsPanel = panel('Questions', 'Rename a question, hide the ones you do not need, or make optional ones required. Team size, names, codes, and the booking slot are always required. For names, the number is how many name parts are needed (4 means a four-part name).',
+    var fieldsPanel = panel('Questions', 'Rename a question, hide the ones you do not need, or make optional ones required. Add a description to explain a question: students see it right under the question. Team size, names, codes, and the booking slot are always required. For names, the number is how many name parts are needed (4 means a four-part name).',
       h('div', { class: 'scroll-x' }, h('table', { class: 'fields-table' },
         h('thead', null, h('tr', null, h('th', null, 'Show'), h('th', null, 'English label'), h('th', null, 'Arabic label'), h('th', null, 'Required'), h('th', null, 'Name parts / type'))),
         h('tbody', null, rows))));

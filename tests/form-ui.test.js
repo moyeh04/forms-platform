@@ -344,3 +344,16 @@ test('Team size: a team of three submits all its members and stores them', async
   const row = w.sheet(w.form.sheetId, 'Responses').rows()[1];
   assert.ok(row[13].includes('4230998') && row[13].includes('4230997'));
 });
+
+test('Descriptions: a question description is shown between the label and the answer', async () => {
+  const w = boot();
+  const fields = w.admin({ action: 'admin.forms.get', id: w.form.id }).form.fields;
+  fields.find((x) => x.id === 'email').help = { en: 'Use your university email', ar: 'إيميل الجامعة' };
+  w.admin({ action: 'admin.forms.update', id: w.form.id, patch: { fields } });
+  const p = await open(w);
+  const field = p.$('[data-path="email"]');
+  const desc = field.querySelector('.field-desc');
+  assert.equal(desc.textContent, 'Use your university email');
+  assert.equal(desc.previousElementSibling.tagName, 'LABEL');
+  assert.equal(desc.nextElementSibling.getAttribute('name'), 'email');
+});
