@@ -414,7 +414,15 @@
     var dangerPanel = h('section', { class: 'panel danger-zone' }, h('h2', null, 'Delete this form'),
       h('p', { class: 'help' }, 'The link stops working and the form leaves the dashboard. Its Google Sheet moves to the Drive trash for 30 days. To stop new registrations but keep everything, set the status to Closed or Archived instead.'),
       h('button', { type: 'button', class: 'btn btn-danger', name: 'delete-form', onclick: function () { A.deleteForm(f, function () { window.location.hash = '#/'; }); } }, icon('trash', 18), 'Delete form'));
-    [general, majorsPanel, sizePanel, fieldsPanel, slotsPanel, keyPanel, emailPanel, rulesPanel, reviewPanel, dangerPanel].forEach(function (n) { if (n) mount.appendChild(n); });
+    var sections = [general, majorsPanel, sizePanel, fieldsPanel, slotsPanel, keyPanel, emailPanel, rulesPanel, reviewPanel, dangerPanel].filter(Boolean);
+    // A sticky bar of section names: the page is long, so admins jump instead of scrolling.
+    var jump = h('nav', { class: 'section-bar', 'aria-label': 'Settings sections' }, sections.map(function (n, i) {
+      var title = n.querySelector('h2').textContent;
+      n.id = 'sec-' + i;
+      return h('button', { type: 'button', class: 'section-link', onclick: function () { try { n.scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch (e) { n.scrollIntoView(); } } }, title.replace('Delete this form', 'Delete'));
+    }));
+    mount.appendChild(jump);
+    sections.forEach(function (n) { mount.appendChild(n); });
     mount.appendChild(h('div', { class: 'savebar' }, h('span', { class: 'muted-note' }, 'Changes apply to students as soon as you save.'), saveBtn));
   };
 })(window.App = window.App || {});
