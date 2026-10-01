@@ -168,8 +168,22 @@ function normalizeRules_(current, next) {
       fail('bad_team_size', 'Team size must be between 1 and 20, and the maximum cannot be lower than the minimum.');
     }
     merged.teamSize = { min: min, max: max };
+    var notice = next && next.teamSize && next.teamSize.notice !== undefined ? next.teamSize.notice : current && current.teamSize && current.teamSize.notice;
+    if (notice) merged.teamSize.notice = normalizeSizeNotice_(notice, min, max);
   }
   return merged;
+}
+
+/** Keeps only whole sizes inside the range, and trimmed English and Arabic text. */
+function normalizeSizeNotice_(n, min, max) {
+  var sizes = [];
+  (Array.isArray(n.sizes) ? n.sizes : []).forEach(function (x) {
+    var v = parseInt(x, 10);
+    if (v >= min && v <= max && sizes.indexOf(v) === -1) sizes.push(v);
+  });
+  sizes.sort(function (a, b) { return a - b; });
+  var text = n.text || {};
+  return { sizes: sizes, text: { en: String(text.en || '').trim(), ar: String(text.ar || '').trim() } };
 }
 
 var PATCHABLE_ = ['title', 'term', 'slug', 'status', 'opensAt', 'closesAt', 'lang', 'icon', 'steps', 'fields', 'slots', 'rules', 'review', 'matching', 'editKey', 'notifications', 'messages'];

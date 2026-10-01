@@ -79,6 +79,7 @@ step needs the real Google services (see "What could not be tested here").
 | Create, duplicate for a new term, open or close with dates, rename or hide questions, add a description under any question | Done |
 | **Team members are mandatory: admin sets the minimum and maximum team size per form** | Done |
 | **Students pick the total team size first; exactly that many member forms then appear** | Done |
+| A note for chosen team sizes (for example "other students will be added to reach 5" on 3 and 4), written by the admin in English and Arabic | Done |
 | Title built from settings, e.g. "Database Team Project Registration Form" plus a term tag. No "Clean Code", no "Form Nº" | Done |
 | Editable lists behind dropdowns (levels, bylaws, majors, sections, groups) | Done |
 
