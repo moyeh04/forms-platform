@@ -160,6 +160,7 @@ no validation.
 | Path | What it is |
 |---|---|
 | `scripts/bundle-backend.js` | The bundler. |
+| `scripts/dev-server.js` | `npm run dev`: serves the site and answers its API calls from the in-memory Google, with sample forms, so pages can be opened in a real browser. |
 | `scripts/download_tasks.py` | Downloads task files and builds `Tasks.xlsx`. |
 | `tests/harness/appsscript-mock.js` | An in-memory Sheets, Drive, Mail, Cache, and clock, so the real backend code runs in tests. |
 | `tests/harness/dom.js` | Opens the real pages in jsdom wired to that backend. |
