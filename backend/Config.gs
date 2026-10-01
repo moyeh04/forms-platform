@@ -10,7 +10,7 @@ var TABS = { forms: 'Forms', clients: 'Clients', lists: 'Lists' };
 
 var FORM_COLS = ['id', 'slug', 'type', 'title', 'term', 'status', 'opensAt', 'closesAt', 'sheetId', 'sheetUrl', 'config', 'createdAt', 'updatedAt'];
 
-var RESPONSE_COLS = ['id', 'ref', 'created', 'updated', 'status', 'review', 'email', 'name', 'code', 'phone', 'title', 'link', 'slot', 'members', 'data', 'keyHash', 'keyExpires', 'deleted'];
+var RESPONSE_COLS = ['id', 'ref', 'created', 'updated', 'status', 'review', 'email', 'name', 'code', 'phone', 'title', 'link', 'slot', 'members', 'data', 'keyHash', 'keyExpires', 'deleted', 'keySeal'];
 
 var CLIENT_COLS_ = ['id', 'name', 'tokenHash', 'forms', 'hiddenColumns', 'canReview', 'active', 'createdAt'];
 

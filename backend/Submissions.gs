@@ -19,16 +19,17 @@ API.submit = function (req) {
     var live = rows.filter(function (r) { return !r.deleted; });
     checkLimits_(vform, v.data, live, null);
     var k = issueKey_(vform, live);
+    var id = uuid();
     var r = applyDerived_(vform, {
-      id: uuid(), ref: nextRef_(form), created: nowIso(), status: 'new', review: defaultReview_(form),
-      data: v.data, keyHash: k.hash, keyExpires: keyExpiry_(form), deleted: false
+      id: id, ref: nextRef_(form), created: nowIso(), status: 'new', review: defaultReview_(form),
+      data: v.data, keyHash: k.hash, keyExpires: keyExpiry_(form), deleted: false, keySeal: sealKey_(form, id, k.key)
     });
     saveResponse_(form, r);
     return { id: r.id, ref: r.ref, key: form.editKey.enabled ? k.key : '', keyExpires: r.keyExpires };
   });
 
   afterChange_(form);
-  sendConfirmation_(vform, result, v.data);
+  result.emailed = sendConfirmation_(vform, result, v.data);
   return result;
 };
 
@@ -75,6 +76,7 @@ API.remove = function (req) {
     if (!current) fail('bad_key', 'That key is not right.');
     current.deleted = true;
     current.keyHash = '';
+    current.keySeal = '';
     saveResponse_(form, current);
   });
   afterChange_(form);
@@ -85,8 +87,10 @@ API.remove = function (req) {
 
 function adminView_(r) {
   var o = clone(r);
+  o.keyKnown = !!(r.keyHash && r.keySeal);
   delete o._row;
   delete o.keyHash;
+  delete o.keySeal;
   return o;
 }
 
@@ -139,6 +143,7 @@ API['admin.submission.delete'] = admin(function (req) {
     if (!r) fail('submission_not_found', 'That submission does not exist.');
     r.deleted = true;
     r.keyHash = '';
+    r.keySeal = '';
     saveResponse_(form, r);
   });
   afterChange_(form);
@@ -154,8 +159,19 @@ API['admin.submission.resetKey'] = admin(function (req) {
     if (!r) fail('submission_not_found', 'That submission does not exist.');
     var k = issueKey_(vform, rows);
     r.keyHash = k.hash;
+    r.keySeal = sealKey_(form, r.id, k.key);
     r.keyExpires = keyExpiry_(form);
     saveResponse_(form, r);
     return { key: k.key, keyExpires: r.keyExpires, ref: r.ref };
   });
+});
+
+/** The admin reads a student's current key, for example when the student lost it. */
+API['admin.submission.key'] = admin(function (req) {
+  var form = requireForm(req.slug || req.id);
+  var r = readResponses(form).filter(function (x) { return x.id === req.submissionId; })[0];
+  if (!r) fail('submission_not_found', 'That submission does not exist.');
+  var key = unsealKey_(form, r.id, r.keySeal);
+  if (!key || keyHash_(form, key) !== r.keyHash) fail('key_unknown', 'This key was issued before keys could be shown. Reset it to give the student a new one you can see.');
+  return { key: key, keyExpires: r.keyExpires, ref: r.ref, expired: !!(r.keyExpires && Date.parse(r.keyExpires) < Date.now()) };
 });

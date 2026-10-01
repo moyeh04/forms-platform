@@ -243,3 +243,40 @@ test('Folder name: a team project folder must be named Name_Project_Name_Subject
   w.drive.setFolderName(id, 'anything goes');
   assert.equal(w.api({ action: 'submit', slug: f.slug, data: data('4230002', link) }).ok, true, 'the rule can be switched off');
 });
+
+test('Keys: the admin can read a student key back; the sheet only holds a sealed copy', () => {
+  const w = boot();
+  const r = w.submit(team());
+  const subs = w.admin({ action: 'admin.submissions', slug: w.form.slug }).submissions;
+  assert.equal(subs[0].keySeal, undefined, 'the seal never leaves the server');
+  assert.equal(subs[0].keyKnown, true);
+  const got = w.admin({ action: 'admin.submission.key', slug: w.form.slug, submissionId: subs[0].id });
+  assert.equal(got.key, r.key);
+  const raw = w.sheet(w.form.sheetId, 'Responses').getDataRange().getValues();
+  assert.ok(!JSON.stringify(raw).includes('"' + r.key + '"'), 'the plain key is not in the sheet');
+  assert.equal(raw[0][raw[0].length - 1], 'keySeal');
+  assert.equal(w.api({ action: 'admin.submission.key', slug: w.form.slug, submissionId: subs[0].id }).error.code, 'bad_pin', 'needs the PIN');
+  const fresh = w.admin({ action: 'admin.submission.resetKey', slug: w.form.slug, submissionId: subs[0].id });
+  assert.equal(w.admin({ action: 'admin.submission.key', slug: w.form.slug, submissionId: subs[0].id }).key, fresh.key, 'a reset key can be shown too');
+});
+
+test('Keys: registrations made before sealing say so and point to Reset key', () => {
+  const w = boot();
+  w.submit(team());
+  const sh = w.sheet(w.form.sheetId, 'Responses');
+  const vals = sh.getDataRange().getValues();
+  sh.getRange(2, vals[0].indexOf('keySeal') + 1).setValue('');
+  const sub = w.admin({ action: 'admin.submissions', slug: w.form.slug }).submissions[0];
+  assert.equal(sub.keyKnown, false);
+  assert.equal(w.admin({ action: 'admin.submission.key', slug: w.form.slug, submissionId: sub.id }).error.code, 'key_unknown');
+});
+
+test('Email: with confirmations off nothing is sent and the answer says so', () => {
+  const w = boot('team_registration', { notifications: { confirmEmail: false, alertEmail: '' } });
+  const r = w.submit(team());
+  assert.equal(r.ok, true);
+  assert.equal(r.emailed, false);
+  assert.equal(w.mail.length, 0);
+  const w2 = boot();
+  assert.equal(w2.submit(team()).emailed, true);
+});

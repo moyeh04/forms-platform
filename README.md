@@ -105,7 +105,7 @@ step needs the real Google services (see "What could not be tested here").
 | 5 random digits, shown once and emailed, expiring after a per-form number of days (default 7) | Done |
 | The key alone opens the registration; wrong guesses are throttled silently (10 per minute per form) | Done |
 | Edit or cancel; cancelling frees the code and the slot | Done |
-| Admin can reset a lost key | Done |
+| Admin can look up a student's key (Details, Show key) or reset a lost one | Done |
 
 ### Reservations
 | Requirement | Status |

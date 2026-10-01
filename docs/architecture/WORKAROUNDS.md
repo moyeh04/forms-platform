@@ -493,10 +493,10 @@ registration. To make a short number safe:
 | Unique within a form | Two registrations never share a key, so the key identifies exactly one |
 | 10 wrong tries a minute per form, silently throttled | 100,000 possibilities cannot be walked through |
 | Expires after a number of days you set | A stolen old key stops working |
-| Shown once, emailed once | Nothing to look up later; a lost key is replaced by the admin |
+| Shown once, optionally emailed | A lost key can be read back by the admin from a sealed copy, or replaced |
 
-**Cost.** A lost key needs the admin (Details, then Reset key). That is a
-feature as much as a cost: there is no "forgot key" page to attack.
+**Cost.** A lost key needs the admin (Details, then Show key or Reset key).
+That is a feature as much as a cost: there is no "forgot key" page to attack.
 
 ---
 
