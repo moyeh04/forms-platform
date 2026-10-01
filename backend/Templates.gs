@@ -73,7 +73,7 @@ function commonConfig_(icon, uniqueBy) {
     rules: { uniqueBy: uniqueBy, uniqueAcrossForm: false, driveCheck: 'strict', maxSubmissions: null },
     editKey: { enabled: true, days: 7, allowEdit: true, allowDelete: true },
     notifications: { confirmEmail: true, alertEmail: '' },
-    review: { steps: [] },
+    review: { sequential: true, steps: [] },
     messages: {
       closed: { en: 'This form is closed.', ar: 'الفورم ده مقفول.' },
       notYet: { en: 'This form has not opened yet.', ar: 'الفورم لسه مفتحش.' },
@@ -170,6 +170,7 @@ function templateFor(type) {
       step_('schedule', ['schedule'])
     ];
     cfg.review = {
+      sequential: true,
       steps: [
         { id: 'schedule', label: { en: 'Timetable check', ar: 'مراجعة الجدول' } },
         { id: 'group', label: { en: 'Group match', ar: 'مطابقة الجروب' } }
