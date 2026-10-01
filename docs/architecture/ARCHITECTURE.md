@@ -449,6 +449,11 @@ flowchart TD
     class X,Y cErr
 ```
 
+The admin can also attach a note to some sizes (`rules.teamSize.notice`). When a
+student picks one of them, `Rules.teamSizeNotice` fills in `{n}` and `{max}` and
+the page shows it under the size chips, on the review step, and on the ticket.
+It is information only; it never blocks a submission.
+
 If a form hides the team size question, the member limits fall back to the
 range (`min - 1` to `max - 1`), so older form definitions keep working.
 

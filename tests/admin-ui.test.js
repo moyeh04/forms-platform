@@ -283,3 +283,17 @@ test('Questions: an admin adds a description and students read it under the ques
   const link = w.api({ action: 'getForm', slug: f.slug }).form.fields.find((x) => x.id === 'link');
   assert.deepEqual(link.help, { en: 'Name it Name_Project_Name_Subject and share it with anyone', ar: 'اعمل شير للفولدر' });
 });
+
+test('Team size note: the admin picks sizes, writes the note, and it is saved', async () => {
+  const w = boot();
+  const f = w.make('team_registration', 'Projects', { rules: { teamSize: { min: 1, max: 5 } } });
+  const p = await openAdmin(w, `#/f/${f.slug}/settings`);
+  p.click('[name="notice-size-3"]'); p.click('[name="notice-size-4"]');
+  assert.equal(p.$('[name="notice-size-3"]').getAttribute('aria-pressed'), 'true');
+  p.click('[name="save"]'); await settle(8);
+  assert.ok(p.text().includes('Write the team size note'), 'sizes without text are refused');
+  p.type('[name="noticeEn"]', 'Others join to reach {max}.');
+  assert.ok(p.$('.notice-preview').textContent.includes('Others join to reach 5.'), 'live preview fills the placeholders');
+  p.click('[name="save"]'); await settle(12);
+  assert.deepEqual(w.admin({ action: 'admin.forms.get', id: f.id }).form.rules.teamSize.notice, { sizes: [3, 4], text: { en: 'Others join to reach {max}.', ar: '' } });
+});

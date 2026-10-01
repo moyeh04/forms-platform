@@ -357,3 +357,16 @@ test('Descriptions: a question description is shown between the label and the an
   assert.equal(desc.previousElementSibling.tagName, 'LABEL');
   assert.equal(desc.nextElementSibling.getAttribute('name'), 'email');
 });
+
+test('Size note: picking a size with a note shows it under the chips and on the review', async () => {
+  const w = boot('team_registration', { rules: { teamSize: { min: 1, max: 5, notice: { sizes: [3, 4], text: { en: 'Others will be added to reach {max}.', ar: 'هيتضاف طلاب لحد {max}' } } } } });
+  const p = await open(w);
+  await fillAbout(p); p.submitForm(); await settle();
+  await fillStudy(p); p.submitForm(); await settle();
+  p.pick('team_size', '2'); await settle();
+  assert.equal(p.$('.size-notice'), null, 'no note for 2');
+  p.pick('team_size', '3'); await settle();
+  assert.equal(p.$('.size-notice').textContent, 'Others will be added to reach 5.');
+  p.pick('team_size', '5'); await settle();
+  assert.equal(p.$('.size-notice'), null, 'no note for 5');
+});
