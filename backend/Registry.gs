@@ -140,6 +140,11 @@ function attachSheet_(form) {
   form.sheetUrl = ss.getUrl();
 }
 
+/** A subject code such as CMPn323: letters, digits, and dashes, no spaces. */
+function cleanSubject_(v) {
+  return String(v || '').replace(/\s+/g, '').replace(/[^A-Za-z0-9\-]/g, '').slice(0, 20);
+}
+
 function createForm(o) {
   if (FORM_TYPES.indexOf(o.type) === -1) fail('unknown_type', 'Unknown form type.');
   var title = String(o.title || '').trim();
@@ -148,6 +153,7 @@ function createForm(o) {
   form.type = o.type;
   form.title = title;
   form.term = String(o.term || '').trim();
+  form.subject = cleanSubject_(o.subject);
   form.slug = uniqueSlug_(o.slug || (title + ' ' + form.term));
   form.id = shortId('f_');
   form.status = 'draft';
@@ -186,7 +192,7 @@ function normalizeSizeNotice_(n, min, max) {
   return { sizes: sizes, text: { en: String(text.en || '').trim(), ar: String(text.ar || '').trim() } };
 }
 
-var PATCHABLE_ = ['title', 'term', 'slug', 'status', 'opensAt', 'closesAt', 'lang', 'icon', 'steps', 'fields', 'slots', 'rules', 'review', 'matching', 'editKey', 'notifications', 'messages'];
+var PATCHABLE_ = ['title', 'term', 'subject', 'slug', 'status', 'opensAt', 'closesAt', 'lang', 'icon', 'steps', 'fields', 'slots', 'rules', 'review', 'matching', 'editKey', 'notifications', 'messages'];
 
 function updateForm(id, patch) {
   var form = requireForm(id);
@@ -195,6 +201,10 @@ function updateForm(id, patch) {
     if (k === 'status' && FORM_STATUSES.indexOf(patch[k]) === -1) fail('bad_status', 'Status must be draft, open, closed, or archived.');
     if (k === 'rules') {
       form.rules = normalizeRules_(form.rules, patch.rules);
+      return;
+    }
+    if (k === 'subject') {
+      form.subject = cleanSubject_(patch.subject);
       return;
     }
     if (k === 'slots') {
@@ -220,6 +230,7 @@ function duplicateForm(id, o) {
   copy.id = shortId('f_');
   copy.title = (o && o.title) || src.title;
   copy.term = o && o.term !== undefined ? o.term : src.term;
+  copy.subject = o && o.subject !== undefined ? cleanSubject_(o.subject) : src.subject || '';
   copy.slug = uniqueSlug_((o && o.slug) || copy.title + ' ' + copy.term);
   copy.status = 'draft';
   copy.createdAt = nowIso();
@@ -239,7 +250,7 @@ function resolveOptions_(form, lists) {
   return form;
 }
 
-var PUBLIC_KEYS_ = ['slug', 'type', 'title', 'term', 'lang', 'icon', 'steps', 'fields', 'slots', 'editKey', 'messages', 'status', 'opensAt', 'closesAt'];
+var PUBLIC_KEYS_ = ['slug', 'type', 'title', 'term', 'subject', 'lang', 'icon', 'steps', 'fields', 'slots', 'editKey', 'messages', 'status', 'opensAt', 'closesAt'];
 
 function publicForm(form) {
   var full = resolveOptions_(clone(form), readLists());
