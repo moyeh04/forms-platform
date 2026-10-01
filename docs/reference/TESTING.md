@@ -170,6 +170,14 @@ function that calls `world.api`. Helpers `type`, `pick`, `click`,
 The first-run checklist exists because these gaps are real. Everything else is
 exercised on every run.
 
+## Looking at the pages in a real browser
+
+jsdom does not draw anything, so `npm run dev` starts a local preview
+(`scripts/dev-server.js`). It serves the real pages and routes their API calls
+into the same in-memory Google the tests use, seeded with a team form, a
+reservation form, a WhatsApp form, three teams, and a viewer link. The admin PIN
+is `4321`. Nothing is saved: stopping the server forgets everything.
+
 ## Adding a test
 
 1. Pick the lowest layer that can see the behaviour: a rule goes in
