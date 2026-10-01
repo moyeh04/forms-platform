@@ -142,7 +142,7 @@ Back in the Forms Registry sheet: **Forms Platform > 3. Set website address...**
 2. Click **New form**, choose a type, give it a title, pick the term (Fall, Spring, or Summer and the year), type the subject code, and click **Create form**.
 3. On the settings page check:
    - **Team size**: minimum and maximum people per team (counting the leader).
-   - **Days and time slots** for reservations.
+   - **Timetable** for reservations: set the session hours, then add days by date.
    - **Status**: set to **Open** and click **Save settings**.
 4. Click **Copy link** and send it to students. The link looks like `.../index.html?f=database-team-project-registration-form-fall-2027`.
 5. Watch submissions under **Responses**. Each form's own Google Sheet is one click away (**Google Sheet**).

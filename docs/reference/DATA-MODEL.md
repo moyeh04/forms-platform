@@ -117,7 +117,7 @@ The `config` cell is the reason new forms need no code:
 | `steps` | How questions are grouped into pages |
 | `rules` | `uniqueBy`, `uniqueAcrossForm`, `driveCheck`, `maxSubmissions`, `majors` (specializations allowed to register; empty means all), `folderName { enabled, subject }` (Drive folder names must be `Name_Project_Name_Subject`; an empty subject means the form's subject code), **`teamSize { min, max, notice }`**. `notice` is optional: `{ sizes: [3, 4], text: { en, ar } }`, a note shown to students who pick one of those sizes; `{n}` and `{max}` are filled in |
 | `editKey` | `enabled`, `days`, `allowEdit`, `allowDelete` |
-| `slots` | Reservation days (id, label, date, times) and `capacity` |
+| `slots` | Reservation days (id, label, date, times), `capacity`, and `pattern { start, end, length, gap }`: the session hours new days start with |
 | `review` | Review steps and whether they are sequential |
 | `matching` | WhatsApp matching switch |
 | `notifications` | `confirmEmail`, `alertEmail` |

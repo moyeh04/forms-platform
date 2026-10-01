@@ -109,7 +109,7 @@ step needs the real Google services (see "What could not be tested here").
 ### Reservations
 | Requirement | Status |
 |---|---|
-| Week, day, and time slots from a generator; one team per slot (capacity adjustable) | Done |
+| Timetable builder: session hours set once with a live preview, days picked by date and named automatically, times as removable chips, copy a day to the next week; one team per slot (capacity adjustable) | Done |
 | One booking per leader code; taken slots crossed out for students | Done |
 | Warning when a timetable change leaves existing bookings without a slot | Done |
 
