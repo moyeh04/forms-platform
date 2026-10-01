@@ -142,7 +142,11 @@ Back in the Forms Registry sheet: **Forms Platform > 3. Set website address...**
 1. Open `https://YOUR-NAME.github.io/forms/admin.html` and enter your PIN.
 2. Click **New form**, choose a type, give it a title, pick the term (Fall, Spring, or Summer and the year), type the subject code, and click **Create form**.
 3. On the settings page check:
-   - **Team size**: minimum and maximum people per team (counting the leader).
+   - **Who can register**: all specializations, or only some (for example Computers only).
+   - **Team size**: minimum and maximum people per team (counting the leader), and an optional note for some sizes (for example "other students will be added to reach 5" for 3 and 4).
+   - **Questions**: rename, hide, or add a description under any question.
+   - **Emails**: whether students get a confirmation email.
+   - **Limits and checks**: the Drive folder name rule `Name_Project_Name_Subject` (on by default for new team forms).
    - **Timetable** for reservations: set the session hours, then add days by date.
    - **Status**: set to **Open** and click **Save settings**.
 4. Click **Copy link** and send it to students. The link looks like `.../index.html?f=database-team-project-registration-form-fall-2027`.

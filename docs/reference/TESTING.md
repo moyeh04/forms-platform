@@ -1,11 +1,11 @@
 # Testing
 
-165 automated tests run without a Google account, a browser, or a network.
+187 automated tests run without a Google account, a browser, or a network.
 They run the **real** backend and the **real** pages. This page explains how
 that works and what it can and cannot prove.
 
 ```
-npm test                                              # 145 JavaScript tests
+npm test                                              # 167 JavaScript tests
 python3 -m unittest discover -s tests -p "test_*.py"  # 20 Python tests
 ```
 
@@ -139,18 +139,18 @@ function that calls `world.api`. Helpers `type`, `pick`, `click`,
 
 | Area | Tests | Examples |
 |---|---:|---|
-| Shared rules | 15 | Arabic filtering, name parts, phones, codes, Drive links, slots, form state |
-| Team size | 12 | Required question, range, exact member count, admin range, conflicts warning |
-| Core and forms | 11 | Setup, PIN lockout, forms CRUD, duplicate, templates |
-| Submissions | 17 | Submit, edit keys, expiry, throttling, duplicates, Drive checks, limits, emails |
+| Shared rules | 16 | Arabic filtering, name parts, phones, codes, Drive links, folder names, slots, form state |
+| Team size and audience | 15 | Required question, range, exact member count, admin range, conflicts warning, size notes, specialization limits |
+| Core and forms | 12 | Setup, PIN lockout, forms CRUD, duplicate, delete, templates |
+| Submissions | 21 | Submit, edit keys, sealed keys, expiry, throttling, duplicates, Drive checks, folder names, limits, emails on and off |
 | Reservations | 11 | Slots, capacity, one booking per leader, orphan warning |
 | Sheet views | 7 | Tinted blocks, leader star, merged task cell, bookings by day |
 | Print | 7 | Print tabs, signature column, PDF success and fallback |
 | Matching | 6 | Paste, normalise, matched, none, duplicate, sequential review |
 | Viewer API | 9 | Tokens, hidden columns, today and by day, review rights, revoked links |
 | Export API | 3 | Teams with members, no phones, PIN required, deleted left out |
-| Student page | 21 | Steps, filters, team size picker, slots, review, ticket, edit by key, themes, Arabic |
-| Admin page | 15 | Login, create, team size settings, locked fields, tinted blocks, matching, clients, lists |
+| Student page | 26 | Steps, filters, descriptions, team size picker and notes, audience line, subject tag, slots, review, ticket and email notice, edit by key, themes, Arabic |
+| Admin page | 23 | Login, create with term chips, team size and notes, descriptions, who can register, locked fields, team cards, show key, timetable builder, delete, matching, clients, lists editor |
 | Instructor page | 7 | Today, by day, hidden columns, review rights, invalid links |
 | Harness | 4 | The fake itself |
 | Excel export (Python) | 20 | Link parsing, downloads, virus-scan page, workbook layout, merged cells, Failed sheet |
