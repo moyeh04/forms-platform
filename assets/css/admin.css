@@ -14,6 +14,10 @@ body.admin { font-size: 1rem; }
 .login .sheet { padding: 34px 30px; }
 .pin-input { font-family: var(--font-code); letter-spacing: .5em; text-align: center; font-size: 1.5rem; }
 
+.section-bar { position: sticky; top: 0; z-index: 6; display: flex; gap: 6px; overflow-x: auto; margin: 0 -16px 14px; padding: 8px 16px; background: color-mix(in srgb, var(--desk) 92%, transparent); backdrop-filter: blur(6px); border-bottom: 1px solid var(--line); scrollbar-width: thin; }
+.section-link { flex: none; padding: 5px 12px; border: 1.5px solid var(--line); border-radius: 999px; background: var(--sheet); color: var(--ink); font-size: var(--fs-help); font-weight: 700; cursor: pointer; white-space: nowrap; }
+.section-link:hover { border-color: var(--sea); }
+.panel[id^="sec-"] { scroll-margin-top: 64px; }
 .panel { background: var(--sheet); border: 1.5px solid var(--line); border-radius: 4px; padding: 18px 20px; margin-bottom: 18px; }
 .panel > h2 { font-size: 1.3rem; margin-bottom: 4px; }
 .panel > .help { margin: 0 0 14px; }
@@ -280,6 +284,19 @@ body.admin { font-size: 1rem; }
   .team-card .mini td.num { grid-row: 1 / span 2; width: auto; padding-top: 3px; }
   .team-card .mini td.nm { grid-column: 2 / 4; }
   .team-card .mini td.mono { font-size: .88rem; color: var(--mute); }
+}
+
+/* Phones: one header row with the actions, the section links underneath; menus and the save bar stay on screen. */
+@media (max-width: 600px) {
+  .admin-bar { gap: 10px; }
+  .admin-bar h1 { flex: 1 1 auto; font-size: 1.3rem; }
+  .admin-nav { order: 3; width: 100%; }
+  .admin-nav a { flex: 1; text-align: center; }
+  .admin-bar .btn-text { display: none; }
+  .more { flex-basis: 100%; }
+  .more-menu { position: static; margin-top: 6px; min-width: 0; box-shadow: none; }
+  .savebar .muted-note { display: none; }
+  .savebar .btn { white-space: nowrap; flex: 1; }
 }
 
 @media print {

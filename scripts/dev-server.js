@@ -72,7 +72,9 @@ function start(port, opts) {
       return;
     }
     let file = path.normalize(path.join(ROOT, decodeURIComponent(url.pathname)));
-    if (!file.startsWith(ROOT)) { res.writeHead(403); res.end(); return; }
+    const rel = path.relative(ROOT, file);
+    // Only files inside the project, and never dot-folders such as .git.
+    if (rel.startsWith('..') || path.isAbsolute(rel) || rel.split(path.sep).some((p) => p.startsWith('.'))) { res.writeHead(403); res.end(); return; }
     if (fs.existsSync(file) && fs.statSync(file).isDirectory()) file = path.join(file, 'index.html');
     fs.readFile(file, (err, buf) => {
       if (err) { res.writeHead(404); res.end('Not found'); return; }
@@ -81,7 +83,8 @@ function start(port, opts) {
     });
   });
 
-  return new Promise((resolve) => server.listen(port, () => resolve({ server, world, info })));
+  // Local only: the preview has a known PIN and must not be reachable from the network.
+  return new Promise((resolve) => server.listen(port, '127.0.0.1', () => resolve({ server, world, info })));
 }
 
 if (require.main === module) {

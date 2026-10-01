@@ -2,6 +2,12 @@
  * Theme tokens: aged map paper, kept light for contrast and easy reading.
  * Light is the default; dark ("candlelit cabin") follows the device or the toggle.
  * No orange, no pure white, no logo.
+ *
+ * Contrast standard: WCAG 2.1 AA in both themes. Text needs 4.5:1 against
+ * its background; outlines that show where a field is (--field-line) and the
+ * focus ring need 3:1. --line is for decorative dividers only.
+ * tests/contrast.test.js checks every pair the pages use, so CI refuses a
+ * colour change that breaks this.
  */
 :root {
   --desk: #E9DFC6;
@@ -10,13 +16,14 @@
   --ink: #2F2418;
   --mute: #6A5A44;
   --line: #CDBB94;
+  --field-line: #8F7C5A;
   --accent: #9A3328;
   --on-accent: #FBF3DF;
   --sea: #3F6B66;
   --on-sea: #F4F1E2;
   --tint-a: #DCE9E2;
   --tint-b: #F0E4C8;
-  --gold: #A9802B;
+  --gold: #7E5E1B;
   --err: #A12B1F;
   --focus: #3F6B66;
   --shadow: rgba(47, 36, 24, .16);
@@ -40,15 +47,15 @@
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --desk: #14100B; --sheet: #231C13; --sheet-2: #2E251A; --ink: #EBDDBA; --mute: #B3A07C; --line: #43352A;
-    --accent: #D4584A; --on-accent: #1B130C; --sea: #86B8AD; --on-sea: #14100B;
+    --desk: #14100B; --sheet: #231C13; --sheet-2: #2E251A; --ink: #EBDDBA; --mute: #B3A07C; --line: #43352A; --field-line: #857459;
+    --accent: #E06A5C; --on-accent: #1B130C; --sea: #86B8AD; --on-sea: #14100B;
     --tint-a: #1F2F2B; --tint-b: #33291B; --gold: #D9B25C; --err: #F08A7C; --focus: #86B8AD; --shadow: rgba(0, 0, 0, .5);
     color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
-  --desk: #14100B; --sheet: #231C13; --sheet-2: #2E251A; --ink: #EBDDBA; --mute: #B3A07C; --line: #43352A;
-  --accent: #D4584A; --on-accent: #1B130C; --sea: #86B8AD; --on-sea: #14100B;
+  --desk: #14100B; --sheet: #231C13; --sheet-2: #2E251A; --ink: #EBDDBA; --mute: #B3A07C; --line: #43352A; --field-line: #857459;
+  --accent: #E06A5C; --on-accent: #1B130C; --sea: #86B8AD; --on-sea: #14100B;
   --tint-a: #1F2F2B; --tint-b: #33291B; --gold: #D9B25C; --err: #F08A7C; --focus: #86B8AD; --shadow: rgba(0, 0, 0, .5);
   color-scheme: dark;
 }
