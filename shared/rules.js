@@ -158,7 +158,7 @@
     return { ok: true, value: p.url, meta: { id: p.id, kind: p.kind } };
   }
 
-  /* ── Drive folder names: Team_Leader_Name_Project_Name_Subject ─── */
+  /* ── Drive folder names: Team_Leader_Name_Project_Name_Subject_Name ─── */
 
   /** Turns free text into an underscore part: "Library System" -> "Library_System". */
   function folderPart(s) {
@@ -168,23 +168,27 @@
   /** An example of a correct folder name, built from what the student typed. */
   function folderNameExample(o) {
     o = o || {};
-    return [folderPart(o.name) || 'Ahmed_Mohamed', folderPart(o.project) || 'Project_Name', folderPart(o.subject) || 'SubjectName'].join('_');
+    return [folderPart(o.name) || 'Ahmed_Mohamed', folderPart(o.project) || 'Project_Name', folderPart(o.subject) || 'Subject_Name'].join('_');
   }
 
   /**
-   * Checks a Drive folder name against Team_Leader_Name_Project_Name_Subject:
+   * Checks a Drive folder name against Team_Leader_Name_Project_Name_Subject_Name:
    * no spaces, at least three parts (leader name, project, subject) joined by single underscores, and,
-   * when a subject is given, ending with it (case does not matter).
+   * when a subject name is given, ending with it (case does not matter). The subject
+   * name may itself hold underscores, like Software_Engineering.
    */
   function checkFolderName(name, opts) {
     opts = opts || {};
     var n = String(name == null ? '' : name).trim();
-    var subject = String(opts.subject || '').trim();
+    var subject = folderPart(opts.subject);
     var params = { example: folderNameExample({ name: opts.example && opts.example.name, project: opts.example && opts.example.project, subject: subject }), subject: subject, name: n };
     if (/\s/.test(n)) return { ok: false, error: 'folder_name_spaces', params: params };
     var parts = n.split('_');
     if (parts.length < 3 || parts.some(function (p) { return !p; })) return { ok: false, error: 'folder_name_format', params: params };
-    if (subject && parts[parts.length - 1].toLowerCase() !== subject.toLowerCase()) return { ok: false, error: 'folder_name_subject', params: params };
+    var tail = '_' + subject.toLowerCase();
+    if (subject && n.toLowerCase().slice(-tail.length) !== tail) return { ok: false, error: 'folder_name_subject', params: params };
+    // The leader's name and the project come before the subject name.
+    if (subject && n.slice(0, -tail.length).split('_').length < 2) return { ok: false, error: 'folder_name_format', params: params };
     return { ok: true };
   }
 
@@ -452,6 +456,7 @@
     validateDriveLink: validateDriveLink,
     generateSlots: generateSlots,
     checkFolderName: checkFolderName,
+    folderPart: folderPart,
     folderNameExample: folderNameExample,
     slotKey: slotKey,
     fieldByRole: fieldByRole,
