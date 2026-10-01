@@ -408,5 +408,5 @@ test('Folder rule: typing the project title updates the example and keeps the ic
   p.type('[name="title"]', 'Smart Parking');
   const rule = p.$('.folder-rule');
   assert.ok(rule.querySelector('.icon svg'), 'the icon is still an icon');
-  assert.ok(rule.querySelector('.folder-rule-text').textContent.includes('YourName_Smart_Parking_CMPn323'));
+  assert.ok(rule.querySelector('.folder-rule-text').textContent.includes('Ahmed_Mohamed_Smart_Parking_CMPn323'));
 });
