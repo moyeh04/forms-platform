@@ -61,8 +61,9 @@ flowchart LR
     class student,admin,teacher cActor
 ```
 
-**To put it online, follow [docs/DEPLOY.md](docs/DEPLOY.md).** The only code you
-edit is the web app address in `assets/js/config.js`.
+**To put it online, follow [docs/DEPLOY.md](docs/DEPLOY.md).** Configure the three
+GitHub repository Variables and the clasp credential Secret. The workflow
+generates the published browser configuration.
 
 ## Requirements checklist
 
@@ -169,13 +170,13 @@ and the Excel export; `tests/` holds the automated tests.
 ```
 npm install          # once, installs the browser test library
 npm test             # 172 tests: rules, backend, form page, dashboard, instructor page
-npm run build        # writes dist/Code.gs and dist/appsscript.json to paste into Apps Script
+npm run build        # writes dist/Code.gs and dist/appsscript.json for clasp
 npm run dev          # local preview on http://localhost:8080 (PIN 4321), in memory, no Google needed
 python3 -m unittest discover -s tests -p "test_*.py"   # 20 tests for the Excel export
 ```
 
 A push to `master` runs `.github/workflows/pages.yml`: the tests, then a GitHub
-Pages deploy of the website files. See [docs/DEPLOY.md](docs/DEPLOY.md#updating-later).
+Actions deployment of Apps Script and the configured website. Set Pages Source to **GitHub Actions** and supply the required repository configuration. See [docs/DEPLOY.md](docs/DEPLOY.md#updating-later).
 
 Commit style is described in [docs/COMMIT_CONVENTION.md](docs/COMMIT_CONVENTION.md).
 Generated files (`dist/`, `node_modules/`) are not committed.

@@ -38,7 +38,7 @@ flowchart LR
         data[("Sheets and Drive")]
     end
     code -- "git push" --> site
-    code -. "npm run build, then paste<br/>dist/Code.gs by hand" .-> gas
+    code -- "Actions: build, clasp push,<br/>update existing deployment" --> gas
     site -- "fetch POST JSON" --> gas
     gas --> data
     classDef cDb fill:#F3E2B3,stroke:#B8892D,stroke-width:1.5px,color:#2F2418
@@ -50,9 +50,10 @@ flowchart LR
     class data cDb
 ```
 
-Two different arrows leave your repository. The website goes through GitHub
-automatically. The backend is **not** deployed by GitHub; you paste it into
-Google yourself. Everything below follows from that.
+Two deployment paths leave your repository. GitHub Actions generates the public
+website configuration from repository Variables and publishes the site artifact.
+It also pushes the backend bundle with clasp and updates the existing Apps
+Script deployment. Google continues to run the backend and store the data.
 
 ## What GitHub does for this project
 
@@ -72,7 +73,7 @@ Google yourself. Everything below follows from that.
 | Run backend code | Google Apps Script |
 | Store registrations | Google Sheets |
 | Keep secrets (PIN, keys, tokens) | Google (script properties and hashed values in sheets) |
-| Deploy the backend | You paste `dist/Code.gs` into Apps Script (each Actions run keeps a built copy as the `backend-dist` artifact) |
+| Execute backend requests | Apps Script runs the bundle that Actions deploys with clasp |
 | Send email | Google MailApp |
 
 Because GitHub only serves files, **nothing secret ever belongs in the
@@ -132,8 +133,9 @@ sequenceDiagram
 Why it suits this project:
 
 - **No build step on the site.** The pages are plain HTML, CSS, and JavaScript.
-  What you commit is exactly what visitors get, so there is nothing that can
-  differ between your computer and the live site.
+  Actions generates the public `config.js` from `API_URL`; other website files
+  are copied directly from source. Deployment IDs are required Variables and
+  clasp credentials are kept only in the `CLASPRC_JSON` Secret.
 - **The root folder is the site.** The HTML files sit at the top of the
   repository, and the workflow copies just them, `assets/`, and `shared/` into
   the published artifact. Backend code, tests, scripts, and docs never go online.
@@ -145,8 +147,8 @@ Why it suits this project:
   feature (Copy key) needs a secure context.
 - **Fast everywhere.** A CDN serves the files near the student, which matters on
   mobile data.
-- **Independent from the backend.** A website update never touches Google, and a
-  backend update never touches GitHub.
+- **Ordered deployment.** After tests, Actions updates Apps Script first, then
+  publishes the configured website. Google handles all subsequent requests.
 
 ## What Google does for this project
 
@@ -263,7 +265,7 @@ read, filter, and print.
 flowchart TD
     q{"What did you change?"}
     q -- "pages, styles, scripts in assets" --> a1["git push<br/>Pages republishes in about a minute"]
-    q -- "backend or shared/rules.js" --> a2["npm run build<br/>paste dist/Code.gs<br/>Deploy, Manage deployments, New version"]
+    q -- "backend or shared/rules.js" --> a2["push master<br/>Actions tests and builds<br/>clasp updates existing deployment"]
     q -- "a rule in shared/rules.js" --> a3["do both:<br/>push the site (browser copy)<br/>and redeploy (server copy)"]
     q -- "a form's questions or team sizes" --> a4["Nothing to deploy.<br/>Change it in the dashboard."]
     classDef cDb fill:#F3E2B3,stroke:#B8892D,stroke-width:1.5px,color:#2F2418
