@@ -4,7 +4,7 @@ var API = API || {};
 
 var VIEW_COLUMNS_ = {
   reservation: [['time', 'Time'], ['name', 'Team leader'], ['code', 'Code'], ['phone', 'Phone'], ['email', 'Email'], ['title', 'Project'], ['level', 'Level'], ['section', 'Section']],
-  team: [['name', 'Name'], ['code', 'Code'], ['phone', 'Phone'], ['title', 'Project or task'], ['link', 'Link']],
+  team: [['name', 'Name'], ['section', 'Section'], ['code', 'Code'], ['phone', 'Phone'], ['title', 'Project or task'], ['link', 'Link']],
   whatsapp: [['name', 'Name'], ['code', 'Code'], ['phone', 'Phone'], ['level', 'Level'], ['group', 'Group'], ['section', 'Section'], ['link', 'Timetable'], ['review', 'Review']]
 };
 
@@ -66,7 +66,7 @@ function teamGroups_(form, client) {
     var hidden = client.hiddenColumns;
     if (hidden.indexOf('title') !== -1) delete g.title;
     if (hidden.indexOf('link') !== -1) delete g.link;
-    g.members = g.members.map(function (m) { return stripHidden_({ name: m.name, code: m.code, phone: m.phone, leader: m.leader }, ['name', 'code', 'phone'].filter(function (k) { return hidden.indexOf(k) !== -1; })); });
+    g.members = g.members.map(function (m) { return stripHidden_({ name: m.name, section: m.section, code: m.code, phone: m.phone, leader: m.leader }, ['name', 'section', 'code', 'phone'].filter(function (k) { return hidden.indexOf(k) !== -1; })); });
     return g;
   });
 }

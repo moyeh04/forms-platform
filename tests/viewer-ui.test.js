@@ -103,6 +103,7 @@ test('Instructor link: teams are tinted blocks with a star and a linked task, an
   assert.equal(blocks[0].querySelectorAll('tbody tr').length, 2);
   assert.ok(blocks[0].querySelector('tr.leader .icon-star'));
   assert.equal(blocks[0].querySelector('.block-side a').getAttribute('href'), link);
+  assert.ok(blocks[0].querySelectorAll('.mini thead th')[2].textContent.includes('Section'));
   assert.equal(p.text().includes('01112345678'), false);
 });
 
