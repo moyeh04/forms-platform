@@ -227,9 +227,13 @@ If you prefer to automate backend updates on every push to `master`:
      "rootDir": "./dist"
    }
    ```
-5. Copy the generated credentials from `~/.clasprc.json` on your machine.
-6. In your GitHub repository, go to **Settings > Secrets and variables > Actions**:
-   - Add secret `CLASPRC_JSON` containing the contents of `~/.clasprc.json`.
+5. Copy the **entire JSON file content** from `~/.clasprc.json` (do not copy just an individual token string like `access_token` or `refresh_token`; clasp needs the whole object including `token`, `oauth2ClientSettings`, and expiration metadata):
+   ```bash
+   cat ~/.clasprc.json
+   ```
+6. In your GitHub repository, go to **Settings > Secrets and variables > Actions > New repository secret**:
+   - **Name:** `CLASPRC_JSON`
+   - **Secret:** paste the entire JSON string starting from `{` to `}` exactly as printed.
    - (Optional) Add secret/variable `APPS_SCRIPT_DEPLOYMENT_ID` if using a custom deployment ID instead of the default found in `assets/js/config.js`.
 7. Whenever you push to `master`, GitHub Actions will run tests, bundle `dist/Code.gs`, push to Apps Script, and update your live deployment version automatically.
 
