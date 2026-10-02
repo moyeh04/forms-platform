@@ -48,12 +48,12 @@ jobs:
   apps-script:
     name: Push to Google Apps Script
     needs: test
-    if: github.event_name != 'pull_request' && env.HAS_CLASPRC == 'true' && env.SCRIPT_ID != ''
+    if: github.event_name != 'pull_request' && env.HAS_CLASPRC == 'true'
     runs-on: ubuntu-latest
     env:
       HAS_CLASPRC: ${{ secrets.CLASPRC_JSON != '' }}
-      SCRIPT_ID: ${{ vars.APPS_SCRIPT_ID || secrets.APPS_SCRIPT_ID || '1qLPDAgNE2UumUM1u0ymPoAhphuPBu7JKsRI3D_WR_39-MwWRkRGZoxNy' }}
-      DEPLOYMENT_ID: ${{ vars.APPS_SCRIPT_DEPLOYMENT_ID || secrets.APPS_SCRIPT_DEPLOYMENT_ID || 'AKfycbzHfEB9ONxnBqtH4iHoP6z1nCzD1hx7zvL-85furpZLQXpwhDYY3dnAbZc9uVt6q17o' }}
+      SCRIPT_ID: ${{ vars.APPS_SCRIPT_ID || secrets.APPS_SCRIPT_ID }}
+      DEPLOYMENT_ID: ${{ vars.APPS_SCRIPT_DEPLOYMENT_ID || secrets.APPS_SCRIPT_DEPLOYMENT_ID }}
     steps:
       - uses: actions/checkout@v4
 
@@ -69,6 +69,14 @@ jobs:
         env:
           CLASPRC_JSON: ${{ secrets.CLASPRC_JSON }}
         run: |
+          if [ -z "$SCRIPT_ID" ]; then
+            echo "Error: APPS_SCRIPT_ID is required to deploy to Google Apps Script. Set it in repository Variables or Secrets." >&2
+            exit 1
+          fi
+          if [ -z "$DEPLOYMENT_ID" ]; then
+            echo "Error: APPS_SCRIPT_DEPLOYMENT_ID is required to deploy to Google Apps Script. Set it in repository Variables or Secrets." >&2
+            exit 1
+          fi
           mkdir -p ~/.clasp
           echo "$CLASPRC_JSON" > ~/.clasprc.json
           node -e "fs.writeFileSync('.clasp.json', JSON.stringify({ scriptId: process.env.SCRIPT_ID, rootDir: './dist' }))"
