@@ -209,6 +209,30 @@ and **Deploy**. The web app address does not change. A change to
 `shared/rules.js` needs both: the push (browser copy) and the new version
 (server copy).
 
+### Optional: Automatic backend deployment via Google clasp & GitHub Actions
+
+If you prefer to automate backend updates on every push to `master`:
+
+1. Visit [script.google.com/home/usersettings](https://script.google.com/home/usersettings) and toggle **Google Apps Script API** to **ON**.
+2. Install clasp locally and log in:
+   ```bash
+   npm install -g @google/clasp
+   clasp login
+   ```
+3. In your Apps Script project editor, go to **Project Settings** (gear icon) and copy the **Script ID**.
+4. Update `.clasp.json` in your project root with your Script ID:
+   ```json
+   {
+     "scriptId": "YOUR_SCRIPT_ID",
+     "rootDir": "./dist"
+   }
+   ```
+5. Copy the generated credentials from `~/.clasprc.json` on your machine.
+6. In your GitHub repository, go to **Settings > Secrets and variables > Actions**:
+   - Add secret `CLASPRC_JSON` containing the contents of `~/.clasprc.json`.
+   - (Optional) Add secret/variable `APPS_SCRIPT_DEPLOYMENT_ID` if using a custom deployment ID instead of the default found in `assets/js/config.js`.
+7. Whenever you push to `master`, GitHub Actions will run tests, bundle `dist/Code.gs`, push to Apps Script, and update your live deployment version automatically.
+
 ## If something goes wrong
 
 | What you see | What to do |

@@ -6,3 +6,4 @@ Tasks_Export/
 __pycache__/
 *.pyc
 .env
+.clasprc.json
