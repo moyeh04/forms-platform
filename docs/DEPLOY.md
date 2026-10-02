@@ -219,23 +219,18 @@ If you prefer to automate backend updates on every push to `master`:
    npm install -g @google/clasp
    clasp login
    ```
-3. In your Apps Script project editor, go to **Project Settings** (gear icon) and copy the **Script ID**.
-4. Update `.clasp.json` in your project root with your Script ID:
-   ```json
-   {
-     "scriptId": "YOUR_SCRIPT_ID",
-     "rootDir": "./dist"
-   }
-   ```
-5. Copy the **entire JSON file content** from `~/.clasprc.json` (do not copy just an individual token string like `access_token` or `refresh_token`; clasp needs the whole object including `token`, `oauth2ClientSettings`, and expiration metadata):
+3. Copy the **entire JSON file content** from `~/.clasprc.json` (including the curly brackets `{ ... }`; clasp needs the entire object with token and client settings):
    ```bash
    cat ~/.clasprc.json
    ```
-6. In your GitHub repository, go to **Settings > Secrets and variables > Actions > New repository secret**:
-   - **Name:** `CLASPRC_JSON`
-   - **Secret:** paste the entire JSON string starting from `{` to `}` exactly as printed.
-   - (Optional) Add secret/variable `APPS_SCRIPT_DEPLOYMENT_ID` if using a custom deployment ID instead of the default found in `assets/js/config.js`.
-7. Whenever you push to `master`, GitHub Actions will run tests, bundle `dist/Code.gs`, push to Apps Script, and update your live deployment version automatically.
+4. In your GitHub repository, configure secrets and variables:
+   - **Secret** `CLASPRC_JSON` (**Settings > Secrets and variables > Actions > New repository secret**):
+     Paste the entire JSON output from `~/.clasprc.json`.
+   - (Optional) **Variables** (**Settings > Secrets and variables > Actions > Variables tab**):
+     - `APPS_SCRIPT_ID`: Your Apps Script ID (found in Apps Script Project Settings).
+     - `APPS_SCRIPT_DEPLOYMENT_ID`: Your deployment ID.
+     - `API_URL`: Your live web app URL (ending in `/exec`). If set, GitHub Actions automatically injects it into `assets/js/config.js` during deployment.
+5. Whenever you push to `master`, GitHub Actions will run tests, bundle `dist/Code.gs`, push to Apps Script, and update your live deployment version automatically.
 
 ## If something goes wrong
 

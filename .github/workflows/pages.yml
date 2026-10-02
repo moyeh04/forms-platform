@@ -48,11 +48,12 @@ jobs:
   apps-script:
     name: Push to Google Apps Script
     needs: test
-    if: github.event_name != 'pull_request' && env.HAS_CLASPRC == 'true'
+    if: github.event_name != 'pull_request' && env.HAS_CLASPRC == 'true' && env.SCRIPT_ID != ''
     runs-on: ubuntu-latest
     env:
       HAS_CLASPRC: ${{ secrets.CLASPRC_JSON != '' }}
-      DEPLOYMENT_ID: ${{ secrets.APPS_SCRIPT_DEPLOYMENT_ID || 'AKfycbzHfEB9ONxnBqtH4iHoP6z1nCzD1hx7zvL-85furpZLQXpwhDYY3dnAbZc9uVt6q17o' }}
+      SCRIPT_ID: ${{ vars.APPS_SCRIPT_ID || secrets.APPS_SCRIPT_ID || '1qLPDAgNE2UumUM1u0ymPoAhphuPBu7JKsRI3D_WR_39-MwWRkRGZoxNy' }}
+      DEPLOYMENT_ID: ${{ vars.APPS_SCRIPT_DEPLOYMENT_ID || secrets.APPS_SCRIPT_DEPLOYMENT_ID || 'AKfycbzHfEB9ONxnBqtH4iHoP6z1nCzD1hx7zvL-85furpZLQXpwhDYY3dnAbZc9uVt6q17o' }}
     steps:
       - uses: actions/checkout@v4
 
@@ -70,6 +71,7 @@ jobs:
         run: |
           mkdir -p ~/.clasp
           echo "$CLASPRC_JSON" > ~/.clasprc.json
+          node -e "fs.writeFileSync('.clasp.json', JSON.stringify({ scriptId: process.env.SCRIPT_ID, rootDir: './dist' }))"
           npx @google/clasp push --force
           npx @google/clasp deploy -i "$DEPLOYMENT_ID" --description "Auto-deployed commit ${{ github.sha }}"
 
@@ -89,10 +91,15 @@ jobs:
 
       # Only the public website goes online: no backend, tests, scripts, or docs.
       - name: Collect the site files
+        env:
+          CONFIG_API_URL: ${{ vars.API_URL || secrets.API_URL }}
         run: |
           mkdir _site
           cp index.html admin.html viewer.html _site/
           cp -r assets shared _site/
+          if [ -n "$CONFIG_API_URL" ]; then
+            sed -i -E "s|API_URL: '.*'|API_URL: '$CONFIG_API_URL'|" _site/assets/js/config.js
+          fi
           touch _site/.nojekyll
 
       - uses: actions/configure-pages@v5
