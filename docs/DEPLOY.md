@@ -251,7 +251,7 @@ Deploy**. This is a recovery path; routine updates use the configured workflow.
 
 | What you see | What to do |
 |---|---|
-| Website says it is not connected to the backend | Set Pages Source to **GitHub Actions**, verify `API_URL` under Actions Variables, then rerun the configured workflow. For a local checkout use `npm run dev`. |
+| Website says it is not connected to the backend | Hard-refresh the page (**Ctrl+F5** on Windows/Linux, **Cmd+Shift+R** on Mac) to bypass browser caching of the placeholder `config.js`. Also verify Pages Source is **GitHub Actions** and `API_URL` is set under repository Variables. |
 | Page says it could not reach the server | The web app was not deployed with **Who has access: Anyone**. Redeploy (step 5). |
 | "That PIN is not correct" | Wrong PIN, or too many tries: wait a few minutes. To reset, run **Forms Platform > 2. Set admin PIN...** again. |
 | Backend update failed | Check the **Deploy Google Apps Script** job. Renew `CLASPRC_JSON` if authentication failed; verify both IDs and enable the Apps Script API. |
