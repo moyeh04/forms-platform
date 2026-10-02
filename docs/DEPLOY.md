@@ -226,10 +226,10 @@ If you prefer to automate backend updates on every push to `master`:
 4. In your GitHub repository, configure secrets and variables:
    - **Secret** `CLASPRC_JSON` (**Settings > Secrets and variables > Actions > New repository secret**):
      Paste the entire JSON output from `~/.clasprc.json`.
-   - (Optional) **Variables** (**Settings > Secrets and variables > Actions > Variables tab**):
+   - **Variables** (**Settings > Secrets and variables > Actions > Variables tab > New repository variable**):
      - `APPS_SCRIPT_ID`: Your Apps Script ID (found in Apps Script Project Settings).
      - `APPS_SCRIPT_DEPLOYMENT_ID`: Your deployment ID.
-     - `API_URL`: Your live web app URL (ending in `/exec`). If set, GitHub Actions automatically injects it into `assets/js/config.js` during deployment.
+     - `API_URL`: Your live web app URL (ending in `/exec`). GitHub Actions automatically injects it into `assets/js/config.js` when publishing to GitHub Pages.
 5. Whenever you push to `master`, GitHub Actions will run tests, bundle `dist/Code.gs`, push to Apps Script, and update your live deployment version automatically.
 
 ## If something goes wrong
