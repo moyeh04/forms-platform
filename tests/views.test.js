@@ -31,24 +31,26 @@ test('Team list: every team is a block with its members, star on the leader, mer
   w.api({ action: 'submit', slug: w.form.slug, data: person({ leader_code: '4230010', leader_name: 'عمر يوسف إبراهيم سعيد', title: 'ER Diagram', link: link('b'), members: [member('منى أشرف كمال فؤاد', '4230011'), member('كريم هشام عادل نصر', '4230012')] }) });
 
   const rows = w.view('Team Members List').rows();
-  assert.deepEqual(rows[0], ['Team member name', 'Code', 'Task']);
+  assert.deepEqual(rows[0], ['Team member name', 'Section', 'Code', 'Task']);
   assert.equal(rows.length, 6);
   assert.equal(rows[1][0], '1.  أحمد محمد محمود أحمد  \u2605');
+  assert.equal(rows[1][1], '4C-TH1');
   assert.equal(rows[2][0], '2.  سارة خالد حسن علي');
-  assert.equal(rows[2][1], '4230002');
+  assert.equal(rows[2][1], '4C-TH1');
+  assert.equal(rows[2][2], '4230002');
   assert.equal(rows[3][0], '1.  عمر يوسف إبراهيم سعيد  \u2605');
   assert.equal(rows[5][0], '3.  كريم هشام عادل نصر');
-  assert.equal(rows[1][2], `=HYPERLINK("${link('a')}","Normalization")`);
-  assert.equal(rows[2][2], '', 'merged cell body stays empty');
-  assert.equal(rows[3][2], `=HYPERLINK("${link('b')}","ER Diagram")`);
+  assert.equal(rows[1][3], `=HYPERLINK("${link('a')}","Normalization")`);
+  assert.equal(rows[2][3], '', 'merged cell body stays empty');
+  assert.equal(rows[3][3], `=HYPERLINK("${link('b')}","ER Diagram")`);
 });
 
 test('Team list: projects without a link show plain text and the header says Project', () => {
   const w = boot('team_registration');
   w.api({ action: 'submit', slug: w.form.slug, data: person({ title: 'Library System', members: [] }) });
   const rows = w.view('Team Members List').rows();
-  assert.equal(rows[0][2], 'Project');
-  assert.equal(rows[1][2], 'Library System');
+  assert.equal(rows[0][3], 'Project');
+  assert.equal(rows[1][3], 'Library System');
 });
 
 test('Team list: deleted teams disappear and an empty form says so', () => {

@@ -242,25 +242,26 @@
     return f && data ? data[f.id] : undefined;
   }
 
-  /** Everyone on a submission: the leader (or the single person) first, then members. */
-  function membersOf(form, data) {
-    var out = [];
-    var name = valueByRole(form, data, 'name');
-    if (name) {
-      out.push({
-        name: name,
-        code: valueByRole(form, data, 'code') || '',
-        phone: valueByRole(form, data, 'phone') || '',
-        leader: true
-      });
-    }
-    var mf = fieldByRole(form, 'members');
-    var list = mf && data && Array.isArray(data[mf.id]) ? data[mf.id] : [];
-    list.forEach(function (m) {
-      out.push({ name: m.name || '', code: m.code || '', phone: m.phone || '', leader: false });
-    });
-    return out;
-  }
+ /** Everyone on a submission: the leader (or the single person) first, then members. */
+ function membersOf(form, data) {
+   var out = [];
+   var name = valueByRole(form, data, 'name');
+   if (name) {
+     out.push({
+       name: name,
+       code: valueByRole(form, data, 'code') || '',
+       phone: valueByRole(form, data, 'phone') || '',
+        section: (data && data.section) || '',
+       leader: true
+     });
+   }
+   var mf = fieldByRole(form, 'members');
+   var list = mf && data && Array.isArray(data[mf.id]) ? data[mf.id] : [];
+   list.forEach(function (m) {
+      out.push({ name: m.name || '', code: m.code || '', phone: m.phone || '', section: m.section || '', leader: false });
+   });
+   return out;
+ }
 
   /** 'open' | 'not_yet' | 'closed' | 'draft' | 'archived' */
   function formState(form, nowMs) {

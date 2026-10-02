@@ -161,6 +161,7 @@ test('Responses: each team is its own tinted block with a leader star and a link
   assert.deepEqual(blocks.map((b) => b.querySelectorAll('.mini tbody tr').length), [2, 3, 1]);
   assert.ok(blocks[0].querySelector('tr.leader .icon-star'));
   assert.equal(blocks[0].querySelector('.block-side a').getAttribute('href'), link('a'));
+  assert.ok(blocks[0].querySelectorAll('.mini thead th')[2].textContent.includes('Section'));
   assert.ok(p.text().includes('3Total') || p.text().includes('Total'));
 });
 

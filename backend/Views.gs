@@ -72,11 +72,11 @@ function byCreated_(a, b) {
 function buildTeamList_(form, ss) {
   var sh = freshView_(ss, 'Team Members List');
   var third = form.type === 'task_submission' ? 'Task' : 'Project';
-  paintHeader_(sh, ['Team member name', 'Code', third]);
-  sh.setColumnWidth(1, 320); sh.setColumnWidth(2, 120); sh.setColumnWidth(3, 300);
+  paintHeader_(sh, ['Team member name', 'Section', 'Code', third]);
+  sh.setColumnWidth(1, 300); sh.setColumnWidth(2, 100); sh.setColumnWidth(3, 110); sh.setColumnWidth(4, 280);
 
   var responses = readResponses(form).sort(byCreated_);
-  if (!responses.length) return emptyView_(sh, 3, 'No registrations yet.');
+  if (!responses.length) return emptyView_(sh, 4, 'No registrations yet.');
 
   var values = [], shades = [], blocks = [];
   responses.forEach(function (r, g) {
@@ -84,24 +84,24 @@ function buildTeamList_(form, ss) {
     var members = Rules.membersOf(form, r.data);
     var start = values.length + 2;
     members.forEach(function (m, i) {
-      values.push([(i + 1) + '.  ' + m.name + (m.leader ? '  \u2605' : ''), m.code, '']);
-      shades.push([style.shades[i % 2], style.shades[i % 2], style.solid]);
+      values.push([(i + 1) + '.  ' + m.name + (m.leader ? '  \u2605' : ''), m.section || '', m.code, '']);
+      shades.push([style.shades[i % 2], style.shades[i % 2], style.shades[i % 2], style.solid]);
     });
     blocks.push({ start: start, length: members.length, response: r, style: style });
   });
 
   var first = 2, last = values.length + 1;
-  sh.getRange(first, 1, values.length, 3).setValues(values).setBackgrounds(shades)
+  sh.getRange(first, 1, values.length, 4).setValues(values).setBackgrounds(shades)
     .setFontFamily(VIEW_STYLE_.font).setFontSize(11).setVerticalAlignment('middle');
   sh.getRange(first, 1, values.length, 1).setFontWeight('bold').setHorizontalAlignment('left');
-  sh.getRange(first, 2, values.length, 1).setHorizontalAlignment('center').setFontWeight('bold');
+  sh.getRange(first, 2, values.length, 2).setHorizontalAlignment('center').setFontWeight('bold');
   sh.setRowHeights(first, values.length, 32);
 
   blocks.forEach(function (b) {
     var title = b.response.title || '\u2014';
-    mergedLabel_(sh, b.start, 3, b.length, title, b.response.link ? hyperlink_(b.response.link, title) : '', b.style.solid);
+    mergedLabel_(sh, b.start, 4, b.length, title, b.response.link ? hyperlink_(b.response.link, title) : '', b.style.solid);
   });
-  frameBlocks_(sh, 3, first, last, blocks);
+  frameBlocks_(sh, 4, first, last, blocks);
 }
 
 /* ── Bookings: one block per day ──────────────────────────────── */

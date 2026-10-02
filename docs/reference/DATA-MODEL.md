@@ -191,7 +191,7 @@ All cells are formatted as **plain text**. That keeps phone numbers such as
 
 | Tab | For | Layout |
 |---|---|---|
-| `Team Members List` | Team and task forms | One block per team: heavy border, alternating tint family, star on the leader, one merged project or task cell with its link |
+| `Team Members List` | Team and task forms | One block per team: heavy border, alternating tint family, member name, section, code, star on the leader, one merged project or task cell with its link |
 | `Bookings` | Reservations | One block per day in timetable order |
 | `Registrations` | WhatsApp forms | Sorted by group and section with review status and a timetable link |
 | `Print - ...` | Printing | A tab per printed day or the team list, with a signature column where relevant |
