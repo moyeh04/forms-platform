@@ -12,7 +12,7 @@
   function endpoint() {
     var url = (window.APP_CONFIG || {}).API_URL || '';
     if (!url || url.indexOf('PASTE_') === 0) {
-      throw apiError('not_configured', 'The website is not connected to the backend yet. Put the web app address in assets/js/config.js.');
+      throw apiError('not_configured', 'The website is not connected to the backend yet. Set the GitHub Actions API_URL variable and publish through GitHub Actions. For local preview, run npm run dev.');
     }
     return url;
   }

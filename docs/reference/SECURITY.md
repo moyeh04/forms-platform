@@ -68,7 +68,7 @@ page's checks give instant feedback; the server repeats every one of them.
 | Edit key (5 digits) | One student, and the admin on request | `sha256(pepper:key:formId:key)` plus a sealed copy (`keySeal`, digits shifted by `sha256(pepper:seal:formId:responseId)`) in the Responses row | Per-form throttle of 10 wrong tries a minute, expiry; only the backend can unseal, only for the PIN | One registration can be edited or cancelled. Admin: **Details, Reset key**. |
 | Viewer token (24 characters) | One instructor or client | `sha256(pepper:client:token)` in the Clients tab | Random, throttled at 30 wrong tries a minute, revocable | Read access to the forms and columns of that link. Turn it off or make **New link**. |
 | Pepper | Apps Script only | Script property `PEPPER`, created once | Never leaves Google | Hashes could be attacked offline. Not exposed by any action. |
-| Web app address | Everyone | In `assets/js/config.js` | Not secret by design | Nothing: it is only an entry point. |
+| Web app address | Everyone | Actions `API_URL` variable; generated published `assets/js/config.js` | Not secret by design | Nothing: it is only an entry point. |
 
 The pepper is a long random value mixed into every hash. A leaked spreadsheet
 alone therefore reveals no PIN, key, or token that could be tested offline.

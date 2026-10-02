@@ -45,7 +45,7 @@ flowchart TD
     end
     a5 -- "copy the address that ends in /exec" --> b1
     subgraph P2["Part 2: the website, on GitHub"]
-        b1["6. Paste the address into assets/js/config.js"] --> b2["7. Push to GitHub"]
+        b1["6. Set API_URL in GitHub repository Variables"] --> b2["7. Push to GitHub"]
         b2 --> b3["8. Settings, Pages: Source GitHub Actions"]
         b3 --> b4["9. Back in the sheet: Set website address"]
     end
@@ -62,7 +62,7 @@ flowchart TD
     classDef cOk fill:#BFD9CF,stroke:#2E5A55,stroke-width:1.5px,color:#17302D
 ```
 
-The only code you edit is one line in `assets/js/config.js`.
+Deployment identifiers live in GitHub repository Variables. Google credentials live in a repository Secret. The workflow generates the published browser configuration; keep the source placeholder unchanged.
 
 ---
 
@@ -106,15 +106,20 @@ The only code you edit is one line in `assets/js/config.js`.
 
 ## Part 2: The website (GitHub Pages)
 
-### 6. Tell the website where the backend is
-1. Open `assets/js/config.js` in a text editor.
-2. Replace `PASTE_YOUR_WEB_APP_URL_HERE` with the URL you copied. Keep the quotes:
-   ```js
-   window.APP_CONFIG = {
-     API_URL: 'https://script.google.com/macros/s/AKfy.../exec'
-   };
-   ```
-3. Save the file. This is the only code edit in the whole project.
+### 6. Configure the deployment in GitHub
+
+In **Settings > Secrets and variables > Actions > Variables**, create:
+
+| Name | Value |
+|---|---|
+| `API_URL` | The complete Apps Script web app URL ending in `/exec` |
+| `APPS_SCRIPT_ID` | Script ID from Apps Script **Project Settings** |
+| `APPS_SCRIPT_DEPLOYMENT_ID` | Deployment ID from **Deploy > Manage deployments** |
+
+`API_URL` must contain that same deployment ID. These are required public
+configuration values. Keep `assets/js/config.js` as a source placeholder;
+`npm run build:site` generates `_site/assets/js/config.js` from `API_URL`.
+The backend credential setup is described under **Updating later** below.
 
 ### 7. Upload to GitHub
 1. On **github.com** click **+**, then **New repository**. Name it, for example, `forms`. Choose **Public** (free Pages needs public) and click **Create repository**.
@@ -127,8 +132,8 @@ The only code you edit is one line in `assets/js/config.js`.
 
 ### 8. Turn on GitHub Pages
 1. In the repository click **Settings**, then **Pages** in the left list.
-2. Under **Build and deployment**, set **Source** to **GitHub Actions**. Nothing else to fill in: the workflow in `.github/workflows/pages.yml` does the rest.
-3. Open the **Actions** tab. The run **Test and deploy site** starts on every push to `master`: it runs all tests, and only if they pass it publishes `index.html`, `admin.html`, `viewer.html`, `assets/`, and `shared/`. If a run is not there yet, click **Test and deploy site**, then **Run workflow**.
+2. Under **Build and deployment**, set **Source** to **GitHub Actions**. This is required: **Deploy from a branch** publishes the source placeholder and cannot read your Actions variables. The workflow in `.github/workflows/pages.yml` publishes the generated site.
+3. Open the **Actions** tab. The run **Test and deploy site** starts on every push to `master`: it checks the workflow, runs the tests, builds the configured site, updates the existing Apps Script deployment, then publishes `index.html`, `admin.html`, `viewer.html`, `assets/`, and `shared/`. If a run is not there yet, click **Test and deploy site**, then **Run workflow**.
 4. Wait for the green tick (about a minute) and refresh the Pages settings. It shows your site address:
    `https://YOUR-NAME.github.io/forms/`
 
@@ -180,66 +185,76 @@ Do these once with a test form:
 
 ## Updating later
 
-```mermaid
-flowchart TD
-    q{"What changed?"}
-    q -- "website: html, assets, shared" --> w["git push to master"]
-    w --> ci["GitHub Actions: tests, then publish<br/>green tick in about 2 minutes"]
-    q -- "backend: backend/ or shared/rules.js" --> b["npm run build<br/>or download backend-dist from the Actions run"]
-    b --> p["Paste dist/Code.gs in Apps Script, save"]
-    p --> v["Deploy, Manage deployments, pencil,<br/>Version: New version, Deploy"]
-    q -- "forms, questions, lists, timetable" --> n["Nothing to deploy:<br/>change it in the dashboard"]
-    class q cDec
-    class ci,v cOk
-    classDef cDec fill:#FBEFC9,stroke:#C9A24A,stroke-width:1.5px,color:#2F2418
-    classDef cOk fill:#BFD9CF,stroke:#2E5A55,stroke-width:1.5px,color:#17302D
-```
+The configured pipeline handles both deployments after a push to `master`:
+workflow validation and tests, backend bundle, site configuration generated from
+`API_URL`, Apps Script update, then GitHub Pages publication. Pull requests run
+checks only. Running the workflow from another branch cannot deploy.
 
-**Website changed**: commit and push to `master`. The **Test and deploy site**
-workflow runs the tests and publishes the site; the change is live when the run
-shows a green tick. A red cross means a test failed and the old site stays up:
-open the run to see which test. Hard-refresh the page (Ctrl+F5) if your browser
-still shows the old version.
+**Required Pages setting:** repository **Settings > Pages > Build and deployment >
+Source: GitHub Actions**. A branch deployment cannot inject repository variables
+and serves the placeholder in `assets/js/config.js` directly.
 
-**Backend changed** (anything in `backend/` or `shared/rules.js`): run
-`npm run build`, or download the **backend-dist** artifact from the latest
-Actions run. In Apps Script paste the new `Code.gs` over the old, save, then
-**Deploy > Manage deployments**, click the pencil, set **Version: New version**,
-and **Deploy**. The web app address does not change. A change to
-`shared/rules.js` needs both: the push (browser copy) and the new version
-(server copy).
+### Required variables and credential secret
 
-### Optional: Automatic backend deployment via Google clasp & GitHub Actions
+In **Settings > Secrets and variables > Actions**, use the **Variables** tab for
+`API_URL`, `APPS_SCRIPT_ID`, and `APPS_SCRIPT_DEPLOYMENT_ID`. Use the **Secrets**
+tab for `CLASPRC_JSON`. Variables are readable configuration; secrets are
+credentials that GitHub masks in logs. The web app URL becomes public in the
+published browser configuration regardless of where it is stored.
 
-If you prefer to automate backend updates on every push to `master`:
-
-1. Visit [script.google.com/home/usersettings](https://script.google.com/home/usersettings) and toggle **Google Apps Script API** to **ON**.
-2. Install clasp locally and log in:
+1. Enable **Google Apps Script API** at
+   [Google Apps Script user settings](https://script.google.com/home/usersettings).
+2. Install the project's pinned clasp version and authenticate locally:
    ```bash
-   npm install -g @google/clasp
-   clasp login
+   npm ci
+   npx --yes @google/clasp@3.4.1 login
    ```
-3. Copy the **entire JSON file content** from `~/.clasprc.json` (including the curly brackets `{ ... }`; clasp needs the entire object with token and client settings):
-   ```bash
-   cat ~/.clasprc.json
-   ```
-4. In your GitHub repository, configure secrets and variables:
-   - **Secret** `CLASPRC_JSON` (**Settings > Secrets and variables > Actions > New repository secret**):
-     Paste the entire JSON output from `~/.clasprc.json`.
-   - **Variables** (**Settings > Secrets and variables > Actions > Variables tab > New repository variable**):
-     - `APPS_SCRIPT_ID`: Your Apps Script ID (found in Apps Script Project Settings).
-     - `APPS_SCRIPT_DEPLOYMENT_ID`: Your deployment ID.
-     - `API_URL`: Your live web app URL (ending in `/exec`). GitHub Actions automatically injects it into `assets/js/config.js` when publishing to GitHub Pages.
-5. Whenever you push to `master`, GitHub Actions will run tests, bundle `dist/Code.gs`, push to Apps Script, and update your live deployment version automatically.
+3. Copy the **entire contents** of `~/.clasprc.json`, **including the opening `{`
+   and closing `}`**. Copy all fields, including both tokens and client settings.
+   Do not select just an access token or refresh token.
+4. Create repository secret **`CLASPRC_JSON`** and paste that complete JSON.
+   Do not paste credentials into issues, chat, committed files, or log output.
+5. Ensure all three required Variables above are set and Pages Source is
+   **GitHub Actions**, then push `master`.
+
+The workflow validates configuration and rejects a missing or malformed URL,
+missing IDs, malformed credential JSON, and a URL pointing to a different
+deployment. It generates ignored `.clasp.json` for `dist/`, uses the same
+`APPS_SCRIPT_DEPLOYMENT_ID` when deploying, and publishes Pages only after the
+backend job succeeds. No personal URL or ID is stored as a fallback in source.
+Credentials are removed from the runner after the deployment attempt.
+
+A Gmail account works with the account owner's clasp login. Clasp uses the
+refresh token to renew access tokens. If Google rejects the saved authorization,
+run the same login command again and replace the **whole** `CLASPRC_JSON` secret.
+No service restart is required. Wait for **Test and deploy site** to succeed,
+then hard-refresh the website. A branch-based **pages build and deployment** run
+is not evidence that this configured workflow succeeded.
+
+### Local preview and export
+
+GitHub variables are available inside Actions; they do not configure a raw
+local checkout. Use `npm run dev` for the in-memory preview (admin PIN `4321`).
+To package a site locally, set `API_URL` in your shell and run
+`npm run build:site`; serve `_site/`. Keep the source placeholder unchanged.
+For the Excel exporter, supply the existing `--api` option or `FORMS_API_URL`
+environment variable, since source `config.js` contains no deployment URL.
+
+### Manual backend recovery
+
+If clasp authentication fails, the tested `backend-dist` artifact remains
+available. Copy its `Code.gs` into Apps Script, save, and update the **existing**
+deployment through **Deploy > Manage deployments > pencil > New version >
+Deploy**. This is a recovery path; routine updates use the configured workflow.
 
 ## If something goes wrong
 
 | What you see | What to do |
 |---|---|
-| Form page says it is not connected to the backend | `assets/js/config.js` still has the placeholder, or the file was not pushed. |
+| Website says it is not connected to the backend | Set Pages Source to **GitHub Actions**, verify `API_URL` under Actions Variables, then rerun the configured workflow. For a local checkout use `npm run dev`. |
 | Page says it could not reach the server | The web app was not deployed with **Who has access: Anyone**. Redeploy (step 5). |
 | "That PIN is not correct" | Wrong PIN, or too many tries: wait a few minutes. To reset, run **Forms Platform > 2. Set admin PIN...** again. |
-| Changes to the backend have no effect | You saved the code but did not create a **New version** of the deployment. |
+| Backend update failed | Check the **Deploy Google Apps Script** job. Renew `CLASPRC_JSON` if authentication failed; verify both IDs and enable the Apps Script API. |
 | The site did not change after a push | Open the **Actions** tab: a red run means a test failed and nothing was published. A green run means the browser cached the old file: press Ctrl+F5. |
 | Actions says Pages is not enabled | Settings, Pages, Source: **GitHub Actions**. |
 | The menu "Forms Platform" is missing | Reload the sheet and wait a few seconds. |
@@ -250,7 +265,7 @@ If you prefer to automate backend updates on every push to `master`:
 
 | Question | Read |
 |---|---|
-| Why only one config line, and why no server? | [HOSTING.md](architecture/HOSTING.md) |
+| How are configuration and hosting split? | [HOSTING.md](architecture/HOSTING.md) |
 | What exactly is `dist/Code.gs`, and who builds it? | [BUILD-PIPELINE.md](architecture/BUILD-PIPELINE.md) |
 | Why "Execute as Me" and "Anyone" is safe here | [WORKAROUNDS.md](architecture/WORKAROUNDS.md) and [SECURITY.md](reference/SECURITY.md) |
 | What is stored where? | [DATA-MODEL.md](reference/DATA-MODEL.md) |

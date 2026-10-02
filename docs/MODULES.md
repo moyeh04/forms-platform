@@ -127,7 +127,7 @@ no validation.
 | `assets/css/app.css` | Components of the student page. |
 | `assets/css/admin.css` | Dashboard and instructor layout, including the team cards (a coloured band per team, header strip, leader tag). |
 | `assets/img/` | The tab icon (`favicon.svg`), PNG sizes for phones and older browsers, and `site.webmanifest`. |
-| `assets/js/config.js` | **The one file you edit:** the web app address. |
+| `assets/js/config.js` | Source placeholder; `scripts/build-site.js` generates its published copy from the Actions `API_URL` variable. |
 | `assets/js/api.js` | Sends requests to the backend as plain-text JSON (avoids browser CORS checks). |
 | `assets/js/form.js`, `ticket.js`, `i18n.js` | The student page, the success ticket, English and Arabic text. |
 | `assets/js/admin*.js` | Dashboard: core and forms list, settings, responses and matching, clients and lists. |

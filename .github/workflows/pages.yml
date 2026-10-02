@@ -1,5 +1,4 @@
-# Tests every push to master, then publishes the website to GitHub Pages.
-# One-time setup: repository Settings > Pages > Build and deployment > Source: GitHub Actions.
+# Pages Source must be GitHub Actions so the generated configuration is served.
 name: Test and deploy site
 
 on:
@@ -14,102 +13,109 @@ permissions:
 
 concurrency:
   group: pages-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   test:
-    name: Tests and backend bundle
+    name: Tests and deployment artifacts
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.23.x'
+      - name: Validate GitHub Actions workflow
+        run: go run github.com/rhysd/actionlint/cmd/actionlint@v1.7.7
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
-
       - run: npm ci
       - run: npm test
-
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
       - run: pip install -r scripts/requirements.txt
       - run: python -m unittest discover -s tests -p "test_*.py"
-
-      # The backend is pasted into Apps Script by hand; this keeps a ready copy with every run.
       - run: npm run build
       - uses: actions/upload-artifact@v4
         with:
           name: backend-dist
           path: dist/
           retention-days: 30
+      - name: Build configured website
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/master'
+        env:
+          API_URL: ${{ vars.API_URL }}
+          APPS_SCRIPT_DEPLOYMENT_ID: ${{ vars.APPS_SCRIPT_DEPLOYMENT_ID }}
+        run: npm run build:site
+      - uses: actions/upload-artifact@v4
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/master'
+        with:
+          name: site-dist
+          path: _site/
+          include-hidden-files: true
+          retention-days: 7
 
   apps-script:
-    name: Push to Google Apps Script
+    name: Deploy Google Apps Script
     needs: test
-    if: github.event_name != 'pull_request' && env.HAS_CLASPRC == 'true'
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
     env:
-      HAS_CLASPRC: ${{ secrets.CLASPRC_JSON != '' }}
-      SCRIPT_ID: ${{ vars.APPS_SCRIPT_ID || secrets.APPS_SCRIPT_ID }}
-      DEPLOYMENT_ID: ${{ vars.APPS_SCRIPT_DEPLOYMENT_ID || secrets.APPS_SCRIPT_DEPLOYMENT_ID }}
+      APPS_SCRIPT_ID: ${{ vars.APPS_SCRIPT_ID }}
+      APPS_SCRIPT_DEPLOYMENT_ID: ${{ vars.APPS_SCRIPT_DEPLOYMENT_ID }}
+      API_URL: ${{ vars.API_URL }}
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
-
       - run: npm ci
-      - run: npm run build
-
-      - name: Deploy with clasp
+      - name: Prepare validated clasp configuration
         env:
           CLASPRC_JSON: ${{ secrets.CLASPRC_JSON }}
+        run: node scripts/prepare-clasp.js
+      - uses: actions/download-artifact@v4
+        with:
+          name: backend-dist
+          path: dist/
+      - name: Update the existing web deployment
         run: |
-          if [ -z "$SCRIPT_ID" ]; then
-            echo "Error: APPS_SCRIPT_ID is required to deploy to Google Apps Script. Set it in repository Variables or Secrets." >&2
-            exit 1
-          fi
-          if [ -z "$DEPLOYMENT_ID" ]; then
-            echo "Error: APPS_SCRIPT_DEPLOYMENT_ID is required to deploy to Google Apps Script. Set it in repository Variables or Secrets." >&2
-            exit 1
-          fi
-          mkdir -p ~/.clasp
-          echo "$CLASPRC_JSON" > ~/.clasprc.json
-          node -e "fs.writeFileSync('.clasp.json', JSON.stringify({ scriptId: process.env.SCRIPT_ID, rootDir: './dist' }))"
-          npx @google/clasp push --force
-          npx @google/clasp deploy -i "$DEPLOYMENT_ID" --description "Auto-deployed commit ${{ github.sha }}"
+          npx --yes @google/clasp@3.4.1 push --force
+          npx --yes @google/clasp@3.4.1 deploy -i "$APPS_SCRIPT_DEPLOYMENT_ID" --description "Commit $GITHUB_SHA"
+      - name: Remove temporary credentials
+        if: always()
+        run: |
+          node -e "const fs = require('node:fs'); for (const p of [process.env.HOME + '/.clasprc.json', '.clasp.json']) fs.rmSync(p, { force: true });"
 
   deploy:
     name: Publish to GitHub Pages
-    needs: test
-    if: github.event_name != 'pull_request'
+    needs: [test, apps-script]
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
     permissions:
+      contents: read
       pages: write
       id-token: write
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - uses: actions/checkout@v4
-
-      # Only the public website goes online: no backend, tests, scripts, or docs.
-      - name: Collect the site files
+      - name: Verify Pages uses GitHub Actions
         env:
-          CONFIG_API_URL: ${{ vars.API_URL || secrets.API_URL }}
+          GH_TOKEN: ${{ github.token }}
         run: |
-          mkdir _site
-          cp index.html admin.html viewer.html _site/
-          cp -r assets shared _site/
-          if [ -n "$CONFIG_API_URL" ]; then
-            sed -i -E "s|API_URL: '.*'|API_URL: '$CONFIG_API_URL'|" _site/assets/js/config.js
+          source=$(gh api "repos/$GITHUB_REPOSITORY/pages" --jq '.build_type')
+          if [ "$source" != "workflow" ]; then
+            echo "::error::Set Settings > Pages > Build and deployment > Source to GitHub Actions."
+            exit 1
           fi
-          touch _site/.nojekyll
-
+      - uses: actions/download-artifact@v4
+        with:
+          name: site-dist
+          path: _site/
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
