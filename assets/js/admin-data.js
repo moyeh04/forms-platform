@@ -197,14 +197,14 @@
             s.link ? h('a', { href: s.link, target: '_blank', rel: 'noopener' }, title, icon('link', 15)) : h('span', null, title)),
           h('span', { class: 'block-meta' }, h('span', { class: 'mono' }, s.ref), ' · ', members.length === 1 ? 'Solo' : members.length + ' members'),
           h('div', { class: 'actions block-actions' }, statusSelect(form, s), detailsButton(form, s, reload))),
-        h('div', { class: 'scroll-x' }, h('table', { class: 'mini' },
-          h('thead', null, h('tr', null, h('th', null, '#'), h('th', null, 'Team member'), h('th', null, 'Code'), h('th', null, 'Phone'))),
-          h('tbody', null, members.map(function (m, k) {
-            return h('tr', { class: m.leader ? 'leader' : null },
-              h('td', { class: 'num' }, String(k + 1)),
-              h('td', { class: 'nm' }, bdi(m.name), m.leader ? h('span', { class: 'lead-tag' }, icon('star', 13), 'Leader') : null),
-              h('td', { class: 'mono' }, m.code), h('td', { class: 'mono' }, m.phone));
-          })))));
+       h('div', { class: 'scroll-x' }, h('table', { class: 'mini' },
+          h('thead', null, h('tr', null, h('th', null, '#'), h('th', null, 'Team member'), h('th', null, 'Section'), h('th', null, 'Code'), h('th', null, 'Phone'))),
+         h('tbody', null, members.map(function (m, k) {
+           return h('tr', { class: m.leader ? 'leader' : null },
+             h('td', { class: 'num' }, String(k + 1)),
+             h('td', { class: 'nm' }, bdi(m.name), m.leader ? h('span', { class: 'lead-tag' }, icon('star', 13), 'Leader') : null),
+              h('td', null, m.section || '-'), h('td', { class: 'mono' }, m.code), h('td', { class: 'mono' }, m.phone));
+         })))));
     }));
   }
 
