@@ -15,8 +15,8 @@ runs `scripts/bundle-backend.js`, which writes two files into `dist/`:
 
 | Output | Made from | You do |
 |---|---|---|
-| `dist/Code.gs` | `shared/rules.js` + every `backend/*.gs` | Paste into the Apps Script editor |
-| `dist/appsscript.json` | `backend/appsscript.json` (copied as-is) | Paste into the manifest file |
+| `dist/Code.gs` | `shared/rules.js` + every `backend/*.gs` | Actions pushes it with pinned clasp |
+| `dist/appsscript.json` | `backend/appsscript.json` (copied as-is) | Actions pushes it with pinned clasp |
 
 `dist/` is listed in `.gitignore`, so it is **not committed**. It is regenerated
 from source whenever you need it, and the zip you downloaded contains a copy so
@@ -72,7 +72,7 @@ flowchart TD
 
     sources --> bundler
     bundler --> dist["dist/<br/>Code.gs and appsscript.json<br/>git-ignored"]
-    dist --> paste["You paste them into<br/>the Apps Script editor"]
+    dist --> paste["Actions pushes dist with clasp"]
     paste --> live["Deploy: new version of the web app"]
     classDef cDb fill:#F3E2B3,stroke:#B8892D,stroke-width:1.5px,color:#2F2418
     classDef cActor fill:#F4D9D3,stroke:#9A3328,stroke-width:1.5px,color:#2F2418
@@ -249,7 +249,7 @@ the **same function** (`bundleSource()`) and loads its output into a sandbox:
 }}%%
 flowchart LR
     src["source files"] --> bs["bundleSource()"]
-    bs --> disk["npm run build<br/>writes dist/Code.gs<br/>what you paste"]
+    bs --> disk["npm run build<br/>writes dist/Code.gs<br/>what clasp deploys"]
     bs --> sandbox["tests: load the string<br/>into a sandbox with fake Google services"]
     classDef cDb fill:#F3E2B3,stroke:#B8892D,stroke-width:1.5px,color:#2F2418
     classDef cActor fill:#F4D9D3,stroke:#9A3328,stroke-width:1.5px,color:#2F2418
@@ -275,27 +275,24 @@ two steps: push the website (for the browser copy) and redeploy the backend
 (for the server copy). Skipping the second is safe but means the server still
 enforces the old rule. The server is always the final judge.
 
-## Does GitHub build anything?
+## What GitHub builds and deploys
 
-It tests and builds, but deploys only the website. On every push to `master`,
-`.github/workflows/pages.yml` runs `npm test`, the Python tests, and
-`npm run build`. It keeps the resulting `dist/` as a downloadable
-**backend-dist** artifact for 30 days and publishes the website files to Pages
-unchanged (no bundling, no minifying). It does not push the backend into Apps
-Script: that stays a paste, because it needs your Google login. See
-[HOSTING.md](HOSTING.md).
+`.github/workflows/pages.yml` validates its own syntax with pinned actionlint,
+runs the JavaScript/Python suites, and creates the `backend-dist` artifact.
+For pushes to `master`, `npm run build:site` packages public files into `_site/`
+and generates `_site/assets/js/config.js` from the required `API_URL` variable.
+Invalid configuration fails before the public artifact is uploaded.
 
-## Optional improvements
+The Apps Script job generates ignored `.clasp.json` and private credentials
+from `APPS_SCRIPT_ID`, `APPS_SCRIPT_DEPLOYMENT_ID`, `API_URL`, and the
+`CLASPRC_JSON` secret. Pinned clasp pushes the tested backend artifact and
+updates the existing deployment ID. Only after that succeeds does Pages publish
+the configured `site-dist` artifact. Pull requests and feature branch dispatches
+cannot deploy. Deployment runs are serialized rather than cancelled midway.
 
-These are real options if the manual paste ever becomes annoying. None are
-needed for the platform to work.
-
-| Idea | What it would give | Trade-off |
-|---|---|---|
-| [`clasp`](https://github.com/google/clasp) | Push `dist/` to Apps Script from the command line | Extra login and tool to install |
-| A GitHub Action that runs the tests on every push | Catches mistakes before deploy | **Done**: `.github/workflows/pages.yml` |
-| Keep a built `dist/` with every run | Download the built files from GitHub | **Done**: the `backend-dist` artifact |
-| Push the backend with `clasp` from the workflow | No manual paste | Needs a stored Google token as a repository secret |
+**Pages Source must be GitHub Actions.** Deploying from a branch serves the
+source placeholder and never runs the configuration generator. See
+[DEPLOY.md](../DEPLOY.md#updating-later) for setup and manual recovery.
 
 ## Troubleshooting
 
