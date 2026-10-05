@@ -37,27 +37,35 @@ function printReservations_(form, dayId, includeEmpty) {
     (byTime[p.time] = byTime[p.time] || []).push(r);
   });
 
+  var includeMembers = Rules.fieldByRole(vform, 'members').enabled !== false;
   var values = [];
   day.times.forEach(function (t) {
     var list = byTime[t] || [];
-    if (!list.length && includeEmpty) values.push(['', t, '', '', '', '']);
-    list.forEach(function (r) { values.push(['', t, r.name, r.code, r.title, '']); });
+    if (!list.length && includeEmpty) values.push(includeMembers ? ['', t, '', '', '', '', ''] : ['', t, '', '', '', '']);
+    list.forEach(function (r) {
+      var row = ['', t, r.name, r.code, r.title];
+      if (includeMembers) row.push((r.data.members || []).map(function (m) { return m.name; }).filter(Boolean).join(', '));
+      row.push('');
+      values.push(row);
+    });
   });
   values.forEach(function (v, i) { v[0] = i + 1; });
 
   var ss = SpreadsheetApp.openById(form.sheetId);
   var sh = freshView_(ss, printSheetName_(day.label));
-  var headers = ['No.', 'Time', 'Team leader', 'Code', 'Project', 'Signature'];
+  var headers = ['No.', 'Time', 'Team leader', 'Code', 'Project'];
+  if (includeMembers) headers.push('Teammates');
+  headers.push('Signature');
   paintPrintHeader_(sh, form.title + '  -  ' + day.label + (day.date ? '  (' + day.date + ')' : ''), headers);
-  [60, 150, 300, 110, 260, 160].forEach(function (w, i) { sh.setColumnWidth(i + 1, w); });
+  [60, 150, 300, 110, 260].concat(includeMembers ? [240, 160] : [160]).forEach(function (w, i) { sh.setColumnWidth(i + 1, w); });
   if (values.length) {
-    sh.getRange(4, 1, values.length, 6).setValues(values).setFontFamily(VIEW_STYLE_.font).setFontSize(12).setVerticalAlignment('middle');
+    sh.getRange(4, 1, values.length, headers.length).setValues(values).setFontFamily(VIEW_STYLE_.font).setFontSize(12).setVerticalAlignment('middle');
     sh.getRange(4, 1, values.length, 2).setHorizontalAlignment('center');
     sh.getRange(4, 4, values.length, 1).setHorizontalAlignment('center');
     sh.setRowHeights(4, values.length, 38);
-    sh.getRange(3, 1, values.length + 1, 6).setBorder(true, true, true, true, true, true, '#000000', SpreadsheetApp.BorderStyle.SOLID);
+    sh.getRange(3, 1, values.length + 1, headers.length).setBorder(true, true, true, true, true, true, '#000000', SpreadsheetApp.BorderStyle.SOLID);
   } else {
-    sh.getRange(4, 1, 1, 6).merge().setValue('No bookings for this day.').setHorizontalAlignment('center');
+    sh.getRange(4, 1, 1, headers.length).merge().setValue('No bookings for this day.').setHorizontalAlignment('center');
   }
   return { sheetName: sh.getName(), gid: sh.getSheetId(), count: values.length, landscape: false };
 }
@@ -69,7 +77,8 @@ function printTeamList_(form) {
   var ss = SpreadsheetApp.openById(form.sheetId);
   var sh = freshView_(ss, 'Print - Team list');
   var headers = ['Team', 'Team member name', 'Code', third];
-  paintPrintHeader_(sh, vform.title + (vform.term ? '  -  ' + vform.term : '') + '  -  Team list', headers);
+  var metadata = FormMetadata.caption(vform);
+  paintPrintHeader_(sh, vform.title + (metadata ? '  -  ' + metadata : '') + '  -  Team list', headers);
   [70, 330, 120, 300].forEach(function (w, i) { sh.setColumnWidth(i + 1, w); });
 
   var responses = readResponses(form).sort(byCreated_);

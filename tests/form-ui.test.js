@@ -194,6 +194,37 @@ test('Edit by key: open, change the title, save, then cancel and register again'
   assert.equal(q.$('[name="leader_code"]').value, '');
 });
 
+test('Reservation: optional teammates can be added, validated, and included on the ticket', async () => {
+  const w = boot('reservation', { slots: { days: [{ label: 'Week 11 - Sunday', date: '2027-11-14', times: ['12:30 - 12:50'] }], capacity: 1 } });
+  const f = w.admin({ action: 'admin.forms.get', id: w.form.id }).form;
+  w.admin({ action: 'admin.forms.update', id: w.form.id, patch: {
+    fields: f.fields.map((field) => field.role === 'members' ? { ...field, enabled: true, required: true } : field),
+    steps: f.steps.map((step) => step.id === 'project' ? { ...step, fields: step.fields.concat(['members']) } : step)
+  } });
+  const p = await open(w);
+  await fillAbout(p); p.submitForm(); await settle();
+  await fillStudy(p); p.submitForm(); await settle();
+  p.type('[name="title"]', 'Library System');
+  p.submitForm(); await settle();
+  p.clickText('Add a team member'); await settle();
+  p.type('[name="members.0.name"]', 'سارة خالد حسن علي');
+  p.type('[name="members.0.phone"]', '01112345678');
+  p.type('[name="members.0.code"]', '4230002');
+  p.pick('members.0.level', 'صفر / الأولى');
+  p.pick('members.0.curriculum', '2020');
+  p.pick('members.0.section', '4C-TH1');
+  p.submitForm(); await settle();
+  assert.equal(p.$('.step-title').textContent, 'Time slot');
+  p.clickText('Week 11 - Sunday'); await settle();
+  p.click(p.$('.slot-chip.time')); await settle();
+  p.submitForm(); await settle();
+  p.submitForm(); await settle(12);
+  assert.ok(p.$('#ticket'));
+  assert.ok(p.$('#ticket').textContent.includes('سارة خالد حسن علي'));
+  const saved = w.admin({ action: 'admin.submissions', slug: w.form.slug }).submissions[0];
+  assert.deepEqual(saved.data.members, [{ name: 'سارة خالد حسن علي', phone: '01112345678', code: '4230002', level: 'صفر / الأولى', curriculum: '2020', section: '4C-TH1' }]);
+});
+
 test('Reservation: taken slots are disabled and a booking can be made', async () => {
   const w = boot('reservation', { slots: { days: [{ label: 'Week 11 - Sunday', date: '2027-11-14', times: ['12:30 - 12:50', '12:55 - 1:15'] }], capacity: 1 } });
   w.api({
@@ -375,6 +406,14 @@ test('Subject: the subject code is shown as a tag next to the term', async () =>
   const w = boot('team_registration', { subject: 'CMPn323' });
   const p = await open(w);
   assert.deepEqual(p.$$('.form-head .tag').map((t) => t.textContent), ['CMPn323', 'Fall 2027']);
+});
+
+test('WhatsApp: the public form shows only the batch year in its title and metadata', async () => {
+  const w = boot('whatsapp_registration', { batchYear: '2028/2029' });
+  const p = await open(w);
+  assert.equal(p.win.document.title, 'Database Team Project Registration Form - Batch 2028/2029');
+  assert.deepEqual(p.$$('.form-head .tag').map((tag) => tag.textContent), ['Batch 2028/2029']);
+  assert.equal(p.$('.form-head .tag-subject'), null);
 });
 
 test('Specialization: a Communications-only form says so and fills in the major', async () => {

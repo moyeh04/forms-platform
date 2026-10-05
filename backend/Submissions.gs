@@ -96,7 +96,14 @@ function adminView_(r) {
 
 API['admin.submissions'] = admin(function (req) {
   var form = requireForm(req.slug || req.id);
-  var rows = readResponses(form, !!req.includeDeleted).map(adminView_);
+  var rows = readResponses(form, !!req.includeDeleted).map(function (r) {
+    var view = adminView_(r);
+    if (form.type === 'reservation' && Rules.fieldByRole(form, 'members').enabled === false) {
+      view.data.members = [];
+      view.members = '';
+    }
+    return view;
+  });
   return { submissions: rows };
 });
 

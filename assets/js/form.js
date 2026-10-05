@@ -103,7 +103,8 @@
       S.form = res.form;
       S.state = res.state;
       S.taken = res.taken || {};
-      document.title = S.form.title + (S.form.subject ? ' (' + S.form.subject + ')' : '') + (S.form.term ? ' - ' + S.form.term : '');
+      var metadata = FormMetadata.display(S.form);
+      document.title = S.form.title + metadata.map(function (item) { return item.variant === 'subject' ? ' (' + item.value + ')' : ' - ' + item.value; }).join('');
       var cfg = S.form.lang || {};
       var lang = cfg.allowSwitch === false ? cfg.default || 'en' : App.i18n.saved() || cfg.default || 'en';
       App.i18n.set(lang);
@@ -158,9 +159,10 @@
     return h('header', { class: 'form-head' },
       ic ? h('span', { class: 'form-icon' }, icon(ic, 30)) : null,
       h('h1', { class: 'form-title' }, S.form ? S.form.title : ''),
-      S.form && (S.form.term || S.form.subject) ? h('div', { class: 'tags' },
-        S.form.subject ? h('span', { class: 'tag tag-subject', lang: 'en', dir: 'ltr' }, S.form.subject) : null,
-        S.form.term ? h('span', { class: 'tag' }, S.form.term) : null) : null,
+      S.form && FormMetadata.display(S.form).length ? h('div', { class: 'tags' },
+        FormMetadata.display(S.form).map(function (item) {
+          return h('span', { class: 'tag' + (item.variant === 'subject' ? ' tag-subject' : ''), lang: item.variant === 'subject' ? 'en' : null, dir: item.variant === 'subject' ? 'ltr' : null }, item.value);
+        })) : null,
       audience()
     );
   }
@@ -394,6 +396,11 @@
     return f && f.enabled !== false ? f : null;
   }
 
+  function membersField() {
+    var f = Rules.fieldByRole(S.form, 'members');
+    return f && f.enabled !== false ? f : null;
+  }
+
   function freshMember(mf) {
     var fresh = {};
     (mf.fields || []).forEach(function (sf) {
@@ -487,8 +494,17 @@
 
     // Forms without a team size question keep the add and remove buttons.
     var range = Rules.teamSizeRange(S.form);
+    var min = field.min == null ? 0 : field.min;
     var max = field.max == null ? range.max - 1 : field.max;
-    wrap.appendChild(h('div', { class: 'members' }, list.map(function (m, i) { return memberCard(field, path, i, true); })));
+    if (list.length === 0) {
+      wrap.appendChild(h('button', { type: 'button', class: 'btn btn-quiet', onclick: function () {
+        getVal(path).push(freshMember(field));
+        saveDraft();
+        render();
+      } }, icon('plus', 20), t('addMember')));
+      return wrap;
+    }
+    wrap.appendChild(h('div', { class: 'members' }, list.map(function (m, i) { return memberCard(field, path, i, list.length > min); })));
     wrap.appendChild(h('p', { class: 'team-size' }, t('teamSize', { n: list.length + 1 })));
     if (list.length < max) {
       wrap.appendChild(h('button', { type: 'button', class: 'btn btn-quiet', onclick: function () {
