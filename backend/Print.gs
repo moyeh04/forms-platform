@@ -69,7 +69,8 @@ function printTeamList_(form) {
   var ss = SpreadsheetApp.openById(form.sheetId);
   var sh = freshView_(ss, 'Print - Team list');
   var headers = ['Team', 'Team member name', 'Code', third];
-  paintPrintHeader_(sh, vform.title + (vform.term ? '  -  ' + vform.term : '') + '  -  Team list', headers);
+  var metadata = FormMetadata.caption(vform);
+  paintPrintHeader_(sh, vform.title + (metadata ? '  -  ' + metadata : '') + '  -  Team list', headers);
   [70, 330, 120, 300].forEach(function (w, i) { sh.setColumnWidth(i + 1, w); });
 
   var responses = readResponses(form).sort(byCreated_);

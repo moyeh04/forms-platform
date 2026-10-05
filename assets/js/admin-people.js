@@ -61,7 +61,8 @@
       forms: client ? client.forms.filter(function (s) { return s !== '*'; }) : [], hidden: client ? client.hiddenColumns.slice() : [], canReview: client ? client.canReview : false
     };
     var formBoxes = h('div', null, forms.map(function (f) {
-      return A.check(f.title + (f.term ? ' (' + f.term + ')' : ''), st.forms.indexOf(f.slug) !== -1, function (v) {
+      var caption = FormMetadata.caption(f);
+      return A.check(f.title + (caption ? ' (' + caption + ')' : ''), st.forms.indexOf(f.slug) !== -1, function (v) {
         st.forms = st.forms.filter(function (s) { return s !== f.slug; });
         if (v) st.forms.push(f.slug);
       });
@@ -285,7 +286,7 @@
         h('h2', null, listName(key)),
         h('p', { class: 'help' }, info.about),
         h('div', { class: 'used-by' }, h('span', { class: 'label' }, 'Used by'),
-          users.length ? users.map(function (f) { return h('a', { class: 'used-chip', href: '#/f/' + encodeURIComponent(f.slug) + '/settings' }, icon((A.TYPES[f.type] || {}).icon || 'task', 14), f.title, f.term ? h('span', { class: 'muted-note' }, f.term) : null); })
+          users.length ? users.map(function (f) { var caption = FormMetadata.caption(f); return h('a', { class: 'used-chip', href: '#/f/' + encodeURIComponent(f.slug) + '/settings' }, icon((A.TYPES[f.type] || {}).icon || 'task', 14), f.title, caption ? h('span', { class: 'muted-note' }, caption) : null); })
             : h('span', { class: 'muted-note' }, 'No form uses it yet. New ' + info.types.map(function (t) { return (A.TYPES[t] || { label: t }).label.toLowerCase(); }).join(', ') + ' forms will.'))));
       if (!st.view) st.view = plain() ? 'chips' : 'table';
       pane.appendChild(h('div', { class: 'view-switch', role: 'radiogroup', 'aria-label': 'Layout' },

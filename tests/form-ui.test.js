@@ -377,6 +377,14 @@ test('Subject: the subject code is shown as a tag next to the term', async () =>
   assert.deepEqual(p.$$('.form-head .tag').map((t) => t.textContent), ['CMPn323', 'Fall 2027']);
 });
 
+test('WhatsApp: the public form shows only the batch year in its title and metadata', async () => {
+  const w = boot('whatsapp_registration', { batchYear: '2028/2029' });
+  const p = await open(w);
+  assert.equal(p.win.document.title, 'Database Team Project Registration Form - Batch 2028/2029');
+  assert.deepEqual(p.$$('.form-head .tag').map((tag) => tag.textContent), ['Batch 2028/2029']);
+  assert.equal(p.$('.form-head .tag-subject'), null);
+});
+
 test('Specialization: a Communications-only form says so and fills in the major', async () => {
   const w = boot('team_registration', { rules: { majors: ['اتصالات'] } });
   const p = await open(w);

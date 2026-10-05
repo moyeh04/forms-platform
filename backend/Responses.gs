@@ -303,7 +303,7 @@ function sendConfirmation_(form, result, data) {
       var lines = [
         'Your registration was received.',
         '',
-        'Form: ' + form.title + (form.term ? ' (' + form.term + ')' : ''),
+        'Form: ' + form.title + (FormMetadata.caption(form) ? ' (' + FormMetadata.caption(form) + ')' : ''),
         'Reference: ' + result.ref
       ];
       if (form.editKey && form.editKey.enabled) {

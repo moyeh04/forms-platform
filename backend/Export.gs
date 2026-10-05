@@ -18,7 +18,9 @@ API['admin.export.teams'] = admin(function (req) {
       members: Rules.membersOf(vform, r.data).map(function (m) { return { name: m.name, code: m.code, leader: m.leader }; })
     };
   });
-  return { form: { slug: form.slug, title: form.title, term: form.term, type: form.type }, teams: teams };
+  var formMetadata = { slug: form.slug, title: form.title, type: form.type };
+  Object.assign(formMetadata, FormMetadata.public(form));
+  return { form: formMetadata, teams: teams };
 });
 
 API['admin.export.tasks'] = API['admin.export.teams'];
