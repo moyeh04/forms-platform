@@ -34,6 +34,7 @@
     f.rules = f.rules || {};
     f.notifications = f.notifications || {};
     f.review = f.review || { steps: [] };
+    var metadata = FormMetadata.read(f);
 
     var t = A.TYPES[f.type] || { label: f.type };
     var link = A.formLink(f.slug);
@@ -51,7 +52,7 @@
     /* General ---------------------------------------------------- */
     var general = panel('General', 'Students can only submit while the status is Open and the current time is inside the dates below.',
       A.field('Title', A.text(f.title, function (v) { f.title = v; }, { name: 'title' }), 'The heading students see.'),
-      A.termPicker({ term: f.term, subject: f.subject }, function (v) { f.term = v.term; f.subject = v.subject; }),
+      A.metadataEditor(f.type, metadata, function (v) { Object.assign(metadata, v); }),
       h('div', { class: 'row' },
         A.field('Link name', A.text(f.slug, function (v) { f.slug = v; }, { name: 'slug', dir: 'ltr' }), 'The form address ends with ?f= and this name. Changing it breaks links already shared.'),
         A.field('Status', A.select(f.status, [['draft', 'Draft (hidden)'], ['open', 'Open'], ['closed', 'Closed'], ['archived', 'Archived']], function (v) { f.status = v; }))),
@@ -379,10 +380,11 @@
     saveBtn.addEventListener('click', function () {
       A.busy(saveBtn, async function () {
         var patch = {
-          title: f.title, term: f.term, subject: f.subject || '', slug: f.slug, status: f.status, opensAt: f.opensAt || '', closesAt: f.closesAt || '',
+          title: f.title, slug: f.slug, status: f.status, opensAt: f.opensAt || '', closesAt: f.closesAt || '',
           lang: f.lang, icon: f.icon, editKey: f.editKey, rules: f.rules, notifications: f.notifications,
           fields: f.fields, review: f.review
         };
+        Object.assign(patch, metadata);
         if (f.matching) patch.matching = f.matching;
         if (hasSize) {
           var min = parseInt(f.rules.teamSize.min, 10), max = parseInt(f.rules.teamSize.max, 10);

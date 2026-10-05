@@ -52,7 +52,7 @@ function menuPrintOptions(kind) {
   return readForms().filter(function (f) { return types.indexOf(f.type) !== -1; }).map(function (f) {
     return {
       slug: f.slug,
-      label: f.title + (f.term ? ' (' + f.term + ')' : ''),
+      label: f.title + (FormMetadata.caption(f) ? ' (' + FormMetadata.caption(f) + ')' : ''),
       days: ((f.slots && f.slots.days) || []).map(function (d) { return { id: d.id, label: d.label }; })
     };
   });

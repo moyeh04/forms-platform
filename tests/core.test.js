@@ -114,6 +114,26 @@ test('Forms: duplicating gives a draft copy with a fresh sheet and settings kept
   assert.equal(copy.editKey.days, 3);
 });
 
+test('WhatsApp metadata: duplicating a legacy record keeps only batch-year metadata', () => {
+  const w = boot();
+  const source = w.admin({ action: 'admin.forms.create', type: 'whatsapp_registration', title: 'Groups', term: 'Spring 2027', subject: 'CMPn123' }).form;
+  const sheet = w.registry.getSheetByName('Forms');
+  const config = JSON.parse(sheet.rows()[1][10]);
+  delete config.batchYear;
+  config.subject = 'CMPn123';
+  sheet.getRange(2, 11).setValue(JSON.stringify(config));
+  sheet.getRange(2, 5).setValue('Spring 2027');
+
+  const copy = w.admin({ action: 'admin.forms.duplicate', id: source.id, title: 'Groups 2028', batchYear: '2028/2029' }).form;
+  assert.equal(copy.batchYear, '2028/2029');
+  assert.equal(copy.term, '');
+  assert.equal(copy.subject, undefined);
+  const persisted = JSON.parse(sheet.rows()[2][10]);
+  assert.equal(persisted.batchYear, '2028/2029');
+  assert.equal(persisted.term, undefined);
+  assert.equal(persisted.subject, undefined);
+});
+
 test('Lists: admins can replace a list and options follow', () => {
   const w = boot();
   w.admin({ action: 'admin.lists.set', key: 'sections', values: ['S1', 'S2'] });

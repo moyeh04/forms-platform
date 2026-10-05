@@ -107,6 +107,14 @@ test('Instructor link: teams are tinted blocks with a star and a linked task, an
   assert.equal(p.text().includes('01112345678'), false);
 });
 
+test('Instructor link: WhatsApp metadata shows the batch year without subject or semester', async () => {
+  const w = boot();
+  const f = w.make('whatsapp_registration', 'Groups', { batchYear: '2029/2030' });
+  const page = await openViewer(w, w.client(), `&f=${f.slug}`);
+  assert.equal(page.$('h1').textContent, 'Groups');
+  assert.deepEqual([...page.$$('.admin-bar .tag-sm')].map((tag) => tag.textContent), ['Batch 2029/2030']);
+});
+
 test('Instructor link: reviewers can mark steps, read-only links only see them', async () => {
   const w = boot();
   const f = w.make('whatsapp_registration', 'Groups');

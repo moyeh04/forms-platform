@@ -77,6 +77,7 @@ function formsSheet() {
 function rowToForm_(row) {
   var form = parseJson(row.config, {});
   FORM_BASE_.forEach(function (k) { form[k] = row[k] === undefined ? '' : String(row[k]); });
+  Object.assign(form, FormMetadata.read(form));
   form._row = row._row;
   return form;
 }
@@ -129,7 +130,8 @@ function uniqueSlug_(wanted) {
 
 /** Creates the form's own spreadsheet inside the platform folder. */
 function attachSheet_(form) {
-  var ss = SpreadsheetApp.create(form.title + (form.term ? ' - ' + form.term : ''));
+  var metadata = FormMetadata.sheet(form);
+  var ss = SpreadsheetApp.create(form.title + (metadata ? ' - ' + metadata : ''));
   var first = ss.getSheets()[0];
   first.setName('Responses');
   first.getRange(1, 1, 1, RESPONSE_COLS.length).setValues([RESPONSE_COLS]).setFontWeight('bold');
@@ -152,9 +154,8 @@ function createForm(o) {
   var form = templateFor(o.type);
   form.type = o.type;
   form.title = title;
-  form.term = String(o.term || '').trim();
-  form.subject = cleanSubject_(o.subject);
-  form.slug = uniqueSlug_(o.slug || (title + ' ' + form.term));
+  Object.assign(form, FormMetadata.create(form.type, o));
+  form.slug = uniqueSlug_(o.slug || (title + ' ' + FormMetadata.slug(form)));
   form.id = shortId('f_');
   form.status = 'draft';
   form.opensAt = '';
@@ -193,19 +194,16 @@ function normalizeSizeNotice_(n, min, max) {
   return { sizes: sizes, text: { en: String(text.en || '').trim(), ar: String(text.ar || '').trim() } };
 }
 
-var PATCHABLE_ = ['title', 'term', 'subject', 'slug', 'status', 'opensAt', 'closesAt', 'lang', 'icon', 'steps', 'fields', 'slots', 'rules', 'review', 'matching', 'editKey', 'notifications', 'messages'];
+var PATCHABLE_ = ['title', 'slug', 'status', 'opensAt', 'closesAt', 'lang', 'icon', 'steps', 'fields', 'slots', 'rules', 'review', 'matching', 'editKey', 'notifications', 'messages'];
 
 function updateForm(id, patch) {
   var form = requireForm(id);
+  FormMetadata.update(form, patch);
   PATCHABLE_.forEach(function (k) {
     if (patch[k] === undefined) return;
     if (k === 'status' && FORM_STATUSES.indexOf(patch[k]) === -1) fail('bad_status', 'Status must be draft, open, closed, or archived.');
     if (k === 'rules') {
       form.rules = normalizeRules_(form.rules, patch.rules);
-      return;
-    }
-    if (k === 'subject') {
-      form.subject = cleanSubject_(patch.subject);
       return;
     }
     if (k === 'slots') {
@@ -230,9 +228,10 @@ function duplicateForm(id, o) {
   delete copy._row;
   copy.id = shortId('f_');
   copy.title = (o && o.title) || src.title;
-  copy.term = o && o.term !== undefined ? o.term : src.term;
-  copy.subject = o && o.subject !== undefined ? cleanSubject_(o.subject) : src.subject || '';
-  copy.slug = uniqueSlug_((o && o.slug) || copy.title + ' ' + copy.term);
+  var metadata = FormMetadata.duplicate(src, o || {});
+  FormMetadata.legacyFields(src.type).forEach(function (key) { delete copy[key]; });
+  Object.assign(copy, metadata);
+  copy.slug = uniqueSlug_((o && o.slug) || copy.title + ' ' + FormMetadata.slug(copy));
   copy.status = 'draft';
   copy.createdAt = nowIso();
   attachSheet_(copy);
@@ -284,12 +283,13 @@ function resolveOptions_(form, lists) {
   return form;
 }
 
-var PUBLIC_KEYS_ = ['slug', 'type', 'title', 'term', 'subject', 'lang', 'icon', 'steps', 'fields', 'slots', 'editKey', 'messages', 'status', 'opensAt', 'closesAt'];
+var PUBLIC_KEYS_ = ['slug', 'type', 'title', 'lang', 'icon', 'steps', 'fields', 'slots', 'editKey', 'messages', 'status', 'opensAt', 'closesAt'];
 
 function publicForm(form) {
   var full = resolveOptions_(clone(form), readLists());
   var out = {};
   PUBLIC_KEYS_.forEach(function (k) { if (full[k] !== undefined) out[k] = full[k]; });
+  Object.assign(out, FormMetadata.public(full));
   out.editKey = { enabled: !!full.editKey.enabled, days: full.editKey.days, allowEdit: !!full.editKey.allowEdit, allowDelete: !!full.editKey.allowDelete };
   out.rules = { maxSubmissions: full.rules ? full.rules.maxSubmissions : null };
   if (full.rules && full.rules.teamSize) out.rules.teamSize = full.rules.teamSize;

@@ -59,8 +59,7 @@
     var d = S.data;
     var bar = h('header', { class: 'admin-bar' },
       h('h1', null, d ? d.form.title : 'Registrations'),
-      d && d.form.subject ? h('span', { class: 'tag-sm tag-subject' }, d.form.subject) : null,
-      d && d.form.term ? h('span', { class: 'tag-sm' }, d.form.term) : null,
+      d && FormMetadata.display(d.form).map(function (item) { return h('span', { class: 'tag-sm' + (item.variant === 'subject' ? ' tag-subject' : '') }, item.value); }),
       h('span', { class: 'muted-note' }, 'Viewing as ' + S.me.client.name),
       h('button', { type: 'button', class: 'icon-btn', 'aria-label': 'Switch light and dark', onclick: function () { App.theme.toggle(); render(); } }, icon(App.theme.effective() === 'dark' ? 'sun' : 'moon', 20)));
     var page = h('div', { class: 'admin-page' }, bar);
@@ -69,7 +68,7 @@
 
     var tools = [];
     if (S.me.forms.length > 1) {
-      var sel = A_select(S.slug, S.me.forms.map(function (f) { return [f.slug, f.title + (f.term ? ' (' + f.term + ')' : '')]; }), function (v) {
+      var sel = A_select(S.slug, S.me.forms.map(function (f) { var caption = FormMetadata.caption(f); return [f.slug, f.title + (caption ? ' (' + caption + ')' : '')]; }), function (v) {
         S.slug = v; S.mode = 'auto'; S.dayId = ''; S.q = '';
         reload();
       });

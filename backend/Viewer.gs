@@ -12,6 +12,12 @@ function viewKind_(form) {
   return form.type === 'reservation' ? 'reservation' : form.type === 'whatsapp_registration' ? 'whatsapp' : 'team';
 }
 
+function viewFormMetadata_(form) {
+  var metadata = { slug: form.slug, title: form.title, type: form.type };
+  Object.assign(metadata, FormMetadata.public(form));
+  return metadata;
+}
+
 function visibleColumns_(client, form) {
   return VIEW_COLUMNS_[viewKind_(form)].filter(function (c) { return client.hiddenColumns.indexOf(c[0]) === -1; })
     .map(function (c) { return { id: c[0], label: c[1] }; });
@@ -85,7 +91,7 @@ API['viewer.me'] = function (req) {
   return {
     client: { name: client.name, canReview: client.canReview },
     forms: viewerForms_(client).map(function (f) {
-      return { slug: f.slug, title: f.title, term: f.term, subject: f.subject || '', type: f.type, icon: f.icon };
+      return Object.assign(viewFormMetadata_(f), { icon: f.icon });
     })
   };
 };
@@ -97,7 +103,7 @@ API['viewer.data'] = function (req) {
   var kind = viewKind_(form);
   var mode = req.mode === 'today' || req.mode === 'day' ? req.mode : 'all';
   var out = {
-    form: { slug: form.slug, title: form.title, term: form.term, subject: form.subject || '', type: form.type },
+    form: viewFormMetadata_(form),
     kind: kind, columns: visibleColumns_(client, form), canReview: client.canReview,
     steps: (form.review && form.review.steps) || [], generatedAt: nowIso()
   };
