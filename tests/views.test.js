@@ -76,6 +76,51 @@ test('Bookings: grouped by day, ordered by timetable, day label on the first row
   assert.equal(rows[3][0], 'Week 11 - Tuesday');
 });
 
+test('Bookings: teammate names appear in the sheet view only when collection is enabled', () => {
+  const w = boot('reservation', {
+    slots: { days: [{ label: 'Sunday', times: ['12:30 - 12:50'] }], capacity: 2 }
+  });
+  const form = w.admin({ action: 'admin.forms.get', id: w.form.id }).form;
+  w.admin({ action: 'admin.forms.update', id: w.form.id, patch: {
+    fields: form.fields.map((field) => field.role === 'members' ? { ...field, enabled: true } : field),
+    steps: form.steps.map((step) => step.id === 'project' ? { ...step, fields: step.fields.concat('members') } : step)
+  } });
+  const name = 'سارة خالد حسن علي';
+  const result = w.api({ action: 'submit', slug: w.form.slug, data: person({
+    title: 'Seminar project', slot: { day: 'sunday', time: '12:30 - 12:50' }, members: [member(name, '4230002')]
+  }) });
+  assert.equal(result.ok, true);
+  const rows = w.view('Bookings').rows();
+  assert.deepEqual(rows[0], ['Day', 'Time', 'Team leader', 'Code', 'Phone', 'Project', 'Teammates']);
+  assert.equal(rows[1][6], name);
+});
+
+test('Bookings: legacy reservations gain disabled teammate metadata before views and printing', () => {
+  const w = boot('reservation', {
+    slots: { days: [{ id: 'sunday', label: 'Sunday', times: ['12:30 - 12:50'] }], capacity: 1 }
+  });
+  w.api({ action: 'submit', slug: w.form.slug, data: person({
+    title: 'Solo project', slot: { day: 'sunday', time: '12:30 - 12:50' }
+  }) });
+
+  const forms = w.registry.getSheetByName('Forms');
+  const config = JSON.parse(forms.rows()[1][10]);
+  config.fields = config.fields.filter((field) => field.role !== 'members');
+  config.steps = config.steps.map((step) => ({ ...step, fields: step.fields.filter((id) => id !== 'members') }));
+  forms.getRange(2, 11).setValue(JSON.stringify(config));
+
+  const legacy = w.admin({ action: 'admin.forms.get', id: w.form.id }).form;
+  const members = legacy.fields.find((field) => field.role === 'members');
+  assert.ok(members, 'legacy reservation receives the teammate field definition');
+  assert.equal(members.enabled, false, 'legacy reservations remain solo-only');
+  assert.ok(legacy.steps.find((step) => step.id === 'project').fields.includes(members.id));
+
+  w.admin({ action: 'admin.views.rebuild', slug: w.form.slug });
+  assert.deepEqual(w.view('Bookings').rows()[0], ['Day', 'Time', 'Team leader', 'Code', 'Phone', 'Project']);
+  const printed = w.admin({ action: 'admin.print.reservations', slug: w.form.slug, dayId: 'sunday' });
+  assert.deepEqual(w.view(printed.sheetName).rows()[2], ['No.', 'Time', 'Team leader', 'Code', 'Project', 'Signature']);
+});
+
 test('Registrations: WhatsApp rows sorted by group and section with review text and link', () => {
   const w = boot('whatsapp_registration');
   const reg = (code, group, section, phone) => w.api({

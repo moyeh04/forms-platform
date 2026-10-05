@@ -78,6 +78,7 @@ function rowToForm_(row) {
   var form = parseJson(row.config, {});
   FORM_BASE_.forEach(function (k) { form[k] = row[k] === undefined ? '' : String(row[k]); });
   Object.assign(form, FormMetadata.read(form));
+  normalizeReservationMembers_(form);
   form._row = row._row;
   return form;
 }

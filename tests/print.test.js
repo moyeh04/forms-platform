@@ -37,6 +37,21 @@ test('Print reservations: one tab per day, in timetable order, with a signature 
   assert.deepEqual(rows.slice(3).map((x) => [x[0], x[1], x[4]]), [[1, '12:30 - 12:50', 'First'], [2, '1:20 - 1:40', 'Second']]);
 });
 
+test('Print reservations: teammate names are printed when collection is enabled', () => {
+  const w = boot('reservation', { slots });
+  const form = w.admin({ action: 'admin.forms.get', id: w.form.id }).form;
+  form.slots.capacity = 2;
+  w.admin({ action: 'admin.forms.update', id: w.form.id, patch: {
+    slots: form.slots,
+    fields: form.fields.map((field) => field.role === 'members' ? { ...field, enabled: true } : field)
+  } });
+  w.api({ action: 'submit', slug: w.form.slug, data: person({ title: 'First', slot: { day: 'week-11-sunday', time: '12:30 - 12:50' }, members: [{ name: 'سارة خالد حسن علي', phone: '01112345678', code: '4230002', level: 'صفر / الأولى', curriculum: '2020', section: '4C-TH1' }] }) });
+  const printed = w.admin({ action: 'admin.print.reservations', slug: w.form.slug, dayId: 'week-11-sunday' });
+  const rows = w.view(printed.sheetName).rows();
+  assert.deepEqual(rows[2], ['No.', 'Time', 'Team leader', 'Code', 'Project', 'Teammates', 'Signature']);
+  assert.equal(rows[3][5], 'سارة خالد حسن علي');
+});
+
 test('Print reservations: can include the empty slots', () => {
   const w = boot('reservation', { slots });
   w.api({ action: 'submit', slug: w.form.slug, data: person({ title: 'First', slot: { day: 'week-11-sunday', time: '12:55 - 1:15' } }) });

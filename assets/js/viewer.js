@@ -132,6 +132,7 @@
     if (col === 'name') return h('td', { class: 'nm' }, bdi(v));
     if (col === 'code' || col === 'phone' || col === 'time') return h('td', { class: 'mono' }, v);
     if (col === 'link') return h('td', null, v ? h('a', { href: v, target: '_blank', rel: 'noopener' }, 'Open') : '');
+    if (col === 'members') return h('td', null, v || '');
     return h('td', null, v === undefined ? '' : String(v));
   }
 

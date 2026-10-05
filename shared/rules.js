@@ -256,7 +256,7 @@
      });
    }
    var mf = fieldByRole(form, 'members');
-   var list = mf && data && Array.isArray(data[mf.id]) ? data[mf.id] : [];
+   var list = mf && mf.enabled !== false && data && Array.isArray(data[mf.id]) ? data[mf.id] : [];
    list.forEach(function (m) {
       out.push({ name: m.name || '', code: m.code || '', phone: m.phone || '', section: m.section || '', leader: false });
    });

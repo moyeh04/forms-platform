@@ -132,6 +132,7 @@
   function details(form, s, reload) {
     var rows = [h('dt', null, 'Reference'), h('dd', null, s.ref), h('dt', null, 'Sent'), h('dd', null, A.fmtDate(s.created))];
     (form.fields || []).forEach(function (f) {
+      if (form.type === 'reservation' && f.role === 'members' && f.enabled === false) return;
       var v = s.data[f.id];
       if (v === undefined || v === '' || (Array.isArray(v) && !v.length)) return;
       var node;
@@ -212,6 +213,7 @@
 
   function bookings(form, rows, reload) {
     var days = (form.slots && form.slots.days) || [];
+    var showTeammates = !!Rules.fieldByRole(form, 'members') && Rules.fieldByRole(form, 'members').enabled !== false;
     var groups = [];
     days.forEach(function (d) { groups.push({ id: d.id, label: d.label, date: d.date, times: d.times, rows: [] }); });
     rows.forEach(function (s) {
@@ -226,10 +228,11 @@
       return h('section', { class: 'block single ' + (i % 2 ? 'tint-b' : 'tint-a'), dataset: { day: g.id } },
         h('div', { class: 'day-head' }, h('span', null, g.label + (g.date ? ' (' + g.date + ')' : '')), h('span', null, g.rows.length + ' booked')),
         h('div', { class: 'scroll-x' }, h('table', { class: 'mini' },
-          h('thead', null, h('tr', null, h('th', null, 'Time'), h('th', null, 'Team leader'), h('th', null, 'Code'), h('th', null, 'Phone'), h('th', null, 'Project'), h('th', null, 'Status'), h('th', null))),
+          h('thead', null, h('tr', null, h('th', null, 'Time'), h('th', null, 'Team leader'), h('th', null, 'Code'), h('th', null, 'Phone'), h('th', null, 'Project'), showTeammates ? h('th', null, 'Teammates') : null, h('th', null, 'Status'), h('th', null))),
           h('tbody', null, g.rows.map(function (s) {
             var L = function (label, td) { td.dataset.label = label; return td; };
-            return h('tr', null, L('Time', h('td', { class: 'mono' }, s.data.slot.time)), L('Team leader', h('td', { class: 'nm' }, bdi(s.name))), L('Code', h('td', { class: 'mono' }, s.code)), L('Phone', h('td', { class: 'mono' }, s.phone)), L('Project', h('td', null, s.title)), L('Status', h('td', null, statusSelect(form, s))), h('td', null, detailsButton(form, s, reload)));
+            var teammates = (s.data.members || []).map(function (member) { return member.name; }).filter(Boolean).join(', ');
+            return h('tr', null, L('Time', h('td', { class: 'mono' }, s.data.slot.time)), L('Team leader', h('td', { class: 'nm' }, bdi(s.name))), L('Code', h('td', { class: 'mono' }, s.code)), L('Phone', h('td', { class: 'mono' }, s.phone)), L('Project', h('td', null, s.title)), showTeammates ? L('Teammates', h('td', null, teammates)) : null, L('Status', h('td', null, statusSelect(form, s))), h('td', null, detailsButton(form, s, reload)));
           })))));
     }));
   }
@@ -383,7 +386,10 @@
   function exportCsv(form, rows) {
     var head = ['Reference', 'Sent', 'Status', 'Name', 'Code', 'Phone', 'Email', 'Title', 'Link', 'Slot', 'Members'];
     var lines = [head].concat(rows.map(function (s) {
-      return [s.ref, s.created, s.status, s.name, s.code, s.phone, s.email, s.title, s.link, slotText(form, s.data.slot), s.members];
+      var members = form.type === 'reservation'
+        ? (Rules.fieldByRole(form, 'members').enabled !== false ? (s.data.members || []).map(function (member) { return member.name + ' (' + member.code + ')'; }).join('; ') : '')
+        : s.members;
+      return [s.ref, s.created, s.status, s.name, s.code, s.phone, s.email, s.title, s.link, slotText(form, s.data.slot), members];
     }));
     var csv = '\ufeff' + lines.map(function (r) { return r.map(csvCell).join(','); }).join('\r\n');
     try {

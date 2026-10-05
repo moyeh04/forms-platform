@@ -82,7 +82,34 @@ test('Templates: projects allow 1 to 6 people, tasks 1 to 5, and the question is
   assert.equal(size.required, true);
   assert.equal(tasks.fields.find((f) => f.id === 'members').required, true);
   assert.deepEqual(tasks.steps.find((s) => s.id === 'members').fields, ['team_size', 'members']);
+  const reservationMembers = boot('reservation').get().fields.find((f) => f.role === 'members');
+  assert.equal(reservationMembers.enabled, false);
+  assert.equal(reservationMembers.required, true);
+  assert.equal(reservationMembers.min, 1);
   assert.equal(boot('reservation').get().fields.some((f) => f.role === 'team_size'), false);
+});
+
+test('Reservation teammates: disabled forms remain solo-only and enabled forms accept a validated member list', () => {
+  const w = boot('reservation');
+  const settings = w.get();
+  const base = { ...leader, slot: { day: 'day-one', time: '12:30 - 12:50' } };
+  settings.slots.days = [{ id: 'day-one', label: 'Sunday', times: ['12:30 - 12:50'] }];
+  settings.slots.capacity = 3;
+  w.admin({ action: 'admin.forms.update', id: w.form.id, patch: { slots: settings.slots } });
+  assert.equal(w.submit(base).ok, true, 'legacy reservations without teammate collection remain valid');
+  w.admin({ action: 'admin.forms.update', id: w.form.id, patch: {
+    fields: settings.fields.map((field) => field.role === 'members' ? { ...field, enabled: true, required: true } : field),
+    steps: settings.steps.map((step) => step.id === 'project' ? { ...step, fields: step.fields.concat(['members']) } : step)
+  } });
+  const teammate = { name: 'سارة خالد حسن علي', phone: '01112345678', code: '4230002', level: 'صفر / الأولى', curriculum: '2020', section: '4C-TH1' };
+  const missing = w.submit({ ...base, leader_code: '4230005', slot: { day: 'day-one', time: '12:30 - 12:50' }, members: [] });
+  assert.equal(missing.error.details.members.error, 'too_few_members');
+  const result = w.submit({ ...base, leader_code: '4230006', members: [teammate] });
+  assert.equal(result.ok, true);
+  const saved = w.admin({ action: 'admin.submissions', slug: w.form.slug }).submissions.find((row) => row.code === '4230006');
+  assert.deepEqual(saved.data.members, [teammate]);
+  const invalid = w.submit({ ...base, leader_code: '4230010', slot: { day: 'day-one', time: '12:30 - 12:50' }, members: [{ ...teammate, name: 'علي حسن' }] });
+  assert.equal(invalid.error.details.members.nested['0.name'].error, 'arabic_parts');
 });
 
 test('Admin: minimum and maximum team size are saved and enforced on submissions', () => {

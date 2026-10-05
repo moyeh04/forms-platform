@@ -3,7 +3,7 @@
 var API = API || {};
 
 var VIEW_COLUMNS_ = {
-  reservation: [['time', 'Time'], ['name', 'Team leader'], ['code', 'Code'], ['phone', 'Phone'], ['email', 'Email'], ['title', 'Project'], ['level', 'Level'], ['section', 'Section']],
+  reservation: [['time', 'Time'], ['name', 'Team leader'], ['code', 'Code'], ['phone', 'Phone'], ['email', 'Email'], ['title', 'Project'], ['level', 'Level'], ['section', 'Section'], ['members', 'Teammates']],
   team: [['name', 'Name'], ['section', 'Section'], ['code', 'Code'], ['phone', 'Phone'], ['title', 'Project or task'], ['link', 'Link']],
   whatsapp: [['name', 'Name'], ['code', 'Code'], ['phone', 'Phone'], ['level', 'Level'], ['group', 'Group'], ['section', 'Section'], ['link', 'Timetable'], ['review', 'Review']]
 };
@@ -19,7 +19,11 @@ function viewFormMetadata_(form) {
 }
 
 function visibleColumns_(client, form) {
-  return VIEW_COLUMNS_[viewKind_(form)].filter(function (c) { return client.hiddenColumns.indexOf(c[0]) === -1; })
+  return VIEW_COLUMNS_[viewKind_(form)].filter(function (c) {
+    var members = c[0] === 'members' ? Rules.fieldByRole(form, 'members') : null;
+    if (members && members.enabled === false) return false;
+    return client.hiddenColumns.indexOf(c[0]) === -1;
+  })
     .map(function (c) { return { id: c[0], label: c[1] }; });
 }
 
@@ -47,6 +51,8 @@ function stripHidden_(obj, hidden) {
 function reservationRows_(form, client, mode, dayId) {
   var days = (form.slots && form.slots.days) || [];
   var today = todayIso_();
+  var membersField = Rules.fieldByRole(form, 'members');
+  var includeMembers = !!(membersField && membersField.enabled !== false);
   var rows = readResponses(form).filter(function (r) { return r.slot; }).map(function (r) {
     var p = slotParts_(form, r.slot);
     var di = days.indexOf(p.day);
@@ -54,7 +60,8 @@ function reservationRows_(form, client, mode, dayId) {
       _order: (di < 0 ? 999 : di) * 1000 + (p.day ? p.day.times.indexOf(p.time) : 0),
       id: r.id, dayId: p.dayId, dayLabel: p.day ? p.day.label : p.dayId, date: p.day ? p.day.date : '',
       time: p.time, name: r.name, code: r.code, phone: r.phone, email: r.email, title: r.title,
-      level: r.data.level || '', section: r.data.section || ''
+      level: r.data.level || '', section: r.data.section || '',
+      members: includeMembers ? Rules.membersOf(form, r.data).filter(function (m) { return !m.leader; }).map(function (m) { return m.name; }).join(', ') : ''
     };
   });
   if (mode === 'today') rows = rows.filter(function (r) { return r.date && r.date === today; });
