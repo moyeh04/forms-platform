@@ -79,6 +79,27 @@ test('Instructor link: switch to a day or to everything, and search', async () =
   assert.equal(p.$$('tbody tr').length, 1);
 });
 
+test('Instructor link: reservation teammate names are displayed only when collection is enabled', async () => {
+  const w = boot();
+  const f = w.make('reservation', 'Seminar', { slots: { days: [{ label: 'Sunday', date: '2027-11-14', times: ['12:30 - 12:50'] }], capacity: 1 } });
+  w.api({ action: 'submit', slug: f.slug, data: person({ title: 'Solo', slot: { day: 'sunday', time: '12:30 - 12:50' } }) });
+  const reader = await openViewer(w, w.client(), `&f=${f.slug}`);
+  assert.equal(reader.$$('.mini thead th').some((th) => th.textContent === 'Teammates'), false);
+  reader.click('[data-mode="all"]'); await settle(8);
+
+  const form = w.admin({ action: 'admin.forms.get', id: f.id }).form;
+  form.slots.capacity = 2;
+  w.admin({ action: 'admin.forms.update', id: f.id, patch: {
+    slots: form.slots,
+    fields: form.fields.map((field) => field.role === 'members' ? { ...field, enabled: true } : field)
+  } });
+  w.api({ action: 'submit', slug: f.slug, data: person({ leader_code: '4230010', title: 'Team', slot: { day: 'sunday', time: '12:30 - 12:50' }, members: [{ name: 'سارة خالد حسن علي', phone: '01112345678', code: '4230011', level: 'صفر / الأولى', curriculum: '2020', section: '4C-TH1' }] }) });
+  const updated = await openViewer(w, reader.win.location.search.match(/[?&]t=([^&]+)/)[1], `&f=${f.slug}`);
+  assert.ok(updated.$$('.mini thead th').some((th) => th.textContent === 'Teammates'));
+  updated.click('[data-mode="all"]'); await settle(8);
+  assert.ok(updated.text().includes('سارة خالد حسن علي'));
+});
+
 test('Instructor link: a date-less timetable has no Today button and opens on all', async () => {
   const w = boot();
   const f = w.make('reservation', 'Seminar', { slots: { days: [{ label: 'Week 11 - Sunday', times: ['12:30 - 12:50'] }], capacity: 1 } });

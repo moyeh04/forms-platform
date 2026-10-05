@@ -396,6 +396,11 @@
     return f && f.enabled !== false ? f : null;
   }
 
+  function membersField() {
+    var f = Rules.fieldByRole(S.form, 'members');
+    return f && f.enabled !== false ? f : null;
+  }
+
   function freshMember(mf) {
     var fresh = {};
     (mf.fields || []).forEach(function (sf) {
@@ -489,8 +494,17 @@
 
     // Forms without a team size question keep the add and remove buttons.
     var range = Rules.teamSizeRange(S.form);
+    var min = field.min == null ? 0 : field.min;
     var max = field.max == null ? range.max - 1 : field.max;
-    wrap.appendChild(h('div', { class: 'members' }, list.map(function (m, i) { return memberCard(field, path, i, true); })));
+    if (list.length === 0) {
+      wrap.appendChild(h('button', { type: 'button', class: 'btn btn-quiet', onclick: function () {
+        getVal(path).push(freshMember(field));
+        saveDraft();
+        render();
+      } }, icon('plus', 20), t('addMember')));
+      return wrap;
+    }
+    wrap.appendChild(h('div', { class: 'members' }, list.map(function (m, i) { return memberCard(field, path, i, list.length > min); })));
     wrap.appendChild(h('p', { class: 'team-size' }, t('teamSize', { n: list.length + 1 })));
     if (list.length < max) {
       wrap.appendChild(h('button', { type: 'button', class: 'btn btn-quiet', onclick: function () {

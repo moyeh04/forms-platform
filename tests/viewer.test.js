@@ -80,6 +80,36 @@ test('Viewer: a link cannot open a form it was not given', () => {
   assert.equal(w.data(c.token, w.team.slug).error.code, 'forbidden');
 });
 
+test('Reservations: teammate names appear only when collecting teammates', () => {
+  const w = boot();
+  const client = w.client();
+  const hidden = w.data(client.token, w.res.slug, { mode: 'all' });
+  assert.equal(hidden.columns.some((column) => column.id === 'members'), false);
+
+  const form = w.admin({ action: 'admin.forms.get', id: w.res.id }).form;
+  form.slots.capacity = 2;
+  w.admin({ action: 'admin.forms.update', id: w.res.id, patch: {
+    slots: form.slots,
+    fields: form.fields.map((field) => field.role === 'members' ? { ...field, enabled: true, required: true } : field)
+  } });
+  w.api({ action: 'submit', slug: w.res.slug, data: {
+    email: 'a@b.com', leader_name: 'أحمد محمد محمود أحمد', leader_code: '4230010', phone: '01012345678', major: 'حاسبات',
+    level: 'صفر / الأولى', section: '4C-TH1', curriculum: '2020', title: 'Team project',
+    slot: { day: 'week-11-sunday', time: '12:30 - 12:50' },
+    members: [{ name: 'سارة خالد حسن علي', phone: '01112345678', code: '4230011', level: 'صفر / الأولى', curriculum: '2020', section: '4C-TH1' }]
+  } });
+  const visible = w.data(client.token, w.res.slug, { mode: 'all' });
+  assert.equal(visible.columns.some((column) => column.id === 'members'), true);
+  assert.ok(visible.rows.some((row) => row.members === 'سارة خالد حسن علي'));
+
+  w.admin({ action: 'admin.forms.update', id: w.res.id, patch: {
+    fields: form.fields.map((field) => field.role === 'members' ? { ...field, enabled: false } : field)
+  } });
+  const disabled = w.data(client.token, w.res.slug, { mode: 'all' });
+  assert.equal(disabled.columns.some((column) => column.id === 'members'), false);
+  assert.equal(JSON.stringify(disabled).includes('سارة خالد حسن علي'), false);
+});
+
 test('Reservations: today, by day, and all, in timetable order', () => {
   const w = boot();
   const c = w.client();

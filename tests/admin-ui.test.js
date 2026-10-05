@@ -307,6 +307,34 @@ test('Responses: details open, and resetting a key gives a new one and kills the
   assert.equal(w.api({ action: 'lookup', slug: f.slug, key: fresh }).ok, true);
 });
 
+test('Reservation teammates: an admin can enable and disable teammate collection', async () => {
+  const w = boot();
+  const f = w.make('reservation', 'Seminar');
+  const p = await openAdmin(w, `#/f/${f.slug}/settings`);
+  const field = p.$('[name="reservation-members"]');
+  assert.ok(field, 'settings exposes a teammate collection toggle');
+  assert.equal(field.checked, false, 'existing reservation forms keep solo booking as the default');
+  field.checked = true; p.fire(field, 'change');
+  p.click('[name="save"]'); await settle(12);
+  let saved = w.admin({ action: 'admin.forms.get', id: f.id }).form;
+  const members = saved.fields.find((item) => item.role === 'members');
+  assert.equal(members.enabled, true);
+  assert.equal(members.required, true);
+  assert.ok(saved.steps.some((step) => step.fields.includes(members.id)));
+  w.admin({ action: 'admin.forms.update', id: f.id, patch: { slots: { days: [{ id: 'one', label: 'Sunday', times: ['12:30 - 12:50'] }], capacity: 1 } } });
+  w.api({ action: 'submit', slug: f.slug, data: person({ leader_code: '4230002', title: 'Library', slot: { day: 'one', time: '12:30 - 12:50' }, members: [member('سارة خالد حسن علي', '4230003')] }) });
+
+  const reload = await openAdmin(w, `#/f/${f.slug}/settings`);
+  assert.equal(reload.$('[name="reservation-members"]').checked, true);
+  reload.$('[name="reservation-members"]').checked = false; reload.fire(reload.$('[name="reservation-members"]'), 'change');
+  reload.click('[name="save"]'); await settle(12);
+  saved = w.admin({ action: 'admin.forms.get', id: f.id }).form;
+  assert.equal(saved.fields.find((item) => item.role === 'members').enabled, false);
+  assert.equal(saved.fields.find((item) => item.role === 'members').required, false);
+  const rows = w.admin({ action: 'admin.submissions', slug: f.slug }).submissions;
+  assert.deepEqual(rows[0].data.members, [], 'disabled roster details are not exposed in submissions');
+});
+
 test('Reservation: add a day, generate its times, save, then bookings appear grouped by day', async () => {
   const w = boot();
   const f = w.make('reservation', 'Seminar');
@@ -525,4 +553,18 @@ test('Details: the admin can show a student key and the email switch is saved', 
   const box = q.$('[name="confirmEmail"]'); box.checked = false; q.fire(box, 'change');
   q.click('[name="save"]'); await settle(12);
   assert.equal(w.admin({ action: 'admin.forms.get', id: f.id }).form.notifications.confirmEmail, false);
+});
+
+test('Settings: saving project and task forms preserves enabled teammate collection', async () => {
+  for (const type of ['team_registration', 'task_submission']) {
+    const w = boot();
+    const f = w.make(type, 'Teams');
+    const p = await openAdmin(w, `#/f/${f.slug}/settings`);
+    p.click('[name="save"]'); await settle(12);
+    const saved = w.admin({ action: 'admin.forms.get', id: f.id }).form;
+    const members = saved.fields.find((field) => field.role === 'members');
+    assert.notEqual(members.enabled, false);
+    assert.equal(members.required, true);
+    p.dom.window.close();
+  }
 });

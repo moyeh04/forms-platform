@@ -66,7 +66,7 @@ function applyDerived_(form, r) {
   r.title = Rules.valueByRole(form, d, 'title') || '';
   r.link = Rules.valueByRole(form, d, 'link') || '';
   r.slot = slotField && d[slotField.id] ? Rules.slotKey(d[slotField.id].day, d[slotField.id].time) : '';
-  r.members = Rules.membersOf(form, d).slice(1).map(function (m) { return m.name + ' (' + m.code + ')'; }).join('; ');
+  r.members = Rules.membersOf(form, d).filter(function (m) { return !m.leader; }).map(function (m) { return m.name + ' (' + m.code + ')'; }).join('; ');
   return r;
 }
 
