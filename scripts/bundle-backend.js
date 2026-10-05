@@ -33,6 +33,7 @@ function listBackend() {
 function bundleSource() {
   const files = [];
   if (fs.existsSync(path.join(root, 'shared', 'rules.js'))) files.push('shared/rules.js');
+  if (fs.existsSync(path.join(root, 'shared', 'form-metadata.js'))) files.push('shared/form-metadata.js');
   files.push(...listBackend());
 
   const parts = files.map((rel) => `// ===== ${rel} =====\n${read(rel).trim()}\n`);

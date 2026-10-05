@@ -108,8 +108,12 @@ function buildTeamList_(form, ss) {
 
 function buildBookings_(form, ss) {
   var sh = freshView_(ss, 'Bookings');
-  paintHeader_(sh, ['Day', 'Time', 'Team leader', 'Code', 'Phone', 'Project']);
-  [190, 140, 300, 110, 130, 280].forEach(function (w, i) { sh.setColumnWidth(i + 1, w); });
+  var membersField = Rules.fieldByRole(form, 'members');
+  var includeMembers = !!(membersField && membersField.enabled !== false);
+  var headers = ['Day', 'Time', 'Team leader', 'Code', 'Phone', 'Project'];
+  if (includeMembers) headers.push('Teammates');
+  paintHeader_(sh, headers);
+  [190, 140, 300, 110, 130, 280].concat(includeMembers ? [240] : []).forEach(function (w, i) { sh.setColumnWidth(i + 1, w); });
 
   var days = (form.slots && form.slots.days) || [];
   function order(r) {
@@ -130,12 +134,14 @@ function buildBookings_(form, ss) {
       blocks.push(current);
     }
     var i = current.length++;
-    values.push(['', p.time, r.name, r.code, r.phone, r.title]);
+    var row = ['', p.time, r.name, r.code, r.phone, r.title];
+    if (includeMembers) row.push((r.data.members || []).map(function (member) { return member.name; }).filter(Boolean).join(', '));
+    values.push(row);
     var s = current.style.shades[i % 2];
-    shades.push([current.style.solid, s, s, s, s, s]);
+    shades.push([current.style.solid, s, s, s, s, s].concat(includeMembers ? [s] : []));
   });
 
-  sh.getRange(2, 1, values.length, 6).setValues(values).setBackgrounds(shades)
+  sh.getRange(2, 1, values.length, headers.length).setValues(values).setBackgrounds(shades)
     .setFontFamily(VIEW_STYLE_.font).setFontSize(11).setVerticalAlignment('middle');
   sh.getRange(2, 3, values.length, 1).setFontWeight('bold');
   sh.getRange(2, 2, values.length, 1).setHorizontalAlignment('center');

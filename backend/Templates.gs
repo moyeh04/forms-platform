@@ -73,6 +73,31 @@ function membersField_() {
   });
 }
 
+function reservationMembersField_() {
+  var members = membersField_();
+  members.enabled = false;
+  members.required = true;
+  members.min = 1;
+  members.max = 5;
+  members.label = { en: 'Teammates', ar: 'أعضاء الفريق' };
+  members.help = { en: 'Add the other people on your team.', ar: 'أضف باقي أعضاء فريقك.' };
+  return members;
+}
+
+function normalizeReservationMembers_(form) {
+  if (form.type !== 'reservation') return form;
+  form.fields = form.fields || [];
+  form.steps = form.steps || [];
+  var members = Rules.fieldByRole(form, 'members');
+  if (!members) {
+    members = reservationMembersField_();
+    form.fields.push(members);
+  }
+  var project = form.steps.filter(function (step) { return step.id === 'project'; })[0];
+  if (project && project.fields.indexOf(members.id) === -1) project.fields.push(members.id);
+  return form;
+}
+
 function commonConfig_(icon, uniqueBy) {
   return {
     lang: { default: 'en', allowSwitch: true },
@@ -144,6 +169,7 @@ function templateFor(type) {
     cfg = commonConfig_('calendar', 'leader_code');
     cfg.fields = personFields_().concat(studyFields_(), [
       field_('title', 'english_text', 'Project title', 'اسم المشروع (بالإنجليزي)', { role: 'title' }),
+      reservationMembersField_(),
       field_('slot', 'slot', 'Booking slot', 'ميعاد المناقشة', { role: 'slot' })
     ]);
     cfg.slots = { days: [], capacity: 1 };
@@ -151,7 +177,7 @@ function templateFor(type) {
     cfg.steps = [
       step_('you', ['email', 'leader_name', 'leader_code', 'phone']),
       step_('study', ['major', 'level', 'section', 'curriculum']),
-      step_('project', ['title']),
+      step_('project', ['title', 'members']),
       step_('slot', ['slot'])
     ];
   } else if (type === 'whatsapp_registration') {

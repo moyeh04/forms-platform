@@ -34,12 +34,15 @@
     f.rules = f.rules || {};
     f.notifications = f.notifications || {};
     f.review = f.review || { steps: [] };
+    var metadata = FormMetadata.read(f);
 
     var t = A.TYPES[f.type] || { label: f.type };
     var link = A.formLink(f.slug);
     var hasSize = !!Rules.fieldByRole(f, 'team_size');
     var hasDrive = (f.fields || []).some(function (x) { return x.type === 'drive_link'; });
     var isTeam = f.type === 'team_registration' || f.type === 'task_submission';
+    var isReservation = f.type === 'reservation';
+    var reservationMembers = Rules.fieldByRole(f, 'members');
 
     ui.clear(mount);
     mount.appendChild(h('div', { class: 'page-head' },
@@ -51,7 +54,7 @@
     /* General ---------------------------------------------------- */
     var general = panel('General', 'Students can only submit while the status is Open and the current time is inside the dates below.',
       A.field('Title', A.text(f.title, function (v) { f.title = v; }, { name: 'title' }), 'The heading students see.'),
-      A.termPicker({ term: f.term, subject: f.subject }, function (v) { f.term = v.term; f.subject = v.subject; }),
+      A.metadataEditor(f.type, metadata, function (v) { Object.assign(metadata, v); }),
       h('div', { class: 'row' },
         A.field('Link name', A.text(f.slug, function (v) { f.slug = v; }, { name: 'slug', dir: 'ltr' }), 'The form address ends with ?f= and this name. Changing it breaks links already shared.'),
         A.field('Status', A.select(f.status, [['draft', 'Draft (hidden)'], ['open', 'Open'], ['closed', 'Closed'], ['archived', 'Archived']], function (v) { f.status = v; }))),
@@ -90,6 +93,15 @@
       };
       paintMajors();
       majorsPanel = panel('Who can register', 'Limit this form to some specializations. The choices come from the Majors list. Students of other specializations cannot submit.', majorChips, majorNote);
+    }
+
+    /* Reservation teammates ------------------------------------- */
+    var teammatePanel = null;
+    if (isReservation && reservationMembers) {
+      teammatePanel = panel('Teammates', 'Optionally collect the names and details of the other people attending with the team leader.',
+        A.check('Ask for teammates', reservationMembers.enabled !== false, function (enabled) {
+          reservationMembers.enabled = enabled;
+        }, false, 'reservation-members'));
     }
 
     /* Team size -------------------------------------------------- */
@@ -201,7 +213,10 @@
       rows.push(tr, descRow);
       if (fd.type === 'members') (fd.fields || []).forEach(function (sf) { fieldRow(sf, true); });
     }
-    (f.fields || []).forEach(function (fd) { fieldRow(fd, false); });
+    (f.fields || []).forEach(function (fd) {
+      if (isReservation && fd.role === 'members') return;
+      fieldRow(fd, false);
+    });
     var fieldsPanel = panel('Questions', 'Rename a question, hide the ones you do not need, or make optional ones required. Add a description to explain a question: students see it right under the question. Team size, names, codes, and the booking slot are always required. For names, the number is how many name parts are needed (4 means a four-part name).',
       h('div', { class: 'scroll-x' }, h('table', { class: 'fields-table' },
         h('thead', null, h('tr', null, h('th', null, 'Show'), h('th', null, 'English label'), h('th', null, 'Arabic label'), h('th', null, 'Required'), h('th', null, 'Name parts / type'))),
@@ -379,10 +394,15 @@
     saveBtn.addEventListener('click', function () {
       A.busy(saveBtn, async function () {
         var patch = {
-          title: f.title, term: f.term, subject: f.subject || '', slug: f.slug, status: f.status, opensAt: f.opensAt || '', closesAt: f.closesAt || '',
+          title: f.title, slug: f.slug, status: f.status, opensAt: f.opensAt || '', closesAt: f.closesAt || '',
           lang: f.lang, icon: f.icon, editKey: f.editKey, rules: f.rules, notifications: f.notifications,
           fields: f.fields, review: f.review
         };
+        if (isReservation && reservationMembers) {
+          reservationMembers.enabled = !!reservationMembers.enabled;
+          reservationMembers.required = reservationMembers.enabled;
+        }
+        Object.assign(patch, metadata);
         if (f.matching) patch.matching = f.matching;
         if (hasSize) {
           var min = parseInt(f.rules.teamSize.min, 10), max = parseInt(f.rules.teamSize.max, 10);
@@ -414,7 +434,7 @@
     var dangerPanel = h('section', { class: 'panel danger-zone' }, h('h2', null, 'Delete this form'),
       h('p', { class: 'help' }, 'The link stops working and the form leaves the dashboard. Its Google Sheet moves to the Drive trash for 30 days. To stop new registrations but keep everything, set the status to Closed or Archived instead.'),
       h('button', { type: 'button', class: 'btn btn-danger', name: 'delete-form', onclick: function () { A.deleteForm(f, function () { window.location.hash = '#/'; }); } }, icon('trash', 18), 'Delete form'));
-    var sections = [general, majorsPanel, sizePanel, fieldsPanel, slotsPanel, keyPanel, emailPanel, rulesPanel, reviewPanel, dangerPanel].filter(Boolean);
+    var sections = [general, majorsPanel, teammatePanel, sizePanel, fieldsPanel, slotsPanel, keyPanel, emailPanel, rulesPanel, reviewPanel, dangerPanel].filter(Boolean);
     // A sticky bar of section names: the page is long, so admins jump instead of scrolling.
     var jump = h('nav', { class: 'section-bar', 'aria-label': 'Settings sections' }, sections.map(function (n, i) {
       var title = n.querySelector('h2').textContent;

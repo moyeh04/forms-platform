@@ -11,7 +11,7 @@ function boot() {
   w.call('setAdminPin', '4321');
   w.admin = (b) => w.api({ ...b, admin: { pin: '4321' } });
   w.make = (type, title, patch = {}) => {
-    const f = w.admin({ action: 'admin.forms.create', type, title, term: 'Fall 2027' }).form;
+    const f = w.admin({ action: 'admin.forms.create', type, title, term: 'Fall 2027', batchYear: '2027/2028' }).form;
     w.admin({ action: 'admin.forms.update', id: f.id, patch: { status: 'open', ...patch } });
     return f;
   };
@@ -63,17 +63,130 @@ test('Create: pick a type, name it, and land on its settings as a draft', async 
   p.pick('type', 'task_submission');
   p.type('[name="title"]', 'Database Tasks');
   p.click('[name="season-spring"]');
-  const year = p.$('[name="termYear"]'); year.value = String(new Date().getFullYear() + 1); p.fire(year, 'change');
+  const year = p.$('[name="termYear"]'); year.value = (new Date().getFullYear() + 1) + '/' + (new Date().getFullYear() + 2); p.fire(year, 'change');
   p.type('[name="subject"]', 'CMP n323');
   p.submitForm(); await settle(12);
   const forms = w.admin({ action: 'admin.forms.list' }).forms;
   assert.equal(forms.length, 1);
   assert.equal(forms[0].type, 'task_submission');
-  assert.equal(forms[0].term, 'Spring ' + (new Date().getFullYear() + 1), 'season chip plus year');
+  assert.equal(forms[0].term, 'Spring ' + (new Date().getFullYear() + 1) + '/' + (new Date().getFullYear() + 2), 'season chip plus academic year');
   assert.equal(forms[0].subject, 'CMPn323', 'spaces are removed from the subject code');
   assert.equal(forms[0].status, 'draft');
   assert.ok(p.win.location.hash.endsWith('/settings'));
   assert.ok(p.$('[name="teamMin"]'), 'settings page is showing');
+});
+
+test('Create: switching types replaces subject and term metadata with a batch year', async () => {
+  const w = boot();
+  const p = await openAdmin(w, '#/new');
+  p.pick('type', 'task_submission');
+  p.type('[name="subject"]', 'CMPn323');
+  p.click('[name="season-spring"]');
+  const termYear = p.$('[name="termYear"]');
+  termYear.value = '2028/2029'; p.fire(termYear, 'change');
+
+  p.pick('type', 'whatsapp_registration');
+  assert.equal(p.$('[name="subject"]'), null, 'WhatsApp registration does not ask for a subject code');
+  assert.equal(p.$('[name="termYear"]'), null, 'WhatsApp registration does not ask for a semester');
+  assert.equal(p.$('[name="batchYear"]').value, new Date().getFullYear() + '/' + (new Date().getFullYear() + 1));
+  p.pick('batchYear', '2030/2031');
+
+  p.pick('type', 'task_submission');
+  assert.equal(p.$('[name="subject"]').value, 'CMPn323', 'switching back restores subject metadata');
+  assert.equal(p.$('[name="termYear"]').value, '2028/2029', 'switching back restores term metadata');
+  p.pick('type', 'whatsapp_registration');
+  assert.equal(p.$('[name="batchYear"]').value, '2030/2031', 'switching types preserves the batch year');
+
+  p.type('[name="title"]', 'Groups 2029');
+  p.submitForm(); await settle(12);
+  const saved = w.admin({ action: 'admin.forms.list' }).forms[0];
+  assert.equal(saved.type, 'whatsapp_registration');
+  assert.equal(saved.batchYear, '2030/2031');
+  assert.equal(JSON.parse(w.registry.getSheetByName('Forms').rows()[1][10]).batchYear, '2030/2031');
+  assert.equal(saved.term, '', 'new WhatsApp forms do not persist a semester');
+  assert.equal(saved.subject, undefined, 'new WhatsApp forms do not persist a subject code');
+});
+
+test('WhatsApp metadata: settings, public form, and viewer retain and display batch year', async () => {
+  const w = boot();
+  const f = w.admin({ action: 'admin.forms.create', type: 'whatsapp_registration', title: 'Groups 2028', batchYear: '2028/2029' }).form;
+  w.admin({ action: 'admin.forms.update', id: f.id, patch: { status: 'open' } });
+  const p = await openAdmin(w, `#/f/${f.slug}/settings`);
+  assert.equal(p.$('[name="batchYear"]').value, '2028/2029');
+  assert.equal(p.$('[name="termYear"]'), null);
+  assert.equal(p.$('[name="subject"]'), null);
+  p.type('[name="batchYear"]', '2029/2030');
+  p.click('[name="save"]'); await settle(12);
+
+  const saved = w.admin({ action: 'admin.forms.get', id: f.id }).form;
+  assert.equal(saved.batchYear, '2029/2030');
+  assert.equal(saved.term, '');
+  const settingsReload = await openAdmin(w, `#/f/${f.slug}/settings`);
+  assert.equal(settingsReload.$('[name="batchYear"]').value, '2029/2030');
+  assert.ok(settingsReload.text().includes('Batch 2029/2030'));
+  assert.equal(settingsReload.text().includes('Fall 2027'), false);
+
+  const pub = w.api({ action: 'getForm', slug: f.slug }).form;
+  assert.equal(pub.batchYear, '2029/2030');
+  assert.equal(pub.term, undefined, 'public WhatsApp metadata contains only the batch year');
+  const studentPage = await openPage('index.html', w, { query: `?f=${f.slug}` });
+  studentPage.window.App.form.init(); await settle();
+  assert.equal(studentPage.window.document.querySelector('.tags').textContent.trim(), 'Batch 2029/2030');
+  assert.equal(studentPage.window.document.title, 'Groups 2028 - Batch 2029/2030');
+
+  const client = w.admin({ action: 'admin.clients.create', name: 'Dr. Ahmed', forms: [f.slug] });
+  const viewerMe = w.api({ action: 'viewer.me', token: client.token });
+  assert.equal(viewerMe.forms[0].batchYear, '2029/2030');
+  assert.equal(viewerMe.forms[0].term, undefined);
+  const viewer = w.api({ action: 'viewer.data', token: client.token, slug: f.slug });
+  assert.equal(viewer.form.batchYear, '2029/2030');
+  assert.equal(viewer.form.term, undefined);
+  const viewerPage = await openPage('viewer.html', w, { query: `?t=${client.token}` });
+  await viewerPage.window.App.viewer.start(); await settle(8);
+  assert.equal(viewerPage.window.document.querySelector('.admin-bar').textContent.includes('Batch 2029/2030'), true);
+  assert.equal(viewerPage.window.document.querySelector('.admin-bar').textContent.includes('Fall 2027'), false);
+
+  const cardPage = await openAdmin(w);
+  const card = cardPage.$('.card[data-slug="' + f.slug + '"]');
+  assert.deepEqual([...card.querySelectorAll('.card-tags .tag-sm')].map((tag) => tag.textContent), ['Batch 2029/2030']);
+  const responsesPage = await openAdmin(w, `#/f/${f.slug}`);
+  assert.deepEqual([...responsesPage.$$('.page-head .tag-sm')].map((tag) => tag.textContent), ['Batch 2029/2030']);
+});
+
+test('WhatsApp metadata: legacy semester records resolve to batch year without displaying old subject metadata', async () => {
+  const w = boot();
+  const f = w.admin({ action: 'admin.forms.create', type: 'whatsapp_registration', title: 'Legacy Groups', term: 'Fall 2027', subject: 'CMPn123' }).form;
+  const forms = w.registry.getSheetByName('Forms');
+  const row = forms.rows()[1];
+  const config = JSON.parse(row[10]);
+  delete config.batchYear;
+  config.subject = 'CMPn123';
+  forms.getRange(2, 11).setValue(JSON.stringify(config));
+  forms.getRange(2, 5).setValue('Fall 2027');
+
+  const saved = w.admin({ action: 'admin.forms.get', id: f.id }).form;
+  assert.equal(saved.batchYear, '2027/2028', 'legacy storage is resolved through its metadata adapter');
+  assert.equal(JSON.parse(forms.rows()[1][10]).batchYear, undefined, 'the legacy record remains unmodified before save');
+  const p = await openAdmin(w, `#/f/${f.slug}/settings`);
+  assert.equal(p.$('[name="batchYear"]').value, '2027/2028');
+  assert.equal(p.$('[name="subject"]'), null);
+  assert.ok(p.text().includes('Batch 2027/2028'));
+  assert.equal(p.text().includes('CMPn123'), false);
+
+  p.click('[name="save"]'); await settle(12);
+  const migrated = w.admin({ action: 'admin.forms.get', id: f.id }).form;
+  assert.equal(migrated.batchYear, '2027/2028');
+  assert.equal(migrated.term, 'Fall 2027', 'saving does not destroy the legacy value');
+  const publicForm = w.api({ action: 'getForm', slug: f.slug }).form;
+  assert.equal(publicForm.batchYear, '2027/2028');
+  assert.equal(publicForm.subject, undefined);
+  assert.equal(publicForm.term, undefined);
+  w.admin({ action: 'admin.forms.update', id: f.id, patch: { status: 'open' } });
+  const client = w.admin({ action: 'admin.clients.create', name: 'Dr. Ahmed', forms: [f.slug] });
+  const view = w.api({ action: 'viewer.data', token: client.token, slug: f.slug });
+  assert.equal(view.form.batchYear, '2027/2028');
+  assert.equal(view.form.subject, undefined);
+  assert.equal(view.form.term, undefined);
 });
 
 test('Create: a title is required', async () => {
@@ -192,6 +305,34 @@ test('Responses: details open, and resetting a key gives a new one and kills the
   assert.match(fresh, /^\d{5}$/);
   assert.equal(w.api({ action: 'lookup', slug: f.slug, key: first.key }).error.code, 'bad_key');
   assert.equal(w.api({ action: 'lookup', slug: f.slug, key: fresh }).ok, true);
+});
+
+test('Reservation teammates: an admin can enable and disable teammate collection', async () => {
+  const w = boot();
+  const f = w.make('reservation', 'Seminar');
+  const p = await openAdmin(w, `#/f/${f.slug}/settings`);
+  const field = p.$('[name="reservation-members"]');
+  assert.ok(field, 'settings exposes a teammate collection toggle');
+  assert.equal(field.checked, false, 'existing reservation forms keep solo booking as the default');
+  field.checked = true; p.fire(field, 'change');
+  p.click('[name="save"]'); await settle(12);
+  let saved = w.admin({ action: 'admin.forms.get', id: f.id }).form;
+  const members = saved.fields.find((item) => item.role === 'members');
+  assert.equal(members.enabled, true);
+  assert.equal(members.required, true);
+  assert.ok(saved.steps.some((step) => step.fields.includes(members.id)));
+  w.admin({ action: 'admin.forms.update', id: f.id, patch: { slots: { days: [{ id: 'one', label: 'Sunday', times: ['12:30 - 12:50'] }], capacity: 1 } } });
+  w.api({ action: 'submit', slug: f.slug, data: person({ leader_code: '4230002', title: 'Library', slot: { day: 'one', time: '12:30 - 12:50' }, members: [member('سارة خالد حسن علي', '4230003')] }) });
+
+  const reload = await openAdmin(w, `#/f/${f.slug}/settings`);
+  assert.equal(reload.$('[name="reservation-members"]').checked, true);
+  reload.$('[name="reservation-members"]').checked = false; reload.fire(reload.$('[name="reservation-members"]'), 'change');
+  reload.click('[name="save"]'); await settle(12);
+  saved = w.admin({ action: 'admin.forms.get', id: f.id }).form;
+  assert.equal(saved.fields.find((item) => item.role === 'members').enabled, false);
+  assert.equal(saved.fields.find((item) => item.role === 'members').required, false);
+  const rows = w.admin({ action: 'admin.submissions', slug: f.slug }).submissions;
+  assert.deepEqual(rows[0].data.members, [], 'disabled roster details are not exposed in submissions');
 });
 
 test('Reservation: add a day, generate its times, save, then bookings appear grouped by day', async () => {
@@ -336,12 +477,12 @@ test('Term: settings show the saved season and year, and switching season saves 
   const f = w.make('team_registration', 'Projects');
   const p = await openAdmin(w, `#/f/${f.slug}/settings`);
   assert.equal(p.$('[name="season-fall"]').getAttribute('aria-pressed'), 'true');
-  assert.equal(p.$('[name="termYear"]').value, '2027');
+  assert.equal(p.$('[name="termYear"]').value, '2027/2028');
   p.click('[name="season-summer"]');
   p.type('[name="subject"]', 'CMPn336');
   p.click('[name="save"]'); await settle(12);
   const saved = w.admin({ action: 'admin.forms.get', id: f.id }).form;
-  assert.equal(saved.term, 'Summer 2027');
+  assert.equal(saved.term, 'Summer 2027/2028');
   assert.equal(saved.subject, 'CMPn336');
   const pub = w.api({ action: 'getForm', slug: saved.slug }).form;
   assert.equal(pub.subject, 'CMPn336', 'students get the subject code');
@@ -412,4 +553,18 @@ test('Details: the admin can show a student key and the email switch is saved', 
   const box = q.$('[name="confirmEmail"]'); box.checked = false; q.fire(box, 'change');
   q.click('[name="save"]'); await settle(12);
   assert.equal(w.admin({ action: 'admin.forms.get', id: f.id }).form.notifications.confirmEmail, false);
+});
+
+test('Settings: saving project and task forms preserves enabled teammate collection', async () => {
+  for (const type of ['team_registration', 'task_submission']) {
+    const w = boot();
+    const f = w.make(type, 'Teams');
+    const p = await openAdmin(w, `#/f/${f.slug}/settings`);
+    p.click('[name="save"]'); await settle(12);
+    const saved = w.admin({ action: 'admin.forms.get', id: f.id }).form;
+    const members = saved.fields.find((field) => field.role === 'members');
+    assert.notEqual(members.enabled, false);
+    assert.equal(members.required, true);
+    p.dom.window.close();
+  }
 });
