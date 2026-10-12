@@ -61,7 +61,8 @@ flowchart LR
     class student,admin,teacher cActor
 ```
 
-**To put it online, follow [docs/DEPLOY.md](docs/DEPLOY.md).** Configure the three
+**To put it online, follow [docs/DEPLOY.md](docs/DEPLOY.md).** One command,
+`npm run setup`, pushes the backend, creates the web app, and stores the three
 GitHub repository Variables and the clasp credential Secret. The workflow
 generates the published browser configuration.
 
@@ -162,7 +163,7 @@ Be aware of these when you go live. They are checked on your first real run:
 See [docs/MODULES.md](docs/MODULES.md). In short: `index.html`, `admin.html`,
 `viewer.html` and `assets/` are the website; `backend/` is the Apps Script;
 `shared/rules.js` holds the validation rules used by the browser, the backend,
-and the tests alike, so they can never disagree; `scripts/` holds the bundler
+and the tests alike, so they can never disagree; `scripts/` holds the bundler,
 the first-deployment setup, and the Excel export; `tests/` holds the automated tests.
 
 ## Working on it
