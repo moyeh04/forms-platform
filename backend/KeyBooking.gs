@@ -5,7 +5,7 @@ var API = API || {};
 /** Forms a reservation may take keys from: any other form that gives its students a key. */
 function keyBookingSources_(form) {
   return readForms().filter(function (f) {
-    return f.id !== form.id && f.type !== 'reservation' && f.editKey && f.editKey.enabled && Rules.fieldByRole(f, 'code');
+    return f.id !== form.id && issuesKeys_(f);
   });
 }
 
@@ -84,3 +84,66 @@ API.bookingTeam = function (req) {
   var booked = readResponses(form).some(function (r) { return code && String(r.data[code.id]) === String(row.data[Rules.fieldByRole(source, 'code').id]); });
   return { team: teamPreview_(source, row), booked: booked };
 };
+
+
+/* ── A series of bookings under one registration form ───────────── */
+
+/** True for a form whose keys can book: it issues keys and asks for a code. */
+function issuesKeys_(f) {
+  return f.type !== 'reservation' && !!(f.editKey && f.editKey.enabled) && !!Rules.fieldByRole(f, 'code');
+}
+
+/** The reservations that are booked with the keys of this form, oldest first. */
+function bookingsOf_(source) {
+  return readForms().filter(function (f) {
+    return f.type === 'reservation' && f.keyBooking && f.keyBooking.enabled && f.keyBooking.source === source.id;
+  }).sort(function (a, b) { return String(a.createdAt).localeCompare(String(b.createdAt)); });
+}
+
+/** "Discussion - Week 3" gives "Discussion - Week 4"; a title with no number gets " 2". */
+function nextTitle_(title) {
+  var m = /^(.*?)(\d+)(\D*)$/.exec(String(title));
+  return m ? m[1] + (parseInt(m[2], 10) + 1) + m[3] : String(title) + ' 2';
+}
+
+/**
+ * The same timetable one week later. A day named after its date is named after the new
+ * date, and a "Week 11" in a typed name becomes "Week 12". A day with no date is kept.
+ */
+function nextWeekSlots_(slots) {
+  var days = ((slots && slots.days) || []).map(function (d) {
+    if (!d.date) return { label: d.label, date: '', times: d.times.slice() };
+    var date = Rules.shiftDate(d.date, 7);
+    var label = d.label === Rules.dayLabel(d.date) ? Rules.dayLabel(date)
+      : String(d.label).replace(/(week\s*)(\d+)/i, function (all, word, n) { return word + (parseInt(n, 10) + 1); });
+    return { label: label, date: date, times: d.times.slice() };
+  });
+  return normalizeSlots_({ days: days, capacity: slots && slots.capacity, pattern: slots && slots.pattern });
+}
+
+/**
+ * The next booking form of a registration form. The first one is a new reservation that
+ * books with the keys of that form. Each later one is a copy of the newest: same questions,
+ * rules and hours, the days one week later, no bookings, and its own sheet. It is a draft.
+ */
+API['admin.bookings.next'] = admin(function (req) {
+  var source = requireForm(req.source);
+  if (!issuesKeys_(source)) fail('bad_key_booking', 'Only a form that gives its students a key can have bookings.');
+  var series = bookingsOf_(source);
+  var last = series[series.length - 1];
+  var title = String(req.title || '').trim();
+  var form;
+  if (last) {
+    form = duplicateForm(last.id, { title: title || nextTitle_(last.title) });
+    if (form.slots && form.slots.days.length) form.slots = nextWeekSlots_(form.slots);
+    form.opensAt = '';
+    form.closesAt = '';
+  } else {
+    if (!title) fail('title_required', 'Give the booking a title.');
+    form = createForm(Object.assign({ type: 'reservation', title: title }, FormMetadata.read(source)));
+    form.keyBooking = { enabled: true, source: source.id };
+  }
+  form = clone(saveForm(form));
+  delete form._row;
+  return { form: form, copied: !!last, number: series.length + 1 };
+});

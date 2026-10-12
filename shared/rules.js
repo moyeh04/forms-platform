@@ -317,6 +317,24 @@
     return (field.options || []).map(function (o) { return String(typeof o === 'object' ? o.value : o); });
   }
 
+  var WEEKDAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  var MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+  /** The name a dated day gets when the admin does not type one: "Sunday 14 Nov" for 2027-11-14. */
+  function dayLabel(date) {
+    var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(date || ''));
+    if (!m) return '';
+    var d = new Date(Date.UTC(+m[1], +m[2] - 1, +m[3]));
+    return WEEKDAYS[d.getUTCDay()] + ' ' + d.getUTCDate() + ' ' + MONTHS[d.getUTCMonth()];
+  }
+
+  /** A date that many days later, as text: shiftDate('2027-11-14', 7) is '2027-11-21'. */
+  function shiftDate(date, days) {
+    var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(date || ''));
+    if (!m) return '';
+    return new Date(Date.UTC(+m[1], +m[2] - 1, +m[3] + days)).toISOString().slice(0, 10);
+  }
+
   function validateField(field, raw, ctx) {
     ctx = ctx || {};
     var t = field.type;
@@ -464,6 +482,8 @@
     valueByRole: valueByRole,
     membersOf: membersOf,
     formState: formState,
+    dayLabel: dayLabel,
+    shiftDate: shiftDate,
     validateField: validateField,
     validateSubmission: validateSubmission,
     teamSizeRange: teamSizeRange,
