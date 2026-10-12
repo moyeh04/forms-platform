@@ -24,6 +24,7 @@ step needs the real Google services (see "What could not be tested here").
 | A form can be limited to some specializations (for example Computers only): the Major question locks to them and the server refuses others | Done |
 | A form can be limited to some sections, picked one by one or a whole year group (4C, 3L) at once, so one Sections list serves every year | Done |
 | Editable lists behind dropdowns (levels, bylaws, majors, sections, groups), and new lists of four kinds (sections built from year groups and counts with no typing, number runs set with steppers, choices with names, short choices) that a question of any form can be pointed at: the lists at the side with their first choices, the picked list in the main part naming the forms that ask it, chips for plain values and rows for choices with English names, a save bar that says what changed and names a form limited to a removed choice, pasted lines and number runs to add many at once | Done |
+| Two windows, or two admins, cannot undo each other: a change to a form, a list or a private link is written under one lock on a fresh copy of its row, and a Setup save over a newer one is refused with the reason, keeping what was typed | Done |
 
 ## Student experience
 | Requirement | Status |
@@ -86,6 +87,7 @@ step needs the real Google services (see "What could not be tested here").
 | Today, by day, or all; search; print | Done |
 | Admin chooses hidden columns (removed on the server, never sent) and whether the link can review | Done |
 | Links can be turned off, replaced, or deleted | Done |
+| A private link keeps its forms when a form's link name is changed | Done |
 | A link can also ask for a six-digit access key sent apart from it; wrong keys lock it for ten minutes; the admin can read a lost key again, make a new one, or remove it | Done |
 | A link can end on a date, picked as a period or a day, and the end can be moved from the list | Done |
 

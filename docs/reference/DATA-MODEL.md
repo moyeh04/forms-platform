@@ -151,7 +151,7 @@ whichever list of the kind `sections` a question reads.
 |---|---|
 | `id`, `name` | Internal id and the admin's label |
 | `tokenHash` | `sha256(pepper + ':client:' + token)`. The token itself is never stored. |
-| `forms` | JSON array of slugs, or `["*"]` for all forms |
+| `forms` | JSON array of form ids, or `["*"]` for all forms. A row saved before ids were stored holds link names; it is read as ids and rewritten as ids on its next save, and before any form's link name changes. |
 | `hiddenColumns` | JSON array, for example `["phone","email"]` |
 | `canReview` | `1` if the link may mark review steps |
 | `active` | `0` when the link is turned off |

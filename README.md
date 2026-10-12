@@ -56,7 +56,7 @@ one link per form.
 | Data | Google Sheets (a registry plus one spreadsheet per form) and Google Drive | The owner can open, sort and print the data without the platform |
 | Excel | Office Open XML written by hand in `backend/Xlsx.gs` | Real `.xlsx` files with merged cells, tints and links, with no library |
 | Hosting | GitHub Pages, deployed by GitHub Actions; the backend is pushed with `clasp` | A push to `master` tests and deploys both halves |
-| Tests | `node:test`, jsdom and an in-memory copy of the Apps Script services; `actionlint` | 265 tests run the real backend and pages with no Google account |
+| Tests | `node:test`, jsdom and an in-memory copy of the Apps Script services; `actionlint` | The tests run the real backend and pages with no Google account |
 | Look | IM Fell English, Amiri and Special Elite, a paper palette in light and dark | Readable in both languages, meeting WCAG 2.1 AA contrast |
 
 ## How it fits together
@@ -109,7 +109,7 @@ flowchart LR
 ```
 npm install          # once, installs the browser test library
 npm run dev          # local preview on http://localhost:8080 (PIN 4321), in memory, no Google needed
-npm test             # 265 tests: rules, backend, form page, dashboard, instructor page, deployment
+npm test             # rules, backend, form page, dashboard, instructor page, deployment
 npm run build        # writes dist/Code.gs and dist/appsscript.json for clasp
 npm run setup        # first deployment: creates the sheet, pushes the backend, creates the web app, configures GitHub
 ```
