@@ -488,3 +488,14 @@ test('Folder rule: typing the project title updates the example and keeps the ic
   assert.ok(rule.querySelector('.icon svg'), 'the icon is still an icon');
   assert.ok(rule.querySelector('.folder-rule-text').textContent.includes('Ahmed_Mohamed_Smart_Parking_Software_Engineering'), 'ends with the subject name, not the code');
 });
+
+test('Route: the ship is over the current step and moves with it', async () => {
+  const w = boot();
+  const p = await open(w);
+  assert.equal(p.$$('.trail-ship').length, 1);
+  assert.ok(p.$('.trail li.is-current .trail-ship .icon-ship'));
+  assert.equal(p.$$('.trail li')[0].querySelector('.trail-ship') !== null, true);
+  await fillAbout(p); p.submitForm(); await settle();
+  assert.equal(p.$$('.trail-ship').length, 1);
+  assert.equal(p.$$('.trail li')[1].querySelector('.trail-ship') !== null, true, 'the ship moved to the second step');
+});

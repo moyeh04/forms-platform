@@ -3,6 +3,8 @@
   'use strict';
 
   var ICONS = {
+    // A pirate ship: hull, mast, two sails and a black flag. It sails the route of the form.
+    ship: '<path d="M2 16h20l-3 5H5z" fill="currentColor" fill-opacity=".85"/><path d="M12 2v14"/><path d="M13.3 5c3.4 1.6 5.4 4.5 5.7 8.6h-5.7z" fill="currentColor" fill-opacity=".15"/><path d="M10.7 7.5C8 8.7 6.3 10.8 5.8 13.6h4.9z" fill="currentColor" fill-opacity=".15"/><path d="M12 2h4l-1.2 1.4L16 4.8h-4z" fill="currentColor"/>',
     team: '<circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.4"/><path d="M3.5 19c0-3 2.5-5 5.5-5s5.5 2 5.5 5"/><path d="M15.5 14.3c2.7-.4 5 1.3 5 4.2"/>',
     calendar: '<rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/><path d="M8 14h2M12 14h2M8 17h2"/>',
     task: '<path d="M6 3.5h8l4 4V20a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4.5a1 1 0 0 1 1-1z"/><path d="M14 3.5V8h4"/><path d="M8.5 13.5l2 2 4-4.5"/>',
