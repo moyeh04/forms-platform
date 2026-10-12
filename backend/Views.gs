@@ -71,23 +71,21 @@ function byCreated_(a, b) {
 
 function buildTeamList_(form, ss) {
   var sh = freshView_(ss, 'Team Members List');
-  var third = form.type === 'task_submission' ? 'Task' : 'Project';
-  paintHeader_(sh, ['Team member name', 'Section', 'Code', third]);
+  paintHeader_(sh, ['Team member name', 'Section', 'Code', teamThing_(form)]);
   sh.setColumnWidth(1, 300); sh.setColumnWidth(2, 100); sh.setColumnWidth(3, 110); sh.setColumnWidth(4, 280);
 
-  var responses = readResponses(form).sort(byCreated_);
-  if (!responses.length) return emptyView_(sh, 4, 'No registrations yet.');
+  var teams = teamBlocks_(form);
+  if (!teams.length) return emptyView_(sh, 4, 'No registrations yet.');
 
   var values = [], shades = [], blocks = [];
-  responses.forEach(function (r, g) {
+  teams.forEach(function (t, g) {
     var style = VIEW_STYLE_.groups[g % 2];
-    var members = Rules.membersOf(form, r.data);
     var start = values.length + 2;
-    members.forEach(function (m, i) {
+    t.members.forEach(function (m, i) {
       values.push([(i + 1) + '.  ' + m.name + (m.leader ? '  \u2605' : ''), m.section || '', m.code, '']);
       shades.push([style.shades[i % 2], style.shades[i % 2], style.shades[i % 2], style.solid]);
     });
-    blocks.push({ start: start, length: members.length, response: r, style: style });
+    blocks.push({ start: start, length: t.members.length, response: t.response, style: style });
   });
 
   var first = 2, last = values.length + 1;

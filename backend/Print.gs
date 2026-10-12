@@ -73,25 +73,22 @@ function printReservations_(form, dayId, includeEmpty) {
 /** Everyone, team by team, with the team number and task merged. */
 function printTeamList_(form) {
   var vform = validationForm(form);
-  var third = form.type === 'task_submission' ? 'Task' : 'Project';
   var ss = SpreadsheetApp.openById(form.sheetId);
   var sh = freshView_(ss, 'Print - Team list');
-  var headers = ['Team', 'Team member name', 'Code', third];
+  var headers = ['Team', 'Team member name', 'Code', teamThing_(form)];
   var metadata = FormMetadata.caption(vform);
   paintPrintHeader_(sh, vform.title + (metadata ? '  -  ' + metadata : '') + '  -  Team list', headers);
   [70, 330, 120, 300].forEach(function (w, i) { sh.setColumnWidth(i + 1, w); });
 
-  var responses = readResponses(form).sort(byCreated_);
   var values = [], shades = [], blocks = [];
-  responses.forEach(function (r, g) {
+  teamBlocks_(form).forEach(function (t, g) {
     var style = VIEW_STYLE_.groups[g % 2];
-    var members = Rules.membersOf(vform, r.data);
     var start = values.length + 4;
-    members.forEach(function (m, i) {
+    t.members.forEach(function (m, i) {
       values.push(['', (i + 1) + '.  ' + m.name + (m.leader ? '  \u2605' : ''), m.code, '']);
       shades.push([style.shades[0], style.shades[i % 2], style.shades[i % 2], style.shades[0]]);
     });
-    blocks.push({ start: start, length: members.length, number: g + 1, response: r });
+    blocks.push({ start: start, length: t.members.length, number: t.number, response: t.response });
   });
   if (!values.length) {
     sh.getRange(4, 1, 1, 4).merge().setValue('No registrations yet.').setHorizontalAlignment('center');
@@ -147,6 +144,6 @@ API['admin.print.reservations'] = admin(function (req) {
 
 API['admin.print.teamList'] = admin(function (req) {
   var form = requireForm(req.slug || req.id);
-  if (form.type !== 'team_registration' && form.type !== 'task_submission') fail('wrong_type', 'Only team and task forms have a team list.');
+  if (!isTeamForm_(form)) fail('wrong_type', 'Only team and task forms have a team list.');
   return printResult_(form, printTeamList_(form));
 });
