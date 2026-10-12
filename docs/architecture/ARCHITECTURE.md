@@ -259,6 +259,16 @@ summary with **Done**, and **Save changes** exists only while an answer differs
 from the saved one (`hub()` and `changed()` in `form.js`). The route trail and
 the Back button belong to the path, so they are not shown here.
 
+A key works for the number of days set in **Setup, Edit key**, counted from
+when it is given. The admin moves that date in `admin-keys.js`, backed by
+`KeyExpiry.gs`: **Extend** in a registration's details changes one key, and
+**Extend keys** in Setup changes all keys, the expired ones, the ones ending in
+three days, or teams picked from a list. A period is added to the later of
+today and the key's own end, so an expired key works again for the whole
+period; a date sets the same end for every key picked. The dialog says the new
+end before anything is saved. Private links use the same picker for their end
+date, with **No end date** as the default.
+
 Team members are resized in place by `memberList` in `form.js`: each member
 form has **Remove**, the list has **Add a team member**, and both move the team
 size choice with them, inside the range of the form. Remove takes out the
@@ -575,12 +585,13 @@ flowchart TD
         Slots["Slots.gs<br/>timetable and availability"]
         KeyBooking["KeyBooking.gs<br/>booking with a registration key"]
         Transfers["Transfers.gs<br/>moving a member between teams"]
+        KeyExpiry["KeyExpiry.gs<br/>when keys stop working"]
     end
     subgraph admin["Admin and reviewers"]
         Views["Views.gs<br/>tinted sheet blocks"]
         Print["Print.gs<br/>print tabs and PDF"]
         Matching["Matching.gs<br/>WhatsApp matching"]
-        Clients["Clients.gs<br/>private links"]
+        Clients["Clients.gs<br/>private links, access keys, end dates"]
         Viewer["Viewer.gs<br/>read-only data"]
         Export["Export.gs<br/>team data for Excel"]
     end
@@ -598,6 +609,7 @@ flowchart TD
     Views --> Responses
     Print --> Views
     Matching --> Responses
+    KeyExpiry --> Responses
     Viewer --> Clients
     Viewer --> Responses
     Export --> Responses
@@ -657,7 +669,8 @@ flowchart LR
         a1["admin.js<br/>shell, login, forms list"]
         a2["admin-settings.js"]
         a3["admin-data.js<br/>blocks, matching, print"]
-        a4["admin-people.js<br/>clients, lists"]
+        a4["admin-people.js<br/>clients"]
+        a5["admin-keys.js<br/>key and link end dates"]
     end
     subgraph viewerp["viewer.html"]
         v1["viewer.js"]
