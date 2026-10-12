@@ -40,16 +40,21 @@ function ask(question) {
 
 /** New sheet (the default) or an existing one; returns the existing Script ID or '' for a new sheet. */
 function chooseSheet(prompt, log) {
-  log(['No sheet is linked to this repository yet.',
-    '  1) Create a new ' + SHEET + ' sheet (recommended)',
-    '  2) Use a sheet I already have'].join('\n'));
-  const choice = prompt('Choose 1 or 2 [1]: ');
+  log(['This repository has no Google Sheet yet.',
+    '  1 = Make a new sheet with the name "' + SHEET + '" (recommended).',
+    '  2 = Use a sheet that you have now.',
+    'Type 1 or 2. Then press Enter.',
+    'If you press Enter only, the answer is 1.'].join('\n'));
+  const choice = prompt('Your answer: ');
   if (choice === '' || choice === '1') return '';
-  if (choice !== '2') throw new Error('Answer 1 or 2. Nothing was created.');
-  const id = prompt('Script ID (in the sheet: Extensions > Apps Script > Project Settings): ');
+  if (choice !== '2') throw new Error('The answer must be 1 or 2. Nothing was created. Start the setup again.');
+  log(['Type the Script ID of your sheet. Then press Enter.',
+    'To find the Script ID: open the sheet, click Extensions > Apps Script, then click Project Settings.',
+    'If you do not have the Script ID now, press Enter only. The setup stops and makes nothing.'].join('\n'));
+  const id = prompt('Script ID: ');
   if (!/^[A-Za-z0-9_-]+$/.test(id)) {
-    throw new Error('No valid Script ID was entered, so nothing was created. ' +
-      'When you have it, run: npm run setup -- <SCRIPT_ID>');
+    throw new Error('The Script ID is missing or incorrect. Nothing was created. ' +
+      'When you have the Script ID, run this command: npm run setup -- <SCRIPT_ID>');
   }
   return id;
 }

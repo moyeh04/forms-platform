@@ -104,10 +104,12 @@ The first time, a browser window opens for Google sign-in: choose the account
 that will own the data and click **Allow**. The command then asks one question:
 
 ```
-No sheet is linked to this repository yet.
-  1) Create a new Forms Registry sheet (recommended)
-  2) Use a sheet I already have
-Choose 1 or 2 [1]:
+This repository has no Google Sheet yet.
+  1 = Make a new sheet with the name "Forms Registry" (recommended).
+  2 = Use a sheet that you have now.
+Type 1 or 2. Then press Enter.
+If you press Enter only, the answer is 1.
+Your answer:
 ```
 
 Press **Enter** for a new sheet. After that the command:
