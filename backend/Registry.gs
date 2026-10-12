@@ -195,7 +195,7 @@ function normalizeSizeNotice_(n, min, max) {
   return { sizes: sizes, text: { en: String(text.en || '').trim(), ar: String(text.ar || '').trim() } };
 }
 
-var PATCHABLE_ = ['title', 'slug', 'status', 'opensAt', 'closesAt', 'lang', 'icon', 'steps', 'fields', 'slots', 'rules', 'review', 'matching', 'editKey', 'notifications', 'messages'];
+var PATCHABLE_ = ['title', 'slug', 'status', 'opensAt', 'closesAt', 'lang', 'icon', 'steps', 'fields', 'slots', 'rules', 'review', 'matching', 'editKey', 'notifications', 'messages', 'keyBooking'];
 
 function updateForm(id, patch) {
   var form = requireForm(id);
@@ -209,6 +209,10 @@ function updateForm(id, patch) {
     }
     if (k === 'slots') {
       form.slots = normalizeSlots_(patch.slots);
+      return;
+    }
+    if (k === 'keyBooking') {
+      form.keyBooking = normalizeKeyBooking_(form, patch.keyBooking);
       return;
     }
     if (k === 'slug') {
@@ -295,6 +299,8 @@ function publicForm(form) {
   out.rules = { maxSubmissions: full.rules ? full.rules.maxSubmissions : null };
   if (full.rules && full.rules.teamSize) out.rules.teamSize = full.rules.teamSize;
   if (allowedMajors_(full).length) out.rules.majors = allowedMajors_(full);
+  var source = keyBookingSource_(form);
+  if (source) out.keyBooking = { title: source.title };
   if (full.rules && full.rules.folderName && full.rules.folderName.enabled) {
     out.rules.folderName = { enabled: true, subject: String(full.rules.folderName.subject || '') };
   }

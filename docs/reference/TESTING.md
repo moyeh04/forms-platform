@@ -1,11 +1,11 @@
 # Testing
 
-224 automated tests run without a Google account, a browser, or a network.
+237 automated tests run without a Google account, a browser, or a network.
 They run the **real** backend and the **real** pages. This page explains how
 that works and what it can and cannot prove.
 
 ```
-npm test                                              # 204 JavaScript tests
+npm test                                              # 217 JavaScript tests
 python3 -m unittest discover -s tests -p "test_*.py"  # 20 Python tests
 ```
 
@@ -146,6 +146,7 @@ function that calls `world.api`. Helpers `type`, `pick`, `click`,
 | Reservations | 11 | Slots, capacity, one booking per leader, orphan warning |
 | Sheet views | 9 | Tinted blocks, leader star, merged task cell, bookings by day |
 | Print | 8 | Print tabs, signature column, PDF success and fallback |
+| Key booking | 13 | Setting and its source form, team preview without contact details, copied answers, forged answers ignored, one booking per team, the same key cancels, expired keys still book, the student page and the admin switch |
 | Matching | 6 | Paste, normalise, matched, none, duplicate, sequential review |
 | Viewer API | 10 | Tokens, hidden columns, today and by day, review rights, revoked links |
 | Export API | 3 | Teams with members, no phones, PIN required, deleted left out |

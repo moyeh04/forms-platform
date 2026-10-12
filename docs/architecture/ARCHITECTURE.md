@@ -24,7 +24,7 @@ sheet, not code.
 | **One source of truth for rules** | `shared/rules.js` is used by the browser, the backend, and the tests. They cannot disagree. |
 | **Forms are data** | A form is a JSON definition in one cell. New questions and new form types need no code. |
 | **Boring technology** | Plain JavaScript, no framework, no bundler for the website, one concatenation script for the backend. Easy to read, easy to fix later. |
-| **Testable without Google** | An in-memory copy of Google's services runs the real backend code, so 204 JavaScript tests cover it without touching a real account. |
+| **Testable without Google** | An in-memory copy of Google's services runs the real backend code, so 217 JavaScript tests cover it without touching a real account. |
 
 ## System context
 
@@ -561,6 +561,7 @@ flowchart TD
         Submissions["Submissions.gs<br/>submit, lookup, update, remove"]
         Responses["Responses.gs<br/>rows, keys, limits, Drive checks, emails"]
         Slots["Slots.gs<br/>timetable and availability"]
+        KeyBooking["KeyBooking.gs<br/>booking with a registration key"]
     end
     subgraph admin["Admin and reviewers"]
         Views["Views.gs<br/>tinted sheet blocks"]
@@ -829,6 +830,6 @@ identical colours.
 | [HOSTING.md](HOSTING.md) | What GitHub does, what Google does, and how they fit |
 | [DATA-MODEL.md](../reference/DATA-MODEL.md) | Every sheet, column, and stored property |
 | [SECURITY.md](../reference/SECURITY.md) | The secrets, who holds them, and what a leak would mean |
-| [TESTING.md](../reference/TESTING.md) | How 224 tests run without Google |
+| [TESTING.md](../reference/TESTING.md) | How 237 tests run without Google |
 | [DEPLOY.md](../DEPLOY.md) | Click-by-click setup |
 | [MODULES.md](../MODULES.md) | File-by-file reference |

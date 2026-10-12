@@ -347,3 +347,6 @@ body.admin { font-size: 1rem; }
   .block-head, .day-head { background: #f2f2f2 !important; }
   .block-actions { display: none !important; }
 }
+
+.plain-list { margin: 6px 0 0; padding-inline-start: 18px; }
+.plain-list li { margin: 2px 0; }

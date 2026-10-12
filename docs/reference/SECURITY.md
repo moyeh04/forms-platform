@@ -172,6 +172,7 @@ flowchart LR
 | `admin.html` is public | Free static hosting has no private area | It holds no data; every action needs the PIN; lockout; `noindex` |
 | An attacker can lock the admin out for 10 minutes by guessing wrong 8 times | The lockout counts attempts globally, so it cannot be bypassed from a browser | Wait, or the owner can still work directly in the sheets |
 | A 5-digit key is short | Students must type it on a phone | Salted per form, 10 tries a minute, expiry, shown once |
+| A registration key also books a slot | Teams should not retype their details | The lookup shares the same 10 tries a minute; the preview shows the leader's name, code, project and team size only, never phone or email; one booking per team; typed answers are ignored, so a key cannot book under another name |
 | A viewer link is a bearer secret | No accounts for instructors | Revocable; hidden columns; send it privately; make a new link if shared widely |
 | The script holds broad Google permissions | It must read students' linked files and manage the platform folder | The manifest lists scopes explicitly; the script is yours; only the owner can change it. The Drive scope is full because checking sharing on arbitrary student links needs it. |
 | Student data lives in the owner's Google Drive | That is the database | Share each form's sheet only with people who need it |

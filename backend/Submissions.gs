@@ -10,15 +10,30 @@ API.submit = function (req) {
   var form = requireForm(String(req.slug || ''));
   assertAcceptingSubmissions_(form);
   var vform = validationForm(form);
-  var v = Rules.validateSubmission(vform, req.data || {});
-  if (!v.ok) fail('invalid', 'Some answers need fixing.', v.errors);
-  checkDriveFields_(vform, v.data);
+  var source = keyBookingSource_(form);
+  var v, registration = null;
+  if (source) {
+    // The answers come from the registration the key opens; the student only picks the slot.
+    registration = registrationByKey_(source, req.sourceKey);
+    var slotField = Rules.fieldByRole(vform, 'slot');
+    v = { ok: true, data: bookingData_(vform, source, registration, (req.data || {})[slotField.id]) };
+    v.data._source = { form: source.id, ref: registration.ref };
+  } else {
+    v = Rules.validateSubmission(vform, req.data || {});
+    if (!v.ok) fail('invalid', 'Some answers need fixing.', v.errors);
+    checkDriveFields_(vform, v.data);
+  }
 
   var result = withLock_(function () {
     var rows = readResponses(form, true);
     var live = rows.filter(function (r) { return !r.deleted; });
-    checkLimits_(vform, v.data, live, null);
-    var k = issueKey_(vform, live);
+    try {
+      checkLimits_(vform, v.data, live, null);
+    } catch (e) {
+      if (source && e.code === 'duplicate') fail('already_booked', 'Your team already has a booking. Cancel it with your key to pick another slot.');
+      throw e;
+    }
+    var k = source ? bookingKey_(vform, live, req.sourceKey) : issueKey_(vform, live);
     var id = uuid();
     var r = applyDerived_(vform, {
       id: id, ref: nextRef_(form), created: nowIso(), status: 'new', review: defaultReview_(form),
