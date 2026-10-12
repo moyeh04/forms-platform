@@ -228,12 +228,6 @@
     }
 
     var teammatePanel = null;
-    if (isReservation && reservationMembers) {
-      teammatePanel = panel('Teammates', 'Optionally collect the names and details of the other people attending with the team leader.',
-        A.check('Ask for teammates', reservationMembers.enabled !== false, function (enabled) {
-          reservationMembers.enabled = enabled;
-        }, false, 'reservation-members'));
-    }
 
     /* Team size -------------------------------------------------- */
     var sizePanel = null;
@@ -459,6 +453,67 @@
       rows.forEach(function (n) { if (n) qList.appendChild(n); });
     }
     paintQuestions();
+
+    /* Teammates of a booking: whether they are asked, how many, the words students read, and what is asked about each one. */
+    if (isReservation && reservationMembers) {
+      var tm = reservationMembers;
+      tm.min = tm.min == null ? 1 : parseInt(tm.min, 10) || 0;
+      tm.max = Math.max(tm.max == null ? 5 : parseInt(tm.max, 10) || 1, tm.min, 1);
+      tm.label = tm.label || { en: 'Teammates', ar: 'أعضاء الفريق' };
+      tm.help = tm.help || { en: '', ar: '' };
+      var tmLine = h('p', { class: 'tm-line', role: 'status' });
+      var tmCount = function () {
+        return tm.min === 0 ? 'A leader can book alone, or add up to ' + plural(tm.max, 'teammate', 'teammates') + '.'
+          : 'Every booking has the leader and ' + (tm.min === tm.max ? 'exactly ' + plural(tm.max, 'teammate', 'teammates') : tm.min + ' to ' + tm.max + ' teammates') + '.';
+      };
+      var tmSteppers = [];
+      var tmStepper = function (key, label, lo, hi) {
+        var out = h('output', { class: 'stepper-val', name: 'teammates-' + key }, String(tm[key]));
+        var btn = function (by, text, aria) { return h('button', { type: 'button', class: 'icon-btn sm', name: 'teammates-' + key + (by < 0 ? '-down' : '-up'), 'aria-label': aria, onclick: function () { tm[key] += by; paintTm(); } }, text); };
+        var down = btn(-1, '−', 'Lower: ' + label), up = btn(1, '+', 'Raise: ' + label);
+        tmSteppers.push(function () { out.textContent = String(tm[key]); down.disabled = tm[key] <= lo(); up.disabled = tm[key] >= hi(); });
+        return h('div', { class: 'field-row' }, h('span', { class: 'label' }, label), h('div', { class: 'stepper' }, down, out, up));
+      };
+      // The teammate questions are drawn by the same row as every other question.
+      var keepRows = rows; rows = [];
+      (tm.fields || []).forEach(function (sf) { fieldRow(sf, true); });
+      var tmRows = rows; rows = keepRows;
+      var tmBody = h('div', { class: 'tm-body l-stack' },
+        h('div', { class: 'subpanel' },
+          h('h3', null, 'How many'),
+          h('p', { class: 'help' }, 'Teammates do not count the leader. Set the fewest to 0 when a leader may book alone.'),
+          h('div', { class: 'row' },
+            tmStepper('min', 'Fewest teammates', function () { return 0; }, function () { return tm.max; }),
+            tmStepper('max', 'Most teammates', function () { return Math.max(1, tm.min); }, function () { return 19; })),
+          tmLine),
+        h('div', { class: 'subpanel' },
+          h('h3', null, 'What students read'),
+          h('p', { class: 'help' }, 'The title above the teammates and the line under it.'),
+          h('div', { class: 'desc-pair' },
+            A.field('Title in English', A.text(tm.label.en, function (v) { tm.label.en = v; }, { name: 'teammates-title-en' })),
+            A.field('Title in Arabic', A.text(tm.label.ar, function (v) { tm.label.ar = v; }, { name: 'teammates-title-ar', dir: 'rtl', lang: 'ar' }))),
+          h('div', { class: 'desc-pair' },
+            A.field('Line under it, in English', h('textarea', { class: 'textarea', rows: '2', name: 'teammates-help-en', oninput: function (e) { tm.help.en = e.target.value; } }, tm.help.en || '')),
+            A.field('Line under it, in Arabic', h('textarea', { class: 'textarea', rows: '2', name: 'teammates-help-ar', dir: 'rtl', lang: 'ar', oninput: function (e) { tm.help.ar = e.target.value; } }, tm.help.ar || '')))),
+        h('div', { class: 'subpanel' },
+          h('h3', null, 'Asked about each teammate'),
+          h('p', { class: 'help' }, 'Hide what you do not need, or make it optional. The name and the code are always asked, because the lists and the duplicate check use them.'),
+          h('div', { class: 'q-list tm-questions' }, tmRows)));
+      var paintTm = function () {
+        tmBody.hidden = tm.enabled === false;
+        tmLine.textContent = tmCount();
+        tmSteppers.forEach(function (paint) { paint(); });
+      };
+      teammatePanel = panel('Teammates', 'The other people who come with the team leader. Decide whether a booking asks for them, how many, and what is asked about each one.',
+        A.check('Ask for teammates', tm.enabled !== false, function (enabled) { tm.enabled = enabled; paintTm(); }, false, 'reservation-members'),
+        tmBody);
+      teammatePanel.summary = function () {
+        var asked = (tm.fields || []).filter(function (sf) { return sf.enabled !== false; }).length;
+        return tm.enabled === false ? 'Not asked' : (tm.min === tm.max ? String(tm.max) : tm.min + ' to ' + tm.max) + ' with the leader, ' + plural(asked, 'detail', 'details') + ' each';
+      };
+      paintTm();
+    }
+
     var fieldsPanel = panel('Questions', 'Each page of the form and its questions, in the order students see them. Rename a page, add a page, or move a question to another page with Page. Rename a question, hide it, make it required, or give it a description. Add your own questions to any page. Team size, names, codes, and the booking slot are always required. For names, the number is how many name parts are needed (4 means a four-part name).',
       qList);
     fieldsPanel.summary = function () {
@@ -503,7 +558,6 @@
       f.type === 'whatsapp_registration' ? A.check('Match registrations to pasted WhatsApp requests', f.matching && f.matching.enabled, function (v) { f.matching = Object.assign({ field: 'phone' }, f.matching || {}, { enabled: v }); }) : null);
 
     /* Summaries --------------------------------------------------- */
-    if (teammatePanel) teammatePanel.summary = function () { return reservationMembers.enabled !== false ? 'Asked' : 'Not asked'; };
     if (sizePanel) sizePanel.summary = function () {
       var min = f.rules.teamSize.min, max = f.rules.teamSize.max;
       return String(min) === String(max) ? plural(parseInt(min, 10) || 0, 'person', 'people') : min + ' to ' + max + ' people';
@@ -532,7 +586,7 @@
       if (f.steps) patch.steps = f.steps;
       if (isReservation && reservationMembers) {
         reservationMembers.enabled = !!reservationMembers.enabled;
-        reservationMembers.required = reservationMembers.enabled;
+        reservationMembers.required = reservationMembers.enabled && reservationMembers.min >= 1;
       }
       Object.assign(patch, metadata);
       if (isReservation) patch.keyBooking = { enabled: !!f.keyBooking.enabled, source: f.keyBooking.source || '' };
