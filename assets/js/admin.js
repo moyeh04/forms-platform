@@ -169,6 +169,28 @@
     return isNaN(d) ? String(iso) : d.toISOString().slice(0, 10);
   };
 
+  /* ── The tabs of one form ───────────────────────────────────── */
+
+  A.FORM_TABS = ['responses', 'questions', 'timetable', 'settings'];
+  var TAB_LABEL = { responses: 'Responses', questions: 'Questions', timetable: 'Timetable', settings: 'Setup' };
+
+  /**
+   * The tab bar every page of a form shows. A tab is a link, so it also opens in a new window.
+   * `pick(id)` may switch in place and return true; then the link is not followed.
+   * `alerts` lists the tabs that need the admin (for example a timetable with no days).
+   */
+  A.formTabs = function (form, active, pick, alerts) {
+    var ids = A.FORM_TABS.filter(function (id) { return id !== 'timetable' || form.type === 'reservation'; });
+    return h('nav', { class: 'form-tabs', 'aria-label': 'Parts of this form' }, ids.map(function (id) {
+      var href = '#/f/' + encodeURIComponent(form.slug) + (id === 'responses' ? '' : '/' + id);
+      return h('a', { href: href, name: 'tab-' + id, 'aria-current': id === active ? 'page' : null, onclick: function (e) { if (pick && pick(id)) e.preventDefault(); } },
+        TAB_LABEL[id], alerts && alerts.indexOf(id) !== -1 ? h('span', { class: 'tab-alert', title: 'Needs your attention' }, '!') : null);
+    }));
+  };
+
+  /** Changes the address without drawing the page again. */
+  A.setHash = function (hash) { window.history.replaceState(null, '', hash); shown = hash; };
+
   /* ── Shell and routing ──────────────────────────────────────── */
 
   function route() {
@@ -177,7 +199,7 @@
     if (parts[0] === 'new') return { name: 'create', args: [] };
     if (parts[0] === 'clients') return { name: 'clients', args: [] };
     if (parts[0] === 'lists') return { name: 'lists', args: [] };
-    if (parts[0] === 'f' && parts[1]) return { name: parts[2] === 'settings' ? 'settings' : 'responses', args: [parts[1]] };
+    if (parts[0] === 'f' && parts[1]) return A.FORM_TABS.indexOf(parts[2]) > 0 ? { name: 'settings', args: [parts[1], parts[2]] } : { name: 'responses', args: [parts[1]] };
     return { name: 'forms', args: [] };
   }
 
@@ -185,8 +207,11 @@
     return h('a', { href: href, 'aria-current': active ? 'page' : null }, text);
   }
 
+  var shown = '';
+
   async function render() {
     var root = document.getElementById('app');
+    A.unsaved = false;
     ui.clear(root);
     if (!App.api.getPin()) return loginView(root);
     var r = route();
@@ -211,7 +236,18 @@
   A.start = function () {
     if (!started) {
       started = true;
-      window.addEventListener('hashchange', render);
+      // A page with unsaved changes (A.unsaved) is left only after the admin agrees.
+      shown = window.location.hash;
+      window.addEventListener('hashchange', async function () {
+        if (A.unsaved) {
+          if (window.location.hash === shown) return;
+          var leave = await ui.confirm({ title: 'Leave without saving?', body: 'Your changes on this page are not saved.', confirmText: 'Leave', danger: true });
+          if (!leave) { window.location.hash = shown; return; }
+        }
+        shown = window.location.hash;
+        render();
+      });
+      window.addEventListener('beforeunload', function (e) { if (A.unsaved) { e.preventDefault(); e.returnValue = ''; } });
       document.addEventListener('click', function (e) {
         Array.prototype.forEach.call(document.querySelectorAll('details.more[open]'), function (d) { if (!d.contains(e.target)) d.open = false; });
       });

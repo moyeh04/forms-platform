@@ -24,7 +24,7 @@ sheet, not code.
 | **One source of truth for rules** | `shared/rules.js` is used by the browser, the backend, and the tests. They cannot disagree. |
 | **Forms are data** | A form is a JSON definition in one cell. New questions and new form types need no code. |
 | **Boring technology** | Plain JavaScript, no framework, no bundler for the website, one concatenation script for the backend. Easy to read, easy to fix later. |
-| **Testable without Google** | An in-memory copy of Google's services runs the real backend code, so 219 JavaScript tests cover it without touching a real account. |
+| **Testable without Google** | An in-memory copy of Google's services runs the real backend code, so 221 JavaScript tests cover it without touching a real account. |
 
 ## System context
 
@@ -804,6 +804,44 @@ pair above, so a colour change that breaks the standard fails CI and is never
 published. It also checks that the device dark theme and the dark toggle use
 identical colours.
 
+## The pages of one form
+
+A form has one header and one tab bar, built by `A.formTabs` in `admin.js` and
+used by both the responses page and the settings page:
+
+| Tab | Address | What it holds |
+|---|---|---|
+| Responses | `#/f/<slug>` | The answers (`admin-data.js`) |
+| Questions | `#/f/<slug>/questions` | The questions under the page of the form that shows them, then team size and teammates |
+| Timetable | `#/f/<slug>/timetable` | Reservations only: bookings per slot, session hours, the grid of days, booking with a key |
+| Setup | `#/f/<slug>/settings` | Name and dates, who can register, edit key, emails, limits, review steps, delete |
+
+Questions, Timetable and Setup are one view (`admin-settings.js`) over one
+form object, so a tab change only hides and shows sections and changes the
+address with `A.setHash`; it never loads the form again and never loses an edit.
+Status is in the header because it is the setting that changes most often.
+
+Rules for this page, to keep when a setting is added:
+
+- **A work area is a tab; a setting is a section.** A thing the admin builds
+  (questions, a timetable) gets a tab and is always open (`panel.pin()`). A
+  switch or a number goes in a section of Setup or under the work area it
+  belongs to.
+- **A section says what it is set to.** `panel(title, help, ...controls)`
+  returns a folded section; give it a `summary` function that returns one short
+  line ("On, 7 days, students can edit and cancel"). The line is painted again
+  after each change. Open sections are remembered per form, so a save does not
+  fold them.
+- **One patch, one save bar.** `buildPatch()` is the only place that turns the
+  form object into what `admin.forms.update` receives. The save bar compares
+  it with the copy taken when the page opened and exists only while they
+  differ (`A.unsaved`). The router asks before leaving a page with
+  `A.unsaved`, and the browser asks before the window closes.
+- **A refused save shows where.** `problem()` returns the first thing that
+  stops a save and its section; the page opens that tab and that section.
+- **No sideways scrolling.** Questions are rows of a grid that stack at 760px,
+  not a table.
+
 ## Phone layout
 
 At 600px and below, a table that lists people does not shrink and does not
@@ -851,6 +889,6 @@ labels of the current tables.
 | [HOSTING.md](HOSTING.md) | What GitHub does, what Google does, and how they fit |
 | [DATA-MODEL.md](../reference/DATA-MODEL.md) | Every sheet, column, and stored property |
 | [SECURITY.md](../reference/SECURITY.md) | The secrets, who holds them, and what a leak would mean |
-| [TESTING.md](../reference/TESTING.md) | How 239 tests run without Google |
+| [TESTING.md](../reference/TESTING.md) | How 241 tests run without Google |
 | [DEPLOY.md](../DEPLOY.md) | Click-by-click setup |
 | [MODULES.md](../MODULES.md) | File-by-file reference |

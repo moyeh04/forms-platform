@@ -95,9 +95,9 @@
     mount.appendChild(h('div', { class: 'page-head' },
       h('h2', null, form.title), A.termTags(form), A.badge(A.STATUS_LABEL[form.status] || form.status, form.status),
       h('span', { class: 'muted-note' }, t.label),
-      h('a', { class: 'btn btn-quiet sm', href: '#/f/' + encodeURIComponent(form.slug) + '/settings' }, 'Settings'),
       h('a', { class: 'btn btn-quiet sm', href: form.sheetUrl, target: '_blank', rel: 'noopener' }, 'Google Sheet'),
       h('button', { type: 'button', class: 'btn btn-quiet sm', onclick: async function () { toast((await ui.copyText(link)) ? 'Form link copied' : 'Could not copy', 'ok'); } }, icon('link', 18), 'Copy form link')));
+    mount.appendChild(A.formTabs(form, 'responses'));
     paintStats();
     mount.appendChild(stats);
     mount.appendChild(h('div', { class: 'toolbar' }, tools));

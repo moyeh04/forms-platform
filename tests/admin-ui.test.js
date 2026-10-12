@@ -238,7 +238,7 @@ test('Settings: status, dates, edit key, and question labels are saved', async (
   status.value = 'closed'; p.fire(status, 'change');
   p.type('[name="keyDays"]', '3');
   p.type('[name="opensAt"]', '2027-10-01T09:00'); p.fire(p.$('[name="opensAt"]'), 'change');
-  const row = p.$('tr[data-field="title"]');
+  const row = p.$('[data-field="title"]');
   p.type(row.querySelector('input[aria-label="English label for title"]'), 'Project name');
   p.click('[name="save"]'); await settle(12);
   const saved = w.admin({ action: 'admin.forms.get', id: f.id }).form;
@@ -253,11 +253,11 @@ test('Settings: required team parts cannot be switched off', async () => {
   const f = w.make('team_registration', 'Projects');
   const p = await openAdmin(w, `#/f/${f.slug}/settings`);
   ['team_size', 'members', 'leader_code', 'leader_name'].forEach((id) => {
-    const boxes = p.$$(`tr[data-field="${id}"] input[type="checkbox"]`);
+    const boxes = p.$$(`[data-field="${id}"] input[type="checkbox"]`);
     assert.equal(boxes.length, 2, id);
     assert.ok(boxes.every((b) => b.disabled && b.checked), id + ' is locked on');
   });
-  assert.equal(p.$('tr[data-field="link"] input[type="checkbox"]').disabled, false, 'the Drive link can be hidden');
+  assert.equal(p.$('[data-field="link"] input[type="checkbox"]').disabled, false, 'the Drive link can be hidden');
 });
 
 test('Responses: each team is its own tinted block with a leader star and a linked task', async () => {
@@ -448,9 +448,9 @@ test('Questions: an admin adds a description and students read it under the ques
   const w = boot();
   const f = w.make('team_registration', 'Projects');
   const p = await openAdmin(w, `#/f/${f.slug}/settings`);
-  assert.ok(p.$('tr[data-desc="link"]').hidden, 'no description yet, so its editor is folded away');
+  assert.ok(p.$('[data-desc="link"]').hidden, 'no description yet, so its editor is folded away');
   p.click('[name="desc-link"]');
-  assert.equal(p.$('tr[data-desc="link"]').hidden, false);
+  assert.equal(p.$('[data-desc="link"]').hidden, false);
   p.type('[name="help-en-link"]', 'Name it Name_Project_Name_Subject and share it with anyone');
   p.type('[name="help-ar-link"]', 'اعمل شير للفولدر');
   p.click('[name="save"]'); await settle(12);
@@ -669,4 +669,65 @@ test('Responses and clients: list rows carry their column names, and the day she
   const group = res.$('.tool-group');
   assert.equal(group.getAttribute('aria-label'), 'Print a day sheet');
   assert.ok(group.querySelector('select') && group.querySelector('[name="printDay"]') && group.querySelector('input[type="checkbox"]'));
+});
+
+test('Form tabs: questions, timetable and setup are tabs of one page, and a change in one tab stays when another opens', async () => {
+  const w = boot();
+  const f = w.admin({ action: 'admin.forms.create', type: 'reservation', title: 'Seminar', term: 'Fall 2027' }).form;
+  const p = await openAdmin(w, `#/f/${f.slug}/settings`);
+  assert.deepEqual(p.$$('.form-tabs a').map((a) => a.textContent.replace('!', '')), ['Responses', 'Questions', 'Timetable', 'Setup']);
+  assert.equal(p.$('[name="tab-settings"]').getAttribute('aria-current'), 'page');
+  assert.ok(p.$('[name="tab-timetable"] .tab-alert'), 'a timetable with no days asks for attention');
+  assert.ok(p.$('[data-panel="Timetable"]').hidden && !p.$('[data-panel="Edit key"]').hidden);
+
+  p.type('[name="keyDays"]', '9');
+  p.click('[name="tab-timetable"]');
+  assert.equal(p.win.location.hash, `#/f/${f.slug}/timetable`);
+  assert.ok(!p.$('[data-panel="Timetable"]').hidden && p.$('[data-panel="Edit key"]').hidden);
+  assert.equal(p.$('[name="keyDays"]').value, '9', 'the page was not drawn again');
+  p.click('[name="capacity-up"]'); p.click('[name="capacity-up"]'); p.click('[name="capacity-down"]');
+  p.click('[name="save"]'); await settle(12);
+  const saved = w.admin({ action: 'admin.forms.get', id: f.id }).form;
+  assert.equal(saved.editKey.days, 9);
+  assert.equal(saved.slots.capacity, 2);
+
+  const team = w.admin({ action: 'admin.forms.create', type: 'team_registration', title: 'Teams', term: 'Fall 2027' }).form;
+  const q = await openAdmin(w, `#/f/${team.slug}/questions`);
+  assert.equal(q.$('[name="tab-timetable"]'), null, 'only a reservation has a timetable');
+  assert.deepEqual(q.$$('.q-page').map((n) => n.textContent.replace(/^\d+/, '')), ['About you', 'Study details', 'Team members', 'Project']);
+  const responses = await openAdmin(w, `#/f/${team.slug}`);
+  assert.equal(responses.$('[name="tab-responses"]').getAttribute('aria-current'), 'page');
+});
+
+test('Setup: a section shows what it is set to, and the save bar exists only while there is a change', async () => {
+  const w = boot();
+  const f = w.admin({ action: 'admin.forms.create', type: 'team_registration', title: 'Teams', term: 'Fall 2027' }).form;
+  const p = await openAdmin(w, `#/f/${f.slug}/settings`);
+  const key = p.$('[data-panel="Edit key"]');
+  assert.equal(key.querySelector('.panel-head').getAttribute('aria-expanded'), 'false');
+  assert.ok(key.querySelector('.panel-body').hidden);
+  assert.equal(key.querySelector('.panel-sum').textContent, 'On, 7 days, students can edit and cancel');
+  assert.ok(p.$('.savebar').hidden, 'nothing to save yet');
+  assert.equal(p.win.App.admin.unsaved, false);
+
+  p.click(key.querySelector('.panel-head'));
+  assert.equal(key.querySelector('.panel-body').hidden, false);
+  p.type('[name="keyDays"]', '3');
+  assert.equal(key.querySelector('.panel-sum').textContent, 'On, 3 days, students can edit and cancel');
+  assert.equal(p.$('.savebar').hidden, false);
+  assert.equal(p.win.App.admin.unsaved, true);
+  p.type('[name="keyDays"]', '7');
+  assert.ok(p.$('.savebar').hidden, 'back to the saved value, so there is nothing to save');
+
+  p.pick('status', 'open');
+  assert.equal(p.$('.savebar').hidden, false);
+  p.click('[name="save"]'); await settle(12);
+  assert.equal(w.admin({ action: 'admin.forms.get', id: f.id }).form.status, 'open');
+  assert.ok(p.$('.savebar').hidden);
+  assert.equal(p.$('[data-panel="Edit key"] .panel-body').hidden, false, 'a section stays open after a save');
+
+  p.type('[name="teamMin"]', '9');
+  p.click('[name="tab-settings"]'); p.click('[name="save"]'); await settle(8);
+  assert.equal(p.$('[name="tab-questions"]').getAttribute('aria-current'), 'page', 'a refused save opens the tab and the section with the problem');
+  assert.equal(p.$('[data-panel="Team size"] .panel-body').hidden, false);
 });

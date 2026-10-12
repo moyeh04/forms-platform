@@ -172,14 +172,14 @@ Back in the Forms Registry sheet: **Forms Platform > 3. Set website address...**
 
 1. Open `https://YOUR-NAME.github.io/forms/admin.html` and enter your PIN.
 2. Click **New form**, choose a type, give it a title, pick the term (Fall, Spring, or Summer and the year), type the subject code, and click **Create form**.
-3. On the settings page check:
-   - **Who can register**: all specializations, or only some (for example Computers only).
-   - **Team size**: minimum and maximum people per team (counting the leader), and an optional note for some sizes (for example "other students will be added to reach 5" for 3 and 4).
+3. A form has four tabs: **Responses**, **Questions**, **Timetable** (reservations only) and **Setup**. Set the **Status** in the header to Open when the form is ready. A bar with **Save settings** appears when you change something. Check:
+   - **Who can register** (Setup): all specializations, or only some (for example Computers only).
+   - **Team size** (Questions tab): minimum and maximum people per team (counting the leader), and an optional note for some sizes (for example "other students will be added to reach 5" for 3 and 4).
    - **Questions**: rename, hide, or add a description under any question.
    - **Emails**: whether students get a confirmation email.
    - **Limits and checks**: the Drive folder name rule `Team_Leader_Name_Project_Name_Subject_Name` (on by default for new team forms). Type the subject name, for example `Software Engineering`, so folders must end with `_Software_Engineering`.
    - **Booking with a key** for reservations: let teams from a registration form book with the 5-digit key they already have, so they type no details. Pick the registration form; each team books once and cancels with the same key.
-   - **Timetable** for reservations: set the session hours, then add the days: a first date, a last date and the weekdays add them all at once. Then click squares in the grid to switch single slots off or on.
+   - **Timetable** for reservations: set how many bookings one slot takes, set the session hours, then add the days: a first date, a last date and the weekdays add them all at once. Then click squares in the grid to switch single slots off or on.
    - **Status**: set to **Open** and click **Save settings**.
 4. Click **Copy link** and send it to students. The link looks like `.../index.html?f=database-team-project-registration-form-fall-2027`.
 5. Watch submissions under **Responses**. Each form's own Google Sheet is one click away (**Google Sheet**).
