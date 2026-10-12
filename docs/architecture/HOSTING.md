@@ -60,7 +60,7 @@ Script deployment. Google continues to run the backend and store the data.
 | Job | How it helps |
 |---|---|
 | **Hosts the website (GitHub Pages)** | Serves `index.html`, `admin.html`, `viewer.html`, and `assets/` as static files over HTTPS, from a global CDN, for free. |
-| **Tests and publishes on every push** | A push to `master` runs the workflow in `.github/workflows/pages.yml`: all JavaScript and Python tests, then a Pages deploy of the website files only. A failing test keeps the old site online. |
+| **Tests and publishes on every push** | A push to `master` runs the workflow in `.github/workflows/pages.yml`: all the tests, then a Pages deploy of the website files only. A failing test keeps the old site online. |
 | **Keeps the full history** | Every change is a commit. A bad change is undone by reverting it. Old versions of any file are one click away. |
 | **Gives you a safety net** | The repository is a complete copy of the project. If your laptop dies, `git clone` brings everything back. |
 | **Documents why things changed** | The commit convention (`feat(admin): ...`, merge commits that summarise a branch) makes the history readable. |
@@ -116,7 +116,7 @@ sequenceDiagram
 
     Dev->>Git: git push
     Git->>CI: Test and deploy site
-    CI->>CI: npm test and Python tests
+    CI->>CI: npm test
     alt a test fails
         CI-->>Dev: red cross, the old site stays online
     else all pass

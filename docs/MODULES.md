@@ -31,9 +31,9 @@ flowchart TD
     repo["Repository"]
     repo --> web["Website<br/>index.html, admin.html, viewer.html<br/>assets/css, assets/js"]
     repo --> shared["shared/rules.js<br/>validation rules"]
-    repo --> be["backend/<br/>17 .gs files + appsscript.json"]
-    repo --> sc["scripts/<br/>bundle-backend.js, setup-deployment.js,<br/>download_tasks.py"]
-    repo --> ts["tests/<br/>JavaScript and Python"]
+    repo --> be["backend/<br/>22 .gs files + appsscript.json"]
+    repo --> sc["scripts/<br/>bundle-backend.js, build-site.js,<br/>setup-deployment.js, dev-server.js"]
+    repo --> ts["tests/<br/>JavaScript"]
     repo --> dc["docs/"]
 
     web -- "push to master,<br/>Actions publishes" --> gh["GitHub Pages<br/>source files plus generated config.js"]
@@ -42,7 +42,6 @@ flowchart TD
     be -- "bundled in" --> dist
     sc -- "npm run build" --> dist
     dist -- "Actions pushes it<br/>with clasp" --> gas["Apps Script<br/>the backend"]
-    sc -- "python script" --> xl["Tasks.xlsx on your laptop"]
     ts -. "run the real bundle in memory" .-> dist
     classDef cDb fill:#F3E2B3,stroke:#B8892D,stroke-width:1.5px,color:#2F2418
     classDef cActor fill:#F4D9D3,stroke:#9A3328,stroke-width:1.5px,color:#2F2418
@@ -163,7 +162,6 @@ no validation.
 | `Menu.gs` | The "Forms Platform" menu in the registry sheet. |
 | `Matching.gs` | WhatsApp request matching. |
 | `Clients.gs`, `Viewer.gs` | Private instructor links, their access keys and end dates, and what they can see. |
-| `Export.gs` | Team data for the Excel export script. |
 
 `npm run build` joins `shared/rules.js` and every backend file into `dist/Code.gs`.
 
@@ -174,11 +172,9 @@ no validation.
 | `scripts/bundle-backend.js` | The bundler. |
 | `scripts/setup-deployment.js` | First deployment from your computer (`npm run setup`): creates the sheet and its script, pushes the bundle, creates the web app, and stores the IDs, the credential and the Pages setting in GitHub. |
 | `scripts/dev-server.js` | `npm run dev`: serves the site and answers its API calls from the in-memory Google, with sample forms, so pages can be opened in a real browser. |
-| `scripts/download_tasks.py` | The older, local way to download task files and build `Tasks.xlsx`, through public links. **Download all** in the dashboard does the same job. |
 | `tests/harness/appsscript-mock.js` | An in-memory Sheets, Drive, Mail, Cache, and clock, so the real backend code runs in tests. |
 | `tests/harness/dom.js` | Opens the real pages in jsdom wired to that backend. |
-| `tests/*.test.js` | 247 tests. |
-| `tests/test_download_tasks.py` | 20 tests for the export, with a local server in place of Google. |
+| `tests/*.test.js` | 265 tests. |
 
 ## Data model in one paragraph
 

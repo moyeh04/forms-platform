@@ -54,15 +54,15 @@ Node's built-in modules (`fs`, `path`, `vm`).
 }}%%
 flowchart TD
     subgraph sources["Source files you edit and commit"]
-        rules["shared/rules.js<br/>UMD validation rules"]
-        gs["backend/*.gs<br/>16 modules"]
+        rules["shared/rules.js, shared/form-metadata.js<br/>rules and form metadata, also loaded by the pages"]
+        gs["backend/*.gs<br/>22 modules"]
         manifest["backend/appsscript.json<br/>time zone, scopes, web app mode"]
     end
 
     cmd["npm run build"] --> bundler
 
     subgraph bundler["scripts/bundle-backend.js"]
-        s1["1. list files<br/>rules.js first, then backend files A to Z, Code.gs last"]
+        s1["1. list files<br/>the two shared files first, then backend files A to Z, Code.gs last"]
         s2["2. read each file, trim, add a header comment<br/>// ===== backend/Auth.gs ====="]
         s3["3. join them into one string"]
         s4["4. compile the string with Node's vm.Script<br/>fail loudly on a syntax error"]
@@ -86,8 +86,8 @@ flowchart TD
 
 ### Step by step
 
-1. **List the files.** `shared/rules.js` goes first so the global `Rules`
-   exists. The backend files follow in alphabetical order, with `Code.gs`
+1. **List the files.** `shared/rules.js` and `shared/form-metadata.js` go
+   first so the globals `Rules` and `FormMetadata` exist. The backend files follow in alphabetical order, with `Code.gs`
    moved to the end (a one-line comparator in `listBackend`).
 2. **Read and label.** Each file is trimmed and prefixed with a comment such as
    `// ===== backend/Auth.gs =====`, so when you read the deployed code in the
@@ -106,10 +106,10 @@ flowchart TD
 Typical output:
 
 ```
-Bundled 17 files into dist/Code.gs (97922 chars).
+Bundled 24 files into dist/Code.gs (180033 chars).
 ```
 
-17 = `rules.js` + 16 backend files.
+24 = the two shared files + 22 backend files.
 
 ## Why joining files is safe
 
@@ -270,7 +270,6 @@ similar copy. The workflow pushes the same `backend-dist` artifact the tests ran
 | Anything in `backend/` or `shared/rules.js` | Yes, Actions does it | Push to `master`; clasp pushes the bundle and updates the existing deployment |
 | `backend/appsscript.json` (scopes, time zone) | Yes, Actions does it | The same push carries the manifest |
 | Only `index.html`, `admin.html`, `viewer.html`, `assets/` | No | Push to `master`; GitHub Pages updates |
-| `scripts/download_tasks.py` | No | It runs locally from the repo |
 
 Run `npm run build` yourself only to inspect the bundle or to run the tests
 locally; a routine update needs no local build.
@@ -283,7 +282,7 @@ deployment succeeds. The server is always the final judge.
 ## What GitHub builds and deploys
 
 `.github/workflows/pages.yml` validates its own syntax with pinned actionlint,
-runs the JavaScript/Python suites, and creates the `backend-dist` artifact.
+runs the tests, and creates the `backend-dist` artifact.
 For pushes to `master`, `npm run build:site` packages public files into `_site/`
 and generates `_site/assets/js/config.js` from the required `API_URL` variable.
 Invalid configuration fails before the public artifact is uploaded.
