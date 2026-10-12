@@ -25,9 +25,13 @@ API['admin.forms.list'] = admin(function () {
 });
 
 API['admin.forms.get'] = admin(function (req) {
-  var f = clone(requireForm(req.id));
+  var form = requireForm(req.id);
+  var f = clone(form);
   delete f._row;
-  return { form: f, lists: readLists() };
+  var out = { form: f, lists: readLists() };
+  // The timetable editor marks slots that already have bookings.
+  if (form.type === 'reservation') out.taken = slotAvailability_(form);
+  return out;
 });
 
 API['admin.forms.create'] = admin(function (req) {

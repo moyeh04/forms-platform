@@ -527,7 +527,7 @@ test('Timetable: session hours, dates that name the day, removing and adding tim
   assert.deepEqual(slots.days[1].times, slots.days[0].times, 'the copy keeps the edited times');
 });
 
-test('Timetable: a date range with weekdays adds every day at once, and each day is one line until opened', async () => {
+test('Timetable: a date range with weekdays adds every day at once', async () => {
   const w = boot();
   const f = w.make('reservation', 'Seminar');
   const p = await openAdmin(w, `#/f/${f.slug}/settings`);
@@ -538,30 +538,73 @@ test('Timetable: a date range with weekdays adds every day at once, and each day
   p.click('[name="range-dow-0"]'); p.click('[name="range-dow-2"]');
   assert.equal(p.$('[name="range-add"]').textContent, 'Add 4 days');
   p.click('[name="range-add"]');
-  assert.equal(p.$$('.day-card').length, 4);
-  assert.equal(p.$$('.day-card.open').length, 0, 'generated days stay closed');
-  assert.equal(p.$('[name="dayLabel-0"]'), null);
-  assert.ok(p.$('.day-card[data-day="0"]').textContent.includes('Sunday 12 Mar'));
-  assert.ok(p.$('.day-card[data-day="0"]').textContent.includes('7 slots, 12:30 to 3:20'));
+  assert.equal(p.$$('.tt-grid thead .tt-day').length, 4);
+  assert.equal(p.$$('.tt-grid tbody tr').length, 7, 'one row per session time');
+  assert.equal(p.$$('.tt-cell.on').length, 28);
+  assert.equal(p.$('.day-card'), null, 'no day is open until it is picked');
   assert.equal(p.$('[name="range-add"]'), null, 'the same range has nothing left to add');
   assert.ok(p.text().includes('already in the timetable'));
-
   p.click('[name="range-dow-4"]');
   assert.equal(p.$('[name="range-add"]').textContent, 'Add 2 days');
   p.click('[name="range-add"]');
-  p.click('[name="toggle-day-1"]');
-  assert.equal(p.$('[name="dayLabel-1"]').value, 'Tuesday 14 Mar', 'an opened day shows its fields');
-  p.click('[name="drop-1-0"]');
-  assert.equal(p.$$('.day-card.open').length, 1, 'the day stays open while it is edited');
-  p.click('[name="toggle-day-1"]');
-  p.click('[name="remove-day-5"]');
   set('range-to', '2028-03-01');
   assert.ok(p.text().includes('before the first date'));
   p.click('[name="save"]'); await settle(12);
   const days = w.admin({ action: 'admin.forms.get', id: f.id }).form.slots.days;
-  assert.deepEqual(days.map((d) => d.date), ['2028-03-12', '2028-03-14', '2028-03-16', '2028-03-19', '2028-03-21']);
-  assert.equal(days[1].times.length, 6);
-  assert.equal(days[0].times.length, 7);
+  assert.deepEqual(days.map((d) => d.date), ['2028-03-12', '2028-03-14', '2028-03-16', '2028-03-19', '2028-03-21', '2028-03-23']);
+});
+
+test('Timetable grid: a square switches one slot, a time switches a row, a day opens its details', async () => {
+  const w = boot();
+  const f = w.make('reservation', 'Seminar');
+  const p = await openAdmin(w, `#/f/${f.slug}/settings`);
+  const set = (name, value) => { const el = p.$(`[name="${name}"]`); el.value = value; p.fire(el, 'change'); };
+  set('range-from', '2028-03-12'); set('range-to', '2028-03-14');
+  p.click('[name="range-dow-0"]'); p.click('[name="range-dow-2"]'); p.click('[name="range-add"]');
+  assert.equal(p.$('[name="apply-all"]'), null, 'nothing to apply while every day matches the session hours');
+
+  p.click('[name="cell-1-0"]');
+  assert.equal(p.$('[name="cell-1-0"]').getAttribute('aria-pressed'), 'false');
+  assert.ok(p.$('[name="apply-all"]'), 'offered once a day differs');
+  p.click('[name="row-6"]');
+  assert.equal(p.$$('.tt-cell.on').length, 11, 'the last time is off on both days');
+  p.click('[name="row-6"]');
+  assert.equal(p.$$('.tt-cell.on').length, 13, 'and on again for both');
+
+  p.click('[name="day-head-0"]');
+  assert.equal(p.$('[name="dayLabel-0"]').value, 'Sunday 12 Mar');
+  assert.equal(p.$$('.day-card').length, 1);
+  p.type('[name="dayLabel-0"]', 'Week 11 - Sunday');
+  p.click('[name="close-day-0"]');
+  assert.equal(p.$('.day-card'), null);
+
+  p.type('[name="pattern-end"]', '16:00');
+  assert.equal(p.$$('.tt-grid tbody tr').length, 8, 'longer session hours add a row');
+  assert.equal(p.$('[name="cell-0-7"]').getAttribute('aria-pressed'), 'false', 'which starts switched off');
+  p.click('[name="apply-all"]');
+  assert.equal(p.$$('.tt-cell.on').length, 16);
+  assert.equal(p.$('[name="apply-all"]'), null);
+  p.click('[name="cell-0-0"]');
+  p.click('[name="save"]'); await settle(12);
+  const days = w.admin({ action: 'admin.forms.get', id: f.id }).form.slots.days;
+  assert.deepEqual(days.map((d) => [d.label, d.times.length]), [['Week 11 - Sunday', 7], ['Tuesday 14 Mar', 8]]);
+});
+
+test('Timetable grid: a booked slot shows its count, and switching it off warns before saving', async () => {
+  const w = boot();
+  const f = w.make('reservation', 'Seminar');
+  w.admin({ action: 'admin.forms.update', id: f.id, patch: { status: 'open', slots: { days: [{ id: 'one', label: 'Sunday', times: ['12:30 - 12:50', '12:55 - 1:15'] }], capacity: 1 } } });
+  const form = w.api({ action: 'getForm', slug: f.slug }).form;
+  const data = { email: 'a@example.com', leader_name: 'أحمد محمد محمود علي', leader_code: '4230459', phone: '01012345678', title: 'Library', slot: { day: 'one', time: '12:55 - 1:15' } };
+  for (const field of form.fields) if (field.type === 'select' && field.enabled !== false) data[field.id] = String(field.options[0].value);
+  assert.equal(w.api({ action: 'submit', slug: f.slug, data }).ok, true);
+  const p = await openAdmin(w, `#/f/${f.slug}/settings`);
+  const cell = () => p.$('.tt-cell.booked');
+  assert.equal(cell().textContent, '1');
+  assert.equal(p.text().includes('switched off'), false);
+  p.click('.tt-cell.booked');
+  assert.equal(cell().getAttribute('aria-pressed'), 'false');
+  assert.ok(p.text().includes('1 booking is on a slot that is switched off'));
 });
 
 test('Delete form: one confirmation from the card removes it; cancelling keeps it', async () => {

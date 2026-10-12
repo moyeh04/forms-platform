@@ -222,7 +222,7 @@
         h('thead', null, h('tr', null, h('th', null, 'Show'), h('th', null, 'English label'), h('th', null, 'Arabic label'), h('th', null, 'Required'), h('th', null, 'Name parts / type'))),
         h('tbody', null, rows))));
 
-    /* Slots: session hours once, then days as lines that open into time chips ---- */
+    /* Slots: session hours once, then a grid of days and times ---- */
     var slotsPanel = null;
     if (f.type === 'reservation') {
       f.slots = f.slots || { days: [], capacity: 1 };
@@ -238,6 +238,7 @@
         return d.getFullYear() + '-' + p2(d.getMonth() + 1) + '-' + p2(d.getDate());
       };
       f.slots.days.forEach(function (d) { d._auto = !d.label || d.label === autoLabel(d.date); });
+      var taken = res.taken || {};
 
       /* Step 1: session hours */
       var patPreview = h('div', { class: 'pattern-preview', 'aria-live': 'polite' });
@@ -248,14 +249,16 @@
         patPreview.appendChild(h('p', { class: 'muted-note' }, times.length + ' slot' + (times.length > 1 ? 's' : '') + ' a day, from ' + times[0].split(' - ')[0] + ' to ' + times[times.length - 1].split(' - ')[1] + '.'));
         patPreview.appendChild(h('div', { class: 'time-chips pattern-chips' }, times.map(function (tm) { return h('span', { class: 'time-chip' }, tm); })));
       };
+      // The grid's rows come from these hours, so it follows every change to them.
+      var hoursChanged = function () { paintPattern(); if (paintDays) paintDays(); };
       var quick = function (key, values, unit) {
         var box = h('div', { class: 'toggle-chips', role: 'radiogroup' });
-        var input = h('input', { class: 'input num', type: 'number', min: '0', max: '240', name: 'pattern-' + key, value: String(pat[key]), 'aria-label': key === 'length' ? 'Minutes per slot' : 'Minutes between slots', oninput: function (e) { pat[key] = parseInt(e.target.value, 10) || 0; paint(); paintPattern(); } });
+        var input = h('input', { class: 'input num', type: 'number', min: '0', max: '240', name: 'pattern-' + key, value: String(pat[key]), 'aria-label': key === 'length' ? 'Minutes per slot' : 'Minutes between slots', oninput: function (e) { pat[key] = parseInt(e.target.value, 10) || 0; paint(); hoursChanged(); } });
         function paint() {
           ui.clear(box);
           values.forEach(function (v) {
             var on = Number(pat[key]) === v;
-            box.appendChild(h('button', { type: 'button', class: 'toggle-chip sm', role: 'radio', 'aria-checked': on ? 'true' : 'false', 'aria-pressed': on ? 'true' : 'false', onclick: function () { pat[key] = v; input.value = String(v); paint(); paintPattern(); } }, v + unit));
+            box.appendChild(h('button', { type: 'button', class: 'toggle-chip sm', role: 'radio', 'aria-checked': on ? 'true' : 'false', 'aria-pressed': on ? 'true' : 'false', onclick: function () { pat[key] = v; input.value = String(v); paint(); hoursChanged(); } }, v + unit));
           });
           box.appendChild(input);
         }
@@ -264,11 +267,23 @@
       };
       var capVal = h('output', { class: 'stepper-val', name: 'capacity' }, String(f.slots.capacity || 1));
       var step = function (d) { f.slots.capacity = Math.max(1, Math.min(50, (f.slots.capacity || 1) + d)); capVal.textContent = String(f.slots.capacity); };
+      // Shown only while some day differs from the session hours, so it always has something to do.
+      var applyBox = h('div', { class: 'tt-apply' });
+      var paintApply = function () {
+        ui.clear(applyBox);
+        if (!patternDiffers()) return;
+        applyBox.appendChild(h('button', { type: 'button', class: 'btn btn-quiet sm', name: 'apply-all', onclick: function () {
+          var times = patternTimes();
+          f.slots.days.forEach(function (d) { d.times = times.slice(); });
+          paintDays(); toast('Every day now uses these hours. Save to keep it.', 'ok');
+        } }, 'Use these hours for every day'));
+        applyBox.appendChild(h('span', { class: 'muted-note' }, 'Some days have different times.'));
+      };
       var hoursCard = h('div', { class: 'tt-step' },
         h('div', { class: 'tt-step-head' }, h('span', { class: 'tt-num' }, '1'), h('div', null, h('h3', null, 'Session hours'), h('p', { class: 'help' }, 'New days start with these slots. You can still change any single day below.'))),
         h('div', { class: 'tt-hours' },
-          A.field('First slot starts', h('input', { class: 'input', type: 'time', name: 'pattern-start', value: pat.start, oninput: function (e) { pat.start = e.target.value; paintPattern(); } })),
-          A.field('Last slot ends by', h('input', { class: 'input', type: 'time', name: 'pattern-end', value: pat.end, oninput: function (e) { pat.end = e.target.value; paintPattern(); } })),
+          A.field('First slot starts', h('input', { class: 'input', type: 'time', name: 'pattern-start', value: pat.start, oninput: function (e) { pat.start = e.target.value; hoursChanged(); } })),
+          A.field('Last slot ends by', h('input', { class: 'input', type: 'time', name: 'pattern-end', value: pat.end, oninput: function (e) { pat.end = e.target.value; hoursChanged(); } })),
           h('div', { class: 'field-row tt-wide' }, h('span', { class: 'label' }, 'Each slot'), quick('length', [10, 15, 20, 30], ' min')),
           h('div', { class: 'field-row tt-wide' }, h('span', { class: 'label' }, 'Break between'), quick('gap', [0, 5, 10], ' min')),
           h('div', { class: 'field-row tt-cap' }, h('span', { class: 'label' }, 'Teams per slot'),
@@ -277,15 +292,9 @@
               capVal,
               h('button', { type: 'button', class: 'icon-btn sm', name: 'capacity-up', 'aria-label': 'More teams per slot', onclick: function () { step(1); } }, '+')))),
         patPreview,
-        h('button', { type: 'button', class: 'btn btn-quiet sm', name: 'apply-all', onclick: function () {
-          var times = patternTimes();
-          if (!times.length) return toast('Fix the session hours first.', 'err');
-          if (!f.slots.days.length) return toast('Add a day first.', 'err');
-          f.slots.days.forEach(function (d) { d.times = times.slice(); });
-          paintDays(); toast('Every day now uses these hours. Save to keep it.', 'ok');
-        } }, 'Use these hours for every day'));
+        applyBox);
 
-      /* Step 2: days. A range adds many at once; each day is one line that opens to be changed. */
+      /* Step 2: days as a grid. A range adds many at once; one day at a time opens for its date, name and odd times. */
       var daysBox = h('div', { class: 'tt-days' });
       var iso = function (d) { return d.getFullYear() + '-' + p2(d.getMonth() + 1) + '-' + p2(d.getDate()); };
       var slotStart = function (tm) {
@@ -298,32 +307,81 @@
         return { label: autoLabel(date), date: date || '', times: times, _auto: true };
       };
       var needsWork = function (d) { return !String(d.label || '').trim() || !d.times.length; };
+      var patternDiffers = function () {
+        var times = patternTimes().join('|');
+        return !!times && f.slots.days.some(function (d) { return d.times.join('|') !== times; });
+      };
+      // One day is open for editing at a time; the grid shows all of them.
+      var select = function (day) { f.slots.days.forEach(function (d) { d._open = d === day; }); };
+      var bookedIn = function (d, tm) { return d.id ? (taken[Rules.slotKey(d.id, tm)] || 0) : 0; };
+      var rowTimes = function () {
+        var all = patternTimes();
+        f.slots.days.forEach(function (d) { d.times.forEach(function (tm) { if (all.indexOf(tm) === -1) all.push(tm); }); });
+        return all.sort(function (x, y) { return slotStart(x) - slotStart(y); });
+      };
+      var grid = function () {
+        var rows = rowTimes();
+        var head = h('tr', null, h('th', { class: 'tt-corner', scope: 'col' }, 'Time'), f.slots.days.map(function (d, i) {
+          var dt = d.date ? new Date(d.date + 'T12:00:00') : null;
+          var name = String(d.label || '').trim();
+          return h('th', { scope: 'col' }, h('button', { type: 'button', class: 'tt-day' + (d._open ? ' on' : '') + (needsWork(d) ? ' bad' : ''), name: 'day-head-' + i, 'aria-pressed': d._open ? 'true' : 'false', title: name || 'This day has no name yet', onclick: function () { select(d._open ? null : d); paintDays(); } },
+            dt ? [h('span', { class: 'dow' }, dt.toLocaleDateString('en-GB', { weekday: 'short' })), h('span', { class: 'dom' }, dt.getDate() + ' ' + dt.toLocaleDateString('en-GB', { month: 'short' }))]
+              : [h('span', { class: 'dow' }, 'No date'), h('span', { class: 'dom' }, name || 'Name it')]));
+        }));
+        var body = rows.map(function (tm, k) {
+          var allOn = f.slots.days.every(function (d) { return d.times.indexOf(tm) !== -1; });
+          return h('tr', null,
+            h('th', { scope: 'row' }, h('button', { type: 'button', class: 'tt-time', name: 'row-' + k, title: allOn ? 'Switch this time off on every day' : 'Switch this time on for every day', onclick: function () {
+              f.slots.days.forEach(function (d) {
+                var at = d.times.indexOf(tm);
+                if (allOn && at !== -1) d.times.splice(at, 1);
+                if (!allOn && at === -1) { d.times.push(tm); d.times.sort(function (x, y) { return slotStart(x) - slotStart(y); }); }
+              });
+              paintDays();
+            } }, tm)),
+            f.slots.days.map(function (d, i) {
+              var at = d.times.indexOf(tm), on = at !== -1, booked = bookedIn(d, tm);
+              var what = tm + ', ' + (d.label || 'day ' + (i + 1)) + (booked ? ', ' + booked + ' booked' : '');
+              return h('td', null, h('button', { type: 'button', class: 'tt-cell' + (on ? ' on' : '') + (booked ? ' booked' : ''), name: 'cell-' + i + '-' + k, 'aria-pressed': on ? 'true' : 'false', 'aria-label': what, title: what, onclick: function () {
+                if (on) d.times.splice(at, 1);
+                else { d.times.push(tm); d.times.sort(function (x, y) { return slotStart(x) - slotStart(y); }); }
+                paintDays();
+              } }, booked ? String(booked) : ''));
+            }));
+        });
+        return h('div', { class: 'tt-grid-wrap' }, h('table', { class: 'tt-grid' }, h('thead', null, head), h('tbody', null, body)));
+      };
       var paintDays = function () {
         ui.clear(daysBox);
-        if (!f.slots.days.length) daysBox.appendChild(h('div', { class: 'empty' }, 'No days yet. Add a range of days, or one day at a time. Each new day gets the session hours above.'));
-        f.slots.days.forEach(function (d, i) { daysBox.appendChild(dayCard(d, i)); });
+        if (!f.slots.days.length) {
+          daysBox.appendChild(h('div', { class: 'empty' }, 'No days yet. Add a range of days, or one day at a time. Each new day gets the session hours above.'));
+        } else {
+          if (!f.slots.days.some(function (d) { return d._open; })) select(f.slots.days.filter(needsWork)[0] || null);
+          var orphans = 0;
+          f.slots.days.forEach(function (d) { rowTimes().forEach(function (tm) { if (d.times.indexOf(tm) === -1) orphans += bookedIn(d, tm); }); });
+          daysBox.appendChild(grid());
+          daysBox.appendChild(h('p', { class: 'help tt-legend' },
+            h('span', { class: 'tt-key on' }), 'open ', h('span', { class: 'tt-key' }), 'off ', h('span', { class: 'tt-key on booked' }, '2'), 'teams booked. ',
+            'Click a slot to switch it. Click a time to switch it on every day. Click a day to rename it, move it or remove it.'));
+          if (orphans) daysBox.appendChild(h('p', { class: 'error', role: 'alert' }, orphans + ' booking' + (orphans === 1 ? ' is' : 's are') + ' on a slot that is switched off. ' + (orphans === 1 ? 'That team keeps its' : 'Those teams keep their') + ' booking, but the slot no longer shows as valid.'));
+          f.slots.days.forEach(function (d, i) { if (d._open) daysBox.appendChild(dayCard(d, i)); });
+        }
         paintRange();
+        paintApply();
       };
       var dayCard = function (d, i) {
-        var open = !!d._open || needsWork(d);
-        var dt = d.date ? new Date(d.date + 'T12:00:00') : null;
-        var badge = h('div', { class: 'day-badge' + (dt ? '' : ' none') },
-          dt ? [h('span', { class: 'dow' }, dt.toLocaleDateString('en-GB', { weekday: 'short' })), h('span', { class: 'dom' }, String(dt.getDate())), h('span', { class: 'mon' }, dt.toLocaleDateString('en-GB', { month: 'short' }))] : h('span', { class: 'dow' }, 'No date'));
         var count = d.times.length + ' slot' + (d.times.length === 1 ? '' : 's');
-        var summary = d.times.length
-          ? h('span', { class: 'muted-note' }, count + ', ' + d.times[0].split(' - ')[0] + ' to ' + d.times[d.times.length - 1].split(' - ')[1])
-          : h('span', { class: 'error' }, 'No slots. Add a time or reset it.');
         var name = String(d.label || '').trim();
-        var row = h('div', { class: 'day-row' }, badge,
-          h('div', { class: 'day-sum' }, name ? h('strong', null, name) : h('span', { class: 'error' }, 'Pick a date or type a name.'), summary),
-          needsWork(d) ? null : h('button', { type: 'button', class: 'btn btn-quiet sm', name: 'toggle-day-' + i, 'aria-expanded': open ? 'true' : 'false', onclick: function () { d._open = !open; paintDays(); } }, open ? 'Done' : 'Change'),
-          h('button', { type: 'button', class: 'icon-btn sm danger', name: 'remove-day-' + i, 'aria-label': 'Remove ' + (name || 'this day'), title: 'Remove day', onclick: function () { f.slots.days.splice(i, 1); paintDays(); } }, icon('trash', 16)));
-        if (!open) return h('article', { class: 'day-card', dataset: { day: String(i) } }, row);
+        var row = h('div', { class: 'day-row' },
+          h('div', { class: 'day-sum' }, name ? h('strong', null, name) : h('span', { class: 'error' }, 'Pick a date or type a name.'),
+            d.times.length ? h('span', { class: 'muted-note' }, count) : h('span', { class: 'error' }, 'No slots. Switch one on in the grid, add a time or reset it.')),
+          needsWork(d) ? null : h('button', { type: 'button', class: 'btn btn-quiet sm', name: 'close-day-' + i, onclick: function () { select(null); paintDays(); } }, 'Done'),
+          h('button', { type: 'button', class: 'btn btn-quiet sm danger', name: 'remove-day-' + i, onclick: function () { f.slots.days.splice(i, 1); paintDays(); } }, icon('trash', 16), 'Remove day'));
 
         var label = A.text(d.label, function (v) { d.label = v; d._auto = false; }, { name: 'dayLabel-' + i, placeholder: 'Week 11 - Sunday', 'aria-label': 'Day name' });
         var chips = h('ul', { class: 'time-chips', 'aria-label': 'Time slots for ' + (d.label || 'this day') },
           d.times.map(function (tm, k) {
-            return h('li', { class: 'time-chip' }, tm, h('button', { type: 'button', name: 'drop-' + i + '-' + k, 'aria-label': 'Remove ' + tm, onclick: function () { d.times.splice(k, 1); d._open = true; paintDays(); } }, icon('x', 14)));
+            return h('li', { class: 'time-chip' }, tm, h('button', { type: 'button', name: 'drop-' + i + '-' + k, 'aria-label': 'Remove ' + tm, onclick: function () { d.times.splice(k, 1); paintDays(); } }, icon('x', 14)));
           }));
         var from = h('input', { class: 'input', type: 'time', name: 'add-from-' + i, 'aria-label': 'Starts' });
         var to = h('input', { class: 'input', type: 'time', name: 'add-to-' + i, 'aria-label': 'Ends' });
@@ -336,7 +394,6 @@
             if (d.times.indexOf(tm) !== -1) return toast('That time is already there.', 'err');
             d.times.push(tm);
             d.times.sort(function (x, y) { return slotStart(x) - slotStart(y); });
-            d._open = true;
             paintDays();
           } }, 'Add'));
         return h('article', { class: 'day-card open', dataset: { day: String(i) } },
@@ -346,21 +403,19 @@
               A.field('Date', h('input', { class: 'input', type: 'date', name: 'dayDate-' + i, value: d.date || '', onchange: function (e) {
                 d.date = e.target.value;
                 if (d._auto) d.label = autoLabel(d.date);
-                d._open = true;
                 paintDays();
               } }), 'Lets instructors open "today".'),
               A.field('Name students see', label)),
             h('div', { class: 'day-slots-head' }, h('span', { class: 'label' }, count),
               h('button', { type: 'button', class: 'link-btn', name: 'show-add-' + i, onclick: function (e) { adder.hidden = false; e.currentTarget.hidden = true; from.focus(); } }, '+ Add a time'),
-              h('button', { type: 'button', class: 'link-btn', name: 'reset-' + i, onclick: function () { var t = patternTimes(); if (!t.length) return toast('Fix the session hours first.', 'err'); d.times = t; d._open = true; paintDays(); } }, 'Reset to session hours')),
+              h('button', { type: 'button', class: 'link-btn', name: 'reset-' + i, onclick: function () { var t = patternTimes(); if (!t.length) return toast('Fix the session hours first.', 'err'); d.times = t; paintDays(); } }, 'Reset to session hours')),
             d.times.length ? chips : null,
             adder,
             h('div', { class: 'actions day-actions' },
               h('button', { type: 'button', class: 'btn btn-quiet sm', name: 'next-week-' + i, onclick: function () {
                 var copy = newDay(d.date ? addDays(d.date, 7) : '', d.times.slice());
                 if (!d.date) copy.label = d.label ? d.label + ' (copy)' : '';
-                copy._open = true;
-                f.slots.days.splice(i + 1, 0, copy); paintDays();
+                f.slots.days.splice(i + 1, 0, copy); select(copy); paintDays();
               } }, icon('copy', 16), d.date ? 'Copy to next week' : 'Duplicate'))));
       };
 
@@ -371,10 +426,10 @@
       var rangeDates = function () {
         var a = new Date(range.from + 'T12:00:00'), b = new Date(range.to + 'T12:00:00'), out = [];
         if (!range.from || !range.to || isNaN(a) || isNaN(b) || b < a) return out;
-        var taken = {};
-        f.slots.days.forEach(function (d) { if (d.date) taken[d.date] = true; });
+        var have = {};
+        f.slots.days.forEach(function (d) { if (d.date) have[d.date] = true; });
         for (var d = a, n = 0; d <= b && n < 366; d.setDate(d.getDate() + 1), n++) {
-          if (range.dow[d.getDay()] && !taken[iso(d)]) out.push(iso(d));
+          if (range.dow[d.getDay()] && !have[iso(d)]) out.push(iso(d));
         }
         return out;
       };
@@ -421,7 +476,7 @@
       paintDays();
       paintPattern();
       var daysCard = h('div', { class: 'tt-step' },
-        h('div', { class: 'tt-step-head' }, h('span', { class: 'tt-num' }, '2'), h('div', null, h('h3', null, 'Days'), h('p', { class: 'help' }, 'Each day is one line. Press Change to edit its date, name or times.'))),
+        h('div', { class: 'tt-step-head' }, h('span', { class: 'tt-num' }, '2'), h('div', null, h('h3', null, 'Days'), h('p', { class: 'help' }, 'Days run across, times run down. Every slot is one square.'))),
         rangeCard,
         daysBox,
         h('button', { type: 'button', class: 'btn btn-quiet', name: 'addDay', onclick: function () {
@@ -429,8 +484,8 @@
           if (!times.length) return toast('Fix the session hours first.', 'err');
           var last = f.slots.days[f.slots.days.length - 1];
           var day = newDay(last && last.date ? addDays(last.date, 1) : '', times);
-          day._open = true;
           f.slots.days.push(day);
+          select(day);
           paintDays();
           var cards = daysBox.querySelectorAll('.day-card');
           var input = cards.length && cards[cards.length - 1].querySelector('input[type="date"]');

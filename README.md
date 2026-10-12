@@ -113,7 +113,7 @@ step needs the real Google services (see "What could not be tested here").
 ### Reservations
 | Requirement | Status |
 |---|---|
-| Timetable builder: session hours set once with a live preview, a date range with weekdays adds many days at once, each day is one line that opens to change its date, name or times, days are named from their date, times are removable chips, copy a day to the next week; one team per slot (capacity adjustable) | Done |
+| Timetable builder: session hours set once with a live preview, a date range with weekdays adds many days at once, the timetable is a grid of days and times where a square switches one slot and a time switches a whole row, squares show how many teams booked them, a day opens to change its date, name or odd times, copy a day to the next week; one team per slot (capacity adjustable) | Done |
 | One booking per leader code; taken slots crossed out for students | Done |
 | Warning when a timetable change leaves existing bookings without a slot | Done |
 
@@ -170,7 +170,7 @@ the first-deployment setup, and the Excel export; `tests/` holds the automated t
 
 ```
 npm install          # once, installs the browser test library
-npm test             # 202 tests: rules, backend, form page, dashboard, instructor page, deployment
+npm test             # 204 tests: rules, backend, form page, dashboard, instructor page, deployment
 npm run build        # writes dist/Code.gs and dist/appsscript.json for clasp
 npm run setup        # first deployment: creates the sheet, pushes the backend, creates the web app, configures GitHub
 npm run dev          # local preview on http://localhost:8080 (PIN 4321), in memory, no Google needed
