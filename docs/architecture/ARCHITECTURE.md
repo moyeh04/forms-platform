@@ -823,7 +823,10 @@ belongs to that form. Nothing else links them, so there is no new column and
 no new record:
 
 - The dashboard does not give such a reservation a card. It lists it inside the
-  card of its form, newest first, with its status and its days.
+  card of its form, newest first, with its status and its days. The list is
+  folded to one line (the count and the newest booking) until it is opened,
+  because a form can have a booking for every week of a term; which forms are
+  open is kept in `sessionStorage` for the browser tab.
 - `admin.bookings.next` (`KeyBooking.gs`) makes the next one. The first is a new
   reservation that books with the keys of the form. Each later one is a copy of
   the newest: the same questions, rules, hours and bookings per slot, its own
