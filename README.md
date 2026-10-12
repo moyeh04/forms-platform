@@ -117,7 +117,7 @@ step needs the real Google services (see "What could not be tested here").
 ### Reservations
 | Requirement | Status |
 |---|---|
-| Timetable builder: session hours set once with a live preview, a date range with weekdays adds many days at once, the timetable is a grid of days and times where a square switches one slot and a time switches a whole row, squares show how many teams booked them, a day opens to change its date, name or odd times, copy a day to the next week; one team per slot (capacity adjustable) | Done |
+| Timetable: click dates on a month calendar to offer them, set the hours once (first slot, last slot, slot length, break), and read the result as one row of slots for each day; a click switches one slot off, a day can have its own hours or another name, a slot shows how many teams booked it, and a warning appears when a booking is left on a day or time that was removed; one team per slot (capacity adjustable) | Done |
 | One booking per leader code; taken slots crossed out for students | Done |
 | Booking with a registration key: a reservation can take the 5-digit key of a team registration form, show the team to confirm, and ask only for the slot; the same key opens and cancels the booking | Done |
 | Warning when a timetable change leaves existing bookings without a slot | Done |
