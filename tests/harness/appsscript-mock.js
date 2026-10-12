@@ -40,6 +40,10 @@ class MockRange {
     return this.proxy;
   }
   setFormula(f) { return this.setValue(f); }
+  setNumberFormat(f) {
+    for (let i = 0; i < this.nr; i++) for (let j = 0; j < this.nc; j++) this.sheet.formats.set(`${this.r + i},${this.c + j}`, f);
+    return this.proxy;
+  }
   clear() { return this.clearContent(); }
   clearContent() {
     for (let i = 0; i < this.nr; i++) for (let j = 0; j < this.nc; j++) this.sheet.cells.delete(`${this.r + i},${this.c + j}`);
@@ -54,7 +58,7 @@ class MockRange {
 
 class MockSheet {
   constructor(ss, name, id) {
-    this.ss = ss; this.name = name; this.id = id; this.cells = new Map(); this.hidden = false;
+    this.ss = ss; this.name = name; this.id = id; this.cells = new Map(); this.formats = new Map(); this.hidden = false;
     this.proxy = new Proxy(this, {
       get: (t, p) => (p in t ? (typeof t[p] === 'function' ? t[p].bind(t) : t[p]) : (...a) => t.proxy)
     });

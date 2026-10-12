@@ -28,7 +28,7 @@ function setup() {
   var lists = ensureTab(ss, TABS.lists, ['key', 'values']);
   if (lists.getLastRow() < 2) {
     Object.keys(DEFAULT_LISTS).forEach(function (k) {
-      lists.appendRow([k, JSON.stringify(normalizeListValues(DEFAULT_LISTS[k]))]);
+      appendPlain_(lists, [k, JSON.stringify(normalizeListValues(DEFAULT_LISTS[k]))]);
     });
   }
   var blank = ss.getSheetByName('Sheet1');
@@ -80,7 +80,7 @@ function writeListRow_(key, json) {
       return;
     }
   }
-  sh.appendRow([key, json]);
+  appendPlain_(sh, [key, json]);
 }
 
 function saveList(key, values) {
@@ -162,7 +162,7 @@ function saveForm(form) {
   var sh = formsSheet();
   var at = formRow_(sh, form.id);
   if (at) writeRow(sh, at, FORM_COLS, formToRow_(form));
-  else sh.appendRow(rowValues(FORM_COLS, formToRow_(form)));
+  else appendPlain_(sh, rowValues(FORM_COLS, formToRow_(form)));
   return form;
 }
 
