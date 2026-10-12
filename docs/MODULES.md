@@ -31,7 +31,7 @@ flowchart TD
     repo["Repository"]
     repo --> web["Website<br/>index.html, admin.html, viewer.html<br/>assets/css, assets/js"]
     repo --> shared["shared/rules.js<br/>validation rules"]
-    repo --> be["backend/<br/>16 .gs files + appsscript.json"]
+    repo --> be["backend/<br/>17 .gs files + appsscript.json"]
     repo --> sc["scripts/<br/>bundle-backend.js, setup-deployment.js,<br/>download_tasks.py"]
     repo --> ts["tests/<br/>JavaScript and Python"]
     repo --> dc["docs/"]
@@ -147,6 +147,7 @@ no validation.
 | `Responses.gs` | Reading and writing rows, edit keys, limits, Drive checks, emails. |
 | `Submissions.gs` | Student submit, lookup, update, cancel; admin edits and key reset. |
 | `Slots.gs` | Reservation timetable checks and availability. |
+| `Questions.gs` | Questions and pages an admin adds: allowed types, ids, labels and choices, and pages that list each existing question once. |
 | `KeyBooking.gs` | Booking a reservation with a registration key from another form: the setting, the team preview, and the copied answers. |
 | `Views.gs` | Tinted block views inside each form's Google Sheet. |
 | `Print.gs` | Print tabs and PDF export. |
@@ -167,7 +168,7 @@ no validation.
 | `scripts/download_tasks.py` | Downloads task files and builds `Tasks.xlsx`. |
 | `tests/harness/appsscript-mock.js` | An in-memory Sheets, Drive, Mail, Cache, and clock, so the real backend code runs in tests. |
 | `tests/harness/dom.js` | Opens the real pages in jsdom wired to that backend. |
-| `tests/*.test.js` | 224 tests. |
+| `tests/*.test.js` | 226 tests. |
 | `tests/test_download_tasks.py` | 20 tests for the export, with a local server in place of Google. |
 
 ## Data model in one paragraph
