@@ -169,7 +169,7 @@ and the Excel export; `tests/` holds the automated tests.
 
 ```
 npm install          # once, installs the browser test library
-npm test             # 172 tests: rules, backend, form page, dashboard, instructor page
+npm test             # 193 tests: rules, backend, form page, dashboard, instructor page, deployment
 npm run build        # writes dist/Code.gs and dist/appsscript.json for clasp
 npm run dev          # local preview on http://localhost:8080 (PIN 4321), in memory, no Google needed
 python3 -m unittest discover -s tests -p "test_*.py"   # 20 tests for the Excel export
