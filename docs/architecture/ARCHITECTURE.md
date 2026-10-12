@@ -24,7 +24,7 @@ sheet, not code.
 | **One source of truth for rules** | `shared/rules.js` is used by the browser, the backend, and the tests. They cannot disagree. |
 | **Forms are data** | A form is a JSON definition in one cell. New questions and new form types need no code. |
 | **Boring technology** | Plain JavaScript, no framework, no bundler for the website, one concatenation script for the backend. Easy to read, easy to fix later. |
-| **Testable without Google** | An in-memory copy of Google's services runs the real backend code, so 217 JavaScript tests cover it without touching a real account. |
+| **Testable without Google** | An in-memory copy of Google's services runs the real backend code, so 219 JavaScript tests cover it without touching a real account. |
 
 ## System context
 
@@ -804,6 +804,27 @@ pair above, so a colour change that breaks the standard fails CI and is never
 published. It also checks that the device dark theme and the dark toggle use
 identical colours.
 
+## Phone layout
+
+At 600px and below, a table that lists people does not shrink and does not
+scroll sideways. Each row becomes a card:
+
+- The table head is hidden, so each cell carries its column name in a
+  `data-label` attribute and CSS prints it before the value. A cell without
+  `data-label` (the name, the row actions) is shown without a label.
+- Team member rows (`.team-card .mini`) put Section and Code next to each
+  other under the name, with the phone number on its own line as a `tel:` link.
+- Bookings (`.block.single .mini`) and the list tables marked
+  `.data-table.cards` (WhatsApp registrations, private links) put one value on
+  each line.
+- A toolbar is a grid of two equal columns. The search box and a `.tool-group`
+  (controls that act together, such as the day, the option and the button of
+  the day sheet) take the full width.
+
+A new list table must set `data-label` on its cells and use one of these
+classes; `tests/admin-ui.test.js` and `tests/viewer-ui.test.js` check the
+labels of the current tables.
+
 ## Where to change what
 
 | I want to... | Edit |
@@ -830,6 +851,6 @@ identical colours.
 | [HOSTING.md](HOSTING.md) | What GitHub does, what Google does, and how they fit |
 | [DATA-MODEL.md](../reference/DATA-MODEL.md) | Every sheet, column, and stored property |
 | [SECURITY.md](../reference/SECURITY.md) | The secrets, who holds them, and what a leak would mean |
-| [TESTING.md](../reference/TESTING.md) | How 237 tests run without Google |
+| [TESTING.md](../reference/TESTING.md) | How 239 tests run without Google |
 | [DEPLOY.md](../DEPLOY.md) | Click-by-click setup |
 | [MODULES.md](../MODULES.md) | File-by-file reference |

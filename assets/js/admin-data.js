@@ -82,10 +82,12 @@
       var empty = false;
       var daySel = A.select(dayId, ((form.slots && form.slots.days) || []).map(function (d) { return [d.id, d.label]; }), function (v) { dayId = v; });
       daySel.setAttribute('aria-label', 'Day to print');
-      tools.push(daySel, A.check('Include empty slots', false, function (v) { empty = v; }),
-        h('button', { type: 'button', class: 'btn btn-quiet sm', name: 'printDay', onclick: function (e) { if (!dayId) return toast('Add a day in the settings first.', 'err'); printOut(e.currentTarget, 'admin.print.reservations', { dayId: dayId, includeEmpty: empty }); } }, icon('printer', 18), 'Print this day'));
+      // One labelled group, so the day and the option stay next to the button they belong to.
+      tools.push(h('div', { class: 'tool-group', role: 'group', 'aria-label': 'Print a day sheet' }, h('span', { class: 'tool-label' }, 'Day sheet'), daySel,
+        A.check('Include empty slots', false, function (v) { empty = v; }),
+        h('button', { type: 'button', class: 'btn btn-quiet sm', name: 'printDay', onclick: function (e) { if (!dayId) return toast('Add a day in the settings first.', 'err'); printOut(e.currentTarget, 'admin.print.reservations', { dayId: dayId, includeEmpty: empty }); } }, icon('printer', 18), 'Print this day')));
     }
-    tools.push(h('button', { type: 'button', class: 'btn btn-quiet sm', onclick: function (e) {
+    tools.push(h('button', { type: 'button', class: 'btn btn-quiet sm', name: 'rebuild', title: 'Write the tabs of the Google Sheet again from the saved answers. Use it when the sheet looks out of date.', onclick: function (e) {
       A.busy(e.currentTarget, async function () { await A.call('admin.views.rebuild', { slug: form.slug }); toast('Google Sheet views rebuilt', 'ok'); });
     } }, 'Rebuild sheet'));
 
@@ -204,7 +206,8 @@
            return h('tr', { class: m.leader ? 'leader' : null },
              h('td', { class: 'num' }, String(k + 1)),
              h('td', { class: 'nm' }, bdi(m.name), m.leader ? h('span', { class: 'lead-tag' }, icon('star', 13), 'Leader') : null),
-              h('td', null, m.section || '-'), h('td', { class: 'mono' }, m.code), h('td', { class: 'mono' }, m.phone));
+              h('td', { dataset: { label: 'Section' } }, m.section || '-'), h('td', { class: 'mono', dataset: { label: 'Code' } }, m.code),
+              h('td', { class: 'mono tel', dataset: { label: 'Phone' } }, m.phone ? h('a', { href: 'tel:' + m.phone }, m.phone) : '-'));
          })))));
     }));
   }
@@ -245,14 +248,15 @@
       var ga = String(a.data.group), gb = String(b.data.group);
       return ga === gb ? (parseInt(a.data.section, 10) || 0) - (parseInt(b.data.section, 10) || 0) : (ga < gb ? -1 : 1);
     });
-    return h('div', { class: 'scroll-x' }, h('table', { class: 'data-table' },
+    return h('div', { class: 'scroll-x' }, h('table', { class: 'data-table cards' },
       h('thead', null, h('tr', null, ['No.', 'Name', 'Code', 'Phone', 'Group', 'Section', 'Timetable'].concat(steps.map(function (s) { return s.label.en; })).concat(['Status', '']).map(function (c) { return h('th', null, c); }))),
       h('tbody', null, sorted.map(function (s, i) {
-        return h('tr', { dataset: { ref: s.ref } }, h('td', null, String(i + 1)), h('td', { class: 'nm' }, bdi(s.name)), h('td', { class: 'mono' }, s.code), h('td', { class: 'mono' }, s.phone),
-          h('td', null, s.data.group || ''), h('td', null, s.data.section || ''),
-          h('td', null, s.link ? h('a', { href: s.link, target: '_blank', rel: 'noopener' }, 'Open') : ''),
-          steps.map(function (st) { return h('td', null, reviewSelect(form, s, st)); }),
-          h('td', null, statusSelect(form, s)), h('td', null, detailsButton(form, s, reload)));
+        var L = function (label, td) { td.dataset.label = label; return td; };
+        return h('tr', { dataset: { ref: s.ref } }, h('td', { class: 'num' }, String(i + 1)), h('td', { class: 'nm' }, bdi(s.name)), L('Code', h('td', { class: 'mono' }, s.code)), L('Phone', h('td', { class: 'mono' }, s.phone)),
+          L('Group', h('td', null, s.data.group || '')), L('Section', h('td', null, s.data.section || '')),
+          L('Timetable', h('td', null, s.link ? h('a', { href: s.link, target: '_blank', rel: 'noopener' }, 'Open') : '')),
+          steps.map(function (st) { return L(st.label.en, h('td', null, reviewSelect(form, s, st))); }),
+          L('Status', h('td', null, statusSelect(form, s))), h('td', null, detailsButton(form, s, reload)));
       }))));
   }
 
@@ -329,7 +333,7 @@
     function paintRight() {
       ui.clear(right);
       var q = state.data.requests.filter(function (r) { return r.id === state.sel; })[0];
-      if (!q) return right.appendChild(h('div', { class: 'empty' }, 'Choose a request on the left to see the student\'s registration and timetable.'));
+      if (!q) return right.appendChild(h('div', { class: 'empty' }, 'Choose a request from the list to see the student\'s registration and timetable.'));
       right.appendChild(h('h2', null, q.label ? bdi(q.label) : q.phone));
       right.appendChild(h('div', { class: 'actions', style: { marginBottom: '12px' } }, h('span', { class: 'mono' }, q.phone), A.badge(q.status === 'none' ? 'No match' : q.status === 'matched' ? 'Matched' : 'Duplicate', q.status), A.badge(A.SUB_LABEL[q.decision] || q.decision, q.decision)));
 

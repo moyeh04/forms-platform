@@ -49,7 +49,10 @@ function seed(world) {
     slots: { days: [{ label: 'Sunday 14 Nov', date: '2027-11-14', times: world.ctx.Rules.generateSlots({ start: '12:30', end: '14:00', length: 20, gap: 5 }) }], capacity: 1 },
     keyBooking: { enabled: true, source: team.id }
   });
-  make('whatsapp_registration', 'Level 2 WhatsApp Groups', 'Fall 2027', {});
+  const groups = make('whatsapp_registration', 'Level 2 WhatsApp Groups', 'Fall 2027', {});
+  [['هدى سامي عادل منصور', '4230710', '01033344455', 'A'], ['كريم وليد حسن جابر', '4230722', '01144455566', 'B']].forEach(([name, code, phone, group]) => {
+    world.api({ action: 'submit', slug: groups.slug, data: { email: 'student@example.com', name, phone, code, level: 'الثاني / الثالثة', major: 'حاسبات', group, section: '21', schedule: 'https://drive.google.com/file/d/1AbCdEfGhIjKlMnOpQrStUvWxYz012345/view' } });
+  });
   const client = admin({ action: 'admin.clients.create', name: 'Dr. Mahmoud - Database', forms: [team.slug], hiddenColumns: [], canReview: false });
   return { team, viewerToken: client.token, discussion, key: registered[0].key };
 }
