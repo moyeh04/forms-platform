@@ -202,6 +202,10 @@ Do these once with a test form:
 
 ## Part 4: Excel list with the real files (on your computer)
 
+The dashboard does this: open the form, **Responses, Download all tasks** (or
+**projects**). The steps below are the older local script, which downloads
+through public links and can meet Google's download limits.
+
 1. Install Python 3 once. In the project folder run `pip install -r scripts/requirements.txt`.
 2. Run (replace the name with your form's link name, the part after `?f=`):
    ```

@@ -36,7 +36,7 @@ Each section has the same shape:
 | 16 | WhatsApp has no API | Paste, normalise phones, match |
 | 17 | Browsers cannot check Drive sharing | The server checks it with the owner's Drive access |
 | 18 | PDFs from a script | Export URL with the script's own token, with a fallback |
-| 19 | Excel with real files | A local Python script, offline-safe links |
+| 19 | Excel with real files | Download all reads the files as the owner inside Google, in small steps, and writes the workbook itself |
 | 20 | Updating without breaking links | Actions pushes a new version to the same deployment |
 | 21 | Email problems must not lose data | Mail is best effort and never blocks saving |
 | 22 | Deleting must free a code but keep history | Soft delete: a flag, not a removed row |
@@ -760,17 +760,26 @@ never fully fails.
 ## 19. Excel with real files
 
 **Problem.** An Excel list of tasks is far more useful when each task opens the
-actual file. Doing that inside Apps Script means fetching dozens of files and
-zipping them under tight runtime limits.
+actual file. Downloading Drive files through their public links (from a script,
+`curl`, or a headless browser) is anonymous traffic that Google limits: "too
+many users have downloaded this file", virus-scan pages, bot checks. Doing it in
+Apps Script instead runs into six minutes a request and about 50 MB a file, and
+Google Sheets cannot save a link to a file next to the workbook.
 
-**What the platform does.** Runs it on the admin's own computer. The script asks
-the backend for the team list (one request), downloads each file locally, and
-builds the workbook. The hyperlinks inside are **relative** (`files/001_Name.pptx`),
-so the whole folder can be moved, zipped, or emailed and still work. Anything
-that cannot be downloaded is listed on a **Failed** sheet with the reason, and
-keeps its original link.
+**What the platform does.** **Download all** under Responses reads each file as
+the owner (`DriveApp`, and the export address with the owner's token for Google
+files), which is not public-link traffic. The page asks for one team at a time,
+a big folder is fetched over several requests, files are split into zip parts
+of up to 40 MB, and each zip reaches the browser in pieces through the API, so
+nothing is shared. `Xlsx.gs` writes `Teams.xlsx` itself, with **relative**
+links (`Tasks/03 - Clean Code.pptx`), so the unzipped folder can be moved and
+still work. Anything that cannot be saved is listed on a **Not downloaded**
+sheet with the reason and its Drive link. See
+[ARCHITECTURE.md](ARCHITECTURE.md#downloading-everything-a-team-form-collected).
 
-**Cost.** Needs Python once. Relative links open in desktop Excel only.
+**Cost.** A file over 45 MB is listed rather than packed. Relative links open in
+desktop Excel only. The older local script, `scripts/download_tasks.py`, still
+works but downloads through public links.
 
 ---
 

@@ -110,6 +110,7 @@ step needs the real Google services (see "What could not be tested here").
 | 5 random digits, shown once and emailed, expiring after a per-form number of days (default 7) | Done |
 | The key alone opens the registration; wrong guesses are throttled silently (10 per minute per form) | Done |
 | Edit or cancel; cancelling frees the code and the slot | Done |
+| A task form locks at its deadline: the key still shows the task but cannot change or cancel it until the form opens again | Done |
 | A key opens a summary of the registration: Change opens one page, Done returns, and Save changes appears only after a change | Done |
 | Remove one chosen team member (with Undo) or add one; the team size follows | Done |
 | Admin can look up a student's key (Details, Show key) or reset a lost one | Done |
@@ -152,7 +153,15 @@ step needs the real Google services (see "What could not be tested here").
 | A link can also ask for a six-digit access key sent apart from it; wrong keys lock it for ten minutes; the admin can read a lost key again, make a new one, or remove it | Done |
 | A link can end on a date, picked as a period or a day, and the end can be moved from the list | Done |
 
-### Excel export
+### Download all
+| Requirement | Status |
+|---|---|
+| **Download all tasks** or **projects** under Responses: every task file, or every project folder with its subfolders, read as the owner inside Google (no public-link download limits); Google files come as Office files | Done |
+| Zip parts of up to 40 MB with `Teams.xlsx`: one tinted block per team, members with the leader starred, the task or project linked to its saved copy, columns as wide as their content, one page wide in print | Done |
+| What cannot be saved is listed in the window and on a "Not downloaded" sheet, with the reason and the Drive link | Done |
+| The zips are read into the browser in pieces through the API, so nothing is shared by link | Done |
+
+### Excel export (older local script)
 | Requirement | Status |
 |---|---|
 | `scripts/download_tasks.py` downloads every task as a real `.pptx` and builds `Tasks.xlsx` with the same merged, tinted layout | Done |
