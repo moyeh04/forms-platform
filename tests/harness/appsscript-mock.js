@@ -60,7 +60,9 @@ class MockSheet {
     });
   }
   get(r, c) { const v = this.cells.get(`${r},${c}`); return v === undefined ? '' : v; }
-  set(r, c, v) { if (v === '' || v === null || v === undefined) this.cells.delete(`${r},${c}`); else this.cells.set(`${r},${c}`, v); }
+  set(r, c, v) { this.noteWrite(); if (v === '' || v === null || v === undefined) this.cells.delete(`${r},${c}`); else this.cells.set(`${r},${c}`, v); }
+  /** A write to the registry while no request holds the lock is recorded, so a test can require there are none. */
+  noteWrite() { const w = this.ss.world; if (w.watchLocks && this.ss === w.registry && !w.lock.held) w.unlockedWrites.push(this.name); }
   getName() { return this.name; }
   setName(n) { this.name = n; return this.proxy; }
   getSheetId() { return this.id; }
@@ -73,6 +75,7 @@ class MockSheet {
   getDataRange() { return this.getRange(1, 1, Math.max(1, this.getLastRow()), Math.max(1, this.getLastColumn())); }
   appendRow(arr) { const r = this.getLastRow() + 1; arr.forEach((v, j) => this.set(r, j + 1, v)); return this.proxy; }
   deleteRow(n) {
+    this.noteWrite();
     const next = new Map();
     for (const [k, v] of this.cells) {
       const [r, c] = k.split(',').map(Number);
@@ -119,6 +122,8 @@ function createWorld(options = {}) {
     cache: new Map(),
     mail: [],
     triggers: [],
+    // The script lock: `busy` makes the next wait time out, `beforeLock` runs once just before a lock is taken.
+    lock: { held: false, busy: false }, unlockedWrites: [], watchLocks: false, beforeLock: null,
     drive: { access: new Map(), missing: new Set(), folders: new Map(), files: new Map(), trashed: new Set() },
     logs: []
   };
@@ -235,7 +240,18 @@ function createWorld(options = {}) {
         remove: (k) => world.cache.delete(k)
       })
     },
-    LockService: { getScriptLock: () => ({ waitLock: () => {}, tryLock: () => true, releaseLock: () => {}, hasLock: () => true }) },
+    LockService: {
+      getScriptLock: () => ({
+        waitLock: () => {
+          if (world.beforeLock) { const between = world.beforeLock; world.beforeLock = null; between(); }
+          if (world.lock.busy) throw new Error('Lock timeout: another process was holding the lock for too long.');
+          world.lock.held = true;
+        },
+        tryLock: () => { if (world.lock.busy) return false; world.lock.held = true; return true; },
+        releaseLock: () => { world.lock.held = false; },
+        hasLock: () => world.lock.held
+      })
+    },
     MailApp: { sendEmail: (a, b, c) => world.mail.push(typeof a === 'object' ? a : { to: a, subject: b, body: c }) },
     Session: {
       getScriptTimeZone: () => 'Africa/Cairo',
