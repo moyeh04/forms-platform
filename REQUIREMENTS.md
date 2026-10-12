@@ -13,7 +13,7 @@ step needs the real Google services (see "What could not be tested here").
 |---|---|
 | Many forms from one admin dashboard, each with its own link (`?f=name`) and its own Google Sheet | Done |
 | Four form types: team registration, task submission, reservation, WhatsApp registration | Done |
-| Admin dashboard protected by a PIN (stored hashed, wrong guesses lock it for a while) | Done |
+| Admin dashboard protected by a PIN (stored hashed, eight wrong guesses lock it for ten minutes); the owner ends a lock from the sheet menu, and a dashboard that is already open stays signed in | Done |
 | Delete a form with one confirmation: its link stops working and its Google Sheet moves to the Drive trash (restorable for 30 days) | Done |
 | Create, duplicate for a new term, open or close with dates, rename or hide questions, add a description under any question | Done |
 | **Team members are mandatory: admin sets the minimum and maximum team size per form** | Done |
@@ -45,7 +45,7 @@ step needs the real Google services (see "What could not be tested here").
 | Requirement | Status |
 |---|---|
 | 5 random digits, shown once and emailed, expiring after a per-form number of days (default 7) | Done |
-| The key alone opens the registration; wrong guesses are throttled silently (10 per minute per form) | Done |
+| The key alone opens the registration; after 10 wrong keys in a minute a form refuses key lookups until the minute ends | Done |
 | Edit or cancel; cancelling frees the code and the slot | Done |
 | A task form locks at its deadline: the key still shows the task but cannot change or cancel it until the form opens again | Done |
 | A key opens a summary of the registration: Change opens one page, Done returns, and Save changes appears only after a change | Done |
@@ -58,15 +58,16 @@ step needs the real Google services (see "What could not be tested here").
 |---|---|
 | Timetable: click dates on a month calendar to offer them, set the hours once (first slot, last slot, slot length, break), and read the result as one row of slots for each day; a click switches one slot off, a day can have its own hours or another name, a slot shows how many teams booked it, and a warning appears when a booking is left on a day or time that was removed; one team per slot (capacity adjustable) | Done |
 | Teammates of a booking: asked or not, the fewest and the most (0 lets a leader book alone), the title and line students read, and which details are asked about each teammate | Done |
-| Moving a student between teams (a switch per form): a leader who names a member of another team can ask for that member, the team registers without them, and the member moves when the leader of the other team approves with the edit key or the admin approves under Responses; emails to both leaders, a full team cannot receive, a leader cannot be asked for, and a team left under the minimum is reported | Done |
+| Moving a student between teams (a switch per form): a leader who names a member of another team can ask for that member, the team registers without them, and the member moves when the leader of the other team approves with the edit key or the admin approves under Responses; emails to both leaders when the form switches them on, a full team cannot receive, a leader cannot be asked for, and a team left under the minimum is reported | Done |
 | One booking per leader code; taken slots crossed out for students | Done |
-| Booking with a registration key: a reservation can take the 5-digit key of a team registration form, show the team to confirm, and ask only for the slot; the same key opens and cancels the booking | Done |
+| Booking with a registration key: a reservation can take the 5-digit key of a team registration form, show the team to confirm, and ask only for the slot; the same key opens the booking, moves it to another slot and cancels it (a new key is given only when another booking of that form already holds the same digits) | Done |
 | Warning when a timetable change leaves existing bookings without a slot | Done |
 
 ## Sheets, dashboards, and printing
 | Requirement | Status |
 |---|---|
-| Google Sheets: every team is a block with a heavy border and alternating tints, a star on the leader, one merged project or task cell | Done |
+| Google Sheets: every team is a block with a heavy border and alternating tints, a star on the leader, one merged project or task cell; the blocks are repainted a minute after a change, and nothing runs while nothing changes | Done |
+| Phone numbers and codes keep a leading zero in every sheet row and in `Teams.xlsx` | Done |
 | Dashboard and instructor links show each team as a card: a teal or gold band, a header with the team number, project, and size, and the leader marked; readable in light and dark and stacked on phones | Done |
 | Phone layout (up to 600px): member rows, bookings, WhatsApp registrations and private links stack as cards with each value under its column name; a phone number is a call link; toolbars use two equal columns and the day sheet controls stay in one labelled group | Done |
 | Weekly bookings: bookings that use the keys of a registration form are listed inside its card in a list that folds to one line, and one button makes the next one as a copy of the last, one week later, as a draft | Done |
@@ -105,7 +106,7 @@ Be aware of these when you go live. They are checked on your first real run:
 
 - **Real Google services.** Tests run against an in-memory copy of Sheets, Drive,
   Mail, and the cache. The real "does this Drive link open for anyone" check,
-  the PDF export, the emails, and the 5-minute formatting timer only run on
+  the PDF export, the emails, and the booked repaint of the sheet views only run on
   Google. Try each once after deploying (the guide has a checklist).
 - **`admin.html` is a public page.** Anyone can open it, but it does nothing
   without the PIN, and wrong PINs lock it. Pick a PIN that is not guessable.

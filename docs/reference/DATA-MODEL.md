@@ -114,6 +114,7 @@ The `config` cell is the reason new forms need no code:
 
 | Key | Holds |
 |---|---|
+| `batchYear` | WhatsApp forms only: the academic year of the batch, such as `2027/2028`. These forms keep `term` empty |
 | `subject` | Subject code shown beside the title, such as `CMPn323` (letters, digits, dashes, no spaces) |
 | `lang` | Default language and whether students see the switch |
 | `icon` | `team`, `calendar`, `task`, `chat`, or `none` |
@@ -191,8 +192,11 @@ trash, where it can be restored for 30 days; the registry row is removed. Named 
 The readable columns are derived from `data` every time a row is saved
 (`applyDerived_`). If they ever disagree, `data` wins.
 
-All cells are formatted as **plain text**. That keeps phone numbers such as
-`01012345678` and codes from losing their leading zeros or turning into numbers.
+Every row is written as **plain text**: a tab is made with plain-text cells, and
+each new row sets the format again (`appendPlain_`), because a row past the ones
+the sheet started with has none. That keeps phone numbers such as `01012345678`
+and codes from losing their leading zeros or turning into numbers. The Transfers
+and Requests tabs and the registry tabs are written the same way.
 
 ### Transfers tab (made with the first request)
 
@@ -203,7 +207,7 @@ form (`rules.transfers`). A form that never has a request has no such tab.
 |---|---|
 | `id` | Unique id of the request |
 | `created`, `updated` | ISO timestamps |
-| `status` | `pending`, `approved`, `rejected`, `cancelled` (by the team that asked) or `closed` (the student moved elsewhere, or one of the two teams was removed) |
+| `status` | `pending`, `approved`, `rejected`, `cancelled` (by the team that asked) or `closed` (the student moved elsewhere, or one of the two teams was cancelled by its leader or deleted by the admin) |
 | `code` | Code of the student |
 | `member` | The member as the asking team typed it (JSON); this is what joins the team on approval |
 | `fromId`, `fromRef` | The team that holds the student |
@@ -242,7 +246,7 @@ Stored by Apps Script itself, not in any sheet:
 | `REGISTRY_ID` | The registry spreadsheet's id |
 | `ROOT_FOLDER_ID` | The `Forms Platform` Drive folder |
 | `SITE_URL` | Your website address, used in emails |
-| `dirty:<form id>` | A flag meaning "rebuild this form's views on the next timer run" |
+| `dirty:<form id>` | The time of the last change whose sheet views are not repainted yet. The booked run of `processDirtyViews` clears it |
 
 ## Short-lived counters (CacheService)
 
@@ -252,6 +256,7 @@ Stored by Apps Script itself, not in any sheet:
 | `badkey:<form id>` | Wrong edit keys on a form | 10 per minute |
 | `bad_tokens` | Wrong viewer tokens | 30 per minute |
 | `client_key:<client id>` | Wrong access keys on one private link | 5 then locked 10 minutes |
+| `views_booked` | A note that a repaint of the sheet views is booked, so a change does not look at the triggers again | 5 minutes |
 | `dl_job:<folder id>` | A Download all in progress: its form, its work folder, what could not be saved, its zip parts | 6 hours |
 
 Download all works in the owner's Drive, in `Forms Platform / Exports / Downloads`,

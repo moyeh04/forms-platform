@@ -285,7 +285,8 @@ Deploy**. This is a recovery path; routine updates use the configured workflow.
 | `npm run setup` stops at "Creating the Forms Registry sheet" | Turn on the Apps Script API (step 1), wait a minute, and run it again. If an empty **Forms Registry** sheet was left in Google Drive by the failed attempt, delete it. |
 | `npm run setup` stops at "Pushing the backend" | Turn on the Apps Script API (step 1). If you passed a Script ID, check that it is the one from Project Settings. |
 | `npm run setup` stops at a GitHub step | Run `gh auth login`, and check that the folder has an `origin` remote on GitHub (step 2). |
-| "That PIN is not correct" | Wrong PIN, or too many tries: wait a few minutes. To reset, run **Forms Platform > 2. Set admin PIN...** again. |
+| "That PIN is not correct" | Type it again; the field keeps what you typed. To choose a new PIN, run **Forms Platform > 2. Set admin PIN...** in the sheet. |
+| "Too many wrong PINs. Wait ten minutes, or unlock the admin page from the Forms Platform menu in the sheet." | Eight wrong PINs lock the dashboard for ten minutes, for everyone. Wait, or click **Forms Platform > Unlock the admin page** in the sheet, which lifts the lock at once and keeps your PIN. A dashboard that was already open keeps working after the lock. |
 | Backend update failed | Check the **Deploy Google Apps Script** job. Renew `CLASPRC_JSON` if authentication failed; verify both IDs and enable the Apps Script API. |
 | The site did not change after a push | Open the **Actions** tab: a red run means a test failed and nothing was published. A green run means the browser cached the old file: press Ctrl+F5. |
 | Actions says Pages is not enabled | Settings, Pages, Source: **GitHub Actions**. |

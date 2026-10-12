@@ -108,7 +108,7 @@ flowchart LR
 | Apps Script | All logic: validation, limits, keys, locking, emails, views | Free quotas | Hold state in memory. Every request starts fresh. |
 | Google Sheets | The only database | Free | Be edited by hand in the Responses tab (the platform owns it). |
 | Drive | Print PDFs, form sheets, student-shared files | Free | Be written by students. They only share links. |
-| Admin laptop | Builds `dist/`, runs the Excel export | Nobody | Be required for students to use the forms. |
+| Admin laptop | Builds `dist/` and runs the first deployment | Nobody | Be required for students to use the forms. |
 
 ## Request lifecycle
 
@@ -226,7 +226,7 @@ sequenceDiagram
     G->>G: issue unique 5-digit key, store only its hash
     G->>SH: append the row
     G->>G: release the lock
-    G->>G: refresh views (inline or mark dirty)
+    G->>G: mark the views out of date, book one repaint
     G->>M: confirmation email (failure is only logged)
     G-->>P: ref, key, expiry
     P-->>S: ticket with key, save image, save PDF
@@ -708,8 +708,8 @@ flowchart LR
 
 ## How sheet views stay fast
 
-Colouring a sheet is slow in Apps Script. The platform formats immediately for
-small forms and defers for big ones, so a student never waits for formatting.
+Colouring a sheet is slow in Apps Script. A change only marks the form, and one
+booked run repaints it a minute later, so a student never waits for formatting.
 
 ```mermaid
 %%{init: {
@@ -737,14 +737,15 @@ small forms and defers for big ones, so a student never waits for formatting.
 flowchart TD
     A["Any change: submit, edit, cancel, status, review"] --> B["afterChange_(form)"]
     B --> C["refreshViews(form)"]
-    C --> D{"Rows in Responses<br/>60 or fewer?"}
-    D -- "yes" --> E["rebuildViews now<br/>under the script lock"]
-    D -- "no" --> F["set script property dirty:formId"]
-    F --> G["Time trigger every 5 minutes<br/>processDirtyViews"]
-    G --> H["for each dirty flag: delete flag, rebuild views"]
-    E --> I[("Team Members List / Bookings / Registrations tabs<br/>tinted blocks, heavy borders, merged project cell")]
-    H --> I
-    J["Admin presses Rebuild sheet"] --> E
+    C --> F["set script property dirty:formId<br/>to the time of the change"]
+    F --> D{"A run of processDirtyViews<br/>already booked?"}
+    D -- "no" --> G["book one run, a minute from now"]
+    D -- "yes" --> W["nothing more to do"]
+    G --> H["the run removes its trigger,<br/>repaints every marked form,<br/>clears a mark that did not change"]
+    H --> I[("Team Members List / Bookings / Registrations tabs<br/>tinted blocks, heavy borders, merged project cell")]
+    H -- "a mark changed while painting,<br/>or 4 minutes passed" --> G
+    J["Admin presses Rebuild sheet"] --> E["rebuildViews now"]
+    E --> I
     classDef cDb fill:#F3E2B3,stroke:#B8892D,stroke-width:1.5px,color:#2F2418
     classDef cActor fill:#F4D9D3,stroke:#9A3328,stroke-width:1.5px,color:#2F2418
     classDef cDec fill:#FBEFC9,stroke:#C9A24A,stroke-width:1.5px,color:#2F2418
@@ -755,8 +756,11 @@ flowchart TD
     class D cDec
 ```
 
-The trigger is installed by **First-time setup**. If it is ever missing, run
-the setup again; it only creates it when absent.
+No timer runs while nothing changes: a run exists only between a change and its
+repaint, and it removes itself. The repaint takes no script lock, because it only
+reads the responses and writes its own tabs. A form whose repaint fails keeps its
+mark, so its next change, or **Rebuild sheet**, paints it. A project that was set
+up while a timer ran every five minutes loses that timer on the first run.
 
 ## Downloading everything a team form collected
 

@@ -39,7 +39,7 @@ flowchart TD
         a{"2. does the action need a secret?"}
         s["3. verify the secret, throttle failures"]
         r["4. validate the data again with shared rules"]
-        w["5. act under a lock, with the owner's permissions"]
+        w["5. act with the owner's permissions,<br/>data rows written under one lock"]
         v --> a --> s --> r --> w
     end
     subgraph trusted["Trusted: the owner's Google account"]
@@ -141,8 +141,9 @@ flowchart LR
 
 ### Details worth knowing
 
-- **Throttling is silent for keys.** A wrong key and a throttled key look alike
-  to a casual guesser; only the message differs after the tenth try in a minute.
+- **Key throttling is per form.** After ten wrong keys in a minute on one form,
+  every key lookup on that form answers `too_many_attempts` until the minute
+  ends, also for a student with the right key.
 - **Per-form key salt.** The form id is part of the key hash, so the same five
   digits in two forms hash to different values, and a hash from one form is
   useless in another.
@@ -161,8 +162,11 @@ flowchart LR
   nothing for a third-party site to ride on (no cross-site request forgery
   surface), and nothing to hijack.
 - **Rendering.** The pages build elements with `textContent` and text nodes, not
-  by pasting student text into HTML. The only `innerHTML` use is for the app's
-  own fixed icon shapes. A student cannot inject script through a name or title.
+  by pasting student text into HTML. The only `innerHTML` use in the pages is for the
+  app's own fixed icon shapes. A student cannot inject script through a name or
+  title. The print dialog of the sheet menu (`Menu.gs`) is the one exception: it
+  builds its list of days as HTML from the day names the admin typed, in a
+  dialog only the sheet owner opens.
 - **Admin PIN in the browser.** Kept in `sessionStorage` for the current tab only
   and sent with each admin request. Closing the tab forgets it.
 
@@ -171,9 +175,10 @@ flowchart LR
 | Weak spot | Why it exists | Mitigation |
 |---|---|---|
 | `admin.html` is public | Free static hosting has no private area | It holds no data; every action needs the PIN; lockout; `noindex` |
-| An attacker can lock the admin out for 10 minutes by guessing wrong 8 times | The lockout counts attempts globally, so it cannot be bypassed from a browser | Wait, or the owner can still work directly in the sheets |
-| A 5-digit key is short | Students must type it on a phone | Salted per form, 10 tries a minute, expiry, shown once |
-| A registration key also books a slot | Teams should not retype their details | The lookup shares the same 10 tries a minute; the preview shows the leader's name, code, project and team size only, never phone or email; one booking per team; typed answers are ignored, so a key cannot book under another name |
+| Anyone who opens the admin page can lock the dashboard for 10 minutes with 8 wrong PINs, and can do it again | Wrong tries are counted in one place for all visitors: there are no accounts to count by | **Unlock the admin page** in the sheet menu lifts the lock at once and keeps the PIN. A dashboard that is already open keeps its PIN and works again when the lock ends. The owner can always work directly in the sheets |
+| A 5-digit key is short, and a guess is tried against every live key of the form | Students must type it on a phone | 10 wrong tries a minute per form, expiry, shown once. This slows guessing and does not stop it: on a form with 200 live keys about 500 guesses reach one of them, which the limit spreads over about an hour. What a key opens is one team's registration. Accepted for a course form |
+| Ten wrong keys in a minute stop key lookups on that form for the rest of the minute, for everyone | The same counter is the limit above | It ends by itself within a minute; the admin can edit or cancel any registration from Responses meanwhile |
+| A registration key also books a slot | Teams should not retype their details | The lookup shares the same 10 tries a minute; the preview shows the leader's name, code, project and team size only, never phone or email; one booking per team; typed answers are ignored when the slot is booked and when it is changed later, so a key cannot book under another name |
 | A viewer link is a bearer secret | No accounts for instructors | Revocable; hidden columns; send it privately; make a new link if shared widely |
 | The script holds broad Google permissions | It must read students' linked files and manage the platform folder | The manifest lists scopes explicitly; the script is yours; only the owner can change it. The Drive scope is full because checking sharing on arbitrary student links needs it. |
 | Student data lives in the owner's Google Drive | That is the database | Share each form's sheet only with people who need it |
@@ -196,8 +201,8 @@ Script properties hold the pepper and the PIN hash. If they are deleted:
 | Data | Where | Who can see it |
 |---|---|---|
 | Names, codes, phones, emails | The form's own Google Sheet | The sheet owner, anyone the owner shares it with, the admin dashboard, and instructors through links with those columns shown |
-| Task files | The student's Drive | Whoever the student shared the link with; the export downloads them using the shared link |
-| Excel export | The admin's laptop | The admin. It contains names and codes but no phone numbers. Do not commit it (`Tasks_Export/` is git-ignored). |
+| Task files and project folders | The student's Drive | Whoever the student shared the link with. **Download all** reads them as the owner |
+| Download all | The owner's Drive, in `Forms Platform / Exports / Downloads`, and wherever the admin saves the zips | The owner, and anyone the saved zips are given to. They hold the students' files and `Teams.xlsx` with names, codes and sections, but no phone numbers or emails. A new download of the same form moves the older folder to the trash |
 
 ## Operational checklist
 
@@ -205,6 +210,6 @@ Script properties hold the pepper and the PIN hash. If they are deleted:
 - [ ] Share each form's Google Sheet with the minimum number of people
 - [ ] Give instructors links with phone and email hidden unless they need them
 - [ ] Turn off a viewer link when its term ends
-- [ ] Keep `Tasks_Export/` out of git and out of shared folders
+- [ ] Keep saved zips and `Teams.xlsx` out of git and out of shared folders, and empty `Exports / Downloads` when a term ends
 - [ ] After changing the backend, check that the **Test and deploy site** run succeeded; a manual recovery must publish a **New version** of the same deployment
 - [ ] Revisit the quota page in Google if you expect hundreds of confirmation emails a day

@@ -1,11 +1,11 @@
 # Testing
 
-272 automated tests run without a Google account, a browser, or a network.
+280 automated tests run without a Google account, a browser, or a network.
 They run the **real** backend and the **real** pages. This page explains how
 that works and what it can and cannot prove.
 
 ```
-npm test    # 272 tests
+npm test    # 280 tests
 ```
 
 ## The layers
@@ -84,7 +84,9 @@ for the code to run unchanged:
 
 The harness exposes `world.api(request)` (the same call a browser makes),
 `world.call('functionName')` (run any backend function by name, such as
-`setup` or `setAdminPin`), and `world.sheet(id, tab)` (read cells back).
+`setup` or `setAdminPin`), `world.sheet(id, tab)` (read cells back), and
+`world.runTriggers()` (fire the triggers that are booked, as Google would when
+their time comes; a test calls it before it reads a tinted view).
 
 ```mermaid
 %%{init: {
@@ -137,19 +139,19 @@ function that calls `world.api`. Helpers `type`, `pick`, `click`,
 |---|---:|---|
 | Shared rules | 16 | Arabic filtering, name parts, phones, codes, Drive links, folder names, slots, form state |
 | Team size and audience | 17 | Required question, range, exact member count, admin range, conflicts warning, size notes, specialization limits, section limits |
-| Core and forms | 13 | Setup, PIN lockout, forms CRUD, duplicate, delete, templates |
-| Submissions | 21 | Submit, edit keys, sealed keys, expiry, throttling, duplicates, Drive checks, folder names, limits, emails on and off |
+| Core and forms | 14 | Setup, PIN lockout and unlocking it from the sheet menu, forms CRUD, duplicate, delete, templates |
+| Submissions | 23 | Submit, edit keys, sealed keys, expiry, throttling, duplicates, Drive checks, folder names, limits, emails on and off and without a key, rows written as text past the rows a sheet starts with |
 | Reservations | 11 | Slots, capacity, one booking per leader, orphan warning |
-| Sheet views | 9 | Tinted blocks, leader star, merged task cell, bookings by day |
+| Sheet views | 11 | Tinted blocks, leader star, merged task cell, bookings by day, one booked repaint for many changes that removes its trigger, a change during the repaint booking another, a failed repaint keeping its mark |
 | Print | 8 | Print tabs, signature column, PDF success and fallback |
-| Key booking | 15 | Setting and its source form, team preview without contact details, copied answers, forged answers ignored, one booking per team, the same key cancels, expired keys still book, the student page and the admin switch, the next booking one week later, bookings listed under their form |
+| Key booking | 16 | Setting and its source form, team preview without contact details, copied answers, forged answers ignored, one booking per team, the same key cancels and moves the booking to another slot with nothing else changed, expired keys still book, the student page and the admin switch, the next booking one week later, bookings listed under their form |
 | Download all | 5 | Task files saved under their team number and linked from `Teams.xlsx`, Google Slides and Docs exported, a project folder with subfolders over several requests, files too big or of a kind that cannot be saved listed with the reason, zip parts and pieces that add up, only zips left in Drive, admin only, a download that expired; the deadline lock of task forms |
 | Key expiry | 6 | Which keys are given and expired, extending the expired ones from today, all of them from their own end, one date for all, chosen teams only, bad requests change nothing, cancelled registrations left out |
-| Member transfers | 8 | Refusal that lists who can be asked for, the request and the team saved without the member, approval by the leader and by the admin, rejection, cancelling, a full team, a leader, two requests for one student, a removed team, the switch and the list under Responses |
+| Member transfers | 9 | Refusal that lists who can be asked for, the request and the team saved without the member, approval by the leader and by the admin, rejection, cancelling, a full team, a leader, two requests for one student, a removed team, a team deleted by the admin, the switch and the list under Responses |
 | Matching | 6 | Paste, normalise, matched, none, duplicate, sequential review |
 | Viewer API | 13 | Tokens, hidden columns, today and by day, review rights, revoked links, access keys with the lock after wrong tries, reading a lost key again, links that end on a date and open again when it moves |
 | Student page | 35 | Steps, filters, descriptions, team size picker and notes, remove and add a member with Undo, the summary a key opens, the ship over the current step, audience line, subject tag, slots, review, ticket and email notice, edit by key, themes, Arabic, asking for a member of another team, answering a request with Approve, Reject or Later, a task locked after its deadline |
-| Admin page | 51 | Login, create with term chips, team size and notes, descriptions, who can register, locked fields, team cards, show key, teammates of a booking (how many, title, details asked), timetable calendar, hours, a day with its own hours and booked slots, delete, matching, clients with the link shown once and the key apart, a lost key shown again, a link end picked and moved, Extend keys for expired keys and chosen teams, one registration's key extended from its details, Download all with what was not downloaded and the saved zip, lists as chips or rows with the reason for a refused save, sections built from groups and counts, number runs with steppers, new lists picked for a question, column names on list rows for the phone layout, the day sheet group, form tabs that keep edits, section summaries, save bar only while there is a change, sections by one or by year group, added questions and pages, new form preview and title reason |
+| Admin page | 52 | Login, a refused PIN kept in its field, a lock that leaves an open window signed in, create with term chips, team size and notes, descriptions, who can register, locked fields, team cards, show key, teammates of a booking (how many, title, details asked), timetable calendar, hours, a day with its own hours and booked slots, delete, matching, clients with the link shown once and the key apart, a lost key shown again, a link end picked and moved, Extend keys for expired keys and chosen teams, one registration's key extended from its details, Download all with what was not downloaded and the saved zip, lists as chips or rows with the reason for a refused save, sections built from groups and counts, number runs with steppers, new lists picked for a question, column names on list rows for the phone layout, the day sheet group, form tabs that keep edits, section summaries, save bar only while there is a change, sections by one or by year group, added questions and pages, new form preview and title reason |
 | Instructor page | 10 | Today, by day, hidden columns, review rights, invalid links, member values named for the phone layout, phone as a call link |
 | Registry writes | 6 | Every change to forms, lists and links written inside the lock, a save that keeps its row while another form is deleted, a save over a newer copy refused, a busy lock, a link that keeps a renamed form, list names that stay unique |
 | Harness | 4 | The fake itself |
@@ -163,7 +165,7 @@ function that calls `world.api`. Helpers `type`, `pick`, `click`,
 | Real Drive sharing check | Needs real Drive files | First-run checklist in [DEPLOY.md](../DEPLOY.md) |
 | Real PDF export | Needs Google's export endpoint | Same checklist |
 | Real email delivery and quotas | Needs real mail | Submit once with your own email |
-| The 5-minute timer firing | Tests confirm setup installs the trigger once and call `processDirtyViews` directly, but cannot make Google fire it | Check **Triggers** in Apps Script after setup |
+| The booked repaint firing | Tests confirm a change books one run and fire it themselves, but cannot make Google fire it | Submit once, wait a minute, and look at the tinted tab |
 | Google's cross-site redirect behaviour | Needs a real web app | A real submission from the live site |
 | Fonts and exact visuals | jsdom does not render | Look at the page, or use the screenshot scripts below |
 | Excel rendering | Cell properties are asserted, not drawn | Open `Teams.xlsx` from a download in desktop Excel |
