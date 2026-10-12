@@ -195,6 +195,32 @@ test('Setup: without a Script ID a sheet with a bound script is created once', (
   assert.throws(() => createdProject('User has not enabled the Apps Script API.'), /Script ID/);
 });
 
+test('Setup: on a terminal the owner chooses a new sheet or an existing one', (t) => {
+  const created = JSON.stringify({ scriptId: 'new-script', parentId: 'new-sheet' });
+  const answers = { 'variable get': { status: 1 }, ' create ': { stdout: created }, ' deploy ': { stdout: 'Deployed ' + newId + ' @1' } };
+  const scripted = (replies) => { const asked = []; return { asked, ask: (question) => { asked.push(question); return replies.shift(); } }; };
+  const created_ = (fake) => fake.lines().some((line) => line.includes(' create '));
+
+  for (const reply of ['', '1']) {
+    const fake = fakeSetup(t, answers);
+    assert.equal(setup('', { ...fake.options, ask: scripted([reply]).ask }).scriptId, 'new-script');
+  }
+  const existing = fakeSetup(t, answers);
+  assert.equal(setup('', { ...existing.options, ask: scripted(['2', 'my-script']).ask }).scriptId, 'my-script');
+  assert.equal(created_(existing), false);
+
+  for (const replies of [['2', ''], ['2', 'not an id'], ['x']]) {
+    const fake = fakeSetup(t, answers);
+    assert.throws(() => setup('', { ...fake.options, ask: scripted(replies).ask }), /[Nn]othing was created/);
+    assert.equal(created_(fake) || fake.lines().some((line) => line.includes('variable set')), false);
+  }
+  const stored = fakeSetup(t, { 'variable get': { stdout: 'test-deployment' } });
+  const silent = scripted([]);
+  setup('', { ...stored.options, ask: silent.ask });
+  setup('given-script', { ...fakeSetup(t, answers).options, ask: silent.ask });
+  assert.deepEqual(silent.asked, []);
+});
+
 test('Setup: the workstation and the workflow pin the same clasp version', () => {
   const workflow = fs.readFileSync(path.join(root, '.github/workflows/pages.yml'), 'utf8');
   const pins = [...workflow.matchAll(/@google\/clasp@[0-9.]+/g)].map((match) => match[0]);

@@ -25,6 +25,35 @@ function deploymentId(output) {
   return match[1];
 }
 
+/** Ask one question on the terminal and return the trimmed answer. */
+function ask(question) {
+  process.stdout.write(question);
+  const buffer = Buffer.alloc(1024);
+  for (;;) {
+    try { return buffer.toString('utf8', 0, fs.readSync(0, buffer, 0, buffer.length)).trim(); }
+    catch (err) {
+      if (err.code !== 'EAGAIN') throw err;
+      Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 50); // Terminal not ready yet.
+    }
+  }
+}
+
+/** New sheet (the default) or an existing one; returns the existing Script ID or '' for a new sheet. */
+function chooseSheet(prompt, log) {
+  log(['No sheet is linked to this repository yet.',
+    '  1) Create a new ' + SHEET + ' sheet (recommended)',
+    '  2) Use a sheet I already have'].join('\n'));
+  const choice = prompt('Choose 1 or 2 [1]: ');
+  if (choice === '' || choice === '1') return '';
+  if (choice !== '2') throw new Error('Answer 1 or 2. Nothing was created.');
+  const id = prompt('Script ID (in the sheet: Extensions > Apps Script > Project Settings): ');
+  if (!/^[A-Za-z0-9_-]+$/.test(id)) {
+    throw new Error('No valid Script ID was entered, so nothing was created. ' +
+      'When you have it, run: npm run setup -- <SCRIPT_ID>');
+  }
+  return id;
+}
+
 /** `clasp create --json` prints one object; anything around it is progress text. */
 function createdProject(output) {
   const text = output || '';
@@ -66,6 +95,8 @@ function setup(scriptId, options = {}) {
     const stored = run('gh', ['variable', 'get', 'APPS_SCRIPT_ID']);
     scriptId = stored.status === 0 ? stored.stdout.trim() : '';
   }
+  // Asked only on a terminal; an unattended run takes the recommended choice.
+  if (!scriptId && options.ask) scriptId = chooseSheet(options.ask, log);
   let sheetUrl = '';
   if (!scriptId) {
     // clasp also clones the empty project into its working folder, so it runs in a scratch one.
@@ -115,7 +146,8 @@ function setup(scriptId, options = {}) {
 
 if (require.main === module) {
   try {
-    const { url, sheetUrl } = setup(process.argv[2] || process.env.APPS_SCRIPT_ID);
+    const { url, sheetUrl } = setup(process.argv[2] || process.env.APPS_SCRIPT_ID,
+      { ask: process.stdin.isTTY ? ask : undefined });
     console.log([
       'Backend deployed and GitHub configured.',
       'Web app address: ' + url,

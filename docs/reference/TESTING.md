@@ -1,11 +1,11 @@
 # Testing
 
-220 automated tests run without a Google account, a browser, or a network.
+221 automated tests run without a Google account, a browser, or a network.
 They run the **real** backend and the **real** pages. This page explains how
 that works and what it can and cannot prove.
 
 ```
-npm test                                              # 200 JavaScript tests
+npm test                                              # 201 JavaScript tests
 python3 -m unittest discover -s tests -p "test_*.py"  # 20 Python tests
 ```
 
@@ -154,7 +154,7 @@ function that calls `world.api`. Helpers `type`, `pick`, `click`,
 | Instructor page | 9 | Today, by day, hidden columns, review rights, invalid links |
 | Harness | 4 | The fake itself |
 | Colour contrast | 4 | Every text and outline pair meets WCAG AA in light, dark, and device-dark themes |
-| Deployment | 13 | `API_URL` validation, URL and deployment ID agree, built pages use the variable URL, clasp configuration, missing credentials, first-deployment setup with a fake `gh` and clasp |
+| Deployment | 14 | `API_URL` validation, URL and deployment ID agree, built pages use the variable URL, clasp configuration, missing credentials, first-deployment setup with a fake `gh` and clasp |
 | Excel export (Python) | 20 | Link parsing, downloads, virus-scan page, workbook layout, merged cells, Failed sheet |
 
 ## What is not covered, and how to cover it

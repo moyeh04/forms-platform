@@ -101,7 +101,16 @@ npm run setup
 ```
 
 The first time, a browser window opens for Google sign-in: choose the account
-that will own the data and click **Allow**. Then the command:
+that will own the data and click **Allow**. The command then asks one question:
+
+```
+No sheet is linked to this repository yet.
+  1) Create a new Forms Registry sheet (recommended)
+  2) Use a sheet I already have
+Choose 1 or 2 [1]:
+```
+
+Press **Enter** for a new sheet. After that the command:
 
 1. creates a Google Sheet named **Forms Registry** with an Apps Script project attached to it;
 2. builds `dist/Code.gs` and `dist/appsscript.json` and pushes them into that project;
@@ -115,9 +124,11 @@ step fails it stops with the reason; fix the cause and run it again. A second
 run reuses the stored sheet and web app, so neither is created twice and the
 address does not change.
 
-**Already have a sheet?** Open its **Extensions > Apps Script**, copy the
-**Script ID** from **Project Settings** (gear icon), and run
-`npm run setup -- YOUR_SCRIPT_ID`. The setup then skips creating a sheet.
+**Already have a sheet?** Answer **2** and paste its **Script ID**, found in the
+sheet under **Extensions > Apps Script > Project Settings** (gear icon). If you
+do not have the ID at hand, press Enter: the command stops without creating
+anything, and you run `npm run setup -- YOUR_SCRIPT_ID` later. The question is
+not asked again once a sheet is linked.
 
 ### 4. First-time setup and admin PIN (in the sheet)
 1. Open the **Forms Registry** sheet from the address the setup printed (it is also in your Google Drive). If it was already open, **reload the page** (F5). Wait about 5 seconds.
