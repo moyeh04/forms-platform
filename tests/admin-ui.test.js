@@ -134,7 +134,7 @@ test('WhatsApp metadata: settings, public form, and viewer retain and display ba
   assert.equal(studentPage.window.document.querySelector('.tags').textContent.trim(), 'Batch 2029/2030');
   assert.equal(studentPage.window.document.title, 'Groups 2028 - Batch 2029/2030');
 
-  const client = w.admin({ action: 'admin.clients.create', name: 'Dr. Ahmed', forms: [f.slug] });
+  const client = w.admin({ action: 'admin.clients.create', name: 'Dr. Ahmed', forms: [f.slug], withKey: false });
   const viewerMe = w.api({ action: 'viewer.me', token: client.token });
   assert.equal(viewerMe.forms[0].batchYear, '2029/2030');
   assert.equal(viewerMe.forms[0].term, undefined);
@@ -182,7 +182,7 @@ test('WhatsApp metadata: legacy semester records resolve to batch year without d
   assert.equal(publicForm.subject, undefined);
   assert.equal(publicForm.term, undefined);
   w.admin({ action: 'admin.forms.update', id: f.id, patch: { status: 'open' } });
-  const client = w.admin({ action: 'admin.clients.create', name: 'Dr. Ahmed', forms: [f.slug] });
+  const client = w.admin({ action: 'admin.clients.create', name: 'Dr. Ahmed', forms: [f.slug], withKey: false });
   const view = w.api({ action: 'viewer.data', token: client.token, slug: f.slug });
   assert.equal(view.form.batchYear, '2027/2028');
   assert.equal(view.form.subject, undefined);
@@ -556,8 +556,11 @@ test('Clients: create a private link, see it once, and it opens the instructor v
   all.checked = true; p.fire(all, 'change');
   const phone = p.$$('.dialog .check').find((l) => l.textContent === 'Phone').querySelector('input');
   phone.checked = true; p.fire(phone, 'change');
+  assert.equal(p.$('[name="withKey"]').checked, true, 'a new link asks for a key unless unticked');
+  const key = p.$('[name="withKey"]'); key.checked = false; p.fire(key, 'change');
   p.clickText('Create link', p.$('.dialog')); await settle(10);
   const link = p.$('.link-box code').textContent;
+  assert.equal(p.$('[name="access-key"]'), null, 'no key was made');
   assert.ok(link.includes('viewer.html?t='));
   const token = new URL(link).searchParams.get('t');
   const me = w.api({ action: 'viewer.me', token });
@@ -832,9 +835,9 @@ test('Responses and clients: list rows carry their column names, and the day she
   assert.deepEqual(labels.slice(0, 5), ['Code', 'Phone', 'Group', 'Section', 'Timetable']);
   assert.equal(labels[labels.length - 1], 'Status');
 
-  w.admin({ action: 'admin.clients.create', name: 'Dr. Ahmed', forms: [groups.slug] });
+  w.admin({ action: 'admin.clients.create', name: 'Dr. Ahmed', forms: [groups.slug], withKey: false });
   const clients = await openAdmin(w, '#/clients');
-  assert.deepEqual(clients.$$('.data-table.cards tbody td[data-label]').map((c) => c.dataset.label), ['Can see', 'Hidden columns', 'Can review', 'Link']);
+  assert.deepEqual(clients.$$('.data-table.cards tbody td[data-label]').map((c) => c.dataset.label), ['Can see', 'Hidden columns', 'Can review', 'Link', 'Access key']);
 
   const seminar = w.admin({ action: 'admin.forms.create', type: 'reservation', title: 'Seminar', term: 'Fall 2027' }).form;
   const res = await openAdmin(w, `#/f/${seminar.slug}`);
@@ -1010,4 +1013,34 @@ test('Lists: the server refuses a list that does not exist and a question that r
   const fields = w.admin({ action: 'admin.forms.get', id: f.id }).form.fields.map((x) => (x.id === 'section' ? { ...x, list: 'nope' } : x));
   assert.equal(w.admin({ action: 'admin.forms.update', id: f.id, patch: { fields } }).error.code, 'list_not_found');
   assert.equal(Object.keys(w.admin({ action: 'admin.lists.get' }).lists).includes('_info'), false);
+});
+
+test('Clients: a link with an access key shows the key once, and the key can be changed or removed', async () => {
+  const w = boot();
+  w.make('reservation', 'Seminar');
+  const p = await openAdmin(w, '#/clients');
+  p.click('[name="newClient"]'); await settle(2);
+  p.type('[name="clientName"]', 'Dr. Ahmed');
+  const all = p.$$('.dialog .check').find((l) => l.textContent.includes('All forms')).querySelector('input');
+  all.checked = true; p.fire(all, 'change');
+  p.clickText('Create link', p.$('.dialog')); await settle(10);
+  const key = p.$('[name="access-key"]').textContent;
+  assert.match(key, /^\d{6}$/);
+  const token = new URL(p.$('.link-box code').textContent).searchParams.get('t');
+  assert.equal(w.api({ action: 'viewer.me', token }).error.code, 'key_needed', 'the link alone opens nothing');
+  assert.equal(w.api({ action: 'viewer.me', token, accessKey: key }).client.name, 'Dr. Ahmed');
+  p.clickText('Done', p.$('.dialog')); await settle(8);
+  assert.ok(p.$('[data-client] [data-label="Access key"]').textContent.includes('Asked'));
+
+  p.click('[name="new-key"]'); await settle(2);
+  p.clickText('Make new key', p.$('.overlay')); await settle(10);
+  const fresh = p.$('[name="access-key"]').textContent;
+  assert.equal(p.$('.dialog .link-box'), null, 'a new key leaves the link as it is');
+  assert.equal(w.api({ action: 'viewer.me', token, accessKey: key }).error.code, 'bad_access_key', 'the old key stops working');
+  assert.equal(w.api({ action: 'viewer.me', token, accessKey: fresh }).ok, true);
+  p.clickText('Done', p.$('.dialog')); await settle(8);
+  p.click('[name="remove-key"]'); await settle(2);
+  p.clickText('Remove key', p.$('.overlay')); await settle(10);
+  assert.equal(w.api({ action: 'viewer.me', token }).ok, true, 'without a key the link opens alone');
+  assert.ok(p.$('[data-client] [data-label="Access key"]').textContent.includes('Not asked'));
 });

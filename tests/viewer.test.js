@@ -33,7 +33,7 @@ function boot() {
     action: 'submit', slug: w.wa.slug,
     data: { email: 'a@b.com', name: 'أحمد محمد محمود أحمد', phone: '01012345678', code: '4230001', level: 'صفر / الأولى', major: 'حاسبات', group: 'A', section: '21', schedule: `https://drive.google.com/file/d/${ID('w')}/view` }
   });
-  w.client = (o = {}) => w.admin({ action: 'admin.clients.create', name: 'Dr. Hassan', forms: [w.res.slug], ...o });
+  w.client = (o = {}) => w.admin({ action: 'admin.clients.create', name: 'Dr. Hassan', forms: [w.res.slug], withKey: false, ...o });
   w.data = (token, slug, extra = {}) => w.api({ action: 'viewer.data', token, slug, ...extra });
   return w;
 }
@@ -163,4 +163,21 @@ test('Viewer: repeated bad tokens are throttled', () => {
   const w = boot();
   for (let i = 0; i < 30; i++) w.api({ action: 'viewer.me', token: 'x' + i });
   assert.equal(w.api({ action: 'viewer.me', token: 'again' }).error.code, 'too_many_attempts');
+});
+
+test('Viewer key: wrong keys lock the link for a while, and a link made before keys opens as before', () => {
+  const w = boot();
+  const made = w.client({ withKey: true });
+  assert.match(made.accessKey, /^\d{6}$/);
+  assert.equal(w.admin({ action: 'admin.clients.list' }).clients[0].hasKey, true);
+  for (let i = 0; i < 5; i++) assert.equal(w.api({ action: 'viewer.me', token: made.token, accessKey: '000000' === made.accessKey ? '111111' : '000000' }).error.code, 'bad_access_key');
+  assert.equal(w.api({ action: 'viewer.me', token: made.token, accessKey: made.accessKey }).error.code, 'key_locked', 'even the right key waits after five wrong ones');
+  const again = w.admin({ action: 'admin.clients.key', id: made.client.id, on: true });
+  assert.equal(w.api({ action: 'viewer.me', token: made.token, accessKey: again.accessKey }).ok, true, 'a new key also lifts the lock');
+  const rows = w.registry.getSheetByName('Clients').rows();
+  assert.equal(rows[0][8], 'keyHash', 'the column gets its header');
+  assert.equal(rows.flat().join('|').includes(again.accessKey), false, 'the key itself is never stored');
+  const old = w.client({ withKey: false });
+  assert.equal(old.accessKey, '');
+  assert.equal(w.api({ action: 'viewer.me', token: old.token }).ok, true);
 });
