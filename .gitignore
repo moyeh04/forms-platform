@@ -3,9 +3,6 @@ dist/
 _site/
 *.zip
 .DS_Store
-Tasks_Export/
-__pycache__/
-*.pyc
 .env
 .clasprc.json
 .clasp.json
