@@ -259,6 +259,13 @@ summary with **Done**, and **Save changes** exists only while an answer differs
 from the saved one (`hub()` and `changed()` in `form.js`). The route trail and
 the Back button belong to the path, so they are not shown here.
 
+A task is handed in by its deadline. Once a task form stops taking answers
+(closed, or past its close date), its key still opens the task to read, but
+**update** and **remove** refuse with `deadline_passed`, and the page says why
+instead of offering Change or Cancel (`taskLocked_` in `Submissions.gs`).
+Opening the form again, or moving its close date, lifts the lock. Team
+registrations are not locked this way.
+
 A key works for the number of days set in **Setup, Edit key**, counted from
 when it is given. The admin moves that date in `admin-keys.js`, backed by
 `KeyExpiry.gs`: **Extend** in a registration's details changes one key, and
@@ -594,6 +601,9 @@ flowchart TD
         Clients["Clients.gs<br/>private links, access keys, end dates"]
         Viewer["Viewer.gs<br/>read-only data"]
         Export["Export.gs<br/>team data for Excel"]
+        TeamList["TeamList.gs<br/>numbered teams, shared"]
+        Download["Download.gs<br/>files and folders in zips"]
+        Xlsx["Xlsx.gs<br/>Excel file writer"]
     end
     Rules["shared/rules.js<br/>pure validation"]
 
@@ -610,6 +620,10 @@ flowchart TD
     Print --> Views
     Matching --> Responses
     KeyExpiry --> Responses
+    Download --> TeamList
+    Download --> Xlsx
+    Views --> TeamList
+    Print --> TeamList
     Viewer --> Clients
     Viewer --> Responses
     Export --> Responses
@@ -671,6 +685,7 @@ flowchart LR
         a3["admin-data.js<br/>blocks, matching, print"]
         a4["admin-people.js<br/>clients"]
         a5["admin-keys.js<br/>key and link end dates"]
+        a6["admin-download.js<br/>Download all"]
     end
     subgraph viewerp["viewer.html"]
         v1["viewer.js"]
@@ -748,10 +763,50 @@ flowchart TD
 The trigger is installed by **First-time setup**. If it is ever missing, run
 the setup again; it only creates it when absent.
 
-## Excel export
+## Downloading everything a team form collected
 
-Apps Script is a poor place to download dozens of files and zip them, so that
-part runs on the admin's own computer.
+**Download all tasks** (or **projects**) under Responses saves every team's task
+file or project folder in zip parts, with a `Teams.xlsx` that lists the teams,
+one tinted block per team, and links each task or project to its saved copy. It
+is one feature for both team forms: `teamBlocks_` in `TeamList.gs` gives the
+numbered teams that the sheet view, the printed list and the download all read,
+so they never disagree on the order or the numbers.
+
+**Why it runs inside Google, and not in a browser or a script on a laptop.**
+Downloading Drive files through their public links (what a script, `curl`, or a
+headless browser such as Playwright does) is anonymous traffic, and Google
+limits it: "too many users have downloaded this file", a virus-scan page for big
+files, and bot checks after a burst of requests. `Download.gs` instead reads each
+file as the owner: `DriveApp` for ordinary files, and the export address with the
+owner's token for Google Slides, Docs and Sheets, which come as Office files.
+That is not public-link traffic, so those limits do not apply. A headless
+browser was considered and left out: it would have to run on the admin's own
+computer (the dashboard is a static page), it means installing a whole browser,
+and it breaks whenever Drive changes its pages.
+
+What is left are Apps Script's own limits, and the design follows them:
+
+| Limit | How the download stays inside it |
+|---|---|
+| Six minutes a request | The page asks for one team at a time. A big folder is fetched over several requests (40 files or 25 seconds each); a repeated request skips what is already saved. |
+| About 50 MB a file | A file over 45 MB is not packed. It is listed with its Drive link. |
+| About 50 MB a zip | The files are split into zip parts of up to 40 MB. `Teams.xlsx` is in part 1; unzipping every part into one folder makes all its links work. |
+| "Slow down" answers from Google | Each read waits and tries again, up to three times, doubling the wait. |
+
+The work happens in the owner's Drive, in `Forms Platform / Exports / Downloads`,
+in a folder per download; starting a new download of the same form moves the
+older one to the trash. Only the zips stay there. The page reads each zip in
+3 MB pieces through the API (`admin.download.chunk`, a ranged Drive request, so
+only the piece is read) and hands the whole file to the browser, so nothing is
+ever shared by link. What could not be saved (no link, a Google Form, a file too
+big, a link that does not open) is listed in the window and on the sheet "Not
+downloaded" of `Teams.xlsx`, each with the reason and its Drive link.
+
+`Teams.xlsx` is written by `Xlsx.gs`, a small writer of the Excel file format.
+Google Sheets cannot save a link to a file that sits next to the workbook, and
+that is the whole point of the list. Each column is as wide as its longest value
+(a file cannot ask Excel to autofit, so the width is measured when it is
+written), names read right to left, and it prints one page wide.
 
 ```mermaid
 %%{init: {
@@ -777,19 +832,17 @@ part runs on the admin's own computer.
   'sequence': {'mirrorActors': false, 'messageMargin': 34, 'boxMargin': 8}
 }}%%
 flowchart LR
-    A["python scripts/download_tasks.py --slug name"] --> B["read API address from assets/js/config.js"]
-    B --> C["POST admin.export.tasks with the PIN"]
-    C --> D["teams, members, leader, link<br/>no phone numbers, no key data"]
-    D --> E{"For each team link"}
-    E -- "Slides" --> F["export as pptx"]
-    E -- "Drive file" --> G["download, keep its own type"]
-    E -- "private, deleted, folder" --> H["record the reason"]
-    F --> I["files/001_Name.pptx"]
-    G --> I
-    D --> J["openpyxl builds Tasks.xlsx<br/>tinted blocks, merged task cell,<br/>relative hyperlink to files/"]
-    I --> J
-    H --> K["Failed sheet in Tasks.xlsx"]
-    J --> K
+    A["Download all"] --> B["admin.download.start<br/>a work folder, the numbered teams"]
+    B --> C{"admin.download.team<br/>for each team"}
+    C -- "a file" --> D["Tasks/03 - Clean Code.pptx"]
+    C -- "a folder" --> E["Projects/03 - Library System/...<br/>over as many requests as it needs"]
+    C -- "cannot be saved" --> F["the reason and the Drive link"]
+    D --> G["admin.download.finish<br/>Teams.xlsx, parts of 40 MB"]
+    E --> G
+    F --> G
+    G --> H["admin.download.pack<br/>one zip per part"]
+    H --> I["admin.download.chunk<br/>3 MB pieces to the page"]
+    I --> J["the browser saves the zip"]
     classDef cDb fill:#F3E2B3,stroke:#B8892D,stroke-width:1.5px,color:#2F2418
     classDef cActor fill:#F4D9D3,stroke:#9A3328,stroke-width:1.5px,color:#2F2418
     classDef cDec fill:#FBEFC9,stroke:#C9A24A,stroke-width:1.5px,color:#2F2418
@@ -797,7 +850,13 @@ flowchart LR
     classDef cErr fill:#F6D5CF,stroke:#A12B1F,stroke-width:1.5px,color:#5A140C
     classDef cOk fill:#BFD9CF,stroke:#2E5A55,stroke-width:1.5px,color:#17302D
     class E cDec
+    class C cDec
+    class F cErr
 ```
+
+`scripts/download_tasks.py` is the older way: it runs on the admin's computer
+and downloads through public links, so it meets the limits above. The dashboard
+download does the same job from the browser.
 
 ## Scale and honest limits
 
@@ -1026,7 +1085,7 @@ labels of the current tables.
 | Change a validation rule | `shared/rules.js` (browser, server, and tests all follow) |
 | Add a backend action | A file in `backend/` that sets `API['name'] = ...` (wrap with `admin()` if private) |
 | Change sheet colours | `backend/Views.gs` |
-| Change the Excel layout | `scripts/download_tasks.py` |
+| Change the downloaded Excel list | `dlWorkbook_` in `backend/Download.gs` (the file format is in `backend/Xlsx.gs`) |
 | Change the Drive folder name rule | `Rules.checkFolderName` in `shared/rules.js` |
 | Change the tab icon | `assets/img/favicon.svg`, then regenerate the PNGs in `assets/img/` |
 | See a change in a real browser before deploying | `npm run dev` (`scripts/dev-server.js`) |

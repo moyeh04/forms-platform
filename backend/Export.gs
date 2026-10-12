@@ -8,14 +8,11 @@ var API = API || {};
 
 API['admin.export.teams'] = admin(function (req) {
   var form = requireForm(req.slug || req.id);
-  if (form.type !== 'team_registration' && form.type !== 'task_submission') {
-    fail('wrong_type', 'Only team and task forms can be exported as a team list.');
-  }
-  var vform = validationForm(form);
-  var teams = readResponses(form).sort(byCreated_).map(function (r) {
+  if (!isTeamForm_(form)) fail('wrong_type', 'Only team and task forms can be exported as a team list.');
+  var teams = teamBlocks_(form).map(function (t) {
     return {
-      ref: r.ref, title: r.title, link: r.link, created: r.created,
-      members: Rules.membersOf(vform, r.data).map(function (m) { return { name: m.name, code: m.code, leader: m.leader }; })
+      ref: t.ref, title: t.title, link: t.link, created: t.created,
+      members: t.members.map(function (m) { return { name: m.name, code: m.code, leader: m.leader }; })
     };
   });
   var formMetadata = { slug: form.slug, title: form.title, type: form.type };

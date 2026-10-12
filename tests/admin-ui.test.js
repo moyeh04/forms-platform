@@ -1138,3 +1138,36 @@ test('Responses: a registration shows when its key ends and extends it alone', a
   assert.equal(after[1].keyExpires, before[1].keyExpires);
   assert.ok(p.$('.detail').textContent.includes(new Date(after[0].keyExpires).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })), 'the details show the new end');
 });
+
+test('Responses: Download all saves every task, shows what was not downloaded, and saves the zip', async () => {
+  const w = boot();
+  const f = w.make('task_submission', 'Tasks', { rules: { driveCheck: 'off' } });
+  w.drive.addFile({ id: ID('a'), name: 'clean.pdf', mime: 'application/pdf', bytes: '%PDF' });
+  submit(w, f, person({ leader_code: '4230001', title: 'Clean Code', link: `https://drive.google.com/file/d/${ID('a')}/view`, members: [] }));
+  submit(w, f, person({ leader_code: '4230002', title: 'Forms', link: `https://drive.google.com/file/d/${ID('b')}/view`, members: [] }));
+  w.drive.addFile({ id: ID('b'), name: 'Quiz', mime: 'application/vnd.google-apps.form' });
+  w.fetch = (url, opts) => {
+    const [, from, to] = /bytes=(\d+)-(\d+)/.exec(opts.headers.Range).map(Number);
+    const buf = w.drive.files.get(/files\/([\w-]+)\?/.exec(url)[1]).buf.slice(from, to + 1);
+    return { getResponseCode: () => 206, getContent: () => Array.from(buf) };
+  };
+  const p = await openAdmin(w, '#/f/' + f.slug + '/responses');
+  const saved = [];
+  p.win.URL.createObjectURL = (blob) => { saved.push(blob); return 'blob:zip'; };
+  p.win.URL.revokeObjectURL = () => {};
+  p.win.HTMLAnchorElement.prototype.click = function () {};
+  p.click('[name="download-all"]'); await settle(2);
+  p.click('[name="download-start"]'); await settle(30);
+  assert.ok(p.$('.dialog').textContent.includes('1 file packed'));
+  assert.ok(p.$('.download-missed').textContent.includes('cannot be downloaded'), 'the reason is shown with the item');
+  p.click('[name="save-part-0"]'); await settle(12);
+  assert.equal(saved.length, 1);
+  assert.ok(saved[0].size > 100, 'the whole zip is handed to the browser');
+});
+
+test('Responses: Download all is not offered before anyone registers', async () => {
+  const w = boot();
+  const f = w.make('team_registration', 'Projects');
+  const p = await openAdmin(w, '#/f/' + f.slug + '/responses');
+  assert.equal(p.$('[name="download-all"]'), null);
+});

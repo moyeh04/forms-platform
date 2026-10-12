@@ -51,15 +51,29 @@ API.submit = function (req) {
   return transferResult_(vform, result, v.data);
 };
 
+/**
+ * A task is handed in by its deadline: once the form stops taking answers, a key still opens
+ * the task but can no longer change or cancel it. Opening the form again lifts the lock.
+ */
+function taskLocked_(form) {
+  return form.type === 'task_submission' && Rules.formState(form) !== 'open';
+}
+
+function assertTaskOpen_(form) {
+  if (taskLocked_(form)) fail('deadline_passed', 'The deadline has passed, so this task can no longer be changed.');
+}
+
 API.lookup = function (req) {
   var form = requireForm(String(req.slug || ''));
   var r = findByKey_(form, req.key);
+  var locked = taskLocked_(form);
   return {
     submission: publicSubmission_(r),
     transfers: teamTransfers_(validationForm(form), r),
     keyExpires: r.keyExpires,
-    canEdit: !!form.editKey.allowEdit,
-    canDelete: !!form.editKey.allowDelete
+    canEdit: !!form.editKey.allowEdit && !locked,
+    canDelete: !!form.editKey.allowDelete && !locked,
+    locked: locked
   };
 };
 
@@ -68,6 +82,7 @@ API.update = function (req) {
   var vform = validationForm(form);
   var found = findByKey_(form, req.key);
   if (!form.editKey.allowEdit) fail('edit_disabled', 'Editing is turned off for this form.');
+  assertTaskOpen_(form);
   var v = Rules.validateSubmission(vform, req.data || {});
   if (!v.ok) fail('invalid', 'Some answers need fixing.', v.errors);
   checkDriveFields_(vform, v.data);
@@ -92,6 +107,7 @@ API.remove = function (req) {
   var form = requireForm(String(req.slug || ''));
   var found = findByKey_(form, req.key);
   if (!form.editKey.allowDelete) fail('delete_disabled', 'Deleting is turned off for this form.');
+  assertTaskOpen_(form);
   withLock_(function () {
     var current = readResponses(form).filter(function (r) { return r.id === found.id; })[0];
     if (!current) fail('bad_key', 'That key is not right.');

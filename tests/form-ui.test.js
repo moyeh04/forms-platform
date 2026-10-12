@@ -597,3 +597,18 @@ test('Transfer: rejecting keeps the member on the team', async () => {
   assert.ok(a.text().includes('منى سعيد فؤاد علي (4230003) stays on your team.'));
   assert.equal(w.admin({ action: 'admin.submissions', slug: w.form.slug }).submissions[0].data.members.length, 2);
 });
+
+test('Deadline: after a task form closes, the key shows the task but cannot change or cancel it', async () => {
+  const w = boot('task_submission', { closesAt: '2027-09-02T10:00:00Z', rules: { driveCheck: 'off' } });
+  const r = w.api({
+    action: 'submit', slug: w.form.slug,
+    data: { email: 'a@b.com', leader_name: AR_NAME, leader_code: '4230001', phone: '01012345678', major: 'حاسبات', level: 'صفر / الأولى', section: '4C-TH1', curriculum: '2020', team_size: '1', members: [], title: 'Normalization', link: `https://drive.google.com/file/d/${ID('a')}/view` }
+  });
+  w.setNow('2027-09-03T10:00:00Z');
+  const p = await open(w);
+  p.clickText('Edit or cancel with your key'); await settle();
+  p.type('#key-input', r.key); p.submitForm(); await settle(10);
+  assert.ok(p.text().includes('The deadline has passed'));
+  assert.ok(p.text().includes('Normalization'), 'the task is still shown');
+  assert.equal(p.$$('button').some((b) => b.textContent.includes('Cancel registration')), false, 'no cancel button');
+});

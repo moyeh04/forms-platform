@@ -98,6 +98,7 @@ flowchart LR
         a2["admin-settings.js"]
         a5["admin-timetable.js"]
         a7["admin-keys.js"]
+        a8["admin-download.js"]
         a3["admin-data.js"]
         a4["admin-people.js"]
         a6["admin-lists.js"]
@@ -133,7 +134,7 @@ no validation.
 | `assets/js/config.js` | Source placeholder; `scripts/build-site.js` generates its published copy from the Actions `API_URL` variable. |
 | `assets/js/api.js` | Sends requests to the backend as plain-text JSON (avoids browser CORS checks). |
 | `assets/js/form.js`, `ticket.js`, `i18n.js` | The student page, the success ticket, English and Arabic text. |
-| `assets/js/admin*.js` | Dashboard: core and forms list, settings, the timetable editor, key and link end dates (`admin-keys.js`), responses and matching, clients, lists. |
+| `assets/js/admin*.js` | Dashboard: core and forms list, settings, the timetable editor, key and link end dates (`admin-keys.js`), responses and matching, Download all (`admin-download.js`), clients, lists. |
 | `assets/js/viewer.js` | The instructor page. |
 | `shared/rules.js` | Validation and normalization rules (Arabic names, phones, codes, Drive links, team size, slots). Used by the browser, the backend, and the tests, so all three always agree. |
 
@@ -152,6 +153,9 @@ no validation.
 | `Slots.gs` | Reservation timetable checks and availability. |
 | `Questions.gs` | Questions and pages an admin adds: allowed types, ids, labels and choices, and pages that list each existing question once. |
 | `KeyBooking.gs` | Booking a reservation with a registration key from another form: the setting, the team preview, the copied answers, and the next booking of a series. |
+| `TeamList.gs` | The numbered teams of a team or task form with their members, read by the sheet view, the printed list, the export and the download. |
+| `Download.gs` | Download all: each team's task file or project folder read as the owner, `Teams.xlsx`, zip parts, and the pieces the page saves. |
+| `Xlsx.gs` | A small writer of Excel files: styles, merged cells, links to files next to the workbook, widths that fit the content. |
 | `KeyExpiry.gs` | When registration edit keys stop working, and moving that date for one, some, or all registrations of a form. |
 | `Transfers.gs` | Moving a member between two teams of a form: the rule, the requests tab, asking on submit and update, the answer of the leader or the admin, the move, and the emails. |
 | `Views.gs` | Tinted block views inside each form's Google Sheet. |
@@ -170,7 +174,7 @@ no validation.
 | `scripts/bundle-backend.js` | The bundler. |
 | `scripts/setup-deployment.js` | First deployment from your computer (`npm run setup`): creates the sheet and its script, pushes the bundle, creates the web app, and stores the IDs, the credential and the Pages setting in GitHub. |
 | `scripts/dev-server.js` | `npm run dev`: serves the site and answers its API calls from the in-memory Google, with sample forms, so pages can be opened in a real browser. |
-| `scripts/download_tasks.py` | Downloads task files and builds `Tasks.xlsx`. |
+| `scripts/download_tasks.py` | The older, local way to download task files and build `Tasks.xlsx`, through public links. **Download all** in the dashboard does the same job. |
 | `tests/harness/appsscript-mock.js` | An in-memory Sheets, Drive, Mail, Cache, and clock, so the real backend code runs in tests. |
 | `tests/harness/dom.js` | Opens the real pages in jsdom wired to that backend. |
 | `tests/*.test.js` | 247 tests. |

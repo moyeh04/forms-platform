@@ -59,6 +59,20 @@ function seed(world) {
   [['هدى سامي عادل منصور', '4230710', '01033344455', 'A'], ['كريم وليد حسن جابر', '4230722', '01144455566', 'B']].forEach(([name, code, phone, group]) => {
     world.api({ action: 'submit', slug: groups.slug, data: { email: 'student@example.com', name, phone, code, level: 'الثاني / الثالثة', major: 'حاسبات', group, section: '21', schedule: 'https://drive.google.com/file/d/1AbCdEfGhIjKlMnOpQrStUvWxYz012345/view' } });
   });
+  // A task form whose files are in pretend Drive, so Download all has something to pack.
+  const tasks = make('task_submission', 'Software Engineering Tasks', 'Fall 2027', {});
+  [['Clean Code', 'application/vnd.google-apps.presentation', ''], ['COCOMO.pdf', 'application/pdf', '%PDF-1.4 COCOMO'], ['Quiz', 'application/vnd.google-apps.form', '']].forEach(([name, mime, bytes], i) => {
+    const id = String.fromCharCode(107 + i).repeat(33);
+    world.drive.addFile({ id, name, mime, bytes });
+    world.api({ action: 'submit', slug: tasks.slug, data: leader({ leader_name: ['سلمى فؤاد نبيل عيسى', 'يوسف ماهر رشدي لطفي', 'نادين شريف عزت فهمي'][i], leader_code: '42305' + (10 + i), title: name.replace(/\.pdf$/, ''), team_size: '1', members: [], link: `https://docs.google.com/presentation/d/${id}/edit` }) });
+  });
+  world.fetch = (url, o) => {
+    const media = /files\/([\w-]+)\?alt=media/.exec(url);
+    if (!media) return { getResponseCode: () => 200, getBlob: () => new world.MockBlob('Exported ' + url, 'application/octet-stream', 'x') };
+    const [, from, to] = /bytes=(\d+)-(\d+)/.exec(o.headers.Range).map(Number);
+    const buf = world.drive.files.get(media[1]).buf.slice(from, to + 1);
+    return { getResponseCode: () => 206, getContent: () => Array.from(buf) };
+  };
   const client = admin({ action: 'admin.clients.create', name: 'Dr. Mahmoud - Database', forms: [team.slug], hiddenColumns: [], canReview: false });
   return { team, viewerToken: client.token, viewerKey: client.accessKey, discussion, key: registered[0].key };
 }

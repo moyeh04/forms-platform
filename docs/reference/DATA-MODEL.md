@@ -251,6 +251,12 @@ Stored by Apps Script itself, not in any sheet:
 | `admin_fails` | Wrong admin PINs | 8 then locked 10 minutes |
 | `badkey:<form id>` | Wrong edit keys on a form | 10 per minute |
 | `bad_tokens` | Wrong viewer tokens | 30 per minute |
+| `client_key:<client id>` | Wrong access keys on one private link | 5 then locked 10 minutes |
+| `dl_job:<folder id>` | A Download all in progress: its form, its work folder, what could not be saved, its zip parts | 6 hours |
+
+Download all works in the owner's Drive, in `Forms Platform / Exports / Downloads`,
+one folder per download named after the form. Starting a new download of the
+same form moves the older folder to the trash; only the zips stay in a folder.
 
 Counters live in the cache and expire on their own, so they cost no sheet
 writes and cannot be reset from the browser.

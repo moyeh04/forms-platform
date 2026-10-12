@@ -1,11 +1,11 @@
 # Testing
 
-280 automated tests run without a Google account, a browser, or a network.
+288 automated tests run without a Google account, a browser, or a network.
 They run the **real** backend and the **real** pages. This page explains how
 that works and what it can and cannot prove.
 
 ```
-npm test                                              # 260 JavaScript tests
+npm test                                              # 268 JavaScript tests
 python3 -m unittest discover -s tests -p "test_*.py"  # 20 Python tests
 ```
 
@@ -147,13 +147,14 @@ function that calls `world.api`. Helpers `type`, `pick`, `click`,
 | Sheet views | 9 | Tinted blocks, leader star, merged task cell, bookings by day |
 | Print | 8 | Print tabs, signature column, PDF success and fallback |
 | Key booking | 15 | Setting and its source form, team preview without contact details, copied answers, forged answers ignored, one booking per team, the same key cancels, expired keys still book, the student page and the admin switch, the next booking one week later, bookings listed under their form |
+| Download all | 5 | Task files saved under their team number and linked from `Teams.xlsx`, Google Slides and Docs exported, a project folder with subfolders over several requests, files too big or of a kind that cannot be saved listed with the reason, zip parts and pieces that add up, only zips left in Drive, admin only, a download that expired; the deadline lock of task forms |
 | Key expiry | 6 | Which keys are given and expired, extending the expired ones from today, all of them from their own end, one date for all, chosen teams only, bad requests change nothing, cancelled registrations left out |
 | Member transfers | 8 | Refusal that lists who can be asked for, the request and the team saved without the member, approval by the leader and by the admin, rejection, cancelling, a full team, a leader, two requests for one student, a removed team, the switch and the list under Responses |
 | Matching | 6 | Paste, normalise, matched, none, duplicate, sequential review |
 | Viewer API | 13 | Tokens, hidden columns, today and by day, review rights, revoked links, access keys with the lock after wrong tries, reading a lost key again, links that end on a date and open again when it moves |
 | Export API | 3 | Teams with members, no phones, PIN required, deleted left out |
-| Student page | 34 | Steps, filters, descriptions, team size picker and notes, remove and add a member with Undo, the summary a key opens, the ship over the current step, audience line, subject tag, slots, review, ticket and email notice, edit by key, themes, Arabic, asking for a member of another team, answering a request with Approve, Reject or Later |
-| Admin page | 48 | Login, create with term chips, team size and notes, descriptions, who can register, locked fields, team cards, show key, teammates of a booking (how many, title, details asked), timetable calendar, hours, a day with its own hours and booked slots, delete, matching, clients with the link shown once and the key apart, a lost key shown again, a link end picked and moved, Extend keys for expired keys and chosen teams, one registration's key extended from its details, lists as chips or rows with the reason for a refused save, sections built from groups and counts, number runs with steppers, new lists picked for a question, column names on list rows for the phone layout, the day sheet group, form tabs that keep edits, section summaries, save bar only while there is a change, sections by one or by year group, added questions and pages, new form preview and title reason |
+| Student page | 35 | Steps, filters, descriptions, team size picker and notes, remove and add a member with Undo, the summary a key opens, the ship over the current step, audience line, subject tag, slots, review, ticket and email notice, edit by key, themes, Arabic, asking for a member of another team, answering a request with Approve, Reject or Later, a task locked after its deadline |
+| Admin page | 50 | Login, create with term chips, team size and notes, descriptions, who can register, locked fields, team cards, show key, teammates of a booking (how many, title, details asked), timetable calendar, hours, a day with its own hours and booked slots, delete, matching, clients with the link shown once and the key apart, a lost key shown again, a link end picked and moved, Extend keys for expired keys and chosen teams, one registration's key extended from its details, Download all with what was not downloaded and the saved zip, lists as chips or rows with the reason for a refused save, sections built from groups and counts, number runs with steppers, new lists picked for a question, column names on list rows for the phone layout, the day sheet group, form tabs that keep edits, section summaries, save bar only while there is a change, sections by one or by year group, added questions and pages, new form preview and title reason |
 | Instructor page | 10 | Today, by day, hidden columns, review rights, invalid links, member values named for the phone layout, phone as a call link |
 | Harness | 4 | The fake itself |
 | Colour contrast | 4 | Every text and outline pair meets WCAG AA in light, dark, and device-dark themes |

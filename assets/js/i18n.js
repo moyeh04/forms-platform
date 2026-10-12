@@ -55,7 +55,7 @@
       saveChanges: 'Save changes', cancelReg: 'Cancel registration', cancelTitle: 'Cancel this registration?',
       cancelBody: 'Your place is released and you can register again.', cancelYes: 'Yes, cancel it', cancelNo: 'Keep it',
       cancelledTitle: 'Registration cancelled', cancelledBody: 'You can fill in the form again if you need to.',
-      savedTitle: 'Changes saved', readOnly: 'Changes are not allowed for this form. You can cancel and register again.',
+      savedTitle: 'Changes saved', readOnly: 'Changes are not allowed for this form. You can cancel and register again.', deadlineLocked: 'The deadline has passed, so this task can no longer be changed or cancelled.',
       backToForm: 'Back to the form', newRegistration: 'Register again',
       errors: {
         required: 'This field is required.', invalid_email: 'Enter a valid email address.',
@@ -83,7 +83,7 @@
         bad_key: 'That key is not right.', key_expired: 'This key has expired. Ask your instructor to extend it, or to make the change for you.',
         too_many_attempts: 'Too many tries. Wait a minute and try again.', key_disabled: 'Editing with a key is turned off.',
         edit_disabled: 'Editing is turned off for this form.', delete_disabled: 'Cancelling is turned off for this form.',
-        form_closed: 'This form is closed.', form_not_yet: 'This form has not opened yet.', form_draft: 'This form is not available yet.',
+        form_closed: 'This form is closed.', deadline_passed: 'The deadline has passed, so this task can no longer be changed.', form_not_yet: 'This form has not opened yet.', form_draft: 'This form is not available yet.',
         busy: 'The server is busy. Try again in a moment.', network: 'Could not reach the server. Check your connection and try again.',
         invalid: 'Some answers need fixing.', server_error: 'Something went wrong. Try again.', bad_response: 'The server sent an unexpected answer.',
         not_configured: 'The website is not connected to the backend yet.'
@@ -141,7 +141,7 @@
       saveChanges: 'احفظ التعديلات', cancelReg: 'إلغاء التسجيل', cancelTitle: 'تلغي التسجيل ده؟',
       cancelBody: 'مكانك هيتحرر وتقدر تسجل تاني.', cancelYes: 'أيوه، الغيه', cancelNo: 'سيبه',
       cancelledTitle: 'تم إلغاء التسجيل', cancelledBody: 'تقدر تملى الفورم تاني لو محتاج.',
-      savedTitle: 'تم حفظ التعديلات', readOnly: 'التعديل مش مسموح في الفورم ده. تقدر تلغي وتسجل من جديد.',
+      savedTitle: 'تم حفظ التعديلات', readOnly: 'التعديل مش مسموح في الفورم ده. تقدر تلغي وتسجل من جديد.', deadlineLocked: 'الميعاد النهائي عدّى، فمينفعش تعدّل التاسك أو تلغيه.',
       backToForm: 'رجوع للفورم', newRegistration: 'سجل من جديد',
       errors: {
         required: 'الخانة دي مطلوبة.', invalid_email: 'اكتب بريد إلكتروني صحيح.',
@@ -169,7 +169,7 @@
         bad_key: 'المفتاح ده غلط.', key_expired: 'المفتاح انتهت صلاحيته. اطلب من المدرس يمدّه، أو يعدّل لك.',
         too_many_attempts: 'محاولات كتير. استنى دقيقة وجرب تاني.', key_disabled: 'التعديل بالمفتاح متوقف.',
         edit_disabled: 'التعديل متوقف في الفورم ده.', delete_disabled: 'الإلغاء متوقف في الفورم ده.',
-        form_closed: 'الفورم ده مقفول.', form_not_yet: 'الفورم لسه مفتحش.', form_draft: 'الفورم ده لسه مش متاح.',
+        form_closed: 'الفورم ده مقفول.', deadline_passed: 'الميعاد النهائي عدّى، فمينفعش تعدّل التاسك.', form_not_yet: 'الفورم لسه مفتحش.', form_draft: 'الفورم ده لسه مش متاح.',
         busy: 'السيرفر مشغول. جرب بعد لحظة.', network: 'مقدرناش نوصل للسيرفر. اتأكد من النت وجرب تاني.',
         invalid: 'في إجابات محتاجة تصليح.', server_error: 'حصلت مشكلة. جرب تاني.', bad_response: 'السيرفر رد بشكل غير متوقع.',
         not_configured: 'الموقع لسه مش متوصل بالسيرفر.'
