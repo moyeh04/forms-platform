@@ -883,7 +883,7 @@
       S.busy = false;
       S.mode = 'edit';
       S.key = key;
-      S.keyInfo = { ref: res.submission.ref, keyExpires: res.keyExpires, canEdit: res.canEdit, canDelete: res.canDelete };
+      S.keyInfo = { ref: res.submission.ref, keyExpires: res.keyExpires, canEdit: res.canEdit, canDelete: res.canDelete, locked: !!res.locked };
       S.data = res.submission.data || {};
       var sf = slotField();
       S.ownSlot = sf && S.data[sf.id] ? Rules.slotKey(S.data[sf.id].day, S.data[sf.id].time) : '';
@@ -905,7 +905,7 @@
   function readonlyView() {
     var groups = S.steps.filter(function (s) { return !s.review; }).map(function (s) { return h('div', null, h('h3', { class: 'member-title' }, stepTitle(s)), summaryList(s)); });
     return sheet(head(),
-      h('div', { class: 'banner info', role: 'status' }, t('editing', { ref: S.keyInfo.ref }) + '. ' + t('readOnly')),
+      h('div', { class: 'banner info', role: 'status' }, t('editing', { ref: S.keyInfo.ref }) + '. ' + t(S.keyInfo.locked ? 'deadlineLocked' : 'readOnly')),
       transferNotes(), bannerEl(),
       groups,
       S.keyInfo.canDelete ? h('div', { class: 'nav' }, h('button', { type: 'button', class: 'btn btn-danger', onclick: askCancel }, icon('trash', 20), t('cancelReg'))) : null);
