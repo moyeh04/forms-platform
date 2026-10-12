@@ -482,6 +482,13 @@ sequenceDiagram
 Only the read-check-write section is locked. Slow work (the Drive link check,
 the email) happens outside it, so the lock is held for milliseconds.
 
+The registry is guarded the same way. Every change to a form, a list or a
+private link reads its row and writes it inside the lock (`withLock_` in
+`Config.gs`), and a form's row is found by its id at the moment of writing,
+because rows move up when a form above is deleted. The Setup page sends only
+what changed, with the `updatedAt` of the copy it shows; a save over a newer
+copy is refused with `stale` and stays on the page with the reason.
+
 **Cost.** Writes are one at a time. At classroom scale nobody notices.
 
 ---

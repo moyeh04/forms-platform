@@ -34,13 +34,16 @@
     }
   };
 
-  A.fail = function (e) {
+  /** What to tell the admin about a failed call. */
+  A.message = function (e) {
     var msg = (e && e.message) || 'Something went wrong.';
     if (e && e.code === 'invalid' && e.details) {
       msg += ' (' + Object.keys(e.details).join(', ') + ')';
     }
-    toast(msg, 'err');
+    return msg;
   };
+
+  A.fail = function (e) { toast(A.message(e), 'err'); };
 
   /** Runs a button action: disables it, reports errors, always re-enables. */
   A.busy = async function (btn, fn) {

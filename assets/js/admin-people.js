@@ -76,7 +76,7 @@
     mount.appendChild(h('div', { class: 'scroll-x' }, h('table', { class: 'data-table cards' },
       h('thead', null, h('tr', null, ['Name', 'Can see', 'Hidden columns', 'Can review', 'Link', 'Access key', ''].map(function (c) { return h('th', null, c); }))),
       h('tbody', null, clients.map(function (c) {
-        var access = c.forms.indexOf('*') !== -1 ? 'All forms' : c.forms.map(function (s) { var f = forms.filter(function (x) { return x.slug === s; })[0]; return f ? f.title : s; }).join(', ');
+        var access = c.forms.indexOf('*') !== -1 ? 'All forms' : c.forms.map(function (id) { var f = forms.filter(function (x) { return x.id === id; })[0]; return f ? f.title : id; }).join(', ');
         return h('tr', { dataset: { client: c.id } },
           h('td', { class: 'nm' }, h('strong', null, c.name)), h('td', { dataset: { label: 'Can see' } }, access || 'No forms'),
           h('td', { dataset: { label: 'Hidden columns' } }, c.hiddenColumns.length ? c.hiddenColumns.join(', ') : 'None'), h('td', { dataset: { label: 'Can review' } }, c.canReview ? 'Yes' : 'No'),
@@ -141,9 +141,9 @@
     };
     var formBoxes = h('div', null, forms.map(function (f) {
       var caption = FormMetadata.caption(f);
-      return A.check(f.title + (caption ? ' (' + caption + ')' : ''), st.forms.indexOf(f.slug) !== -1, function (v) {
-        st.forms = st.forms.filter(function (s) { return s !== f.slug; });
-        if (v) st.forms.push(f.slug);
+      return A.check(f.title + (caption ? ' (' + caption + ')' : ''), st.forms.indexOf(f.id) !== -1, function (v) {
+        st.forms = st.forms.filter(function (id) { return id !== f.id; });
+        if (v) st.forms.push(f.id);
       });
     }));
     var body = h('div', null,

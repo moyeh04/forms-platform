@@ -174,7 +174,7 @@ no validation.
 | `scripts/dev-server.js` | `npm run dev`: serves the site and answers its API calls from the in-memory Google, with sample forms, so pages can be opened in a real browser. |
 | `tests/harness/appsscript-mock.js` | An in-memory Sheets, Drive, Mail, Cache, and clock, so the real backend code runs in tests. |
 | `tests/harness/dom.js` | Opens the real pages in jsdom wired to that backend. |
-| `tests/*.test.js` | 265 tests. |
+| `tests/*.test.js` | The tests, one file per area; [TESTING.md](reference/TESTING.md) lists them. |
 
 ## Data model in one paragraph
 

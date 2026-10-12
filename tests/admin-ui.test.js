@@ -239,6 +239,28 @@ test('Team size: admin sets the minimum and maximum and students see exactly tho
   assert.deepEqual(s.$$('.size-chips input').map((i) => i.value), ['2', '3', '4']);
 });
 
+test('Setup: a save over a newer change is refused, and the reason and what was typed stay', async () => {
+  const w = boot();
+  const f = w.make('task_submission', 'Tasks');
+  const p = await openAdmin(w, `#/f/${f.slug}/settings`);
+  // Another window closes the form after this page was opened.
+  w.advanceDays(0.001);
+  w.admin({ action: 'admin.forms.update', id: f.id, patch: { status: 'closed' } });
+  p.type('[name="title"]', 'Typed here');
+  p.click('[name="save"]'); await settle(8);
+  const note = p.$('.savebar-note');
+  assert.match(note.textContent, /changed in another window/);
+  assert.equal(note.getAttribute('role'), 'alert');
+  assert.equal(p.$('[name="title"]').value, 'Typed here', 'the change is still on the page');
+  const kept = w.admin({ action: 'admin.forms.get', id: f.id }).form;
+  assert.deepEqual([kept.title, kept.status], ['Tasks', 'closed']);
+  p.clickText('Discard'); await settle(10);
+  p.type('[name="title"]', 'Typed again');
+  p.click('[name="save"]'); await settle(10);
+  const saved = w.admin({ action: 'admin.forms.get', id: f.id }).form;
+  assert.deepEqual([saved.title, saved.status], ['Typed again', 'closed'], 'only the title was sent, so the other window\'s status stays');
+});
+
 test('Team size: an impossible range is refused before anything is saved', async () => {
   const w = boot();
   const f = w.make('task_submission', 'Tasks');

@@ -134,16 +134,16 @@ API['admin.bookings.next'] = admin(function (req) {
   var title = String(req.title || '').trim();
   var form;
   if (last) {
-    form = duplicateForm(last.id, { title: title || nextTitle_(last.title) });
-    if (form.slots && form.slots.days.length) form.slots = nextWeekSlots_(form.slots);
-    form.opensAt = '';
-    form.closesAt = '';
+    form = duplicateForm(last.id, { title: title || nextTitle_(last.title) }, function (copy) {
+      if (copy.slots && copy.slots.days.length) copy.slots = nextWeekSlots_(copy.slots);
+      copy.opensAt = '';
+      copy.closesAt = '';
+    });
   } else {
     if (!title) fail('title_required', 'Give the booking a title.');
-    form = createForm(Object.assign({ type: 'reservation', title: title }, FormMetadata.read(source)));
-    form.keyBooking = { enabled: true, source: source.id };
+    form = createForm(Object.assign({ type: 'reservation', title: title }, FormMetadata.read(source)), function (made) {
+      made.keyBooking = { enabled: true, source: source.id };
+    });
   }
-  form = clone(saveForm(form));
-  delete form._row;
   return { form: form, copied: !!last, number: series.length + 1 };
 });

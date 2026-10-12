@@ -125,13 +125,12 @@ function rowToForm_(row) {
   FORM_BASE_.forEach(function (k) { form[k] = row[k] === undefined ? '' : String(row[k]); });
   Object.assign(form, FormMetadata.read(form));
   normalizeReservationMembers_(form);
-  form._row = row._row;
   return form;
 }
 
 function formToRow_(form) {
   var config = clone(form);
-  FORM_BASE_.concat(['_row']).forEach(function (k) { delete config[k]; });
+  FORM_BASE_.forEach(function (k) { delete config[k]; });
   var row = {};
   FORM_BASE_.forEach(function (k) { row[k] = form[k]; });
   row.config = JSON.stringify(config);
@@ -154,16 +153,22 @@ function requireForm(slugOrId) {
   return f;
 }
 
+/** The row a form is on now. Rows move up when a form above is deleted, so it is looked up for each write. */
+function formRow_(sh, id) {
+  var last = sh.getLastRow();
+  if (last < 2) return 0;
+  var ids = sh.getRange(2, 1, last - 1, 1).getValues();
+  for (var i = 0; i < ids.length; i++) if (String(ids[i][0]) === id) return i + 2;
+  return 0;
+}
+
+/** Writes a form to its row, or to a new row when it has none. Call it inside withLock_. */
 function saveForm(form) {
   form.updatedAt = nowIso();
   var sh = formsSheet();
-  var row = formToRow_(form);
-  if (form._row) {
-    writeRow(sh, form._row, FORM_COLS, row);
-  } else {
-    sh.appendRow(rowValues(FORM_COLS, row));
-    form._row = sh.getLastRow();
-  }
+  var at = formRow_(sh, form.id);
+  if (at) writeRow(sh, at, FORM_COLS, formToRow_(form));
+  else sh.appendRow(rowValues(FORM_COLS, formToRow_(form)));
   return form;
 }
 
@@ -194,7 +199,24 @@ function cleanSubject_(v) {
   return String(v || '').replace(/\s+/g, '').replace(/[^A-Za-z0-9\-]/g, '').slice(0, 20);
 }
 
-function createForm(o) {
+/**
+ * Gives a new form its sheet and its row. The sheet is made first, outside the lock, because
+ * Google takes seconds to create one; the link name is chosen and the row written inside it.
+ * `adjust` may change the form before it is saved.
+ */
+function addForm_(form, wantedSlug, adjust) {
+  form.id = shortId('f_');
+  form.status = 'draft';
+  form.createdAt = nowIso();
+  attachSheet_(form);
+  return withLock_(function () {
+    form.slug = uniqueSlug_(wantedSlug || (form.title + ' ' + FormMetadata.slug(form)));
+    if (adjust) adjust(form);
+    return saveForm(form);
+  });
+}
+
+function createForm(o, adjust) {
   if (FORM_TYPES.indexOf(o.type) === -1) fail('unknown_type', 'Unknown form type.');
   var title = String(o.title || '').trim();
   if (!title) fail('title_required', 'Give the form a title.');
@@ -202,14 +224,9 @@ function createForm(o) {
   form.type = o.type;
   form.title = title;
   Object.assign(form, FormMetadata.create(form.type, o));
-  form.slug = uniqueSlug_(o.slug || (title + ' ' + FormMetadata.slug(form)));
-  form.id = shortId('f_');
-  form.status = 'draft';
   form.opensAt = '';
   form.closesAt = '';
-  form.createdAt = nowIso();
-  attachSheet_(form);
-  return saveForm(form);
+  return addForm_(form, o.slug, adjust);
 }
 
 /** Merges new rule settings over the old ones and checks the team size range. */
@@ -245,8 +262,18 @@ function normalizeSizeNotice_(n, min, max) {
 
 var PATCHABLE_ = ['title', 'slug', 'status', 'opensAt', 'closesAt', 'lang', 'icon', 'steps', 'fields', 'slots', 'rules', 'review', 'matching', 'editKey', 'notifications', 'messages', 'keyBooking'];
 
-function updateForm(id, patch) {
-  var form = requireForm(id);
+/**
+ * Changes a form. `base` is the `updatedAt` of the copy the page was showing: when the form
+ * has been saved since, the change is refused instead of overwriting the newer one.
+ */
+function updateForm(id, patch, base) {
+  return withLock_(function () { return applyFormPatch_(requireForm(id), patch, base); });
+}
+
+function applyFormPatch_(form, patch, base) {
+  if (base && String(base) !== form.updatedAt) {
+    fail('stale', 'This form was changed in another window since you opened it. Press Discard to load the latest, then make your change again.');
+  }
   FormMetadata.update(form, patch);
   PATCHABLE_.forEach(function (k) {
     if (patch[k] === undefined) return;
@@ -267,6 +294,7 @@ function updateForm(id, patch) {
       var wanted = slugify(patch.slug);
       var clash = findForm(wanted);
       if (clash && clash.id !== form.id) fail('slug_taken', 'Another form already uses that link name.');
+      if (wanted !== form.slug) keepClientForms_();
       form.slug = wanted;
       return;
     }
@@ -276,20 +304,14 @@ function updateForm(id, patch) {
   return saveForm(form);
 }
 
-function duplicateForm(id, o) {
+function duplicateForm(id, o, adjust) {
   var src = requireForm(id);
   var copy = clone(src);
-  delete copy._row;
-  copy.id = shortId('f_');
   copy.title = (o && o.title) || src.title;
   var metadata = FormMetadata.duplicate(src, o || {});
   FormMetadata.legacyFields(src.type).forEach(function (key) { delete copy[key]; });
   Object.assign(copy, metadata);
-  copy.slug = uniqueSlug_((o && o.slug) || copy.title + ' ' + FormMetadata.slug(copy));
-  copy.status = 'draft';
-  copy.createdAt = nowIso();
-  attachSheet_(copy);
-  return saveForm(copy);
+  return addForm_(copy, o && o.slug, adjust);
 }
 
 /**
@@ -297,20 +319,22 @@ function duplicateForm(id, o) {
  * trash (restorable for 30 days), and private links stop listing it.
  */
 function deleteForm(id) {
-  var form = requireForm(id);
-  formsSheet().deleteRow(form._row);
+  return withLock_(function () { return removeForm_(requireForm(id)); });
+}
+
+function removeForm_(form) {
+  var sh = formsSheet();
+  sh.deleteRow(formRow_(sh, form.id));
   var trashed = false;
   if (form.sheetId) {
     try { DriveApp.getFileById(form.sheetId).setTrashed(true); trashed = true; } catch (e) { Logger.log('Sheet not trashed: ' + e.message); }
   }
   try { PropertiesService.getScriptProperties().deleteProperty('dirty:' + form.id); } catch (e) { /* nothing to clean */ }
-  if (typeof readClients_ === 'function') {
-    readClients_().forEach(function (c) {
-      if (c.forms.indexOf(form.slug) === -1) return;
-      c.forms = c.forms.filter(function (s) { return s !== form.slug; });
-      saveClient_(c);
-    });
-  }
+  readClients_().forEach(function (c) {
+    if (c.forms.indexOf(form.id) === -1) return;
+    c.forms = c.forms.filter(function (s) { return s !== form.id; });
+    saveClient_(c);
+  });
   return { deleted: true, sheetTrashed: trashed, title: form.title };
 }
 

@@ -82,12 +82,6 @@ function defaultReview_(form) {
   return out;
 }
 
-function withLock_(fn) {
-  var lock = LockService.getScriptLock();
-  try { lock.waitLock(20000); } catch (e) { fail('busy', 'The server is busy. Try again in a moment.'); }
-  try { return fn(); } finally { lock.releaseLock(); }
-}
-
 function assertAcceptingSubmissions_(form) {
   var state = Rules.formState(form);
   if (state !== 'open') fail('form_' + state, 'This form is not accepting submissions.', { state: state });
