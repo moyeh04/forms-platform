@@ -253,6 +253,7 @@ body.admin { font-size: 1rem; }
 .requests > .request-warn:first-child { margin: 0; padding: 0; border: 0; }
 .sub-setting { margin-inline-start: 34px; }
 .sub-setting[hidden] { display: none; }
+.sub-setting > .help { margin: 0 0 6px; padding-inline-start: 34px; }
 
 /* Teammates of a booking: the settings exist only while teammates are asked. */
 .tm-body { --l-gap: 0; }

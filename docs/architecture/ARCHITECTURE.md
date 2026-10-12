@@ -24,7 +24,7 @@ sheet, not code.
 | **One source of truth for rules** | `shared/rules.js` is used by the browser, the backend, and the tests. They cannot disagree. |
 | **Forms are data** | A form is a JSON definition in one cell. New questions and new form types need no code. |
 | **Boring technology** | Plain JavaScript, no framework, no bundler for the website, one concatenation script for the backend. Easy to read, easy to fix later. |
-| **Testable without Google** | An in-memory copy of Google's services runs the real backend code, so 243 JavaScript tests cover it without touching a real account. |
+| **Testable without Google** | An in-memory copy of Google's services runs the real backend code, so 244 JavaScript tests cover it without touching a real account. |
 
 ## System context
 
@@ -934,6 +934,9 @@ Rules of the move:
   random does not show who is in which team.
 - Nothing of the student who moves is asked: the two leaders, or the admin,
   decide.
+- A leader learns about a request by opening the form with the key. Emails to
+  the two leaders go out only with `rules.transferEmails`, which is off unless
+  the admin ticks it.
 
 ## The Lists page
 
@@ -1017,6 +1020,6 @@ labels of the current tables.
 | [HOSTING.md](HOSTING.md) | What GitHub does, what Google does, and how they fit |
 | [DATA-MODEL.md](../reference/DATA-MODEL.md) | Every sheet, column, and stored property |
 | [SECURITY.md](../reference/SECURITY.md) | The secrets, who holds them, and what a leak would mean |
-| [TESTING.md](../reference/TESTING.md) | How 263 tests run without Google |
+| [TESTING.md](../reference/TESTING.md) | How 264 tests run without Google |
 | [DEPLOY.md](../DEPLOY.md) | Click-by-click setup |
 | [MODULES.md](../MODULES.md) | File-by-file reference |

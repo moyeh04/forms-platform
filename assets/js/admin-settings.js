@@ -301,9 +301,12 @@
       A.check('Folder names must follow Team_Leader_Name_Project_Name_Subject_Name', f.rules.folderName.enabled, function (v) { f.rules.folderName.enabled = v; }),
       A.field('Subject name at the end', A.text(f.rules.folderName.subject || '', function (v) { f.rules.folderName.subject = Rules.folderPart(v); }, { name: 'folderSubject', dir: 'ltr', placeholder: 'Software_Engineering' }), 'The subject name, not the code. Spaces become underscores. Leave empty to accept any subject name.')) : null;
     // Asking for a member of another team has a meaning only while a student may be in one team.
+    var mailRow = h('div', { class: 'sub-setting', hidden: !f.rules.transfers },
+      A.check('Also email both leaders about each request and its answer', f.rules.transferEmails === true, function (v) { f.rules.transferEmails = v; }, false, 'transferEmails'));
     var transferRow = isTeam ? h('div', { class: 'sub-setting', hidden: !f.rules.uniqueAcrossForm },
-      A.check('A leader may ask for a student who is in another team', !!f.rules.transfers, function (v) { f.rules.transfers = v; }, false, 'transfers'),
-      h('p', { class: 'help' }, 'The team registers without that student. The student moves when the leader of the other team approves with the edit key, or when you approve under Responses.')) : null;
+      A.check('A leader may ask for a student who is in another team', !!f.rules.transfers, function (v) { f.rules.transfers = v; mailRow.hidden = !v; }, false, 'transfers'),
+      h('p', { class: 'help' }, 'The team registers without that student. The leader of the other team sees the request when opening the form with the edit key, and the student moves on approval. You can approve under Responses as well.'),
+      mailRow) : null;
     var rulesPanel = panel('Limits and checks', null,
       h('div', { class: 'row' },
         A.field('Maximum submissions', A.number(f.rules.maxSubmissions == null ? '' : f.rules.maxSubmissions, function (v) { f.rules.maxSubmissions = v === '' ? null : parseInt(v, 10); }, { name: 'maxSubmissions', min: '1' }), 'Leave empty for no limit.'),

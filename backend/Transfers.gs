@@ -4,7 +4,8 @@
  * A form that allows a student in only one team refuses a team that names a member of another
  * team. With `rules.transfers` on, the leader can ask for that member instead: the team is
  * saved without the member and a request is recorded. The leader of the team that holds the
- * member, or the admin, approves or rejects it. An approval moves the member.
+ * member, or the admin, approves or rejects it. An approval moves the member. The leaders see
+ * requests when they open the form with their key; emails go out only with `rules.transferEmails`.
  *
  * Requests are rows of the tab "Transfers" in the sheet of the form. The tab is made with the
  * first request, so a form that never has one keeps its sheet as it is.
@@ -181,7 +182,8 @@ function teamTransfers_(form, team) {
 /** Tells the leader who must answer, or the leader who asked, by email. Never stops the request. */
 function mailTransfer_(form, t, kind) {
   try {
-    if ((form.notifications || {}).confirmEmail === false) return;
+    // The leaders see requests when they open the form with their key; email only when switched on.
+    if ((form.rules || {}).transferEmails !== true) return;
     var rows = readResponses(form);
     var team = rows.filter(function (r) { return r.id === (kind === 'asked' ? t.fromId : t.toId); })[0];
     var to = team && Rules.valueByRole(form, team.data, 'email');

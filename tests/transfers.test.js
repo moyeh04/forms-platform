@@ -9,7 +9,7 @@ function boot(rules = {}) {
   w.admin = (b) => w.api({ ...b, admin: { pin: '4321' } });
   const f = w.admin({ action: 'admin.forms.create', type: 'team_registration', title: 'Projects', term: 'Fall 2027', batchYear: '2027/2028' }).form;
   const base = w.admin({ action: 'admin.forms.get', id: f.id }).form.rules;
-  w.admin({ action: 'admin.forms.update', id: f.id, patch: { status: 'open', rules: { ...base, transfers: true, teamSize: { min: 2, max: 3 }, ...rules } } });
+  w.admin({ action: 'admin.forms.update', id: f.id, patch: { status: 'open', rules: { ...base, transfers: true, transferEmails: true, teamSize: { min: 2, max: 3 }, ...rules } } });
   w.slug = f.slug;
   return w;
 }
@@ -156,15 +156,20 @@ async function openAdmin(w, hash) {
 }
 
 test('Transfer dashboard: the rule is a switch under one team per student, and Responses lists what waits', async () => {
-  const w = boot({ transfers: false });
+  const w = boot({ transfers: false, transferEmails: undefined });
   const set = await openAdmin(w, `#/f/${w.slug}/settings`);
   assert.equal(set.$('.sub-setting').hidden, false, 'shown while a student may be in only one team');
   const one = set.$('[name="uniqueAcrossForm"]'); one.checked = false; set.fire(one, 'change');
   assert.ok(set.$('.sub-setting').hidden, 'and hidden with it');
   one.checked = true; set.fire(one, 'change');
+  assert.ok(set.$('[name="transferEmails"]').closest('.sub-setting').hidden, 'the email switch waits for the transfer switch');
   const box = set.$('[name="transfers"]'); box.checked = true; set.fire(box, 'change');
+  const mail = set.$('[name="transferEmails"]');
+  assert.equal(mail.closest('.sub-setting').hidden, false);
+  assert.equal(mail.checked, false, 'transfer emails start switched off');
   set.click('[name="save"]'); await settle(12);
-  assert.equal(w.admin({ action: 'admin.forms.get', id: w.slug }).form.rules.transfers, true);
+  const saved = w.admin({ action: 'admin.forms.get', id: w.slug }).form.rules;
+  assert.deepEqual([saved.transfers, saved.transferEmails === true], [true, false]);
 
   const a = send(w, team(4230001, [4230002]));
   const b = send(w, team(4230011, [4230002, 4230004], { transfer: ['4230002'] }));
@@ -177,4 +182,14 @@ test('Transfer dashboard: the rule is a switch under one team per student, and R
   assert.equal(p.$('.request-row'), null, 'an answered request leaves the list');
   assert.ok(p.$('[name="under-min"]').textContent.includes(`One team is under the minimum of 2: ${a.ref}.`));
   assert.deepEqual(codesOf(rows(w).submissions[1]), ['4230004', '4230002']);
+});
+
+test('Transfer: no email unless the form switches transfer emails on', () => {
+  const w = boot({ transferEmails: undefined });
+  const before = w.mail.length;
+  const { a } = asked(w);
+  const id = send(w, { action: 'lookup', key: a.key }).transfers.incoming[0].id;
+  send(w, { action: 'transfer.decide', key: a.key, id, approve: true });
+  assert.equal(w.mail.filter((m) => /asks for one of your members|Your request was/.test(m.subject)).length, 0);
+  assert.ok(w.mail.length >= before, 'registration confirmations are a separate setting');
 });
