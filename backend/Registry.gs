@@ -169,7 +169,9 @@ function createForm(o) {
 /** Merges new rule settings over the old ones and checks the team size range. */
 function normalizeRules_(current, next) {
   var merged = Object.assign({}, current || {}, next || {});
-  if (merged.majors !== undefined) merged.majors = Array.isArray(merged.majors) ? merged.majors.map(String).filter(Boolean) : [];
+  LIMITED_LISTS_.forEach(function (list) {
+    if (merged[list] !== undefined) merged[list] = Array.isArray(merged[list]) ? merged[list].map(String).filter(Boolean) : [];
+  });
   if (merged.teamSize !== undefined) {
     var min = parseInt(merged.teamSize && merged.teamSize.min, 10);
     var max = parseInt(merged.teamSize && merged.teamSize.max, 10);
@@ -265,20 +267,28 @@ function deleteForm(id) {
   return { deleted: true, sheetTrashed: trashed, title: form.title };
 }
 
+/** The lists a form can be limited to some values of. The rule has the name of the list: rules.majors, rules.sections. */
+var LIMITED_LISTS_ = ['majors', 'sections'];
+
+/** The values of a list that a form is limited to; empty means every value. */
+function allowedValues_(form, list) {
+  var m = form && form.rules && form.rules[list];
+  return Array.isArray(m) ? m.map(String).filter(Boolean) : [];
+}
+
 /** The specializations a form is limited to; empty means everyone. */
 function allowedMajors_(form) {
-  var m = form && form.rules && form.rules.majors;
-  return Array.isArray(m) ? m.map(String).filter(Boolean) : [];
+  return allowedValues_(form, 'majors');
 }
 
 /** Lists are merged into select fields so the browser gets plain options. */
 function resolveOptions_(form, lists) {
-  var allowed = allowedMajors_(form);
   function fix(fields) {
     (fields || []).forEach(function (f) {
       if (f.list) f.options = lists[f.list] || [];
-      // A form limited to some specializations only offers (and only accepts) those.
-      if (f.list === 'majors' && allowed.length) {
+      // A form limited to some values of a list only offers (and only accepts) those.
+      var allowed = LIMITED_LISTS_.indexOf(f.list) === -1 ? [] : allowedValues_(form, f.list);
+      if (allowed.length) {
         f.options = f.options.filter(function (o) { return allowed.indexOf(String(o.value)) !== -1; });
       }
       if (f.fields) fix(f.fields);

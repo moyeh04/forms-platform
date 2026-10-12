@@ -186,3 +186,17 @@ test('Specialization: a form limited to Computers only offers and accepts Comput
   w.admin({ action: 'admin.forms.update', id: w.form.id, patch: { rules: { majors: [] } } });
   assert.equal(w.api({ action: 'getForm', slug: w.form.slug }).form.fields.find((f) => f.id === 'major').options.length, 2, 'empty means everyone');
 });
+
+test('Sections: a form limited to some sections offers and accepts only those, for the leader and the members', () => {
+  const w = boot();
+  w.admin({ action: 'admin.forms.update', id: w.form.id, patch: { rules: { sections: ['4C-TH1', '4C-T1'] } } });
+  const pub = w.api({ action: 'getForm', slug: w.form.slug }).form;
+  assert.deepEqual(pub.fields.find((f) => f.id === 'section').options.map((o) => o.value), ['4C-TH1', '4C-T1']);
+  const memberSection = pub.fields.find((f) => f.type === 'members').fields.find((f) => f.id === 'section');
+  assert.deepEqual(memberSection.options.map((o) => o.value), ['4C-TH1', '4C-T1']);
+  const bad = w.submit({ ...leader, section: '4C-TH2', team_size: '1', members: [] });
+  assert.equal(bad.error.details.section.error, 'invalid_choice', 'the server refuses a section that is not allowed');
+  assert.equal(w.submit({ ...leader, section: '4C-T1', team_size: '1', members: [] }).ok, true);
+  w.admin({ action: 'admin.forms.update', id: w.form.id, patch: { rules: { sections: [] } } });
+  assert.ok(w.api({ action: 'getForm', slug: w.form.slug }).form.fields.find((f) => f.id === 'section').options.length > 2, 'empty means every section');
+});

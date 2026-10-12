@@ -731,3 +731,23 @@ test('Setup: a section shows what it is set to, and the save bar exists only whi
   assert.equal(p.$('[name="tab-questions"]').getAttribute('aria-current'), 'page', 'a refused save opens the tab and the section with the problem');
   assert.equal(p.$('[data-panel="Team size"] .panel-body').hidden, false);
 });
+
+test('Who can register: sections are picked one by one or a whole year group at once', async () => {
+  const w = boot();
+  const lists = w.admin({ action: 'admin.lists.get' }).lists;
+  const f = w.make('reservation', 'Seminar');
+  const p = await openAdmin(w, `#/f/${f.slug}/settings`);
+  const who = p.$('[data-panel="Who can register"]');
+  assert.equal(who.querySelector('.panel-sum').textContent, 'Everyone');
+  assert.equal(p.$('[name="section-all"]').getAttribute('aria-pressed'), 'true');
+  p.click('[name="section-4C-TH1"]'); p.click('[name="section-4C-O2"]');
+  assert.equal(who.querySelector('.panel-sum').textContent, '2 sections (4C)');
+  p.click('[name="save"]'); await settle(12);
+  assert.deepEqual(w.admin({ action: 'admin.forms.get', id: f.id }).form.rules.sections, ['4C-TH1', '4C-O2']);
+
+  p.click('[name="section-group-4C"]');
+  assert.equal(p.$('[name="section-all"]').getAttribute('aria-pressed'), 'true', 'every section chosen is the same as no limit');
+  p.click('[name="save"]'); await settle(12);
+  assert.deepEqual(w.admin({ action: 'admin.forms.get', id: f.id }).form.rules.sections, []);
+  assert.ok(lists.sections.length > 2);
+});

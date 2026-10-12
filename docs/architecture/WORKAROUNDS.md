@@ -695,6 +695,10 @@ form uses, so WhatsApp-only lists stay out of the way when editing team forms.
 A form can also narrow a list for itself: `rules.majors` keeps only the chosen
 specializations when the options are resolved, so a Computers-only form offers
 and accepts only Computers, in the browser and on the server, from one setting.
+`rules.sections` does the same for the Sections list, for the leader and for
+each member, so one Sections list can hold the sections of every year (4C-TH1,
+3L-A, ...) and each form offers only its own. The lists that can be narrowed
+are named once, in `LIMITED_LISTS_` in `Registry.gs`.
 
 **Cost.** Changing a list also changes what old forms accept. Existing stored
 answers are not rewritten.
