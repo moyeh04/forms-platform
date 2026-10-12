@@ -275,6 +275,44 @@ body.admin { font-size: 1rem; }
 .list-card-peek { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .list-card-meta { font-size: var(--fs-help); color: var(--mute); }
 .lists-back { display: none; }
+.list-new { justify-content: center; border-style: dashed; }
+.list-new[aria-current="true"] { border-color: var(--sea); color: var(--sea); }
+.list-card-kind { flex: none; font-size: var(--fs-help); font-weight: 400; font-style: italic; color: var(--mute); }
+.list-title { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 14px; }
+.list-title .link-btn { padding: 0; font-size: var(--fs-help); }
+.danger-link { color: var(--err) !important; }
+.list-rename { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.list-rename .input { flex: 1 1 14rem; }
+/* A list of sections: one card for each year group, a stepper for each kind of section. */
+.sec-editor { --l-gap: 12px; }
+.sec-group { padding: 12px 14px; border: 1.5px solid var(--line); border-radius: 4px; background: var(--sheet-2); }
+.sec-group-head { display: flex; align-items: center; gap: 12px; margin-bottom: 6px; }
+.sec-group-name { font-family: var(--font-title); font-size: 1.5rem; }
+.sec-group-head .icon-btn { margin-inline-start: auto; }
+.sec-kinds { display: flex; flex-direction: column; gap: 6px; }
+.sec-kind { display: grid; grid-template-columns: 3rem auto minmax(0, 1fr); align-items: center; gap: 12px; }
+.sec-code { font-weight: 700; font-size: 1.1rem; }
+.sec-range { overflow-wrap: anywhere; }
+.sec-kind .stepper { margin: 0; }
+.stepper-input { width: 4.2rem; min-height: 36px; text-align: center; font-weight: 700; }
+.sec-more { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; margin-top: 8px; }
+.sec-adder { padding: 12px 14px; border: 1.5px dashed var(--line); border-radius: 4px; }
+.sec-adder h3 { font-size: 1.1rem; margin-bottom: 6px; }
+.sec-pick { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; margin-bottom: 8px; }
+.sec-pick .label { min-width: 9rem; margin: 0; }
+.sec-pick .toggle-chips { align-items: center; }
+.sec-letter { width: 5rem; min-height: 32px; }
+.sec-preview .value-chips { margin-top: 8px; }
+.value-chip.plain { padding: 3px 12px; font-weight: 400; }
+.num-run { display: flex; flex-wrap: wrap; gap: 12px 28px; }
+.kind-cards { --l-min: 200px; margin: 6px 0 14px; }
+.kind-card { display: flex; flex-direction: column; gap: 4px; padding: 12px 14px; text-align: start; border: 1.5px solid var(--line); border-radius: 4px; background: var(--sheet); color: var(--ink); cursor: pointer; }
+.kind-card:hover { border-color: var(--ink); }
+.kind-card[aria-checked="true"] { border-color: var(--sea); box-shadow: inset 0 0 0 1.5px var(--sea); background: var(--sheet-2); }
+.kind-example { font-weight: 700; color: var(--sea); }
+.list-pane > .actions { margin-top: 16px; }
+.q-list-pick { grid-column: 2 / -1; display: flex; align-items: center; gap: 8px; }
+.q-list-pick .select { max-width: 22rem; min-height: 34px; }
 .list-head h2 { font-size: 1.4rem; }
 .used-by { margin: 4px 0 16px; font-size: var(--fs-help); color: var(--mute); }
 .used-by a { color: var(--sea); font-weight: 700; }
@@ -319,6 +357,10 @@ body.admin { font-size: 1rem; }
   .lists-back { display: inline-block; margin-bottom: 6px; }
 }
 @media (max-width: 600px) {
+  .sec-kind { grid-template-columns: 2.6rem auto; }
+  .sec-range { grid-column: 1 / -1; }
+  .sec-pick .label { min-width: 0; flex-basis: 100%; }
+  .q-list-pick { grid-column: 1; }
   .choice-head { display: none; }
   .choice, .with-ar > .choice { grid-template-columns: 1.6rem minmax(0, 1fr) auto; gap: 6px 8px; padding: 8px 4px; }
   .choice-tools { grid-column: 3; grid-row: 1; }

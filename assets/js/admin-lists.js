@@ -1,27 +1,51 @@
 /**
- * Admin: the shared lists behind dropdown questions (levels, majors, sections...).
+ * Admin: the shared lists behind dropdown questions.
  *
- * The lists are at the side and the choices of the picked list are in the main part. A list
- * of plain values is shown as chips; a list whose choices have English names is shown as rows.
- * The save bar exists only while the picked list differs from its saved copy.
+ * A list has a kind, and the kind decides how it is edited, so most lists need no typing:
+ *   sections  built from year groups (4C, 3L) and how many of each kind (TH, T, O) they have
+ *   numbers   a run from one number to another
+ *   named     choices with an English name (majors, levels), as rows
+ *   plain     short choices (groups, bylaws), as chips
+ * The admin can make more lists (another set of sections) and pick, per form, which list a
+ * question reads. The save bar exists only while the open list differs from its saved copy.
  */
 (function (App) {
   'use strict';
   var A = App.admin, ui = App.ui, h = ui.h, icon = ui.icon, toast = ui.toast;
 
-  /** What each shared list is for, and which form types ask it by default. */
-  var LIST_INFO = {
-    levels: { name: 'Levels', about: 'The level or year question.', types: ['team_registration', 'task_submission', 'reservation', 'whatsapp_registration'] },
-    curricula: { name: 'Bylaws', about: 'The bylaw (curriculum year) question.', types: ['team_registration', 'task_submission', 'reservation'] },
-    majors: { name: 'Majors', about: 'Specializations. A form can also be limited to some of them in its setup.', types: ['team_registration', 'task_submission', 'reservation', 'whatsapp_registration'] },
-    sections: { name: 'Sections', about: 'Lecture sections such as 4C-TH1. A form can also be limited to some of them in its setup.', types: ['team_registration', 'task_submission', 'reservation'] },
-    groups: { name: 'Groups', about: 'WhatsApp group letters (A with Chemistry, B without).', types: ['whatsapp_registration'] },
-    wa_sections: { name: 'WhatsApp section numbers', about: 'The number next to TH in a student timetable.', types: ['whatsapp_registration'] }
+  /** The lists that came with the platform: their names, what they are for, and their kind. */
+  var BUILTIN = {
+    levels: { name: 'Levels', about: 'The level or year question.', kind: 'named', types: ['team_registration', 'task_submission', 'reservation', 'whatsapp_registration'] },
+    curricula: { name: 'Bylaws', about: 'The bylaw (curriculum year) question.', kind: 'plain', types: ['team_registration', 'task_submission', 'reservation'] },
+    majors: { name: 'Majors', about: 'Specializations. A form can also be limited to some of them in its setup.', kind: 'named', types: ['team_registration', 'task_submission', 'reservation', 'whatsapp_registration'] },
+    sections: { name: 'Sections', about: 'Lecture sections such as 4C-TH1. A form can also be limited to some of them in its setup.', kind: 'sections', types: ['team_registration', 'task_submission', 'reservation'] },
+    groups: { name: 'Groups', about: 'WhatsApp group letters (A with Chemistry, B without).', kind: 'plain', types: ['whatsapp_registration'] },
+    wa_sections: { name: 'WhatsApp section numbers', about: 'The number next to TH in a student timetable.', kind: 'numbers', types: ['whatsapp_registration'] }
   };
-  var PEEK = 4; // Choices named on the card of a list.
+  var KINDS = {
+    sections: { label: 'Sections', example: '4C-TH1, 4C-T1, 3L-TH1', about: 'Built from year groups and how many of each kind they have. Nothing to type.' },
+    numbers: { label: 'Numbers', example: '1, 2, 3 … 33', about: 'A run from one number to another.' },
+    named: { label: 'Choices with names', example: 'حاسبات · Computers', about: 'Each choice with its English name, as rows.' },
+    plain: { label: 'Short choices', example: 'A, B, 2020', about: 'Short values shown as chips.' }
+  };
+  var SECTION_CODES = ['TH', 'T', 'O'];
+  var YEARS = ['0', '1', '2', '3', '4', '5'];
+  var PEEK = 4;
 
-  function listName(key) { return (LIST_INFO[key] && LIST_INFO[key].name) || key; }
   function plural(n, one, many) { return n + ' ' + (n === 1 ? one : many); }
+
+  /** The kind and the name of a list, for this page and for the Questions tab. */
+  A.listKind = function (key, info) { return ((info || {})[key] || {}).kind || (BUILTIN[key] || {}).kind || 'plain'; };
+  /**
+   * Whether a question may be pointed at this list instead of its own. A list the admin made may
+   * always be picked; a built-in one only when it is the only built-in of its kind (Sections, the
+   * WhatsApp numbers), because Levels and Majors, or Bylaws and Groups, mean different things.
+   */
+  A.listSwappable = function (key) {
+    if (!BUILTIN.hasOwnProperty(key)) return true;
+    return Object.keys(BUILTIN).filter(function (k) { return BUILTIN[k].kind === BUILTIN[key].kind; }).length === 1;
+  };
+  A.listName = function (key, info) { return ((info || {})[key] || {}).name || (BUILTIN[key] || {}).name || key; };
 
   /** Forms whose questions (or member questions) read this list. */
   function formsUsing(forms, key) {
@@ -38,13 +62,13 @@
       return { value: String(o.value), en: label.en && label.en !== String(o.value) ? label.en : '', ar: label.ar && label.ar !== String(o.value) ? label.ar : '' };
     });
   }
-
   function fromRows(rows) {
     return rows.filter(function (r) { return r.value.trim(); }).map(function (r) {
       var v = r.value.trim();
       return { value: v, label: { en: r.en.trim() || v, ar: r.ar.trim() || v } };
     });
   }
+  function plainRows(values) { return values.map(function (v) { return { value: String(v), en: '', ar: '' }; }); }
 
   /** Lines of pasted text as rows; "value | English name" gives the choice a name. */
   function parse(text) {
@@ -54,13 +78,61 @@
     }).filter(function (r) { return r.value; });
   }
 
+  /* ── Sections: year groups × kinds × counts ─────────────────── */
+
+  /**
+   * Reads "4C-TH1 … 4C-TH8, 4C-T1 …" as [{ name: '4C', kinds: [{ code: 'TH', count: 8 }, …] }].
+   * A value that the groups cannot give back exactly (a gap, another shape) is kept in `extras`.
+   */
+  function readSections(values) {
+    var groups = [], extras = [], seen = {};
+    values.forEach(function (v) {
+      var m = /^([^-\s]+)-([A-Za-z]+)(\d+)$/.exec(v);
+      if (!m) { extras.push(v); return; }
+      var g = groups.filter(function (x) { return x.name === m[1]; })[0];
+      if (!g) groups.push(g = { name: m[1], kinds: [] });
+      var k = g.kinds.filter(function (x) { return x.code === m[2]; })[0];
+      if (!k) g.kinds.push(k = { code: m[2], count: 0, nums: [] });
+      k.nums.push(+m[3]);
+      seen[v] = true;
+    });
+    groups.forEach(function (g) {
+      g.kinds.forEach(function (k) {
+        var whole = k.nums.slice().sort(function (a, b) { return a - b; }).every(function (n, i) { return n === i + 1; });
+        if (whole) k.count = k.nums.length;
+        else { k.nums.forEach(function (n) { extras.push(g.name + '-' + k.code + n); }); k.count = 0; }
+        delete k.nums;
+      });
+      g.kinds = g.kinds.filter(function (k) { return k.count; });
+    });
+    return { groups: groups.filter(function (g) { return g.kinds.length; }), extras: extras };
+  }
+  function writeSections(s) {
+    var out = [];
+    s.groups.forEach(function (g) { g.kinds.forEach(function (k) { for (var n = 1; n <= k.count; n++) out.push(g.name + '-' + k.code + n); }); });
+    return out.concat(s.extras.filter(function (v) { return out.indexOf(v) === -1; }));
+  }
+
+  /** "4C" is the year 4 and the letter C. */
+  function groupParts(name) { var m = /^(\d+)([A-Za-z]+)$/.exec(name); return m ? { year: m[1], letter: m[2].toUpperCase() } : null; }
+
+  /** A number a stepper and its field share; typing is possible, never needed. */
+  function stepper(name, label, value, lo, hi, set) {
+    var input = h('input', { class: 'input num stepper-input', type: 'number', inputmode: 'numeric', name: name, min: String(lo), max: String(hi), value: String(value), 'aria-label': label,
+      onchange: function (e) { var v = parseInt(e.target.value, 10); if (isNaN(v)) v = value; set(Math.max(lo, Math.min(hi, v))); } });
+    return h('span', { class: 'stepper' },
+      h('button', { type: 'button', class: 'icon-btn sm', name: name + '-down', 'aria-label': 'Fewer: ' + label, disabled: value <= lo, onclick: function () { set(value - 1); } }, '−'),
+      input,
+      h('button', { type: 'button', class: 'icon-btn sm', name: name + '-up', 'aria-label': 'More: ' + label, disabled: value >= hi, onclick: function () { set(value + 1); } }, '+'));
+  }
+
   A.views.lists = async function (mount, picked) {
-    var both = await Promise.all([A.call('admin.lists.get'), A.call('admin.forms.list')]);
-    var lists = both[0].lists;
-    var forms = both[1].forms;
-    var keys = Object.keys(lists);
+    var data = await Promise.all([A.call('admin.lists.get'), A.call('admin.forms.list')]);
+    var lists = data[0].lists, info = data[0].info || {};
+    var forms = data[1].forms;
+    var keys = function () { return Object.keys(lists); };
     // `open` is false while the address names no list: a phone then shows only the lists.
-    var st = { key: keys.indexOf(picked) !== -1 ? picked : keys[0], open: keys.indexOf(picked) !== -1, rows: [], order: false };
+    var st = { key: keys().indexOf(picked) !== -1 ? picked : keys()[0], open: keys().indexOf(picked) !== -1 || picked === 'new', creating: picked === 'new', rows: [], order: false, renaming: false };
 
     var index = h('nav', { class: 'l-side lists-index l-stack', 'aria-label': 'Lists' });
     var pane = h('section', { class: 'l-main panel list-pane' });
@@ -73,11 +145,16 @@
     var bar = h('div', { class: 'savebar', hidden: true }, h('span', { class: 'savebar-text' }, barNote, barWarn),
       h('button', { type: 'button', class: 'btn btn-quiet', name: 'discard', onclick: function () { load(st.key); paint(); } }, 'Discard'), saveBtn);
 
-    function load(key) { st.key = key; st.rows = toRows(lists[key]); st.order = false; }
-    function dirty() { return JSON.stringify(fromRows(st.rows)) !== JSON.stringify(fromRows(toRows(lists[st.key]))) || st.rows.some(function (r) { return !r.value.trim() && (r.en.trim() || r.ar.trim()); }); }
+    var kind = function (k) { return A.listKind(k || st.key, info); };
+    var name = function (k) { return A.listName(k || st.key, info); };
+    function load(key) {
+      st.key = key; st.rows = toRows(lists[key]); st.order = false; st.renaming = false;
+      st.sections = kind() === 'sections' ? readSections(st.rows.map(function (r) { return r.value; })) : null;
+    }
+    function dirty() { return !st.creating && (JSON.stringify(fromRows(st.rows)) !== JSON.stringify(fromRows(toRows(lists[st.key]))) || st.rows.some(function (r) { return !r.value.trim() && (r.en.trim() || r.ar.trim()); })); }
     function named() { return st.rows.some(function (r) { return r.en || r.ar; }); }
     /** Rows are needed for names and order; plain values read best as chips. */
-    function asRows() { return st.order || named(); }
+    function asRows() { return kind() === 'named' || st.order || named(); }
 
     /** The first thing that stops a save, or ''. `at` is the row to mark. */
     function problem() {
@@ -104,7 +181,8 @@
       if (removed.length) parts.push(removed.length + ' removed');
       if (!parts.length) parts.push('names or order changed');
       // A form limited to some values of this list (rules.majors, rules.sections) loses a removed one.
-      var limited = forms.filter(function (f) { return ((f.rules || {})[st.key] || []).some(function (v) { return removed.indexOf(String(v)) !== -1; }); });
+      var rule = st.key === 'majors' ? 'majors' : kind() === 'sections' ? 'sections' : '';
+      var limited = !rule ? [] : formsUsing(forms, st.key).filter(function (f) { return ((f.rules || {})[rule] || []).some(function (v) { return removed.indexOf(String(v)) !== -1; }); });
       return { text: parts.join(', '), limited: limited };
     }
 
@@ -118,50 +196,148 @@
       Array.prototype.forEach.call(rowsBox.querySelectorAll('[data-i]'), function (el) { el.classList.toggle('bad', isDirty && +el.dataset.i === bad.at); });
       if (isDirty) {
         var c = changes();
-        barNote.textContent = listName(st.key) + ': ' + c.text + '. Not saved yet.';
+        barNote.textContent = name() + ': ' + c.text + '. Not saved yet.';
         barWarn.textContent = c.limited.length ? 'Limited to a removed choice: ' + c.limited.map(function (f) { return f.title; }).join(', ') + '.' : '';
-        saveBtn.textContent = 'Save ' + listName(st.key);
+        saveBtn.textContent = 'Save ' + name();
       }
       paintIndex();
     }
 
+    async function leaveOk() {
+      if (!dirty()) return true;
+      return ui.confirm({ title: 'Leave without saving?', body: 'Your changes to ' + name() + ' are not saved.', confirmText: 'Leave', danger: true });
+    }
     async function select(key) {
-      if (key !== st.key && dirty()) {
-        var leave = await ui.confirm({ title: 'Leave without saving?', body: 'Your changes to ' + listName(st.key) + ' are not saved.', confirmText: 'Leave', danger: true });
-        if (!leave) return;
-      }
-      if (key !== st.key) load(key);
-      st.open = true;
+      if ((key !== st.key || st.creating) && !(await leaveOk())) return;
+      if (key !== st.key || st.creating) load(key);
+      st.creating = false; st.open = true;
       A.setHash('#/lists/' + encodeURIComponent(key));
       paint();
+    }
+    async function startNew() {
+      if (!(await leaveOk())) return;
+      load(st.key);
+      st.creating = true; st.open = true;
+      A.setHash('#/lists/new');
+      paint();
+      var el = pane.querySelector('[name="list-name"]'); if (el && el.focus) el.focus();
     }
 
     saveBtn.addEventListener('click', function () {
       A.busy(saveBtn, async function () {
         if (problem().text) { changed(); if (problemBox.scrollIntoView) problemBox.scrollIntoView({ block: 'center' }); return; }
         var out = await A.call('admin.lists.set', { key: st.key, values: fromRows(st.rows) });
-        lists = out.lists;
+        lists = out.lists; info = out.info || info;
         load(st.key);
-        toast(listName(st.key) + ' saved. Every form that uses it shows the new choices.', 'ok');
+        toast(name() + ' saved. Every form that uses it shows the new choices.', 'ok');
         paint();
       });
     });
 
     function paintIndex() {
       ui.clear(index);
-      keys.forEach(function (k) {
-        var current = k === st.key;
+      index.appendChild(h('button', { type: 'button', class: 'btn btn-quiet list-new', name: 'new-list', 'aria-current': st.creating ? 'true' : null, onclick: startNew }, icon('plus', 18), 'New list'));
+      keys().forEach(function (k) {
+        var current = k === st.key && !st.creating;
         var values = current ? fromRows(st.rows) : (lists[k] || []);
         var users = formsUsing(forms, k).length;
         var peek = values.slice(0, PEEK).map(function (o) { return (o.label && o.label.en) || o.value; }).join(', ') + (values.length > PEEK ? ' …' : '');
         index.appendChild(h('button', { type: 'button', class: 'list-card', name: 'pick-' + k, 'aria-current': current ? 'true' : null, onclick: function () { select(k); } },
-          h('span', { class: 'list-card-name' }, listName(k), current && dirty() ? h('span', { class: 'badge draft' }, 'Not saved') : null),
+          h('span', { class: 'list-card-name' }, name(k), current && dirty() ? h('span', { class: 'badge draft' }, 'Not saved') : name(k) !== KINDS[kind(k)].label ? h('span', { class: 'list-card-kind' }, KINDS[kind(k)].label) : null),
           h('span', { class: 'list-card-peek', dir: 'auto' }, peek || 'No choices yet'),
           h('span', { class: 'list-card-meta' }, plural(values.length, 'choice', 'choices') + ' · ' + (users ? plural(users, 'form', 'forms') : 'no form yet'))));
       });
     }
 
-    function removeRow(i) { st.rows.splice(i, 1); paintRows(); changed(); }
+    function setRows(rows) { st.rows = rows; paintRows(); changed(); }
+    function removeRow(i) { st.rows.splice(i, 1); if (st.sections) st.sections = readSections(st.rows.map(function (r) { return r.value; })); paintRows(); changed(); }
+
+    /* Editors -------------------------------------------------------- */
+
+    function sectionsEditor() {
+      var s = st.sections;
+      var apply = function () { setRows(plainRows(writeSections(s))); };
+      var box = h('div', { class: 'sec-editor l-stack' });
+      s.groups.forEach(function (g, gi) {
+        var used = g.kinds.map(function (k) { return k.code; });
+        var more = SECTION_CODES.filter(function (c) { return used.indexOf(c) === -1; });
+        var count = g.kinds.reduce(function (n, k) { return n + k.count; }, 0);
+        box.appendChild(h('div', { class: 'sec-group', dataset: { group: g.name } },
+          h('div', { class: 'sec-group-head' },
+            h('strong', { class: 'sec-group-name' }, g.name),
+            h('span', { class: 'muted-note' }, plural(count, 'section', 'sections')),
+            h('button', { type: 'button', class: 'icon-btn sm danger', name: 'remove-group-' + g.name, 'aria-label': 'Remove the group ' + g.name, onclick: function () { s.groups.splice(gi, 1); apply(); } }, icon('trash', 16))),
+          h('div', { class: 'sec-kinds' }, g.kinds.map(function (k, ki) {
+            return h('div', { class: 'sec-kind' },
+              h('span', { class: 'sec-code' }, k.code),
+              stepper('count-' + g.name + '-' + k.code, k.code + ' sections of ' + g.name, k.count, 0, 40, function (v) {
+                if (v === 0) g.kinds.splice(ki, 1); else k.count = v;
+                if (!g.kinds.length) s.groups.splice(gi, 1);
+                apply();
+              }),
+              h('span', { class: 'sec-range muted-note' }, k.count ? g.name + '-' + k.code + '1' + (k.count > 1 ? ' to ' + k.code + k.count : '') : ''));
+          })),
+          more.length ? h('div', { class: 'sec-more' }, h('span', { class: 'muted-note' }, 'Add a kind:'), more.map(function (c) {
+            return h('button', { type: 'button', class: 'toggle-chip sm', name: 'add-kind-' + g.name + '-' + c, onclick: function () { g.kinds.push({ code: c, count: 1 }); apply(); } }, '+ ' + c);
+          })) : null));
+      });
+      box.appendChild(groupAdder(s, apply));
+      if (s.extras.length) {
+        box.appendChild(h('div', { class: 'sec-extras' }, h('span', { class: 'label' }, 'Other sections'),
+          h('p', { class: 'help' }, 'These do not follow the year-kind-number pattern, so they are kept as they are.'),
+          h('ul', { class: 'value-chips' }, s.extras.map(function (v) {
+            return h('li', { class: 'value-chip' }, h('span', { dir: 'auto' }, v), h('button', { type: 'button', name: 'remove-extra-' + v, 'aria-label': 'Remove ' + v, onclick: function () { s.extras = s.extras.filter(function (x) { return x !== v; }); apply(); } }, icon('x', 14)));
+          }))));
+      }
+      return box;
+    }
+
+    /** A new group is a year and a letter picked from chips; Add appears once both are picked. */
+    function groupAdder(s, apply) {
+      var pick = st.groupPick = st.groupPick || { year: '', letter: '' };
+      var letters = ['C', 'L'];
+      keys().forEach(function (k) {
+        if (kind(k) !== 'sections') return;
+        readSections((lists[k] || []).map(function (o) { return String(o.value); })).groups.forEach(function (g) { var p = groupParts(g.name); if (p && letters.indexOf(p.letter) === -1) letters.push(p.letter); });
+      });
+      var box = h('div', { class: 'sec-adder' });
+      var paintAdder = function () {
+        ui.clear(box);
+        var nameNow = pick.year && pick.letter ? pick.year + pick.letter : '';
+        var exists = nameNow && s.groups.some(function (g) { return g.name === nameNow; });
+        var chipRow = function (label, values, key) {
+          return h('div', { class: 'sec-pick' }, h('span', { class: 'label' }, label), h('div', { class: 'toggle-chips' }, values.map(function (v) {
+            return h('button', { type: 'button', class: 'toggle-chip sm', name: 'group-' + key + '-' + v, 'aria-pressed': pick[key] === v ? 'true' : 'false', onclick: function () { pick[key] = pick[key] === v ? '' : v; paintAdder(); } }, v);
+          }), key === 'letter' ? h('input', { class: 'input sec-letter', name: 'group-letter-other', maxlength: '2', placeholder: 'Other', 'aria-label': 'Another department letter', value: letters.indexOf(pick.letter) === -1 ? pick.letter : '',
+            oninput: function (e) { pick.letter = e.target.value.replace(/[^A-Za-z]/g, '').toUpperCase(); var at = e.target.selectionStart; paintAdder(); var el = box.querySelector('[name="group-letter-other"]'); if (el) { el.focus(); try { el.setSelectionRange(at, at); } catch (x) { /* not a text field */ } } } }) : null));
+        };
+        box.appendChild(h('h3', null, 'Add a year group'));
+        box.appendChild(chipRow('Year', YEARS, 'year'));
+        box.appendChild(chipRow('Department letter', letters, 'letter'));
+        if (exists) box.appendChild(h('p', { class: 'muted-note' }, nameNow + ' is already in this list.'));
+        else if (nameNow) box.appendChild(h('button', { type: 'button', class: 'btn btn-quiet sm', name: 'add-group', onclick: function () {
+          var last = s.groups[s.groups.length - 1];
+          s.groups.push({ name: nameNow, kinds: last ? last.kinds.map(function (k) { return { code: k.code, count: k.count }; }) : [{ code: 'TH', count: 1 }] });
+          st.groupPick = { year: '', letter: '' };
+          apply();
+        } }, icon('plus', 16), 'Add ' + nameNow + (s.groups.length ? ' with the same kinds as ' + s.groups[s.groups.length - 1].name : '')));
+      };
+      paintAdder();
+      return box;
+    }
+
+    function numbersEditor() {
+      var nums = st.rows.map(function (r) { return parseInt(r.value, 10); });
+      var run = nums.length && nums.every(function (n, i) { return !isNaN(n) && String(n) === st.rows[i].value && (i === 0 || n === nums[i - 1] + 1); });
+      if (st.rows.length && !run) return null;
+      var from = nums.length ? nums[0] : 1, to = nums.length ? nums[nums.length - 1] : 1;
+      var set = function (a, b) { if (b < a) b = a; var out = []; for (var n = a; n <= b && out.length <= 300; n++) out.push(String(n)); setRows(plainRows(out)); };
+      return h('div', { class: 'num-editor' },
+        h('div', { class: 'num-run' },
+          h('div', { class: 'field-row' }, h('span', { class: 'label' }, 'From'), stepper('range-from', 'First number', from, 0, 999, function (v) { set(v, Math.max(v, to)); })),
+          h('div', { class: 'field-row' }, h('span', { class: 'label' }, 'To'), stepper('range-to', 'Last number', to, from, from + 300, function (v) { set(from, v); }))),
+        h('p', { class: 'muted-note' }, plural(st.rows.length, 'choice', 'choices') + ': ' + (st.rows.length ? from + ' to ' + to : 'none')));
+    }
 
     function rowEl(r, i) {
       var move = function (d) { var j = i + d; var t = st.rows[i]; st.rows[i] = st.rows[j]; st.rows[j] = t; paintRows(); changed(); };
@@ -177,26 +353,26 @@
           h('button', { type: 'button', class: 'icon-btn sm', 'aria-label': 'Move down', disabled: i === st.rows.length - 1, onclick: function () { move(1); } }, '↓'),
           h('button', { type: 'button', class: 'icon-btn sm danger', name: 'remove-' + i, 'aria-label': 'Remove ' + (r.value || 'this choice'), onclick: function () { removeRow(i); } }, icon('trash', 16))));
     }
-
     function chipEl(r, i) {
       return h('li', { class: 'value-chip', dataset: { i: String(i) } }, h('span', { dir: 'auto' }, r.value),
         h('button', { type: 'button', name: 'remove-' + i, 'aria-label': 'Remove ' + r.value, onclick: function () { removeRow(i); } }, icon('x', 14)));
     }
-
-    function paintRows() {
-      ui.clear(rowsBox);
+    function choicesEditor() {
+      var box = h('div');
       st.withAr = st.rows.some(function (r) { return r.ar; });
       var rows = asRows();
-      if (!st.rows.length) rowsBox.appendChild(h('div', { class: 'empty' }, h('strong', null, 'No choices yet.'), ' Add the first one below.'));
-      else if (!rows) rowsBox.appendChild(h('ul', { class: 'value-chips' }, st.rows.map(chipEl)));
+      if (!st.rows.length) box.appendChild(h('div', { class: 'empty' }, h('strong', null, 'No choices yet.'), ' Add the first one below.'));
+      else if (!rows) box.appendChild(h('ul', { class: 'value-chips' }, st.rows.map(chipEl)));
       else {
-        rowsBox.appendChild(h('div', { class: 'choice-head' + (st.withAr ? ' with-ar' : ''), 'aria-hidden': 'true' }, h('span'), h('span', null, 'Choice'), h('span', null, 'English name'), st.withAr ? h('span', null, 'Arabic name') : null, h('span')));
-        rowsBox.appendChild(h('ol', { class: 'choices' + (st.withAr ? ' with-ar' : '') }, st.rows.map(rowEl)));
+        box.appendChild(h('div', { class: 'choice-head' + (st.withAr ? ' with-ar' : ''), 'aria-hidden': 'true' }, h('span'), h('span', null, 'Choice'), h('span', null, 'English name'), st.withAr ? h('span', null, 'Arabic name') : null, h('span')));
+        box.appendChild(h('ol', { class: 'choices' + (st.withAr ? ' with-ar' : '') }, st.rows.map(rowEl)));
       }
-      rowsBox.appendChild(adder(rows));
+      box.appendChild(adder(rows));
       // Chips cannot rename or reorder, so a plain list offers the rows; rows of a plain list offer the way back.
-      if (st.rows.length && !named()) rowsBox.appendChild(h('button', { type: 'button', class: 'link-btn', name: rows ? 'short-view' : 'edit-rows', onclick: function () { st.order = !rows; paintRows(); changed(); } },
+      if (st.rows.length && kind() !== 'named' && !named()) box.appendChild(h('button', { type: 'button', class: 'link-btn', name: rows ? 'short-view' : 'edit-rows', onclick: function () { st.order = !rows; paintRows(); changed(); } },
         rows ? 'Back to the short view' : 'Rename, reorder or add English names'));
+      box.appendChild(many());
+      return box;
     }
 
     function adder(rows) {
@@ -212,52 +388,126 @@
       return h('div', { class: 'choice-add' + (rows ? '' : ' short') }, v, en, h('button', { type: 'button', class: 'btn btn-quiet sm', name: 'add-choice', onclick: add }, icon('plus', 18), 'Add'));
     }
 
-    /** Many choices in one step: pasted lines, or a run of numbers for a list of numbers. */
+    /** Many choices in one step: pasted lines. */
     function many() {
       var paste = h('textarea', { class: 'textarea', rows: '5', name: 'paste-list', placeholder: 'One choice on each line. For an English name, add a bar:\nحاسبات | Computers', 'aria-label': 'Choices, one on each line' });
-      var pasteActs = h('div', { class: 'actions' });
-      var use = function (replace) { return function () { st.rows = (replace ? [] : st.rows).concat(parse(paste.value)); paste.value = ''; paintRows(); changed(); paintActs(); }; };
-      function paintActs() {
-        ui.clear(pasteActs);
+      var acts = h('div', { class: 'actions' });
+      var use = function (replace) { return function () { st.rows = (replace ? [] : st.rows).concat(parse(paste.value)); paste.value = ''; paintRows(); changed(); }; };
+      paste.addEventListener('input', function () {
+        ui.clear(acts);
         var n = parse(paste.value).length;
         if (!n) return;
-        pasteActs.appendChild(h('button', { type: 'button', class: 'btn btn-quiet sm', name: 'paste-add', onclick: use(false) }, 'Add ' + plural(n, 'choice', 'choices') + ' to the end'));
-        if (st.rows.length) pasteActs.appendChild(h('button', { type: 'button', class: 'btn btn-quiet sm', name: 'paste-replace', onclick: use(true) }, 'Replace the list with ' + (n === 1 ? 'it' : 'them')));
-      }
-      paste.addEventListener('input', paintActs);
+        acts.appendChild(h('button', { type: 'button', class: 'btn btn-quiet sm', name: 'paste-add', onclick: use(false) }, 'Add ' + plural(n, 'choice', 'choices') + ' to the end'));
+        if (st.rows.length) acts.appendChild(h('button', { type: 'button', class: 'btn btn-quiet sm', name: 'paste-replace', onclick: use(true) }, 'Replace the list with ' + (n === 1 ? 'it' : 'them')));
+      });
+      return h('details', { class: 'list-many', name: 'add-many' }, h('summary', null, 'Paste many at once'), paste, acts);
+    }
 
-      var numeric = st.rows.every(function (r) { return /^\d+$/.test(r.value); });
-      var from = h('input', { class: 'input num', type: 'number', inputmode: 'numeric', name: 'range-from', value: '1', 'aria-label': 'First number' });
-      var to = h('input', { class: 'input num', type: 'number', inputmode: 'numeric', name: 'range-to', value: String(Math.max(st.rows.length, 1)), 'aria-label': 'Last number' });
-      var rangeErr = h('span', { class: 'error', role: 'alert' });
-      var range = numeric ? h('div', { class: 'list-range' },
-        h('span', { class: 'label' }, 'Or number them'), h('span', null, 'from'), from, h('span', null, 'to'), to,
-        h('button', { type: 'button', class: 'btn btn-quiet sm', name: 'fill-range', onclick: function () {
-          var a = parseInt(from.value, 10), b = parseInt(to.value, 10);
-          rangeErr.textContent = !(a >= 0) || !(b >= a) ? 'The last number must not be before the first.' : b - a > 300 ? 'That is more than 300 choices. Use a shorter run.' : '';
-          if (rangeErr.textContent) return;
-          st.rows = []; for (var n = a; n <= b; n++) st.rows.push({ value: String(n), en: '', ar: '' });
-          paintRows(); changed();
-        } }, st.rows.length ? 'Replace the list' : 'Fill the list'), rangeErr) : null;
-      return h('details', { class: 'list-many', name: 'add-many' }, h('summary', null, 'Add many at once'), paste, pasteActs, range);
+    function paintRows() {
+      ui.clear(rowsBox);
+      var k = kind();
+      var ed = k === 'sections' ? sectionsEditor() : k === 'numbers' ? numbersEditor() : null;
+      rowsBox.appendChild(ed || choicesEditor());
+      if (k === 'sections' && st.rows.length) rowsBox.appendChild(h('details', { class: 'list-many sec-preview' }, h('summary', null, 'See all ' + plural(st.rows.length, 'section', 'sections')),
+        h('ul', { class: 'value-chips' }, st.rows.map(function (r) { return h('li', { class: 'value-chip plain' }, r.value); }))));
+    }
+
+    /* Pane ----------------------------------------------------------- */
+
+    function createPane() {
+      var form = st.newList = st.newList || { name: '', kind: 'sections', copyOf: '' };
+      var err = h('p', { class: 'error', role: 'alert', hidden: true });
+      var actions = h('div', { class: 'actions' });
+      var paintActions = function () {
+        ui.clear(actions);
+        if (!form.name.trim()) return;
+        var btn = h('button', { type: 'button', class: 'btn btn-primary', name: 'create-list' }, 'Make "' + form.name.trim() + '"');
+        btn.addEventListener('click', function () {
+          A.busy(btn, async function () {
+            try {
+              var out = await A.call('admin.lists.create', { name: form.name, kind: form.kind, copyOf: form.copyOf || undefined });
+              lists = out.lists; info = out.info;
+              st.newList = null; st.creating = false;
+              load(out.key);
+              A.setHash('#/lists/' + encodeURIComponent(out.key));
+              toast('"' + name(out.key) + '" is ready. Pick it for a question in the Questions tab of a form.', 'ok');
+              paint();
+            } catch (e) {
+              if (e.code !== 'list_name_taken' && e.code !== 'list_name') throw e;
+              err.textContent = e.message; err.hidden = false;
+            }
+          });
+        });
+        actions.appendChild(btn);
+      };
+      var nameInput = A.text(form.name, function (v) { form.name = v; err.hidden = true; paintActions(); }, { name: 'list-name', placeholder: 'For example: Sections of the third year', maxlength: '60' });
+      var kindBox = h('div', { class: 'kind-cards l-grid', role: 'radiogroup', 'aria-label': 'Kind of list' });
+      var fromBox = h('div');
+      var paintKinds = function () {
+        ui.clear(kindBox);
+        Object.keys(KINDS).forEach(function (k) {
+          var on = form.kind === k;
+          kindBox.appendChild(h('button', { type: 'button', class: 'kind-card', role: 'radio', name: 'kind-' + k, 'aria-checked': on ? 'true' : 'false', onclick: function () { form.kind = k; form.copyOf = ''; paintKinds(); } },
+            h('strong', null, KINDS[k].label), h('span', { class: 'kind-example', dir: 'ltr' }, KINDS[k].example), h('span', { class: 'muted-note' }, KINDS[k].about)));
+        });
+        ui.clear(fromBox);
+        var same = keys().filter(function (k) { return kind(k) === form.kind; });
+        fromBox.appendChild(h('span', { class: 'label' }, 'Start with'));
+        fromBox.appendChild(h('div', { class: 'toggle-chips' }, [['', 'Nothing']].concat(same.map(function (k) { return [k, 'A copy of ' + name(k)]; })).map(function (o) {
+          return h('button', { type: 'button', class: 'toggle-chip sm', name: 'copy-' + (o[0] || 'none'), 'aria-pressed': form.copyOf === o[0] ? 'true' : 'false', onclick: function () { form.copyOf = o[0]; paintKinds(); } }, o[1]);
+        })));
+      };
+      paintKinds(); paintActions();
+      return [h('h2', null, 'New list'),
+        h('p', { class: 'help' }, 'A list can be asked by any number of forms. After you make it, pick it for a question in the Questions tab of a form.'),
+        A.field('Name', nameInput), err,
+        h('span', { class: 'label' }, 'Kind'), kindBox, fromBox, actions];
+    }
+
+    function headPane() {
+      var custom = !!info[st.key];
+      var users = formsUsing(forms, st.key);
+      var about = (BUILTIN[st.key] || {}).about || KINDS[kind()].about;
+      var title;
+      if (st.renaming) {
+        var input = A.text(name(), function () {}, { name: 'rename-input', 'aria-label': 'Name of the list', maxlength: '60' });
+        var renameBtn = h('button', { type: 'button', class: 'btn btn-quiet sm', name: 'rename-save' }, 'Rename');
+        renameBtn.addEventListener('click', function () {
+          A.busy(renameBtn, async function () { var out = await A.call('admin.lists.rename', { key: st.key, name: input.value }); info = out.info; st.renaming = false; paint(); });
+        });
+        title = h('div', { class: 'list-rename' }, input, renameBtn, h('button', { type: 'button', class: 'link-btn', onclick: function () { st.renaming = false; paint(); } }, 'Cancel'));
+      } else {
+        title = h('div', { class: 'list-title' }, h('h2', null, name()), name() !== KINDS[kind()].label ? h('span', { class: 'list-card-kind' }, KINDS[kind()].label) : null,
+          custom ? h('button', { type: 'button', class: 'link-btn', name: 'rename-list', onclick: function () { st.renaming = true; paint(); } }, 'Rename') : null,
+          // Deleting is offered only while no form asks the list.
+          custom && !users.length ? h('button', { type: 'button', class: 'link-btn danger-link', name: 'delete-list', onclick: function (e) {
+            var btn = e.currentTarget;
+            ui.confirm({ title: 'Delete ' + name() + '?', body: 'No form asks this list. It is removed for good.', confirmText: 'Delete', danger: true }).then(function (yes) {
+              if (!yes) return;
+              A.busy(btn, async function () {
+                var out = await A.call('admin.lists.delete', { key: st.key });
+                lists = out.lists; info = out.info; A.unsaved = false;
+                load(keys()[0]); st.open = false; A.setHash('#/lists'); paint();
+              });
+            });
+          } }, 'Delete') : null);
+      }
+      return h('div', { class: 'list-head' }, title,
+        h('p', { class: 'help' }, about),
+        h('p', { class: 'used-by' }, users.length ? users.reduce(function (out, f, i) {
+          return out.concat(i ? ', ' : [], h('a', { href: '#/f/' + encodeURIComponent(f.slug) + '/questions' }, f.title));
+        }, ['Asked by ']) : 'No form asks it yet. Pick it for a question in the Questions tab of a form.'));
     }
 
     function paintPane() {
       ui.clear(pane);
-      var info = LIST_INFO[st.key] || { about: '', types: [] };
-      var users = formsUsing(forms, st.key);
+      pane.appendChild(h('button', { type: 'button', class: 'link-btn lists-back', name: 'all-lists', onclick: function () { st.open = false; st.creating = false; A.setHash('#/lists'); paint(); } }, '‹ All lists'));
+      if (st.creating) { createPane().forEach(function (n) { if (n) pane.appendChild(n); }); return; }
       pane.dataset.list = st.key;
-      pane.appendChild(h('button', { type: 'button', class: 'link-btn lists-back', name: 'all-lists', onclick: function () { st.open = false; A.setHash('#/lists'); paint(); } }, '‹ All lists'));
-      pane.appendChild(h('div', { class: 'list-head' },
-        h('h2', null, listName(st.key)),
-        info.about ? h('p', { class: 'help' }, info.about) : null,
-        h('p', { class: 'used-by' }, users.length ? users.reduce(function (out, f, i) {
-          return out.concat(i ? ', ' : [], h('a', { href: '#/f/' + encodeURIComponent(f.slug) + '/questions' }, f.title));
-        }, ['Asked by ']) : 'No form asks it yet.' + (info.types.length ? ' A new ' + info.types.map(function (t) { return (A.TYPES[t] || { label: t }).label.toLowerCase(); }).join(', ') + ' form will.' : ''))));
+      pane.appendChild(headPane());
       paintRows();
       pane.appendChild(rowsBox);
       pane.appendChild(problemBox);
-      pane.appendChild(many());
       pane.appendChild(h('p', { class: 'muted-note' }, 'A save reaches every form that asks this list. Answers already given are not changed.'));
     }
 
@@ -265,8 +515,7 @@
 
     ui.clear(mount);
     mount.appendChild(h('div', { class: 'page-head' }, h('h2', null, 'Lists')));
-    mount.appendChild(h('p', { class: 'help' }, 'The choices of the dropdown questions. A list is shared: change it here and every form that asks it follows.'));
-    if (!keys.length) return mount.appendChild(h('div', { class: 'empty' }, 'No lists yet.'));
+    mount.appendChild(h('p', { class: 'help' }, 'The choices of the dropdown questions. A list is shared: change it here and every form that asks it follows. Make more lists, such as another set of sections, and pick one for a question in the Questions tab of a form.'));
     load(st.key);
     mount.appendChild(wrap);
     mount.appendChild(bar);

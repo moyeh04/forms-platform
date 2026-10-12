@@ -54,6 +54,15 @@ function normalizeQuestions_(form) {
     taken[clean.id] = true;
     return clean;
   });
+  // A question that reads a list may read any list that exists; the admin picks it in the Questions tab.
+  var lists = readLists();
+  var known = function (fields) {
+    (fields || []).forEach(function (f) {
+      if (f.list && !lists.hasOwnProperty(f.list)) fail('list_not_found', 'The list "' + f.list + '" does not exist.');
+      known(f.fields);
+    });
+  };
+  known(form.fields);
   var placed = {};
   var pages = {};
   if ((form.steps || []).length > PAGE_LIMIT_) fail('bad_question', 'A form can have at most ' + PAGE_LIMIT_ + ' pages.');

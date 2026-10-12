@@ -146,10 +146,17 @@
 
     /* Who can register --------------------------------------------- */
     var majorsPanel = null;
+    var paintSectionRule = function () {};
     var label = function (o) { return (o.label && o.label.en) || o.value; };
     var limited = function (list) { return (f.fields || []).some(function (x) { return (x.list === list && x.enabled !== false) || (x.fields || []).some(function (y) { return y.list === list && y.enabled !== false; }); }); };
     var majorOptions = limited('majors') ? (res.lists && res.lists.majors) || [] : [];
-    var sectionOptions = limited('sections') ? (res.lists && res.lists.sections) || [] : [];
+    // The section rule applies to whichever list of sections the section question reads.
+    var sectionList = function () {
+      var key = '';
+      (f.fields || []).forEach(function (x) { [x].concat(x.fields || []).forEach(function (y) { if (!key && y.list && y.enabled !== false && A.listKind(y.list, res.listInfo) === 'sections') key = y.list; }); });
+      return key;
+    };
+    var sectionOptions = sectionList() ? (res.lists && res.lists[sectionList()]) || [] : [];
     if (majorOptions.length || sectionOptions.length) {
       var whoBody = [];
       if (majorOptions.length) {
@@ -169,11 +176,23 @@
         f.rules.sections = Array.isArray(f.rules.sections) ? f.rules.sections.slice() : [];
         var sectionNote = h('p', { class: 'muted-note' });
         var paintSectionNote = function () {
-          sectionNote.textContent = f.rules.sections.length ? 'Students choose from ' + plural(f.rules.sections.length, 'section', 'sections') + '. The other sections are not offered and are refused.' : 'Students choose from every section in the Sections list.';
+          sectionNote.textContent = f.rules.sections.length ? 'Students choose from ' + plural(f.rules.sections.length, 'section', 'sections') + '. The other sections are not offered and are refused.' : 'Students choose from every section in the list ' + A.listName(sectionList(), res.listInfo) + '.';
         };
-        whoBody.push(h('h3', null, 'Sections'), h('p', { class: 'help' }, 'Pick the sections this form is for; they can be from more than one year. A group is the part of the name before the dash (4C, 3L). ', h('a', { href: '#/lists' }, 'Add or rename sections in Lists.')),
-          allowPicker({ name: 'section', all: 'All sections', options: sectionOptions, groupOf: sectionGroup, get: function () { return f.rules.sections; }, set: function (v) { f.rules.sections = v; paintSectionNote(); } }), sectionNote);
-        paintSectionNote();
+        var sectionHelp = h('p', { class: 'help' });
+        var sectionBox = h('div');
+        // Drawn again when the section question is pointed at another list in the Questions tab.
+        paintSectionRule = function () {
+          var key = sectionList();
+          sectionOptions = key ? (res.lists && res.lists[key]) || [] : [];
+          f.rules.sections = f.rules.sections.filter(function (v) { return sectionOptions.some(function (o) { return String(o.value) === v; }); });
+          ui.clear(sectionHelp);
+          sectionHelp.append('Pick the sections this form is for; they can be from more than one year. The choices come from the list ' + A.listName(key, res.listInfo) + '. ', h('a', { href: '#/lists/' + encodeURIComponent(key) }, 'Change the sections in Lists.'));
+          ui.clear(sectionBox);
+          sectionBox.appendChild(allowPicker({ name: 'section', all: 'All sections', options: sectionOptions, groupOf: sectionGroup, get: function () { return f.rules.sections; }, set: function (v) { f.rules.sections = v; paintSectionNote(); } }));
+          paintSectionNote();
+        };
+        whoBody.push(h('h3', null, 'Sections'), sectionHelp, sectionBox, sectionNote);
+        paintSectionRule();
       }
       majorsPanel = panel('Who can register', 'Limit this form to some students. With no limit, every choice of the list is offered.', whoBody);
       majorsPanel.summary = function () {
@@ -326,6 +345,26 @@
     // Questions that belong to a page for a reason: the member forms follow the size, and a booking is its own page.
     var FIXED_ROLES = ['team_size', 'members', 'slot'];
     var KINDS = [['text', 'Short answer'], ['textarea', 'Long answer'], ['select', 'One choice from a list']];
+    /**
+     * Which list a question reads, among the lists of the same kind. Shown only when there is
+     * another list to pick. The leader's section and the members' section move together.
+     */
+    function listPicker(fd) {
+      if (!fd.list) return null;
+      var kindOf = function (k) { return A.listKind(k, res.listInfo); };
+      var same = Object.keys(res.lists || {}).filter(function (k) { return k === fd.list || (A.listSwappable(k) && A.listSwappable(fd.list) && kindOf(k) === kindOf(fd.list)); });
+      if (same.length < 2) return null;
+      var sel = A.select(fd.list, same.map(function (k) { return [k, A.listName(k, res.listInfo)]; }), function (v) {
+        var old = fd.list;
+        (f.fields || []).forEach(function (x) { [x].concat(x.fields || []).forEach(function (y) { if (y.id === fd.id && y.list === old) y.list = v; }); });
+        fd.list = v;
+        paintSectionRule();
+        paintQuestions();
+      });
+      sel.setAttribute('name', 'list-' + fd.id);
+      sel.setAttribute('aria-label', 'List for ' + fd.label.en);
+      return h('label', { class: 'q-list-pick' }, h('span', { class: 'muted-note' }, 'Choices from'), sel);
+    }
     function hasHelp(fd) { return !!(fd.help && ((fd.help.en || '').trim() || (fd.help.ar || '').trim())); }
     function pageName(st) { return (st.title && (st.title.en || st.title.ar)) || 'Page with no title'; }
     function pageOf(fd) { return (f.steps || []).filter(function (st) { return (st.fields || []).indexOf(fd.id) !== -1; })[0] || null; }
@@ -436,7 +475,8 @@
         h('div', { class: 'q-opts' },
           A.check('Required', fd.required !== false, function (v) { fd.required = v; }, locked),
           fd.type === 'arabic_name' ? h('label', { class: 'q-parts' }, A.number(fd.minParts || 4, function (v) { fd.minParts = parseInt(v, 10) || 4; }, { class: 'input num', min: '2', max: '6', 'aria-label': 'Name parts for ' + fd.id }), 'name parts') : h('span', { class: 'q-type' }, kind ? 'added · ' + kind.toLowerCase() : fd.type.replace('_', ' ')),
-          descBtn, toolsBtn));
+          descBtn, toolsBtn),
+        listPicker(fd));
       if (fd.enabled === false) row.classList.add('off');
       rows.push(row, descRow, tools);
       if (fd.type === 'members') (fd.fields || []).forEach(function (sf) { fieldRow(sf, true); });

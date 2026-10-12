@@ -28,7 +28,7 @@ API['admin.forms.get'] = admin(function (req) {
   var form = requireForm(req.id);
   var f = clone(form);
   delete f._row;
-  var out = { form: f, lists: readLists() };
+  var out = { form: f, lists: readLists(), listInfo: readListInfo() };
   // The timetable editor marks slots that already have bookings.
   if (form.type === 'reservation') {
     out.taken = slotAvailability_(form);
@@ -65,12 +65,63 @@ API['admin.forms.delete'] = admin(function (req) {
   return withLock_(function () { return deleteForm(form.id); });
 });
 
+function listsOut_() { return { lists: readLists(), info: readListInfo() }; }
+
+function requireList_(key) {
+  key = String(key || '');
+  if (!key || key.charAt(0) === '_' || !readLists().hasOwnProperty(key)) fail('list_not_found', 'There is no such list.');
+  return key;
+}
+
 API['admin.lists.get'] = admin(function () {
-  return { lists: readLists() };
+  return listsOut_();
 });
 
 API['admin.lists.set'] = admin(function (req) {
-  if (!req.key) fail('key_required', 'A list needs a name.');
-  saveList(String(req.key), req.values || []);
-  return { lists: readLists() };
+  saveList(requireList_(req.key), req.values || []);
+  return listsOut_();
+});
+
+/** A new list: a name, a kind, and the choices to start with (empty, or a copy of another list). */
+API['admin.lists.create'] = admin(function (req) {
+  var name = String(req.name || '').trim().slice(0, 60);
+  if (!name) fail('list_name', 'Give the list a name.');
+  var kind = LIST_KINDS_.indexOf(req.kind) === -1 ? 'plain' : req.kind;
+  var lists = readLists();
+  var info = readListInfo();
+  var taken = Object.keys(lists).some(function (k) { return ((info[k] && info[k].name) || BUILTIN_LIST_NAMES_[k] || '').toLowerCase() === name.toLowerCase(); });
+  if (taken) fail('list_name_taken', 'Another list has that name.');
+  var base = name.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '').slice(0, 30) || 'list';
+  var key = base, n = 2;
+  while (lists.hasOwnProperty(key) || BUILTIN_LIST_KINDS_.hasOwnProperty(key)) key = base + '_' + n++;
+  var values = req.copyOf ? lists[requireList_(req.copyOf)] : [];
+  return withLock_(function () {
+    saveList(key, values);
+    info[key] = { name: name, kind: kind };
+    saveListInfo_(info);
+    var out = listsOut_();
+    out.key = key;
+    return out;
+  });
+});
+
+API['admin.lists.rename'] = admin(function (req) {
+  var key = requireList_(req.key);
+  var info = readListInfo();
+  if (!info[key]) fail('list_builtin', 'The lists that came with the platform keep their names.');
+  var name = String(req.name || '').trim().slice(0, 60);
+  if (!name) fail('list_name', 'Give the list a name.');
+  info[key].name = name;
+  saveListInfo_(info);
+  return listsOut_();
+});
+
+/** Only a list an admin made, and only while no form asks it. */
+API['admin.lists.delete'] = admin(function (req) {
+  var key = requireList_(req.key);
+  if (!readListInfo()[key]) fail('list_builtin', 'The lists that came with the platform cannot be deleted.');
+  var users = formsUsingList_(key);
+  if (users.length) fail('list_in_use', 'A form still asks this list: ' + users.map(function (f) { return f.title; }).join(', ') + '.');
+  withLock_(function () { deleteList_(key); });
+  return listsOut_();
 });
