@@ -181,3 +181,38 @@ test('Viewer key: wrong keys lock the link for a while, and a link made before k
   assert.equal(old.accessKey, '');
   assert.equal(w.api({ action: 'viewer.me', token: old.token }).ok, true);
 });
+
+test('Viewer key: the admin can read a lost key again, and a link made before sealed keys says to make a new one', () => {
+  const w = boot();
+  const made = w.client({ withKey: true });
+  const listed = w.admin({ action: 'admin.clients.list' }).clients[0];
+  assert.equal(listed.keyKnown, true);
+  assert.equal(w.admin({ action: 'admin.clients.showKey', id: made.client.id }).accessKey, made.accessKey);
+  const fresh = w.admin({ action: 'admin.clients.key', id: made.client.id, on: true });
+  assert.equal(w.admin({ action: 'admin.clients.showKey', id: made.client.id }).accessKey, fresh.accessKey, 'a new key replaces the one shown');
+  const sheet = w.registry.getSheetByName('Clients');
+  assert.equal(sheet.rows()[0][9], 'keySeal');
+  sheet.getRange(2, 10).setValue(''); // a key given before keys were sealed
+  assert.equal(w.admin({ action: 'admin.clients.list' }).clients[0].keyKnown, false);
+  assert.equal(w.admin({ action: 'admin.clients.showKey', id: made.client.id }).error.code, 'key_unknown');
+  const plain = w.client();
+  assert.equal(w.admin({ action: 'admin.clients.showKey', id: plain.client.id }).error.code, 'no_key');
+});
+
+test('Viewer link end: a link stops on its end date and opens again when the admin moves it', () => {
+  const w = boot();
+  const made = w.client({ expires: '2027-11-20T21:59:00Z' });
+  assert.equal(made.client.expires, '2027-11-20T21:59:00.000Z');
+  assert.equal(w.api({ action: 'viewer.me', token: made.token }).ok, true);
+  w.setNow('2027-11-21T08:00:00Z');
+  const shut = w.api({ action: 'viewer.me', token: made.token });
+  assert.equal(shut.error.code, 'link_expired');
+  assert.match(shut.error.message, /2027-11-20/);
+  assert.equal(w.admin({ action: 'admin.clients.list' }).clients[0].expired, true);
+  w.admin({ action: 'admin.clients.update', id: made.client.id, patch: { expires: '2027-12-31T21:59:00Z' } });
+  assert.equal(w.api({ action: 'viewer.me', token: made.token }).ok, true);
+  w.admin({ action: 'admin.clients.update', id: made.client.id, patch: { expires: '' } });
+  w.setNow('2030-01-01T00:00:00Z');
+  assert.equal(w.api({ action: 'viewer.me', token: made.token }).ok, true, 'no end date means it never ends');
+  assert.equal(w.admin({ action: 'admin.clients.update', id: made.client.id, patch: { expires: 'soon' } }).error.code, 'bad_date');
+});
