@@ -251,6 +251,10 @@ test('Booking series: the dashboard lists bookings under their form and makes th
   const p = await openAdmin(w);
   assert.equal(p.$$('.card').length, 1, 'the booking is not a card of its own');
   const card = p.$(`.card[data-slug="${w.teams.slug}"]`);
+  const fold = card.querySelector('details.series');
+  assert.equal(fold.open, false, 'the bookings are folded until asked for');
+  assert.ok(fold.querySelector('.series-latest').textContent.includes(w.form.title), 'the fold names the newest booking');
+  fold.open = true; p.fire(fold, 'toggle');
   assert.deepEqual([...card.querySelectorAll('.series-title')].map((n) => n.textContent), [w.form.title]);
   p.click('[name="next-booking"]'); await settle(12);
   assert.ok(p.win.location.hash.endsWith('/timetable'), 'the new booking opens on its timetable');
@@ -258,4 +262,6 @@ test('Booking series: the dashboard lists bookings under their form and makes th
   const again = await openAdmin(w);
   assert.equal(again.$$('.series-title').length, 2);
   assert.equal(again.$('.series-count').textContent, '2');
+  const reopened = await openAdmin(w);
+  assert.equal(reopened.$('details.series').open, false, 'a new window starts folded');
 });

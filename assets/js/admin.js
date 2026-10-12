@@ -363,8 +363,10 @@
       ]);
     } }, icon('plus', 16), kids.length ? 'New booking, one week later' : 'Add a booking for this form');
     if (!kids.length) return h('div', { class: 'series' }, next);
-    return h('details', { class: 'series', open: true },
-      h('summary', null, icon('calendar', 18), 'Bookings', h('span', { class: 'series-count' }, String(kids.length))),
+    // Folded until asked for: a form can have a booking for every week of a term. The fold shows the newest one.
+    var box = h('details', { class: 'series', open: seriesOpen(f.id), ontoggle: function () { seriesOpen(f.id, box.open); } },
+      h('summary', { name: 'bookings-' + f.slug }, icon('calendar', 18), 'Bookings', h('span', { class: 'series-count' }, String(kids.length)),
+        h('span', { class: 'series-latest' }, kids[0].title, A.badge(A.STATUS_LABEL[kids[0].status] || kids[0].status, kids[0].status))),
       h('ul', { class: 'series-list' }, kids.map(function (k) {
         var link = A.formLink(k.slug);
         return h('li', { dataset: { booking: k.slug } },
@@ -375,6 +377,18 @@
             h('button', { type: 'button', class: 'link-btn', 'aria-label': 'Copy the link of ' + k.title, onclick: async function () { toast((await ui.copyText(link)) ? 'Booking link copied' : 'Could not copy', 'ok'); } }, 'Copy link')));
       })),
       next);
+    return box;
+  }
+
+  /** Which forms have their bookings unfolded, kept for the browser tab. Without storage, they stay folded. */
+  function seriesOpen(id, open) {
+    try {
+      var all = JSON.parse(window.sessionStorage.getItem('forms.series') || '{}');
+      if (open === undefined) return !!all[id];
+      all[id] = open;
+      window.sessionStorage.setItem('forms.series', JSON.stringify(all));
+    } catch (e) { /* storage is not available */ }
+    return false;
   }
 
   /** One confirmation, then the form is gone and its sheet is in the Drive trash. */

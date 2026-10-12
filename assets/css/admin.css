@@ -111,7 +111,14 @@ body.admin { font-size: 1rem; }
 .card-actions { margin-top: auto; }
 /* The bookings of a registration form, inside its card. */
 .series { margin-top: 4px; padding-top: 10px; border-top: 1px dashed var(--line); }
-.series > summary { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: var(--fs-label); cursor: pointer; }
+.series > summary { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; padding: 6px 8px; margin: 0 -8px; border-radius: 4px; font-weight: 700; font-size: var(--fs-label); cursor: pointer; list-style: none; }
+.series > summary::-webkit-details-marker { display: none; }
+.series > summary:hover { background: var(--sheet-2); }
+.series > summary::after { content: ''; flex: none; width: 8px; height: 8px; margin-inline-start: auto; border-inline-end: 2px solid var(--mute); border-bottom: 2px solid var(--mute); transform: rotate(45deg); transition: transform .15s; }
+.series[open] > summary::after { transform: rotate(-135deg); }
+.series-latest { display: inline-flex; align-items: center; gap: 8px; min-width: 0; color: var(--mute); font-weight: 400; font-size: var(--fs-help); }
+.series[open] .series-latest { display: none; }
+.series[open] > summary { margin-bottom: 2px; }
 .series-count { padding: 0 8px; border-radius: 999px; background: var(--sheet-2); color: var(--mute); font-size: var(--fs-help); }
 .series-list { margin: 8px 0 10px; padding: 0; list-style: none; }
 .series-list li { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 12px; padding: 8px 0; border-top: 1px solid color-mix(in srgb, var(--line) 70%, transparent); }
