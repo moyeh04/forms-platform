@@ -72,8 +72,8 @@ flowchart TD
 
     sources --> bundler
     bundler --> dist["dist/<br/>Code.gs and appsscript.json<br/>git-ignored"]
-    dist --> paste["Actions pushes dist with clasp"]
-    paste --> live["Deploy: new version of the web app"]
+    dist --> push["Actions pushes dist with clasp"]
+    push --> live["Deploy: new version of the web app"]
     classDef cDb fill:#F3E2B3,stroke:#B8892D,stroke-width:1.5px,color:#2F2418
     classDef cActor fill:#F4D9D3,stroke:#9A3328,stroke-width:1.5px,color:#2F2418
     classDef cDec fill:#FBEFC9,stroke:#C9A24A,stroke-width:1.5px,color:#2F2418
@@ -89,13 +89,13 @@ flowchart TD
    exists. The backend files follow in alphabetical order, with `Code.gs`
    moved to the end (a one-line comparator in `listBackend`).
 2. **Read and label.** Each file is trimmed and prefixed with a comment such as
-   `// ===== backend/Auth.gs =====`, so when you read the pasted code in the
+   `// ===== backend/Auth.gs =====`, so when you read the deployed code in the
    Apps Script editor you can still see where every part came from.
 3. **Join.** All parts become one string.
 4. **Check it compiles.** `new vm.Script(code, { filename: 'Code.gs' })` makes
    Node parse the whole bundle. If anything is wrong (a missing bracket, a stray
    character) the build stops with the exact line. You find out on your laptop,
-   not after pasting.
+   not after deploying.
 5. **Write** `dist/Code.gs`.
 6. **Copy the manifest** to `dist/appsscript.json`. It carries three things
    Apps Script needs: the time zone (`Africa/Cairo`), the permission scopes
@@ -259,21 +259,25 @@ flowchart LR
     classDef cOk fill:#BFD9CF,stroke:#2E5A55,stroke-width:1.5px,color:#17302D
 ```
 
-So a passing test means the **exact text** you paste works, not a similar copy.
+So a passing test means the **exact text** that is deployed works, not a
+similar copy. The workflow pushes the same `backend-dist` artifact the tests ran.
 
 ## When to rebuild
 
 | You changed | Rebuild? | Then |
 |---|---|---|
-| Anything in `backend/` or `shared/rules.js` | Yes | Paste `dist/Code.gs`, deploy a **new version** |
-| `backend/appsscript.json` (scopes, time zone) | Yes | Paste the manifest too |
-| Only `index.html`, `admin.html`, `viewer.html`, `assets/` | No | Commit and push; GitHub Pages updates |
+| Anything in `backend/` or `shared/rules.js` | Yes, Actions does it | Push to `master`; clasp pushes the bundle and updates the existing deployment |
+| `backend/appsscript.json` (scopes, time zone) | Yes, Actions does it | The same push carries the manifest |
+| Only `index.html`, `admin.html`, `viewer.html`, `assets/` | No | Push to `master`; GitHub Pages updates |
 | `scripts/download_tasks.py` | No | It runs locally from the repo |
 
-Note that `shared/rules.js` is used by **both sides**, so changing a rule means
-two steps: push the website (for the browser copy) and redeploy the backend
-(for the server copy). Skipping the second is safe but means the server still
-enforces the old rule. The server is always the final judge.
+Run `npm run build` yourself only to inspect the bundle or to run the tests
+locally; a routine update needs no local build.
+
+Note that `shared/rules.js` is used by **both sides**: the browser copy ships
+with the website and the server copy is inside the bundle. One push to `master`
+updates both, the server first, and Pages is published only after the backend
+deployment succeeds. The server is always the final judge.
 
 ## What GitHub builds and deploys
 
@@ -300,6 +304,7 @@ source placeholder and never runs the configuration generator. See
 |---|---|---|
 | `npm run build` prints a syntax error with a line | A real typo in a source file | Fix it; the line number refers to the joined file |
 | `dist/` is missing | It is git-ignored and was not built on this machine | `npm install` then `npm run build` |
-| Pasted code has no effect | You saved but did not create a **New version** of the deployment | Deploy > Manage deployments > pencil > New version |
-| `Rules is not defined` in Apps Script | `rules.js` was not pasted (partial paste) | Paste the whole `dist/Code.gs` |
+| Backend change is not live after a push | The **Deploy Google Apps Script** job failed or was skipped (not `master`, or a pull request) | Open the run in the Actions tab and fix the reported variable or credential |
+| Manual recovery: pasted code has no effect | You saved but did not create a **New version** of the deployment | Deploy > Manage deployments > pencil > New version |
+| Manual recovery: `Rules is not defined` in Apps Script | `rules.js` was not pasted (partial paste) | Paste the whole `Code.gs` from the `backend-dist` artifact |
 | Menu **Forms Platform** missing | Sheet not reloaded after saving the script | Reload the sheet and wait a few seconds |

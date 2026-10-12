@@ -36,12 +36,12 @@ flowchart TD
     repo --> ts["tests/<br/>JavaScript and Python"]
     repo --> dc["docs/"]
 
-    web -- "git push" --> gh["GitHub Pages<br/>serves the files as they are"]
+    web -- "push to master,<br/>Actions publishes" --> gh["GitHub Pages<br/>source files plus generated config.js"]
     shared -- "script tag" --> gh
     shared -- "bundled in" --> dist["dist/Code.gs<br/>git-ignored, rebuilt on demand"]
     be -- "bundled in" --> dist
     sc -- "npm run build" --> dist
-    dist -- "you paste it" --> gas["Apps Script<br/>the backend"]
+    dist -- "Actions pushes it<br/>with clasp" --> gas["Apps Script<br/>the backend"]
     sc -- "python script" --> xl["Tasks.xlsx on your laptop"]
     ts -. "run the real bundle in memory" .-> dist
     classDef cDb fill:#F3E2B3,stroke:#B8892D,stroke-width:1.5px,color:#2F2418
