@@ -536,21 +536,42 @@ test('Clients: create a private link, see it once, and it opens the instructor v
   assert.deepEqual(w.admin({ action: 'admin.clients.list' }).clients[0].hiddenColumns, ['phone']);
 });
 
-test('Lists: editing a list updates the choices every form offers', async () => {
+test('Lists: a plain list is chips, and the save bar exists only while it differs from the saved copy', async () => {
   const w = boot();
-  const f = w.make('team_registration', 'Projects');
   const p = await openAdmin(w, '#/lists');
-  // Groups is a plain list, shown as chips; add one with Enter and save.
-  p.click('[name="pick-groups"]');
-  assert.ok(p.$('.value-chips'), 'plain lists open in the compact view');
+  assert.ok(p.$('.lists') && !p.$('.lists').classList.contains('picked'), 'no list in the address: a phone shows the lists');
+  assert.ok(p.$('[name="pick-sections"]').textContent.includes('4C-TH1, 4C-TH2, 4C-TH3, 4C-TH4 …'), 'a card names the first choices');
+  p.click('[name="pick-groups"]'); await settle(2);
+  assert.ok(p.$('.lists').classList.contains('picked'));
+  assert.equal(p.win.location.hash, '#/lists/groups');
+  assert.ok(p.$('.value-chips'), 'plain values are chips');
+  assert.equal(p.$('[name="new-en"]'), null, 'chips ask for the choice only');
+  assert.ok(p.$('.savebar').hidden, 'nothing to save yet');
   p.type('[name="new-value"]', 'C');
   p.$('[name="new-value"]').dispatchEvent(new p.win.KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
-  assert.ok(p.text().includes('Unsaved changes'));
+  assert.equal(p.$('.savebar').hidden, false);
+  assert.ok(p.$('.savebar').textContent.includes('Groups: 1 added. Not saved yet.'));
+  assert.ok(p.$('[name="pick-groups"]').textContent.includes('Not saved'));
+  p.click('[name="remove-2"]');
+  assert.ok(p.$('.savebar').hidden, 'back to the saved choices, so the bar is gone');
+  p.type('[name="new-value"]', 'C'); p.click('[name="add-choice"]');
   p.click('[name="save-list"]'); await settle(8);
   assert.deepEqual(w.admin({ action: 'admin.lists.get' }).lists.groups.map((o) => o.value), ['A', 'B', 'C']);
-  // Majors carry English names, so they open as a table; add a named one and reorder.
-  p.click('[name="pick-majors"]');
-  assert.ok(p.$('[name="en-0"]'), 'named lists open in the table view');
+  assert.ok(p.$('.savebar').hidden);
+  p.click('[name="all-lists"]');
+  assert.equal(p.win.location.hash, '#/lists');
+  assert.ok(!p.$('.lists').classList.contains('picked'));
+});
+
+test('Lists: a list with English names is rows that can be added to and reordered, and every form follows', async () => {
+  const w = boot();
+  const f = w.make('team_registration', 'Projects');
+  const p = await openAdmin(w, '#/lists/majors');
+  assert.ok(p.$('.lists').classList.contains('picked'), 'the address opens the list');
+  assert.ok(p.$('[name="en-0"]'), 'named choices are rows');
+  assert.equal(p.$('[name="ar-0"]'), null, 'no Arabic name column while no choice has one');
+  assert.equal(p.$('[name="edit-rows"]') || p.$('[name="short-view"]'), null, 'named choices have no short view');
+  assert.ok(p.$('.used-by').textContent.includes('Projects'), 'the forms that ask the list are named');
   p.type('[name="new-value"]', 'كهرباء'); p.type('[name="new-en"]', 'Power');
   p.click('[name="add-choice"]');
   p.click('.choice[data-i="2"] [aria-label="Move up"]');
@@ -559,22 +580,54 @@ test('Lists: editing a list updates the choices every form offers', async () => 
   assert.deepEqual(major.options.map((o) => o.label.en), ['Computers', 'Power', 'Communications']);
 });
 
-test('Lists: the type filter hides lists a kind of form does not use, and each list shows its forms', async () => {
+test('Lists: a refused save says why next to the choices, and a removed choice names the form limited to it', async () => {
   const w = boot();
-  w.make('team_registration', 'Projects');
-  const p = await openAdmin(w, '#/lists');
-  p.click('[name="type-whatsapp_registration"]');
-  assert.equal(p.$('[name="pick-sections"]'), null, 'team sections are hidden for WhatsApp forms');
-  assert.ok(p.$('[name="pick-wa_sections"]'));
-  p.click('[name="type-team_registration"]');
-  assert.equal(p.$('[name="pick-wa_sections"]'), null);
-  p.click('[name="pick-levels"]');
-  assert.ok(p.$('.used-by').textContent.includes('Projects'), 'used-by names the form');
-  assert.equal(p.$('[name="pick-sections"]') && p.$('[name="range-to"]'), null, 'no number filler for non-numeric lists');
-  p.click('[name="type-whatsapp_registration"]');
-  p.click('[name="pick-wa_sections"]');
-  p.type('[name="range-to"]', '3'); p.click('[name="fill-range"]');
-  assert.equal(p.$$('.value-chip').length, 3, 'number fill replaces the list');
+  w.make('team_registration', 'Projects', { rules: { sections: ['4C-TH1', '4C-TH2'] } });
+  const p = await openAdmin(w, '#/lists/sections');
+  p.click('[name="edit-rows"]');
+  assert.ok(p.$('[name="value-0"]'), 'a plain list opens as rows to rename and reorder');
+  assert.ok(p.$('.savebar').hidden, 'opening the rows changes nothing');
+  p.type('[name="value-1"]', '4C-TH1');
+  assert.ok(p.text().includes('"4C-TH1" is in the list twice. Remove one of them.'));
+  assert.ok(p.$('.choice[data-i="1"]').classList.contains('bad'), 'the row is marked');
+  assert.equal(p.$('[name="value-1"]').value, '4C-TH1', 'the refused value stays in its field');
+  p.click('[name="save-list"]'); await settle(8);
+  assert.equal(w.admin({ action: 'admin.lists.get' }).lists.sections[1].value, '4C-TH2', 'nothing was saved');
+  p.click('[name="remove-1"]');
+  assert.ok(p.$('.savebar').textContent.includes('Sections: 1 removed. Not saved yet.'));
+  assert.ok(p.$('.savebar-warn').textContent.includes('Limited to a removed choice: Projects.'));
+  p.click('[name="discard"]');
+  assert.ok(p.$('.savebar').hidden);
+  assert.equal(p.$$('.value-chip').length, 14, 'discard brings the saved choices back');
+
+  p.click('[name="pick-groups"]'); await settle(2);
+  p.click('[name="remove-0"]'); p.click('[name="remove-0"]');
+  assert.ok(p.text().includes('A list needs at least one choice.'));
+  p.click('[name="pick-levels"]'); await settle(2);
+  assert.ok(p.text().includes('Leave without saving?'), 'another list is opened only after the admin agrees');
+});
+
+test('Lists: many choices at once, pasted or numbered', async () => {
+  const w = boot();
+  const p = await openAdmin(w, '#/lists/wa_sections');
+  assert.equal(p.$$('.value-chip').length, 33);
+  p.type('[name="range-from"]', '5'); p.type('[name="range-to"]', '2'); p.click('[name="fill-range"]');
+  assert.ok(p.text().includes('The last number must not be before the first.'));
+  assert.equal(p.$$('.value-chip').length, 33);
+  p.type('[name="range-from"]', '1'); p.type('[name="range-to"]', '3'); p.click('[name="fill-range"]');
+  assert.equal(p.$$('.value-chip').length, 3, 'the numbers replace the list');
+  assert.ok(p.$('.savebar').textContent.includes('30 removed'));
+
+  const q = await openAdmin(w, '#/lists/majors');
+  assert.equal(q.$('[name="fill-range"]'), null, 'no numbering for a list that is not numbers');
+  assert.equal(q.$('[name="paste-add"]'), null, 'nothing to add before something is pasted');
+  q.type('[name="paste-list"]', 'كهرباء | Power\n\nميكانيكا');
+  assert.equal(q.$('[name="paste-add"]').textContent, 'Add 2 choices to the end');
+  q.click('[name="paste-add"]');
+  assert.equal(q.$('[name="en-2"]').value, 'Power');
+  assert.equal(q.$('[name="value-3"]').value, 'ميكانيكا');
+  q.click('[name="save-list"]'); await settle(8);
+  assert.deepEqual(w.admin({ action: 'admin.lists.get' }).lists.majors.map((o) => o.label.en), ['Computers', 'Communications', 'Power', 'ميكانيكا']);
 });
 
 test('Questions: an admin adds a description and students read it under the question', async () => {
