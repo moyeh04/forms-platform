@@ -204,6 +204,7 @@ API['admin.submission.delete'] = admin(function (req) {
     r.keyHash = '';
     r.keySeal = '';
     saveResponse_(form, r);
+    closeTransfersOf_(form, r.id);
   });
   afterChange_(form);
   return { deleted: true };

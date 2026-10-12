@@ -95,6 +95,16 @@ test('Transfer: rejecting keeps both teams, and the team that asked can cancel w
   assert.deepEqual(send(w, { action: 'lookup', key: a.key }).transfers.incoming, []);
 });
 
+test('Transfer: a team deleted by the admin takes its requests with it', () => {
+  const w = boot();
+  const { a, b } = asked(w);
+  assert.equal(rows(w).transfers.length, 1);
+  const asking = rows(w).submissions.filter((s) => s.ref === b.ref)[0];
+  assert.equal(w.admin({ action: 'admin.submission.delete', slug: w.slug, submissionId: asking.id }).deleted, true);
+  assert.deepEqual(rows(w).transfers, []);
+  assert.deepEqual(send(w, { action: 'lookup', key: a.key }).transfers.incoming, []);
+});
+
 test('Transfer: the admin answers from the dashboard, and a team left under the minimum is reported', () => {
   const w = boot();
   const a = send(w, team(4230001, [4230002]));
