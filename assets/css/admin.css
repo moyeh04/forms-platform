@@ -97,7 +97,7 @@ body.admin { font-size: 1rem; }
 .badge.draft, .badge.pending, .badge.new { background: transparent; color: var(--mute); }
 .badge.duplicate, .badge.in_review { background: var(--tint-b); border-color: var(--accent); color: var(--ink); }
 
-.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; align-items: start; }
+.cards:not(table) { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; align-items: start; }
 .card { background: var(--sheet); border: 1.5px solid var(--line); border-radius: 4px; padding: 16px 18px; display: flex; flex-direction: column; gap: 10px; }
 .card h3 { font-size: 1.25rem; line-height: 1.3; }
 .card-top { display: flex; align-items: flex-start; gap: 10px; }
