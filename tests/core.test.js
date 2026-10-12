@@ -20,7 +20,7 @@ test('Setup: creates registry tabs, default lists, and is safe to repeat', () =>
   assert.equal(lists.sections.length, 14);
   assert.equal(lists.wa_sections.length, 33);
   assert.equal(w.registry.getSheetByName('Lists').getLastRow(), 7);
-  assert.equal(w.triggers.filter((t) => t === 'processDirtyViews').length, 1);
+  assert.deepEqual(w.triggers, [], 'setup books no timer');
 });
 
 test('Admin: wrong PIN is rejected and repeated guesses lock out', () => {

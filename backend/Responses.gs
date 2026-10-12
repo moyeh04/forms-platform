@@ -333,9 +333,7 @@ function sendConfirmation_(form, result, data) {
   return sent;
 }
 
-/** Views are rebuilt by a later module when it is present. */
+/** After a saved change: the form's sheet views are marked for a repaint. A failure here never fails the save. */
 function afterChange_(form) {
-  if (typeof refreshViews === 'function') {
-    try { refreshViews(form); } catch (e) { Logger.log('View refresh failed: ' + e.message); }
-  }
+  try { refreshViews(form); } catch (e) { Logger.log('Views not marked: ' + e.message); }
 }

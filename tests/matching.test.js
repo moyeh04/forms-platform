@@ -90,6 +90,7 @@ test('Decide: approving a matched request completes the group step on the regist
   assert.equal(after.requests[0].note, 'Looks right');
   const sub = after.submissions[0];
   assert.equal(sub.status, 'approved');
+  w.runTriggers();
   assert.equal(w.sheet(w.form.sheetId, 'Registrations').rows()[1][7], 'Timetable check: approved  |  Group match: approved');
 });
 

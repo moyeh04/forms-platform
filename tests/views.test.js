@@ -1,6 +1,5 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const vm = require('node:vm');
 const { createWorld } = require('./harness/appsscript-mock.js');
 
 const ID = (c) => c.repeat(33);
@@ -13,7 +12,8 @@ function boot(type, patch = {}) {
   const form = w.admin({ action: 'admin.forms.create', type, title: 'Views', term: 'Fall 2027' }).form;
   w.admin({ action: 'admin.forms.update', id: form.id, patch: { status: 'open', ...patch } });
   w.form = form;
-  w.view = (name) => w.sheet(form.sheetId, name);
+  // The views are painted by the run a change books, so reading one lets that run happen first.
+  w.view = (name) => { w.runTriggers(); return w.sheet(form.sheetId, name); };
   return w;
 }
 
@@ -136,16 +136,54 @@ test('Registrations: WhatsApp rows sorted by group and section with review text 
   assert.ok(rows[1][6].startsWith('=HYPERLINK('));
 });
 
-test('Large forms: rebuild is deferred to the timer and then catches up', () => {
+const marked = (w) => [...w.props.keys()].filter((k) => k.startsWith('dirty:'));
+
+test('Views: changes book one run a minute later, which paints the view and removes itself', () => {
   const w = boot('team_registration');
-  vm.runInContext('VIEW_INLINE_LIMIT = 1', w.ctx);
+  assert.deepEqual(w.triggers, [], 'nothing is booked while nothing changed');
   w.api({ action: 'submit', slug: w.form.slug, data: person({ title: 'One', members: [] }) });
   w.api({ action: 'submit', slug: w.form.slug, data: person({ leader_code: '4230099', title: 'Two', members: [] }) });
-  assert.equal(w.view('Team Members List').rows().length, 2, 'only the first team is in the view so far');
-  assert.ok([...w.props.keys()].some((k) => k.startsWith('dirty:')));
-  w.call('processDirtyViews');
-  assert.equal(w.view('Team Members List').rows().length, 3);
-  assert.equal([...w.props.keys()].some((k) => k.startsWith('dirty:')), false);
+  assert.deepEqual(w.triggers.map((t) => [t.fn, t.kind, t.arg]), [['processDirtyViews', 'after', 60000]], 'two changes, one run');
+  assert.equal(w.sheet(w.form.sheetId, 'Team Members List'), null, 'the submission did not wait for the view');
+  assert.equal(marked(w).length, 1);
+  assert.equal(w.runTriggers(), 1);
+  assert.equal(w.sheet(w.form.sheetId, 'Team Members List').rows().length, 3);
+  assert.deepEqual([w.triggers.length, marked(w).length], [0, 0], 'the run left nothing behind');
+  assert.equal(w.runTriggers(), 0, 'and nothing runs again until the next change');
+});
+
+test('Views: a repaint that fails keeps its mark, and the timer of an older version is removed', () => {
+  const w = boot('team_registration');
+  // A deployment made before this version left a run every five minutes.
+  w.triggers.push({ fn: 'processDirtyViews', id: 'old', kind: 'everyMinutes', arg: 5 });
+  w.api({ action: 'submit', slug: w.form.slug, data: person({ title: 'One', members: [] }) });
+  assert.equal(w.triggers.length, 1, 'a booked run is not booked twice');
+  const sheet = w.spreadsheets.get(w.form.sheetId);
+  w.spreadsheets.delete(w.form.sheetId);
+  w.runTriggers();
+  assert.deepEqual([w.triggers.length, marked(w).length], [0, 1], 'the old timer is gone and the form is still marked');
+  w.spreadsheets.set(w.form.sheetId, sheet);
+  w.api({ action: 'submit', slug: w.form.slug, data: person({ leader_code: '4230099', title: 'Two', members: [] }) });
+  w.runTriggers();
+  assert.equal(w.sheet(w.form.sheetId, 'Team Members List').rows().length, 3);
+  assert.equal(marked(w).length, 0);
+});
+
+test('Views: a change that arrives while a form is painted books one more run', () => {
+  const w = boot('team_registration');
+  w.api({ action: 'submit', slug: w.form.slug, data: person({ title: 'One', members: [] }) });
+  // The second team registers after the run read its marks and before it finished.
+  const real = w.ctx.rebuildViews;
+  w.ctx.rebuildViews = (form) => {
+    w.ctx.rebuildViews = real;
+    w.advanceDays(0.001);
+    w.api({ action: 'submit', slug: w.form.slug, data: person({ leader_code: '4230099', title: 'Two', members: [] }) });
+    return real(form);
+  };
+  w.runTriggers();
+  assert.deepEqual([w.triggers.length, marked(w).length], [1, 1], 'the newer mark is kept and a run is booked for it');
+  w.runTriggers();
+  assert.deepEqual([w.triggers.length, marked(w).length], [0, 0]);
 });
 
 test('Admin: rebuild on demand returns the sheet link', () => {

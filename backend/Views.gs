@@ -3,13 +3,18 @@
  *
  * Every team (or day, or registration) is a block with its own tint and a
  * heavy border around it, so the eye can match a name to its task, code or
- * slot at a glance. Large forms rebuild on a timer instead of on every
- * submission, so students never wait for formatting.
+ * slot at a glance.
+ *
+ * A change only marks the form's views as out of date and books one run a minute later. The
+ * run repaints every marked form and removes itself, so students never wait for formatting
+ * and nothing runs while nothing changes.
  */
 
 var API = API || {};
 
-var VIEW_INLINE_LIMIT = 60;
+var VIEW_DELAY_MS_ = 60000;
+/** A run stops starting new forms after this long, well inside Google's six minutes, and books another. */
+var VIEW_RUN_BUDGET_MS_ = 240000;
 
 var VIEW_STYLE_ = {
   ink: '#3A2A1A',
@@ -194,29 +199,64 @@ var VIEW_BUILDERS_ = {
   whatsapp_registration: buildRegistrations_
 };
 
+/** Paints the views now. It only reads the responses and writes its own tabs, so it takes no lock. */
 function rebuildViews(form) {
   var build = VIEW_BUILDERS_[form.type];
   if (!build) return false;
-  var vform = validationForm(form);
-  withLock_(function () { build(vform, SpreadsheetApp.openById(form.sheetId)); });
+  build(validationForm(form), SpreadsheetApp.openById(form.sheetId));
   return true;
 }
 
+/** Marks a form's views as out of date, with the time, and makes sure a run is booked. */
 function refreshViews(form) {
-  var count = Math.max(0, responsesSheet(form).getLastRow() - 1);
-  if (count <= VIEW_INLINE_LIMIT) rebuildViews(form);
-  else setProp('dirty:' + form.id, '1');
+  setProp('dirty:' + form.id, nowIso());
+  bookViewRun_();
 }
 
-/** Time-driven: rebuilds the views of big forms that changed. */
-function processDirtyViews() {
-  var props = PropertiesService.getScriptProperties().getProperties();
-  Object.keys(props).forEach(function (k) {
-    if (k.indexOf('dirty:') !== 0) return;
-    var form = findForm(k.slice(6));
-    PropertiesService.getScriptProperties().deleteProperty(k);
-    if (form) rebuildViews(form);
+function viewRunBooked_() {
+  return ScriptApp.getProjectTriggers().some(function (t) { return t.getHandlerFunction() === 'processDirtyViews'; });
+}
+
+/** Books one run of processDirtyViews. The cache note saves looking at the triggers on every change. */
+function bookViewRun_() {
+  var cache = CacheService.getScriptCache();
+  if (cache.get('views_booked')) return;
+  withLock_(function () {
+    if (!viewRunBooked_()) ScriptApp.newTrigger('processDirtyViews').timeBased().after(VIEW_DELAY_MS_).create();
   });
+  cache.put('views_booked', '1', 300);
+}
+
+/**
+ * The booked run: removes its trigger, repaints every marked form, and books another run only
+ * when a change arrived while it was painting or it ran out of time. A form whose repaint fails
+ * keeps its mark, so the next change, or Rebuild sheet in the dashboard, paints it.
+ */
+function processDirtyViews() {
+  ScriptApp.getProjectTriggers().forEach(function (t) {
+    if (t.getHandlerFunction() === 'processDirtyViews') ScriptApp.deleteTrigger(t);
+  });
+  CacheService.getScriptCache().remove('views_booked');
+  var store = PropertiesService.getScriptProperties();
+  var marks = store.getProperties();
+  var forms = {};
+  readForms().forEach(function (f) { forms[f.id] = f; });
+  var started = Date.now(), again = false;
+  Object.keys(marks).forEach(function (k) {
+    if (k.indexOf('dirty:') !== 0) return;
+    var form = forms[k.slice(6)];
+    if (!form) { store.deleteProperty(k); return; }
+    if (Date.now() - started > VIEW_RUN_BUDGET_MS_) { again = true; return; }
+    try {
+      rebuildViews(form);
+    } catch (e) {
+      Logger.log('Views of ' + form.slug + ' not rebuilt: ' + e.message);
+      return;
+    }
+    if (store.getProperty(k) === marks[k]) store.deleteProperty(k);
+    else again = true;
+  });
+  if (again) bookViewRun_();
 }
 
 API['admin.views.rebuild'] = admin(function (req) {

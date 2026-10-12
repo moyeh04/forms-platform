@@ -34,13 +34,7 @@ function setup() {
   var blank = ss.getSheetByName('Sheet1');
   if (blank && blank.getLastRow() === 0 && ss.getSheets().length > 1) ss.deleteSheet(blank);
   rootFolder();
-  installTriggers_();
   return { registryUrl: ss.getUrl(), folderId: getProp('ROOT_FOLDER_ID') };
-}
-
-function installTriggers_() {
-  var have = ScriptApp.getProjectTriggers().some(function (t) { return t.getHandlerFunction() === 'processDirtyViews'; });
-  if (!have) ScriptApp.newTrigger('processDirtyViews').timeBased().everyMinutes(5).create();
 }
 
 /* ── Lists ────────────────────────────────────────────────────── */
