@@ -7,7 +7,7 @@ const vm = require('node:vm');
 const { spawnSync } = require('node:child_process');
 const { apiUrl, buildSite } = require('../scripts/build-site.js');
 const { deploymentConfig, prepareClasp } = require('../scripts/prepare-clasp.js');
-const { CLASP, deploymentId, setup } = require('../scripts/setup-deployment.js');
+const { CLASP, createdProject, deploymentId, setup } = require('../scripts/setup-deployment.js');
 
 const root = path.resolve(__dirname, '..');
 const env = {
@@ -112,7 +112,7 @@ function fakeSetup(t, answers = {}) {
   const calls = [];
   const run = (command, args, options = {}) => {
     const line = [command, ...args].join(' ');
-    calls.push({ line, input: options.input, project: fs.existsSync(path.join(dir, '.clasp.json')) });
+    calls.push({ line, input: options.input, cwd: options.cwd, project: fs.existsSync(path.join(dir, '.clasp.json')) });
     const key = Object.keys(answers).find((part) => line.includes(part));
     return { status: 0, stdout: '', stderr: '', ...(key ? answers[key] : {}) };
   };
@@ -164,12 +164,35 @@ test('Setup: a branch-built Pages site is switched to GitHub Actions', (t) => {
 });
 
 test('Setup: a failed step stops before GitHub is configured', (t) => {
-  assert.throws(() => setup('', fakeSetup(t).options), /Script ID/);
+  assert.throws(() => setup('not an id', fakeSetup(t).options), /Script ID/);
   const fake = fakeSetup(t, { 'push --force': { status: 1, stderr: 'User has not enabled the Apps Script API' } });
   assert.throws(() => setup(env.APPS_SCRIPT_ID, fake.options), /Apps Script API/);
   assert.equal(fake.lines().some((line) => line.includes('variable set') || line.includes('secret set')), false);
   assert.equal(fs.existsSync(path.join(fake.dir, '.clasp.json')), false);
   assert.throws(() => deploymentId('Created version 1.'), /deployment ID/);
+});
+
+test('Setup: without a Script ID a sheet with a bound script is created once', (t) => {
+  const created = JSON.stringify({ scriptId: 'new-script', parentId: 'new-sheet', files: [] });
+  const fake = fakeSetup(t, {
+    'variable get': { status: 1 },
+    ' create ': { stdout: 'Creating script...\n' + created },
+    ' deploy ': { stdout: 'Deployed ' + newId + ' @1' }
+  });
+  const result = setup('', fake.options);
+  assert.equal(result.scriptId, 'new-script');
+  assert.equal(result.sheetUrl, 'https://docs.google.com/spreadsheets/d/new-sheet/edit');
+  const create = fake.calls.find((call) => call.line.includes('create --type sheets --title Forms Registry --json'));
+  assert.notEqual(create.cwd, fake.dir);
+  assert.equal(fs.existsSync(create.cwd), false);
+  const lines = fake.lines();
+  assert.equal(lines.indexOf('gh variable set APPS_SCRIPT_ID --body new-script') < lines.findIndex((line) => line.includes('push --force')), true);
+
+  const again = fakeSetup(t, { 'variable get APPS_SCRIPT_ID': { stdout: 'new-script' },
+    'variable get APPS_SCRIPT_DEPLOYMENT_ID': { stdout: 'test-deployment' } });
+  assert.equal(setup('', again.options).scriptId, 'new-script');
+  assert.equal(again.lines().some((line) => line.includes(' create ')), false);
+  assert.throws(() => createdProject('User has not enabled the Apps Script API.'), /Script ID/);
 });
 
 test('Setup: the workstation and the workflow pin the same clasp version', () => {

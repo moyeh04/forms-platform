@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/** First deployment from a workstation: push the backend, create the web app, configure GitHub. */
+/** First deployment from a workstation: create the sheet, push the backend, create the web app, configure GitHub. */
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
@@ -9,10 +9,11 @@ const { claspProject } = require('./prepare-clasp.js');
 const ROOT = path.resolve(__dirname, '..');
 const CLASP = '@google/clasp@3.4.1'; // Same pinned version as .github/workflows/pages.yml.
 const PAGES = 'repos/{owner}/{repo}/pages';
+const SHEET = 'Forms Registry';
 
 function execute(command, args, options = {}) {
   return spawnSync(command, args, {
-    cwd: ROOT, encoding: 'utf8', shell: process.platform === 'win32',
+    cwd: options.cwd || ROOT, encoding: 'utf8', shell: process.platform === 'win32',
     input: options.input, stdio: options.interactive ? 'inherit' : ['pipe', 'pipe', 'pipe']
   });
 }
@@ -22,6 +23,17 @@ function deploymentId(output) {
   const match = /([A-Za-z0-9_-]{20,})\s+@\d+/.exec(output || '');
   if (!match) throw new Error('clasp did not report a deployment ID. Its output was:\n' + (output || '(empty)'));
   return match[1];
+}
+
+/** `clasp create --json` prints one object; anything around it is progress text. */
+function createdProject(output) {
+  const text = output || '';
+  let created = {};
+  try { created = JSON.parse(text.slice(text.indexOf('{'), text.lastIndexOf('}') + 1)); } catch (_) { /* reported below */ }
+  if (!/^[A-Za-z0-9_-]+$/.test(created.scriptId || '')) {
+    throw new Error('clasp did not report a Script ID. Its output was:\n' + (text || '(empty)'));
+  }
+  return { scriptId: created.scriptId, sheetUrl: 'https://docs.google.com/spreadsheets/d/' + created.parentId + '/edit' };
 }
 
 function setup(scriptId, options = {}) {
@@ -38,8 +50,8 @@ function setup(scriptId, options = {}) {
   const clasp = (label, args, extra) => must(label, 'npx', ['--yes', CLASP, ...args], extra);
   const variable = (name, value) => must('Setting ' + name, 'gh', ['variable', 'set', name, '--body', value]);
 
-  if (!/^[A-Za-z0-9_-]+$/.test(scriptId || '')) {
-    throw new Error('Pass the Script ID from Apps Script Project Settings: npm run setup -- <SCRIPT_ID>');
+  if (scriptId && !/^[A-Za-z0-9_-]+$/.test(scriptId)) {
+    throw new Error('That is not a Script ID. Copy it from Apps Script Project Settings, or pass none to create a new sheet.');
   }
   must('GitHub login check (run "gh auth login" first)', 'gh', ['auth', 'status']);
 
@@ -47,6 +59,27 @@ function setup(scriptId, options = {}) {
   if (!fs.existsSync(credentials)) {
     log('No clasp login found. A browser window opens for Google sign-in.');
     clasp('Google sign-in', ['login'], { interactive: true });
+  }
+
+  // A stored Script ID means the sheet exists; creating another one would orphan its data.
+  if (!scriptId) {
+    const stored = run('gh', ['variable', 'get', 'APPS_SCRIPT_ID']);
+    scriptId = stored.status === 0 ? stored.stdout.trim() : '';
+  }
+  let sheetUrl = '';
+  if (!scriptId) {
+    // clasp also clones the empty project into its working folder, so it runs in a scratch one.
+    const scratch = fs.mkdtempSync(path.join(os.tmpdir(), 'forms-setup-'));
+    try {
+      const output = clasp('Creating the ' + SHEET + ' sheet (turn on the Apps Script API at ' +
+        'https://script.google.com/home/usersettings; if a sheet without a script was left in Drive, delete it)',
+        ['create', '--type', 'sheets', '--title', SHEET, '--json'], { cwd: scratch });
+      ({ scriptId, sheetUrl } = createdProject(output));
+    } finally {
+      fs.rmSync(scratch, { recursive: true, force: true });
+    }
+    // Stored at once, so a later failure cannot lead to a second sheet on the next run.
+    variable('APPS_SCRIPT_ID', scriptId);
   }
 
   const project = path.join(root, '.clasp.json');
@@ -77,21 +110,22 @@ function setup(scriptId, options = {}) {
   else if (pages.stdout.trim() !== 'workflow') {
     must('Switching Pages to GitHub Actions', 'gh', ['api', '-X', 'PUT', PAGES, '-f', 'build_type=workflow']);
   }
-  return { id, url };
+  return { id, url, scriptId, sheetUrl };
 }
 
 if (require.main === module) {
   try {
-    const { url } = setup(process.argv[2] || process.env.APPS_SCRIPT_ID);
+    const { url, sheetUrl } = setup(process.argv[2] || process.env.APPS_SCRIPT_ID);
     console.log([
       'Backend deployed and GitHub configured.',
       'Web app address: ' + url,
+      sheetUrl ? 'New sheet: ' + sheetUrl : 'Sheet: the one that owns this script (unchanged).',
       'Next:',
-      '  1. Reload the Forms Registry sheet, then Forms Platform > 1. First-time setup (allow permissions).',
+      '  1. Open or reload the ' + SHEET + ' sheet, then Forms Platform > 1. First-time setup (allow permissions).',
       '  2. Forms Platform > 2. Set admin PIN...',
       '  3. git push origin master (or: gh workflow run pages.yml) to publish the website.'
     ].join('\n'));
   } catch (err) { console.error(err.message); process.exitCode = 1; }
 }
 
-module.exports = { CLASP, deploymentId, setup };
+module.exports = { CLASP, createdProject, deploymentId, setup };

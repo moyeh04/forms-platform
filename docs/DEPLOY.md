@@ -9,8 +9,8 @@ On your computer you need three tools:
 - **git**
 - **GitHub CLI** (`gh`), signed in once with `gh auth login`
 
-One command, `npm run setup`, does the first deployment: it pushes the backend
-into your Apps Script project, creates the web app, and writes the IDs, the
+One command, `npm run setup`, does the first deployment: it creates the Google
+Sheet with its Apps Script project, pushes the backend into it, creates the web app, and writes the IDs, the
 credential and the Pages setting into your GitHub repository. Nothing is pasted
 into the Apps Script editor and nothing is typed into GitHub settings.
 
@@ -42,14 +42,13 @@ into the Apps Script editor and nothing is typed into GitHub settings.
 }}%%
 flowchart TD
     subgraph P1["Part 1: prepare, by hand"]
-        a1["1. Create the Forms Registry sheet<br/>and copy its Script ID"] --> a2["2. Turn on the Apps Script API"]
-        a2 --> a3["3. Create the GitHub repository"]
+        a1["1. Turn on the Apps Script API"] --> a2["2. Create the GitHub repository"]
     end
-    a3 --> b1
+    a2 --> b1
     subgraph P2["Part 2: deploy, by command"]
-        b1["4. npm run setup -- SCRIPT_ID<br/>backend, web app, variables, secret, Pages"] --> b2["5. In the sheet: First-time setup<br/>and Set admin PIN"]
-        b2 --> b3["6. git push: Actions tests<br/>and publishes the website"]
-        b3 --> b4["7. In the sheet: Set website address"]
+        b1["3. npm run setup<br/>sheet, backend, web app,<br/>variables, secret, Pages"] --> b2["4. In the sheet: First-time setup<br/>and Set admin PIN"]
+        b2 --> b3["5. git push: Actions tests<br/>and publishes the website"]
+        b3 --> b4["6. In the sheet: Set website address"]
     end
     b4 --> c1
     subgraph P3["Part 3: use it"]
@@ -70,20 +69,13 @@ Deployment identifiers live in GitHub repository Variables. Google credentials l
 
 ## Part 1: Prepare (by hand, once)
 
-### 1. Create the registry sheet and its script
-1. Open **sheets.google.com** and click **Blank spreadsheet**.
-2. Click the title at the top-left ("Untitled spreadsheet") and rename it **Forms Registry**.
-3. Click **Extensions**, then **Apps Script**. A new tab opens with an empty script that belongs to this sheet.
-4. Click the title ("Untitled project") and rename it **Forms Platform**.
-5. Click the **gear icon** (Project Settings) in the left panel and copy the **Script ID**. This is the only value you carry over by hand.
-
-Leave the code in the editor as it is. The setup replaces it.
-
-### 2. Turn on the Apps Script API
+### 1. Turn on the Apps Script API
 Open [Google Apps Script user settings](https://script.google.com/home/usersettings)
-and switch **Google Apps Script API** to **On**. Without it Google refuses the push.
+and switch **Google Apps Script API** to **On**. Google offers this switch only
+on that page, so no command can flip it, and without it Google refuses every
+request the setup makes.
 
-### 3. Create the GitHub repository
+### 2. Create the GitHub repository
 In the project folder:
 
 ```bash
@@ -97,43 +89,48 @@ repository already exists, skip this step.
 
 ## Part 2: Deploy (by command)
 
-### 4. Run the setup
-In the project folder (replace `YOUR_SCRIPT_ID` with the value from step 1):
+### 3. Run the setup
+In the project folder:
 
 ```bash
 npm ci
 ```
 
 ```bash
-npm run setup -- YOUR_SCRIPT_ID
+npm run setup
 ```
 
 The first time, a browser window opens for Google sign-in: choose the account
-that owns the sheet and click **Allow**. Then the command:
+that will own the data and click **Allow**. Then the command:
 
-1. builds `dist/Code.gs` and `dist/appsscript.json`;
-2. pushes them into your Apps Script project;
+1. creates a Google Sheet named **Forms Registry** with an Apps Script project attached to it;
+2. builds `dist/Code.gs` and `dist/appsscript.json` and pushes them into that project;
 3. creates the web app deployment (**Execute as: Me**, **Who has access: Anyone**, both taken from the manifest);
 4. stores `APPS_SCRIPT_ID`, `APPS_SCRIPT_DEPLOYMENT_ID` and `API_URL` as repository Variables;
 5. stores your clasp login as the repository Secret `CLASPRC_JSON`;
 6. sets GitHub Pages to **Source: GitHub Actions**.
 
-It prints the web app address when it finishes. If a step fails it stops with
-the reason and changes nothing further; fix the cause and run it again. A second
-run updates the same web app, so the address does not change.
+It prints the address of the new sheet and of the web app when it finishes. If a
+step fails it stops with the reason; fix the cause and run it again. A second
+run reuses the stored sheet and web app, so neither is created twice and the
+address does not change.
 
-### 5. First-time setup and admin PIN (in the sheet)
-1. Go back to the **Forms Registry** sheet tab and **reload the page** (F5). Wait about 5 seconds.
+**Already have a sheet?** Open its **Extensions > Apps Script**, copy the
+**Script ID** from **Project Settings** (gear icon), and run
+`npm run setup -- YOUR_SCRIPT_ID`. The setup then skips creating a sheet.
+
+### 4. First-time setup and admin PIN (in the sheet)
+1. Open the **Forms Registry** sheet from the address the setup printed (it is also in your Google Drive). If it was already open, **reload the page** (F5). Wait about 5 seconds.
 2. A new menu **Forms Platform** appears next to Help. Click it, then **1. First-time setup**.
 3. Google asks for permission. Click **Continue**, choose your account, then:
-   - If you see "Google hasn't verified this app", click **Advanced**, then **Go to Forms Platform (unsafe)**. This message appears because the script is yours and was never submitted to Google. It is safe: you are giving the script access to *your own* account.
+   - If you see "Google hasn't verified this app", click **Advanced**, then **Go to Forms Registry (unsafe)**. This message appears because the script is yours and was never submitted to Google. It is safe: you are giving the script access to *your own* account.
    - Click **Allow**.
 4. Click **Forms Platform > 1. First-time setup** again. A message says the setup finished. This creates the Forms, Lists, and Clients tabs and a Drive folder called **Forms Platform**.
 5. Click **Forms Platform > 2. Set admin PIN...** Type a PIN with at least 4 characters and press OK. Pick something not easy to guess: the admin page is public, and the PIN is the only lock.
 
 The web app answers only after this permission step, because it runs as you.
 
-### 6. Publish the website
+### 5. Publish the website
 ```bash
 git push -u origin master
 ```
@@ -153,8 +150,8 @@ gh api "repos/{owner}/{repo}/pages" --jq .html_url
 
 The address looks like `https://YOUR-NAME.github.io/forms/`.
 
-### 7. Tell the sheet your website address (for emails)
-Back in the Forms Registry sheet: **Forms Platform > 3. Set website address...** and paste the address from step 6. Confirmation emails link to it.
+### 6. Tell the sheet your website address (for emails)
+Back in the Forms Registry sheet: **Forms Platform > 3. Set website address...** and paste the address from step 5. Confirmation emails link to it.
 
 ---
 
@@ -271,9 +268,10 @@ Deploy**. This is a recovery path; routine updates use the configured workflow.
 | What you see | What to do |
 |---|---|
 | Website says it is not connected to the backend | Hard-refresh the page (**Ctrl+F5** on Windows/Linux, **Cmd+Shift+R** on Mac) to bypass browser caching of the placeholder `config.js`. Also verify Pages Source is **GitHub Actions** and `API_URL` is set under repository Variables. |
-| Page says it could not reach the server | Run **First-time setup** in the sheet (step 5); the web app answers only after you allow the permissions. If it still fails, check under **Deploy > Manage deployments** that access is **Anyone**. |
-| `npm run setup` stops at "Pushing the backend" | Turn on the Apps Script API (step 2), wait a minute, and run it again. Check that the Script ID is the one from Project Settings. |
-| `npm run setup` stops at a GitHub step | Run `gh auth login`, and check that the folder has an `origin` remote on GitHub (step 3). |
+| Page says it could not reach the server | Run **First-time setup** in the sheet (step 4); the web app answers only after you allow the permissions. If it still fails, check under **Deploy > Manage deployments** that access is **Anyone**. |
+| `npm run setup` stops at "Creating the Forms Registry sheet" | Turn on the Apps Script API (step 1), wait a minute, and run it again. If an empty **Forms Registry** sheet was left in Google Drive by the failed attempt, delete it. |
+| `npm run setup` stops at "Pushing the backend" | Turn on the Apps Script API (step 1). If you passed a Script ID, check that it is the one from Project Settings. |
+| `npm run setup` stops at a GitHub step | Run `gh auth login`, and check that the folder has an `origin` remote on GitHub (step 2). |
 | "That PIN is not correct" | Wrong PIN, or too many tries: wait a few minutes. To reset, run **Forms Platform > 2. Set admin PIN...** again. |
 | Backend update failed | Check the **Deploy Google Apps Script** job. Renew `CLASPRC_JSON` if authentication failed; verify both IDs and enable the Apps Script API. |
 | The site did not change after a push | Open the **Actions** tab: a red run means a test failed and nothing was published. A green run means the browser cached the old file: press Ctrl+F5. |
