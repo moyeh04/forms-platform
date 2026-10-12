@@ -128,11 +128,18 @@ The `config` cell is the reason new forms need no code:
 
 | Column | Meaning |
 |---|---|
-| `key` | List name: `levels`, `curricula`, `majors`, `sections`, `groups`, `wa_sections` |
+| `key` | List key: the built-in `levels`, `curricula`, `majors`, `sections`, `groups`, `wa_sections`, or the key of a list an admin made (from its name, such as `third_year`) |
 | `values` | JSON array of `{ value, label: { en, ar } }` |
 
-A form's dropdown stores only the list **name**. The options are filled in when
-the form is read, so editing a list updates every form that uses it.
+The row with the key `_info` is not a list. Its `values` is a JSON object with
+the name and the kind of each list an admin made:
+`{ "third_year": { "name": "Third year", "kind": "sections" } }`. The kinds are
+`sections`, `numbers`, `named` and `plain`; a built-in list has its kind by key.
+
+A form's dropdown stores only the list **key** (`field.list`), and the admin
+picks it in the Questions tab. The options are filled in when the form is read,
+so editing a list updates every form that uses it. `rules.sections` limits
+whichever list of the kind `sections` a question reads.
 
 ### Clients tab (instructor and client links)
 

@@ -24,7 +24,7 @@ sheet, not code.
 | **One source of truth for rules** | `shared/rules.js` is used by the browser, the backend, and the tests. They cannot disagree. |
 | **Forms are data** | A form is a JSON definition in one cell. New questions and new form types need no code. |
 | **Boring technology** | Plain JavaScript, no framework, no bundler for the website, one concatenation script for the backend. Easy to read, easy to fix later. |
-| **Testable without Google** | An in-memory copy of Google's services runs the real backend code, so 244 JavaScript tests cover it without touching a real account. |
+| **Testable without Google** | An in-memory copy of Google's services runs the real backend code, so 247 JavaScript tests cover it without touching a real account. |
 
 ## System context
 
@@ -943,9 +943,17 @@ Rules of the move:
 `admin-lists.js` draws `#/lists` and `#/lists/<key>`: the lists at the side
 (`.l-side`) and the choices of the picked one in the main part (`.l-main`).
 
-- **The data picks the layout.** A list of plain values is chips; a list where
-  a choice has an English name is rows. There is no layout switch. A plain list
-  offers the rows through one link, because chips cannot rename or reorder.
+- **The kind picks the editor.** A list of `sections` is built from year group
+  cards with a stepper for each kind (TH, T, O), and a group is added by
+  picking a year and a letter; a value that the groups cannot give back is
+  kept under Other sections. A list of `numbers` is two steppers. A `named`
+  list is rows; a `plain` list is chips, with one link to the rows because
+  chips cannot rename or reorder. Typing is needed only for names.
+- **Lists are made, not only edited.** New list asks for a name, a kind and a
+  copy to start from (`admin.lists.create`). An admin's own list can be renamed,
+  and deleted while no form asks it; Delete is shown only then. A question
+  that reads a list picks it in the Questions tab ("Choices from"), shown only
+  when another list of the same kind may be picked (`A.listSwappable`).
 - **The save bar is the one of the settings page.** It exists only while the
   picked list differs from its saved copy, sets `A.unsaved`, and says what a
   save would change ("1 added, 2 removed"). When a removed choice is in the
@@ -1020,6 +1028,6 @@ labels of the current tables.
 | [HOSTING.md](HOSTING.md) | What GitHub does, what Google does, and how they fit |
 | [DATA-MODEL.md](../reference/DATA-MODEL.md) | Every sheet, column, and stored property |
 | [SECURITY.md](../reference/SECURITY.md) | The secrets, who holds them, and what a leak would mean |
-| [TESTING.md](../reference/TESTING.md) | How 264 tests run without Google |
+| [TESTING.md](../reference/TESTING.md) | How 267 tests run without Google |
 | [DEPLOY.md](../DEPLOY.md) | Click-by-click setup |
 | [MODULES.md](../MODULES.md) | File-by-file reference |
