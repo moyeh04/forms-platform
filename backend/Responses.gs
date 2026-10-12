@@ -168,6 +168,14 @@ function issueKey_(form, rows) {
   fail('keys_exhausted', 'No free edit keys are left for this form.');
 }
 
+/** A booking made with a registration key is opened by that same key, unless another booking already holds it. */
+function bookingKey_(form, rows, key) {
+  key = String(key || '').trim();
+  var hash = keyHash_(form, key);
+  var used = rows.some(function (r) { return !r.deleted && r.keyHash === hash; });
+  return used ? issueKey_(form, rows) : { key: key, hash: hash };
+}
+
 function keyExpiry_(form) {
   var days = (form.editKey && form.editKey.days) || 7;
   return new Date(Date.now() + days * 86400000).toISOString();
@@ -177,8 +185,8 @@ function requireKeyEnabled_(form) {
   if (!form.editKey || !form.editKey.enabled) fail('key_disabled', 'Editing with a key is turned off for this form.');
 }
 
-/** Finds the registration a key belongs to. Wrong guesses are throttled. */
-function findByKey_(form, key) {
+/** Finds the registration a key belongs to. Wrong guesses are throttled. `anyAge` accepts a key that has expired. */
+function findByKey_(form, key, anyAge) {
   requireKeyEnabled_(form);
   var cache = CacheService.getScriptCache();
   var tag = 'badkey:' + form.id;
@@ -192,7 +200,7 @@ function findByKey_(form, key) {
     cache.put(tag, String(fails + 1), 60);
     fail('bad_key', 'That key is not right.');
   }
-  if (hit.keyExpires && Date.parse(hit.keyExpires) < Date.now()) fail('key_expired', 'This key has expired. Ask your instructor to make the change.');
+  if (!anyAge && hit.keyExpires && Date.parse(hit.keyExpires) < Date.now()) fail('key_expired', 'This key has expired. Ask your instructor to make the change.');
   return hit;
 }
 

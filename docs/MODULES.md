@@ -147,6 +147,7 @@ no validation.
 | `Responses.gs` | Reading and writing rows, edit keys, limits, Drive checks, emails. |
 | `Submissions.gs` | Student submit, lookup, update, cancel; admin edits and key reset. |
 | `Slots.gs` | Reservation timetable checks and availability. |
+| `KeyBooking.gs` | Booking a reservation with a registration key from another form: the setting, the team preview, and the copied answers. |
 | `Views.gs` | Tinted block views inside each form's Google Sheet. |
 | `Print.gs` | Print tabs and PDF export. |
 | `Menu.gs` | The "Forms Platform" menu in the registry sheet. |
@@ -166,7 +167,7 @@ no validation.
 | `scripts/download_tasks.py` | Downloads task files and builds `Tasks.xlsx`. |
 | `tests/harness/appsscript-mock.js` | An in-memory Sheets, Drive, Mail, Cache, and clock, so the real backend code runs in tests. |
 | `tests/harness/dom.js` | Opens the real pages in jsdom wired to that backend. |
-| `tests/*.test.js` | 204 tests. |
+| `tests/*.test.js` | 217 tests. |
 | `tests/test_download_tasks.py` | 20 tests for the export, with a local server in place of Google. |
 
 ## Data model in one paragraph

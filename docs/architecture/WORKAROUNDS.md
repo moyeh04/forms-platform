@@ -258,7 +258,7 @@ flowchart LR
     r["shared/rules.js"] --> bundle
     b1["backend/Auth.gs"] --> bundle
     b2["backend/Registry.gs"] --> bundle
-    b3["... 14 more .gs files"] --> bundle
+    b3["... 15 more .gs files"] --> bundle
     bundle(("scripts/bundle-backend.js"))
     bundle --> out["dist/Code.gs<br/>one file to deploy"]
     manifest["backend/appsscript.json"] --> bundle

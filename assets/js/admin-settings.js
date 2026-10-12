@@ -96,6 +96,40 @@
     }
 
     /* Reservation teammates ------------------------------------- */
+    /* Booking with a key: the student types a registration key instead of the answers */
+    var keyBookPanel = null;
+    if (isReservation) {
+      var sources = res.keySources || [];
+      f.keyBooking = f.keyBooking || { enabled: false, source: '' };
+      var kbBody = h('div');
+      var paintKb = function () {
+        ui.clear(kbBody);
+        // Without a form that issues keys there is nothing to switch on, so the switch is not shown.
+        if (!sources.length) return kbBody.appendChild(h('p', { class: 'muted-note' }, 'No form gives its students a key yet. Create a team registration form first, then come back here.'));
+        var known = sources.some(function (s) { return s.id === f.keyBooking.source; });
+        kbBody.appendChild(A.check('Students book with the key from their registration', f.keyBooking.enabled, function (v) {
+          f.keyBooking.enabled = v;
+          if (v && !known) f.keyBooking.source = sources[0].id;
+          paintKb();
+        }, false, 'keyBooking'));
+        if (!f.keyBooking.enabled) return;
+        if (!known) {
+          kbBody.appendChild(h('p', { class: 'error', role: 'alert' }, 'The registration form this used no longer gives keys. Choose another one.'));
+          f.keyBooking.source = sources[0].id;
+        }
+        var pick = A.select(f.keyBooking.source, sources.map(function (s) { return [s.id, s.title + (s.term ? ' (' + s.term + ')' : '')]; }), function (v) { f.keyBooking.source = v; });
+        pick.name = 'keySource';
+        kbBody.appendChild(A.field('Registration form', pick, 'The student types the 5-digit key from that form, checks the team shown, and picks a slot.'));
+        kbBody.appendChild(h('ul', { class: 'help plain-list' },
+          h('li', null, 'Name, code, phone and every other question the two forms share are copied from the registration. Students are not asked them again.'),
+          h('li', null, 'The Questions section below still decides which answers are kept and shown.'),
+          h('li', null, 'The same key opens and cancels the booking. A key that has expired for editing still books.'),
+          h('li', null, 'Each team books once.')));
+      };
+      paintKb();
+      keyBookPanel = panel('Booking with a key', 'Let teams that already registered book a slot without typing their details again.', kbBody);
+    }
+
     var teammatePanel = null;
     if (isReservation && reservationMembers) {
       teammatePanel = panel('Teammates', 'Optionally collect the names and details of the other people attending with the team leader.',
@@ -533,6 +567,7 @@
           reservationMembers.required = reservationMembers.enabled;
         }
         Object.assign(patch, metadata);
+        if (isReservation) patch.keyBooking = { enabled: !!f.keyBooking.enabled, source: f.keyBooking.source || '' };
         if (f.matching) patch.matching = f.matching;
         if (hasSize) {
           var min = parseInt(f.rules.teamSize.min, 10), max = parseInt(f.rules.teamSize.max, 10);
@@ -564,7 +599,7 @@
     var dangerPanel = h('section', { class: 'panel danger-zone' }, h('h2', null, 'Delete this form'),
       h('p', { class: 'help' }, 'The link stops working and the form leaves the dashboard. Its Google Sheet moves to the Drive trash for 30 days. To stop new registrations but keep everything, set the status to Closed or Archived instead.'),
       h('button', { type: 'button', class: 'btn btn-danger', name: 'delete-form', onclick: function () { A.deleteForm(f, function () { window.location.hash = '#/'; }); } }, icon('trash', 18), 'Delete form'));
-    var sections = [general, majorsPanel, teammatePanel, sizePanel, fieldsPanel, slotsPanel, keyPanel, emailPanel, rulesPanel, reviewPanel, dangerPanel].filter(Boolean);
+    var sections = [general, majorsPanel, keyBookPanel, teammatePanel, sizePanel, fieldsPanel, slotsPanel, keyPanel, emailPanel, rulesPanel, reviewPanel, dangerPanel].filter(Boolean);
     // A sticky bar of section names: the page is long, so admins jump instead of scrolling.
     var jump = h('nav', { class: 'section-bar', 'aria-label': 'Settings sections' }, sections.map(function (n, i) {
       var title = n.querySelector('h2').textContent;
