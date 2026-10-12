@@ -155,7 +155,7 @@ test('Forms: deleting needs the link name, removes the form, trashes its sheet, 
   const w = boot();
   const a = w.admin({ action: 'admin.forms.create', type: 'team_registration', title: 'Keep me', term: 'Fall 2027' }).form;
   const b = w.admin({ action: 'admin.forms.create', type: 'reservation', title: 'Delete me', term: 'Fall 2027' }).form;
-  w.admin({ action: 'admin.clients.create', name: 'Dr. X', forms: [a.slug, b.slug], hiddenColumns: [], canReview: false });
+  w.admin({ action: 'admin.clients.create', name: 'Dr. X', forms: [a.slug, b.slug], hiddenColumns: [], canReview: false, withKey: false });
   assert.equal(w.admin({ action: 'admin.forms.delete', id: b.id }).error.code, 'confirm_required');
   assert.equal(w.api({ action: 'admin.forms.delete', id: b.id, confirm: b.slug }).ok, false, 'needs the PIN');
   const r = w.admin({ action: 'admin.forms.delete', id: b.id, confirm: b.slug });

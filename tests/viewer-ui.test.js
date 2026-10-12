@@ -15,7 +15,7 @@ function boot() {
     w.admin({ action: 'admin.forms.update', id: f.id, patch: { status: 'open', ...patch } });
     return f;
   };
-  w.client = (body) => w.admin({ action: 'admin.clients.create', name: 'Dr. Ahmed', forms: ['*'], ...body }).token;
+  w.client = (body) => w.admin({ action: 'admin.clients.create', name: 'Dr. Ahmed', forms: ['*'], withKey: false, ...body }).token;
   return w;
 }
 
@@ -159,7 +159,7 @@ test('Instructor link: invalid, missing, and turned-off links explain themselves
   await none.window.App.viewer.start(); await settle(4);
   assert.ok(none.window.document.body.textContent.includes('missing its access code'));
 
-  const made = w.admin({ action: 'admin.clients.create', name: 'Temp', forms: ['*'] });
+  const made = w.admin({ action: 'admin.clients.create', name: 'Temp', forms: ['*'], withKey: false });
   w.admin({ action: 'admin.clients.update', id: made.client.id, patch: { active: false } });
   const off = await openViewer(w, made.token);
   assert.ok(off.text().includes('turned off'));

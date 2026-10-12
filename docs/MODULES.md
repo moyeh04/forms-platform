@@ -97,6 +97,7 @@ flowchart LR
         a1["admin.js"]
         a2["admin-settings.js"]
         a5["admin-timetable.js"]
+        a7["admin-keys.js"]
         a3["admin-data.js"]
         a4["admin-people.js"]
         a6["admin-lists.js"]
@@ -132,7 +133,7 @@ no validation.
 | `assets/js/config.js` | Source placeholder; `scripts/build-site.js` generates its published copy from the Actions `API_URL` variable. |
 | `assets/js/api.js` | Sends requests to the backend as plain-text JSON (avoids browser CORS checks). |
 | `assets/js/form.js`, `ticket.js`, `i18n.js` | The student page, the success ticket, English and Arabic text. |
-| `assets/js/admin*.js` | Dashboard: core and forms list, settings, the timetable editor, responses and matching, clients, lists. |
+| `assets/js/admin*.js` | Dashboard: core and forms list, settings, the timetable editor, key and link end dates (`admin-keys.js`), responses and matching, clients, lists. |
 | `assets/js/viewer.js` | The instructor page. |
 | `shared/rules.js` | Validation and normalization rules (Arabic names, phones, codes, Drive links, team size, slots). Used by the browser, the backend, and the tests, so all three always agree. |
 
@@ -151,12 +152,13 @@ no validation.
 | `Slots.gs` | Reservation timetable checks and availability. |
 | `Questions.gs` | Questions and pages an admin adds: allowed types, ids, labels and choices, and pages that list each existing question once. |
 | `KeyBooking.gs` | Booking a reservation with a registration key from another form: the setting, the team preview, the copied answers, and the next booking of a series. |
+| `KeyExpiry.gs` | When registration edit keys stop working, and moving that date for one, some, or all registrations of a form. |
 | `Transfers.gs` | Moving a member between two teams of a form: the rule, the requests tab, asking on submit and update, the answer of the leader or the admin, the move, and the emails. |
 | `Views.gs` | Tinted block views inside each form's Google Sheet. |
 | `Print.gs` | Print tabs and PDF export. |
 | `Menu.gs` | The "Forms Platform" menu in the registry sheet. |
 | `Matching.gs` | WhatsApp request matching. |
-| `Clients.gs`, `Viewer.gs` | Private instructor links and what they can see. |
+| `Clients.gs`, `Viewer.gs` | Private instructor links, their access keys and end dates, and what they can see. |
 | `Export.gs` | Team data for the Excel export script. |
 
 `npm run build` joins `shared/rules.js` and every backend file into `dist/Code.gs`.

@@ -185,7 +185,7 @@ Back in the Forms Registry sheet: **Forms Platform > 3. Set website address...**
    - **Status**: set to **Open** and click **Save settings**.
 4. Click **Copy link** and send it to students. The link looks like `.../index.html?f=database-team-project-registration-form-fall-2027`.
 5. Watch submissions under **Responses**. Each form's own Google Sheet is one click away (**Google Sheet**).
-6. For instructors: **Clients > New private link**. Send them the link shown once. They need no account.
+6. For instructors: **Clients > New private link**. Send them the link, which is shown once, and send the six-digit access key apart from it, for example the link by email and the key by WhatsApp. They need no account. If they lose the key, **Show** in the list reads it again.
 
 ### First-run checklist (things only real Google can confirm)
 Do these once with a test form:

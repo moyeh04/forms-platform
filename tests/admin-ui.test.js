@@ -134,7 +134,7 @@ test('WhatsApp metadata: settings, public form, and viewer retain and display ba
   assert.equal(studentPage.window.document.querySelector('.tags').textContent.trim(), 'Batch 2029/2030');
   assert.equal(studentPage.window.document.title, 'Groups 2028 - Batch 2029/2030');
 
-  const client = w.admin({ action: 'admin.clients.create', name: 'Dr. Ahmed', forms: [f.slug] });
+  const client = w.admin({ action: 'admin.clients.create', name: 'Dr. Ahmed', forms: [f.slug], withKey: false });
   const viewerMe = w.api({ action: 'viewer.me', token: client.token });
   assert.equal(viewerMe.forms[0].batchYear, '2029/2030');
   assert.equal(viewerMe.forms[0].term, undefined);
@@ -182,7 +182,7 @@ test('WhatsApp metadata: legacy semester records resolve to batch year without d
   assert.equal(publicForm.subject, undefined);
   assert.equal(publicForm.term, undefined);
   w.admin({ action: 'admin.forms.update', id: f.id, patch: { status: 'open' } });
-  const client = w.admin({ action: 'admin.clients.create', name: 'Dr. Ahmed', forms: [f.slug] });
+  const client = w.admin({ action: 'admin.clients.create', name: 'Dr. Ahmed', forms: [f.slug], withKey: false });
   const view = w.api({ action: 'viewer.data', token: client.token, slug: f.slug });
   assert.equal(view.form.batchYear, '2027/2028');
   assert.equal(view.form.subject, undefined);
@@ -556,8 +556,11 @@ test('Clients: create a private link, see it once, and it opens the instructor v
   all.checked = true; p.fire(all, 'change');
   const phone = p.$$('.dialog .check').find((l) => l.textContent === 'Phone').querySelector('input');
   phone.checked = true; p.fire(phone, 'change');
+  assert.equal(p.$('[name="withKey"]').checked, true, 'a new link asks for a key unless unticked');
+  const key = p.$('[name="withKey"]'); key.checked = false; p.fire(key, 'change');
   p.clickText('Create link', p.$('.dialog')); await settle(10);
   const link = p.$('.link-box code').textContent;
+  assert.equal(p.$('[name="access-key"]'), null, 'no key was made');
   assert.ok(link.includes('viewer.html?t='));
   const token = new URL(link).searchParams.get('t');
   const me = w.api({ action: 'viewer.me', token });
@@ -832,9 +835,9 @@ test('Responses and clients: list rows carry their column names, and the day she
   assert.deepEqual(labels.slice(0, 5), ['Code', 'Phone', 'Group', 'Section', 'Timetable']);
   assert.equal(labels[labels.length - 1], 'Status');
 
-  w.admin({ action: 'admin.clients.create', name: 'Dr. Ahmed', forms: [groups.slug] });
+  w.admin({ action: 'admin.clients.create', name: 'Dr. Ahmed', forms: [groups.slug], withKey: false });
   const clients = await openAdmin(w, '#/clients');
-  assert.deepEqual(clients.$$('.data-table.cards tbody td[data-label]').map((c) => c.dataset.label), ['Can see', 'Hidden columns', 'Can review', 'Link']);
+  assert.deepEqual(clients.$$('.data-table.cards tbody td[data-label]').map((c) => c.dataset.label), ['Can see', 'Hidden columns', 'Can review', 'Link', 'Access key']);
 
   const seminar = w.admin({ action: 'admin.forms.create', type: 'reservation', title: 'Seminar', term: 'Fall 2027' }).form;
   const res = await openAdmin(w, `#/f/${seminar.slug}`);
@@ -1010,4 +1013,128 @@ test('Lists: the server refuses a list that does not exist and a question that r
   const fields = w.admin({ action: 'admin.forms.get', id: f.id }).form.fields.map((x) => (x.id === 'section' ? { ...x, list: 'nope' } : x));
   assert.equal(w.admin({ action: 'admin.forms.update', id: f.id, patch: { fields } }).error.code, 'list_not_found');
   assert.equal(Object.keys(w.admin({ action: 'admin.lists.get' }).lists).includes('_info'), false);
+});
+
+test('Clients: a link with an access key shows the link once and the key apart, and the key can be changed or removed', async () => {
+  const w = boot();
+  w.make('reservation', 'Seminar');
+  const p = await openAdmin(w, '#/clients');
+  p.click('[name="newClient"]'); await settle(2);
+  p.type('[name="clientName"]', 'Dr. Ahmed');
+  const all = p.$$('.dialog .check').find((l) => l.textContent.includes('All forms')).querySelector('input');
+  all.checked = true; p.fire(all, 'change');
+  p.clickText('Create link', p.$('.dialog')); await settle(10);
+  const key = p.$('[name="access-key"]').textContent;
+  assert.match(key, /^\d{6}$/);
+  const token = new URL(p.$('.link-box code').textContent).searchParams.get('t');
+  assert.equal(w.api({ action: 'viewer.me', token }).error.code, 'key_needed', 'the link alone opens nothing');
+  assert.equal(w.api({ action: 'viewer.me', token, accessKey: key }).client.name, 'Dr. Ahmed');
+  p.clickText('Done', p.$('.dialog')); await settle(8);
+  assert.ok(p.$('[data-client] [data-label="Access key"]').textContent.includes('Asked'));
+
+  p.click('[name="new-key"]'); await settle(2);
+  p.clickText('Make new key', p.$('.overlay')); await settle(10);
+  const fresh = p.$('[name="access-key"]').textContent;
+  assert.equal(p.$('.dialog .link-box'), null, 'a new key leaves the link as it is');
+  assert.equal(w.api({ action: 'viewer.me', token, accessKey: key }).error.code, 'bad_access_key', 'the old key stops working');
+  assert.equal(w.api({ action: 'viewer.me', token, accessKey: fresh }).ok, true);
+  p.clickText('Done', p.$('.dialog')); await settle(8);
+  p.click('[name="remove-key"]'); await settle(2);
+  p.clickText('Remove key', p.$('.overlay')); await settle(10);
+  assert.equal(w.api({ action: 'viewer.me', token }).ok, true, 'without a key the link opens alone');
+  assert.ok(p.$('[data-client] [data-label="Access key"]').textContent.includes('Not asked'));
+});
+
+test('Clients: the admin sees a lost key again, and a link ends on its date until it is moved', async () => {
+  const w = boot();
+  const f = w.make('reservation', 'Seminar');
+  const p = await openAdmin(w, '#/clients');
+  p.click('[name="newClient"]'); await settle(2);
+  p.type('[name="clientName"]', 'Dr. Ahmed');
+  const box = p.$$('.dialog .check').find((l) => l.textContent.includes('Seminar')).querySelector('input');
+  box.checked = true; p.fire(box, 'change');
+  assert.equal(p.$('[name="link-end-none"]').getAttribute('aria-pressed'), 'true', 'a new link has no end unless one is picked');
+  p.click('[name="link-end-date"]'); await settle(1);
+  p.clickText('Create link', p.$('.dialog')); await settle(6);
+  assert.equal(w.admin({ action: 'admin.clients.list' }).clients.length, 0, 'no link is made while the date is not picked');
+  assert.ok(p.$('.dialog .extend-preview').textContent.includes('Pick the date'), 'the reason is next to the picker');
+  p.click('[name="link-end-30"]'); await settle(1);
+  p.clickText('Create link', p.$('.dialog')); await settle(10);
+  const key = p.$('[name="access-key"]').textContent;
+  const token = new URL(p.$('.link-box code').textContent).searchParams.get('t');
+  p.clickText('Done', p.$('.dialog')); await settle(8);
+  const made = w.admin({ action: 'admin.clients.list' }).clients[0];
+  assert.equal(Math.round((Date.parse(made.expires) - Date.now()) / 86400000), 30);
+  assert.ok(p.$('[data-client] [data-label="Link"]').textContent.includes('Until'));
+
+  p.click('[name="show-key"]'); await settle(8);
+  assert.equal(p.$('[name="access-key"]').textContent, key, 'the same key, not a new one');
+  assert.equal(p.$('.dialog .link-box'), null, 'the link itself cannot be shown again');
+  p.clickText('Done', p.$('.dialog')); await settle(2);
+
+  w.setNow(Date.parse(made.expires) + 86400000);
+  p.win.App.admin.render(); await settle(10);
+  assert.equal(w.api({ action: 'viewer.me', token, accessKey: key }).error.code, 'link_expired');
+  assert.ok(p.$('[data-client] [data-label="Link"]').textContent.includes('Ended'));
+  p.click('[name="change-end"]'); await settle(2);
+  p.click('[name="link-end-none"]'); await settle(1);
+  p.clickText('Save', p.$('.dialog')); await settle(10);
+  assert.equal(w.api({ action: 'viewer.me', token, accessKey: key }).ok, true, 'moving the end opens the link again');
+  assert.ok(p.$('[data-client] [data-label="Link"]').textContent.includes('No end date'));
+  assert.ok(f);
+});
+
+test('Setup: Extend keys gives the expired keys, or chosen teams, more time', async () => {
+  const w = boot();
+  const f = w.make('team_registration', 'Projects');
+  submit(w, f, person({ leader_code: '4230001', title: 'Old', members: [] }));
+  w.setNow(w.nowMs + 10 * 86400000);
+  submit(w, f, person({ leader_code: '4230002', title: 'Library', members: [] }));
+  submit(w, f, person({ leader_code: '4230003', title: 'Clinic', members: [] }));
+  const keys = () => w.admin({ action: 'admin.keys.list', slug: f.slug }).keys;
+  const before = keys();
+  const p = await openAdmin(w, '#/f/' + f.slug + '/settings');
+  p.click('[data-panel="Edit key"] .panel-head'); await settle(4);
+  assert.ok(p.$('.keys-summary').textContent.includes('1 expired'));
+  p.click('[name="extend-keys"]'); await settle(8);
+  assert.equal(p.$('[name="which-expired"]').getAttribute('aria-pressed'), 'true', 'expired keys are picked first');
+  assert.equal(p.$('[name="which-soon"]'), null, 'a filter with nothing in it is not offered');
+  assert.equal(p.$('[name="extend-go"]').textContent, 'Extend key');
+  p.click('[name="extend-go"]'); await settle(10);
+  const after = keys();
+  assert.equal(after[0].expired, false);
+  assert.equal(after[1].keyExpires, before[1].keyExpires);
+  assert.ok(p.$('.keys-summary').textContent.includes('all working'), 'the line is counted again');
+
+  p.click('[name="extend-keys"]'); await settle(8);
+  p.click('[name="which-chosen"]'); await settle(1);
+  assert.equal(p.$('[name="extend-go"]').disabled, true, 'nothing chosen yet');
+  p.type('[name="key-search"]', 'clinic'); await settle(1);
+  assert.equal(p.$$('.key-row').length, 1);
+  p.click('[name="choose-shown"]'); await settle(1);
+  p.click('[name="extend-30"]'); await settle(1);
+  assert.ok(p.$('.extend-preview').textContent.includes('will work until'));
+  p.click('[name="extend-go"]'); await settle(10);
+  const last = keys();
+  assert.equal(Date.parse(last[2].keyExpires) - Date.parse(before[2].keyExpires), 30 * 86400000);
+  assert.equal(last[1].keyExpires, before[1].keyExpires);
+});
+
+test('Responses: a registration shows when its key ends and extends it alone', async () => {
+  const w = boot();
+  const f = w.make('team_registration', 'Projects');
+  submit(w, f, person({ leader_code: '4230001', title: 'Old', members: [] }));
+  submit(w, f, person({ leader_code: '4230002', title: 'Library', members: [] }));
+  const before = w.admin({ action: 'admin.keys.list', slug: f.slug }).keys;
+  const p = await openAdmin(w, '#/f/' + f.slug + '/responses');
+  p.clickText('Details', p.$('[data-ref="' + before[0].ref + '"]')); await settle(4);
+  assert.ok(p.$('.detail').textContent.includes('Key works'));
+  p.click('[name="extend-key"]'); await settle(8);
+  assert.equal(p.$('[name="which-all"]'), null, 'only this registration');
+  p.click('[name="extend-3"]'); await settle(1);
+  p.click('[name="extend-go"]'); await settle(10);
+  const after = w.admin({ action: 'admin.keys.list', slug: f.slug }).keys;
+  assert.equal(Date.parse(after[0].keyExpires) - Date.parse(before[0].keyExpires), 3 * 86400000);
+  assert.equal(after[1].keyExpires, before[1].keyExpires);
+  assert.ok(p.$('.detail').textContent.includes(new Date(after[0].keyExpires).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })), 'the details show the new end');
 });

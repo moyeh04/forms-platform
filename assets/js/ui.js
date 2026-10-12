@@ -78,7 +78,8 @@
   /** A promise-based confirmation, styled like the rest of the page. */
   function confirmDialog(o) {
     return new Promise(function (resolve) {
-      var done = function (v) { if (overlay.parentNode) overlay.parentNode.removeChild(overlay); resolve(v); };
+      var onKey = function (e) { if (e.key === 'Escape') done(false); };
+      var done = function (v) { document.removeEventListener('keydown', onKey); if (overlay.parentNode) overlay.parentNode.removeChild(overlay); resolve(v); };
       var yes = h('button', { type: 'button', class: 'btn ' + (o.danger ? 'btn-danger' : 'btn-primary'), onclick: function () { done(true); } }, o.confirmText || 'OK');
       var no = h('button', { type: 'button', class: 'btn btn-quiet', onclick: function () { done(false); } }, o.cancelText || 'Cancel');
       var overlay = h('div', { class: 'overlay', onclick: function (e) { if (e.target === overlay) done(false); } },
@@ -87,6 +88,7 @@
           o.body ? h('p', null, o.body) : null,
           h('div', { class: 'dialog-actions' }, no, yes)));
       document.body.appendChild(overlay);
+      document.addEventListener('keydown', onKey);
       no.focus();
     });
   }

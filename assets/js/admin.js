@@ -144,7 +144,15 @@
 
   A.modal = function (title, body, buttons) {
     var overlay;
-    var close = function () { if (overlay.parentNode) overlay.parentNode.removeChild(overlay); };
+    // Escape closes the dialog on top, like Cancel.
+    var onKey = function (e) {
+      var all = document.querySelectorAll('.overlay');
+      if (e.key === 'Escape' && all[all.length - 1] === overlay) { e.stopImmediatePropagation(); close(); }
+    };
+    var close = function () {
+      document.removeEventListener('keydown', onKey);
+      if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
+    };
     var actions = (buttons || [{ text: 'Close', kind: 'quiet' }]).map(function (b) {
       return h('button', { type: 'button', class: 'btn btn-' + (b.kind || 'quiet'), onclick: function (e) {
         if (!b.onclick) return close();
@@ -155,6 +163,7 @@
       h('div', { class: 'dialog', role: 'dialog', 'aria-modal': 'true', 'aria-label': title },
         h('h2', { class: 'dialog-title' }, title), body, h('div', { class: 'dialog-actions' }, actions)));
     document.body.appendChild(overlay);
+    document.addEventListener('keydown', onKey);
     return { close: close, el: overlay };
   };
 

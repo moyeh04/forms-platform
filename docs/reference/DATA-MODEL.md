@@ -74,6 +74,10 @@ erDiagram
         json hiddenColumns
         string canReview
         string active
+        string createdAt
+        string keyHash
+        string keySeal
+        string expires
     }
     REQUEST {
         string id
@@ -152,6 +156,13 @@ whichever list of the kind `sections` a question reads.
 | `canReview` | `1` if the link may mark review steps |
 | `active` | `0` when the link is turned off |
 | `createdAt` | ISO timestamp |
+| `keyHash` | `sha256(pepper + ':clientkey:' + id + ':' + key)` for the six-digit access key, or empty when the link asks for none |
+| `keySeal` | The access key sealed for the admin: `S` plus six digits, each shifted by a pad from `sha256(pepper + ':clientseal:' + id)`. Empty for a link without a key, and for keys made before this column existed. |
+| `expires` | ISO time the link stops working, or empty for no end |
+
+`keyHash`, `keySeal` and `expires` were added after the first release. A Clients
+tab without them gets the headers the next time a link is saved; until then the
+empty cells mean no key and no end.
 
 ## A form's own spreadsheet
 

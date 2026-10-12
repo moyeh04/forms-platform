@@ -8,7 +8,15 @@
 
   var ui = App.ui, h = ui.h, icon = ui.icon, toast = ui.toast;
   var V = App.viewer = {};
-  var S = { token: '', slug: '', me: null, data: null, mode: 'auto', dayId: '', q: '', error: '' };
+  var S = { token: '', slug: '', me: null, data: null, mode: 'auto', dayId: '', q: '', error: '', key: '', askKey: false, keyError: '' };
+
+  /** The access key is kept for this tab only, under the link it opens. */
+  var KEY_STORE = 'fp_viewer_key_';
+  function storedKey() { try { return window.sessionStorage.getItem(KEY_STORE + S.token) || ''; } catch (e) { return ''; } }
+  function storeKey(k) { try { if (k) window.sessionStorage.setItem(KEY_STORE + S.token, k); else window.sessionStorage.removeItem(KEY_STORE + S.token); } catch (e) { /* storage off */ } }
+  /** Every call carries the key; the server asks for it only when the link has one. */
+  function call(action, extra) { return App.api.viewer(action, S.token, Object.assign({ accessKey: S.key || undefined }, extra || {})); }
+  var KEY_ERRORS = ['key_needed', 'bad_access_key', 'key_locked'];
 
   function bdi(text) { return h('bdi', { lang: 'ar' }, text || ''); }
 
@@ -18,11 +26,11 @@
   }
 
   async function load() {
-    S.data = await App.api.viewer('viewer.data', S.token, { slug: S.slug, mode: S.mode === 'auto' ? 'all' : S.mode, dayId: S.dayId });
+    S.data = await call('viewer.data', { slug: S.slug, mode: S.mode === 'auto' ? 'all' : S.mode, dayId: S.dayId });
     var d = S.data;
     if (S.mode === 'auto') {
       S.mode = d.kind === 'reservation' && (d.days || []).some(function (x) { return x.date && x.date === d.today; }) ? 'today' : 'all';
-      if (S.mode === 'today') S.data = await App.api.viewer('viewer.data', S.token, { slug: S.slug, mode: 'today' });
+      if (S.mode === 'today') S.data = await call('viewer.data', { slug: S.slug, mode: 'today' });
     }
   }
 
@@ -31,16 +39,48 @@
     S.token = p.t;
     S.slug = p.f;
     if (!S.token) { S.error = 'This link is missing its access code. Ask for a new one.'; return render(); }
+    S.key = storedKey();
+    await open();
+  };
+
+  async function open() {
     try {
-      S.me = await App.api.viewer('viewer.me', S.token);
+      S.me = await call('viewer.me');
+      S.askKey = false; S.keyError = '';
+      storeKey(S.key);
       var known = S.me.forms.some(function (f) { return f.slug === S.slug; });
       if (!known) S.slug = S.me.forms[0] ? S.me.forms[0].slug : '';
       if (S.slug) await load();
     } catch (e) {
-      S.error = e.message;
+      if (KEY_ERRORS.indexOf(e.code) !== -1) {
+        // A stored key that stopped working (a new key was made) is forgotten.
+        storeKey('');
+        S.askKey = true;
+        S.keyError = e.code === 'key_needed' ? '' : e.message;
+      } else S.error = e.message;
     }
     render();
-  };
+  }
+
+  /** The link has a key: ask for it, and keep a wrong one in its field with the reason. */
+  function keyView() {
+    var input = h('input', { class: 'input key-input', id: 'access-key', type: 'text', inputmode: 'numeric', maxlength: '6', autocomplete: 'one-time-code', placeholder: '000000', 'aria-label': 'Access key', 'aria-describedby': 'access-key-err', value: S.key });
+    var busy = false;
+    return h('div', { class: 'login' }, h('div', { class: 'sheet' }, h('div', { class: 'wrap' },
+      h('h1', { class: 'step-title' }, 'Enter the access key'),
+      h('p', null, 'This link also needs the six-digit key that was sent to you separately.'),
+      h('form', { novalidate: 'novalidate', onsubmit: async function (e) {
+        e.preventDefault();
+        if (busy) return;
+        S.key = input.value.replace(/\D/g, '');
+        if (S.key.length !== 6) { S.keyError = 'The key has six digits.'; return render(); }
+        busy = true;
+        await open();
+      } },
+        input,
+        h('p', { class: 'error', id: 'access-key-err', role: 'alert' }, S.keyError || ''),
+        h('div', { class: 'nav' }, h('button', { type: 'submit', class: 'btn btn-primary', name: 'open-view' }, 'Open'))))));
+  }
 
   async function reload(msg) {
     try { await load(); if (msg) toast(msg, 'ok'); } catch (e) { toast(e.message, 'err'); }
@@ -56,6 +96,7 @@
       return root.appendChild(h('div', { class: 'login' }, h('div', { class: 'sheet' }, h('div', { class: 'wrap' },
         h('h1', { class: 'step-title' }, 'This link cannot be opened'), h('p', null, S.error)))));
     }
+    if (S.askKey) { root.appendChild(keyView()); var el = document.getElementById('access-key'); if (el) el.focus(); return; }
     var d = S.data;
     var bar = h('header', { class: 'admin-bar' },
       h('h1', null, d ? d.form.title : 'Registrations'),
@@ -199,7 +240,7 @@
       var cur = (r.review || {})[st.id] || 'pending';
       if (!d.canReview) return h('span', null, st.label.en + ': ', h('span', { class: 'badge ' + cur }, cur));
       var sel = A_select(cur, ['pending', 'approved', 'rejected'].map(function (x) { return [x, x[0].toUpperCase() + x.slice(1)]; }), function (v) {
-        App.api.viewer('viewer.review', S.token, { slug: S.slug, submissionId: r.id, stepId: st.id, status: v })
+        call('viewer.review', { slug: S.slug, submissionId: r.id, stepId: st.id, status: v })
           .then(function () { r.review[st.id] = v; toast(st.label.en + ': ' + v, 'ok'); })
           .catch(function (e) { toast(e.message, 'err'); });
       });

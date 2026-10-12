@@ -113,6 +113,7 @@ step needs the real Google services (see "What could not be tested here").
 | A key opens a summary of the registration: Change opens one page, Done returns, and Save changes appears only after a change | Done |
 | Remove one chosen team member (with Undo) or add one; the team size follows | Done |
 | Admin can look up a student's key (Details, Show key) or reset a lost one | Done |
+| Admin can extend one key from its details, or many from Setup with **Extend keys**: all, the expired ones, those ending in three days, or chosen teams, by a period or to a date; time is added from today or the key's end, whichever is later | Done |
 
 ### Reservations
 | Requirement | Status |
@@ -148,6 +149,8 @@ step needs the real Google services (see "What could not be tested here").
 | Today, by day, or all; search; print | Done |
 | Admin chooses hidden columns (removed on the server, never sent) and whether the link can review | Done |
 | Links can be turned off, replaced, or deleted | Done |
+| A link can also ask for a six-digit access key sent apart from it; wrong keys lock it for ten minutes; the admin can read a lost key again, make a new one, or remove it | Done |
+| A link can end on a date, picked as a period or a day, and the end can be moved from the list | Done |
 
 ### Excel export
 | Requirement | Status |
