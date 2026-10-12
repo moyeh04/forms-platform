@@ -176,8 +176,9 @@
             return h('tr', { class: m.leader ? 'leader' : null },
               h('td', { class: 'num' }, String(k + 1)),
               showName ? h('td', { class: 'nm' }, bdi(m.name), m.leader ? h('span', { class: 'lead-tag' }, icon('star', 13), 'Leader') : null) : null,
-              showSection ? h('td', null, m.section || '-') : null,
-              showCode ? h('td', { class: 'mono' }, m.code) : null, showPhone ? h('td', { class: 'mono' }, m.phone) : null);
+              showSection ? h('td', { dataset: { label: 'Section' } }, m.section || '-') : null,
+              showCode ? h('td', { class: 'mono', dataset: { label: 'Code' } }, m.code) : null,
+              showPhone ? h('td', { class: 'mono tel', dataset: { label: 'Phone' } }, m.phone ? h('a', { href: 'tel:' + m.phone }, m.phone) : '-') : null);
           })))));
     }));
   }

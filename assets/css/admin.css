@@ -234,6 +234,8 @@ body.admin { font-size: 1rem; }
 /* Responses: every team, day and registration is a block with its own tint and a heavy border. */
 .toolbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 14px; }
 .toolbar .input, .toolbar .select { width: auto; min-width: 180px; min-height: 42px; font-size: 1rem; }
+.tool-group { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; padding: 6px 10px; border: 1.5px dashed var(--line); border-radius: 4px; }
+.tool-label { color: var(--mute); font-size: .72rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
 .stats { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
 .stat { padding: 6px 14px; border: 1.5px solid var(--line); border-radius: 4px; background: var(--sheet); font-weight: 700; font-size: var(--fs-label); }
 .stat b { font-size: 1.15rem; margin-inline-end: 6px; }
@@ -305,16 +307,39 @@ body.admin { font-size: 1rem; }
 .data-table tr:nth-child(even) td { background: var(--sheet-2); }
 .scroll-x { overflow-x: auto; }
 
+.mini .tel a { color: inherit; text-decoration: none; }
+
+/* Phones: a team member is a name line and labelled lines under it, all starting at the same edge. */
 @media (max-width: 600px) {
+  .team-card .scroll-x { overflow: visible; }
   .team-card .mini { min-width: 0; table-layout: auto; }
+  .team-card .mini, .team-card .mini tbody { display: block; }
   .team-card .mini thead { display: none; }
-  .team-card .mini tr { display: grid; grid-template-columns: 1.6rem minmax(0, 1fr) minmax(0, 1fr); column-gap: 8px; row-gap: 2px; padding: 9px 14px; border-top: 1px solid color-mix(in srgb, var(--line) 70%, transparent); }
+  .team-card .mini tr { display: grid; grid-template-columns: 1.6rem minmax(0, 1fr) minmax(0, 1fr); column-gap: 8px; row-gap: 3px; padding: 10px 14px; border-top: 1px solid color-mix(in srgb, var(--line) 70%, transparent); }
   .team-card .mini tbody tr:nth-child(even) { background: color-mix(in srgb, var(--ink) 3%, transparent); }
   .team-card .mini tr.leader { background: color-mix(in srgb, var(--band) 10%, transparent); }
-  .team-card .mini td { padding: 0; border: 0; background: none !important; }
-  .team-card .mini td.num { grid-row: 1 / span 2; width: auto; padding-top: 3px; }
+  .team-card .mini td { padding: 0; border: 0; background: none !important; min-width: 0; }
+  .team-card .mini td.num { grid-column: 1; grid-row: 1 / span 3; width: auto; padding-top: 3px; }
   .team-card .mini td.nm { grid-column: 2 / 4; }
-  .team-card .mini td.mono { font-size: .88rem; color: var(--mute); }
+  .team-card .mini td[data-label] { grid-column: 2; display: flex; flex-direction: column; font-size: .95rem; }
+  .team-card .mini td[data-label] + td[data-label]:not(.tel) { grid-column: 3; }
+  .team-card .mini td[data-label]::before { content: attr(data-label); color: var(--mute); font-family: var(--font-body); font-size: .68rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+  .team-card .mini td.tel[data-label] { grid-column: 2 / 4; flex-direction: row; align-items: baseline; gap: 10px; margin-top: 2px; }
+  .team-card .mini td.tel a { display: inline-flex; align-items: center; min-height: 32px; padding: 0 10px; border: 1.5px solid var(--line); border-radius: 999px; color: var(--ink); }
+  .block-head { padding: 10px 14px; }
+  .block-meta { white-space: normal; }
+
+  /* Search fills the row; filters and actions share two equal columns instead of wrapping at random widths. */
+  .toolbar { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .toolbar > * { width: 100%; min-width: 0; justify-content: center; }
+  .toolbar .input, .toolbar .select { width: 100%; min-width: 0; }
+  .toolbar .input[type="search"], .toolbar > .input:first-child { grid-column: 1 / -1; }
+  .toolbar .tool-group { grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .tool-group .tool-label, .tool-group .select { grid-column: 1 / -1; }
+  .tool-group > * { min-width: 0; justify-content: center; }
+  .page-head h2 { flex-basis: 100%; font-size: 1.45rem; }
+  .page-head .btn { flex: 1 1 auto; justify-content: center; }
+  .stats { gap: 6px; }
 }
 
 /* Phones: one header row with the actions, the section links underneath; menus and the save bar stay on screen. */
@@ -339,6 +364,22 @@ body.admin { font-size: 1rem; }
   .block.single .mini td { display: flex; align-items: baseline; gap: 10px; padding: 2px 0; border: 0; background: none !important; white-space: normal; }
   .block.single .mini td[data-label]::before { content: attr(data-label); flex: none; min-width: 6.5rem; color: var(--mute); font-family: var(--font-body); font-size: .72rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
   .block.single .mini td.mono:first-child { font-size: 1.1rem; }
+}
+
+/* Phones: a wide list table becomes one card per row, each value under its column name. */
+@media (max-width: 600px) {
+  .data-table.cards, .data-table.cards tbody { display: block; }
+  .data-table.cards thead { display: none; }
+  .data-table.cards tr { display: block; margin-bottom: 10px; padding: 10px 14px; background: var(--sheet); border: 1.5px solid var(--line); border-radius: 4px; }
+  .data-table.cards td { display: flex; align-items: baseline; gap: 10px; padding: 3px 0; border: 0; background: none !important; }
+  .data-table.cards td.num { display: none; }
+  .data-table.cards td.nm { font-size: 1.1rem; margin-bottom: 4px; }
+  .data-table.cards td[data-label]::before { content: attr(data-label); flex: none; width: 7.5rem; color: var(--mute); font-family: var(--font-body); font-size: .72rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+  .data-table.cards td:empty { display: none; }
+  .data-table.cards td:last-child { margin-top: 6px; }
+  .data-table.cards .actions .btn { flex: 1 1 auto; justify-content: center; }
+  .dialog-actions { flex-wrap: wrap; }
+  .dialog-actions .btn { flex: 1 1 auto; white-space: nowrap; justify-content: center; }
 }
 
 @media print {

@@ -21,14 +21,14 @@
     mount.appendChild(h('p', { class: 'help' }, 'A private link lets an instructor or client see chosen forms without a Google account or a PIN. It is read-only, and you choose which columns they see. Turn a link off at any time.'));
     if (!clients.length) return mount.appendChild(h('div', { class: 'empty' }, 'No private links yet.'));
 
-    mount.appendChild(h('div', { class: 'scroll-x' }, h('table', { class: 'data-table' },
+    mount.appendChild(h('div', { class: 'scroll-x' }, h('table', { class: 'data-table cards' },
       h('thead', null, h('tr', null, ['Name', 'Can see', 'Hidden columns', 'Can review', 'Link', ''].map(function (c) { return h('th', null, c); }))),
       h('tbody', null, clients.map(function (c) {
         var access = c.forms.indexOf('*') !== -1 ? 'All forms' : c.forms.map(function (s) { var f = forms.filter(function (x) { return x.slug === s; })[0]; return f ? f.title : s; }).join(', ');
         return h('tr', { dataset: { client: c.id } },
-          h('td', null, h('strong', null, c.name)), h('td', null, access || 'No forms'),
-          h('td', null, c.hiddenColumns.length ? c.hiddenColumns.join(', ') : 'None'), h('td', null, c.canReview ? 'Yes' : 'No'),
-          h('td', null, A.badge(c.active ? 'On' : 'Off', c.active ? 'open' : 'closed')),
+          h('td', { class: 'nm' }, h('strong', null, c.name)), h('td', { dataset: { label: 'Can see' } }, access || 'No forms'),
+          h('td', { dataset: { label: 'Hidden columns' } }, c.hiddenColumns.length ? c.hiddenColumns.join(', ') : 'None'), h('td', { dataset: { label: 'Can review' } }, c.canReview ? 'Yes' : 'No'),
+          h('td', { dataset: { label: 'Link' } }, A.badge(c.active ? 'On' : 'Off', c.active ? 'open' : 'closed')),
           h('td', null, h('div', { class: 'actions' },
             h('button', { type: 'button', class: 'btn btn-quiet sm', name: 'edit', onclick: function () { clientDialog(c, forms); } }, 'Edit'),
             h('button', { type: 'button', class: 'btn btn-quiet sm', name: 'regenerate', onclick: function (e) {

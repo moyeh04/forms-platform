@@ -173,3 +173,13 @@ test('Instructor link: only the forms shared with the client are listed', async 
   assert.equal(p.$('h1').textContent, 'Seminar B');
   assert.equal(p.$$('select').some((s) => [...s.options].some((o) => o.value === a.slug)), false);
 });
+
+test('Instructor link: each member value names its column and the phone is a call link', async () => {
+  const w = boot();
+  const f = w.make('team_registration', 'Teams');
+  w.api({ action: 'submit', slug: f.slug, data: person({ title: 'Library', team_size: '1', members: [] }) });
+  const p = await openViewer(w, w.client());
+  const labels = p.$$('.team-card tbody tr:first-child td[data-label]').map((c) => c.dataset.label);
+  assert.deepEqual(labels, ['Section', 'Code', 'Phone'], 'the phone layout prints these in place of the table head');
+  assert.equal(p.$('.team-card td.tel a').getAttribute('href'), 'tel:01012345678');
+});

@@ -648,3 +648,25 @@ test('Settings: saving project and task forms preserves enabled teammate collect
     p.dom.window.close();
   }
 });
+
+test('Responses and clients: list rows carry their column names, and the day sheet controls are one group', async () => {
+  const w = boot();
+  const groups = w.admin({ action: 'admin.forms.create', type: 'whatsapp_registration', title: 'Groups', batchYear: '2028/2029' }).form;
+  w.admin({ action: 'admin.forms.update', id: groups.id, patch: { status: 'open' } });
+  w.api({ action: 'submit', slug: groups.slug, data: { email: 'a@b.com', name: 'أحمد محمد محمود أحمد', phone: '01012345678', code: '4230001', level: 'صفر / الأولى', major: 'حاسبات', group: 'A', section: '21', schedule: 'https://drive.google.com/file/d/' + 't'.repeat(33) + '/view' } });
+  const list = await openAdmin(w, `#/f/${groups.slug}`);
+  list.clickText('All registrations'); await settle(6);
+  const labels = list.$$('.data-table.cards tbody tr:first-child td[data-label]').map((c) => c.dataset.label);
+  assert.deepEqual(labels.slice(0, 5), ['Code', 'Phone', 'Group', 'Section', 'Timetable']);
+  assert.equal(labels[labels.length - 1], 'Status');
+
+  w.admin({ action: 'admin.clients.create', name: 'Dr. Ahmed', forms: [groups.slug] });
+  const clients = await openAdmin(w, '#/clients');
+  assert.deepEqual(clients.$$('.data-table.cards tbody td[data-label]').map((c) => c.dataset.label), ['Can see', 'Hidden columns', 'Can review', 'Link']);
+
+  const seminar = w.admin({ action: 'admin.forms.create', type: 'reservation', title: 'Seminar', term: 'Fall 2027' }).form;
+  const res = await openAdmin(w, `#/f/${seminar.slug}`);
+  const group = res.$('.tool-group');
+  assert.equal(group.getAttribute('aria-label'), 'Print a day sheet');
+  assert.ok(group.querySelector('select') && group.querySelector('[name="printDay"]') && group.querySelector('input[type="checkbox"]'));
+});
