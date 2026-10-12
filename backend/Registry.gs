@@ -226,6 +226,7 @@ function updateForm(id, patch) {
     }
     form[k] = patch[k];
   });
+  if (patch.fields !== undefined || patch.steps !== undefined) normalizeQuestions_(form);
   return saveForm(form);
 }
 
