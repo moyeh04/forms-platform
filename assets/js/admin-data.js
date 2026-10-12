@@ -105,6 +105,8 @@
       h('button', { type: 'button', class: 'btn btn-quiet sm', onclick: function () { exportCsv(form, filtered()); } }, icon('download', 18), 'Download CSV')];
     if (form.type === 'team_registration' || form.type === 'task_submission') {
       tools.push(h('button', { type: 'button', class: 'btn btn-quiet sm', name: 'printTeams', onclick: function (e) { printOut(e.currentTarget, 'admin.print.teamList', {}); } }, icon('printer', 18), 'Print team list'));
+      // Shown only once there is something to download.
+      if (all.length) tools.push(h('button', { type: 'button', class: 'btn btn-quiet sm', name: 'download-all', onclick: function () { A.downloadAll(form); } }, icon('download', 18), form.type === 'task_submission' ? 'Download all tasks' : 'Download all projects'));
     }
     if (form.type === 'reservation') {
       var day = ((form.slots && form.slots.days) || [])[0];
