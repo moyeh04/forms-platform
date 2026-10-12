@@ -129,6 +129,8 @@ step needs the real Google services (see "What could not be tested here").
 | Phone layout (up to 600px): member rows, bookings, WhatsApp registrations and private links stack as cards with each value under its column name; a phone number is a call link; toolbars use two equal columns and the day sheet controls stay in one labelled group | Done |
 | One form, four tabs (Responses, Questions, Timetable, Setup) with the status in the header; settings fold to one line that says what they are set to; the save bar appears only when something changed and leaving with unsaved changes asks first | Done |
 | Questions listed under the page of the form that shows them, as rows that stack on a narrow screen | Done |
+| Your own questions (short answer, long answer, one choice from a list) on any page; answers appear in Details and in the CSV | Done |
+| Pages of the form: add a page with its title in both languages, rename, reorder, move any question to another page | Done |
 | Bookings per slot (1 to 50) as its own control at the top of the timetable | Done |
 | Print team list and print a day's reservations from a sheet menu and from the dashboard, with PDF export | Done, check live |
 | WhatsApp split screen: pasted request numbers matched to registrations by phone, timetable preview, approve or reject, two review steps | Done |
@@ -178,7 +180,7 @@ the first-deployment setup, and the Excel export; `tests/` holds the automated t
 
 ```
 npm install          # once, installs the browser test library
-npm test             # 224 tests: rules, backend, form page, dashboard, instructor page, deployment
+npm test             # 226 tests: rules, backend, form page, dashboard, instructor page, deployment
 npm run build        # writes dist/Code.gs and dist/appsscript.json for clasp
 npm run setup        # first deployment: creates the sheet, pushes the backend, creates the web app, configures GitHub
 npm run dev          # local preview on http://localhost:8080 (PIN 4321), in memory, no Google needed

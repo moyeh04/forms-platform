@@ -24,7 +24,7 @@ sheet, not code.
 | **One source of truth for rules** | `shared/rules.js` is used by the browser, the backend, and the tests. They cannot disagree. |
 | **Forms are data** | A form is a JSON definition in one cell. New questions and new form types need no code. |
 | **Boring technology** | Plain JavaScript, no framework, no bundler for the website, one concatenation script for the backend. Easy to read, easy to fix later. |
-| **Testable without Google** | An in-memory copy of Google's services runs the real backend code, so 224 JavaScript tests cover it without touching a real account. |
+| **Testable without Google** | An in-memory copy of Google's services runs the real backend code, so 226 JavaScript tests cover it without touching a real account. |
 
 ## System context
 
@@ -851,6 +851,17 @@ Rules for this page, to keep when a setting is added:
   `A.unsaved`, and the browser asks before the window closes.
 - **A refused save shows where.** `problem()` returns the first thing that
   stops a save and its section; the page opens that tab and that section.
+- **Pages and questions are data.** `steps` is the list of pages (id, title in
+  both languages, the ids of its questions in order) and `fields` is the list
+  of questions. The Questions tab edits both: a page can be added, renamed,
+  moved and, while it is empty, removed; a question can be moved to another
+  page or up and down. A question the admin adds has `custom: true`, an id that
+  starts with `q_`, and the type `text`, `textarea` or `select` with its own
+  `options`. `normalizeQuestions_` in `Questions.gs` cleans both lists on every
+  save. The student form already draws any question of a page and skips a page
+  with no questions, and an answer is stored under the id of its question in
+  the `data` JSON, so no sheet column changes. Team size, team members and the
+  booking slot stay on their page.
 - **Limit a list with `allowPicker`.** A rule that keeps some values of a list
   (specializations, sections) uses the `allowPicker` chips, stores the values
   under the name of the list in `rules`, and adds that name to
@@ -906,6 +917,6 @@ labels of the current tables.
 | [HOSTING.md](HOSTING.md) | What GitHub does, what Google does, and how they fit |
 | [DATA-MODEL.md](../reference/DATA-MODEL.md) | Every sheet, column, and stored property |
 | [SECURITY.md](../reference/SECURITY.md) | The secrets, who holds them, and what a leak would mean |
-| [TESTING.md](../reference/TESTING.md) | How 244 tests run without Google |
+| [TESTING.md](../reference/TESTING.md) | How 246 tests run without Google |
 | [DEPLOY.md](../DEPLOY.md) | Click-by-click setup |
 | [MODULES.md](../MODULES.md) | File-by-file reference |

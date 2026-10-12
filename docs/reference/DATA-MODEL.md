@@ -113,8 +113,8 @@ The `config` cell is the reason new forms need no code:
 | `subject` | Subject code shown beside the title, such as `CMPn323` (letters, digits, dashes, no spaces) |
 | `lang` | Default language and whether students see the switch |
 | `icon` | `team`, `calendar`, `task`, `chat`, or `none` |
-| `fields` | The questions: id, type, role, labels and an optional description (`help`) in English and Arabic, required, enabled, list name, name parts |
-| `steps` | How questions are grouped into pages |
+| `fields` | The questions: id, type, role, labels and an optional description (`help`) in English and Arabic, required, enabled, list name, name parts. A question added by the admin has `custom: true`, an id that starts with `q_`, the type `text`, `textarea` or `select`, and for `select` its own `options` |
+| `steps` | The pages of the form in order: id, `title` in English and Arabic, and the ids of its questions in order. The admin can add, rename and reorder pages |
 | `rules` | `uniqueBy`, `uniqueAcrossForm`, `driveCheck`, `maxSubmissions`, `majors` (specializations allowed to register; empty means all), `sections` (sections offered and accepted; empty means all), `folderName { enabled, subject }` (Drive folder names must be `Team_Leader_Name_Project_Name_Subject_Name`; the subject name, for example `Software_Engineering`; empty accepts any subject name), **`teamSize { min, max, notice }`**. `notice` is optional: `{ sizes: [3, 4], text: { en, ar } }`, a note shown to students who pick one of those sizes; `{n}` and `{max}` are filled in |
 | `editKey` | `enabled`, `days`, `allowEdit`, `allowDelete` |
 | `slots` | Reservation days (id, label, date, times), `capacity`, and `pattern { start, end, length, gap }`: the session hours new days start with |

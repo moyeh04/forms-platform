@@ -319,7 +319,95 @@
 
     /* Fields ----------------------------------------------------- */
     var rows = [];
+    var qList = h('div', { class: 'q-list' });
+    var toolsOpen = {};
+    // Questions that belong to a page for a reason: the member forms follow the size, and a booking is its own page.
+    var FIXED_ROLES = ['team_size', 'members', 'slot'];
+    var KINDS = [['text', 'Short answer'], ['textarea', 'Long answer'], ['select', 'One choice from a list']];
     function hasHelp(fd) { return !!(fd.help && ((fd.help.en || '').trim() || (fd.help.ar || '').trim())); }
+    function pageName(st) { return (st.title && (st.title.en || st.title.ar)) || 'Page with no title'; }
+    function pageOf(fd) { return (f.steps || []).filter(function (st) { return (st.fields || []).indexOf(fd.id) !== -1; })[0] || null; }
+    function moveToPage(fd, id) {
+      var from = pageOf(fd);
+      if (from) from.fields = from.fields.filter(function (x) { return x !== fd.id; });
+      var to = f.steps.filter(function (st) { return st.id === id; })[0];
+      to.fields = (to.fields || []).concat([fd.id]);
+      paintQuestions();
+    }
+    function shift(fd, by) {
+      var list = pageOf(fd).fields;
+      var at = list.indexOf(fd.id), to = at + by;
+      if (to < 0 || to >= list.length) return;
+      list.splice(at, 1); list.splice(to, 0, fd.id);
+      paintQuestions();
+    }
+    function addQuestion(st) {
+      var id = 'q_' + Math.random().toString(36).slice(2, 10);
+      var fd = { id: id, type: 'text', custom: true, label: { en: '', ar: '' }, required: false, enabled: true };
+      f.fields.push(fd);
+      st.fields = (st.fields || []).concat([id]);
+      toolsOpen[id] = true;
+      paintQuestions();
+      var input = qList.querySelector('[data-field="' + id + '"] input[type="text"]');
+      if (input && input.focus) input.focus();
+    }
+    function removeQuestion(fd) {
+      f.fields = f.fields.filter(function (x) { return x !== fd; });
+      (f.steps || []).forEach(function (st) { st.fields = (st.fields || []).filter(function (x) { return x !== fd.id; }); });
+      paintQuestions();
+    }
+    /** The heading of a page: its number, its title in both languages, its place among the pages, and Remove while it is empty. */
+    function pageHead(st, n) {
+      st.title = st.title || { en: st.id, ar: st.id };
+      var empty = !(st.fields || []).length;
+      var move = function (by) { f.steps.splice(n, 1); f.steps.splice(n + by, 0, st); paintQuestions(); };
+      return h('div', { class: 'q-page', dataset: { page: st.id } },
+        h('span', { class: 'tt-num' }, String(n + 1)),
+        h('div', { class: 'q-labels' },
+          A.text(st.title.en, function (v) { st.title.en = v; }, { name: 'page-title-en-' + st.id, 'aria-label': 'English title of page ' + (n + 1), placeholder: 'Page title, in English' }),
+          A.text(st.title.ar, function (v) { st.title.ar = v; }, { name: 'page-title-ar-' + st.id, 'aria-label': 'Arabic title of page ' + (n + 1), dir: 'rtl', lang: 'ar', placeholder: 'عنوان الصفحة' })),
+        h('div', { class: 'q-opts' },
+          h('button', { type: 'button', class: 'icon-btn sm', name: 'page-up-' + st.id, 'aria-label': 'Move page ' + (n + 1) + ' up', disabled: n === 0, onclick: function () { move(-1); } }, '↑'),
+          h('button', { type: 'button', class: 'icon-btn sm', name: 'page-down-' + st.id, 'aria-label': 'Move page ' + (n + 1) + ' down', disabled: n === f.steps.length - 1, onclick: function () { move(1); } }, '↓'),
+          // A page is removed only when nothing is on it, so removing a page never removes a question.
+          empty && f.steps.length > 1 ? h('button', { type: 'button', class: 'btn btn-quiet sm danger', name: 'remove-page-' + st.id, onclick: function () { f.steps.splice(n, 1); paintQuestions(); } }, icon('trash', 16), 'Remove page') : null));
+    }
+    function addPage() {
+      var st = { id: 'p_' + Math.random().toString(36).slice(2, 10), custom: true, title: { en: '', ar: '' }, fields: [] };
+      f.steps = (f.steps || []).concat([st]);
+      paintQuestions();
+      var input = qList.querySelector('[name="page-title-en-' + st.id + '"]');
+      if (input && input.focus) input.focus();
+    }
+    /** "Yes" or "Yes | نعم" on each line. */
+    function readChoices(text) {
+      return String(text || '').split('\n').map(function (line) {
+        var parts = line.split('|').map(function (x) { return x.trim(); });
+        return parts[0] ? { value: parts[0], label: { en: parts[0], ar: parts[1] || parts[0] } } : null;
+      }).filter(Boolean);
+    }
+    /** Where the question is, and for an added question what kind it is. Folded until asked for, to keep the list short. */
+    function toolsRow(fd) {
+      var page = pageOf(fd);
+      var movable = FIXED_ROLES.indexOf(fd.role) === -1 && (f.steps || []).length > 1 && page;
+      if (!movable && !fd.custom) return null;
+      var list = page ? page.fields : [];
+      var pageSel = movable ? A.select(page.id, f.steps.map(function (st, n) { return [st.id, (n + 1) + '. ' + pageName(st)]; }), function (v) { moveToPage(fd, v); }) : null;
+      if (pageSel) pageSel.name = 'page-' + fd.id;
+      var kindSel = fd.custom ? A.select(fd.type, KINDS, function (v) { fd.type = v; if (v !== 'select') delete fd.options; paintQuestions(); }) : null;
+      if (kindSel) kindSel.name = 'kind-' + fd.id;
+      var choices = fd.custom && fd.type === 'select' ? h('label', { class: 'field-row q-choices' }, h('span', { class: 'label' }, 'Choices, one on each line'),
+        h('textarea', { class: 'textarea', rows: '4', name: 'choices-' + fd.id, placeholder: 'Yes\nNo\nTo add the Arabic text: Yes | نعم', oninput: function (e) { fd.options = readChoices(e.target.value); } },
+          (fd.options || []).map(function (o) { return o.label.ar && o.label.ar !== o.label.en ? o.label.en + ' | ' + o.label.ar : o.label.en; }).join('\n'))) : null;
+      return h('div', { class: 'q-tools', dataset: { tools: fd.id }, hidden: !toolsOpen[fd.id] },
+        pageSel ? h('label', { class: 'q-tool' }, h('span', { class: 'tool-label' }, 'Page'), pageSel) : null,
+        movable ? h('span', { class: 'q-tool' }, h('span', { class: 'tool-label' }, 'Order'),
+          h('button', { type: 'button', class: 'icon-btn sm', name: 'up-' + fd.id, 'aria-label': 'Move up', disabled: list.indexOf(fd.id) === 0, onclick: function () { shift(fd, -1); } }, '↑'),
+          h('button', { type: 'button', class: 'icon-btn sm', name: 'down-' + fd.id, 'aria-label': 'Move down', disabled: list.indexOf(fd.id) === list.length - 1, onclick: function () { shift(fd, 1); } }, '↓')) : null,
+        kindSel ? h('label', { class: 'q-tool' }, h('span', { class: 'tool-label' }, 'Kind of answer'), kindSel) : null,
+        fd.custom ? h('button', { type: 'button', class: 'btn btn-quiet sm danger', name: 'remove-' + fd.id, title: 'Answers already given stay in the Google Sheet but are no longer shown.', onclick: function () { removeQuestion(fd); } }, icon('trash', 16), 'Remove question') : null,
+        choices);
+    }
     function fieldRow(fd, sub) {
       var locked = LOCKED_ROLES.indexOf(fd.role) !== -1;
       // The description stays hidden until it has text or the admin asks for it.
@@ -333,33 +421,46 @@
         descRow.hidden = false; descBtn.hidden = true;
         var first = descRow.querySelector('textarea'); if (first) first.focus();
       } }, '+ Description');
-      var row = h('div', { class: 'q-row' + (sub ? ' sub' : ''), dataset: { field: fd.id } },
+      var tools = sub ? null : toolsRow(fd);
+      var toolsBtn = tools ? h('button', { type: 'button', class: 'link-btn add-desc', name: 'tools-' + fd.id, 'aria-expanded': toolsOpen[fd.id] ? 'true' : 'false', onclick: function () {
+        toolsOpen[fd.id] = tools.hidden; tools.hidden = !tools.hidden; toolsBtn.setAttribute('aria-expanded', tools.hidden ? 'false' : 'true');
+      } }, fd.custom ? 'Page and kind' : 'Page') : null;
+      var kind = (KINDS.filter(function (k) { return fd.custom && k[0] === fd.type; })[0] || [])[1];
+      var row = h('div', { class: 'q-row' + (sub ? ' sub' : '') + (fd.custom ? ' custom' : ''), dataset: { field: fd.id } },
         h('div', { class: 'q-show' }, A.check('Show', fd.enabled !== false, function (v) { fd.enabled = v; row.classList.toggle('off', !v); }, locked)),
         h('div', { class: 'q-labels' },
-          A.text(fd.label.en, function (v) { fd.label.en = v; }, { 'aria-label': 'English label for ' + fd.id }),
-          A.text(fd.label.ar, function (v) { fd.label.ar = v; }, { 'aria-label': 'Arabic label for ' + fd.id, dir: 'rtl', lang: 'ar' })),
+          A.text(fd.label.en, function (v) { fd.label.en = v; }, { 'aria-label': 'English label for ' + fd.id, placeholder: fd.custom ? 'Your question, in English' : null }),
+          A.text(fd.label.ar, function (v) { fd.label.ar = v; }, { 'aria-label': 'Arabic label for ' + fd.id, dir: 'rtl', lang: 'ar', placeholder: fd.custom ? 'السؤال بالعربي' : null })),
         h('div', { class: 'q-opts' },
           A.check('Required', fd.required !== false, function (v) { fd.required = v; }, locked),
-          fd.type === 'arabic_name' ? h('label', { class: 'q-parts' }, A.number(fd.minParts || 4, function (v) { fd.minParts = parseInt(v, 10) || 4; }, { class: 'input num', min: '2', max: '6', 'aria-label': 'Name parts for ' + fd.id }), 'name parts') : h('span', { class: 'q-type' }, fd.type.replace('_', ' ')),
-          descBtn));
+          fd.type === 'arabic_name' ? h('label', { class: 'q-parts' }, A.number(fd.minParts || 4, function (v) { fd.minParts = parseInt(v, 10) || 4; }, { class: 'input num', min: '2', max: '6', 'aria-label': 'Name parts for ' + fd.id }), 'name parts') : h('span', { class: 'q-type' }, kind ? 'added · ' + kind.toLowerCase() : fd.type.replace('_', ' ')),
+          descBtn, toolsBtn));
       if (fd.enabled === false) row.classList.add('off');
-      rows.push(row, descRow);
+      rows.push(row, descRow, tools);
       if (fd.type === 'members') (fd.fields || []).forEach(function (sf) { fieldRow(sf, true); });
     }
     // Questions are listed under the page of the form that shows them, in the order students meet them.
-    var listed = (f.fields || []).filter(function (fd) { return !(isReservation && fd.role === 'members'); });
-    var placed = {};
-    (f.steps || []).forEach(function (st, n) {
-      var mine = (st.fields || []).map(function (id) { return listed.filter(function (fd) { return fd.id === id; })[0]; }).filter(Boolean);
-      if (!mine.length) return;
-      rows.push(h('h3', { class: 'q-page', dataset: { page: st.id } }, h('span', { class: 'tt-num' }, String(n + 1)), (st.title && st.title.en) || st.id));
-      mine.forEach(function (fd) { placed[fd.id] = true; fieldRow(fd, false); });
-    });
-    var loose = listed.filter(function (fd) { return !placed[fd.id]; });
-    if (loose.length && rows.length) rows.push(h('h3', { class: 'q-page', dataset: { page: '' } }, 'Not on a page'));
-    loose.forEach(function (fd) { fieldRow(fd, false); });
-    var fieldsPanel = panel('Questions', 'Rename a question, hide the ones you do not need, or make optional ones required. Add a description to explain a question: students see it right under the question. Team size, names, codes, and the booking slot are always required. For names, the number is how many name parts are needed (4 means a four-part name).',
-      h('div', { class: 'q-list' }, rows));
+    function paintQuestions() {
+      rows = [];
+      var listed = (f.fields || []).filter(function (fd) { return !(isReservation && fd.role === 'members'); });
+      var placed = {};
+      (f.steps || []).forEach(function (st, n) {
+        var mine = (st.fields || []).map(function (id) { return listed.filter(function (fd) { return fd.id === id; })[0]; }).filter(Boolean);
+        rows.push(pageHead(st, n));
+        mine.forEach(function (fd) { placed[fd.id] = true; fieldRow(fd, false); });
+        if (!mine.length) rows.push(h('p', { class: 'muted-note q-empty' }, 'This page has no questions yet. Students do not see a page with no questions.'));
+        rows.push(h('button', { type: 'button', class: 'btn btn-quiet sm q-add', name: 'add-question-' + st.id, onclick: function () { addQuestion(st); } }, icon('plus', 16), 'Add a question to this page'));
+      });
+      var loose = listed.filter(function (fd) { return !placed[fd.id]; });
+      if (loose.length && (f.steps || []).length) rows.push(h('h3', { class: 'q-page', dataset: { page: '' } }, 'Not on a page (students do not see these)'));
+      loose.forEach(function (fd) { fieldRow(fd, false); });
+      rows.push(h('button', { type: 'button', class: 'btn btn-quiet q-add-page', name: 'add-page', onclick: addPage }, icon('plus', 18), 'Add a page'));
+      ui.clear(qList);
+      rows.forEach(function (n) { if (n) qList.appendChild(n); });
+    }
+    paintQuestions();
+    var fieldsPanel = panel('Questions', 'Each page of the form and its questions, in the order students see them. Rename a page, add a page, or move a question to another page with Page. Rename a question, hide it, make it required, or give it a description. Add your own questions to any page. Team size, names, codes, and the booking slot are always required. For names, the number is how many name parts are needed (4 means a four-part name).',
+      qList);
     fieldsPanel.summary = function () {
       var all = [];
       (f.fields || []).forEach(function (fd) { if (!(isReservation && fd.role === 'members')) all.push(fd); });
@@ -698,6 +799,7 @@
         lang: f.lang, icon: f.icon, editKey: f.editKey, rules: f.rules, notifications: f.notifications,
         fields: f.fields, review: f.review
       };
+      if (f.steps) patch.steps = f.steps;
       if (isReservation && reservationMembers) {
         reservationMembers.enabled = !!reservationMembers.enabled;
         reservationMembers.required = reservationMembers.enabled;
@@ -720,6 +822,11 @@
     };
     /** The first thing that stops a save, with the section it is in; null when the page can be saved. */
     var problem = function () {
+      if ((f.steps || []).some(function (st) { return !(st.title.en || '').trim() && !(st.title.ar || '').trim(); })) return { panel: fieldsPanel, text: 'Give every page a title, or remove the page.' };
+      var added = (f.fields || []).filter(function (fd) { return fd.custom; });
+      if (added.some(function (fd) { return !(fd.label.en || '').trim() && !(fd.label.ar || '').trim(); })) return { panel: fieldsPanel, text: 'Write the question for every question you added, or remove it.' };
+      var few = added.filter(function (fd) { return fd.type === 'select' && (fd.options || []).length < 2; })[0];
+      if (few) return { panel: fieldsPanel, text: '"' + (few.label.en || few.label.ar) + '" needs at least two choices.' };
       if (hasSize) {
         var min = parseInt(f.rules.teamSize.min, 10), max = parseInt(f.rules.teamSize.max, 10);
         if (!(min >= 1) || !(max >= min) || max > 20) return { panel: sizePanel, text: 'Team size needs a minimum of at least 1 and a maximum that is not lower, up to 20.' };

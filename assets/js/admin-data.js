@@ -388,12 +388,14 @@
   function csvCell(v) { return '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"'; }
 
   function exportCsv(form, rows) {
-    var head = ['Reference', 'Sent', 'Status', 'Name', 'Code', 'Phone', 'Email', 'Title', 'Link', 'Slot', 'Members'];
+    // Questions the admin added come after the fixed columns, one column each.
+    var added = (form.fields || []).filter(function (fd) { return fd.custom; });
+    var head = ['Reference', 'Sent', 'Status', 'Name', 'Code', 'Phone', 'Email', 'Title', 'Link', 'Slot', 'Members'].concat(added.map(function (fd) { return fd.label.en; }));
     var lines = [head].concat(rows.map(function (s) {
       var members = form.type === 'reservation'
         ? (Rules.fieldByRole(form, 'members').enabled !== false ? (s.data.members || []).map(function (member) { return member.name + ' (' + member.code + ')'; }).join('; ') : '')
         : s.members;
-      return [s.ref, s.created, s.status, s.name, s.code, s.phone, s.email, s.title, s.link, slotText(form, s.data.slot), members];
+      return [s.ref, s.created, s.status, s.name, s.code, s.phone, s.email, s.title, s.link, slotText(form, s.data.slot), members].concat(added.map(function (fd) { return s.data[fd.id] == null ? '' : String(s.data[fd.id]); }));
     }));
     var csv = '\ufeff' + lines.map(function (r) { return r.map(csvCell).join(','); }).join('\r\n');
     try {
