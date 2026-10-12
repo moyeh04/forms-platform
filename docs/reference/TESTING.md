@@ -1,12 +1,11 @@
 # Testing
 
-288 automated tests run without a Google account, a browser, or a network.
+265 automated tests run without a Google account, a browser, or a network.
 They run the **real** backend and the **real** pages. This page explains how
 that works and what it can and cannot prove.
 
 ```
-npm test                                              # 268 JavaScript tests
-python3 -m unittest discover -s tests -p "test_*.py"  # 20 Python tests
+npm test    # 265 tests
 ```
 
 ## The layers
@@ -38,27 +37,24 @@ flowchart TD
     subgraph tools["Test tools"]
         harness["appsscript-mock.js<br/>in-memory Google"]
         dom["dom.js<br/>jsdom pages wired to the harness"]
-        srv["local HTTP server<br/>stands in for Google in Python tests"]
     end
     subgraph units["Unit"]
         rules["rules.test.js<br/>pure validation"]
         team["teamsize.test.js"]
     end
     subgraph backend["Backend through the in-memory world"]
-        core["core, submissions, reservations,<br/>views, print, matching, viewer, export"]
+        core["core, submissions, reservations,<br/>views, print, matching, viewer, download"]
     end
     subgraph pages["Whole pages"]
         fui["form-ui.test.js"]
         aui["admin-ui.test.js"]
         vui["viewer-ui.test.js"]
     end
-    py["test_download_tasks.py<br/>export script and workbook"]
 
     harness --> backend
     harness --> dom
     dom --> pages
     rules --> backend
-    srv --> py
     classDef cDb fill:#F3E2B3,stroke:#B8892D,stroke-width:1.5px,color:#2F2418
     classDef cActor fill:#F4D9D3,stroke:#9A3328,stroke-width:1.5px,color:#2F2418
     classDef cDec fill:#FBEFC9,stroke:#C9A24A,stroke-width:1.5px,color:#2F2418
@@ -152,14 +148,12 @@ function that calls `world.api`. Helpers `type`, `pick`, `click`,
 | Member transfers | 8 | Refusal that lists who can be asked for, the request and the team saved without the member, approval by the leader and by the admin, rejection, cancelling, a full team, a leader, two requests for one student, a removed team, the switch and the list under Responses |
 | Matching | 6 | Paste, normalise, matched, none, duplicate, sequential review |
 | Viewer API | 13 | Tokens, hidden columns, today and by day, review rights, revoked links, access keys with the lock after wrong tries, reading a lost key again, links that end on a date and open again when it moves |
-| Export API | 3 | Teams with members, no phones, PIN required, deleted left out |
 | Student page | 35 | Steps, filters, descriptions, team size picker and notes, remove and add a member with Undo, the summary a key opens, the ship over the current step, audience line, subject tag, slots, review, ticket and email notice, edit by key, themes, Arabic, asking for a member of another team, answering a request with Approve, Reject or Later, a task locked after its deadline |
 | Admin page | 50 | Login, create with term chips, team size and notes, descriptions, who can register, locked fields, team cards, show key, teammates of a booking (how many, title, details asked), timetable calendar, hours, a day with its own hours and booked slots, delete, matching, clients with the link shown once and the key apart, a lost key shown again, a link end picked and moved, Extend keys for expired keys and chosen teams, one registration's key extended from its details, Download all with what was not downloaded and the saved zip, lists as chips or rows with the reason for a refused save, sections built from groups and counts, number runs with steppers, new lists picked for a question, column names on list rows for the phone layout, the day sheet group, form tabs that keep edits, section summaries, save bar only while there is a change, sections by one or by year group, added questions and pages, new form preview and title reason |
 | Instructor page | 10 | Today, by day, hidden columns, review rights, invalid links, member values named for the phone layout, phone as a call link |
 | Harness | 4 | The fake itself |
 | Colour contrast | 4 | Every text and outline pair meets WCAG AA in light, dark, and device-dark themes |
 | Deployment | 14 | `API_URL` validation, URL and deployment ID agree, built pages use the variable URL, clasp configuration, missing credentials, first-deployment setup with a fake `gh` and clasp |
-| Excel export (Python) | 20 | Link parsing, downloads, virus-scan page, workbook layout, merged cells, Failed sheet |
 
 ## What is not covered, and how to cover it
 
@@ -171,7 +165,7 @@ function that calls `world.api`. Helpers `type`, `pick`, `click`,
 | The 5-minute timer firing | Tests confirm setup installs the trigger once and call `processDirtyViews` directly, but cannot make Google fire it | Check **Triggers** in Apps Script after setup |
 | Google's cross-site redirect behaviour | Needs a real web app | A real submission from the live site |
 | Fonts and exact visuals | jsdom does not render | Look at the page, or use the screenshot scripts below |
-| Excel rendering | Cell properties are asserted, not drawn | Open `Tasks.xlsx`; it was also rendered to an image during development |
+| Excel rendering | Cell properties are asserted, not drawn | Open `Teams.xlsx` from a download in desktop Excel |
 
 The first-run checklist exists because these gaps are real. Everything else is
 exercised on every run.

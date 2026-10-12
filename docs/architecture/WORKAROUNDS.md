@@ -778,8 +778,7 @@ sheet with the reason and its Drive link. See
 [ARCHITECTURE.md](ARCHITECTURE.md#downloading-everything-a-team-form-collected).
 
 **Cost.** A file over 45 MB is listed rather than packed. Relative links open in
-desktop Excel only. The older local script, `scripts/download_tasks.py`, still
-works but downloads through public links.
+desktop Excel only.
 
 ---
 

@@ -73,7 +73,6 @@ flowchart LR
         mail["MailApp<br/>confirmation emails"]
     end
 
-    pyscript["scripts/download_tasks.py<br/>runs on the admin laptop"]
     sheetui["Google Sheets UI<br/>menu and print"]
 
     student --> idx
@@ -86,8 +85,6 @@ flowchart LR
     gas --> fs
     gas --> drive
     gas --> mail
-    pyscript -- "POST JSON + PIN" --> gas
-    pyscript -. "downloads shared files" .-> drive
     admin --> sheetui
     sheetui --- reg
     rules -. "same file loaded by" .-> idx
@@ -600,7 +597,6 @@ flowchart TD
         Matching["Matching.gs<br/>WhatsApp matching"]
         Clients["Clients.gs<br/>private links, access keys, end dates"]
         Viewer["Viewer.gs<br/>read-only data"]
-        Export["Export.gs<br/>team data for Excel"]
         TeamList["TeamList.gs<br/>numbered teams, shared"]
         Download["Download.gs<br/>files and folders in zips"]
         Xlsx["Xlsx.gs<br/>Excel file writer"]
@@ -626,7 +622,6 @@ flowchart TD
     Print --> TeamList
     Viewer --> Clients
     Viewer --> Responses
-    Export --> Responses
     Templates --> Registry
     Menu --> Print
     Registry --> Views
@@ -853,10 +848,6 @@ flowchart LR
     class C cDec
     class F cErr
 ```
-
-`scripts/download_tasks.py` is the older way: it runs on the admin's computer
-and downloads through public links, so it meets the limits above. The dashboard
-download does the same job from the browser.
 
 ## Scale and honest limits
 

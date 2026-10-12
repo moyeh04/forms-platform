@@ -200,19 +200,12 @@ Do these once with a test form:
 
 ---
 
-## Part 4: Excel list with the real files (on your computer)
+## Part 4: Excel list with the real files
 
-The dashboard does this: open the form, **Responses, Download all tasks** (or
-**projects**). The steps below are the older local script, which downloads
-through public links and can meet Google's download limits.
-
-1. Install Python 3 once. In the project folder run `pip install -r scripts/requirements.txt`.
-2. Run (replace the name with your form's link name, the part after `?f=`):
-   ```
-   python scripts/download_tasks.py --slug database-tasks-fall-2027
-   ```
-3. Type your admin PIN when asked.
-4. Open `Tasks_Export/database-tasks-fall-2027/Tasks.xlsx` in desktop Excel. Click a task name to open its downloaded `.pptx`. Keep `Tasks.xlsx` and the `files` folder together. Anything that could not be downloaded is on the **Failed** sheet with the reason (usually a link that is not shared with "Anyone with the link").
+1. In the dashboard, open a team or task form and go to **Responses**.
+2. Press **Download all tasks** (or **Download all projects**), then **Start**. Keep the window open; a big form takes a few minutes.
+3. Save every zip part into one folder and unzip them there.
+4. Open `Teams.xlsx` in desktop Excel. Click a task or project to open its saved copy. Keep `Teams.xlsx` next to the `Tasks` or `Projects` folder. Anything that could not be saved is on the **Not downloaded** sheet with the reason and its Drive link.
 
 ---
 
