@@ -207,7 +207,7 @@ function findByKey_(form, key, anyAge) {
     cache.put(tag, String(fails + 1), 60);
     fail('bad_key', 'That key is not right.');
   }
-  if (!anyAge && hit.keyExpires && Date.parse(hit.keyExpires) < Date.now()) fail('key_expired', 'This key has expired. Ask your instructor to make the change.');
+  if (!anyAge && hit.keyExpires && Date.parse(hit.keyExpires) < Date.now()) fail('key_expired', 'This key has expired. Ask your instructor to extend it, or to make the change for you.');
   return hit;
 }
 
