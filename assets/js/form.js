@@ -236,7 +236,7 @@
     var title = h('h2', { class: 'step-title', tabindex: '-1', id: 'step-title' }, step.review ? t(hub() ? 'yourRegistration' : 'reviewTitle') : stepTitle(step));
     var body = step.review ? reviewBody() : step.team ? teamBody() : step.fields.map(function (f) { return renderField(f, f.id); });
     var last = S.stepIndex === S.steps.length - 1;
-    var primary = h('button', { type: 'submit', class: 'btn btn-primary', disabled: S.busy }, last ? (S.busy ? t('submitting') : t(S.mode === 'edit' ? 'saveChanges' : 'submit')) : hub() ? t('done') : t(step.team && !S.team ? 'findTeam' : 'next'), last || hub() ? null : icon('arrow', 20));
+    var primary = h('button', { type: 'submit', class: 'btn btn-primary', disabled: S.busy }, last ? (S.busy ? t('submitting') : t(S.mode === 'edit' ? 'saveChanges' : keyMode() ? 'book' : 'submit')) : hub() ? t('done') : t(step.team && !S.team ? 'findTeam' : 'next'), last || hub() ? null : icon('arrow', 20));
     // A team that has booked cannot go on, so the button that would take it there is not offered.
     if (step.team && S.team && S.teamBooked) primary = null;
     // Save exists only when an answer differs from the saved registration.

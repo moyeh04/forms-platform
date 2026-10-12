@@ -475,9 +475,7 @@
       var pat = f.slots.pattern = Object.assign({ start: '12:30', end: '15:30', length: 20, gap: 5 }, f.slots.pattern || {});
       var patternTimes = function () { return Rules.generateSlots({ start: pat.start, end: pat.end, length: pat.length, gap: pat.gap }); };
       var autoLabel = function (date) {
-        var d = new Date(date + 'T12:00:00');
-        if (!date || isNaN(d)) return '';
-        try { return d.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'short' }); } catch (e) { return date; }
+        return Rules.dayLabel(date);
       };
       var addDays = function (date, n) {
         var d = new Date(date + 'T12:00:00'); d.setDate(d.getDate() + n);
