@@ -8,6 +8,7 @@
  */
 const vm = require('node:vm');
 const crypto = require('node:crypto');
+const zlib = require('node:zlib');
 const { bundleSource } = require('../../scripts/bundle-backend.js');
 
 /* ── Spreadsheet ─────────────────────────────────────────────── */
@@ -126,26 +127,71 @@ function createWorld(options = {}) {
   const createSs = (name) => { const ss = new MockSpreadsheet(world, uid(), name); world.spreadsheets.set(ss.id, ss); world.drive.files.set(ss.id, { name, isSheet: true }); return ss; };
   world.registry = createSs('Forms Registry');
 
+  // Blobs hold real bytes, so a zip or a workbook the backend builds can be opened in a test.
+  class MockBlob {
+    constructor(bytes, type, name) { this.buf = Buffer.from(bytes == null ? '' : bytes); this.type = type || ''; this.name = name || ''; this.data = bytes; }
+    getBytes() { return Array.from(this.buf, (b) => (b > 127 ? b - 256 : b)); }
+    getName() { return this.name; }
+    setName(n) { this.name = n; return this; }
+    getContentType() { return this.type; }
+    setContentType(t) { this.type = t; return this; }
+    getDataAsString() { return this.buf.toString('utf8'); }
+    copyBlob() { return new MockBlob(this.buf, this.type, this.name); }
+  }
+  const toBuf = (v) => (Buffer.isBuffer(v) ? v : Array.isArray(v) ? Buffer.from(v.map((b) => (b + 256) % 256)) : Buffer.from(String(v == null ? '' : v), 'utf8'));
+  /** A plain zip (stored, not compressed) with UTF-8 names. */
+  function zipOf(blobs, name) {
+    const parts = [], central = [];
+    let offset = 0;
+    blobs.forEach((b) => {
+      const data = b.buf, fname = Buffer.from(b.name, 'utf8'), crc = zlib.crc32(data);
+      const head = Buffer.alloc(30);
+      head.writeUInt32LE(0x04034b50, 0); head.writeUInt16LE(20, 4); head.writeUInt16LE(0x0800, 6); head.writeUInt16LE(0, 8);
+      head.writeUInt32LE(crc >>> 0, 14); head.writeUInt32LE(data.length, 18); head.writeUInt32LE(data.length, 22); head.writeUInt16LE(fname.length, 26);
+      const dir = Buffer.alloc(46);
+      dir.writeUInt32LE(0x02014b50, 0); dir.writeUInt16LE(20, 4); dir.writeUInt16LE(20, 6); dir.writeUInt16LE(0x0800, 8);
+      dir.writeUInt32LE(crc >>> 0, 16); dir.writeUInt32LE(data.length, 20); dir.writeUInt32LE(data.length, 24); dir.writeUInt16LE(fname.length, 28); dir.writeUInt32LE(offset, 42);
+      parts.push(head, fname, data); central.push(dir, fname);
+      offset += 30 + fname.length + data.length;
+    });
+    const cd = Buffer.concat(central), end = Buffer.alloc(22);
+    end.writeUInt32LE(0x06054b50, 0); end.writeUInt16LE(blobs.length, 8); end.writeUInt16LE(blobs.length, 10); end.writeUInt32LE(cd.length, 12); end.writeUInt32LE(offset, 16);
+    return new MockBlob(Buffer.concat(parts.concat([cd, end])), 'application/zip', name || 'archive.zip');
+  }
+  world.MockBlob = MockBlob;
+  /** Puts a file in pretend Drive: { name, mime, bytes, parent }. Returns its id. */
+  world.drive.addFile = (o) => { const id = o.id || uid(); world.drive.files.set(id, { name: o.name, mime: o.mime || 'application/octet-stream', buf: toBuf(o.bytes || ''), parent: o.parent }); return id; };
+  world.drive.addFolder = (o) => { const id = o.id || uid(); world.drive.folders.set(id, { name: o.name, parent: o.parent }); return id; };
+  const iter = (list) => { let i = 0; return { hasNext: () => i < list.length, next: () => list[i++] }; };
+
   const fileObj = (id) => ({
     getId: () => id,
     getName: () => (world.drive.files.get(id) || {}).name || id,
+    getMimeType: () => (world.drive.files.get(id) || {}).mime || 'application/octet-stream',
+    getSize: () => ((world.drive.files.get(id) || {}).buf || Buffer.alloc(0)).length,
     getUrl: () => `https://drive.google.com/file/d/${id}/view`,
     getSharingAccess: () => world.drive.access.get(id) || 'ANYONE_WITH_LINK',
     moveTo: () => fileObj(id),
     setTrashed: (v) => { if (v) world.drive.trashed.add(id); else world.drive.trashed.delete(id); return fileObj(id); },
     isTrashed: () => world.drive.trashed.has(id),
-    getBlob: () => ({ getName: () => id })
+    getBlob: () => { const f = world.drive.files.get(id) || {}; return new MockBlob(f.buf || Buffer.alloc(0), f.mime, f.name || id); }
   });
   const folderObj = (id) => ({
     getId: () => id,
     getName: () => world.drive.folders.get(id).name,
     getSharingAccess: () => world.drive.access.get(id) || 'ANYONE_WITH_LINK',
-    createFolder: (name) => { const nid = uid(); world.drive.folders.set(nid, { name }); return folderObj(nid); },
-    getFoldersByName: (name) => {
-      const hits = [...world.drive.folders].filter(([, f]) => f.name === name).map(([id]) => folderObj(id));
-      let i = 0; return { hasNext: () => i < hits.length, next: () => hits[i++] };
-    },
-    createFile: (blobOrName) => { const nid = uid(); world.drive.files.set(nid, { name: (blobOrName && blobOrName.name) || String(blobOrName) }); return fileObj(nid); }
+    getUrl: () => `https://drive.google.com/drive/folders/${id}`,
+    setTrashed: (v) => { if (v) world.drive.trashed.add(id); else world.drive.trashed.delete(id); return folderObj(id); },
+    createFolder: (name) => { const nid = uid(); world.drive.folders.set(nid, { name, parent: id }); return folderObj(nid); },
+    getFoldersByName: (name) => iter([...world.drive.folders].filter(([fid, f]) => f.name === name && (f.parent === undefined || f.parent === id) && !world.drive.trashed.has(fid)).map(([fid]) => folderObj(fid))),
+    getFolders: () => iter([...world.drive.folders].filter(([fid, f]) => f.parent === id && !world.drive.trashed.has(fid)).map(([fid]) => folderObj(fid))),
+    getFiles: () => iter([...world.drive.files].filter(([fid, f]) => f.parent === id && !world.drive.trashed.has(fid)).map(([fid]) => fileObj(fid))),
+    createFile: (blobOrName) => {
+      const nid = uid();
+      const blob = blobOrName instanceof MockBlob ? blobOrName : null;
+      world.drive.files.set(nid, { name: (blobOrName && blobOrName.name) || String(blobOrName), mime: blob ? blob.type : '', buf: blob ? blob.buf : Buffer.alloc(0), parent: id });
+      return fileObj(nid);
+    }
   });
 
   const sandbox = {
@@ -220,12 +266,13 @@ function createWorld(options = {}) {
       DigestAlgorithm: { SHA_256: 'sha256', MD5: 'md5' },
       getUuid: () => crypto.randomUUID(),
       computeDigest: (algo, value) => Array.from(crypto.createHash(algo).update(String(value), 'utf8').digest()).map((b) => (b > 127 ? b - 256 : b)),
-      base64Encode: (v) => Buffer.from(typeof v === 'string' ? v : v.map((b) => (b + 256) % 256)).toString('base64'),
+      base64Encode: (v) => toBuf(v).toString('base64'),
       formatDate: (date, tz, pattern) => {
         const p = Object.fromEntries(new Intl.DateTimeFormat('en-CA', { timeZone: tz, year: 'numeric', month: '2-digit', day: '2-digit' }).formatToParts(date).map((x) => [x.type, x.value]));
         return pattern.replace('yyyy', p.year).replace('MM', p.month).replace('dd', p.day);
       },
-      newBlob: (data, type, name) => ({ data, type, name }),
+      newBlob: (data, type, name) => new MockBlob(toBuf(data), type, name),
+      zip: (blobs, name) => zipOf(blobs, name),
       sleep: () => {}
     }
   };
