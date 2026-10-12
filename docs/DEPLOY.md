@@ -171,7 +171,7 @@ Back in the Forms Registry sheet: **Forms Platform > 3. Set website address...**
 ## Part 3: Use it
 
 1. Open `https://YOUR-NAME.github.io/forms/admin.html` and enter your PIN.
-2. Click **New form**, choose a type, give it a title, pick the term (Fall, Spring, or Summer and the year), type the subject code, and click **Create form**.
+2. Click **New form**, choose what the form is for, give it a title, pick the term (Fall, Spring, or Summer and the year) and, if you want, a subject code. The side of the page shows what students will see. Click **Create form**.
 3. A form has four tabs: **Responses**, **Questions**, **Timetable** (reservations only) and **Setup**. Set the **Status** in the header to Open when the form is ready. A bar with **Save settings** appears when you change something. Check:
    - **Who can register** (Setup): all specializations, or only some (for example Computers only).
    - **Team size** (Questions tab): minimum and maximum people per team (counting the leader), and an optional note for some sizes (for example "other students will be added to reach 5" for 3 and 4).
