@@ -164,5 +164,5 @@ test('Forms: deleting needs the link name, removes the form, trashes its sheet, 
   assert.ok(w.drive.trashed.has(b.sheetId), 'the sheet is in the Drive trash, not destroyed');
   assert.deepEqual(w.admin({ action: 'admin.forms.list' }).forms.map((f) => f.slug), [a.slug], 'the other form is untouched');
   assert.equal(w.api({ action: 'getForm', slug: b.slug }).error.code, 'form_not_found', 'the link stops working');
-  assert.deepEqual(w.admin({ action: 'admin.clients.list' }).clients[0].forms, [a.slug]);
+  assert.deepEqual(w.admin({ action: 'admin.clients.list' }).clients[0].forms, [a.id]);
 });

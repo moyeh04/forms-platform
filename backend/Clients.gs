@@ -11,6 +11,9 @@
  *
  * A link can end on a date (`expires`); after it, the link and its key open nothing until the
  * admin moves the date.
+ *
+ * A link names its forms by id, so renaming a form's link name does not take the form away
+ * from it. Links saved with link names are read as ids and stored as ids on their next save.
  */
 
 var CLIENT_KEY_TRIES_ = 5;
@@ -31,7 +34,34 @@ function rowToClient_(r) {
 }
 
 function readClients_() {
-  return readTable(clientsSheet_(), CLIENT_COLS_).map(rowToClient_);
+  var clients = readTable(clientsSheet_(), CLIENT_COLS_).map(rowToClient_);
+  // A form id holds an underscore and a link name never does, so the two cannot be confused.
+  var named = function (s) { return s !== '*' && String(s).indexOf('_') === -1; };
+  if (!clients.some(function (c) { return c.forms.some(named); })) return clients;
+  var ids = {};
+  readForms().forEach(function (f) { ids[f.slug] = f.id; });
+  clients.forEach(function (c) {
+    if (!c.forms.some(named)) return;
+    c.byName = true;
+    c.forms = c.forms.map(function (s) { return named(s) ? ids[s] : s; }).filter(Boolean);
+  });
+  return clients;
+}
+
+/** Stores ids in every link that still names its forms by link name. Run before a link name changes. */
+function keepClientForms_() {
+  readClients_().forEach(function (c) { if (c.byName) saveClient_(c); });
+}
+
+/** Changes one link inside the lock, on a fresh copy of its row, and saves it. Returns what `change` returns. */
+function changeClient_(id, change) {
+  return withLock_(function () {
+    var c = readClients_().filter(function (x) { return x.id === id; })[0];
+    if (!c) fail('client_not_found', 'That client does not exist.');
+    var out = change(c);
+    saveClient_(c);
+    return out;
+  });
 }
 
 function clientToRow_(c) {
@@ -42,6 +72,7 @@ function clientToRow_(c) {
   };
 }
 
+/** Writes a link to its row, or to a new row. Call it inside withLock_, with a row read there. */
 function saveClient_(c) {
   var sh = clientsSheet_();
   // A Clients tab made before the key and end-date columns gets their headers the first time a link is saved.
@@ -108,7 +139,7 @@ function cleanClientForms_(list) {
   return list.map(function (s) {
     var f = findForm(String(s));
     if (!f) fail('form_not_found', 'Form "' + s + '" does not exist.');
-    return f.slug;
+    return f.id;
   });
 }
 
@@ -142,7 +173,7 @@ function requireClient_(req) {
 }
 
 function clientAllows_(client, form) {
-  return client.forms.indexOf('*') !== -1 || client.forms.indexOf(form.slug) !== -1;
+  return client.forms.indexOf('*') !== -1 || client.forms.indexOf(form.id) !== -1;
 }
 
 API['admin.clients.list'] = admin(function () {
@@ -160,43 +191,40 @@ API['admin.clients.create'] = admin(function (req) {
   };
   var key = req.withKey === false ? '' : newClientKey_();
   setClientKey_(c, key);
-  saveClient_(c);
+  withLock_(function () { saveClient_(c); });
   return { client: publicClient_(c), token: token, accessKey: key };
 });
 
 API['admin.clients.update'] = admin(function (req) {
-  var c = readClients_().filter(function (x) { return x.id === req.id; })[0];
-  if (!c) fail('client_not_found', 'That client does not exist.');
   var p = req.patch || {};
-  if (p.name !== undefined) c.name = String(p.name).trim() || c.name;
-  if (p.forms !== undefined) c.forms = cleanClientForms_(p.forms);
-  if (p.hiddenColumns !== undefined) c.hiddenColumns = Array.isArray(p.hiddenColumns) ? p.hiddenColumns : [];
-  if (p.canReview !== undefined) c.canReview = !!p.canReview;
-  if (p.active !== undefined) c.active = !!p.active;
-  if (p.expires !== undefined) c.expires = cleanExpiry_(p.expires);
-  saveClient_(c);
-  return { client: publicClient_(c) };
+  return changeClient_(req.id, function (c) {
+    if (p.name !== undefined) c.name = String(p.name).trim() || c.name;
+    if (p.forms !== undefined) c.forms = cleanClientForms_(p.forms);
+    if (p.hiddenColumns !== undefined) c.hiddenColumns = Array.isArray(p.hiddenColumns) ? p.hiddenColumns : [];
+    if (p.canReview !== undefined) c.canReview = !!p.canReview;
+    if (p.active !== undefined) c.active = !!p.active;
+    if (p.expires !== undefined) c.expires = cleanExpiry_(p.expires);
+    return { client: publicClient_(c) };
+  });
 });
 
 API['admin.clients.regenerate'] = admin(function (req) {
-  var c = readClients_().filter(function (x) { return x.id === req.id; })[0];
-  if (!c) fail('client_not_found', 'That client does not exist.');
   var token = newToken_();
-  c.tokenHash = clientToken_(token);
-  c.active = true;
-  saveClient_(c);
-  return { client: publicClient_(c), token: token };
+  return changeClient_(req.id, function (c) {
+    c.tokenHash = clientToken_(token);
+    c.active = true;
+    return { client: publicClient_(c), token: token };
+  });
 });
 
 /** Gives a link a new access key (`on`), or removes its key so the link alone opens it. */
 API['admin.clients.key'] = admin(function (req) {
-  var c = readClients_().filter(function (x) { return x.id === req.id; })[0];
-  if (!c) fail('client_not_found', 'That client does not exist.');
   var key = req.on === false ? '' : newClientKey_();
-  setClientKey_(c, key);
-  saveClient_(c);
-  CacheService.getScriptCache().remove('client_key:' + c.id);
-  return { client: publicClient_(c), accessKey: key };
+  return changeClient_(req.id, function (c) {
+    setClientKey_(c, key);
+    CacheService.getScriptCache().remove('client_key:' + c.id);
+    return { client: publicClient_(c), accessKey: key };
+  });
 });
 
 /** The admin reads a link's current key, for example when the client lost it. */
@@ -210,8 +238,10 @@ API['admin.clients.showKey'] = admin(function (req) {
 });
 
 API['admin.clients.remove'] = admin(function (req) {
-  var c = readClients_().filter(function (x) { return x.id === req.id; })[0];
-  if (!c) fail('client_not_found', 'That client does not exist.');
-  clientsSheet_().deleteRow(c._row);
-  return { removed: true };
+  return withLock_(function () {
+    var c = readClients_().filter(function (x) { return x.id === req.id; })[0];
+    if (!c) fail('client_not_found', 'That client does not exist.');
+    clientsSheet_().deleteRow(c._row);
+    return { removed: true };
+  });
 });
