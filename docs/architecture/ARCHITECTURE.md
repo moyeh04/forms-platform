@@ -24,7 +24,7 @@ sheet, not code.
 | **One source of truth for rules** | `shared/rules.js` is used by the browser, the backend, and the tests. They cannot disagree. |
 | **Forms are data** | A form is a JSON definition in one cell. New questions and new form types need no code. |
 | **Boring technology** | Plain JavaScript, no framework, no bundler for the website, one concatenation script for the backend. Easy to read, easy to fix later. |
-| **Testable without Google** | An in-memory copy of Google's services runs the real backend code, so 230 JavaScript tests cover it without touching a real account. |
+| **Testable without Google** | An in-memory copy of Google's services runs the real backend code, so 232 JavaScript tests cover it without touching a real account. |
 
 ## System context
 
@@ -900,6 +900,25 @@ Rules for this page, to keep when a setting is added:
   order of the decisions: the days on a calendar, the hours once, then one row
   of slots for each day as the result.
 
+## The Lists page
+
+`admin-lists.js` draws `#/lists` and `#/lists/<key>`: the lists at the side
+(`.l-side`) and the choices of the picked one in the main part (`.l-main`).
+
+- **The data picks the layout.** A list of plain values is chips; a list where
+  a choice has an English name is rows. There is no layout switch. A plain list
+  offers the rows through one link, because chips cannot rename or reorder.
+- **The save bar is the one of the settings page.** It exists only while the
+  picked list differs from its saved copy, sets `A.unsaved`, and says what a
+  save would change ("1 added, 2 removed"). When a removed choice is in the
+  `rules` of a form (`LIMITED_LISTS_`), the bar names that form.
+- **A refused save stays on the page.** A choice that is in the list twice, a
+  name without a value and an empty list are written under the choices and the
+  row is marked. Nothing is reported with a toast.
+- **One of two on a phone.** Below 940px the page shows the lists while the
+  address is `#/lists`, and the picked list with a link back while the address
+  names one. Both are in the page; the class `picked` on `.lists` chooses.
+
 ## Phone layout
 
 At 600px and below, a table that lists people does not shrink and does not
@@ -963,6 +982,6 @@ labels of the current tables.
 | [HOSTING.md](HOSTING.md) | What GitHub does, what Google does, and how they fit |
 | [DATA-MODEL.md](../reference/DATA-MODEL.md) | Every sheet, column, and stored property |
 | [SECURITY.md](../reference/SECURITY.md) | The secrets, who holds them, and what a leak would mean |
-| [TESTING.md](../reference/TESTING.md) | How 250 tests run without Google |
+| [TESTING.md](../reference/TESTING.md) | How 252 tests run without Google |
 | [DEPLOY.md](../DEPLOY.md) | Click-by-click setup |
 | [MODULES.md](../MODULES.md) | File-by-file reference |

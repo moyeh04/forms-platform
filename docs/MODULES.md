@@ -99,6 +99,7 @@ flowchart LR
         a5["admin-timetable.js"]
         a3["admin-data.js"]
         a4["admin-people.js"]
+        a6["admin-lists.js"]
     end
     subgraph viewer["viewer.html: instructor page"]
         v1["viewer.js"]
@@ -131,7 +132,7 @@ no validation.
 | `assets/js/config.js` | Source placeholder; `scripts/build-site.js` generates its published copy from the Actions `API_URL` variable. |
 | `assets/js/api.js` | Sends requests to the backend as plain-text JSON (avoids browser CORS checks). |
 | `assets/js/form.js`, `ticket.js`, `i18n.js` | The student page, the success ticket, English and Arabic text. |
-| `assets/js/admin*.js` | Dashboard: core and forms list, settings, the timetable editor, responses and matching, clients and lists. |
+| `assets/js/admin*.js` | Dashboard: core and forms list, settings, the timetable editor, responses and matching, clients, lists. |
 | `assets/js/viewer.js` | The instructor page. |
 | `shared/rules.js` | Validation and normalization rules (Arabic names, phones, codes, Drive links, team size, slots). Used by the browser, the backend, and the tests, so all three always agree. |
 
@@ -169,7 +170,7 @@ no validation.
 | `scripts/download_tasks.py` | Downloads task files and builds `Tasks.xlsx`. |
 | `tests/harness/appsscript-mock.js` | An in-memory Sheets, Drive, Mail, Cache, and clock, so the real backend code runs in tests. |
 | `tests/harness/dom.js` | Opens the real pages in jsdom wired to that backend. |
-| `tests/*.test.js` | 230 tests. |
+| `tests/*.test.js` | 232 tests. |
 | `tests/test_download_tasks.py` | 20 tests for the export, with a local server in place of Google. |
 
 ## Data model in one paragraph
