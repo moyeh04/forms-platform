@@ -41,7 +41,13 @@ function seed(world) {
     leader({ leader_name: 'أحمد محمد محمود علي', leader_code: '4230459', title: 'Library System', team_size: '3', members: [mem('سارة خالد حسن علي', '4230441', '01112345678'), mem('منى أشرف كمال فؤاد', '4230423', '01212345678')] }),
     leader({ leader_name: 'يوسف إبراهيم سيد حسن', leader_code: '4230501', phone: '01098765432', title: 'Clinic Booking', team_size: '2', members: [mem('عمر طارق عبد الله محمد', '4230502', '01198765432')] }),
     leader({ leader_name: 'نور الدين أحمد فتحي سالم', leader_code: '4230611', phone: '01055512345', title: 'Smart Parking', team_size: '1', members: [] })
-  ].map((data) => world.api({ action: 'submit', slug: team.slug, data }));
+  ].map((data, i) => {
+    // The last team registered ten days ago, so its key has expired and Extend keys has something to show.
+    if (i === 2) world.setNow(Date.now() - 10 * 86400000);
+    const r = world.api({ action: 'submit', slug: team.slug, data });
+    world.setNow(Date.now());
+    return r;
+  });
 
   make('reservation', 'Microprocessor Project Seminar', 'Spring 2028', {});
   // A reservation booked with the keys of the team form, so that flow can be tried with a real key.
@@ -54,7 +60,7 @@ function seed(world) {
     world.api({ action: 'submit', slug: groups.slug, data: { email: 'student@example.com', name, phone, code, level: 'الثاني / الثالثة', major: 'حاسبات', group, section: '21', schedule: 'https://drive.google.com/file/d/1AbCdEfGhIjKlMnOpQrStUvWxYz012345/view' } });
   });
   const client = admin({ action: 'admin.clients.create', name: 'Dr. Mahmoud - Database', forms: [team.slug], hiddenColumns: [], canReview: false });
-  return { team, viewerToken: client.token, discussion, key: registered[0].key };
+  return { team, viewerToken: client.token, viewerKey: client.accessKey, discussion, key: registered[0].key };
 }
 
 function start(port, opts) {
@@ -107,7 +113,7 @@ if (require.main === module) {
     console.log(`Forms Platform preview on ${base}  (in memory, nothing reaches Google)`);
     console.log(`  Admin:    ${base}/admin.html   PIN ${PIN}`);
     if (info.team) console.log(`  Form:     ${base}/index.html?f=${info.team.slug}`);
-    if (info.viewerToken) console.log(`  Viewer:   ${base}/viewer.html?t=${info.viewerToken}`);
+    if (info.viewerToken) console.log(`  Viewer:   ${base}/viewer.html?t=${info.viewerToken}   access key ${info.viewerKey}`);
     if (info.discussion) console.log(`  Book with a key: ${base}/index.html?f=${info.discussion.slug}   key ${info.key}`);
   });
 }
