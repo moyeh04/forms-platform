@@ -6,11 +6,17 @@
   var A = App.admin = { views: {} };
   var started = false;
 
+  // What each kind of form is: `text` says what it is for, `pages` are the pages students go
+  // through (the same as the template in Templates.gs), `next` is what to set up after creating it.
   A.TYPES = {
-    team_registration: { label: 'Team registration', icon: 'team', text: 'A team leader and members, a project title, and an optional Drive folder.' },
-    task_submission: { label: 'Task submission', icon: 'task', text: 'A team, a task name, and a slides link. Teams are merged under one task.' },
-    reservation: { label: 'Reservation', icon: 'calendar', text: 'Teams book a day and a time slot. One team per slot.' },
-    whatsapp_registration: { label: 'WhatsApp group registration', icon: 'chat', text: 'Name, phone, group, section and timetable. Reviewed in two steps and matched to WhatsApp requests.' }
+    team_registration: { label: 'Team registration', icon: 'team', text: 'Teams sign up once: a leader, the members and a project title.',
+      pages: ['About you', 'Study details', 'Team members', 'Project'], next: ['Set the smallest and the largest team.', 'Choose who can register.'] },
+    task_submission: { label: 'Task submission', icon: 'task', text: 'Teams hand in a task with a link to their work.',
+      pages: ['About you', 'Study details', 'Team members', 'Task'], next: ['Set the team size.', 'Check the rule for the links students send.'] },
+    reservation: { label: 'Reservation', icon: 'calendar', text: 'Teams book one time slot on a day that you offer.',
+      pages: ['About you', 'Study details', 'Project', 'Time slot'], next: ['Add the days and times in the Timetable tab.', 'Choose how many bookings one slot takes.'] },
+    whatsapp_registration: { label: 'WhatsApp group registration', icon: 'chat', text: 'Students ask to join a group, and you check each one against the join requests.',
+      pages: ['About you', 'Study details', 'Schedule'], next: ['Paste the join requests under Responses to match them.'] }
   };
   A.STATUS_LABEL = { draft: 'Draft', open: 'Open', closed: 'Closed', archived: 'Archived' };
   A.SUB_STATUSES = ['new', 'in_review', 'approved', 'rejected', 'done'];
@@ -109,12 +115,12 @@
     var yearSel = A.select(st.year, yearOptions(st.year), function (v) { st.year = v; emit(); });
     yearSel.name = 'termYear';
     yearSel.setAttribute('aria-label', 'Year');
-    var subj = A.text(subject, function (v) { subject = v.replace(/\s+/g, ''); emit(); }, { name: 'subject', placeholder: 'CMPn323', dir: 'ltr', autocomplete: 'off', spellcheck: 'false' });
+    var subj = A.text(subject, function (v) { subject = v.replace(/\s+/g, ''); emit(); }, { name: 'subject', placeholder: 'CS101', dir: 'ltr', autocomplete: 'off', spellcheck: 'false' });
     paint();
     return h('div', { class: 'term-picker' },
       h('div', { class: 'field-row term-season' }, h('span', { class: 'label' }, 'Term'), chips, custom),
       h('label', { class: 'field-row term-year' }, h('span', { class: 'label' }, 'Year'), yearSel),
-      h('label', { class: 'field-row term-subject' }, h('span', { class: 'label' }, 'Subject code'), subj, h('span', { class: 'help' }, 'Shown beside the title, for example CMPn323. No spaces.')));
+      h('label', { class: 'field-row term-subject' }, h('span', { class: 'label' }, 'Subject code'), subj, h('span', { class: 'help' }, 'Optional. A short code shown beside the title. No spaces.')));
   };
 
   A.METADATA_EDITORS['batch-year'] = function (o, onchange) {
@@ -355,40 +361,76 @@
 
   /* ── Create ─────────────────────────────────────────────────── */
 
+  /* ── New form: choose what it is for, name it, and see what students will get ── */
+
   A.views.create = async function (mount) {
     var state = { type: 'team_registration', title: '' };
     var metadata = {};
     Object.keys(A.TYPES).forEach(function (type) { metadata[type] = FormMetadata.defaults(type); });
     ui.clear(mount);
+
+    var preview = h('div', { class: 'new-preview', 'aria-live': 'polite' });
+    var nextBox = h('ul', { class: 'plain-list new-next' });
+    function paintSide() {
+      var t = A.TYPES[state.type];
+      var title = state.title.trim();
+      ui.clear(preview);
+      preview.appendChild(h('span', { class: 'form-icon' }, icon(t.icon, 26)));
+      preview.appendChild(h('p', { class: 'new-preview-title' + (title ? '' : ' empty') }, title || 'Your title'));
+      preview.appendChild(h('div', { class: 'card-tags' }, A.termTags(Object.assign({ type: state.type }, metadata[state.type]))));
+      preview.appendChild(h('ol', { class: 'new-pages' }, t.pages.concat(['Review']).map(function (name) { return h('li', null, name); })));
+      ui.clear(nextBox);
+      t.next.concat(['Change, add or move any question and page.', 'Set the status to Open when the form is ready.']).forEach(function (line) { nextBox.appendChild(h('li', null, line)); });
+    }
+
     var metadataHost = h('div');
     function paintMetadata() {
       ui.clear(metadataHost);
       metadataHost.appendChild(A.metadataEditor(state.type, metadata[state.type], function (values) {
         Object.assign(metadata[state.type], values);
+        paintSide();
       }));
     }
     var picks = Object.keys(A.TYPES).map(function (k) {
       var t = A.TYPES[k];
       return h('label', { class: 'type-opt' },
-        h('input', { type: 'radio', name: 'type', value: k, checked: k === state.type, onchange: function () { state.type = k; paintMetadata(); } }),
-        h('div', null, h('strong', null, icon(t.icon, 22), t.label), h('p', null, t.text)));
+        h('input', { type: 'radio', name: 'type', value: k, checked: k === state.type, onchange: function () { state.type = k; paintMetadata(); paintSide(); } }),
+        h('div', null, h('span', { class: 'type-icon' }, icon(t.icon, 24)), h('div', null, h('strong', null, t.label), h('p', null, t.text))));
     });
-    var btn = h('button', { type: 'submit', class: 'btn btn-primary' }, 'Create form');
+
+    // A refused title stays in its field with the reason next to it.
+    var titleError = h('p', { class: 'error', id: 'new-title-err', role: 'alert', hidden: true }, 'Give the form a title first.');
+    var titleInput = A.text('', function (v) { state.title = v; if (v.trim()) refuse(false); paintSide(); }, { name: 'title', placeholder: 'The heading students see', 'aria-describedby': 'new-title-err', autocomplete: 'off' });
+    function refuse(on) { titleError.hidden = !on; titleInput.setAttribute('aria-invalid', on ? 'true' : 'false'); titleInput.classList.toggle('bad', !!on); }
+
+    var btn = h('button', { type: 'submit', class: 'btn btn-primary', name: 'create' }, 'Create form');
+    var numbered = function (n, title, help) {
+      return h('div', { class: 'tt-step-head' }, h('span', { class: 'tt-num' }, String(n)), h('div', null, h('h3', null, title), help ? h('p', { class: 'help' }, help) : null));
+    };
     paintMetadata();
-    mount.appendChild(h('form', { novalidate: 'novalidate', onsubmit: function (e) {
+    paintSide();
+    mount.appendChild(h('form', { class: 'new-form', novalidate: 'novalidate', onsubmit: function (e) {
       e.preventDefault();
-      if (!state.title.trim()) return toast('Give the form a title first.', 'err');
+      if (!state.title.trim()) { refuse(true); if (titleInput.focus) titleInput.focus(); return; }
       A.busy(btn, async function () {
         var res = await A.call('admin.forms.create', Object.assign({ type: state.type, title: state.title }, metadata[state.type]));
         toast('Form created as a draft. Check its settings, then open it.', 'ok');
         window.location.hash = '#/f/' + encodeURIComponent(res.form.slug) + '/settings';
       });
     } },
-      h('div', { class: 'page-head' }, h('h2', null, 'New form')),
-      h('div', { class: 'panel' }, h('h2', null, 'What does it collect?'), h('div', { class: 'type-pick' }, picks)),
-      h('div', { class: 'panel' }, h('h2', null, 'Name it'),
-        A.field('Title', A.text('', function (v) { state.title = v; }, { name: 'title', placeholder: 'Database Team Project Registration Form' }), 'This is the heading students see.'),
-        metadataHost),
-      h('div', { class: 'actions' }, btn, h('a', { class: 'btn btn-quiet', href: '#/' }, 'Cancel'))));
+      h('div', { class: 'page-head' }, h('h2', null, 'New form'), h('a', { class: 'btn btn-quiet sm', href: '#/' }, 'Cancel')),
+      h('div', { class: 'l-split' },
+        h('div', { class: 'l-main' },
+          h('section', { class: 'panel' }, numbered(1, 'What is the form for?', 'This decides the pages and questions the form starts with. You can change them after.'),
+            h('div', { class: 'type-pick l-grid', role: 'radiogroup', 'aria-label': 'What the form is for' }, picks)),
+          h('section', { class: 'panel' }, numbered(2, 'Name it'),
+            h('label', { class: 'field-row' }, h('span', { class: 'label' }, 'Title'), titleInput, titleError),
+            metadataHost)),
+        h('aside', { class: 'l-side new-side' },
+          h('section', { class: 'panel l-stack' },
+            h('span', { class: 'tool-label' }, 'What students will see'), preview,
+            h('span', { class: 'tool-label' }, 'After you create it'), nextBox,
+            h('p', { class: 'muted-note' }, 'The form starts as a draft. Students cannot open it until you set it to Open.'),
+            btn)))));
   };
 })(window.App = window.App || {});

@@ -192,9 +192,29 @@ test('WhatsApp metadata: legacy semester records resolve to batch year without d
 test('Create: a title is required', async () => {
   const w = boot();
   const p = await openAdmin(w, '#/new');
+  assert.ok(p.$('#new-title-err').hidden);
   p.submitForm(); await settle(4);
-  assert.ok(p.text().includes('Give the form a title first.'));
+  assert.equal(p.$('#new-title-err').hidden, false, 'the reason is next to the field');
+  assert.equal(p.$('#new-title-err').textContent, 'Give the form a title first.');
+  assert.equal(p.$('[name="title"]').getAttribute('aria-invalid'), 'true');
   assert.equal(w.admin({ action: 'admin.forms.list' }).forms.length, 0);
+  p.type('[name="title"]', 'Seminar');
+  assert.ok(p.$('#new-title-err').hidden, 'the reason leaves when the title is typed');
+});
+
+test('Create: the preview shows the title, the tags and the pages of the chosen kind of form', async () => {
+  const w = boot();
+  const p = await openAdmin(w, '#/new');
+  assert.equal(p.$('.new-preview-title').textContent, 'Your title');
+  p.type('[name="title"]', 'Project discussion');
+  p.type('[name="subject"]', 'CS101');
+  assert.equal(p.$('.new-preview-title').textContent, 'Project discussion');
+  assert.ok(p.$('.new-preview').textContent.includes('CS101'));
+  for (const type of Object.keys(p.win.App.admin.TYPES)) {
+    p.pick('type', type);
+    const made = w.admin({ action: 'admin.forms.create', type, title: 'T ' + type, term: 'Fall 2027' }).form;
+    assert.deepEqual(p.$$('.new-pages li').map((n) => n.textContent), made.steps.map((st) => st.title.en).concat(['Review']), type + ': the preview lists the pages of the template');
+  }
 });
 
 test('Team size: admin sets the minimum and maximum and students see exactly those choices', async () => {

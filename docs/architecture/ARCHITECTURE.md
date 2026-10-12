@@ -24,7 +24,7 @@ sheet, not code.
 | **One source of truth for rules** | `shared/rules.js` is used by the browser, the backend, and the tests. They cannot disagree. |
 | **Forms are data** | A form is a JSON definition in one cell. New questions and new form types need no code. |
 | **Boring technology** | Plain JavaScript, no framework, no bundler for the website, one concatenation script for the backend. Easy to read, easy to fix later. |
-| **Testable without Google** | An in-memory copy of Google's services runs the real backend code, so 226 JavaScript tests cover it without touching a real account. |
+| **Testable without Google** | An in-memory copy of Google's services runs the real backend code, so 227 JavaScript tests cover it without touching a real account. |
 
 ## System context
 
@@ -887,6 +887,22 @@ scroll sideways. Each row becomes a card:
   (controls that act together, such as the day, the option and the button of
   the day sheet) take the full width.
 
+### Layout pieces
+
+A new page is built from the layout classes at the top of `admin.css`, which
+change shape from the width they are given, so the page has no media query of
+its own:
+
+| Class | What it does |
+|---|---|
+| `.l-split` with `.l-main` and `.l-side` | A main part and a narrower side. The side goes under the main part when both do not fit. |
+| `.l-grid` | Equal columns, as many as fit. `--l-min` is the narrowest a column may be. |
+| `.l-stack` | Children under each other with one gap (`--l-gap`). |
+
+The new form page uses all three and nothing else for its layout. A media
+query is for a thing that changes what it is on a phone (a table that becomes
+cards), not for a thing that only needs fewer columns.
+
 A new list table must set `data-label` on its cells and use one of these
 classes; `tests/admin-ui.test.js` and `tests/viewer-ui.test.js` check the
 labels of the current tables.
@@ -917,6 +933,6 @@ labels of the current tables.
 | [HOSTING.md](HOSTING.md) | What GitHub does, what Google does, and how they fit |
 | [DATA-MODEL.md](../reference/DATA-MODEL.md) | Every sheet, column, and stored property |
 | [SECURITY.md](../reference/SECURITY.md) | The secrets, who holds them, and what a leak would mean |
-| [TESTING.md](../reference/TESTING.md) | How 246 tests run without Google |
+| [TESTING.md](../reference/TESTING.md) | How 247 tests run without Google |
 | [DEPLOY.md](../DEPLOY.md) | Click-by-click setup |
 | [MODULES.md](../MODULES.md) | File-by-file reference |
