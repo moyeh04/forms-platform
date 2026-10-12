@@ -196,7 +196,7 @@ A good test states one behaviour in its name, for example
 ## Why this design
 
 - **Fast.** The suite finishes in a few seconds, so it can run on every change.
-- **Honest.** It runs the exact text you paste, via the same `bundleSource()`
+- **Honest.** It runs the exact text that is deployed, via the same `bundleSource()`
   the build uses.
 - **Cheap to extend.** The fake is small, and tests read like user stories.
 - **Safe.** No test touches a real account, so nothing can send a real email or
