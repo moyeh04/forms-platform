@@ -93,6 +93,10 @@ function normalizeReservationMembers_(form) {
     members = reservationMembersField_();
     form.fields.push(members);
   }
+  // The number of teammates stays a range that the page can draw: 0 to 19, with room for at least one.
+  var min = parseInt(members.min, 10), max = parseInt(members.max, 10);
+  members.min = Math.max(0, Math.min(19, isNaN(min) ? 1 : min));
+  members.max = Math.max(1, members.min, Math.min(19, isNaN(max) ? 5 : max));
   var project = form.steps.filter(function (step) { return step.id === 'project'; })[0];
   if (project && project.fields.indexOf(members.id) === -1) project.fields.push(members.id);
   return form;
