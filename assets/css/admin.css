@@ -127,19 +127,35 @@ body.admin { font-size: 1rem; }
 .tt-range-fields .toggle-chips { margin: 4px 0 0; }
 .tt-range-result { margin-top: 8px; }
 .tt-range-result p { margin: 0; }
-.tt-days { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; }
-.day-card { padding: 8px 12px; border: 1.5px solid var(--line); border-radius: 4px; background: var(--sheet); }
-.day-card.open { padding-bottom: 14px; border-color: var(--ink); }
-.day-row { display: flex; align-items: center; gap: 12px; }
+.tt-days { margin-bottom: 12px; }
+.tt-apply { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.tt-grid-wrap { overflow-x: auto; border: 1.5px solid var(--line); border-radius: 4px; background: var(--sheet); }
+.tt-grid { border-collapse: separate; border-spacing: 0; width: max-content; min-width: 100%; }
+.tt-grid th, .tt-grid td { padding: 3px; border: 0; text-align: center; }
+.tt-grid thead th { position: sticky; top: 0; z-index: 2; background: var(--sheet); border-bottom: 1.5px solid var(--line); }
+.tt-grid tbody th, .tt-grid .tt-corner { position: sticky; inset-inline-start: 0; z-index: 1; background: var(--sheet); border-inline-end: 1.5px solid var(--line); text-align: start; }
+.tt-grid .tt-corner { z-index: 3; padding: 6px 10px; font-size: var(--fs-help); color: var(--mute); }
+.tt-day { display: flex; flex-direction: column; align-items: center; gap: 1px; min-width: 66px; padding: 5px 8px; border: 1.5px solid transparent; border-radius: 4px; background: transparent; color: var(--ink); line-height: 1.15; cursor: pointer; }
+.tt-day:hover { border-color: var(--line); }
+.tt-day.on { background: var(--ink); color: var(--sheet); }
+.tt-day.bad { color: var(--err); border-color: var(--err); border-style: dashed; }
+.tt-day.bad.on { background: var(--err); color: var(--sheet); border-style: solid; }
+.tt-day .dow { font-size: .75rem; text-transform: uppercase; letter-spacing: .08em; }
+.tt-day .dom { font-weight: 700; white-space: nowrap; max-width: 8ch; overflow: hidden; text-overflow: ellipsis; }
+.tt-time { width: 100%; min-height: 36px; padding: 2px 10px; border: 0; border-radius: 4px; background: transparent; color: var(--ink); font-family: var(--font-code); font-size: .88rem; white-space: nowrap; text-align: start; cursor: pointer; }
+.tt-time:hover { background: var(--sheet-2); }
+.tt-cell { display: block; width: 100%; min-width: 58px; min-height: 36px; padding: 0; border: 1.5px dashed var(--line); border-radius: 4px; background: transparent; color: var(--on-sea); font-weight: 700; cursor: pointer; }
+.tt-cell:hover { border-color: var(--ink); }
+.tt-cell.on { border-style: solid; border-color: var(--sea); background: var(--sea); }
+.tt-cell.booked:not(.on) { border-color: var(--err); color: var(--err); }
+.tt-legend { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 8px 0 0; }
+.tt-key { display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 18px; border: 1.5px dashed var(--line); border-radius: 3px; font-size: .75rem; font-weight: 700; font-style: normal; color: var(--on-sea); }
+.tt-key.on { border-style: solid; border-color: var(--sea); background: var(--sea); }
+.day-card { margin-top: 12px; padding: 10px 14px 14px; border: 1.5px solid var(--ink); border-radius: 4px; background: var(--sheet); }
+.day-row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
 .day-sum { flex: 1; min-width: 0; display: flex; flex-direction: column; }
-.day-sum strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .day-sum .error { margin: 0; }
 .day-body { margin-top: 10px; padding-top: 12px; border-top: 1px dashed var(--line); }
-.day-badge { flex: none; display: flex; align-items: baseline; justify-content: center; gap: 6px; min-width: 104px; padding: 5px 10px; border-radius: 4px; background: var(--ink); color: var(--sheet); line-height: 1.1; }
-.day-badge .dow { font-size: .8rem; text-transform: uppercase; letter-spacing: .08em; }
-.day-badge .dom { font-size: 1.2rem; font-family: var(--font-title); }
-.day-badge .mon { font-size: .85rem; }
-.day-badge.none { background: transparent; color: var(--mute); border: 1.5px dashed var(--line); }
 .day-fields { display: grid; grid-template-columns: minmax(150px, .8fr) minmax(0, 1.2fr); gap: 0 16px; }
 .day-slots-head { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 16px; margin: 2px 0 8px; }
 .day-slots-head .label { margin: 0 auto 0 0; }
@@ -151,10 +167,12 @@ body.admin { font-size: 1rem; }
 .danger-zone { border-color: var(--err); }
 .danger-zone h2 { color: var(--err); }
 @media (max-width: 640px) {
-  .day-row { flex-wrap: wrap; }
-  .day-sum { flex-basis: 100%; order: 3; }
-  .day-badge { margin-inline-end: auto; }
+  .day-sum { flex-basis: 100%; }
   .day-fields { grid-template-columns: 1fr; }
+  .tt-day { min-width: 58px; padding: 4px 5px; }
+  .tt-cell { min-width: 50px; min-height: 40px; }
+  .tt-time { padding: 2px 6px; font-size: .8rem; }
+  .tt-hours .toggle-chips { flex-wrap: wrap; }
   .tt-range-fields { grid-template-columns: 1fr 1fr; }
   .tt-range-fields .field-row { grid-column: 1 / -1; }
 }
