@@ -24,7 +24,7 @@ sheet, not code.
 | **One source of truth for rules** | `shared/rules.js` is used by the browser, the backend, and the tests. They cannot disagree. |
 | **Forms are data** | A form is a JSON definition in one cell. New questions and new form types need no code. |
 | **Boring technology** | Plain JavaScript, no framework, no bundler for the website, one concatenation script for the backend. Easy to read, easy to fix later. |
-| **Testable without Google** | An in-memory copy of Google's services runs the real backend code, so 233 JavaScript tests cover it without touching a real account. |
+| **Testable without Google** | An in-memory copy of Google's services runs the real backend code, so 243 JavaScript tests cover it without touching a real account. |
 
 ## System context
 
@@ -574,6 +574,7 @@ flowchart TD
         Responses["Responses.gs<br/>rows, keys, limits, Drive checks, emails"]
         Slots["Slots.gs<br/>timetable and availability"]
         KeyBooking["KeyBooking.gs<br/>booking with a registration key"]
+        Transfers["Transfers.gs<br/>moving a member between teams"]
     end
     subgraph admin["Admin and reviewers"]
         Views["Views.gs<br/>tinted sheet blocks"]
@@ -900,6 +901,40 @@ Rules for this page, to keep when a setting is added:
   order of the decisions: the days on a calendar, the hours once, then one row
   of slots for each day as the result.
 
+## Moving a member between teams
+
+`rules.uniqueAcrossForm` refuses a team that names a member of another team.
+With `rules.transfers` also on, `Transfers.gs` turns the refusal into a request.
+
+1. `submit` and `update` call `takeOutTransfers_` inside the lock. It fails with
+   `duplicate_member` and lists, under `transfer`, the members that can be asked
+   for. The page shows them in a popup.
+2. The page sends the same request again with their codes in `transfer`. The
+   members are taken out of the answers, the team size answer follows, the team
+   is saved, and `recordTransfers_` writes one `pending` row for each in the tab
+   `Transfers`.
+3. `lookup` returns `transfers`: `incoming` (requests for members of this team)
+   and `outgoing` (requests this team made). The page asks about each incoming
+   one when the registration opens.
+4. `transfer.decide` (the key of the team that holds the member) and
+   `admin.transfer.decide` both call `decideTransfer_`. The first answer counts.
+   An approval removes the member from the team that holds the code, adds the
+   stored member to the team that asked, and moves both team sizes.
+
+Rules of the move:
+
+- A leader of a team is never offered, and an approval is refused if the
+  student became a leader meanwhile (`transfer_leader`).
+- A team that is full cannot receive (`transfer_full`).
+- A team left under the minimum size is allowed; the answer carries `underMin`
+  and Responses lists every team under the minimum.
+- An approval closes the other waiting requests for the same student. Removing
+  a team closes its waiting requests.
+- The popup names the other team by its reference only, so a code typed at
+  random does not show who is in which team.
+- Nothing of the student who moves is asked: the two leaders, or the admin,
+  decide.
+
 ## The Lists page
 
 `admin-lists.js` draws `#/lists` and `#/lists/<key>`: the lists at the side
@@ -982,6 +1017,6 @@ labels of the current tables.
 | [HOSTING.md](HOSTING.md) | What GitHub does, what Google does, and how they fit |
 | [DATA-MODEL.md](../reference/DATA-MODEL.md) | Every sheet, column, and stored property |
 | [SECURITY.md](../reference/SECURITY.md) | The secrets, who holds them, and what a leak would mean |
-| [TESTING.md](../reference/TESTING.md) | How 253 tests run without Google |
+| [TESTING.md](../reference/TESTING.md) | How 263 tests run without Google |
 | [DEPLOY.md](../DEPLOY.md) | Click-by-click setup |
 | [MODULES.md](../MODULES.md) | File-by-file reference |
