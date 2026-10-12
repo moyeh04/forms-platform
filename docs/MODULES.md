@@ -32,7 +32,7 @@ flowchart TD
     repo --> web["Website<br/>index.html, admin.html, viewer.html<br/>assets/css, assets/js"]
     repo --> shared["shared/rules.js<br/>validation rules"]
     repo --> be["backend/<br/>16 .gs files + appsscript.json"]
-    repo --> sc["scripts/<br/>bundle-backend.js, download_tasks.py"]
+    repo --> sc["scripts/<br/>bundle-backend.js, setup-deployment.js,<br/>download_tasks.py"]
     repo --> ts["tests/<br/>JavaScript and Python"]
     repo --> dc["docs/"]
 
@@ -161,11 +161,12 @@ no validation.
 | Path | What it is |
 |---|---|
 | `scripts/bundle-backend.js` | The bundler. |
+| `scripts/setup-deployment.js` | First deployment from your computer (`npm run setup`): pushes the bundle, creates the web app, and stores the IDs, the credential and the Pages setting in GitHub. |
 | `scripts/dev-server.js` | `npm run dev`: serves the site and answers its API calls from the in-memory Google, with sample forms, so pages can be opened in a real browser. |
 | `scripts/download_tasks.py` | Downloads task files and builds `Tasks.xlsx`. |
 | `tests/harness/appsscript-mock.js` | An in-memory Sheets, Drive, Mail, Cache, and clock, so the real backend code runs in tests. |
 | `tests/harness/dom.js` | Opens the real pages in jsdom wired to that backend. |
-| `tests/*.test.js` | 193 tests. |
+| `tests/*.test.js` | 199 tests. |
 | `tests/test_download_tasks.py` | 20 tests for the export, with a local server in place of Google. |
 
 ## Data model in one paragraph

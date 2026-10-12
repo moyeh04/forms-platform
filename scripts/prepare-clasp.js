@@ -5,6 +5,10 @@ const os = require('node:os');
 const path = require('node:path');
 const { apiUrl } = require('./build-site.js');
 
+function claspProject(scriptId) {
+  return { scriptId, rootDir: './dist' };
+}
+
 function deploymentConfig(env) {
   for (const key of ['APPS_SCRIPT_ID', 'APPS_SCRIPT_DEPLOYMENT_ID']) {
     if (!/^[A-Za-z0-9_-]+$/.test(env[key] || '')) {
@@ -19,7 +23,7 @@ function deploymentConfig(env) {
   if (!credentials || typeof credentials !== 'object' || Array.isArray(credentials) || !Object.keys(credentials).length) {
     throw new Error('CLASPRC_JSON must contain a nonempty JSON credentials object.');
   }
-  return { project: { scriptId: env.APPS_SCRIPT_ID, rootDir: './dist' }, credentials };
+  return { project: claspProject(env.APPS_SCRIPT_ID), credentials };
 }
 
 function prepareClasp(env = process.env, root = path.resolve(__dirname, '..'), home = os.homedir()) {
@@ -33,4 +37,4 @@ if (require.main === module) {
   catch (err) { console.error(err.message); process.exitCode = 1; }
 }
 
-module.exports = { deploymentConfig, prepareClasp };
+module.exports = { claspProject, deploymentConfig, prepareClasp };
