@@ -145,16 +145,23 @@ function keyPad_(form, responseId) {
   return sha256Hex(pepper() + ':seal:' + form.id + ':' + responseId);
 }
 
-function sealKey_(form, responseId, key) {
-  var pad = keyPad_(form, responseId);
+/** Shifts each digit of `key` by the matching hex digit of `pad`. Client keys use it too. */
+function sealDigits_(pad, key) {
   return 'S' + String(key).split('').map(function (d, i) { return String((parseInt(d, 10) + parseInt(pad.charAt(i), 16)) % 10); }).join('');
 }
 
-function unsealKey_(form, responseId, seal) {
+function unsealDigits_(pad, seal, length) {
   var s = String(seal || '');
-  if (!/^S\d{5}$/.test(s)) return '';
-  var pad = keyPad_(form, responseId);
+  if (!new RegExp('^S\\d{' + length + '}$').test(s)) return '';
   return s.slice(1).split('').map(function (d, i) { return String(((parseInt(d, 10) - parseInt(pad.charAt(i), 16)) % 10 + 10) % 10); }).join('');
+}
+
+function sealKey_(form, responseId, key) {
+  return sealDigits_(keyPad_(form, responseId), key);
+}
+
+function unsealKey_(form, responseId, seal) {
+  return unsealDigits_(keyPad_(form, responseId), seal, 5);
 }
 
 function issueKey_(form, rows) {

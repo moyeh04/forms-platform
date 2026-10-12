@@ -5,8 +5,12 @@
  *
  * A link can also need an access key: six digits the admin sends apart from the link, so a
  * link that is forwarded or leaked opens nothing on its own. Only the salted hash of the key
- * is stored, and wrong keys lock the link for a while. A link made before keys existed has
- * none and opens as before.
+ * is stored, with a sealed copy only this script can open so the admin can look a lost key
+ * up. Wrong keys lock the link for a while. A link made before keys existed has none and opens
+ * as before.
+ *
+ * A link can end on a date (`expires`); after it, the link and its key open nothing until the
+ * admin moves the date.
  */
 
 var CLIENT_KEY_TRIES_ = 5;
@@ -22,7 +26,7 @@ function rowToClient_(r) {
     _row: r._row, id: String(r.id), name: String(r.name), tokenHash: String(r.tokenHash),
     forms: parseJson(r.forms, []), hiddenColumns: parseJson(r.hiddenColumns, []),
     canReview: String(r.canReview) === '1', active: String(r.active) !== '0', createdAt: String(r.createdAt),
-    keyHash: String(r.keyHash || '')
+    keyHash: String(r.keyHash || ''), keySeal: String(r.keySeal || ''), expires: String(r.expires || '')
   };
 }
 
@@ -33,15 +37,18 @@ function readClients_() {
 function clientToRow_(c) {
   return {
     id: c.id, name: c.name, tokenHash: c.tokenHash, forms: JSON.stringify(c.forms), hiddenColumns: JSON.stringify(c.hiddenColumns),
-    canReview: c.canReview ? '1' : '0', active: c.active ? '1' : '0', createdAt: c.createdAt, keyHash: c.keyHash || ''
+    canReview: c.canReview ? '1' : '0', active: c.active ? '1' : '0', createdAt: c.createdAt, keyHash: c.keyHash || '',
+    keySeal: c.keySeal || '', expires: c.expires || ''
   };
 }
 
 function saveClient_(c) {
   var sh = clientsSheet_();
-  // A Clients tab made before the key column gets its header the first time a link is saved.
-  var head = sh.getRange(1, CLIENT_COLS_.length);
-  if (String(head.getValue()) !== 'keyHash') head.setValue('keyHash').setFontWeight('bold');
+  // A Clients tab made before the key and end-date columns gets their headers the first time a link is saved.
+  CLIENT_COLS_.slice(8).forEach(function (name, i) {
+    var head = sh.getRange(1, 9 + i);
+    if (String(head.getValue()) !== name) head.setValue(name).setFontWeight('bold');
+  });
   if (c._row) writeRow(sh, c._row, CLIENT_COLS_, clientToRow_(c));
   else {
     sh.appendRow(rowValues(CLIENT_COLS_, clientToRow_(c)));
@@ -58,6 +65,29 @@ function clientKeyHash_(c, key) {
   return sha256Hex(pepper() + ':clientkey:' + c.id + ':' + key);
 }
 
+function clientKeyPad_(c) {
+  return sha256Hex(pepper() + ':clientseal:' + c.id);
+}
+
+/** Gives the link `key`, or no key when it is empty. */
+function setClientKey_(c, key) {
+  c.keyHash = key ? clientKeyHash_(c, key) : '';
+  c.keySeal = key ? sealDigits_(clientKeyPad_(c), key) : '';
+}
+
+function clientExpired_(c) {
+  return !!(c.expires && Date.parse(c.expires) < Date.now());
+}
+
+/** An end date from the admin: an ISO time, or empty for no end. */
+function cleanExpiry_(value) {
+  var v = String(value || '').trim();
+  if (!v) return '';
+  var t = Date.parse(v);
+  if (isNaN(t)) fail('bad_date', 'That end date is not a date.');
+  return new Date(t).toISOString();
+}
+
 function newClientKey_() {
   var n = parseInt(uuid().replace(/-/g, '').slice(0, 10), 16) % 1000000;
   return ('00000' + n).slice(-6);
@@ -68,7 +98,8 @@ function newToken_() {
 }
 
 function publicClient_(c) {
-  return { id: c.id, name: c.name, forms: c.forms, hiddenColumns: c.hiddenColumns, canReview: c.canReview, active: c.active, createdAt: c.createdAt, hasKey: !!c.keyHash };
+  return { id: c.id, name: c.name, forms: c.forms, hiddenColumns: c.hiddenColumns, canReview: c.canReview, active: c.active, createdAt: c.createdAt,
+    hasKey: !!c.keyHash, keyKnown: !!(c.keyHash && c.keySeal), expires: c.expires, expired: clientExpired_(c) };
 }
 
 function cleanClientForms_(list) {
@@ -95,6 +126,7 @@ function requireClient_(req) {
     fail('bad_token', 'This link is not valid.');
   }
   if (!hit.active) fail('revoked', 'This link was turned off.');
+  if (clientExpired_(hit)) fail('link_expired', 'This link ended on ' + hit.expires.slice(0, 10) + '. Ask whoever sent it to extend it.');
   if (hit.keyHash) {
     var tag = 'client_key:' + hit.id;
     var wrong = parseInt(cache.get(tag) || '0', 10);
@@ -123,10 +155,11 @@ API['admin.clients.create'] = admin(function (req) {
   var token = newToken_();
   var c = {
     id: shortId('c_'), name: name, tokenHash: clientToken_(token), forms: cleanClientForms_(req.forms),
-    hiddenColumns: Array.isArray(req.hiddenColumns) ? req.hiddenColumns : [], canReview: !!req.canReview, active: true, createdAt: nowIso()
+    hiddenColumns: Array.isArray(req.hiddenColumns) ? req.hiddenColumns : [], canReview: !!req.canReview, active: true, createdAt: nowIso(),
+    expires: cleanExpiry_(req.expires)
   };
   var key = req.withKey === false ? '' : newClientKey_();
-  c.keyHash = key ? clientKeyHash_(c, key) : '';
+  setClientKey_(c, key);
   saveClient_(c);
   return { client: publicClient_(c), token: token, accessKey: key };
 });
@@ -140,6 +173,7 @@ API['admin.clients.update'] = admin(function (req) {
   if (p.hiddenColumns !== undefined) c.hiddenColumns = Array.isArray(p.hiddenColumns) ? p.hiddenColumns : [];
   if (p.canReview !== undefined) c.canReview = !!p.canReview;
   if (p.active !== undefined) c.active = !!p.active;
+  if (p.expires !== undefined) c.expires = cleanExpiry_(p.expires);
   saveClient_(c);
   return { client: publicClient_(c) };
 });
@@ -159,10 +193,20 @@ API['admin.clients.key'] = admin(function (req) {
   var c = readClients_().filter(function (x) { return x.id === req.id; })[0];
   if (!c) fail('client_not_found', 'That client does not exist.');
   var key = req.on === false ? '' : newClientKey_();
-  c.keyHash = key ? clientKeyHash_(c, key) : '';
+  setClientKey_(c, key);
   saveClient_(c);
   CacheService.getScriptCache().remove('client_key:' + c.id);
   return { client: publicClient_(c), accessKey: key };
+});
+
+/** The admin reads a link's current key, for example when the client lost it. */
+API['admin.clients.showKey'] = admin(function (req) {
+  var c = readClients_().filter(function (x) { return x.id === req.id; })[0];
+  if (!c) fail('client_not_found', 'That client does not exist.');
+  if (!c.keyHash) fail('no_key', 'This link does not ask for a key.');
+  var key = unsealDigits_(clientKeyPad_(c), c.keySeal, 6);
+  if (!key || clientKeyHash_(c, key) !== c.keyHash) fail('key_unknown', 'This key was made before keys could be shown. Make a new key to see it.');
+  return { accessKey: key };
 });
 
 API['admin.clients.remove'] = admin(function (req) {
