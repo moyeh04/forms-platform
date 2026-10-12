@@ -539,3 +539,11 @@ body.admin { font-size: 1rem; }
 
 .plain-list { margin: 6px 0 0; padding-inline-start: 18px; }
 .plain-list li { margin: 2px 0; }
+
+/* Client links: the access key column and the dialog that shows a new link and key once. */
+.client-key { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; }
+.client-key .link-btn { padding: 0; font-size: var(--fs-help); }
+.warn-text { color: var(--err); font-weight: 700; }
+.access-reveal { --l-gap: 14px; }
+.access-reveal .link-box { margin: 4px 0 6px; overflow-wrap: anywhere; }
+.access-reveal .key-reveal { margin: 4px 0 6px; }
