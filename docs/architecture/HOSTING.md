@@ -122,7 +122,7 @@ sequenceDiagram
     else all pass
         CI->>Pages: publish index, admin, viewer, assets, shared
     end
-    Note over Pages: No build. The files are served exactly as committed.
+    Note over Pages: No build. Files are served as committed, except config.js, generated from API_URL.
     Stu->>CDN: GET /forms/index.html?f=slug
     CDN-->>Stu: static HTML (cached, over HTTPS)
     Stu->>CDN: GET assets/css, assets/js, shared/rules.js
@@ -266,7 +266,7 @@ flowchart TD
     q{"What did you change?"}
     q -- "pages, styles, scripts in assets" --> a1["git push<br/>Pages republishes in about a minute"]
     q -- "backend or shared/rules.js" --> a2["push master<br/>Actions tests and builds<br/>clasp updates existing deployment"]
-    q -- "a rule in shared/rules.js" --> a3["do both:<br/>push the site (browser copy)<br/>and redeploy (server copy)"]
+    q -- "a rule in shared/rules.js" --> a3["push master once<br/>Actions updates the server copy,<br/>then publishes the browser copy"]
     q -- "a form's questions or team sizes" --> a4["Nothing to deploy.<br/>Change it in the dashboard."]
     classDef cDb fill:#F3E2B3,stroke:#B8892D,stroke-width:1.5px,color:#2F2418
     classDef cActor fill:#F4D9D3,stroke:#9A3328,stroke-width:1.5px,color:#2F2418

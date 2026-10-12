@@ -204,5 +204,5 @@ Script properties hold the pepper and the PIN hash. If they are deleted:
 - [ ] Give instructors links with phone and email hidden unless they need them
 - [ ] Turn off a viewer link when its term ends
 - [ ] Keep `Tasks_Export/` out of git and out of shared folders
-- [ ] After changing the Apps Script, deploy a **New version** of the same deployment
+- [ ] After changing the backend, check that the **Test and deploy site** run succeeded; a manual recovery must publish a **New version** of the same deployment
 - [ ] Revisit the quota page in Google if you expect hundreds of confirmation emails a day

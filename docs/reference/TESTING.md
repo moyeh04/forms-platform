@@ -1,11 +1,11 @@
 # Testing
 
-192 automated tests run without a Google account, a browser, or a network.
+213 automated tests run without a Google account, a browser, or a network.
 They run the **real** backend and the **real** pages. This page explains how
 that works and what it can and cannot prove.
 
 ```
-npm test                                              # 172 JavaScript tests
+npm test                                              # 193 JavaScript tests
 python3 -m unittest discover -s tests -p "test_*.py"  # 20 Python tests
 ```
 
@@ -140,20 +140,21 @@ function that calls `world.api`. Helpers `type`, `pick`, `click`,
 | Area | Tests | Examples |
 |---|---:|---|
 | Shared rules | 16 | Arabic filtering, name parts, phones, codes, Drive links, folder names, slots, form state |
-| Team size and audience | 15 | Required question, range, exact member count, admin range, conflicts warning, size notes, specialization limits |
-| Core and forms | 12 | Setup, PIN lockout, forms CRUD, duplicate, delete, templates |
+| Team size and audience | 16 | Required question, range, exact member count, admin range, conflicts warning, size notes, specialization limits |
+| Core and forms | 13 | Setup, PIN lockout, forms CRUD, duplicate, delete, templates |
 | Submissions | 21 | Submit, edit keys, sealed keys, expiry, throttling, duplicates, Drive checks, folder names, limits, emails on and off |
 | Reservations | 11 | Slots, capacity, one booking per leader, orphan warning |
-| Sheet views | 7 | Tinted blocks, leader star, merged task cell, bookings by day |
-| Print | 7 | Print tabs, signature column, PDF success and fallback |
+| Sheet views | 9 | Tinted blocks, leader star, merged task cell, bookings by day |
+| Print | 8 | Print tabs, signature column, PDF success and fallback |
 | Matching | 6 | Paste, normalise, matched, none, duplicate, sequential review |
-| Viewer API | 9 | Tokens, hidden columns, today and by day, review rights, revoked links |
+| Viewer API | 10 | Tokens, hidden columns, today and by day, review rights, revoked links |
 | Export API | 3 | Teams with members, no phones, PIN required, deleted left out |
-| Student page | 27 | Steps, filters, descriptions, team size picker and notes, audience line, subject tag, slots, review, ticket and email notice, edit by key, themes, Arabic |
-| Admin page | 23 | Login, create with term chips, team size and notes, descriptions, who can register, locked fields, team cards, show key, timetable builder, delete, matching, clients, lists editor |
-| Instructor page | 7 | Today, by day, hidden columns, review rights, invalid links |
+| Student page | 29 | Steps, filters, descriptions, team size picker and notes, audience line, subject tag, slots, review, ticket and email notice, edit by key, themes, Arabic |
+| Admin page | 28 | Login, create with term chips, team size and notes, descriptions, who can register, locked fields, team cards, show key, timetable builder, delete, matching, clients, lists editor |
+| Instructor page | 9 | Today, by day, hidden columns, review rights, invalid links |
 | Harness | 4 | The fake itself |
 | Colour contrast | 4 | Every text and outline pair meets WCAG AA in light, dark, and device-dark themes |
+| Deployment | 6 | `API_URL` validation, URL and deployment ID agree, built pages use the variable URL, clasp configuration, missing credentials |
 | Excel export (Python) | 20 | Link parsing, downloads, virus-scan page, workbook layout, merged cells, Failed sheet |
 
 ## What is not covered, and how to cover it
@@ -196,7 +197,7 @@ A good test states one behaviour in its name, for example
 ## Why this design
 
 - **Fast.** The suite finishes in a few seconds, so it can run on every change.
-- **Honest.** It runs the exact text you paste, via the same `bundleSource()`
+- **Honest.** It runs the exact text that is deployed, via the same `bundleSource()`
   the build uses.
 - **Cheap to extend.** The fake is small, and tests read like user stories.
 - **Safe.** No test touches a real account, so nothing can send a real email or
