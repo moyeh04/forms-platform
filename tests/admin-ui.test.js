@@ -362,6 +362,36 @@ function showMonth(p, month) {
 }
 const slotTexts = (p, row) => [...p.$$('.tt-row')[row].querySelectorAll('.tt-slot')].map((c) => c.firstChild.textContent);
 
+test('Reservation teammates: how many, the title students read, and what is asked about each one', async () => {
+  const w = boot();
+  const f = w.make('reservation', 'Seminar', { slots: { days: [{ id: 'one', label: 'Sunday', times: ['12:30 - 12:50', '12:55 - 1:15'] }], capacity: 1 } });
+  const p = await openAdmin(w, `#/f/${f.slug}/questions`);
+  assert.ok(p.$('.tm-body').hidden, 'the settings exist only while teammates are asked');
+  const ask = p.$('[name="reservation-members"]'); ask.checked = true; p.fire(ask, 'change');
+  assert.equal(p.$('.tm-body').hidden, false);
+  assert.ok(p.text().includes('Every booking has the leader and 1 to 5 teammates.'));
+  p.click('[name="teammates-min-down"]');
+  assert.ok(p.text().includes('A leader can book alone, or add up to 5 teammates.'));
+  assert.ok(p.$('[name="teammates-min-down"]').disabled, 'fewer than none is not offered');
+  p.click('[name="teammates-max-down"]'); p.click('[name="teammates-max-down"]'); p.click('[name="teammates-max-down"]');
+  assert.equal(p.$('[name="teammates-max"]').textContent, '2');
+  p.type('[name="teammates-title-en"]', 'Who comes with you');
+  const phone = p.$('.tm-questions [data-field="phone"] .q-show input');
+  phone.checked = false; p.fire(phone, 'change');
+  assert.ok(p.$('.tm-questions [data-field="name"] .q-show input').disabled, 'the name is always asked');
+  p.click('[name="save"]'); await settle(12);
+
+  const members = w.admin({ action: 'admin.forms.get', id: f.id }).form.fields.find((x) => x.role === 'members');
+  assert.deepEqual([members.enabled, members.required, members.min, members.max, members.label.en], [true, false, 0, 2, 'Who comes with you']);
+  assert.equal(members.fields.find((x) => x.id === 'phone').enabled, false);
+  const book = (code, time, list) => w.api({ action: 'submit', slug: f.slug, data: person({ leader_code: code, title: 'Library', slot: { day: 'one', time }, members: list }) });
+  assert.equal(book('4230010', '12:30 - 12:50', []).ok, true, 'a leader books alone');
+  const three = ['4230011', '4230012', '4230013'].map((c) => member('سارة خالد حسن علي', c));
+  assert.equal(book('4230020', '12:55 - 1:15', three).ok, false, 'more teammates than the most is refused');
+  const noPhone = { ...member('سارة خالد حسن علي', '4230021') }; delete noPhone.phone;
+  assert.equal(book('4230020', '12:55 - 1:15', [noPhone]).ok, true, 'a hidden detail is not needed');
+});
+
 test('Timetable: a day with no date gets a name and the general hours, and bookings appear grouped by day', async () => {
   const w = boot();
   const f = w.make('reservation', 'Seminar');
