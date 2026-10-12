@@ -144,3 +144,37 @@ test('Transfer: off by default, and a cancelled team takes its requests with it'
   assert.deepEqual(rows(w).transfers, []);
   assert.deepEqual(send(w, { action: 'lookup', key: a.key }).transfers.incoming, []);
 });
+
+const { openPage, helpers, settle } = require('./harness/dom.js');
+
+async function openAdmin(w, hash) {
+  const dom = await openPage('admin.html', w, { hash });
+  dom.window.App.api.setPin('4321');
+  await dom.window.App.admin.start();
+  await settle(10);
+  return { dom, win: dom.window, ...helpers(dom.window) };
+}
+
+test('Transfer dashboard: the rule is a switch under one team per student, and Responses lists what waits', async () => {
+  const w = boot({ transfers: false });
+  const set = await openAdmin(w, `#/f/${w.slug}/settings`);
+  assert.equal(set.$('.sub-setting').hidden, false, 'shown while a student may be in only one team');
+  const one = set.$('[name="uniqueAcrossForm"]'); one.checked = false; set.fire(one, 'change');
+  assert.ok(set.$('.sub-setting').hidden, 'and hidden with it');
+  one.checked = true; set.fire(one, 'change');
+  const box = set.$('[name="transfers"]'); box.checked = true; set.fire(box, 'change');
+  set.click('[name="save"]'); await settle(12);
+  assert.equal(w.admin({ action: 'admin.forms.get', id: w.slug }).form.rules.transfers, true);
+
+  const a = send(w, team(4230001, [4230002]));
+  const b = send(w, team(4230011, [4230002, 4230004], { transfer: ['4230002'] }));
+  const p = await openAdmin(w, `#/f/${w.slug}`);
+  const row = p.$('.request-row');
+  assert.ok(p.$('.requests').textContent.includes('One student asked for by another team'));
+  assert.ok(row.textContent.includes(NAMES[4230002]) && row.textContent.includes(`from ${a.ref} to ${b.ref}`));
+  assert.equal(p.$('[name="under-min"]'), null);
+  p.click('[name="transfer-approve"]'); await settle(14);
+  assert.equal(p.$('.request-row'), null, 'an answered request leaves the list');
+  assert.ok(p.$('[name="under-min"]').textContent.includes(`One team is under the minimum of 2: ${a.ref}.`));
+  assert.deepEqual(codesOf(rows(w).submissions[1]), ['4230004', '4230002']);
+});

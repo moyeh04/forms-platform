@@ -300,11 +300,16 @@
       h('p', { class: 'help' }, 'When the Drive check is on, the folder name is read and must look like Team_Leader_Name_Project_Name_Subject_Name, for example Ahmed_Mohamed_Library_System_Software_Engineering: no spaces, parts joined by underscores, ending with the subject name. Students see the rule with an example.'),
       A.check('Folder names must follow Team_Leader_Name_Project_Name_Subject_Name', f.rules.folderName.enabled, function (v) { f.rules.folderName.enabled = v; }),
       A.field('Subject name at the end', A.text(f.rules.folderName.subject || '', function (v) { f.rules.folderName.subject = Rules.folderPart(v); }, { name: 'folderSubject', dir: 'ltr', placeholder: 'Software_Engineering' }), 'The subject name, not the code. Spaces become underscores. Leave empty to accept any subject name.')) : null;
+    // Asking for a member of another team has a meaning only while a student may be in one team.
+    var transferRow = isTeam ? h('div', { class: 'sub-setting', hidden: !f.rules.uniqueAcrossForm },
+      A.check('A leader may ask for a student who is in another team', !!f.rules.transfers, function (v) { f.rules.transfers = v; }, false, 'transfers'),
+      h('p', { class: 'help' }, 'The team registers without that student. The student moves when the leader of the other team approves with the edit key, or when you approve under Responses.')) : null;
     var rulesPanel = panel('Limits and checks', null,
       h('div', { class: 'row' },
         A.field('Maximum submissions', A.number(f.rules.maxSubmissions == null ? '' : f.rules.maxSubmissions, function (v) { f.rules.maxSubmissions = v === '' ? null : parseInt(v, 10); }, { name: 'maxSubmissions', min: '1' }), 'Leave empty for no limit.'),
         hasDrive ? A.field('Google Drive links', A.select(f.rules.driveCheck || 'strict', [['strict', 'Must open and be shared with anyone who has the link'], ['off', 'Do not check']], function (v) { f.rules.driveCheck = v; })) : null),
-      isTeam ? A.check('A student may appear in only one team of this form', f.rules.uniqueAcrossForm, function (v) { f.rules.uniqueAcrossForm = v; }) : null,
+      isTeam ? A.check('A student may appear in only one team of this form', f.rules.uniqueAcrossForm, function (v) { f.rules.uniqueAcrossForm = v; transferRow.hidden = !v; }, false, 'uniqueAcrossForm') : null,
+      transferRow,
       folderBox);
     var emailPanel = panel('Emails', 'Emails go out from your Google account. Students always see their key on the success page, and you can look any key up under Responses, Details.',
       A.check('Send each student a confirmation email with their reference and key', f.notifications.confirmEmail !== false, function (v) { f.notifications.confirmEmail = v; }, false, 'confirmEmail'),
@@ -571,7 +576,7 @@
       return (f.notifications.confirmEmail !== false ? 'Confirmation to students' : 'No confirmation') + (f.notifications.alertEmail ? ' · note to ' + f.notifications.alertEmail : '');
     };
     rulesPanel.summary = function () {
-      return [f.rules.maxSubmissions ? 'At most ' + f.rules.maxSubmissions : 'No limit', isTeam && f.rules.uniqueAcrossForm ? 'one team per student' : ''].filter(Boolean).join(' · ');
+      return [f.rules.maxSubmissions ? 'At most ' + f.rules.maxSubmissions : 'No limit', isTeam && f.rules.uniqueAcrossForm ? 'one team per student' + (f.rules.transfers ? ', leaders may ask for a student' : '') : ''].filter(Boolean).join(' · ');
     };
     reviewPanel.summary = function () { return f.review.steps.length ? f.review.steps.map(function (x) { return x.label.en; }).join(', ') : 'None'; };
 

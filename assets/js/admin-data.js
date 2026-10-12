@@ -27,6 +27,7 @@
     var both = await Promise.all([A.call('admin.forms.get', { id: slug }), A.call('admin.submissions', { slug: slug })]);
     var form = both[0].form;
     var all = both[1].submissions;
+    var transfers = both[1].transfers || [];
     var state = { q: '', status: 'all', tab: form.type === 'whatsapp_registration' && form.matching && form.matching.enabled ? 'matching' : 'list' };
     var link = A.formLink(form.slug);
     var t = A.TYPES[form.type] || { label: form.type };
@@ -50,6 +51,33 @@
       return all.filter(function (s) { return (state.status === 'all' || s.status === state.status) && (!q || haystack(form, s).indexOf(q) !== -1); });
     }
 
+    /** What waits for the admin: members asked for by another team, and teams under the minimum size. */
+    function needsYou() {
+      var range = Rules.teamSizeRange(form), sizeField = Rules.fieldByRole(form, 'team_size');
+      var small = sizeField ? all.filter(function (s) { return parseInt(s.data[sizeField.id], 10) < range.min; }) : [];
+      if (!transfers.length && !small.length) return null;
+      var decide = function (t, approve) {
+        return function (e) {
+          A.busy(e.currentTarget, async function () {
+            var out = await A.call('admin.transfer.decide', { slug: form.slug, transfer: t.id, approve: approve });
+            ui.toast(approve ? (t.name || t.code) + ' moved to ' + t.to + '.' + (out.underMin ? ' ' + t.from + ' is now under the minimum team size.' : '') : 'Rejected. ' + (t.name || t.code) + ' stays in ' + t.from + '.', 'ok');
+            reload();
+          });
+        };
+      };
+      return h('section', { class: 'requests', 'aria-label': 'Needs you' },
+        transfers.length ? h('h3', null, transfers.length === 1 ? 'One student asked for by another team' : transfers.length + ' students asked for by another team') : null,
+        transfers.length ? h('p', { class: 'help' }, 'The leader of the team that holds the student can answer with the edit key. You can answer here as well; the first answer counts.') : null,
+        transfers.map(function (t) {
+          return h('div', { class: 'request-row', dataset: { transfer: t.id } },
+            h('span', { class: 'request-text' }, h('strong', { dir: 'auto' }, t.name || t.code), ' ', h('span', { class: 'mono' }, t.code), h('span', { class: 'muted-note' }, ' from '), h('strong', null, t.from), h('span', { class: 'muted-note' }, ' to '), h('strong', null, t.to)),
+            h('span', { class: 'actions' },
+              h('button', { type: 'button', class: 'btn btn-quiet sm', name: 'transfer-reject', onclick: decide(t, false) }, 'Reject'),
+              h('button', { type: 'button', class: 'btn btn-primary sm', name: 'transfer-approve', onclick: decide(t, true) }, 'Approve and move')));
+        }),
+        small.length ? h('p', { class: 'request-warn', name: 'under-min' }, (small.length === 1 ? 'One team is' : small.length + ' teams are') + ' under the minimum of ' + range.min + ': ' + small.map(function (s) { return s.ref; }).join(', ') + '.') : null);
+    }
+
     function paint() {
       ui.clear(content);
       if (form.type === 'whatsapp_registration' && form.matching && form.matching.enabled) {
@@ -59,6 +87,8 @@
         if (state.tab === 'matching') { stats.hidden = true; return matchingView(form, content); }
       }
       stats.hidden = false;
+      var needs = needsYou();
+      if (needs) content.appendChild(needs);
       var rows = filtered();
       if (!rows.length) return content.appendChild(h('div', { class: 'empty' }, all.length ? 'Nothing matches that search.' : 'No submissions yet. Share the form link to start collecting.'));
       if (form.type === 'reservation') content.appendChild(bookings(form, rows, reload));
