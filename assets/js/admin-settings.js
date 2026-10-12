@@ -32,7 +32,7 @@
     var body = h('div', { class: 'panel-body', hidden: true }, help ? h('p', { class: 'help' }, help) : null, Array.prototype.slice.call(arguments, 2));
     var sum = h('span', { class: 'panel-sum' });
     var head = h('button', { type: 'button', class: 'panel-head', 'aria-expanded': 'false' }, h('span', { class: 'panel-title' }, title), sum);
-    var node = h('section', { class: 'panel', dataset: { panel: title } }, h('h2', null, head), body);
+    var node = h('section', { class: 'panel fold', dataset: { panel: title } }, h('h2', null, head), body);
     node.panelTitle = title;
     node.isOpen = function () { return !body.hidden; };
     node.setOpen = function (open) {
