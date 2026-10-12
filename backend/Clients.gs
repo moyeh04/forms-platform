@@ -2,7 +2,14 @@
  * Read-only access for instructors and clients through private links.
  * A link contains a random token; only its salted hash is stored, so a
  * leaked spreadsheet cannot be used to open anyone's view.
+ *
+ * A link can also need an access key: six digits the admin sends apart from the link, so a
+ * link that is forwarded or leaked opens nothing on its own. Only the salted hash of the key
+ * is stored, and wrong keys lock the link for a while. A link made before keys existed has
+ * none and opens as before.
  */
+
+var CLIENT_KEY_TRIES_ = 5;
 
 var API = API || {};
 
@@ -14,7 +21,8 @@ function rowToClient_(r) {
   return {
     _row: r._row, id: String(r.id), name: String(r.name), tokenHash: String(r.tokenHash),
     forms: parseJson(r.forms, []), hiddenColumns: parseJson(r.hiddenColumns, []),
-    canReview: String(r.canReview) === '1', active: String(r.active) !== '0', createdAt: String(r.createdAt)
+    canReview: String(r.canReview) === '1', active: String(r.active) !== '0', createdAt: String(r.createdAt),
+    keyHash: String(r.keyHash || '')
   };
 }
 
@@ -25,12 +33,15 @@ function readClients_() {
 function clientToRow_(c) {
   return {
     id: c.id, name: c.name, tokenHash: c.tokenHash, forms: JSON.stringify(c.forms), hiddenColumns: JSON.stringify(c.hiddenColumns),
-    canReview: c.canReview ? '1' : '0', active: c.active ? '1' : '0', createdAt: c.createdAt
+    canReview: c.canReview ? '1' : '0', active: c.active ? '1' : '0', createdAt: c.createdAt, keyHash: c.keyHash || ''
   };
 }
 
 function saveClient_(c) {
   var sh = clientsSheet_();
+  // A Clients tab made before the key column gets its header the first time a link is saved.
+  var head = sh.getRange(1, CLIENT_COLS_.length);
+  if (String(head.getValue()) !== 'keyHash') head.setValue('keyHash').setFontWeight('bold');
   if (c._row) writeRow(sh, c._row, CLIENT_COLS_, clientToRow_(c));
   else {
     sh.appendRow(rowValues(CLIENT_COLS_, clientToRow_(c)));
@@ -43,12 +54,21 @@ function clientToken_(token) {
   return sha256Hex(pepper() + ':client:' + token);
 }
 
+function clientKeyHash_(c, key) {
+  return sha256Hex(pepper() + ':clientkey:' + c.id + ':' + key);
+}
+
+function newClientKey_() {
+  var n = parseInt(uuid().replace(/-/g, '').slice(0, 10), 16) % 1000000;
+  return ('00000' + n).slice(-6);
+}
+
 function newToken_() {
   return (uuid() + uuid()).replace(/-/g, '').slice(0, 24);
 }
 
 function publicClient_(c) {
-  return { id: c.id, name: c.name, forms: c.forms, hiddenColumns: c.hiddenColumns, canReview: c.canReview, active: c.active, createdAt: c.createdAt };
+  return { id: c.id, name: c.name, forms: c.forms, hiddenColumns: c.hiddenColumns, canReview: c.canReview, active: c.active, createdAt: c.createdAt, hasKey: !!c.keyHash };
 }
 
 function cleanClientForms_(list) {
@@ -75,6 +95,17 @@ function requireClient_(req) {
     fail('bad_token', 'This link is not valid.');
   }
   if (!hit.active) fail('revoked', 'This link was turned off.');
+  if (hit.keyHash) {
+    var tag = 'client_key:' + hit.id;
+    var wrong = parseInt(cache.get(tag) || '0', 10);
+    if (wrong >= CLIENT_KEY_TRIES_) fail('key_locked', 'Too many wrong keys. Wait ten minutes and try again.');
+    var key = String((req && req.accessKey) || '').replace(/\D/g, '');
+    if (!key) fail('key_needed', 'This link needs its access key.');
+    if (clientKeyHash_(hit, key) !== hit.keyHash) {
+      cache.put(tag, String(wrong + 1), 600);
+      fail('bad_access_key', 'That access key is not right.');
+    }
+  }
   return hit;
 }
 
@@ -90,11 +121,14 @@ API['admin.clients.create'] = admin(function (req) {
   var name = String(req.name || '').trim();
   if (!name) fail('name_required', 'Give this person or group a name.');
   var token = newToken_();
-  var c = saveClient_({
+  var c = {
     id: shortId('c_'), name: name, tokenHash: clientToken_(token), forms: cleanClientForms_(req.forms),
     hiddenColumns: Array.isArray(req.hiddenColumns) ? req.hiddenColumns : [], canReview: !!req.canReview, active: true, createdAt: nowIso()
-  });
-  return { client: publicClient_(c), token: token };
+  };
+  var key = req.withKey === false ? '' : newClientKey_();
+  c.keyHash = key ? clientKeyHash_(c, key) : '';
+  saveClient_(c);
+  return { client: publicClient_(c), token: token, accessKey: key };
 });
 
 API['admin.clients.update'] = admin(function (req) {
@@ -118,6 +152,17 @@ API['admin.clients.regenerate'] = admin(function (req) {
   c.active = true;
   saveClient_(c);
   return { client: publicClient_(c), token: token };
+});
+
+/** Gives a link a new access key (`on`), or removes its key so the link alone opens it. */
+API['admin.clients.key'] = admin(function (req) {
+  var c = readClients_().filter(function (x) { return x.id === req.id; })[0];
+  if (!c) fail('client_not_found', 'That client does not exist.');
+  var key = req.on === false ? '' : newClientKey_();
+  c.keyHash = key ? clientKeyHash_(c, key) : '';
+  saveClient_(c);
+  CacheService.getScriptCache().remove('client_key:' + c.id);
+  return { client: publicClient_(c), accessKey: key };
 });
 
 API['admin.clients.remove'] = admin(function (req) {

@@ -12,7 +12,7 @@ var FORM_COLS = ['id', 'slug', 'type', 'title', 'term', 'status', 'opensAt', 'cl
 
 var RESPONSE_COLS = ['id', 'ref', 'created', 'updated', 'status', 'review', 'email', 'name', 'code', 'phone', 'title', 'link', 'slot', 'members', 'data', 'keyHash', 'keyExpires', 'deleted', 'keySeal'];
 
-var CLIENT_COLS_ = ['id', 'name', 'tokenHash', 'forms', 'hiddenColumns', 'canReview', 'active', 'createdAt'];
+var CLIENT_COLS_ = ['id', 'name', 'tokenHash', 'forms', 'hiddenColumns', 'canReview', 'active', 'createdAt', 'keyHash'];
 
 var FORM_TYPES = ['team_registration', 'task_submission', 'reservation', 'whatsapp_registration'];
 var FORM_STATUSES = ['draft', 'open', 'closed', 'archived'];
