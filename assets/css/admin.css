@@ -100,7 +100,7 @@ body.admin { font-size: 1rem; }
 .badge.draft, .badge.pending, .badge.new { background: transparent; color: var(--mute); }
 .badge.duplicate, .badge.in_review { background: var(--tint-b); border-color: var(--accent); color: var(--ink); }
 
-.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; align-items: start; }
 .card { background: var(--sheet); border: 1.5px solid var(--line); border-radius: 4px; padding: 16px 18px; display: flex; flex-direction: column; gap: 10px; }
 .card h3 { font-size: 1.25rem; line-height: 1.3; }
 .card-top { display: flex; align-items: flex-start; gap: 10px; }
@@ -109,6 +109,17 @@ body.admin { font-size: 1rem; }
 .card-tags { margin-top: 2px; }
 .card { box-shadow: 0 1px 2px var(--shadow); border-radius: 6px; }
 .card-actions { margin-top: auto; }
+/* The bookings of a registration form, inside its card. */
+.series { margin-top: 4px; padding-top: 10px; border-top: 1px dashed var(--line); }
+.series > summary { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: var(--fs-label); cursor: pointer; }
+.series-count { padding: 0 8px; border-radius: 999px; background: var(--sheet-2); color: var(--mute); font-size: var(--fs-help); }
+.series-list { margin: 8px 0 10px; padding: 0; list-style: none; }
+.series-list li { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 12px; padding: 8px 0; border-top: 1px solid color-mix(in srgb, var(--line) 70%, transparent); }
+.series-title { flex: 1 1 100%; color: var(--ink); font-weight: 700; text-decoration: none; }
+.series-title:hover { text-decoration: underline; }
+.series-meta { display: inline-flex; align-items: center; gap: 8px; margin-inline-end: auto; }
+.series-links { display: inline-flex; gap: 14px; }
+.series-links .link-btn { padding: 2px 0; font-size: var(--fs-help); }
 .more { position: relative; }
 .more > summary { list-style: none; cursor: pointer; }
 .more > summary::-webkit-details-marker { display: none; }

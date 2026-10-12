@@ -215,3 +215,47 @@ test('Key booking setting: offered only with a form that issues keys, and saved 
   assert.equal(q.$('[name="keyBooking"]'), null);
   assert.ok(q.text().includes('No form gives its students a key yet'));
 });
+
+test('Booking series: the first booking is made for a form, and each next one is the last one a week later', () => {
+  const w = boot();
+  const next = (extra = {}) => w.admin({ action: 'admin.bookings.next', source: w.teams.id, ...extra });
+  const dated = { status: 'open', slots: { days: [{ label: 'Sunday 14 Nov', date: '2027-11-14', times: ['12:30 - 12:50', '12:55 - 1:15'] }, { label: 'Week 11 - Tuesday', date: '2027-11-16', times: ['12:30 - 12:50'] }, { label: 'Any day', times: ['2:00 - 2:20'] }], capacity: 2 } };
+  w.update(dated);
+  assert.equal(w.book(w.keyA, { day: 'sunday-14-nov', time: '12:30 - 12:50' }).ok, true);
+
+  const second = next();
+  assert.equal(second.copied, true);
+  assert.equal(second.form.title, w.form.title + ' 2', 'a title with no number gets one');
+  assert.equal(second.form.status, 'draft');
+  assert.notEqual(second.form.sheetId, w.form.sheetId, 'the copy has its own sheet');
+  assert.deepEqual(JSON.parse(JSON.stringify(second.form.keyBooking)), { enabled: true, source: w.teams.id });
+  assert.deepEqual(second.form.slots.days.map((d) => [d.label, d.date]), [['Sunday 21 Nov', '2027-11-21'], ['Week 12 - Tuesday', '2027-11-23'], ['Any day', '']]);
+  assert.equal(second.form.slots.capacity, 2);
+  assert.equal(w.admin({ action: 'admin.submissions', slug: second.form.slug }).submissions.length, 0, 'bookings are not copied');
+
+  w.admin({ action: 'admin.forms.update', id: second.form.id, patch: { title: 'Discussion - Week 2' } });
+  assert.equal(next().form.title, 'Discussion - Week 3', 'the number in the title goes up');
+  assert.equal(next({ title: 'Final discussion' }).form.title, 'Final discussion');
+
+  assert.equal(next({ source: w.form.id }).error.code, 'bad_key_booking', 'a reservation has no keys of its own to book with');
+});
+
+test('Booking series: the dashboard lists bookings under their form and makes the next one in one click', async () => {
+  const w = boot();
+  const openAdmin = async (world) => {
+    const dom = await openPage('admin.html', world, { hash: '' });
+    dom.window.App.api.setPin('4321');
+    await dom.window.App.admin.start(); await settle(10);
+    return { win: dom.window, ...helpers(dom.window) };
+  };
+  const p = await openAdmin(w);
+  assert.equal(p.$$('.card').length, 1, 'the booking is not a card of its own');
+  const card = p.$(`.card[data-slug="${w.teams.slug}"]`);
+  assert.deepEqual([...card.querySelectorAll('.series-title')].map((n) => n.textContent), [w.form.title]);
+  p.click('[name="next-booking"]'); await settle(12);
+  assert.ok(p.win.location.hash.endsWith('/timetable'), 'the new booking opens on its timetable');
+  assert.equal(w.admin({ action: 'admin.forms.list' }).forms.length, 3);
+  const again = await openAdmin(w);
+  assert.equal(again.$$('.series-title').length, 2);
+  assert.equal(again.$('.series-count').textContent, '2');
+});

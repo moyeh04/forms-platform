@@ -127,6 +127,7 @@ step needs the real Google services (see "What could not be tested here").
 | Google Sheets: every team is a block with a heavy border and alternating tints, a star on the leader, one merged project or task cell | Done |
 | Dashboard and instructor links show each team as a card: a teal or gold band, a header with the team number, project, and size, and the leader marked; readable in light and dark and stacked on phones | Done |
 | Phone layout (up to 600px): member rows, bookings, WhatsApp registrations and private links stack as cards with each value under its column name; a phone number is a call link; toolbars use two equal columns and the day sheet controls stay in one labelled group | Done |
+| Weekly bookings: bookings that use the keys of a registration form are listed inside its card, and one button makes the next one as a copy of the last, one week later, as a draft | Done |
 | New form page: choose what the form is for, name it, and see a live preview of the title, tags and pages students get, with what to set up next | Done |
 | One form, four tabs (Responses, Questions, Timetable, Setup) with the status in the header; settings fold to one line that says what they are set to; the save bar appears only when something changed and leaving with unsaved changes asks first | Done |
 | Questions listed under the page of the form that shows them, as rows that stack on a narrow screen | Done |
@@ -181,7 +182,7 @@ the first-deployment setup, and the Excel export; `tests/` holds the automated t
 
 ```
 npm install          # once, installs the browser test library
-npm test             # 227 tests: rules, backend, form page, dashboard, instructor page, deployment
+npm test             # 229 tests: rules, backend, form page, dashboard, instructor page, deployment
 npm run build        # writes dist/Code.gs and dist/appsscript.json for clasp
 npm run setup        # first deployment: creates the sheet, pushes the backend, creates the web app, configures GitHub
 npm run dev          # local preview on http://localhost:8080 (PIN 4321), in memory, no Google needed

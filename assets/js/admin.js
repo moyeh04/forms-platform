@@ -303,10 +303,15 @@
       mount.appendChild(h('div', { class: 'empty' }, 'No forms yet. Create the first one and choose what it collects.'));
       return;
     }
-    mount.appendChild(h('div', { class: 'cards' }, forms.map(formCard)));
+    // A booking that is opened with the keys of a form is listed under that form, not as a card of its own.
+    var ids = forms.map(function (f) { return f.id; });
+    var under = function (f) { var src = bookedBy(f); return src && ids.indexOf(src) !== -1 ? src : ''; };
+    mount.appendChild(h('div', { class: 'cards' }, forms.filter(function (f) { return !under(f); }).map(function (f) {
+      return formCard(f, forms.filter(function (k) { return under(k) === f.id; }));
+    })));
   };
 
-  function formCard(f) {
+  function formCard(f, kids) {
     var t = A.TYPES[f.type] || { label: f.type, icon: 'task' };
     var link = A.formLink(f.slug);
     var more = h('details', { class: 'more' },
@@ -315,7 +320,7 @@
         f.sheetUrl ? h('a', { role: 'menuitem', href: f.sheetUrl, target: '_blank', rel: 'noopener' }, icon('task', 16), 'Open Google Sheet') : null,
         h('button', { type: 'button', role: 'menuitem', onclick: function () { more.open = false; duplicateDialog(f); } }, icon('copy', 16), 'Duplicate for a new term'),
         h('button', { type: 'button', role: 'menuitem', class: 'danger', name: 'delete-form', 'aria-label': 'Delete ' + f.title, onclick: function () { more.open = false; A.deleteForm(f); } }, icon('trash', 16), 'Delete form')));
-    return h('article', { class: 'card', dataset: { slug: f.slug } },
+    return h('article', { class: 'card' + (kids && kids.length ? ' has-series' : ''), dataset: { slug: f.slug } },
       h('div', { class: 'card-top' }, h('span', { class: 'card-icon' }, icon(t.icon, 22)),
         h('div', null, h('h3', null, f.title), h('div', { class: 'card-tags' }, A.termTags(f)))),
       h('div', { class: 'actions' }, A.badge(A.STATUS_LABEL[f.status] || f.status, f.status), h('span', { class: 'muted-note' }, t.label)),
@@ -324,7 +329,52 @@
         h('a', { class: 'btn btn-quiet sm', href: '#/f/' + encodeURIComponent(f.slug) + '/settings' }, 'Settings'),
         h('a', { class: 'btn btn-quiet sm', href: link, target: '_blank', rel: 'noopener' }, 'Open form'),
         h('button', { type: 'button', class: 'btn btn-quiet sm', 'aria-label': 'Copy the link of ' + f.title, onclick: async function () { toast((await ui.copyText(link)) ? 'Form link copied' : 'Could not copy', 'ok'); } }, icon('link', 18), 'Copy link'),
-        more));
+        more),
+      issuesKeys(f) ? series(f, kids || []) : null);
+  }
+
+  /** A form that gives its students a key can have bookings that are opened with that key. */
+  function issuesKeys(f) { return f.type !== 'reservation' && !!(f.editKey && f.editKey.enabled); }
+  function bookedBy(f) { return f.type === 'reservation' && f.keyBooking && f.keyBooking.enabled ? f.keyBooking.source : ''; }
+
+  function daysText(f) {
+    var days = ((f.slots && f.slots.days) || []);
+    if (!days.length) return 'No days yet';
+    return days.length === 1 ? days[0].label : days[0].label + ' to ' + days[days.length - 1].label;
+  }
+
+  /** The bookings under a registration form, newest first, and the button that makes the next one. */
+  function series(f, kids) {
+    var make = function (title, btn) {
+      return A.busy(btn, async function () {
+        var res = await A.call('admin.bookings.next', { source: f.id, title: title || '' });
+        toast(res.copied ? '"' + res.form.title + '" is a copy of the last booking, one week later. Check the days, then set it to Open.' : '"' + res.form.title + '" created as a draft. Add its days, then set it to Open.', 'ok');
+        window.location.hash = '#/f/' + encodeURIComponent(res.form.slug) + '/timetable';
+      });
+    };
+    var next = h('button', { type: 'button', class: 'btn btn-quiet sm', name: 'next-booking', onclick: function (e) {
+      if (kids.length) return make('', e.currentTarget);
+      var title = 'Discussion - Week 1';
+      A.modal('First booking for "' + f.title + '"', h('div', null,
+        h('p', { class: 'help' }, 'Teams book a time with the key they got from this form, so they do not type their details again. Later bookings are copied from this one, one week later, and the number in the title goes up.'),
+        A.field('Title', A.text(title, function (v) { title = v; }, { name: 'booking-title' }))), [
+        { text: 'Cancel', kind: 'quiet' },
+        { text: 'Create booking', kind: 'primary', onclick: function () { if (!title.trim()) { toast('Give the booking a title.', 'err'); return false; } return make(title); } }
+      ]);
+    } }, icon('plus', 16), kids.length ? 'New booking, one week later' : 'Add a booking for this form');
+    if (!kids.length) return h('div', { class: 'series' }, next);
+    return h('details', { class: 'series', open: true },
+      h('summary', null, icon('calendar', 18), 'Bookings', h('span', { class: 'series-count' }, String(kids.length))),
+      h('ul', { class: 'series-list' }, kids.map(function (k) {
+        var link = A.formLink(k.slug);
+        return h('li', { dataset: { booking: k.slug } },
+          h('a', { class: 'series-title', href: '#/f/' + encodeURIComponent(k.slug) }, k.title),
+          h('span', { class: 'series-meta' }, A.badge(A.STATUS_LABEL[k.status] || k.status, k.status), h('span', { class: 'muted-note' }, daysText(k))),
+          h('span', { class: 'series-links' },
+            h('a', { class: 'link-btn', href: '#/f/' + encodeURIComponent(k.slug) + '/timetable' }, 'Timetable'),
+            h('button', { type: 'button', class: 'link-btn', 'aria-label': 'Copy the link of ' + k.title, onclick: async function () { toast((await ui.copyText(link)) ? 'Booking link copied' : 'Could not copy', 'ok'); } }, 'Copy link')));
+      })),
+      next);
   }
 
   /** One confirmation, then the form is gone and its sheet is in the Drive trash. */

@@ -24,7 +24,7 @@ sheet, not code.
 | **One source of truth for rules** | `shared/rules.js` is used by the browser, the backend, and the tests. They cannot disagree. |
 | **Forms are data** | A form is a JSON definition in one cell. New questions and new form types need no code. |
 | **Boring technology** | Plain JavaScript, no framework, no bundler for the website, one concatenation script for the backend. Easy to read, easy to fix later. |
-| **Testable without Google** | An in-memory copy of Google's services runs the real backend code, so 227 JavaScript tests cover it without touching a real account. |
+| **Testable without Google** | An in-memory copy of Google's services runs the real backend code, so 229 JavaScript tests cover it without touching a real account. |
 
 ## System context
 
@@ -816,6 +816,23 @@ pair above, so a colour change that breaks the standard fails CI and is never
 published. It also checks that the device dark theme and the dark toggle use
 identical colours.
 
+## Bookings under a registration form
+
+A reservation that is booked with the keys of a form (`keyBooking.source`)
+belongs to that form. Nothing else links them, so there is no new column and
+no new record:
+
+- The dashboard does not give such a reservation a card. It lists it inside the
+  card of its form, newest first, with its status and its days.
+- `admin.bookings.next` (`KeyBooking.gs`) makes the next one. The first is a new
+  reservation that books with the keys of the form. Each later one is a copy of
+  the newest: the same questions, rules, hours and bookings per slot, its own
+  empty sheet, status Draft, and every dated day seven days later
+  (`nextWeekSlots_`). A day named after its date is named after the new date
+  (`Rules.dayLabel`), "Week 11" in a typed name becomes "Week 12", and the last
+  number in the title goes up ("Discussion - Week 3" to "Week 4").
+- A team books once in each of them, because each is its own form.
+
 ## The pages of one form
 
 A form has one header and one tab bar, built by `A.formTabs` in `admin.js` and
@@ -933,6 +950,6 @@ labels of the current tables.
 | [HOSTING.md](HOSTING.md) | What GitHub does, what Google does, and how they fit |
 | [DATA-MODEL.md](../reference/DATA-MODEL.md) | Every sheet, column, and stored property |
 | [SECURITY.md](../reference/SECURITY.md) | The secrets, who holds them, and what a leak would mean |
-| [TESTING.md](../reference/TESTING.md) | How 247 tests run without Google |
+| [TESTING.md](../reference/TESTING.md) | How 249 tests run without Google |
 | [DEPLOY.md](../DEPLOY.md) | Click-by-click setup |
 | [MODULES.md](../MODULES.md) | File-by-file reference |
