@@ -772,7 +772,7 @@ files), which is not public-link traffic. The page asks for one team at a time,
 a big folder is fetched over several requests, files are split into zip parts
 of up to 40 MB, and each zip reaches the browser in pieces through the API, so
 nothing is shared. `Xlsx.gs` writes `Teams.xlsx` itself, with **relative**
-links (`Tasks/03 - Clean Code.pptx`), so the unzipped folder can be moved and
+links (`Tasks/03 - Task 3.pptx`), so the unzipped folder can be moved and
 still work. Anything that cannot be saved is listed on a **Not downloaded**
 sheet with the reason and its Drive link. See
 [ARCHITECTURE.md](ARCHITECTURE.md#downloading-everything-a-team-form-collected).

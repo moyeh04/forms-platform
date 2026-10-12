@@ -61,7 +61,7 @@ function seed(world) {
   });
   // A task form whose files are in pretend Drive, so Download all has something to pack.
   const tasks = make('task_submission', 'Software Engineering Tasks', 'Fall 2027', {});
-  [['Clean Code', 'application/vnd.google-apps.presentation', ''], ['COCOMO.pdf', 'application/pdf', '%PDF-1.4 COCOMO'], ['Quiz', 'application/vnd.google-apps.form', '']].forEach(([name, mime, bytes], i) => {
+  [['Task 1', 'application/vnd.google-apps.presentation', ''], ['Task 2.pdf', 'application/pdf', '%PDF-1.4 Task 2'], ['Task 3', 'application/vnd.google-apps.form', '']].forEach(([name, mime, bytes], i) => {
     const id = String.fromCharCode(107 + i).repeat(33);
     world.drive.addFile({ id, name, mime, bytes });
     world.api({ action: 'submit', slug: tasks.slug, data: leader({ leader_name: ['سلمى فؤاد نبيل عيسى', 'يوسف ماهر رشدي لطفي', 'نادين شريف عزت فهمي'][i], leader_code: '42305' + (10 + i), title: name.replace(/\.pdf$/, ''), team_size: '1', members: [], link: `https://docs.google.com/presentation/d/${id}/edit` }) });
