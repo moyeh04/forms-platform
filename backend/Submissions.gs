@@ -27,6 +27,8 @@ API.submit = function (req) {
   var result = withLock_(function () {
     var rows = readResponses(form, true);
     var live = rows.filter(function (r) { return !r.deleted; });
+    // Members that another team holds are asked for, not saved with this team.
+    var wants = source ? [] : takeOutTransfers_(vform, v.data, live, null, req.transfer);
     try {
       checkLimits_(vform, v.data, live, null);
     } catch (e) {
@@ -40,12 +42,13 @@ API.submit = function (req) {
       data: v.data, keyHash: k.hash, keyExpires: keyExpiry_(form), deleted: false, keySeal: sealKey_(form, id, k.key)
     });
     saveResponse_(form, r);
-    return { id: r.id, ref: r.ref, key: form.editKey.enabled ? k.key : '', keyExpires: r.keyExpires };
+    var asked = recordTransfers_(form, r, wants);
+    return { id: r.id, ref: r.ref, key: form.editKey.enabled ? k.key : '', keyExpires: r.keyExpires, asked: asked };
   });
 
   afterChange_(form);
   result.emailed = sendConfirmation_(vform, result, v.data);
-  return result;
+  return transferResult_(vform, result, v.data);
 };
 
 API.lookup = function (req) {
@@ -53,6 +56,7 @@ API.lookup = function (req) {
   var r = findByKey_(form, req.key);
   return {
     submission: publicSubmission_(r),
+    transfers: teamTransfers_(validationForm(form), r),
     keyExpires: r.keyExpires,
     canEdit: !!form.editKey.allowEdit,
     canDelete: !!form.editKey.allowDelete
@@ -68,18 +72,20 @@ API.update = function (req) {
   if (!v.ok) fail('invalid', 'Some answers need fixing.', v.errors);
   checkDriveFields_(vform, v.data);
 
-  withLock_(function () {
+  var asked = withLock_(function () {
     var live = readResponses(form);
     var current = live.filter(function (r) { return r.id === found.id; })[0];
     if (!current) fail('bad_key', 'That key is not right.');
+    var wants = takeOutTransfers_(vform, v.data, live, current.id, req.transfer);
     checkLimits_(vform, v.data, live, current.id);
     current.data = v.data;
     applyDerived_(vform, current);
     saveResponse_(form, current);
+    return recordTransfers_(form, current, wants);
   });
 
   afterChange_(form);
-  return { ref: found.ref };
+  return transferResult_(vform, { ref: found.ref, asked: asked }, v.data);
 };
 
 API.remove = function (req) {
@@ -93,10 +99,25 @@ API.remove = function (req) {
     current.keyHash = '';
     current.keySeal = '';
     saveResponse_(form, current);
+    closeTransfersOf_(form, current.id);
   });
   afterChange_(form);
   return { removed: true, ref: found.ref };
 };
+
+/**
+ * Finishes a save that asked for members of other teams: emails their leaders, and returns the
+ * saved answers, which no longer hold those members.
+ */
+function transferResult_(form, result, data) {
+  var asked = result.asked || [];
+  delete result.asked;
+  if (!asked.length) return result;
+  asked.forEach(function (t) { mailTransfer_(form, t, 'asked'); });
+  result.data = data;
+  result.transfers = asked.map(function (t) { return { code: t.code, name: t.member.name || '', team: t.fromRef }; });
+  return result;
+}
 
 /* ── Admin ────────────────────────────────────────────────────── */
 
@@ -119,7 +140,7 @@ API['admin.submissions'] = admin(function (req) {
     }
     return view;
   });
-  return { submissions: rows };
+  return { submissions: rows, transfers: adminTransfers_(form) };
 });
 
 API['admin.submission.update'] = admin(function (req) {
