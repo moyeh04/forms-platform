@@ -204,7 +204,7 @@
     if (!parts.length) return { name: 'forms', args: [] };
     if (parts[0] === 'new') return { name: 'create', args: [] };
     if (parts[0] === 'clients') return { name: 'clients', args: [] };
-    if (parts[0] === 'lists') return { name: 'lists', args: [] };
+    if (parts[0] === 'lists') return { name: 'lists', args: [parts[1] || ''] };
     if (parts[0] === 'f' && parts[1]) return A.FORM_TABS.indexOf(parts[2]) > 0 ? { name: 'settings', args: [parts[1], parts[2]] } : { name: 'responses', args: [parts[1]] };
     return { name: 'forms', args: [] };
   }
