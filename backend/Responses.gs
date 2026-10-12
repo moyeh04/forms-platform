@@ -308,19 +308,20 @@ function sendConfirmation_(form, result, data) {
   try {
     var to = Rules.valueByRole(form, data, 'email');
     var n = form.notifications || {};
-    if (n.confirmEmail !== false && to && result.key) {
+    if (n.confirmEmail !== false && to) {
       var lines = [
         'Your registration was received.',
         '',
         'Form: ' + form.title + (FormMetadata.caption(form) ? ' (' + FormMetadata.caption(form) + ')' : ''),
         'Reference: ' + result.ref
       ];
-      if (form.editKey && form.editKey.enabled) {
+      var keyed = form.editKey && form.editKey.enabled;
+      if (keyed) {
         lines.push('Edit key: ' + result.key, 'The key works until ' + result.keyExpires.slice(0, 10) + '.');
         var link = siteLink_(form);
         if (link) lines.push('Edit or delete here: ' + link);
       }
-      lines.push('', 'تم استلام تسجيلك. احتفظ بالرقم المرجعي والمفتاح.');
+      lines.push('', 'تم استلام تسجيلك. ' + (keyed ? 'احتفظ بالرقم المرجعي والمفتاح.' : 'احتفظ بالرقم المرجعي.'));
       MailApp.sendEmail({ to: to, subject: '[' + form.title + '] Registration received - ' + result.ref, body: lines.join('\n') });
       sent = true;
     }

@@ -272,6 +272,16 @@ test('Keys: registrations made before sealing say so and point to Reset key', ()
   assert.equal(w.admin({ action: 'admin.submission.key', slug: w.form.slug, submissionId: sub.id }).error.code, 'key_unknown');
 });
 
+test('Email: a form without edit keys still confirms, with no key in the message', () => {
+  const w = boot('team_registration', { editKey: { enabled: false, days: 7, allowEdit: false, allowDelete: false } });
+  const r = w.submit(team());
+  assert.equal(r.key, '');
+  assert.equal(r.emailed, true);
+  assert.equal(w.mail.length, 1);
+  assert.match(w.mail[0].body, /Reference: TR-/);
+  assert.doesNotMatch(w.mail[0].body, /Edit key|The key works until|المفتاح/);
+});
+
 test('Email: with confirmations off nothing is sent and the answer says so', () => {
   const w = boot('team_registration', { notifications: { confirmEmail: false, alertEmail: '' } });
   const r = w.submit(team());
