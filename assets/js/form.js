@@ -227,24 +227,32 @@
     return h('p', { class: 'foot' }, h('button', { type: 'button', class: 'link-btn', onclick: function () { S.view = 'keyEntry'; S.keyError = ''; render(); } }, t('editLink')));
   }
 
+  /** With a key the form is not a path: it opens on the summary, and each page is reached from there and returns to it. */
+  function hub() { return S.mode === 'edit'; }
+  function changed() { return JSON.stringify(S.data) !== S.original; }
+
   function formView() {
     var step = S.steps[S.stepIndex];
-    var title = h('h2', { class: 'step-title', tabindex: '-1', id: 'step-title' }, step.review ? t('reviewTitle') : stepTitle(step));
+    var title = h('h2', { class: 'step-title', tabindex: '-1', id: 'step-title' }, step.review ? t(hub() ? 'yourRegistration' : 'reviewTitle') : stepTitle(step));
     var body = step.review ? reviewBody() : step.team ? teamBody() : step.fields.map(function (f) { return renderField(f, f.id); });
     var last = S.stepIndex === S.steps.length - 1;
-    var primary = h('button', { type: 'submit', class: 'btn btn-primary', disabled: S.busy }, last ? (S.busy ? t('submitting') : t(S.mode === 'edit' ? 'saveChanges' : 'submit')) : t(step.team && !S.team ? 'findTeam' : 'next'), last ? null : icon('arrow', 20));
+    var primary = h('button', { type: 'submit', class: 'btn btn-primary', disabled: S.busy }, last ? (S.busy ? t('submitting') : t(S.mode === 'edit' ? 'saveChanges' : 'submit')) : hub() ? t('done') : t(step.team && !S.team ? 'findTeam' : 'next'), last || hub() ? null : icon('arrow', 20));
     // A team that has booked cannot go on, so the button that would take it there is not offered.
     if (step.team && S.team && S.teamBooked) primary = null;
-    var nav = h('div', { class: 'nav' }, S.stepIndex > 0 ? h('button', { type: 'button', class: 'btn btn-quiet', onclick: function () { go(S.stepIndex - 1); } }, t('back')) : null, primary);
+    // Save exists only when an answer differs from the saved registration.
+    if (hub() && last && !changed()) primary = h('p', { class: 'help no-changes' }, t('noChanges'));
+    var back = S.stepIndex > 0 && !hub() ? h('button', { type: 'button', class: 'btn btn-quiet', onclick: function () { go(S.stepIndex - 1); } }, t('back')) : null;
+    var nav = h('div', { class: 'nav' }, back, primary);
+    var help = !step.review ? null : hub() ? t('yourRegistrationHelp') : t(S.form.editKey && S.form.editKey.enabled ? 'reviewHelpKey' : 'reviewHelp');
     var f = h('form', { novalidate: 'novalidate', onsubmit: function (e) { e.preventDefault(); if (!S.busy) next(); } },
-      title, step.review ? h('p', { class: 'step-help' }, t(S.form.editKey && S.form.editKey.enabled ? 'reviewHelpKey' : 'reviewHelp')) : null, body, nav);
+      title, help ? h('p', { class: 'step-help' }, help) : null, body, nav);
     var edit = S.mode === 'edit'
       ? h('div', { class: 'banner info', role: 'status' }, t('editing', { ref: S.keyInfo.ref }) + '. ' + t('keyUntil', { date: App.i18n.fmtDate(S.keyInfo.keyExpires) }))
       : null;
     var cancel = S.mode === 'edit' && S.keyInfo.canDelete && last
       ? h('p', { class: 'foot' }, h('button', { type: 'button', class: 'link-btn', onclick: askCancel }, t('cancelReg')))
       : null;
-    return sheet(head(), edit, trail(), bannerEl(), f, cancel, S.mode === 'new' && S.stepIndex === 0 ? editLink() : null);
+    return sheet(head(), edit, hub() ? null : trail(), bannerEl(), f, cancel, S.mode === 'new' && S.stepIndex === 0 ? editLink() : null);
   }
 
   /* ── Fields ─────────────────────────────────────────────────── */
@@ -473,14 +481,43 @@
 
   /* ── Team members ───────────────────────────────────────────── */
 
-  function memberCard(field, path, i, removable) {
+  /** `remove` is given only when the team can lose a member; then the card has the button. */
+  function memberCard(field, path, i, remove) {
     var subs = (field.fields || []).filter(function (sf) { return sf.enabled !== false; });
     var head = h('div', { class: 'member-head' },
       h('span', { class: 'member-title' }, t('memberN', { n: i + 1 })),
-      removable ? h('button', { type: 'button', class: 'btn btn-quiet', 'aria-label': t('removeMember') + ' ' + (i + 1), onclick: function () {
-        var l = getVal(path); l.splice(i, 1); S.errors = dropErrors(path); saveDraft(); render();
-      } }, icon('trash', 18), t('removeMember')) : null);
+      remove ? h('button', { type: 'button', class: 'btn btn-quiet', name: 'remove-member-' + i, 'aria-label': t('removeMember') + ' ' + (i + 1), onclick: function () { remove(i); } }, icon('trash', 18), t('removeMember')) : null);
     return h('div', { class: 'member' }, head, subs.map(function (sf) { return renderField(sf, path + '.' + i + '.' + sf.id); }));
+  }
+
+  /**
+   * The member forms with one remove button each and one add button. `resize(list)` stores the
+   * new list; with a team size question it also moves the chosen size, so the two never disagree.
+   * A removed member comes back with Undo, because the form it held may have been filled in.
+   */
+  function memberList(field, path, list, min, max, resize) {
+    var commit = function (next, banner) {
+      S.errors = dropErrors(path); delete S.errors[path];
+      resize(next);
+      S.banner = banner || null;
+      saveDraft();
+      render();
+    };
+    var remove = list.length > min ? function (i) {
+      var before = list.slice();
+      commit(list.filter(function (m, k) { return k !== i; }), { kind: 'info', text: t('memberRemoved', { n: i + 1 }),
+        action: h('button', { type: 'button', class: 'link-btn', name: 'undo-remove', onclick: function () { commit(before); } }, t('undo')) });
+    } : null;
+    return [
+      list.length ? h('div', { class: 'members' }, list.map(function (m, i) { return memberCard(field, path, i, remove); })) : null,
+      list.length ? h('p', { class: 'team-size' }, t('teamSize', { n: list.length + 1 })) : null,
+      list.length < max ? h('button', { type: 'button', class: 'btn btn-quiet', name: 'add-member', onclick: function () {
+        commit(list.concat([freshMember(field)]));
+        var cards = root.querySelectorAll('.member');
+        var input = cards.length && cards[cards.length - 1].querySelector('input, select');
+        if (input && input.focus) input.focus();
+      } }, icon('plus', 20), t('addMember')) : null
+    ];
   }
 
   function membersControl(field, path) {
@@ -488,45 +525,27 @@
     var sf = sizeField();
     var list = getVal(path);
     if (!Array.isArray(list)) { list = []; setVal(path, list); }
+    var range = Rules.teamSizeRange(S.form);
 
     if (sf) {
-      // The chosen team size decides how many member forms are shown.
+      // The chosen team size decides how many member forms are shown; add and remove move it.
       var size = parseInt(S.data[sf.id], 10);
       if (isNaN(size)) {
         wrap.appendChild(h('p', { class: 'help pick-size' }, t('pickSize')));
         return wrap;
       }
       if (list.length !== size - 1) { syncMembers(size); list = getVal(path); }
-      if (size === 1) {
-        wrap.appendChild(h('p', { class: 'help solo-team' }, t('soloTeam')));
-        return wrap;
-      }
-      wrap.appendChild(h('div', { class: 'members' }, list.map(function (m, i) { return memberCard(field, path, i, false); })));
-      wrap.appendChild(h('p', { class: 'team-size' }, t('teamSize', { n: size })));
+      if (size === 1) wrap.appendChild(h('p', { class: 'help solo-team' }, t('soloTeam')));
+      memberList(field, path, list, range.min - 1, range.max - 1, function (next) {
+        setVal(path, next); setVal(sf.id, String(next.length + 1)); delete S.errors[sf.id];
+      }).forEach(function (n) { if (n) wrap.appendChild(n); });
       return wrap;
     }
 
-    // Forms without a team size question keep the add and remove buttons.
-    var range = Rules.teamSizeRange(S.form);
+    // Forms without a team size question have only the add and remove buttons.
     var min = field.min == null ? 0 : field.min;
     var max = field.max == null ? range.max - 1 : field.max;
-    if (list.length === 0) {
-      wrap.appendChild(h('button', { type: 'button', class: 'btn btn-quiet', onclick: function () {
-        getVal(path).push(freshMember(field));
-        saveDraft();
-        render();
-      } }, icon('plus', 20), t('addMember')));
-      return wrap;
-    }
-    wrap.appendChild(h('div', { class: 'members' }, list.map(function (m, i) { return memberCard(field, path, i, list.length > min); })));
-    wrap.appendChild(h('p', { class: 'team-size' }, t('teamSize', { n: list.length + 1 })));
-    if (list.length < max) {
-      wrap.appendChild(h('button', { type: 'button', class: 'btn btn-quiet', onclick: function () {
-        getVal(path).push(freshMember(field));
-        saveDraft();
-        render();
-      } }, icon('plus', 20), t('addMember')));
-    }
+    memberList(field, path, list, min, max, function (next) { setVal(path, next); }).forEach(function (n) { if (n) wrap.appendChild(n); });
     return wrap;
   }
 
@@ -740,7 +759,7 @@
       focusFirstError();
       return;
     }
-    go(S.stepIndex + 1);
+    go(hub() ? S.steps.length - 1 : S.stepIndex + 1);
   }
 
   function showErrorsAndJump(errs) {
@@ -856,8 +875,10 @@
       S.data = res.submission.data || {};
       var sf = slotField();
       S.ownSlot = sf && S.data[sf.id] ? Rules.slotKey(S.data[sf.id].day, S.data[sf.id].time) : '';
-      S.errors = {}; S.banner = null; S.stepIndex = 0;
+      S.errors = {}; S.banner = null;
+      S.original = JSON.stringify(S.data);
       buildSteps();
+      S.stepIndex = S.steps.length - 1;
       S.view = res.canEdit ? 'form' : 'readonly';
       render();
     } catch (e) {

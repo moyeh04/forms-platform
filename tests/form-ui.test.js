@@ -173,11 +173,21 @@ test('Edit by key: open, change the title, save, then cancel and register again'
   assert.ok(p.text().includes('That key is not right.'));
   p.type('#key-input', key); p.submitForm(); await settle(8);
   assert.ok(p.text().includes('Editing TR-2027-0001'));
-  assert.equal(p.$('[name="leader_code"]').value, '4230999');
+  assert.equal(p.$('#step-title').textContent, 'Your registration', 'a key opens the summary, not the first page');
+  assert.ok(p.text().includes('4230999') && p.text().includes('Library System'));
+  assert.equal(p.$('.trail'), null, 'the summary is not a step of a path');
+  assert.equal(p.$('button[type="submit"]'), null, 'nothing is changed, so there is nothing to save');
+  assert.ok(p.text().includes('Nothing is changed yet.'));
 
-  p.submitForm(); await settle(); p.submitForm(); await settle(); p.submitForm(); await settle();
+  p.click(p.$$('.review-group .link-btn')[3]); await settle();
+  assert.equal(p.$('button[type="submit"]').textContent, 'Done');
+  p.type('[name="title"]', 'x');
+  p.submitForm(); await settle();
+  assert.ok(p.$('.field.has-error'), 'a page with a mistake does not go back to the summary');
   p.type('[name="title"]', 'Library System v2');
   p.submitForm(); await settle();
+  assert.equal(p.$('#step-title').textContent, 'Your registration');
+  assert.equal(p.$('button[type="submit"]').textContent, 'Save changes');
   p.submitForm(); await settle(12);
   assert.ok(p.text().includes('Changes saved'));
   assert.equal(w.sheet(w.form.sheetId, 'Responses').rows()[1][10], 'Library System v2');
@@ -185,7 +195,6 @@ test('Edit by key: open, change the title, save, then cancel and register again'
   const q = await open(w);
   q.clickText('Edit or cancel with your key'); await settle();
   q.type('#key-input', key); q.submitForm(); await settle(8);
-  for (let i = 0; i < 4; i++) { q.submitForm(); await settle(); }
   q.clickText('Cancel registration'); await settle();
   q.clickText('Yes, cancel it'); await settle(8);
   assert.ok(q.text().includes('Registration cancelled'));
@@ -313,7 +322,7 @@ test('Team size: member forms stay hidden until a size is chosen, and Next needs
   assert.ok(p.$('[data-path="team_size"] .error').textContent.includes('required'));
 });
 
-test('Team size: choosing a size shows exactly that many member forms with no add or remove buttons', async () => {
+test('Team size: choosing a size shows exactly that many member forms', async () => {
   const w = boot();
   const p = await open(w);
   await fillAbout(p); p.submitForm(); await settle();
@@ -321,9 +330,39 @@ test('Team size: choosing a size shows exactly that many member forms with no ad
   p.pick('team_size', '4'); await settle();
   assert.equal(p.$$('.member').length, 3);
   assert.deepEqual(p.$$('.member-title').map((n) => n.textContent), ['Team member 1', 'Team member 2', 'Team member 3']);
-  assert.equal(p.$$('button').some((b) => /Add a team member|Remove/.test(b.textContent)), false);
   assert.ok(p.text().includes('Team of 4'));
   assert.equal(p.$('.size-chips input[value="4"]').checked, true);
+});
+
+test('Team members: remove takes that member out and lowers the size, Undo brings it back, add raises the size', async () => {
+  const w = boot();
+  const p = await open(w);
+  await fillAbout(p); p.submitForm(); await settle();
+  await fillStudy(p); p.submitForm(); await settle();
+  p.pick('team_size', '3'); await settle();
+  p.type('[name="members.0.name"]', 'سارة خالد حسن علي');
+  p.type('[name="members.1.name"]', 'منى أشرف كمال فؤاد');
+
+  p.click('[name="remove-member-0"]'); await settle();
+  assert.equal(p.$$('.member').length, 1);
+  assert.equal(p.$('[name="members.0.name"]').value, 'منى أشرف كمال فؤاد', 'the member that was chosen left, not the last one');
+  assert.equal(p.$('.size-chips input[value="2"]').checked, true);
+  assert.ok(p.text().includes('Team member 1 was removed.'));
+
+  p.click('[name="undo-remove"]'); await settle();
+  assert.deepEqual([0, 1].map((i) => p.$(`[name="members.${i}.name"]`).value), ['سارة خالد حسن علي', 'منى أشرف كمال فؤاد']);
+  assert.equal(p.$('.size-chips input[value="3"]').checked, true);
+
+  p.click('[name="add-member"]'); await settle();
+  assert.equal(p.$$('.member').length, 3);
+  assert.equal(p.$('.size-chips input[value="4"]').checked, true);
+  assert.equal(p.$('[name="members.2.name"]').value, '');
+
+  const range = w.api({ action: 'getForm', slug: w.form.slug }).form.rules.teamSize;
+  p.pick('team_size', String(range.max)); await settle();
+  assert.equal(p.$('[name="add-member"]'), null, 'a full team has no add button');
+  p.pick('team_size', String(range.min)); await settle();
+  assert.equal(p.$('[name^="remove-member"]'), null, 'the smallest team has no remove button');
 });
 
 test('Team size: changing the size keeps what was already typed', async () => {

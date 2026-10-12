@@ -24,7 +24,7 @@ sheet, not code.
 | **One source of truth for rules** | `shared/rules.js` is used by the browser, the backend, and the tests. They cannot disagree. |
 | **Forms are data** | A form is a JSON definition in one cell. New questions and new form types need no code. |
 | **Boring technology** | Plain JavaScript, no framework, no bundler for the website, one concatenation script for the backend. Easy to read, easy to fix later. |
-| **Testable without Google** | An in-memory copy of Google's services runs the real backend code, so 223 JavaScript tests cover it without touching a real account. |
+| **Testable without Google** | An in-memory copy of Google's services runs the real backend code, so 224 JavaScript tests cover it without touching a real account. |
 
 ## System context
 
@@ -251,6 +251,18 @@ Two details worth knowing:
 The key alone identifies the registration. That is a deliberate trade for
 "no accounts", and the reason the key is salted per form, throttled, and
 expiring. See [SECURITY.md](../reference/SECURITY.md).
+
+A new registration is a path: one page after another, then a review. A
+registration opened with a key is not. It opens on a summary of every answer
+("Your registration"), each page is reached with **Change** and returns to the
+summary with **Done**, and **Save changes** exists only while an answer differs
+from the saved one (`hub()` and `changed()` in `form.js`). The route trail and
+the Back button belong to the path, so they are not shown here.
+
+Team members are resized in place by `memberList` in `form.js`: each member
+form has **Remove**, the list has **Add a team member**, and both move the team
+size choice with them, inside the range of the form. Remove takes out the
+member that was chosen and offers **Undo**, because its form may be filled in.
 
 ```mermaid
 %%{init: {
@@ -894,6 +906,6 @@ labels of the current tables.
 | [HOSTING.md](HOSTING.md) | What GitHub does, what Google does, and how they fit |
 | [DATA-MODEL.md](../reference/DATA-MODEL.md) | Every sheet, column, and stored property |
 | [SECURITY.md](../reference/SECURITY.md) | The secrets, who holds them, and what a leak would mean |
-| [TESTING.md](../reference/TESTING.md) | How 243 tests run without Google |
+| [TESTING.md](../reference/TESTING.md) | How 244 tests run without Google |
 | [DEPLOY.md](../DEPLOY.md) | Click-by-click setup |
 | [MODULES.md](../MODULES.md) | File-by-file reference |
