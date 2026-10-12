@@ -1,8 +1,10 @@
 # Workarounds: how the platform gets a lot from free hosting
 
-The deployment guide is short on purpose: paste one file, paste one address,
-turn on Pages. That shortness is the result of a series of design decisions,
-each made to remove a step or a risk. This document explains every one.
+The deployment guide is short on purpose: paste the backend once, set a few
+repository variables, turn on Pages. After that first setup every update is a
+push to `master`; GitHub Actions rebuilds, tests and deploys both halves. That
+shortness is the result of a series of design decisions, each made to remove a
+step or a risk. This document explains every one.
 
 Each section has the same shape:
 
@@ -34,7 +36,7 @@ Each section has the same shape:
 | 17 | Browsers cannot check Drive sharing | The server checks it with the owner's Drive access |
 | 18 | PDFs from a script | Export URL with the script's own token, with a fallback |
 | 19 | Excel with real files | A local Python script, offline-safe links |
-| 20 | Updating without breaking links | A new version of the same deployment |
+| 20 | Updating without breaking links | Actions pushes a new version to the same deployment |
 | 21 | Email problems must not lose data | Mail is best effort and never blocks saving |
 | 22 | Deleting must free a code but keep history | Soft delete: a flag, not a removed row |
 | 23 | Sheets turns `01012345678` into a number | Every data cell is formatted as plain text |
@@ -257,7 +259,7 @@ flowchart LR
     b2["backend/Registry.gs"] --> bundle
     b3["... 14 more .gs files"] --> bundle
     bundle(("scripts/bundle-backend.js"))
-    bundle --> out["dist/Code.gs<br/>one paste"]
+    bundle --> out["dist/Code.gs<br/>one file to deploy"]
     manifest["backend/appsscript.json"] --> bundle
     bundle --> out2["dist/appsscript.json"]
     classDef cDb fill:#F3E2B3,stroke:#B8892D,stroke-width:1.5px,color:#2F2418
@@ -273,8 +275,11 @@ The bundler also **checks the result compiles** before writing it, so a typo
 shows up on your computer instead of in the Apps Script editor. Full details in
 [BUILD-PIPELINE.md](BUILD-PIPELINE.md).
 
-**Cost.** One extra command (`npm run build`) before a paste. The zip already
-contains the built `dist/`, so a first deploy needs no tooling at all.
+**Cost.** A build step between the source and Apps Script. The workflow runs it
+on every push to `master` and hands `dist/` to clasp, so an update needs no
+command and no paste. Only the first deploy is by hand: `dist/Code.gs` and
+`dist/appsscript.json` are pasted once to create the Apps Script project that
+later pushes update (`npm run build` produces them if `dist/` is missing).
 
 ---
 
@@ -378,7 +383,8 @@ live account.
 **What the platform does.** Builds a small, faithful copy of those services in
 memory (`tests/harness/appsscript-mock.js`), then loads the **real bundled
 `Code.gs`** into it. The tests do not test a copy of the logic; they run the
-exact text you will paste.
+exact text that is deployed. The workflow pushes that same tested bundle to
+Apps Script.
 
 ```mermaid
 %%{init: {
@@ -768,10 +774,20 @@ keeps its original link.
 **Problem.** If every backend change produced a new web app address, you would
 have to edit `config.js` and republish every time.
 
-**What the platform does.** Updating means **Deploy > Manage deployments >
-Edit > New version** on the *same* deployment, so the address never changes.
+**What the platform does.** Updating means a new version of the *same*
+deployment, so the address never changes. A push to `master` does it: the
+workflow pushes the tested bundle with clasp and redeploys under the fixed
+`APPS_SCRIPT_DEPLOYMENT_ID`, and it refuses to run when `API_URL` points at a
+different deployment. Pages is published only after that succeeds. The manual
+equivalent is **Deploy > Manage deployments > Edit > New version**; creating a
+*new* deployment instead would change the address.
+
 The website needs no edit when the backend changes, and the backend needs none
 when the website changes. They only agree on the JSON actions.
+
+**Cost.** Three repository variables and one credential secret to set up once
+([DEPLOY.md](../DEPLOY.md#updating-later)). If Google rejects the saved clasp
+login, the secret has to be replaced before the next deploy can run.
 
 ---
 
