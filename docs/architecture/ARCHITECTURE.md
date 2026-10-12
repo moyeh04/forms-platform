@@ -845,7 +845,7 @@ used by both the responses page and the settings page:
 |---|---|---|
 | Responses | `#/f/<slug>` | The answers (`admin-data.js`) |
 | Questions | `#/f/<slug>/questions` | The questions under the page of the form that shows them, then team size and teammates |
-| Timetable | `#/f/<slug>/timetable` | Reservations only: bookings per slot, session hours, the grid of days, booking with a key |
+| Timetable | `#/f/<slug>/timetable` | Reservations only: the calendar of days, the hours and bookings per slot, the slots of each day, booking with a key |
 | Setup | `#/f/<slug>/settings` | Name and dates, who can register, edit key, emails, limits, review steps, delete |
 
 Questions, Timetable and Setup are one view (`admin-settings.js`) over one
@@ -889,6 +889,16 @@ Rules for this page, to keep when a setting is added:
   and for validation. An empty rule means every value.
 - **No sideways scrolling.** Questions are rows of a grid that stack at 760px,
   not a table.
+- **A work area that is large is its own file.** The timetable is
+  `admin-timetable.js`: `A.timetable(form, taken)` returns `{ node, summary(),
+  problem(), slots() }`, and the settings view only places the node in a
+  section and asks it for its part of the patch. The saved shape stays
+  `slots.days` (`id`, `label`, `date`, `times`) with `slots.pattern` as the
+  general hours. Which times of a day are switched off, and whether the day
+  has times that no hours explain, is worked out from that when the page
+  opens, so no field was added for the editor. The order on the page is the
+  order of the decisions: the days on a calendar, the hours once, then one row
+  of slots for each day as the result.
 
 ## Phone layout
 

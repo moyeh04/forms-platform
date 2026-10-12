@@ -96,6 +96,7 @@ flowchart LR
         r2["shared/rules.js"]
         a1["admin.js"]
         a2["admin-settings.js"]
+        a5["admin-timetable.js"]
         a3["admin-data.js"]
         a4["admin-people.js"]
     end
@@ -130,7 +131,7 @@ no validation.
 | `assets/js/config.js` | Source placeholder; `scripts/build-site.js` generates its published copy from the Actions `API_URL` variable. |
 | `assets/js/api.js` | Sends requests to the backend as plain-text JSON (avoids browser CORS checks). |
 | `assets/js/form.js`, `ticket.js`, `i18n.js` | The student page, the success ticket, English and Arabic text. |
-| `assets/js/admin*.js` | Dashboard: core and forms list, settings, responses and matching, clients and lists. |
+| `assets/js/admin*.js` | Dashboard: core and forms list, settings, the timetable editor, responses and matching, clients and lists. |
 | `assets/js/viewer.js` | The instructor page. |
 | `shared/rules.js` | Validation and normalization rules (Arabic names, phones, codes, Drive links, team size, slots). Used by the browser, the backend, and the tests, so all three always agree. |
 
