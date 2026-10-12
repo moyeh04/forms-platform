@@ -118,6 +118,7 @@ step needs the real Google services (see "What could not be tested here").
 | Requirement | Status |
 |---|---|
 | Timetable: click dates on a month calendar to offer them, set the hours once (first slot, last slot, slot length, break), and read the result as one row of slots for each day; a click switches one slot off, a day can have its own hours or another name, a slot shows how many teams booked it, and a warning appears when a booking is left on a day or time that was removed; one team per slot (capacity adjustable) | Done |
+| Teammates of a booking: asked or not, the fewest and the most (0 lets a leader book alone), the title and line students read, and which details are asked about each teammate | Done |
 | One booking per leader code; taken slots crossed out for students | Done |
 | Booking with a registration key: a reservation can take the 5-digit key of a team registration form, show the team to confirm, and ask only for the slot; the same key opens and cancels the booking | Done |
 | Warning when a timetable change leaves existing bookings without a slot | Done |
@@ -183,7 +184,7 @@ the first-deployment setup, and the Excel export; `tests/` holds the automated t
 
 ```
 npm install          # once, installs the browser test library
-npm test             # 232 tests: rules, backend, form page, dashboard, instructor page, deployment
+npm test             # 233 tests: rules, backend, form page, dashboard, instructor page, deployment
 npm run build        # writes dist/Code.gs and dist/appsscript.json for clasp
 npm run setup        # first deployment: creates the sheet, pushes the backend, creates the web app, configures GitHub
 npm run dev          # local preview on http://localhost:8080 (PIN 4321), in memory, no Google needed
