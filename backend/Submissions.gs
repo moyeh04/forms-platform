@@ -83,9 +83,15 @@ API.update = function (req) {
   var found = findByKey_(form, req.key);
   if (!form.editKey.allowEdit) fail('edit_disabled', 'Editing is turned off for this form.');
   assertTaskOpen_(form);
-  var v = Rules.validateSubmission(vform, req.data || {});
-  if (!v.ok) fail('invalid', 'Some answers need fixing.', v.errors);
-  checkDriveFields_(vform, v.data);
+  var v;
+  if (keyBookingSource_(form)) {
+    // A booking made with a team's key holds that team's answers. Only its slot can change.
+    v = { ok: true, data: movedBooking_(vform, found.data, req.data || {}) };
+  } else {
+    v = Rules.validateSubmission(vform, req.data || {});
+    if (!v.ok) fail('invalid', 'Some answers need fixing.', v.errors);
+    checkDriveFields_(vform, v.data);
+  }
 
   var asked = withLock_(function () {
     var live = readResponses(form);
@@ -204,6 +210,7 @@ API['admin.submission.delete'] = admin(function (req) {
     r.keyHash = '';
     r.keySeal = '';
     saveResponse_(form, r);
+    closeTransfersOf_(form, r.id);
   });
   afterChange_(form);
   return { deleted: true };

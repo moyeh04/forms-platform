@@ -39,20 +39,10 @@ function responseToRow_(r) {
 function saveResponse_(form, r) {
   r.updated = nowIso();
   var sh = responsesSheet(form);
-  ensureResponseHeader_(sh);
+  ensureHeaders_(sh, RESPONSE_COLS);
   if (r._row) writeRow(sh, r._row, RESPONSE_COLS, responseToRow_(r));
-  else {
-    sh.appendRow(rowValues(RESPONSE_COLS, responseToRow_(r)));
-    r._row = sh.getLastRow();
-  }
+  else r._row = appendPlain_(sh, rowValues(RESPONSE_COLS, responseToRow_(r)));
   return r;
-}
-
-/** Sheets made before a column was added get its header the first time a row is saved. */
-function ensureResponseHeader_(sh) {
-  var last = RESPONSE_COLS.length;
-  var cell = sh.getRange(1, last);
-  if (String(cell.getValue()) !== RESPONSE_COLS[last - 1]) cell.setValue(RESPONSE_COLS[last - 1]).setFontWeight('bold');
 }
 
 /** Fills the readable columns from the validated data. */
@@ -308,19 +298,20 @@ function sendConfirmation_(form, result, data) {
   try {
     var to = Rules.valueByRole(form, data, 'email');
     var n = form.notifications || {};
-    if (n.confirmEmail !== false && to && result.key) {
+    if (n.confirmEmail !== false && to) {
       var lines = [
         'Your registration was received.',
         '',
         'Form: ' + form.title + (FormMetadata.caption(form) ? ' (' + FormMetadata.caption(form) + ')' : ''),
         'Reference: ' + result.ref
       ];
-      if (form.editKey && form.editKey.enabled) {
+      var keyed = form.editKey && form.editKey.enabled;
+      if (keyed) {
         lines.push('Edit key: ' + result.key, 'The key works until ' + result.keyExpires.slice(0, 10) + '.');
         var link = siteLink_(form);
         if (link) lines.push('Edit or delete here: ' + link);
       }
-      lines.push('', 'تم استلام تسجيلك. احتفظ بالرقم المرجعي والمفتاح.');
+      lines.push('', 'تم استلام تسجيلك. ' + (keyed ? 'احتفظ بالرقم المرجعي والمفتاح.' : 'احتفظ بالرقم المرجعي.'));
       MailApp.sendEmail({ to: to, subject: '[' + form.title + '] Registration received - ' + result.ref, body: lines.join('\n') });
       sent = true;
     }
@@ -333,9 +324,7 @@ function sendConfirmation_(form, result, data) {
   return sent;
 }
 
-/** Views are rebuilt by a later module when it is present. */
+/** After a saved change: the form's sheet views are marked for a repaint. A failure here never fails the save. */
 function afterChange_(form) {
-  if (typeof refreshViews === 'function') {
-    try { refreshViews(form); } catch (e) { Logger.log('View refresh failed: ' + e.message); }
-  }
+  try { refreshViews(form); } catch (e) { Logger.log('Views not marked: ' + e.message); }
 }

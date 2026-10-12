@@ -20,12 +20,20 @@ function setAdminPin(pin) {
   return true;
 }
 
+/** Called from the menu: forgets the wrong tries, which lifts a lock. Returns true when the page was locked. */
+function unlockAdmin() {
+  var cache = CacheService.getScriptCache();
+  var locked = parseInt(cache.get('admin_fails') || '0', 10) >= ADMIN_MAX_FAILS;
+  cache.remove('admin_fails');
+  return locked;
+}
+
 function requireAdmin(req) {
   var stored = getProp('ADMIN_PIN_HASH');
   if (!stored) fail('not_configured', 'Set the admin PIN from the Forms Platform menu first.');
   var cache = CacheService.getScriptCache();
   var fails = parseInt(cache.get('admin_fails') || '0', 10);
-  if (fails >= ADMIN_MAX_FAILS) fail('locked', 'Too many wrong PINs. Wait a few minutes and try again.');
+  if (fails >= ADMIN_MAX_FAILS) fail('locked', 'Too many wrong PINs. Wait ten minutes, or unlock the admin page from the Forms Platform menu in the sheet.');
   var pin = req && req.admin && req.admin.pin;
   if (!pin || pinHash_(pin) !== stored) {
     cache.put('admin_fails', String(fails + 1), ADMIN_LOCK_SECONDS);

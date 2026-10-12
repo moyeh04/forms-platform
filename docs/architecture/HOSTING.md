@@ -158,10 +158,10 @@ Why it suits this project:
 | **Google Sheets** | The database: one registry sheet plus one sheet per form. Also the admin's spreadsheet view of the data. |
 | **Drive** | Holds the `Forms Platform` folder, the form sheets, and exported PDFs. Students' project files stay in their own Drive and are only linked. |
 | **MailApp** | Sends confirmation emails with the edit key. |
-| **LockService** | Prevents two students taking the same slot. |
+| **LockService** | Lets one request at a time change the data, so two students cannot take the same slot and two saves cannot overwrite each other. |
 | **CacheService** | Counts wrong PIN, key, and token attempts for throttling. |
 | **PropertiesService** | Stores the private pepper, the PIN hash, and the registry id. |
-| **Triggers** | Runs `processDirtyViews` every five minutes. |
+| **Triggers** | Runs `processDirtyViews` once, a minute after a change, to repaint the sheet views. |
 
 ## Who is allowed to do what
 
@@ -235,7 +235,7 @@ read, filter, and print.
 | GitHub Pages is down | The site does not load | Google Sheets and the admin's direct access to the data |
 | Apps Script is down or over quota | The pages load, then say "Could not reach the server" and let the student try again | Draft answers are kept in the tab; instructors' printed copies |
 | A wrong web app address in `config.js` | "The website is not connected to the backend yet" | Nothing submits until it is fixed |
-| Student's connection drops mid-submit | A clear retry message; nothing is half-saved because the write happens in one locked step | Their draft stays in the tab |
+| Student's connection drops mid-submit | A clear retry message. A registration is one row written in one locked step, so it is saved whole or not at all | Their draft stays in the tab |
 
 ## Updating
 
@@ -289,7 +289,7 @@ Yes, with the usual care:
   and the client token hashes live in Google, never in git.
 - The web app address is not secret. Protection comes from the server checks,
   not from hiding the address.
-- Do not commit exports (`Tasks_Export/` is git-ignored) because they contain
-  student names and codes.
+- Do not commit downloaded zips or `Teams.xlsx`: they contain student files,
+  names and codes.
 - If you prefer a private repository, check GitHub's current rules: Pages for a
   private repository may require a paid plan. The platform itself is unaffected.

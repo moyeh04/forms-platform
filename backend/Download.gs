@@ -228,7 +228,8 @@ function dlWorkbook_(form, job, saved) {
       rows.push([
         i === 0 ? { v: t.number, style: group(g, 2) } : { v: '', style: group(g, 2) },
         { v: (i + 1) + '. ' + m.name + (m.leader ? ' ★' : ''), style: group(g, i % 2) },
-        { v: /^\d+$/.test(String(m.code)) ? Number(m.code) : m.code, style: group(g, 2 + i % 2) },
+        // A code that starts with 0 stays text, or Excel would drop the zero.
+        { v: /^[1-9]\d*$/.test(String(m.code)) ? Number(m.code) : m.code, style: group(g, 2 + i % 2) },
         { v: m.section || '', style: group(g, 2 + i % 2) },
         i === 0 ? { v: t.title || t.ref, style: group(g, 4), link: link } : { v: '', style: group(g, 4) }
       ]);

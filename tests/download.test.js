@@ -83,7 +83,7 @@ test('Download: every task is saved under its team number, with a workbook that 
   w.drive.addFile({ id: ID('c'), name: 'huge.mp4', mime: 'video/mp4', bytes: Buffer.alloc(46 * 1024 * 1024) });
   const submit = (code, title, id, o) => assert.equal(w.api({ action: 'submit', slug: f.slug, data: person(code, { title, link: `https://docs.google.com/presentation/d/${id}/edit`, ...o }) }).ok, true);
   submit('4230001', 'Task 1', ID('a'), { members: [mate('سارة خالد حسن علي', '4230002')] });
-  submit('4230003', 'Task 2', ID('b'));
+  submit('0230003', 'Task 2', ID('b'));
   submit('4230004', 'Demo: video/clip', ID('c'));
 
   const { entries, fin } = download(w, f.slug);
@@ -99,6 +99,8 @@ test('Download: every task is saved under its team number, with a workbook that 
   const sheet = book['xl/worksheets/sheet1.xml'].toString();
   assert.ok(sheet.includes('1. أحمد محمد محمود أحمد ★') && sheet.includes('2. سارة خالد حسن علي'), 'members in order, leader starred');
   assert.ok(sheet.includes('<mergeCell ref="E2:E3"/>'), 'one task cell per team');
+  assert.ok(sheet.includes('<v>4230001</v>'), 'a code is a number in Excel');
+  assert.ok(sheet.includes('>0230003</t>') && !sheet.includes('<v>230003</v>'), 'unless it starts with 0, which only text keeps');
   const rels = book['xl/worksheets/_rels/sheet1.xml.rels'].toString();
   assert.ok(rels.includes('Target="Tasks/01%20-%20Task%201.pptx"'), 'the task opens the saved copy');
   assert.ok(rels.includes(`Target="https://docs.google.com/presentation/d/${ID('c')}/edit"`), 'a task that was not saved opens in Drive');

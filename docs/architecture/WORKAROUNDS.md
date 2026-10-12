@@ -29,7 +29,7 @@ Each section has the same shape:
 | 9 | Students have no accounts | A 5-digit key, salted, throttled, expiring |
 | 10 | The admin page is public | It is useless without a hashed, rate-limited PIN |
 | 11 | Instructors need a view without a login | Private tokens, only the hash stored, columns stripped server-side |
-| 12 | Colouring sheets is slow | Format inline when small, defer to a timer when big |
+| 12 | Colouring sheets is slow | Mark the form and repaint it a minute later, outside the request |
 | 13 | One giant sheet becomes a mess | A registry sheet plus one sheet per form |
 | 14 | New forms should not need code | The form is data in a single cell |
 | 15 | Lists change often | Options are resolved when read, not copied |
@@ -135,7 +135,7 @@ flowchart TD
     who -- "none: public action" --> pub["getForm, submit, lookup...<br/>validated, throttled, limited"]
     who -- "admin PIN" --> adm["admin.* actions<br/>PIN hash, lockout after 8 wrong tries"]
     who -- "edit key" --> key["lookup, update, remove<br/>one registration only, 10 tries a minute"]
-    who -- "viewer token" --> tok["viewer.* actions<br/>read only, chosen forms, hidden columns"]
+    who -- "viewer token" --> tok["viewer.* actions<br/>chosen forms, hidden columns,<br/>writes review marks only"]
     classDef cDb fill:#F3E2B3,stroke:#B8892D,stroke-width:1.5px,color:#2F2418
     classDef cActor fill:#F4D9D3,stroke:#9A3328,stroke-width:1.5px,color:#2F2418
     classDef cDec fill:#FBEFC9,stroke:#C9A24A,stroke-width:1.5px,color:#2F2418
@@ -480,7 +480,8 @@ sequenceDiagram
 ```
 
 Only the read-check-write section is locked. Slow work (the Drive link check,
-the email) happens outside it, so the lock is held for milliseconds.
+the email, the repaint of the sheet views) happens outside it, so the lock is
+held only while the tab is read and the row is written.
 
 The registry is guarded the same way. Every change to a form, a list or a
 private link reads its row and writes it inside the lock (`withLock_` in
@@ -505,7 +506,7 @@ registration. To make a short number safe:
 |---|---|
 | Stored as `sha256(pepper + form id + key)` | A leaked sheet reveals no keys, and the same key in two forms hashes differently |
 | Unique within a form | Two registrations never share a key, so the key identifies exactly one |
-| 10 wrong tries a minute per form, silently throttled | 100,000 possibilities cannot be walked through |
+| 10 wrong tries a minute per form | Guessing is slowed to a few hundred tries an hour. It is not stopped: [SECURITY.md](../reference/SECURITY.md#honest-weak-spots) says what is left |
 | Expires after a number of days you set | A stolen old key stops working |
 | Shown once, optionally emailed | A lost key can be read back by the admin from a sealed copy, or replaced |
 
@@ -593,18 +594,25 @@ deleted at any time.
 **Problem.** Formatting hundreds of cells in Apps Script takes seconds. If it
 ran during a submission, students would wait.
 
-**What the platform does.** Chooses by size, and moves big work off the
-student's request entirely:
+**What the platform does.** Moves the colouring off the request entirely:
 
-- Up to **60 rows**: rebuild the tinted views immediately.
-- More than 60: set a `dirty:<form id>` flag; a **time trigger every 5 minutes**
-  rebuilds flagged forms.
+- A change writes the data, then only sets `dirty:<form id>` to the time of the
+  change and books **one run** of `processDirtyViews` a minute later, unless one
+  is booked already.
+- The run removes its own trigger and repaints every marked form. Ten changes in
+  a minute are one repaint.
+- It clears a mark only when the mark did not change while it painted. When one
+  did, or four minutes have passed, it books another run and stops.
+- The repaint takes no script lock: it reads the responses and writes only its
+  own tabs, so students are never queued behind formatting.
 
 See the diagram in [ARCHITECTURE.md](ARCHITECTURE.md#how-sheet-views-stay-fast).
-The data itself is always written first; only the *colouring* is deferred.
+Nothing runs while nothing changes, so an idle project uses none of the daily
+trigger time.
 
-**Cost.** On a big form the colours can lag by up to five minutes. The admin
-can press **Rebuild sheet** at any time.
+**Cost.** The tinted tabs follow a change by about a minute. The admin can
+press **Rebuild sheet** at any time, and the dashboard, the instructor page and
+the downloads read the Responses tab directly, so they are never behind.
 
 ---
 

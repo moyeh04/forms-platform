@@ -40,6 +40,10 @@ class MockRange {
     return this.proxy;
   }
   setFormula(f) { return this.setValue(f); }
+  setNumberFormat(f) {
+    for (let i = 0; i < this.nr; i++) for (let j = 0; j < this.nc; j++) this.sheet.formats.set(`${this.r + i},${this.c + j}`, f);
+    return this.proxy;
+  }
   clear() { return this.clearContent(); }
   clearContent() {
     for (let i = 0; i < this.nr; i++) for (let j = 0; j < this.nc; j++) this.sheet.cells.delete(`${this.r + i},${this.c + j}`);
@@ -54,7 +58,7 @@ class MockRange {
 
 class MockSheet {
   constructor(ss, name, id) {
-    this.ss = ss; this.name = name; this.id = id; this.cells = new Map(); this.hidden = false;
+    this.ss = ss; this.name = name; this.id = id; this.cells = new Map(); this.formats = new Map(); this.hidden = false;
     this.proxy = new Proxy(this, {
       get: (t, p) => (p in t ? (typeof t[p] === 'function' ? t[p].bind(t) : t[p]) : (...a) => t.proxy)
     });
@@ -259,11 +263,13 @@ function createWorld(options = {}) {
       getActiveUser: () => ({ getEmail: () => 'owner@example.com' })
     },
     ScriptApp: {
-      getProjectTriggers: () => world.triggers.map((t) => ({ getHandlerFunction: () => t, getUniqueId: () => t })),
-      deleteTrigger: () => {},
+      getProjectTriggers: () => world.triggers.map((t) => ({ getHandlerFunction: () => t.fn, getUniqueId: () => t.id })),
+      deleteTrigger: (trigger) => { world.triggers = world.triggers.filter((t) => t.id !== trigger.getUniqueId()); },
       getOAuthToken: () => 'test-token',
       newTrigger: (fn) => {
-        const chain = new Proxy({}, { get: (t, p) => (p === 'create' ? () => world.triggers.push(fn) : () => chain) });
+        // { fn, id, kind: 'after' or 'everyMinutes', arg: the delay or the interval }
+        const made = { fn, id: uid() };
+        const chain = new Proxy({}, { get: (t, p) => (p === 'create' ? () => { world.triggers.push(made); } : (...a) => { if (p !== 'timeBased') { made.kind = p; made.arg = a[0]; } return chain; }) });
         return chain;
       }
     },
@@ -317,6 +323,8 @@ function createWorld(options = {}) {
     return JSON.parse(out.getContent());
   };
   world.call = (name, ...args) => vm.runInContext(name, ctx)(...args);
+  /** Fires every trigger that is booked now, as Google would when its time comes. Returns how many ran. */
+  world.runTriggers = () => { const due = world.triggers.slice(); due.forEach((t) => world.call(t.fn)); return due.length; };
   world.sheet = (ssId, name) => { const s = world.spreadsheets.get(ssId).getSheetByName(name); return s; };
   world.drive.setAccess = (id, a) => world.drive.access.set(id, a);
   world.drive.setFolderName = (id, name) => world.drive.folders.set(id, { name });

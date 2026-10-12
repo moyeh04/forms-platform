@@ -39,7 +39,7 @@ API['admin.matching.import'] = admin(function (req) {
         if (have[p.phone]) { duplicates++; return; }
         have[p.phone] = true;
         var label = line.split(p.raw).join(' ').replace(/[\s,;:|\-]+/g, ' ').trim();
-        sh.appendRow([uuid(), line, p.phone, label, nowIso(), 'pending', '']);
+        appendPlain_(sh, [uuid(), line, p.phone, label, nowIso(), 'pending', '']);
         added++;
       });
     });

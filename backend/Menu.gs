@@ -1,7 +1,7 @@
 /**
  * The "Forms Platform" menu inside the registry spreadsheet.
  * Everything an owner needs without touching code: first-time setup,
- * the admin PIN, and one-click printing.
+ * the admin PIN, one-click printing, and unlocking the admin page.
  */
 
 function onOpen() {
@@ -13,6 +13,8 @@ function onOpen() {
     .addItem('Print reservations for a day...', 'menuPrintReservations')
     .addItem('Print team list...', 'menuPrintTeamList')
     .addItem('Rebuild all views', 'menuRebuildViews')
+    .addSeparator()
+    .addItem('Unlock the admin page', 'menuUnlockAdmin')
     .addToUi();
 }
 
@@ -33,6 +35,12 @@ function menuSetPin() {
   } catch (e) {
     ui.alert('Not saved', e.message, ui.ButtonSet.OK);
   }
+}
+
+function menuUnlockAdmin() {
+  var ui = SpreadsheetApp.getUi();
+  if (unlockAdmin()) ui.alert('Unlocked', 'The admin page takes the PIN again. The PIN is the same.', ui.ButtonSet.OK);
+  else ui.alert('Not locked', 'The admin page was not locked. If the PIN is refused, set a new one with "2. Set admin PIN...".', ui.ButtonSet.OK);
 }
 
 function menuSetSiteUrl() {

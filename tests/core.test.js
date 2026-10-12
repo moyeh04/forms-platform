@@ -20,7 +20,7 @@ test('Setup: creates registry tabs, default lists, and is safe to repeat', () =>
   assert.equal(lists.sections.length, 14);
   assert.equal(lists.wa_sections.length, 33);
   assert.equal(w.registry.getSheetByName('Lists').getLastRow(), 7);
-  assert.equal(w.triggers.filter((t) => t === 'processDirtyViews').length, 1);
+  assert.deepEqual(w.triggers, [], 'setup books no timer');
 });
 
 test('Admin: wrong PIN is rejected and repeated guesses lock out', () => {
@@ -30,6 +30,18 @@ test('Admin: wrong PIN is rejected and repeated guesses lock out', () => {
   assert.equal(w.api({ action: 'admin.login', admin: { pin: '4321' } }).error.code, 'locked');
   w.advanceDays(1);
   assert.equal(w.api({ action: 'admin.login', admin: { pin: '4321' } }).ok, true);
+});
+
+test('Admin: unlocking from the sheet menu lifts a lock and keeps the PIN', () => {
+  const w = boot();
+  assert.equal(w.call('unlockAdmin'), false, 'nothing to unlock');
+  for (let i = 0; i < 8; i++) w.api({ action: 'admin.login', admin: { pin: '0000' } });
+  const locked = w.api({ action: 'admin.login', admin: { pin: '4321' } }).error;
+  assert.equal(locked.code, 'locked');
+  assert.match(locked.message, /unlock the admin page from the Forms Platform menu/);
+  assert.equal(w.call('unlockAdmin'), true);
+  assert.equal(w.api({ action: 'admin.login', admin: { pin: '4321' } }).ok, true);
+  assert.equal(w.api({ action: 'admin.login', admin: { pin: '0000' } }).error.code, 'bad_pin', 'wrong tries count from zero again');
 });
 
 test('Admin: actions need the PIN and PIN must be long enough', () => {

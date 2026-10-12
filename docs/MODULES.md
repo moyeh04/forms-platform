@@ -135,6 +135,7 @@ no validation.
 | `assets/js/form.js`, `ticket.js`, `i18n.js` | The student page, the success ticket, English and Arabic text. |
 | `assets/js/admin*.js` | Dashboard: core and forms list, settings, the timetable editor, key and link end dates (`admin-keys.js`), responses and matching, Download all (`admin-download.js`), clients, lists. |
 | `assets/js/viewer.js` | The instructor page. |
+| `shared/form-metadata.js` | What each form type shows beside its title (term, subject code, batch year) and how it is read, saved and copied. Used by the pages and the backend. |
 | `shared/rules.js` | Validation and normalization rules (Arabic names, phones, codes, Drive links, team size, slots). Used by the browser, the backend, and the tests, so all three always agree. |
 
 ## Backend (`backend/`, becomes one `Code.gs`)
@@ -144,26 +145,26 @@ no validation.
 | `Code.gs` | Entry point. Routes each request to its handler. |
 | `Config.gs` | Constants and small helpers. |
 | `Auth.gs` | Admin PIN (salted hash, lockout). |
-| `Registry.gs` | The registry sheet: forms, lists, clients; setup. |
+| `Registry.gs` | The registry sheet: setup, reading and writing forms and lists, and creating, updating, duplicating and deleting a form under the lock. |
 | `Templates.gs` | The four form types and the default lists, all as data. |
-| `FormsApi.gs` | Create, update, and duplicate forms; the public form definition. |
+| `FormsApi.gs` | The API of forms and lists: the public form definition, the admin's form actions, and making, renaming, filling and deleting lists. |
 | `Responses.gs` | Reading and writing rows, edit keys, limits, Drive checks, emails. |
 | `Submissions.gs` | Student submit, lookup, update, cancel; admin edits and key reset. |
 | `Slots.gs` | Reservation timetable checks and availability. |
 | `Questions.gs` | Questions and pages an admin adds: allowed types, ids, labels and choices, and pages that list each existing question once. |
 | `KeyBooking.gs` | Booking a reservation with a registration key from another form: the setting, the team preview, the copied answers, and the next booking of a series. |
-| `TeamList.gs` | The numbered teams of a team or task form with their members, read by the sheet view, the printed list, the export and the download. |
+| `TeamList.gs` | The numbered teams of a team or task form with their members, read by the sheet view, the printed list and the download. |
 | `Download.gs` | Download all: each team's task file or project folder read as the owner, `Teams.xlsx`, zip parts, and the pieces the page saves. |
 | `Xlsx.gs` | A small writer of Excel files: styles, merged cells, links to files next to the workbook, widths that fit the content. |
 | `KeyExpiry.gs` | When registration edit keys stop working, and moving that date for one, some, or all registrations of a form. |
 | `Transfers.gs` | Moving a member between two teams of a form: the rule, the requests tab, asking on submit and update, the answer of the leader or the admin, the move, and the emails. |
-| `Views.gs` | Tinted block views inside each form's Google Sheet. |
+| `Views.gs` | Tinted block views inside each form's Google Sheet, and the booked run that repaints them a minute after a change. |
 | `Print.gs` | Print tabs and PDF export. |
-| `Menu.gs` | The "Forms Platform" menu in the registry sheet. |
+| `Menu.gs` | The "Forms Platform" menu in the registry sheet: setup, the admin PIN, printing, rebuilding the views, and unlocking the admin page after wrong PINs. |
 | `Matching.gs` | WhatsApp request matching. |
 | `Clients.gs`, `Viewer.gs` | Private instructor links, their access keys and end dates, and what they can see. |
 
-`npm run build` joins `shared/rules.js` and every backend file into `dist/Code.gs`.
+`npm run build` joins `shared/rules.js`, `shared/form-metadata.js` and every backend file into `dist/Code.gs`.
 
 ## Tools and tests
 

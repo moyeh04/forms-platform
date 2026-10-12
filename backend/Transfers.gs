@@ -42,10 +42,7 @@ function saveTransfer_(form, t) {
   var o = clone(t);
   o.member = JSON.stringify(t.member || {});
   if (t._row) writeRow(sh, t._row, TRANSFER_COLS, o);
-  else {
-    sh.appendRow(rowValues(TRANSFER_COLS, o));
-    t._row = sh.getLastRow();
-  }
+  else t._row = appendPlain_(sh, rowValues(TRANSFER_COLS, o));
   return t;
 }
 

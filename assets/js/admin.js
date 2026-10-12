@@ -29,7 +29,8 @@
     try {
       return await App.api.admin(action, extra);
     } catch (e) {
-      if (e.code === 'bad_pin' || e.code === 'locked') { App.api.setPin(''); A.start(); }
+      // A wrong PIN signs this window out. A lock is passing: the PIN is kept and the message says to wait.
+      if (e.code === 'bad_pin') { App.api.setPin(''); A.start(); }
       throw e;
     }
   };
@@ -247,7 +248,7 @@
     try { await view.apply(null, [mount].concat(r.args)); } catch (e) {
       ui.clear(mount);
       mount.appendChild(h('div', { class: 'banner' }, e.message || 'Could not load this page.'));
-      if (e.code === 'bad_pin' || e.code === 'locked') { App.api.setPin(''); render(); }
+      if (e.code === 'bad_pin') { App.api.setPin(''); render(); }
     }
   }
 
@@ -289,10 +290,11 @@
         App.api.setPin(pin.value);
         render();
       } catch (ex) {
+        // The refused PIN stays in its field, selected, so typing replaces it.
         err.textContent = ex.message;
         err.hidden = false;
-        pin.value = '';
         pin.focus();
+        pin.select();
       } finally { btn.disabled = false; }
     } },
       h('h1', { class: 'step-title' }, 'Admin dashboard'),

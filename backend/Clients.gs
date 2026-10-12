@@ -75,16 +75,9 @@ function clientToRow_(c) {
 /** Writes a link to its row, or to a new row. Call it inside withLock_, with a row read there. */
 function saveClient_(c) {
   var sh = clientsSheet_();
-  // A Clients tab made before the key and end-date columns gets their headers the first time a link is saved.
-  CLIENT_COLS_.slice(8).forEach(function (name, i) {
-    var head = sh.getRange(1, 9 + i);
-    if (String(head.getValue()) !== name) head.setValue(name).setFontWeight('bold');
-  });
+  ensureHeaders_(sh, CLIENT_COLS_);
   if (c._row) writeRow(sh, c._row, CLIENT_COLS_, clientToRow_(c));
-  else {
-    sh.appendRow(rowValues(CLIENT_COLS_, clientToRow_(c)));
-    c._row = sh.getLastRow();
-  }
+  else c._row = appendPlain_(sh, rowValues(CLIENT_COLS_, clientToRow_(c)));
   return c;
 }
 

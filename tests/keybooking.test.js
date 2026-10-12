@@ -106,6 +106,24 @@ test('Key booking: one booking per team, opened and cancelled by the same key', 
   assert.equal(w.book(w.keyA, slot(1)).ok, true, 'a cancelled team can book again');
 });
 
+test('Key booking: with editing on, a booking can move to another slot and nothing else changes', () => {
+  const w = boot({ editKey: { enabled: true, days: 7, allowEdit: true, allowDelete: true } });
+  assert.equal(w.book(w.keyA, slot(0)).ok, true);
+  const before = w.rows()[0];
+  const moved = w.api({
+    action: 'update', slug: w.form.slug, key: w.keyA,
+    data: { slot: slot(1), leader_name: 'شخص اخر تماما هنا', leader_code: '9999999', title: 'Not Their Project' }
+  });
+  assert.equal(moved.ok, true);
+  const after = w.rows()[0];
+  assert.deepEqual([after.name, after.code, after.title], [before.name, before.code, before.title], 'the team is still the one the key belongs to');
+  assert.equal(after.data.slot.time, slot(1).time);
+  assert.deepEqual(after.data._source, before.data._source);
+  assert.equal(w.api({ action: 'update', slug: w.form.slug, key: w.keyA, data: { slot: { day: 'sunday', time: 'never' } } }).error.code, 'invalid');
+  assert.equal(w.book(w.keyB, slot(1)).error.code, 'slot_taken', 'the slot it moved to is taken');
+  assert.equal(w.book(w.keyB, slot(0)).ok, true, 'and the slot it left is free');
+});
+
 test('Key booking: a key that expired for editing still books', () => {
   const w = boot();
   w.advanceDays(9);

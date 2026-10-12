@@ -218,7 +218,7 @@ Google calls three kinds of function by name:
 |---|---|---|
 | `doPost(e)` / `doGet()` | A request reaches the web app address | `Code.gs` |
 | `onOpen()` | The registry sheet opens (draws the **Forms Platform** menu) | `Menu.gs` |
-| `processDirtyViews()` | Every 5 minutes (a time trigger made by setup) | `Views.gs` |
+| `processDirtyViews()` | Once, a minute after a change (a time trigger it books and removes itself) | `Views.gs` |
 
 ## The same bundle is what the tests run
 

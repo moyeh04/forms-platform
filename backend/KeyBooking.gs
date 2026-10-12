@@ -52,6 +52,11 @@ function bookingData_(form, source, row, slot) {
     var value = from ? row.data[from.id] : undefined;
     if (value !== undefined && value !== '') data[f.id] = clone(value);
   });
+  return withSlot_(form, data, slot);
+}
+
+/** `data` with the slot the student picked, checked against the timetable. */
+function withSlot_(form, data, slot) {
   var slotField = Rules.fieldByRole(form, 'slot');
   var checked = Rules.validateField(slotField, slot, { form: form });
   if (!checked.ok) {
@@ -61,6 +66,11 @@ function bookingData_(form, source, row, slot) {
   }
   data[slotField.id] = checked.value;
   return data;
+}
+
+/** The saved answers of a booking with the slot from `typed`; anything else that was typed is ignored. */
+function movedBooking_(form, saved, typed) {
+  return withSlot_(form, clone(saved), typed[Rules.fieldByRole(form, 'slot').id]);
 }
 
 /** What the student sees before booking, to confirm the key is theirs. No contact details. */
