@@ -499,3 +499,101 @@ test('Route: the ship is over the current step and moves with it', async () => {
   assert.equal(p.$$('.trail-ship').length, 1);
   assert.equal(p.$$('.trail li')[1].querySelector('.trail-ship') !== null, true, 'the ship moved to the second step');
 });
+
+/** A form that lets a leader ask for a member of another team, with team A (two members) saved. */
+function bootTransfers() {
+  const w = boot();
+  const rules = w.admin({ action: 'admin.forms.get', id: w.form.id }).form.rules;
+  w.admin({ action: 'admin.forms.update', id: w.form.id, patch: { rules: { ...rules, transfers: true } } });
+  const mate = (name, code) => ({ name, phone: '01112345678', code, level: 'صفر / الأولى', curriculum: '2020', section: '4C-TH1' });
+  w.teamA = w.api({ action: 'submit', slug: w.form.slug, data: { email: 'a@example.com', leader_name: AR_NAME, leader_code: '4230001', phone: '01012345678', major: 'حاسبات', level: 'صفر / الأولى', section: '4C-TH1', curriculum: '2020', title: 'Compiler', team_size: '3', members: [mate('سارة خالد حسن علي', '4230002'), mate('منى سعيد فؤاد علي', '4230003')] } });
+  return w;
+}
+
+/** Registers team B from the page with one member, and stops on the review page. */
+async function teamBWith(w, code) {
+  const p = await open(w);
+  await fillAbout(p); p.submitForm(); await settle();
+  await fillStudy(p); p.submitForm(); await settle();
+  p.pick('team_size', '2'); await settle();
+  p.type('[name="members.0.name"]', 'سارة خالد حسن علي'); p.type('[name="members.0.phone"]', '01112345678'); p.type('[name="members.0.code"]', code);
+  p.submitForm(); await settle();
+  p.type('[name="title"]', 'Library System'); p.submitForm(); await settle();
+  return p;
+}
+
+async function openWithKey(w, key) {
+  const p = await open(w);
+  p.clickText('Edit or cancel with your key'); await settle();
+  p.type('#key-input', key); p.submitForm(); await settle(10);
+  return p;
+}
+
+test('Transfer: a member of another team can be asked for, and the team registers without them', async () => {
+  const w = bootTransfers();
+  const p = await teamBWith(w, '4230002');
+  p.submitForm(); await settle(12);
+  const dialog = p.$('.overlay .dialog');
+  assert.ok(dialog.textContent.includes('Already in another team'));
+  assert.ok(dialog.textContent.includes(`سارة خالد حسن علي (4230002) → ${w.teamA.ref}`), 'the popup names the member and the team by its reference');
+  p.clickText('Go back', dialog); await settle(4);
+  assert.equal(p.$('#ticket'), null, 'declining registers nothing');
+  assert.ok(p.text().includes('Someone in this team is already registered in another team.'));
+  assert.equal(p.$('.trail .is-current .trail-label').textContent, 'Team members', 'and returns to the members');
+
+  p.submitForm(); await settle(); p.submitForm(); await settle();
+  p.submitForm(); await settle(12);
+  p.clickText('Ask the leader', p.$('.overlay .dialog')); await settle(14);
+  assert.ok(p.$('#ticket'), 'the team is registered');
+  assert.ok(p.$('[name="transfer-sent"]').textContent.includes('Request sent: سارة خالد حسن علي (4230002)'));
+  const rows = w.admin({ action: 'admin.submissions', slug: w.form.slug });
+  assert.deepEqual(rows.submissions[1].data.members, []);
+  assert.equal(rows.transfers.length, 1);
+
+  const key = p.$$('.key-digit').map((d) => d.textContent).join('');
+  const b = await openWithKey(w, key);
+  assert.ok(b.$('[data-transfer="pending"]').textContent.includes(`Waiting for team ${w.teamA.ref} to release سارة خالد حسن علي (4230002).`));
+  b.click('[name="transfer-cancel"]'); await settle(8);
+  assert.equal(b.$('.transfer-notes'), null, 'a cancelled request is gone');
+  assert.equal(w.admin({ action: 'admin.submissions', slug: w.form.slug }).transfers.length, 0);
+});
+
+test('Transfer: the leader who holds the member is asked when the registration opens, and approving moves the member', async () => {
+  const w = bootTransfers();
+  const p = await teamBWith(w, '4230002');
+  p.submitForm(); await settle(12);
+  p.clickText('Ask the leader', p.$('.overlay .dialog')); await settle(14);
+  const keyB = p.$$('.key-digit').map((d) => d.textContent).join('');
+
+  const a = await openWithKey(w, w.teamA.key);
+  const dialog = a.$('.overlay .dialog');
+  assert.ok(dialog.textContent.includes('A team asks for one of your members'));
+  assert.ok(dialog.textContent.includes('asks for سارة خالد حسن علي (4230002) to move to it.'));
+  assert.ok(dialog.textContent.includes('If you approve, you will be a team of 2.'));
+  a.click('[name="transfer-later"]'); await settle(4);
+  assert.equal(a.$('.overlay'), null);
+  assert.ok(a.$('[data-transfer="incoming"]'), 'a request left for later stays above the registration');
+
+  a.click('[name="transfer-answer"]'); await settle(4);
+  a.click('[name="transfer-approve"]'); await settle(12);
+  assert.equal(a.$('.transfer-notes'), null);
+  assert.ok(a.text().includes('سارة خالد حسن علي (4230002) moved to team'));
+  assert.equal(a.text().includes('4230002)') && a.$$('.review-group').some((g) => g.textContent.includes('4230002')), false, 'the member left this registration');
+  const rows = w.admin({ action: 'admin.submissions', slug: w.form.slug }).submissions;
+  assert.deepEqual(rows.map((r) => r.data.members.map((m) => m.code)), [['4230003'], ['4230002']]);
+
+  const b = await openWithKey(w, keyB);
+  assert.ok(b.$('[data-transfer="approved"]').textContent.includes('سارة خالد حسن علي (4230002) joined your team.'));
+  assert.ok(b.$$('.review-group').some((g) => g.textContent.includes('4230002')));
+});
+
+test('Transfer: rejecting keeps the member on the team', async () => {
+  const w = bootTransfers();
+  const p = await teamBWith(w, '4230003');
+  p.submitForm(); await settle(12);
+  p.clickText('Ask the leader', p.$('.overlay .dialog')); await settle(14);
+  const a = await openWithKey(w, w.teamA.key);
+  a.click('[name="transfer-reject"]'); await settle(12);
+  assert.ok(a.text().includes('منى سعيد فؤاد علي (4230003) stays on your team.'));
+  assert.equal(w.admin({ action: 'admin.submissions', slug: w.form.slug }).submissions[0].data.members.length, 2);
+});

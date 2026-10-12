@@ -176,6 +176,22 @@ The readable columns are derived from `data` every time a row is saved
 All cells are formatted as **plain text**. That keeps phone numbers such as
 `01012345678` and codes from losing their leading zeros or turning into numbers.
 
+### Transfers tab (made with the first request)
+
+One row for each member that a team asked for from another team of the same
+form (`rules.transfers`). A form that never has a request has no such tab.
+
+| Column | Meaning |
+|---|---|
+| `id` | Unique id of the request |
+| `created`, `updated` | ISO timestamps |
+| `status` | `pending`, `approved`, `rejected`, `cancelled` (by the team that asked) or `closed` (the student moved elsewhere, or one of the two teams was removed) |
+| `code` | Code of the student |
+| `member` | The member as the asking team typed it (JSON); this is what joins the team on approval |
+| `fromId`, `fromRef` | The team that holds the student |
+| `toId`, `toRef` | The team that asked |
+| `decidedBy` | `leader` or `admin` |
+
 ### Requests tab (WhatsApp forms only)
 
 | Column | Meaning |

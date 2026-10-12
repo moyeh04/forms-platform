@@ -226,3 +226,9 @@ ul.plain li { padding: 1px 0; }
 .folder-rule { display: flex; gap: 8px; align-items: flex-start; margin: 6px 0 0; font-size: var(--fs-help); color: var(--ink); line-height: 1.5; }
 .folder-rule .icon { color: var(--sea); margin-top: 2px; }
 .folder-rule-text { overflow-wrap: anywhere; }
+
+/* Requests to move a member between teams: one line each above the registration. */
+.transfer-notes { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+.transfer-notes .banner { margin: 0; }
+.transfer-actions { flex-wrap: wrap; }
+@media (max-width: 480px) { .transfer-actions .btn { flex: 1 1 auto; } }
