@@ -1,11 +1,11 @@
 # Testing
 
-243 automated tests run without a Google account, a browser, or a network.
+244 automated tests run without a Google account, a browser, or a network.
 They run the **real** backend and the **real** pages. This page explains how
 that works and what it can and cannot prove.
 
 ```
-npm test                                              # 223 JavaScript tests
+npm test                                              # 224 JavaScript tests
 python3 -m unittest discover -s tests -p "test_*.py"  # 20 Python tests
 ```
 
@@ -150,7 +150,7 @@ function that calls `world.api`. Helpers `type`, `pick`, `click`,
 | Matching | 6 | Paste, normalise, matched, none, duplicate, sequential review |
 | Viewer API | 10 | Tokens, hidden columns, today and by day, review rights, revoked links |
 | Export API | 3 | Teams with members, no phones, PIN required, deleted left out |
-| Student page | 29 | Steps, filters, descriptions, team size picker and notes, audience line, subject tag, slots, review, ticket and email notice, edit by key, themes, Arabic |
+| Student page | 30 | Steps, filters, descriptions, team size picker and notes, remove and add a member with Undo, the summary a key opens, audience line, subject tag, slots, review, ticket and email notice, edit by key, themes, Arabic |
 | Admin page | 35 | Login, create with term chips, team size and notes, descriptions, who can register, locked fields, team cards, show key, timetable grid, date range and booked slots, delete, matching, clients, lists editor, column names on list rows for the phone layout, the day sheet group, form tabs that keep edits, section summaries, save bar only while there is a change, sections by one or by year group |
 | Instructor page | 10 | Today, by day, hidden columns, review rights, invalid links, member values named for the phone layout, phone as a call link |
 | Harness | 4 | The fake itself |
