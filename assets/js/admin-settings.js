@@ -222,7 +222,7 @@
         h('thead', null, h('tr', null, h('th', null, 'Show'), h('th', null, 'English label'), h('th', null, 'Arabic label'), h('th', null, 'Required'), h('th', null, 'Name parts / type'))),
         h('tbody', null, rows))));
 
-    /* Slots: session hours once, then days as cards of time chips ---- */
+    /* Slots: session hours once, then days as lines that open into time chips ---- */
     var slotsPanel = null;
     if (f.type === 'reservation') {
       f.slots = f.slots || { days: [], capacity: 1 };
@@ -285,24 +285,45 @@
           paintDays(); toast('Every day now uses these hours. Save to keep it.', 'ok');
         } }, 'Use these hours for every day'));
 
-      /* Step 2: days */
+      /* Step 2: days. A range adds many at once; each day is one line that opens to be changed. */
       var daysBox = h('div', { class: 'tt-days' });
-      var paintDays = function () {
-        ui.clear(daysBox);
-        if (!f.slots.days.length) daysBox.appendChild(h('div', { class: 'empty' }, 'No days yet. Add the first day: it gets the session hours above.'));
-        f.slots.days.forEach(function (d, i) { daysBox.appendChild(dayCard(d, i)); });
+      var iso = function (d) { return d.getFullYear() + '-' + p2(d.getMonth() + 1) + '-' + p2(d.getDate()); };
+      var slotStart = function (tm) {
+        // "1:15 - 1:35" is after "12:55": hours below 8 are read as afternoon.
+        var m = String(tm).match(/^(\d{1,2}):(\d{2})/); if (!m) return 0;
+        var hh = parseInt(m[1], 10); if (hh < 8) hh += 12;
+        return hh * 60 + parseInt(m[2], 10);
       };
       var newDay = function (date, times) {
         return { label: autoLabel(date), date: date || '', times: times, _auto: true };
       };
+      var needsWork = function (d) { return !String(d.label || '').trim() || !d.times.length; };
+      var paintDays = function () {
+        ui.clear(daysBox);
+        if (!f.slots.days.length) daysBox.appendChild(h('div', { class: 'empty' }, 'No days yet. Add a range of days, or one day at a time. Each new day gets the session hours above.'));
+        f.slots.days.forEach(function (d, i) { daysBox.appendChild(dayCard(d, i)); });
+        paintRange();
+      };
       var dayCard = function (d, i) {
+        var open = !!d._open || needsWork(d);
         var dt = d.date ? new Date(d.date + 'T12:00:00') : null;
         var badge = h('div', { class: 'day-badge' + (dt ? '' : ' none') },
           dt ? [h('span', { class: 'dow' }, dt.toLocaleDateString('en-GB', { weekday: 'short' })), h('span', { class: 'dom' }, String(dt.getDate())), h('span', { class: 'mon' }, dt.toLocaleDateString('en-GB', { month: 'short' }))] : h('span', { class: 'dow' }, 'No date'));
+        var count = d.times.length + ' slot' + (d.times.length === 1 ? '' : 's');
+        var summary = d.times.length
+          ? h('span', { class: 'muted-note' }, count + ', ' + d.times[0].split(' - ')[0] + ' to ' + d.times[d.times.length - 1].split(' - ')[1])
+          : h('span', { class: 'error' }, 'No slots. Add a time or reset it.');
+        var name = String(d.label || '').trim();
+        var row = h('div', { class: 'day-row' }, badge,
+          h('div', { class: 'day-sum' }, name ? h('strong', null, name) : h('span', { class: 'error' }, 'Pick a date or type a name.'), summary),
+          needsWork(d) ? null : h('button', { type: 'button', class: 'btn btn-quiet sm', name: 'toggle-day-' + i, 'aria-expanded': open ? 'true' : 'false', onclick: function () { d._open = !open; paintDays(); } }, open ? 'Done' : 'Change'),
+          h('button', { type: 'button', class: 'icon-btn sm danger', name: 'remove-day-' + i, 'aria-label': 'Remove ' + (name || 'this day'), title: 'Remove day', onclick: function () { f.slots.days.splice(i, 1); paintDays(); } }, icon('trash', 16)));
+        if (!open) return h('article', { class: 'day-card', dataset: { day: String(i) } }, row);
+
         var label = A.text(d.label, function (v) { d.label = v; d._auto = false; }, { name: 'dayLabel-' + i, placeholder: 'Week 11 - Sunday', 'aria-label': 'Day name' });
         var chips = h('ul', { class: 'time-chips', 'aria-label': 'Time slots for ' + (d.label || 'this day') },
           d.times.map(function (tm, k) {
-            return h('li', { class: 'time-chip' }, tm, h('button', { type: 'button', name: 'drop-' + i + '-' + k, 'aria-label': 'Remove ' + tm, onclick: function () { d.times.splice(k, 1); paintDays(); } }, icon('x', 14)));
+            return h('li', { class: 'time-chip' }, tm, h('button', { type: 'button', name: 'drop-' + i + '-' + k, 'aria-label': 'Remove ' + tm, onclick: function () { d.times.splice(k, 1); d._open = true; paintDays(); } }, icon('x', 14)));
           }));
         var from = h('input', { class: 'input', type: 'time', name: 'add-from-' + i, 'aria-label': 'Starts' });
         var to = h('input', { class: 'input', type: 'time', name: 'add-to-' + i, 'aria-label': 'Ends' });
@@ -315,52 +336,106 @@
             if (d.times.indexOf(tm) !== -1) return toast('That time is already there.', 'err');
             d.times.push(tm);
             d.times.sort(function (x, y) { return slotStart(x) - slotStart(y); });
+            d._open = true;
             paintDays();
           } }, 'Add'));
-        return h('article', { class: 'day-card', dataset: { day: String(i) } },
-          badge,
+        return h('article', { class: 'day-card open', dataset: { day: String(i) } },
+          row,
           h('div', { class: 'day-body' },
             h('div', { class: 'day-fields' },
               A.field('Date', h('input', { class: 'input', type: 'date', name: 'dayDate-' + i, value: d.date || '', onchange: function (e) {
                 d.date = e.target.value;
                 if (d._auto) d.label = autoLabel(d.date);
+                d._open = true;
                 paintDays();
               } }), 'Lets instructors open "today".'),
               A.field('Name students see', label)),
-            h('div', { class: 'day-slots-head' }, h('span', { class: 'label' }, d.times.length + ' slot' + (d.times.length === 1 ? '' : 's')),
+            h('div', { class: 'day-slots-head' }, h('span', { class: 'label' }, count),
               h('button', { type: 'button', class: 'link-btn', name: 'show-add-' + i, onclick: function (e) { adder.hidden = false; e.currentTarget.hidden = true; from.focus(); } }, '+ Add a time'),
-              h('button', { type: 'button', class: 'link-btn', name: 'reset-' + i, onclick: function () { var t = patternTimes(); if (!t.length) return toast('Fix the session hours first.', 'err'); d.times = t; paintDays(); } }, 'Reset to session hours')),
-            d.times.length ? chips : h('p', { class: 'error' }, 'This day has no slots. Add a time or reset it.'),
+              h('button', { type: 'button', class: 'link-btn', name: 'reset-' + i, onclick: function () { var t = patternTimes(); if (!t.length) return toast('Fix the session hours first.', 'err'); d.times = t; d._open = true; paintDays(); } }, 'Reset to session hours')),
+            d.times.length ? chips : null,
             adder,
             h('div', { class: 'actions day-actions' },
               h('button', { type: 'button', class: 'btn btn-quiet sm', name: 'next-week-' + i, onclick: function () {
                 var copy = newDay(d.date ? addDays(d.date, 7) : '', d.times.slice());
                 if (!d.date) copy.label = d.label ? d.label + ' (copy)' : '';
+                copy._open = true;
                 f.slots.days.splice(i + 1, 0, copy); paintDays();
-              } }, icon('copy', 16), d.date ? 'Copy to next week' : 'Duplicate'),
-              h('button', { type: 'button', class: 'btn btn-quiet sm danger', name: 'remove-day-' + i, onclick: function () { f.slots.days.splice(i, 1); paintDays(); } }, icon('trash', 16), 'Remove day'))));
+              } }, icon('copy', 16), d.date ? 'Copy to next week' : 'Duplicate'))));
       };
-      var slotStart = function (tm) {
-        // "1:15 - 1:35" is after "12:55": hours below 8 are read as afternoon.
-        var m = String(tm).match(/^(\d{1,2}):(\d{2})/); if (!m) return 0;
-        var hh = parseInt(m[1], 10); if (hh < 8) hh += 12;
-        return hh * 60 + parseInt(m[2], 10);
+
+      /* Range: first date, last date and weekdays make all the days in one step. */
+      var WEEK = [[6, 'Sat'], [0, 'Sun'], [1, 'Mon'], [2, 'Tue'], [3, 'Wed'], [4, 'Thu'], [5, 'Fri']];
+      var MAX_RANGE = 62;
+      var range = { from: '', to: '', dow: {} };
+      var rangeDates = function () {
+        var a = new Date(range.from + 'T12:00:00'), b = new Date(range.to + 'T12:00:00'), out = [];
+        if (!range.from || !range.to || isNaN(a) || isNaN(b) || b < a) return out;
+        var taken = {};
+        f.slots.days.forEach(function (d) { if (d.date) taken[d.date] = true; });
+        for (var d = a, n = 0; d <= b && n < 366; d.setDate(d.getDate() + 1), n++) {
+          if (range.dow[d.getDay()] && !taken[iso(d)]) out.push(iso(d));
+        }
+        return out;
       };
+      var rangeResult = h('div', { class: 'tt-range-result', 'aria-live': 'polite' });
+      var paintRange = function () {
+        ui.clear(rangeResult);
+        var picked = WEEK.some(function (w) { return range.dow[w[0]]; });
+        var note = function (text, cls) { rangeResult.appendChild(h('p', { class: cls || 'muted-note' }, text)); };
+        if (!range.from || !range.to) return note('Pick the first date and the last date.');
+        if (range.to < range.from) return note('The last date is before the first date.', 'error');
+        if (!picked) return note('Pick the weekdays that have sessions.');
+        var dates = rangeDates();
+        if (!dates.length) return note('Every matching day is already in the timetable.');
+        if (dates.length > MAX_RANGE) return note('That is ' + dates.length + ' days. Add at most ' + MAX_RANGE + ' at a time.', 'error');
+        // The button exists only while it can add something.
+        rangeResult.appendChild(h('button', { type: 'button', class: 'btn btn-primary sm', name: 'range-add', onclick: function () {
+          var times = patternTimes();
+          if (!times.length) return toast('Fix the session hours first.', 'err');
+          dates.forEach(function (date) { f.slots.days.push(newDay(date, times.slice())); });
+          // Dated days in calendar order; days without a date keep their place at the end.
+          var dated = f.slots.days.filter(function (d) { return d.date; }).sort(function (x, y) { return x.date < y.date ? -1 : x.date > y.date ? 1 : 0; });
+          f.slots.days = dated.concat(f.slots.days.filter(function (d) { return !d.date; }));
+          paintDays();
+          toast(dates.length + ' day' + (dates.length === 1 ? '' : 's') + ' added. Save to keep ' + (dates.length === 1 ? 'it' : 'them') + '.', 'ok');
+        } }, icon('plus', 18), 'Add ' + dates.length + ' day' + (dates.length === 1 ? '' : 's')));
+      };
+      var dowBox = h('div', { class: 'toggle-chips', role: 'group', 'aria-label': 'Weekdays' });
+      var paintDow = function () {
+        ui.clear(dowBox);
+        WEEK.forEach(function (w) {
+          var on = !!range.dow[w[0]];
+          dowBox.appendChild(h('button', { type: 'button', class: 'toggle-chip sm', name: 'range-dow-' + w[0], 'aria-pressed': on ? 'true' : 'false', onclick: function () { range.dow[w[0]] = !on; paintDow(); paintRange(); } }, w[1]));
+        });
+      };
+      paintDow();
+      var rangeCard = h('div', { class: 'tt-range' },
+        h('h4', null, 'Add several days'),
+        h('div', { class: 'tt-range-fields' },
+          A.field('First date', h('input', { class: 'input', type: 'date', name: 'range-from', onchange: function (e) { range.from = e.target.value; paintRange(); } })),
+          A.field('Last date', h('input', { class: 'input', type: 'date', name: 'range-to', onchange: function (e) { range.to = e.target.value; paintRange(); } })),
+          h('div', { class: 'field-row' }, h('span', { class: 'label' }, 'On these weekdays'), dowBox)),
+        rangeResult);
+
       paintDays();
       paintPattern();
       var daysCard = h('div', { class: 'tt-step' },
-        h('div', { class: 'tt-step-head' }, h('span', { class: 'tt-num' }, '2'), h('div', null, h('h3', null, 'Days'), h('p', { class: 'help' }, 'Pick a date and the day is named for you. Remove a slot with its ×, or copy a whole day to the next week.'))),
+        h('div', { class: 'tt-step-head' }, h('span', { class: 'tt-num' }, '2'), h('div', null, h('h3', null, 'Days'), h('p', { class: 'help' }, 'Each day is one line. Press Change to edit its date, name or times.'))),
+        rangeCard,
         daysBox,
         h('button', { type: 'button', class: 'btn btn-quiet', name: 'addDay', onclick: function () {
           var times = patternTimes();
           if (!times.length) return toast('Fix the session hours first.', 'err');
           var last = f.slots.days[f.slots.days.length - 1];
-          f.slots.days.push(newDay(last && last.date ? addDays(last.date, 1) : '', times));
+          var day = newDay(last && last.date ? addDays(last.date, 1) : '', times);
+          day._open = true;
+          f.slots.days.push(day);
           paintDays();
           var cards = daysBox.querySelectorAll('.day-card');
           var input = cards.length && cards[cards.length - 1].querySelector('input[type="date"]');
           if (input && input.focus) input.focus();
-        } }, icon('plus', 20), 'Add a day'));
+        } }, icon('plus', 20), 'Add one day'));
       slotsPanel = panel('Timetable', 'Each slot can be booked by the number of teams you set. Students see taken slots crossed out.', hoursCard, daysCard);
     }
 

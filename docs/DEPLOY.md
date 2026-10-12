@@ -178,7 +178,7 @@ Back in the Forms Registry sheet: **Forms Platform > 3. Set website address...**
    - **Questions**: rename, hide, or add a description under any question.
    - **Emails**: whether students get a confirmation email.
    - **Limits and checks**: the Drive folder name rule `Team_Leader_Name_Project_Name_Subject_Name` (on by default for new team forms). Type the subject name, for example `Software Engineering`, so folders must end with `_Software_Engineering`.
-   - **Timetable** for reservations: set the session hours, then add days by date.
+   - **Timetable** for reservations: set the session hours, then add the days: a first date, a last date and the weekdays add them all at once.
    - **Status**: set to **Open** and click **Save settings**.
 4. Click **Copy link** and send it to students. The link looks like `.../index.html?f=database-team-project-registration-form-fall-2027`.
 5. Watch submissions under **Responses**. Each form's own Google Sheet is one click away (**Google Sheet**).
