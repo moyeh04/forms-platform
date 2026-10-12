@@ -834,7 +834,7 @@ written), names read right to left, and it prints one page wide.
 flowchart LR
     A["Download all"] --> B["admin.download.start<br/>a work folder, the numbered teams"]
     B --> C{"admin.download.team<br/>for each team"}
-    C -- "a file" --> D["Tasks/03 - Clean Code.pptx"]
+    C -- "a file" --> D["Tasks/03 - Task 3.pptx"]
     C -- "a folder" --> E["Projects/03 - Library System/...<br/>over as many requests as it needs"]
     C -- "cannot be saved" --> F["the reason and the Drive link"]
     D --> G["admin.download.finish<br/>Teams.xlsx, parts of 40 MB"]

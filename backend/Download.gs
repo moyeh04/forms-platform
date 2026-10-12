@@ -37,7 +37,7 @@ function dlName_(text, fallback) {
 
 function dlPad_(n) { return n < 10 ? '0' + n : String(n); }
 
-/** Where a team's things go inside the zip: "Tasks/03 - Clean Code" or "Projects/03 - Library System". */
+/** Where a team's things go inside the zip: "Tasks/03 - Task 3" or "Projects/03 - Library System". */
 function dlBase_(form, team) {
   return (form.type === 'task_submission' ? 'Tasks/' : 'Projects/') + dlPad_(team.number) + ' - ' + dlName_(team.title, team.ref);
 }
