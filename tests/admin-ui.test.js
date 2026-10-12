@@ -1143,7 +1143,7 @@ test('Responses: Download all saves every task, shows what was not downloaded, a
   const w = boot();
   const f = w.make('task_submission', 'Tasks', { rules: { driveCheck: 'off' } });
   w.drive.addFile({ id: ID('a'), name: 'clean.pdf', mime: 'application/pdf', bytes: '%PDF' });
-  submit(w, f, person({ leader_code: '4230001', title: 'Clean Code', link: `https://drive.google.com/file/d/${ID('a')}/view`, members: [] }));
+  submit(w, f, person({ leader_code: '4230001', title: 'Task 1', link: `https://drive.google.com/file/d/${ID('a')}/view`, members: [] }));
   submit(w, f, person({ leader_code: '4230002', title: 'Forms', link: `https://drive.google.com/file/d/${ID('b')}/view`, members: [] }));
   w.drive.addFile({ id: ID('b'), name: 'Quiz', mime: 'application/vnd.google-apps.form' });
   w.fetch = (url, opts) => {

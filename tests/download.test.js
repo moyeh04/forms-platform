@@ -78,18 +78,18 @@ function download(w, slug) {
 test('Download: every task is saved under its team number, with a workbook that links to it', () => {
   const w = boot();
   const f = w.make('task_submission', 'Software Engineering Tasks');
-  w.drive.addFile({ id: ID('a'), name: 'Clean Code', mime: SLIDES });
-  w.drive.addFile({ id: ID('b'), name: 'cocomo.pdf', mime: 'application/pdf', bytes: '%PDF cocomo' });
+  w.drive.addFile({ id: ID('a'), name: 'Task 1', mime: SLIDES });
+  w.drive.addFile({ id: ID('b'), name: 'report.pdf', mime: 'application/pdf', bytes: '%PDF report' });
   w.drive.addFile({ id: ID('c'), name: 'huge.mp4', mime: 'video/mp4', bytes: Buffer.alloc(46 * 1024 * 1024) });
   const submit = (code, title, id, o) => assert.equal(w.api({ action: 'submit', slug: f.slug, data: person(code, { title, link: `https://docs.google.com/presentation/d/${id}/edit`, ...o }) }).ok, true);
-  submit('4230001', 'Clean Code', ID('a'), { members: [mate('سارة خالد حسن علي', '4230002')] });
-  submit('4230003', 'COCOMO', ID('b'));
+  submit('4230001', 'Task 1', ID('a'), { members: [mate('سارة خالد حسن علي', '4230002')] });
+  submit('4230003', 'Task 2', ID('b'));
   submit('4230004', 'Demo: video/clip', ID('c'));
 
   const { entries, fin } = download(w, f.slug);
   const root = 'Software Engineering Tasks/';
-  assert.deepEqual(Object.keys(entries).sort(), [root + 'Tasks/01 - Clean Code.pptx', root + 'Tasks/02 - COCOMO.pdf', root + 'Teams.xlsx']);
-  assert.equal(entries[root + 'Tasks/02 - COCOMO.pdf'].toString(), '%PDF cocomo');
+  assert.deepEqual(Object.keys(entries).sort(), [root + 'Tasks/01 - Task 1.pptx', root + 'Tasks/02 - Task 2.pdf', root + 'Teams.xlsx']);
+  assert.equal(entries[root + 'Tasks/02 - Task 2.pdf'].toString(), '%PDF report');
   assert.match(w.exports[0], /presentation\/d\/a+\/export\/pptx/, 'Google Slides are exported as PowerPoint');
   assert.equal(fin.failed.length, 1);
   assert.match(fin.failed[0].reason, /Too big/);
@@ -100,7 +100,7 @@ test('Download: every task is saved under its team number, with a workbook that 
   assert.ok(sheet.includes('1. أحمد محمد محمود أحمد ★') && sheet.includes('2. سارة خالد حسن علي'), 'members in order, leader starred');
   assert.ok(sheet.includes('<mergeCell ref="E2:E3"/>'), 'one task cell per team');
   const rels = book['xl/worksheets/_rels/sheet1.xml.rels'].toString();
-  assert.ok(rels.includes('Target="Tasks/01%20-%20Clean%20Code.pptx"'), 'the task opens the saved copy');
+  assert.ok(rels.includes('Target="Tasks/01%20-%20Task%201.pptx"'), 'the task opens the saved copy');
   assert.ok(rels.includes(`Target="https://docs.google.com/presentation/d/${ID('c')}/edit"`), 'a task that was not saved opens in Drive');
   assert.ok(book['xl/worksheets/sheet2.xml'].toString().includes('Too big'), 'a second sheet says what was not downloaded and why');
 });
