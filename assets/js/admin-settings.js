@@ -303,13 +303,18 @@
     }
 
     /* Edit key --------------------------------------------------- */
-    var keyPanel = panel('Edit key', 'Each student gets a 5-digit key on the success page and by email. The key alone opens their registration.',
-      h('div', { class: 'row' },
-        h('div', { class: 'field-row' }, A.check('Give students an edit key', f.editKey.enabled, function (v) { f.editKey.enabled = v; })),
-        A.field('Key works for (days)', A.number(f.editKey.days, function (v) { f.editKey.days = parseInt(v, 10) || 7; }, { name: 'keyDays', min: '1', max: '90' }))),
+    // The keys already given are counted from the saved form: a key switched on but not saved has none yet.
+    var keysGiven = f.editKey.enabled && f.id ? A.keysSummary(f) : null;
+    var keyMore = h('div', { class: 'key-more', hidden: !f.editKey.enabled },
+      A.field('A new key works for (days)', A.number(f.editKey.days, function (v) { f.editKey.days = parseInt(v, 10) || 7; }, { name: 'keyDays', min: '1', max: '90' }),
+        'Counted from when the key is given. To give keys already sent more time, use Extend keys.'),
       h('div', { class: 'row' },
         h('div', { class: 'field-row' }, A.check('Students may change their answers', f.editKey.allowEdit, function (v) { f.editKey.allowEdit = v; })),
-        h('div', { class: 'field-row' }, A.check('Students may cancel their registration', f.editKey.allowDelete, function (v) { f.editKey.allowDelete = v; }))));
+        h('div', { class: 'field-row' }, A.check('Students may cancel their registration', f.editKey.allowDelete, function (v) { f.editKey.allowDelete = v; }))),
+      keysGiven);
+    var keyPanel = panel('Edit key', 'Each student gets a 5-digit key on the success page and by email. The key alone opens their registration.',
+      h('div', { class: 'field-row' }, A.check('Give students an edit key', f.editKey.enabled, function (v) { f.editKey.enabled = v; keyMore.hidden = !v; })),
+      keyMore);
 
     /* Rules ------------------------------------------------------ */
     var hasFolder = (f.fields || []).some(function (x) { return x.type === 'drive_link' && (!x.kinds || x.kinds.indexOf('folder') !== -1); });

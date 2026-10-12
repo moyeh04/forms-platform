@@ -175,6 +175,7 @@
       else node = String(v);
       rows.push(h('dt', null, f.label.en), h('dd', null, node));
     });
+    var paintUntil = function () {};
     if (form.editKey && form.editKey.enabled) {
       var keyBox = h('dd', { class: 'key-cell' });
       var paintKey = function () {
@@ -185,13 +186,28 @@
             ui.clear(keyBox);
             keyBox.appendChild(h('span', { class: 'key-inline' }, k.key));
             keyBox.appendChild(h('button', { type: 'button', class: 'btn btn-quiet sm', onclick: async function () { toast((await ui.copyText(k.key)) ? 'Key copied' : 'Could not copy', 'ok'); } }, icon('copy', 16), 'Copy'));
-            keyBox.appendChild(h('span', { class: 'muted-note' }, (k.expired ? 'Expired on ' : 'Works until ') + A.fmtDate(k.keyExpires) + (k.expired ? '. Reset it to give a fresh one.' : '')));
           });
         } }, icon('eye', 16), 'Show key'));
         if (!s.keyKnown) keyBox.appendChild(h('span', { class: 'muted-note' }, 'Issued before keys could be shown: use Reset key below.'));
       };
       paintKey();
-      rows.splice(4, 0, h('dt', null, 'Edit key'), keyBox);
+      // When the key stops working, with a button to move that date; an expired key works again after it.
+      var untilBox = h('dd', { class: 'key-cell' });
+      paintUntil = function () {
+        ui.clear(untilBox);
+        untilBox.appendChild(A.untilText(s.keyExpires));
+        untilBox.appendChild(h('button', { type: 'button', class: 'btn btn-quiet sm', name: 'extend-key', onclick: function (e) {
+          A.busy(e.currentTarget, function () {
+            return A.extendKeys(form, { ids: [s.id], done: function (keys) {
+              var mine = keys.filter(function (k) { return k.id === s.id; })[0];
+              if (mine) s.keyExpires = mine.keyExpires;
+              paintUntil();
+            } });
+          });
+        } }, icon('calendar', 16), 'Extend'));
+      };
+      paintUntil();
+      rows.splice(4, 0, h('dt', null, 'Edit key'), keyBox, h('dt', null, 'Key works'), untilBox);
     }
     var steps = ((form.review && form.review.steps) || []).map(function (st) { return h('div', { class: 'row' }, A.field(st.label.en, reviewSelect(form, s, st))); });
     var body = h('div', { class: 'detail' }, h('dl', null, rows), steps);
@@ -199,6 +215,8 @@
       { text: 'Reset key', kind: 'quiet', onclick: async function () {
         var r = await A.call('admin.submission.resetKey', { slug: form.slug, submissionId: s.id });
         s.keyKnown = true;
+        s.keyExpires = r.keyExpires;
+        paintUntil();
         A.reveal('New key for ' + r.ref, 'Give this key to the student. They open the form link and choose "Edit or cancel with your key". It works until ' + A.fmtDate(r.keyExpires) + '. The old key stops working. You can see it again any time under Details.', r.key, true);
         return false;
       } },
