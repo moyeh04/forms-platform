@@ -40,9 +40,24 @@ test('Login: a wrong PIN is refused and the right one opens the dashboard', asyn
   assert.ok(p.$('#pin'));
   p.type('#pin', '0000'); p.submitForm(); await settle(8);
   assert.ok(p.$('#pin-err').textContent.includes('not correct'));
+  assert.equal(p.$('#pin').value, '0000', 'the refused PIN stays in its field');
+  assert.deepEqual([p.$('#pin').selectionStart, p.$('#pin').selectionEnd], [0, 4], 'selected, so typing replaces it');
   p.type('#pin', '4321'); p.submitForm(); await settle(10);
   assert.ok(p.text().includes('No forms yet'));
   assert.equal(p.$('.admin-nav a[aria-current="page"]').textContent, 'Forms');
+});
+
+test('Login: a lock after wrong tries elsewhere does not sign an open dashboard out', async () => {
+  const w = boot();
+  w.make('team_registration', 'Projects');
+  for (let i = 0; i < 8; i++) w.api({ action: 'admin.login', admin: { pin: '0000' } });
+  const p = await openAdmin(w);
+  assert.ok(p.$('.banner').textContent.includes('Too many wrong PINs'), 'the page says to wait');
+  assert.equal(p.$('#pin'), null, 'and does not ask for the PIN again');
+  assert.equal(p.win.App.api.getPin(), '4321');
+  w.call('unlockAdmin');
+  await p.win.App.admin.start(); await settle(10);
+  assert.ok(p.text().includes('Projects'), 'the same window works once the lock is lifted');
 });
 
 test('Forms: the list shows every form with its type, status, and actions', async () => {
