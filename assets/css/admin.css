@@ -242,6 +242,7 @@ body.admin { font-size: 1rem; }
 .tt-slot-n { display: inline-flex; align-items: center; justify-content: center; min-width: 18px; height: 18px; padding: 0 4px; border-radius: 999px; background: var(--sheet); color: var(--ink); font-family: var(--font-body); font-size: .75rem; font-weight: 700; text-decoration: none; }
 .savebar { position: sticky; bottom: 0; z-index: 5; display: flex; gap: 12px; align-items: center; justify-content: flex-end; padding: 12px 16px; background: var(--sheet); border-top: 1.5px solid var(--ink); margin-top: 18px; }
 .savebar-note { margin-inline-end: auto; font-weight: 700; }
+.savebar-note.is-error { color: var(--err); }
 
 /* Responses: what waits for the admin, above the answers. */
 .requests { margin-bottom: 18px; padding: 14px 16px; border: 1.5px solid var(--sea); border-radius: 4px; background: var(--sheet); }

@@ -667,12 +667,24 @@
       if (timetable && timetable.problem()) return { panel: slotsPanel, text: timetable.problem() };
       return null;
     };
+    var UNSAVED = 'You have changes that are not saved.';
+    var barNote = h('span', { class: 'savebar-note', role: 'status' }, UNSAVED);
+    /** What the save bar says. The reason a save was refused stays there until the next change. */
+    var say = function (text, refused) {
+      barNote.textContent = text;
+      barNote.classList.toggle('is-error', !!refused);
+      barNote.setAttribute('role', refused ? 'alert' : 'status');
+    };
     var saveBtn = h('button', { type: 'button', class: 'btn btn-primary', name: 'save' }, 'Save settings');
     saveBtn.addEventListener('click', function () {
       A.busy(saveBtn, async function () {
         var stop = problem();
-        if (stop) { show(stop.panel.tab); stop.panel.setOpen(true); return toast(stop.text, 'err'); }
-        var out = await A.call('admin.forms.update', { id: f.id, patch: buildPatch() });
+        if (stop) { show(stop.panel.tab); stop.panel.setOpen(true); return say(stop.text, true); }
+        // Only what changed is sent, with the time of the copy this page shows, so a save never undoes someone else's.
+        var now = buildPatch(), was = JSON.parse(saved), patch = {};
+        Object.keys(now).forEach(function (k) { if (JSON.stringify(now[k]) !== JSON.stringify(was[k])) patch[k] = now[k]; });
+        var out;
+        try { out = await A.call('admin.forms.update', { id: f.id, base: f.updatedAt, patch: patch }); } catch (e) { return say(A.message(e), true); }
         A.unsaved = false;
         toast('Settings saved', 'ok');
         if (out.teamSizeConflicts) toast(out.teamSizeConflicts + ' saved team(s) now fall outside this team size range.', 'err');
@@ -721,9 +733,10 @@
 
     /* Unsaved changes: the bar exists only while there is something to save. */
     var saved = JSON.stringify(buildPatch());
-    var bar = h('div', { class: 'savebar', hidden: true }, h('span', { class: 'savebar-note', role: 'status' }, 'You have changes that are not saved.'),
+    var bar = h('div', { class: 'savebar', hidden: true }, barNote,
       h('button', { type: 'button', class: 'btn btn-quiet', name: 'discard', onclick: function () { A.unsaved = false; A.render(); } }, 'Discard'), saveBtn);
-    var refresh = function () {
+    var refresh = function (e) {
+      if (!(e && bar.contains(e.target))) say(UNSAVED);
       sections.forEach(function (n) { n.paintSummary(); });
       A.unsaved = JSON.stringify(buildPatch()) !== saved;
       bar.hidden = !A.unsaved;
