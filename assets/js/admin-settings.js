@@ -50,6 +50,54 @@
 
   function plural(n, one, many) { return n + ' ' + (n === 1 ? one : many); }
 
+  /** "4C-TH2" belongs to the group "4C": the part before the first dash. */
+  function sectionGroup(o) { var v = String(o.value); return v.indexOf('-') > 0 ? v.slice(0, v.indexOf('-')) : 'Other'; }
+
+  /**
+   * Chips that limit a form to some values of a list. An empty choice means every value,
+   * and choosing every value is stored as the empty choice.
+   * opts: name (prefix of the control names), all (text of the "no limit" chip), options,
+   * get() and set(values), and optionally groupOf(option) to put the chips under a heading
+   * that switches its whole group.
+   */
+  function allowPicker(opts) {
+    var box = h('div', { class: 'allow-picker' });
+    var chip = function (name, text, on, click, sub) {
+      return h('button', { type: 'button', class: 'toggle-chip', name: name, 'aria-pressed': on ? 'true' : 'false', onclick: function () { click(); paint(); } }, text, sub ? h('span', { class: 'chip-sub', lang: 'ar' }, sub) : null);
+    };
+    var put = function (values) { opts.set(values.length === opts.options.length ? [] : values); };
+    var groups = [];
+    opts.options.forEach(function (o) {
+      var id = opts.groupOf ? opts.groupOf(o) : '';
+      var g = groups.filter(function (x) { return x.id === id; })[0];
+      if (!g) groups.push(g = { id: id, options: [] });
+      g.options.push(o);
+    });
+    function paint() {
+      var chosen = opts.get();
+      var has = function (o) { return chosen.indexOf(String(o.value)) !== -1; };
+      ui.clear(box);
+      box.appendChild(h('div', { class: 'toggle-chips' }, chip(opts.name + '-all', opts.all, !chosen.length, function () { opts.set([]); })));
+      groups.forEach(function (g) {
+        var whole = g.options.every(has);
+        var values = g.options.map(function (o) { return String(o.value); });
+        box.appendChild(h('div', { class: 'toggle-chips', role: 'group', 'aria-label': g.id || opts.all },
+          g.id ? chip(opts.name + '-group-' + g.id, 'All ' + g.id, whole, function () {
+            var rest = chosen.filter(function (v) { return values.indexOf(v) === -1; });
+            put(whole ? rest : rest.concat(values));
+          }) : null,
+          g.options.map(function (o) {
+            var on = has(o);
+            return chip(opts.name + '-' + o.value, (o.label && o.label.en) || o.value, on, function () {
+              put(on ? chosen.filter(function (v) { return v !== String(o.value); }) : chosen.concat([String(o.value)]));
+            }, o.label && o.label.ar && o.label.ar !== o.label.en && o.label.ar !== String(o.value) ? o.label.ar : null);
+          })));
+      });
+    }
+    paint();
+    return box;
+  }
+
   A.views.settings = async function (mount, slug, startTab) {
     var res = await A.call('admin.forms.get', { id: slug });
     var f = res.form;
@@ -98,34 +146,45 @@
 
     /* Who can register --------------------------------------------- */
     var majorsPanel = null;
-    var majorOptions = (res.lists && res.lists.majors) || [];
-    var hasMajor = (f.fields || []).some(function (x) { return x.list === 'majors' && x.enabled !== false; });
-    if (hasMajor && majorOptions.length) {
-      f.rules.majors = Array.isArray(f.rules.majors) ? f.rules.majors.slice() : [];
-      var majorChips = h('div', { class: 'toggle-chips', role: 'group', 'aria-label': 'Specializations allowed' });
-      var majorNote = h('p', { class: 'muted-note' });
-      var paintMajors = function () {
-        ui.clear(majorChips);
-        var all = !f.rules.majors.length;
-        majorChips.appendChild(h('button', { type: 'button', class: 'toggle-chip', name: 'major-all', 'aria-pressed': all ? 'true' : 'false', onclick: function () { f.rules.majors = []; paintMajors(); } }, 'All specializations'));
-        majorOptions.forEach(function (o) {
-          var on = f.rules.majors.indexOf(String(o.value)) !== -1;
-          majorChips.appendChild(h('button', { type: 'button', class: 'toggle-chip', name: 'major-' + o.value, 'aria-pressed': on ? 'true' : 'false', onclick: function () {
-            f.rules.majors = on ? f.rules.majors.filter(function (v) { return v !== String(o.value); }) : f.rules.majors.concat([String(o.value)]);
-            if (f.rules.majors.length === majorOptions.length) f.rules.majors = [];
-            paintMajors();
-          } }, (o.label && o.label.en) || o.value, o.label && o.label.ar && o.label.ar !== o.label.en ? h('span', { class: 'chip-sub', lang: 'ar' }, o.label.ar) : null));
-        });
-        var names = majorOptions.filter(function (o) { return f.rules.majors.indexOf(String(o.value)) !== -1; }).map(function (o) { return (o.label && o.label.en) || o.value; });
-        majorNote.textContent = !names.length ? 'Students of every specialization can register.'
-          : names.length === 1 ? 'Only ' + names[0] + ' students can register. The Major question is filled in for them and locked.'
-          : 'Only ' + names.join(' and ') + ' students can register.';
-      };
-      paintMajors();
-      majorsPanel = panel('Who can register', 'Limit this form to some specializations. The choices come from the Majors list. Students of other specializations cannot submit.', majorChips, majorNote);
+    var label = function (o) { return (o.label && o.label.en) || o.value; };
+    var limited = function (list) { return (f.fields || []).some(function (x) { return (x.list === list && x.enabled !== false) || (x.fields || []).some(function (y) { return y.list === list && y.enabled !== false; }); }); };
+    var majorOptions = limited('majors') ? (res.lists && res.lists.majors) || [] : [];
+    var sectionOptions = limited('sections') ? (res.lists && res.lists.sections) || [] : [];
+    if (majorOptions.length || sectionOptions.length) {
+      var whoBody = [];
+      if (majorOptions.length) {
+        f.rules.majors = Array.isArray(f.rules.majors) ? f.rules.majors.slice() : [];
+        var majorNote = h('p', { class: 'muted-note' });
+        var paintMajorNote = function () {
+          var names = majorOptions.filter(function (o) { return f.rules.majors.indexOf(String(o.value)) !== -1; }).map(label);
+          majorNote.textContent = !names.length ? 'Students of every specialization can register.'
+            : names.length === 1 ? 'Only ' + names[0] + ' students can register. The Major question is filled in for them and locked.'
+            : 'Only ' + names.join(' and ') + ' students can register.';
+        };
+        whoBody.push(h('h3', null, 'Specializations'), h('p', { class: 'help' }, 'The choices come from the Majors list. Students of other specializations cannot submit.'),
+          allowPicker({ name: 'major', all: 'All specializations', options: majorOptions, get: function () { return f.rules.majors; }, set: function (v) { f.rules.majors = v; paintMajorNote(); } }), majorNote);
+        paintMajorNote();
+      }
+      if (sectionOptions.length) {
+        f.rules.sections = Array.isArray(f.rules.sections) ? f.rules.sections.slice() : [];
+        var sectionNote = h('p', { class: 'muted-note' });
+        var paintSectionNote = function () {
+          sectionNote.textContent = f.rules.sections.length ? 'Students choose from ' + plural(f.rules.sections.length, 'section', 'sections') + '. The other sections are not offered and are refused.' : 'Students choose from every section in the Sections list.';
+        };
+        whoBody.push(h('h3', null, 'Sections'), h('p', { class: 'help' }, 'Pick the sections this form is for; they can be from more than one year. A group is the part of the name before the dash (4C, 3L). ', h('a', { href: '#/lists' }, 'Add or rename sections in Lists.')),
+          allowPicker({ name: 'section', all: 'All sections', options: sectionOptions, groupOf: sectionGroup, get: function () { return f.rules.sections; }, set: function (v) { f.rules.sections = v; paintSectionNote(); } }), sectionNote);
+        paintSectionNote();
+      }
+      majorsPanel = panel('Who can register', 'Limit this form to some students. With no limit, every choice of the list is offered.', whoBody);
       majorsPanel.summary = function () {
-        var names = majorOptions.filter(function (o) { return f.rules.majors.indexOf(String(o.value)) !== -1; }).map(function (o) { return (o.label && o.label.en) || o.value; });
-        return names.length ? 'Only ' + names.join(', ') : 'Everyone';
+        var parts = [];
+        if (majorOptions.length && f.rules.majors.length) parts.push('Only ' + majorOptions.filter(function (o) { return f.rules.majors.indexOf(String(o.value)) !== -1; }).map(label).join(', '));
+        if (sectionOptions.length && f.rules.sections.length) {
+          var groups = [];
+          f.rules.sections.forEach(function (v) { var g = sectionGroup({ value: v }); if (groups.indexOf(g) === -1) groups.push(g); });
+          parts.push(plural(f.rules.sections.length, 'section', 'sections') + ' (' + groups.join(', ') + ')');
+        }
+        return parts.length ? parts.join(' · ') : 'Everyone';
       };
     }
 

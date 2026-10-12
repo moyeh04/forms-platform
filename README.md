@@ -86,6 +86,7 @@ step needs the real Google services (see "What could not be tested here").
 | Term picked from Fall, Spring, or Summer chips plus a year list, and a subject code (for example CMPn323) shown as a tag | Done |
 | Title built from settings, e.g. "Database Team Project Registration Form" plus a term tag. No "Clean Code", no "Form Nº" | Done |
 | A form can be limited to some specializations (for example Computers only): the Major question locks to them and the server refuses others | Done |
+| A form can be limited to some sections, picked one by one or a whole year group (4C, 3L) at once, so one Sections list serves every year | Done |
 | Editable lists behind dropdowns (levels, bylaws, majors, sections, groups): a list-by-list editor filtered by form type, showing which forms use each list, with compact chips for plain lists, named rows for the rest, number ranges, and bulk paste | Done |
 
 ### Student experience
@@ -175,7 +176,7 @@ the first-deployment setup, and the Excel export; `tests/` holds the automated t
 
 ```
 npm install          # once, installs the browser test library
-npm test             # 221 tests: rules, backend, form page, dashboard, instructor page, deployment
+npm test             # 223 tests: rules, backend, form page, dashboard, instructor page, deployment
 npm run build        # writes dist/Code.gs and dist/appsscript.json for clasp
 npm run setup        # first deployment: creates the sheet, pushes the backend, creates the web app, configures GitHub
 npm run dev          # local preview on http://localhost:8080 (PIN 4321), in memory, no Google needed
