@@ -254,7 +254,7 @@
     var cancel = S.mode === 'edit' && S.keyInfo.canDelete && last
       ? h('p', { class: 'foot' }, h('button', { type: 'button', class: 'link-btn', onclick: askCancel }, t('cancelReg')))
       : null;
-    return sheet(head(), edit, hub() ? null : trail(), bannerEl(), f, cancel, S.mode === 'new' && S.stepIndex === 0 ? editLink() : null);
+    return sheet(head(), edit, hub() ? transferNotes() : null, hub() ? null : trail(), bannerEl(), f, cancel, S.mode === 'new' && S.stepIndex === 0 ? editLink() : null);
   }
 
   /* ── Fields ─────────────────────────────────────────────────── */
@@ -783,15 +783,18 @@
     try {
       var res;
       if (S.mode === 'edit') {
-        res = await App.api.call({ action: 'update', slug: S.slug, key: S.key, data: v.data });
+        res = await App.api.call({ action: 'update', slug: S.slug, key: S.key, data: v.data, transfer: S.transfer || undefined });
         S.result = { ref: res.ref, edited: true };
       } else {
-        var request = { action: 'submit', slug: S.slug, data: v.data, lang: App.i18n.lang };
+        var request = { action: 'submit', slug: S.slug, data: v.data, lang: App.i18n.lang, transfer: S.transfer || undefined };
         if (keyMode()) request.sourceKey = S.sourceKey;
         res = await App.api.call(request);
         S.result = { ref: res.ref, key: res.key, keyExpires: res.keyExpires, emailed: !!res.emailed };
       }
-      S.data = v.data;
+      // A member that was asked for from another team is not in the saved answers yet.
+      S.data = res.data || v.data;
+      S.result.transfers = res.transfers || [];
+      S.transfer = null;
       clearDraft();
       S.busy = false;
       S.view = 'ticket';
@@ -828,6 +831,13 @@
       return render();
     }
     if (code === 'duplicate_member') {
+      // Every clashing member can be asked for: offer that before refusing.
+      var offer = d.transfer || [];
+      if (offer.length && offer.length === (d.codes || []).length && !S.transfer) {
+        var ask = await App.ui.confirm({ title: t('transferTitle'), body: t('transferBody', { list: offer.map(function (o) { return who(memberName(o.code), o.code) + ' → ' + o.team; }).join(t('listSep')) }), confirmText: t('transferAsk'), cancelText: t('transferNo') });
+        if (ask) { S.transfer = offer.map(function (o) { return o.code; }); return submit(); }
+      }
+      S.transfer = null;
       S.banner = { kind: 'err', text: t('errors.duplicate_member') + (d.codes ? ' (' + d.codes.join(', ') + ')' : '') };
       S.stepIndex = Math.max(0, S.steps.findIndex(function (s) { return s.fields.some(function (f) { return f.type === 'members'; }); }));
       return render();
@@ -879,10 +889,12 @@
       S.ownSlot = sf && S.data[sf.id] ? Rules.slotKey(S.data[sf.id].day, S.data[sf.id].time) : '';
       S.errors = {}; S.banner = null;
       S.original = JSON.stringify(S.data);
+      S.transfers = res.transfers || { incoming: [], outgoing: [] };
       buildSteps();
       S.stepIndex = S.steps.length - 1;
       S.view = res.canEdit ? 'form' : 'readonly';
       render();
+      askTransfers();
     } catch (e) {
       S.busy = false;
       S.keyError = App.i18n.err({ error: e.code }) || e.message;
@@ -894,6 +906,7 @@
     var groups = S.steps.filter(function (s) { return !s.review; }).map(function (s) { return h('div', null, h('h3', { class: 'member-title' }, stepTitle(s)), summaryList(s)); });
     return sheet(head(),
       h('div', { class: 'banner info', role: 'status' }, t('editing', { ref: S.keyInfo.ref }) + '. ' + t('readOnly')),
+      transferNotes(), bannerEl(),
       groups,
       S.keyInfo.canDelete ? h('div', { class: 'nav' }, h('button', { type: 'button', class: 'btn btn-danger', onclick: askCancel }, icon('trash', 20), t('cancelReg'))) : null);
   }
@@ -929,7 +942,85 @@
       ref: S.result.ref, key: S.result.key, keyExpires: S.result.keyExpires, edited: !!S.result.edited,
       email: !S.result.edited && S.result.emailed ? em : '', summary: ticketSummary()
     };
-    return sheet(head(), App.ticket.render(opts), App.ticket.actions(opts));
+    var asked = S.result.transfers || [];
+    var note = asked.length ? h('div', { class: 'banner info', role: 'status', name: 'transfer-sent' }, t('transferSent', { list: asked.map(function (a) { return who(a.name, a.code) + ' → ' + a.team; }).join(t('listSep')) })) : null;
+    return sheet(head(), note, App.ticket.render(opts), App.ticket.actions(opts));
+  }
+
+  /* ── Members asked for by, or from, another team ────────────── */
+
+  function who(name, code) { return name ? name + ' (' + code + ')' : String(code); }
+  function memberName(code) {
+    var mf = Rules.fieldByRole(S.form, 'members');
+    var hit = ((mf && S.data[mf.id]) || []).filter(function (m) { return String(m.code) === String(code); })[0];
+    return hit ? hit.name : '';
+  }
+
+  /** The request as a question with three answers. Resolves to 'approve', 'reject' or 'later'. */
+  function transferDialog(r) {
+    return new Promise(function (resolve) {
+      var done = function (v) { if (overlay.parentNode) overlay.parentNode.removeChild(overlay); resolve(v); };
+      var btn = function (cls, name, text, v) { return h('button', { type: 'button', class: 'btn ' + cls, name: name, onclick: function () { done(v); } }, text); };
+      var later = btn('btn-quiet', 'transfer-later', t('transferLater'), 'later');
+      var overlay = h('div', { class: 'overlay', onclick: function (e) { if (e.target === overlay) done('later'); } },
+        h('div', { class: 'dialog', role: 'dialog', 'aria-modal': 'true', 'aria-label': t('transferAskedTitle') },
+          h('h2', { class: 'dialog-title' }, t('transferAskedTitle')),
+          h('p', null, t('transferAskedBody', { team: r.team, who: who(r.name, r.code) })),
+          h('p', { class: 'help' }, t('transferSizeAfter', { n: r.sizeAfter }) + (r.sizeAfter < r.min ? ' ' + t('transferUnderMin', { min: r.min }) : '')),
+          h('div', { class: 'dialog-actions transfer-actions' }, later, btn('btn-quiet', 'transfer-reject', t('transferReject'), 'reject'), btn('btn-primary', 'transfer-approve', t('transferApprove'), 'approve'))));
+      document.body.appendChild(overlay);
+      later.focus();
+    });
+  }
+
+  async function answerTransfer(r) {
+    // An approval replaces the answers on this page with the saved ones, so edits are saved first.
+    if (changed()) { S.banner = { kind: 'err', text: t('transferSaveFirst') }; return render(); }
+    var answer = await transferDialog(r);
+    if (answer === 'later') return;
+    try {
+      var res = await App.api.call({ action: 'transfer.decide', slug: S.slug, key: S.key, id: r.id, approve: answer === 'approve' });
+      S.data = res.submission.data || {};
+      S.original = JSON.stringify(S.data);
+      S.transfers = res.transfers;
+      S.banner = { kind: 'info', text: t(answer === 'approve' ? 'transferApproved' : 'transferRejected', { who: who(r.name, r.code), team: r.team }) };
+      buildSteps();
+      S.stepIndex = S.steps.length - 1;
+    } catch (e) {
+      S.banner = { kind: 'err', text: App.i18n.err({ error: e.code }) || e.message };
+      try { S.transfers = (await App.api.call({ action: 'lookup', slug: S.slug, key: S.key })).transfers; } catch (x) { /* keep what is shown */ }
+    }
+    render();
+  }
+
+  /** Asks about each waiting request, one after the other, when the registration opens. */
+  async function askTransfers() {
+    var list = (S.transfers.incoming || []).slice();
+    for (var i = 0; i < list.length; i++) await answerTransfer(list[i]);
+  }
+
+  async function cancelTransfer(r) {
+    try {
+      S.transfers = (await App.api.call({ action: 'transfer.cancel', slug: S.slug, key: S.key, id: r.id })).transfers;
+    } catch (e) {
+      S.banner = { kind: 'err', text: App.i18n.err({ error: e.code }) || e.message };
+    }
+    render();
+  }
+
+  /** One line for each request that waits or was answered, above the registration. */
+  function transferNotes() {
+    var tr = S.transfers || {};
+    var lines = (tr.incoming || []).map(function (r) {
+      return h('div', { class: 'banner info transfer-note', role: 'status', dataset: { transfer: 'incoming' } }, t('transferAskedBody', { team: r.team, who: who(r.name, r.code) }), ' ',
+        h('button', { type: 'button', class: 'link-btn', name: 'transfer-answer', onclick: function () { answerTransfer(r); } }, t('transferAnswer')));
+    }).concat((tr.outgoing || []).map(function (r) {
+      var key = { pending: 'transferWaiting', approved: 'transferJoined', rejected: 'transferKept', closed: 'transferElsewhere' }[r.status];
+      if (!key) return null;
+      return h('div', { class: 'banner info transfer-note', role: 'status', dataset: { transfer: r.status } }, t(key, { team: r.team, who: who(r.name, r.code) }), ' ',
+        r.status === 'pending' ? h('button', { type: 'button', class: 'link-btn', name: 'transfer-cancel', onclick: function () { cancelTransfer(r); } }, t('transferCancel')) : null);
+    })).filter(Boolean);
+    return lines.length ? h('div', { class: 'transfer-notes' }, lines) : null;
   }
 
   /* ── Start ──────────────────────────────────────────────────── */
