@@ -121,13 +121,25 @@ body.admin { font-size: 1rem; }
 .pattern-chips .time-chip { padding: 2px 10px; background: transparent; border-style: dashed; color: var(--mute); }
 .time-chip button { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; border: 0; border-radius: 50%; background: transparent; color: var(--mute); cursor: pointer; }
 .time-chip button:hover { background: var(--tint-b); color: var(--err); }
-.tt-days { display: flex; flex-direction: column; gap: 12px; margin-bottom: 12px; }
-.day-card { display: grid; grid-template-columns: 76px minmax(0, 1fr); gap: 16px; padding: 14px 16px; border: 1.5px solid var(--line); border-radius: 4px; background: var(--sheet); }
-.day-badge { display: flex; flex-direction: column; align-items: center; justify-content: center; align-self: start; padding: 8px 0; border-radius: 4px; background: var(--ink); color: var(--sheet); line-height: 1.1; }
+.tt-range { margin-bottom: 14px; padding: 12px 14px; border: 1.5px dashed var(--line); border-radius: 4px; background: var(--sheet); }
+.tt-range h4 { margin: 0 0 6px; font-size: 1rem; }
+.tt-range-fields { display: grid; grid-template-columns: minmax(150px, .7fr) minmax(150px, .7fr) minmax(0, 1.6fr); gap: 0 16px; align-items: start; }
+.tt-range-fields .toggle-chips { margin: 4px 0 0; }
+.tt-range-result { margin-top: 8px; }
+.tt-range-result p { margin: 0; }
+.tt-days { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; }
+.day-card { padding: 8px 12px; border: 1.5px solid var(--line); border-radius: 4px; background: var(--sheet); }
+.day-card.open { padding-bottom: 14px; border-color: var(--ink); }
+.day-row { display: flex; align-items: center; gap: 12px; }
+.day-sum { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.day-sum strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.day-sum .error { margin: 0; }
+.day-body { margin-top: 10px; padding-top: 12px; border-top: 1px dashed var(--line); }
+.day-badge { flex: none; display: flex; align-items: baseline; justify-content: center; gap: 6px; min-width: 104px; padding: 5px 10px; border-radius: 4px; background: var(--ink); color: var(--sheet); line-height: 1.1; }
 .day-badge .dow { font-size: .8rem; text-transform: uppercase; letter-spacing: .08em; }
-.day-badge .dom { font-size: 1.8rem; font-family: var(--font-title); }
+.day-badge .dom { font-size: 1.2rem; font-family: var(--font-title); }
 .day-badge .mon { font-size: .85rem; }
-.day-badge.none { background: transparent; color: var(--mute); border: 1.5px dashed var(--line); min-height: 76px; text-align: center; }
+.day-badge.none { background: transparent; color: var(--mute); border: 1.5px dashed var(--line); }
 .day-fields { display: grid; grid-template-columns: minmax(150px, .8fr) minmax(0, 1.2fr); gap: 0 16px; }
 .day-slots-head { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 16px; margin: 2px 0 8px; }
 .day-slots-head .label { margin: 0 auto 0 0; }
@@ -139,11 +151,12 @@ body.admin { font-size: 1rem; }
 .danger-zone { border-color: var(--err); }
 .danger-zone h2 { color: var(--err); }
 @media (max-width: 640px) {
-  .day-card { grid-template-columns: 1fr; }
-  .day-badge { flex-direction: row; gap: 8px; padding: 6px 12px; align-self: stretch; }
-  .day-badge .dom { font-size: 1.2rem; }
-  .day-badge.none { min-height: 0; }
+  .day-row { flex-wrap: wrap; }
+  .day-sum { flex-basis: 100%; order: 3; }
+  .day-badge { margin-inline-end: auto; }
   .day-fields { grid-template-columns: 1fr; }
+  .tt-range-fields { grid-template-columns: 1fr 1fr; }
+  .tt-range-fields .field-row { grid-column: 1 / -1; }
 }
 .savebar { position: sticky; bottom: 0; z-index: 5; display: flex; gap: 12px; align-items: center; justify-content: flex-end; padding: 12px 16px; background: var(--sheet); border-top: 1.5px solid var(--ink); margin-top: 18px; }
 

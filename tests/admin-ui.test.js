@@ -527,6 +527,43 @@ test('Timetable: session hours, dates that name the day, removing and adding tim
   assert.deepEqual(slots.days[1].times, slots.days[0].times, 'the copy keeps the edited times');
 });
 
+test('Timetable: a date range with weekdays adds every day at once, and each day is one line until opened', async () => {
+  const w = boot();
+  const f = w.make('reservation', 'Seminar');
+  const p = await openAdmin(w, `#/f/${f.slug}/settings`);
+  const set = (name, value) => { const el = p.$(`[name="${name}"]`); el.value = value; p.fire(el, 'change'); };
+  assert.equal(p.$('[name="range-add"]'), null, 'no button before the range can add anything');
+  set('range-from', '2028-03-12'); set('range-to', '2028-03-23');
+  assert.ok(p.text().includes('Pick the weekdays'));
+  p.click('[name="range-dow-0"]'); p.click('[name="range-dow-2"]');
+  assert.equal(p.$('[name="range-add"]').textContent, 'Add 4 days');
+  p.click('[name="range-add"]');
+  assert.equal(p.$$('.day-card').length, 4);
+  assert.equal(p.$$('.day-card.open').length, 0, 'generated days stay closed');
+  assert.equal(p.$('[name="dayLabel-0"]'), null);
+  assert.ok(p.$('.day-card[data-day="0"]').textContent.includes('Sunday 12 Mar'));
+  assert.ok(p.$('.day-card[data-day="0"]').textContent.includes('7 slots, 12:30 to 3:20'));
+  assert.equal(p.$('[name="range-add"]'), null, 'the same range has nothing left to add');
+  assert.ok(p.text().includes('already in the timetable'));
+
+  p.click('[name="range-dow-4"]');
+  assert.equal(p.$('[name="range-add"]').textContent, 'Add 2 days');
+  p.click('[name="range-add"]');
+  p.click('[name="toggle-day-1"]');
+  assert.equal(p.$('[name="dayLabel-1"]').value, 'Tuesday 14 Mar', 'an opened day shows its fields');
+  p.click('[name="drop-1-0"]');
+  assert.equal(p.$$('.day-card.open').length, 1, 'the day stays open while it is edited');
+  p.click('[name="toggle-day-1"]');
+  p.click('[name="remove-day-5"]');
+  set('range-to', '2028-03-01');
+  assert.ok(p.text().includes('before the first date'));
+  p.click('[name="save"]'); await settle(12);
+  const days = w.admin({ action: 'admin.forms.get', id: f.id }).form.slots.days;
+  assert.deepEqual(days.map((d) => d.date), ['2028-03-12', '2028-03-14', '2028-03-16', '2028-03-19', '2028-03-21']);
+  assert.equal(days[1].times.length, 6);
+  assert.equal(days[0].times.length, 7);
+});
+
 test('Delete form: one confirmation from the card removes it; cancelling keeps it', async () => {
   const w = boot();
   w.make('team_registration', 'Old projects');
