@@ -612,23 +612,20 @@ test('Lists: a list with English names is rows that can be added to and reordere
 
 test('Lists: a refused save says why next to the choices, and a removed choice names the form limited to it', async () => {
   const w = boot();
-  w.make('team_registration', 'Projects', { rules: { sections: ['4C-TH1', '4C-TH2'] } });
-  const p = await openAdmin(w, '#/lists/sections');
-  p.click('[name="edit-rows"]');
-  assert.ok(p.$('[name="value-0"]'), 'a plain list opens as rows to rename and reorder');
-  assert.ok(p.$('.savebar').hidden, 'opening the rows changes nothing');
-  p.type('[name="value-1"]', '4C-TH1');
-  assert.ok(p.text().includes('"4C-TH1" is in the list twice. Remove one of them.'));
+  w.make('team_registration', 'Projects', { rules: { majors: ['حاسبات'] } });
+  const p = await openAdmin(w, '#/lists/majors');
+  p.type('[name="value-1"]', 'حاسبات');
+  assert.ok(p.text().includes('"حاسبات" is in the list twice. Remove one of them.'));
   assert.ok(p.$('.choice[data-i="1"]').classList.contains('bad'), 'the row is marked');
-  assert.equal(p.$('[name="value-1"]').value, '4C-TH1', 'the refused value stays in its field');
+  assert.equal(p.$('[name="value-1"]').value, 'حاسبات', 'the refused value stays in its field');
   p.click('[name="save-list"]'); await settle(8);
-  assert.equal(w.admin({ action: 'admin.lists.get' }).lists.sections[1].value, '4C-TH2', 'nothing was saved');
-  p.click('[name="remove-1"]');
-  assert.ok(p.$('.savebar').textContent.includes('Sections: 1 removed. Not saved yet.'));
+  assert.equal(w.admin({ action: 'admin.lists.get' }).lists.majors[1].value, 'اتصالات', 'nothing was saved');
+  p.click('[name="discard"]');
+  p.click('[name="remove-0"]');
+  assert.ok(p.$('.savebar').textContent.includes('Majors: 1 removed. Not saved yet.'));
   assert.ok(p.$('.savebar-warn').textContent.includes('Limited to a removed choice: Projects.'));
   p.click('[name="discard"]');
   assert.ok(p.$('.savebar').hidden);
-  assert.equal(p.$$('.value-chip').length, 14, 'discard brings the saved choices back');
 
   p.click('[name="pick-groups"]'); await settle(2);
   p.click('[name="remove-0"]'); p.click('[name="remove-0"]');
@@ -637,27 +634,91 @@ test('Lists: a refused save says why next to the choices, and a removed choice n
   assert.ok(p.text().includes('Leave without saving?'), 'another list is opened only after the admin agrees');
 });
 
-test('Lists: many choices at once, pasted or numbered', async () => {
+test('Lists: sections are built from year groups and counts, without typing', async () => {
+  const w = boot();
+  w.make('team_registration', 'Projects', { rules: { sections: ['4C-O3'] } });
+  const p = await openAdmin(w, '#/lists/sections');
+  assert.equal(p.$('[name="count-4C-TH"]').value, '8', 'the saved list reads as 4C with 8 TH, 3 T and 3 O');
+  assert.equal(p.$('[name="count-4C-O"]').value, '3');
+  assert.ok(p.$('.savebar').hidden);
+  assert.equal(p.$('[name="add-group"]'), null, 'Add appears once a year and a letter are picked');
+  p.click('[name="group-year-3"]'); p.click('[name="group-letter-L"]');
+  assert.ok(p.$('[name="add-group"]').textContent.includes('Add 3L with the same kinds as 4C'));
+  p.click('[name="add-group"]');
+  assert.equal(p.$('[name="count-3L-TH"]').value, '8');
+  p.click('[name="count-3L-TH-down"]'); p.click('[name="count-3L-TH-down"]');
+  p.click('[name="count-3L-O-down"]'); p.click('[name="count-3L-O-down"]'); p.click('[name="count-3L-O-down"]');
+  assert.equal(p.$('[name="count-3L-O"]'), null, 'a kind counted down to none leaves the group');
+  assert.ok(p.$('[name="add-kind-3L-O"]'), 'and can be added back');
+  p.click('[name="count-4C-O-down"]');
+  assert.ok(p.$('.savebar').textContent.includes('Sections: 9 added, 1 removed. Not saved yet.'));
+  assert.ok(p.$('.savebar-warn').textContent.includes('Limited to a removed choice: Projects.'));
+  p.click('[name="group-year-4"]'); p.click('[name="group-letter-C"]');
+  assert.ok(p.text().includes('4C is already in this list.'));
+  assert.equal(p.$('[name="add-group"]'), null);
+  p.click('[name="save-list"]'); await settle(8);
+  const saved = w.admin({ action: 'admin.lists.get' }).lists.sections.map((o) => o.value);
+  assert.equal(saved.length, 22);
+  assert.deepEqual(saved.slice(13), ['3L-TH1', '3L-TH2', '3L-TH3', '3L-TH4', '3L-TH5', '3L-TH6', '3L-T1', '3L-T2', '3L-T3']);
+});
+
+test('Lists: a run of numbers is set with two steppers', async () => {
   const w = boot();
   const p = await openAdmin(w, '#/lists/wa_sections');
-  assert.equal(p.$$('.value-chip').length, 33);
-  p.type('[name="range-from"]', '5'); p.type('[name="range-to"]', '2'); p.click('[name="fill-range"]');
-  assert.ok(p.text().includes('The last number must not be before the first.'));
-  assert.equal(p.$$('.value-chip').length, 33);
-  p.type('[name="range-from"]', '1'); p.type('[name="range-to"]', '3'); p.click('[name="fill-range"]');
-  assert.equal(p.$$('.value-chip').length, 3, 'the numbers replace the list');
-  assert.ok(p.$('.savebar').textContent.includes('30 removed'));
+  assert.equal(p.$('[name="range-to"]').value, '33');
+  p.click('[name="range-to-down"]'); p.click('[name="range-to-down"]');
+  p.click('[name="range-from-up"]');
+  assert.ok(p.text().includes('30 choices: 2 to 31'));
+  assert.ok(p.$('.savebar').textContent.includes('3 removed'));
+  const to = p.$('[name="range-to"]'); to.value = '40'; p.fire(to, 'change');
+  assert.ok(p.text().includes('39 choices: 2 to 40'), 'the number can also be typed');
+  p.click('[name="save-list"]'); await settle(8);
+  const saved = w.admin({ action: 'admin.lists.get' }).lists.wa_sections.map((o) => o.value);
+  assert.deepEqual([saved[0], saved[saved.length - 1], saved.length], ['2', '40', 39]);
+});
 
-  const q = await openAdmin(w, '#/lists/majors');
-  assert.equal(q.$('[name="fill-range"]'), null, 'no numbering for a list that is not numbers');
-  assert.equal(q.$('[name="paste-add"]'), null, 'nothing to add before something is pasted');
-  q.type('[name="paste-list"]', 'كهرباء | Power\n\nميكانيكا');
-  assert.equal(q.$('[name="paste-add"]').textContent, 'Add 2 choices to the end');
-  q.click('[name="paste-add"]');
-  assert.equal(q.$('[name="en-2"]').value, 'Power');
-  assert.equal(q.$('[name="value-3"]').value, 'ميكانيكا');
-  q.click('[name="save-list"]'); await settle(8);
-  assert.deepEqual(w.admin({ action: 'admin.lists.get' }).lists.majors.map((o) => o.label.en), ['Computers', 'Communications', 'Power', 'ميكانيكا']);
+test('Lists: a new list of sections, picked for the section question of one form, limits that form', async () => {
+  const w = boot();
+  const f = w.make('team_registration', 'Projects');
+  const p = await openAdmin(w, '#/lists');
+  p.click('[name="new-list"]'); await settle(2);
+  assert.equal(p.win.location.hash, '#/lists/new');
+  assert.equal(p.$('[name="create-list"]'), null, 'nothing to make before it has a name');
+  p.type('[name="list-name"]', 'Sections');
+  p.click('[name="copy-none"]');
+  p.click('[name="create-list"]'); await settle(8);
+  assert.ok(p.text().includes('Another list has that name.'), 'the reason is next to the name');
+  assert.equal(p.$('[name="list-name"]').value, 'Sections');
+  p.type('[name="list-name"]', 'Third year');
+  p.click('[name="create-list"]'); await settle(8);
+  assert.equal(p.win.location.hash, '#/lists/third_year');
+  assert.ok(p.$('[name="delete-list"]'), 'a list no form asks can be deleted');
+  p.click('[name="group-year-3"]'); p.click('[name="group-letter-L"]'); p.click('[name="add-group"]');
+  assert.equal(p.$('[name="count-3L-TH"]').value, '1', 'the first group starts with one TH');
+  p.click('[name="add-kind-3L-T"]'); p.click('[name="count-3L-T-up"]');
+  p.click('[name="save-list"]'); await settle(8);
+  assert.deepEqual(w.admin({ action: 'admin.lists.get' }).lists.third_year.map((o) => o.value), ['3L-TH1', '3L-T1', '3L-T2']);
+
+  const q = await openAdmin(w, `#/f/${f.slug}/questions`);
+  assert.equal(q.$('[name="list-level"]'), null, 'a question with no other list to read offers no choice');
+  const pick = q.$('[name="list-section"]');
+  pick.value = 'third_year'; q.fire(pick, 'change');
+  q.click(`[href="#/f/${f.slug}/settings"]`); await settle(4);
+  assert.ok(q.$('[name="section-3L-T2"]'), 'Who can register offers the sections of the list now read');
+  q.click('[name="section-3L-T1"]');
+  q.click('[name="save"]'); await settle(12);
+  const saved = w.admin({ action: 'admin.forms.get', id: f.id }).form;
+  assert.equal(saved.fields.find((x) => x.id === 'section').list, 'third_year');
+  assert.equal(saved.fields.find((x) => x.role === 'members').fields.find((x) => x.id === 'section').list, 'third_year', 'the members follow the leader');
+  const offered = w.api({ action: 'getForm', slug: f.slug }).form.fields.find((x) => x.id === 'section').options.map((o) => o.value);
+  assert.deepEqual(offered, ['3L-T1'], 'students are offered the picked sections of the new list');
+
+  const r = await openAdmin(w, '#/lists/third_year');
+  assert.equal(r.$('[name="delete-list"]'), null, 'no Delete while a form asks the list');
+  assert.equal(w.admin({ action: 'admin.lists.delete', key: 'third_year' }).error.code, 'list_in_use');
+  assert.equal(w.admin({ action: 'admin.lists.delete', key: 'sections' }).error.code, 'list_builtin');
+  r.click('[name="rename-list"]'); r.type('[name="rename-input"]', 'Year 3 sections'); r.click('[name="rename-save"]'); await settle(6);
+  assert.ok(r.$('.list-title h2').textContent.includes('Year 3 sections'));
 });
 
 test('Questions: an admin adds a description and students read it under the question', async () => {
@@ -939,4 +1000,14 @@ test('Pages: the admin adds a page with its title, puts a question on it, rename
   again.click(`[name="remove-page-${page}"]`);
   again.click('[name="save"]'); await settle(12);
   assert.equal(w.admin({ action: 'admin.forms.get', id: f.id }).form.steps.length, 4);
+});
+
+test('Lists: the server refuses a list that does not exist and a question that reads one', () => {
+  const w = boot();
+  const f = w.make('team_registration', 'Projects');
+  assert.equal(w.admin({ action: 'admin.lists.set', key: 'nope', values: ['A'] }).error.code, 'list_not_found');
+  assert.equal(w.admin({ action: 'admin.lists.set', key: '_info', values: ['A'] }).error.code, 'list_not_found', 'the info row is not a list');
+  const fields = w.admin({ action: 'admin.forms.get', id: f.id }).form.fields.map((x) => (x.id === 'section' ? { ...x, list: 'nope' } : x));
+  assert.equal(w.admin({ action: 'admin.forms.update', id: f.id, patch: { fields } }).error.code, 'list_not_found');
+  assert.equal(Object.keys(w.admin({ action: 'admin.lists.get' }).lists).includes('_info'), false);
 });
