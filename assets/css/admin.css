@@ -84,7 +84,7 @@ body.admin { font-size: 1rem; }
 .field-row { display: block; margin-bottom: 10px; }
 .field-row > .label { display: block; margin-bottom: 4px; }
 .field-row .input, .field-row .select, .field-row .textarea { width: 100%; }
-.check { display: flex; align-items: center; gap: 10px; min-height: 40px; font-weight: 700; font-size: var(--fs-label); cursor: pointer; }
+.check { display: flex; align-items: center; gap: 10px; min-height: 40px; font-weight: 700; font-size: var(--fs-label); cursor: pointer; min-width: 0; overflow-wrap: anywhere; }
 .check input { width: 20px; height: 20px; accent-color: var(--sea); flex: none; }
 .page-head { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; margin-bottom: 16px; }
 .page-head h2 { font-size: 1.7rem; margin-inline-end: auto; }
