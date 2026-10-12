@@ -1,0 +1,164 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 420" width="960" height="420" role="img" aria-labelledby="t d">
+  <title id="t">Forms Platform: from scattered messages to one tidy sheet</title>
+  <desc id="d">Chat messages, a sheet full of duplicates and a lost file drift into the platform. Out comes a sheet of teams in tinted blocks, an edit key, an Excel list and a zip of every file.</desc>
+  <style>
+    /* The palette of assets/css/theme.css */
+    .paper { fill: #F8F1DD; } .paper2 { fill: #F1E7CB; } .ink { fill: #2F2418; } .mute { fill: #6A5A44; }
+    .sea { fill: #3F6B66; } .accent { fill: #9A3328; } .tintA { fill: #DCE9E2; } .tintB { fill: #F0E4C8; } .gold { fill: #7E5E1B; }
+    .line { stroke: #CDBB94; } .serif { font-family: 'IM Fell English', Georgia, 'Times New Roman', serif; }
+    .body { font-family: Amiri, Georgia, 'Times New Roman', serif; } .mono { font-family: 'Special Elite', 'Courier New', monospace; }
+
+    * { transform-box: fill-box; }
+    .float { animation: float 3.2s ease-in-out infinite alternate; transform-origin: center; }
+    .f2 { animation-delay: -1.1s; } .f3 { animation-delay: -2.2s; } .f4 { animation-delay: -0.5s; }
+    @keyframes float { from { transform: translate(0, -5px) rotate(-1.5deg); } to { transform: translate(0, 5px) rotate(1.5deg); } }
+
+    /* The mess is pulled into the platform, then comes back for the next round. */
+    .pull { animation: pull 9s cubic-bezier(.6, 0, .4, 1) infinite; transform-origin: center; }
+    .p2 { animation-delay: .25s; } .p3 { animation-delay: .5s; } .p4 { animation-delay: .75s; }
+    @keyframes pull {
+      0%, 30% { transform: none; opacity: 1; }
+      46% { transform: translate(300px, 0) scale(.15); opacity: 0; }
+      88% { transform: translate(-40px, 0); opacity: 0; }
+      100% { transform: none; opacity: 1; }
+    }
+
+    .flow { stroke-dasharray: 6 10; animation: flow 1.2s linear infinite; }
+    @keyframes flow { to { stroke-dashoffset: -32; } }
+
+    .ring { animation: ring 2.4s ease-out infinite; transform-origin: center; }
+    .r2 { animation-delay: 1.2s; }
+    @keyframes ring { from { transform: scale(.9); opacity: .7; } to { transform: scale(1.5); opacity: 0; } }
+    .hub { animation: hub 9s ease-in-out infinite; transform-origin: center; }
+    @keyframes hub { 0%, 36% { transform: scale(1); } 44% { transform: scale(1.12); } 52%, 100% { transform: scale(1); } }
+
+    /* The tidy sheet fills in, team by team. */
+    .row { opacity: 0; animation: row 9s ease-out infinite both; }
+    @keyframes row {
+      0%, 48% { opacity: 0; transform: translate(-14px, 0); }
+      54%, 92% { opacity: 1; transform: none; }
+      98%, 100% { opacity: 0; transform: none; }
+    }
+    .d1 { animation-delay: .15s; } .d2 { animation-delay: .3s; } .d3 { animation-delay: .45s; } .d4 { animation-delay: .6s; }
+    .d5 { animation-delay: .75s; } .d6 { animation-delay: .9s; } .d7 { animation-delay: 1.3s; } .d8 { animation-delay: 1.6s; } .d9 { animation-delay: 1.9s; }
+
+    @media (prefers-reduced-motion: reduce) {
+      .float, .pull, .flow, .ring, .hub { animation: none; }
+      .row { animation: none; opacity: 1; }
+    }
+  </style>
+
+  <!-- The card -->
+  <rect x="1" y="1" width="958" height="418" rx="14" class="paper" stroke="#CDBB94" stroke-width="2"/>
+  <text x="480" y="48" text-anchor="middle" class="serif ink" font-size="27">Registration, tasks and bookings, without the chaos</text>
+  <line x1="300" y1="64" x2="660" y2="64" stroke="#CDBB94" stroke-dasharray="3 5"/>
+
+  <!-- Before: the mess -->
+  <g class="pull">
+    <g class="float">
+      <rect x="40" y="96" width="210" height="46" rx="12" class="tintA" stroke="#3F6B66" stroke-width="1.2"/>
+      <text x="56" y="124" class="body ink" font-size="15">is there room in team 3??</text>
+    </g>
+  </g>
+  <g class="pull p2">
+    <g class="float f2">
+      <rect x="86" y="156" width="196" height="46" rx="12" class="tintB" stroke="#C9A24A" stroke-width="1.2"/>
+      <text x="102" y="184" class="body ink" font-size="15">I sent my code twice</text>
+    </g>
+  </g>
+  <g class="pull p3">
+    <g class="float f3">
+      <rect x="38" y="218" width="170" height="104" rx="6" fill="#FFFFFF" stroke="#CDBB94" stroke-width="1.5"/>
+      <rect x="38" y="218" width="170" height="20" rx="6" fill="#6A5A44"/>
+      <text x="48" y="232" class="mono" fill="#F8F1DD" font-size="10">Sheet1 (copy) (2)</text>
+      <g class="mono" font-size="11" fill="#2F2418">
+        <text x="48" y="256">001  Student</text>
+        <text x="48" y="275">001  Student</text>
+        <text x="48" y="294">0O1  studnet</text>
+        <text x="48" y="313">???  team?</text>
+      </g>
+      <line x1="44" y1="271" x2="200" y2="271" stroke="#9A3328" stroke-width="2"/>
+      <line x1="44" y1="290" x2="200" y2="290" stroke="#9A3328" stroke-width="2"/>
+    </g>
+  </g>
+  <g class="pull p4">
+    <g class="float f4">
+      <rect x="222" y="236" width="74" height="88" rx="5" fill="#FFFFFF" stroke="#9A3328" stroke-width="1.5"/>
+      <path d="M276 236 L296 256 L276 256 Z" fill="#F0E4C8" stroke="#9A3328" stroke-width="1.2"/>
+      <text x="259" y="290" text-anchor="middle" class="serif accent" font-size="30">?</text>
+      <text x="259" y="314" text-anchor="middle" class="mono accent" font-size="9">final_v3.pptx</text>
+    </g>
+  </g>
+  <text x="170" y="364" text-anchor="middle" class="body accent" font-size="15">Chats, duplicate codes, lost files</text>
+
+  <!-- The flow -->
+  <path d="M308 200 C 350 200, 360 200, 402 200" class="flow" stroke="#9A3328" stroke-width="3" fill="none"/>
+  <path d="M558 200 C 600 200, 610 200, 652 200" class="flow" stroke="#3F6B66" stroke-width="3" fill="none"/>
+  <path d="M640 192 L654 200 L640 208" fill="none" stroke="#3F6B66" stroke-width="3"/>
+
+  <!-- The platform -->
+  <circle cx="480" cy="200" r="70" class="ring" fill="none" stroke="#3F6B66" stroke-width="3"/>
+  <circle cx="480" cy="200" r="70" class="ring r2" fill="none" stroke="#C9A24A" stroke-width="3"/>
+  <g class="hub">
+    <circle cx="480" cy="200" r="70" class="ink"/>
+    <circle cx="480" cy="200" r="61" fill="none" stroke="#F8F1DD" stroke-width="1.5" stroke-dasharray="2 4"/>
+    <rect x="456" y="160" width="48" height="58" rx="4" class="paper"/>
+    <rect x="463" y="170" width="34" height="5" rx="2" class="sea"/>
+    <rect x="463" y="181" width="26" height="4" rx="2" class="mute"/>
+    <rect x="463" y="191" width="30" height="4" rx="2" class="mute"/>
+    <rect x="463" y="201" width="20" height="4" rx="2" class="mute"/>
+    <circle cx="497" cy="210" r="9" class="accent"/>
+    <path d="M492.5 210 L496 213.5 L502 206.5" fill="none" stroke="#F8F1DD" stroke-width="2.2"/>
+    <text x="480" y="242" text-anchor="middle" class="serif" fill="#F8F1DD" font-size="13">Forms Platform</text>
+  </g>
+  <text x="480" y="300" text-anchor="middle" class="body ink" font-size="15">One link per form</text>
+  <text x="480" y="320" text-anchor="middle" class="body mute" font-size="13">checked the same way in the page and the server</text>
+
+  <!-- After: one tidy sheet -->
+  <g>
+    <rect x="664" y="92" width="260" height="22" rx="3" class="ink"/>
+    <g class="mono" font-size="10" fill="#F3E6C4">
+      <text x="672" y="107">#</text><text x="690" y="107">Team member</text><text x="800" y="107">Code</text><text x="862" y="107">Task</text>
+    </g>
+
+    <g class="row d1"><rect x="664" y="116" width="182" height="22" class="tintA"/><rect x="846" y="116" width="78" height="46" class="sea"/>
+      <text x="672" y="131" class="mono ink" font-size="10">1</text><text x="690" y="131" class="body ink" font-size="12">★ Student 1</text><text x="800" y="131" class="mono ink" font-size="10">001</text>
+      <text x="885" y="143" text-anchor="middle" class="serif" fill="#FFFFFF" font-size="11" text-decoration="underline">Task 1</text></g>
+    <g class="row d2"><rect x="664" y="140" width="182" height="22" fill="#EEF5F1"/>
+      <text x="690" y="155" class="body ink" font-size="12">Student 2</text><text x="800" y="155" class="mono ink" font-size="10">002</text></g>
+
+    <g class="row d3"><rect x="664" y="164" width="182" height="22" class="tintB"/><rect x="846" y="164" width="78" height="46" class="accent"/>
+      <text x="672" y="179" class="mono ink" font-size="10">2</text><text x="690" y="179" class="body ink" font-size="12">★ Student 3</text><text x="800" y="179" class="mono ink" font-size="10">003</text>
+      <text x="885" y="191" text-anchor="middle" class="serif" fill="#FFFFFF" font-size="11" text-decoration="underline">Task 2</text></g>
+    <g class="row d4"><rect x="664" y="188" width="182" height="22" fill="#F8F1DE"/>
+      <text x="690" y="203" class="body ink" font-size="12">Student 4</text><text x="800" y="203" class="mono ink" font-size="10">004</text></g>
+
+    <g class="row d5"><rect x="664" y="212" width="182" height="22" class="tintA"/><rect x="846" y="212" width="78" height="22" class="sea"/>
+      <text x="672" y="227" class="mono ink" font-size="10">3</text><text x="690" y="227" class="body ink" font-size="12">★ Student 5</text><text x="800" y="227" class="mono ink" font-size="10">005</text>
+      <text x="885" y="227" text-anchor="middle" class="serif" fill="#FFFFFF" font-size="11" text-decoration="underline">Task 3</text></g>
+    <rect x="664" y="92" width="260" height="142" rx="3" fill="none" stroke="#2F2418" stroke-width="1.5"/>
+
+    <!-- Chips: the key, the list and the zip -->
+    <g class="row d7">
+      <rect x="664" y="250" width="92" height="30" rx="15" class="paper2" stroke="#2F2418" stroke-width="1.2" stroke-dasharray="3 3"/>
+      <text x="710" y="270" text-anchor="middle" class="mono ink" font-size="13" >• • • • •</text>
+    </g>
+    <g class="row d8">
+      <rect x="764" y="250" width="86" height="30" rx="15" class="tintA" stroke="#3F6B66" stroke-width="1.2"/>
+      <text x="807" y="270" text-anchor="middle" class="body ink" font-size="13">Teams.xlsx</text>
+    </g>
+    <g class="row d9">
+      <rect x="858" y="250" width="66" height="30" rx="15" class="sea"/>
+      <text x="891" y="270" text-anchor="middle" class="body" fill="#F8F1DD" font-size="13">.zip</text>
+    </g>
+  </g>
+  <text x="794" y="318" text-anchor="middle" class="body sea" font-size="15">One tidy sheet, keys, every file</text>
+
+  <!-- Who it is for -->
+  <line x1="40" y1="384" x2="920" y2="384" stroke="#CDBB94"/>
+  <g class="body mute" font-size="14" text-anchor="middle">
+    <text x="170" y="406">Students register in English or Arabic</text>
+    <text x="480" y="406">The admin runs every form from one dashboard</text>
+    <text x="794" y="406">Instructors read a private link</text>
+  </g>
+</svg>
