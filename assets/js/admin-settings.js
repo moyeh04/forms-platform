@@ -21,12 +21,36 @@
     return isNaN(d) ? '' : d.toISOString();
   }
 
+  // Which sections are open, by form id, so a save (which draws the page again) does not fold them.
+  var opened = {};
+
+  /**
+   * A settings section folded to one line: its name and what it is set to now.
+   * `node.summary` is a function that returns that line; `node.setOpen` unfolds it.
+   */
   function panel(title, help) {
-    var body = Array.prototype.slice.call(arguments, 2);
-    return h('section', { class: 'panel' }, h('h2', null, title), help ? h('p', { class: 'help' }, help) : null, body);
+    var body = h('div', { class: 'panel-body', hidden: true }, help ? h('p', { class: 'help' }, help) : null, Array.prototype.slice.call(arguments, 2));
+    var sum = h('span', { class: 'panel-sum' });
+    var head = h('button', { type: 'button', class: 'panel-head', 'aria-expanded': 'false' }, h('span', { class: 'panel-title' }, title), sum);
+    var node = h('section', { class: 'panel', dataset: { panel: title } }, h('h2', null, head), body);
+    node.panelTitle = title;
+    node.isOpen = function () { return !body.hidden; };
+    node.setOpen = function (open) {
+      body.hidden = !open;
+      head.setAttribute('aria-expanded', open ? 'true' : 'false');
+      node.classList.toggle('open', !!open);
+      if (node.onToggle) node.onToggle(!!open);
+    };
+    node.paintSummary = function () { sum.textContent = node.summary ? node.summary() : ''; };
+    /** The work area of a tab is always open: it has nothing to fold to. */
+    node.pin = function () { node.pinned = true; node.classList.add('pinned'); head.disabled = true; node.setOpen(true); };
+    head.addEventListener('click', function () { node.setOpen(body.hidden); });
+    return node;
   }
 
-  A.views.settings = async function (mount, slug) {
+  function plural(n, one, many) { return n + ' ' + (n === 1 ? one : many); }
+
+  A.views.settings = async function (mount, slug, startTab) {
     var res = await A.call('admin.forms.get', { id: slug });
     var f = res.form;
     f.lang = f.lang || { default: 'en', allowSwitch: true };
@@ -45,19 +69,20 @@
     var reservationMembers = Rules.fieldByRole(f, 'members');
 
     ui.clear(mount);
+    // Status is the setting changed most often, so it is in the header of every tab.
+    var statusSel = A.select(f.status, [['draft', 'Draft (hidden)'], ['open', 'Open'], ['closed', 'Closed'], ['archived', 'Archived']], function (v) { f.status = v; });
+    statusSel.name = 'status';
     mount.appendChild(h('div', { class: 'page-head' },
-      h('h2', null, f.title), A.termTags(f), A.badge(A.STATUS_LABEL[f.status] || f.status, f.status), h('span', { class: 'muted-note' }, t.label),
-      h('a', { class: 'btn btn-quiet sm', href: '#/f/' + encodeURIComponent(f.slug) }, 'Responses'),
+      h('h2', null, f.title), A.termTags(f), h('span', { class: 'muted-note' }, t.label),
+      h('label', { class: 'status-pick' }, h('span', { class: 'tool-label' }, 'Status'), statusSel),
       h('a', { class: 'btn btn-quiet sm', href: link, target: '_blank', rel: 'noopener' }, 'Open form'),
       h('button', { type: 'button', class: 'btn btn-quiet sm', onclick: async function () { toast((await ui.copyText(link)) ? 'Form link copied' : 'Could not copy', 'ok'); } }, icon('link', 18), 'Copy link')));
 
     /* General ---------------------------------------------------- */
-    var general = panel('General', 'Students can only submit while the status is Open and the current time is inside the dates below.',
+    var general = panel('Name and dates', 'Students can only submit while the status is Open and the current time is inside the dates below.',
       A.field('Title', A.text(f.title, function (v) { f.title = v; }, { name: 'title' }), 'The heading students see.'),
       A.metadataEditor(f.type, metadata, function (v) { Object.assign(metadata, v); }),
-      h('div', { class: 'row' },
-        A.field('Link name', A.text(f.slug, function (v) { f.slug = v; }, { name: 'slug', dir: 'ltr' }), 'The form address ends with ?f= and this name. Changing it breaks links already shared.'),
-        A.field('Status', A.select(f.status, [['draft', 'Draft (hidden)'], ['open', 'Open'], ['closed', 'Closed'], ['archived', 'Archived']], function (v) { f.status = v; }))),
+      A.field('Link name', A.text(f.slug, function (v) { f.slug = v; }, { name: 'slug', dir: 'ltr' }), 'The form address ends with ?f= and this name. Changing it breaks links already shared.'),
       h('div', { class: 'row' },
         A.field('Opens at', h('input', { class: 'input', type: 'datetime-local', name: 'opensAt', value: toLocal(f.opensAt), onchange: function (e) { f.opensAt = fromLocal(e.target.value); } }), 'Leave empty to open as soon as the status is Open.'),
         A.field('Closes at', h('input', { class: 'input', type: 'datetime-local', name: 'closesAt', value: toLocal(f.closesAt), onchange: function (e) { f.closesAt = fromLocal(e.target.value); } }), 'Leave empty to stay open until you close it.')),
@@ -65,6 +90,11 @@
         A.field('Form language', A.select(f.lang.default, [['en', 'English'], ['ar', 'Arabic']], function (v) { f.lang.default = v; })),
         A.field('Header icon', A.select(f.icon || 'none', [['team', 'Team'], ['calendar', 'Calendar'], ['task', 'Task'], ['chat', 'Chat'], ['none', 'None']], function (v) { f.icon = v; })),
         h('div', { class: 'field-row' }, A.check('Show the language switch to students', f.lang.allowSwitch !== false, function (v) { f.lang.allowSwitch = v; }))));
+
+    general.summary = function () {
+      var when = function (iso) { return toLocal(iso).replace('T', ' '); };
+      return [f.title, f.opensAt ? 'opens ' + when(f.opensAt) : '', f.closesAt ? 'closes ' + when(f.closesAt) : ''].filter(Boolean).join(' · ');
+    };
 
     /* Who can register --------------------------------------------- */
     var majorsPanel = null;
@@ -93,6 +123,10 @@
       };
       paintMajors();
       majorsPanel = panel('Who can register', 'Limit this form to some specializations. The choices come from the Majors list. Students of other specializations cannot submit.', majorChips, majorNote);
+      majorsPanel.summary = function () {
+        var names = majorOptions.filter(function (o) { return f.rules.majors.indexOf(String(o.value)) !== -1; }).map(function (o) { return (o.label && o.label.en) || o.value; });
+        return names.length ? 'Only ' + names.join(', ') : 'Everyone';
+      };
     }
 
     /* Reservation teammates ------------------------------------- */
@@ -128,6 +162,10 @@
       };
       paintKb();
       keyBookPanel = panel('Booking with a key', 'Let teams that already registered book a slot without typing their details again.', kbBody);
+      keyBookPanel.summary = function () {
+        var from = sources.filter(function (x) { return x.id === f.keyBooking.source; })[0];
+        return f.keyBooking.enabled ? 'On' + (from ? ', keys of ' + from.title : ', no form chosen') : 'Off';
+      };
     }
 
     var teammatePanel = null;
@@ -225,36 +263,50 @@
     function hasHelp(fd) { return !!(fd.help && ((fd.help.en || '').trim() || (fd.help.ar || '').trim())); }
     function fieldRow(fd, sub) {
       var locked = LOCKED_ROLES.indexOf(fd.role) !== -1;
-      // The description row stays hidden until it has text or the admin asks for it.
-      var descRow = h('tr', { class: 'desc-row' + (sub ? ' sub' : ''), dataset: { desc: fd.id }, hidden: !hasHelp(fd) },
-        h('td', null),
-        h('td', { colspan: '4' }, h('div', { class: 'desc-edit' },
-          h('span', { class: 'label' }, 'Description students see under this question'),
-          h('div', { class: 'desc-pair' },
-            h('textarea', { class: 'textarea', rows: '2', name: 'help-en-' + fd.id, 'aria-label': 'English description for ' + fd.id, placeholder: 'English, for example: In case of 3 or 4, other students will be added to reach 5', oninput: function (e) { fd.help = Object.assign({}, fd.help, { en: e.target.value }); } }, (fd.help && fd.help.en) || ''),
-            h('textarea', { class: 'textarea', rows: '2', name: 'help-ar-' + fd.id, 'aria-label': 'Arabic description for ' + fd.id, dir: 'rtl', lang: 'ar', placeholder: 'بالعربي', oninput: function (e) { fd.help = Object.assign({}, fd.help, { ar: e.target.value }); } }, (fd.help && fd.help.ar) || '')),
-          h('button', { type: 'button', class: 'link-btn', onclick: function () { fd.help = { en: '', ar: '' }; descRow.querySelectorAll('textarea').forEach(function (t) { t.value = ''; }); descRow.hidden = true; descBtn.hidden = false; } }, 'Remove description'))));
+      // The description stays hidden until it has text or the admin asks for it.
+      var descRow = h('div', { class: 'q-desc' + (sub ? ' sub' : ''), dataset: { desc: fd.id }, hidden: !hasHelp(fd) },
+        h('span', { class: 'label' }, 'Description students see under this question'),
+        h('div', { class: 'desc-pair' },
+          h('textarea', { class: 'textarea', rows: '2', name: 'help-en-' + fd.id, 'aria-label': 'English description for ' + fd.id, placeholder: 'English, for example: In case of 3 or 4, other students will be added to reach 5', oninput: function (e) { fd.help = Object.assign({}, fd.help, { en: e.target.value }); } }, (fd.help && fd.help.en) || ''),
+          h('textarea', { class: 'textarea', rows: '2', name: 'help-ar-' + fd.id, 'aria-label': 'Arabic description for ' + fd.id, dir: 'rtl', lang: 'ar', placeholder: 'بالعربي', oninput: function (e) { fd.help = Object.assign({}, fd.help, { ar: e.target.value }); } }, (fd.help && fd.help.ar) || '')),
+        h('button', { type: 'button', class: 'link-btn', onclick: function () { fd.help = { en: '', ar: '' }; descRow.querySelectorAll('textarea').forEach(function (t) { t.value = ''; }); descRow.hidden = true; descBtn.hidden = false; } }, 'Remove description'));
       var descBtn = h('button', { type: 'button', class: 'link-btn add-desc', name: 'desc-' + fd.id, hidden: hasHelp(fd), onclick: function () {
         descRow.hidden = false; descBtn.hidden = true;
         var first = descRow.querySelector('textarea'); if (first) first.focus();
       } }, '+ Description');
-      var tr = h('tr', { class: sub ? 'sub' : null, dataset: { field: fd.id } },
-        h('td', null, A.check('', fd.enabled !== false, function (v) { fd.enabled = v; }, locked)),
-        h('td', null, A.text(fd.label.en, function (v) { fd.label.en = v; }, { 'aria-label': 'English label for ' + fd.id }), descBtn),
-        h('td', null, A.text(fd.label.ar, function (v) { fd.label.ar = v; }, { 'aria-label': 'Arabic label for ' + fd.id, dir: 'rtl', lang: 'ar' })),
-        h('td', null, A.check('', fd.required !== false, function (v) { fd.required = v; }, locked)),
-        h('td', null, fd.type === 'arabic_name' ? A.number(fd.minParts || 4, function (v) { fd.minParts = parseInt(v, 10) || 4; }, { class: 'input num', min: '2', max: '6', 'aria-label': 'Name parts for ' + fd.id }) : h('span', { class: 'muted-note' }, fd.type.replace('_', ' '))));
-      rows.push(tr, descRow);
+      var row = h('div', { class: 'q-row' + (sub ? ' sub' : ''), dataset: { field: fd.id } },
+        h('div', { class: 'q-show' }, A.check('Show', fd.enabled !== false, function (v) { fd.enabled = v; row.classList.toggle('off', !v); }, locked)),
+        h('div', { class: 'q-labels' },
+          A.text(fd.label.en, function (v) { fd.label.en = v; }, { 'aria-label': 'English label for ' + fd.id }),
+          A.text(fd.label.ar, function (v) { fd.label.ar = v; }, { 'aria-label': 'Arabic label for ' + fd.id, dir: 'rtl', lang: 'ar' })),
+        h('div', { class: 'q-opts' },
+          A.check('Required', fd.required !== false, function (v) { fd.required = v; }, locked),
+          fd.type === 'arabic_name' ? h('label', { class: 'q-parts' }, A.number(fd.minParts || 4, function (v) { fd.minParts = parseInt(v, 10) || 4; }, { class: 'input num', min: '2', max: '6', 'aria-label': 'Name parts for ' + fd.id }), 'name parts') : h('span', { class: 'q-type' }, fd.type.replace('_', ' ')),
+          descBtn));
+      if (fd.enabled === false) row.classList.add('off');
+      rows.push(row, descRow);
       if (fd.type === 'members') (fd.fields || []).forEach(function (sf) { fieldRow(sf, true); });
     }
-    (f.fields || []).forEach(function (fd) {
-      if (isReservation && fd.role === 'members') return;
-      fieldRow(fd, false);
+    // Questions are listed under the page of the form that shows them, in the order students meet them.
+    var listed = (f.fields || []).filter(function (fd) { return !(isReservation && fd.role === 'members'); });
+    var placed = {};
+    (f.steps || []).forEach(function (st, n) {
+      var mine = (st.fields || []).map(function (id) { return listed.filter(function (fd) { return fd.id === id; })[0]; }).filter(Boolean);
+      if (!mine.length) return;
+      rows.push(h('h3', { class: 'q-page', dataset: { page: st.id } }, h('span', { class: 'tt-num' }, String(n + 1)), (st.title && st.title.en) || st.id));
+      mine.forEach(function (fd) { placed[fd.id] = true; fieldRow(fd, false); });
     });
+    var loose = listed.filter(function (fd) { return !placed[fd.id]; });
+    if (loose.length && rows.length) rows.push(h('h3', { class: 'q-page', dataset: { page: '' } }, 'Not on a page'));
+    loose.forEach(function (fd) { fieldRow(fd, false); });
     var fieldsPanel = panel('Questions', 'Rename a question, hide the ones you do not need, or make optional ones required. Add a description to explain a question: students see it right under the question. Team size, names, codes, and the booking slot are always required. For names, the number is how many name parts are needed (4 means a four-part name).',
-      h('div', { class: 'scroll-x' }, h('table', { class: 'fields-table' },
-        h('thead', null, h('tr', null, h('th', null, 'Show'), h('th', null, 'English label'), h('th', null, 'Arabic label'), h('th', null, 'Required'), h('th', null, 'Name parts / type'))),
-        h('tbody', null, rows))));
+      h('div', { class: 'q-list' }, rows));
+    fieldsPanel.summary = function () {
+      var all = [];
+      (f.fields || []).forEach(function (fd) { if (!(isReservation && fd.role === 'members')) all.push(fd); });
+      var hidden = all.filter(function (fd) { return fd.enabled === false; }).length;
+      return (all.length - hidden) + ' shown' + (hidden ? ', ' + hidden + ' hidden' : '');
+    };
 
     /* Slots: session hours once, then a grid of days and times ---- */
     var slotsPanel = null;
@@ -319,14 +371,16 @@
           A.field('First slot starts', h('input', { class: 'input', type: 'time', name: 'pattern-start', value: pat.start, oninput: function (e) { pat.start = e.target.value; hoursChanged(); } })),
           A.field('Last slot ends by', h('input', { class: 'input', type: 'time', name: 'pattern-end', value: pat.end, oninput: function (e) { pat.end = e.target.value; hoursChanged(); } })),
           h('div', { class: 'field-row tt-wide' }, h('span', { class: 'label' }, 'Each slot'), quick('length', [10, 15, 20, 30], ' min')),
-          h('div', { class: 'field-row tt-wide' }, h('span', { class: 'label' }, 'Break between'), quick('gap', [0, 5, 10], ' min')),
-          h('div', { class: 'field-row tt-cap' }, h('span', { class: 'label' }, 'Teams per slot'),
-            h('div', { class: 'stepper' },
-              h('button', { type: 'button', class: 'icon-btn sm', 'aria-label': 'Fewer teams per slot', onclick: function () { step(-1); } }, '−'),
-              capVal,
-              h('button', { type: 'button', class: 'icon-btn sm', name: 'capacity-up', 'aria-label': 'More teams per slot', onclick: function () { step(1); } }, '+')))),
+          h('div', { class: 'field-row tt-wide' }, h('span', { class: 'label' }, 'Break between'), quick('gap', [0, 5, 10], ' min'))),
         patPreview,
         applyBox);
+
+      var capCard = h('div', { class: 'tt-capacity' },
+        h('div', null, h('h3', null, 'Bookings per slot'), h('p', { class: 'help' }, 'How many teams can book the same time. With 2, a slot stays open until two teams have booked it.')),
+        h('div', { class: 'stepper' },
+          h('button', { type: 'button', class: 'icon-btn sm', name: 'capacity-down', 'aria-label': 'Fewer bookings per slot', onclick: function () { step(-1); } }, '−'),
+          capVal,
+          h('button', { type: 'button', class: 'icon-btn sm', name: 'capacity-up', 'aria-label': 'More bookings per slot', onclick: function () { step(1); } }, '+')));
 
       /* Step 2: days as a grid. A range adds many at once; one day at a time opens for its date, name and odd times. */
       var daysBox = h('div', { class: 'tt-days' });
@@ -525,7 +579,12 @@
           var input = cards.length && cards[cards.length - 1].querySelector('input[type="date"]');
           if (input && input.focus) input.focus();
         } }, icon('plus', 20), 'Add one day'));
-      slotsPanel = panel('Timetable', 'Each slot can be booked by the number of teams you set. Students see taken slots crossed out.', hoursCard, daysCard);
+      slotsPanel = panel('Timetable', 'The days and times that students can book. Students see taken slots crossed out.', capCard, hoursCard, daysCard);
+      slotsPanel.summary = function () {
+        var n = f.slots.days.reduce(function (sum, d) { return sum + d.times.length; }, 0);
+        if (!f.slots.days.length) return 'No days yet';
+        return plural(f.slots.days.length, 'day', 'days') + ' · ' + plural(n, 'slot', 'slots') + ' · ' + plural(f.slots.capacity || 1, 'booking', 'bookings') + ' per slot';
+      };
     }
 
     /* Review ----------------------------------------------------- */
@@ -553,41 +612,75 @@
       } }, icon('plus', 20), 'Add a review step'),
       f.type === 'whatsapp_registration' ? A.check('Match registrations to pasted WhatsApp requests', f.matching && f.matching.enabled, function (v) { f.matching = Object.assign({ field: 'phone' }, f.matching || {}, { enabled: v }); }) : null);
 
+    /* Summaries --------------------------------------------------- */
+    if (teammatePanel) teammatePanel.summary = function () { return reservationMembers.enabled !== false ? 'Asked' : 'Not asked'; };
+    if (sizePanel) sizePanel.summary = function () {
+      var min = f.rules.teamSize.min, max = f.rules.teamSize.max;
+      return String(min) === String(max) ? plural(parseInt(min, 10) || 0, 'person', 'people') : min + ' to ' + max + ' people';
+    };
+    keyPanel.summary = function () {
+      if (!f.editKey.enabled) return 'Off';
+      var may = [f.editKey.allowEdit ? 'edit' : '', f.editKey.allowDelete ? 'cancel' : ''].filter(Boolean).join(' and ');
+      return 'On, ' + plural(f.editKey.days, 'day', 'days') + (may ? ', students can ' + may : ', students cannot change anything');
+    };
+    emailPanel.summary = function () {
+      return (f.notifications.confirmEmail !== false ? 'Confirmation to students' : 'No confirmation') + (f.notifications.alertEmail ? ' · note to ' + f.notifications.alertEmail : '');
+    };
+    rulesPanel.summary = function () {
+      return [f.rules.maxSubmissions ? 'At most ' + f.rules.maxSubmissions : 'No limit', isTeam && f.rules.uniqueAcrossForm ? 'one team per student' : ''].filter(Boolean).join(' · ');
+    };
+    reviewPanel.summary = function () { return f.review.steps.length ? f.review.steps.map(function (x) { return x.label.en; }).join(', ') : 'None'; };
+
     /* Save ------------------------------------------------------- */
+    /** Everything the page can change, as the server expects it. Also compared with the saved copy to know if there is something to save. */
+    var buildPatch = function () {
+      var patch = {
+        title: f.title, slug: f.slug, status: f.status, opensAt: f.opensAt || '', closesAt: f.closesAt || '',
+        lang: f.lang, icon: f.icon, editKey: f.editKey, rules: f.rules, notifications: f.notifications,
+        fields: f.fields, review: f.review
+      };
+      if (isReservation && reservationMembers) {
+        reservationMembers.enabled = !!reservationMembers.enabled;
+        reservationMembers.required = reservationMembers.enabled;
+      }
+      Object.assign(patch, metadata);
+      if (isReservation) patch.keyBooking = { enabled: !!f.keyBooking.enabled, source: f.keyBooking.source || '' };
+      if (f.matching) patch.matching = f.matching;
+      if (hasSize) {
+        var nt = f.rules.teamSize.notice;
+        patch.rules = Object.assign({}, f.rules, { teamSize: { min: parseInt(f.rules.teamSize.min, 10), max: parseInt(f.rules.teamSize.max, 10), notice: nt && nt.sizes.length ? nt : null } });
+      }
+      if (f.slots) {
+        patch.slots = {
+          capacity: f.slots.capacity || 1,
+          pattern: f.slots.pattern,
+          days: f.slots.days.map(function (d) { return { id: d.id, label: d.label, date: d.date, times: d.times.slice() }; })
+        };
+      }
+      return patch;
+    };
+    /** The first thing that stops a save, with the section it is in; null when the page can be saved. */
+    var problem = function () {
+      if (hasSize) {
+        var min = parseInt(f.rules.teamSize.min, 10), max = parseInt(f.rules.teamSize.max, 10);
+        if (!(min >= 1) || !(max >= min) || max > 20) return { panel: sizePanel, text: 'Team size needs a minimum of at least 1 and a maximum that is not lower, up to 20.' };
+        var nt = f.rules.teamSize.notice;
+        if (nt && nt.sizes.length && !(nt.text.en || '').trim() && !(nt.text.ar || '').trim()) return { panel: sizePanel, text: 'Write the team size note, or switch off its sizes.' };
+      }
+      if (f.slots) {
+        if (f.slots.days.some(function (d) { return !String(d.label || '').trim(); })) return { panel: slotsPanel, text: 'Give every day a date or a name.' };
+        var empty = f.slots.days.filter(function (d) { return !d.times.length; })[0];
+        if (empty) return { panel: slotsPanel, text: '"' + empty.label + '" has no time slots.' };
+      }
+      return null;
+    };
     var saveBtn = h('button', { type: 'button', class: 'btn btn-primary', name: 'save' }, 'Save settings');
     saveBtn.addEventListener('click', function () {
       A.busy(saveBtn, async function () {
-        var patch = {
-          title: f.title, slug: f.slug, status: f.status, opensAt: f.opensAt || '', closesAt: f.closesAt || '',
-          lang: f.lang, icon: f.icon, editKey: f.editKey, rules: f.rules, notifications: f.notifications,
-          fields: f.fields, review: f.review
-        };
-        if (isReservation && reservationMembers) {
-          reservationMembers.enabled = !!reservationMembers.enabled;
-          reservationMembers.required = reservationMembers.enabled;
-        }
-        Object.assign(patch, metadata);
-        if (isReservation) patch.keyBooking = { enabled: !!f.keyBooking.enabled, source: f.keyBooking.source || '' };
-        if (f.matching) patch.matching = f.matching;
-        if (hasSize) {
-          var min = parseInt(f.rules.teamSize.min, 10), max = parseInt(f.rules.teamSize.max, 10);
-          if (!(min >= 1) || !(max >= min) || max > 20) return toast('Team size needs a minimum of at least 1 and a maximum that is not lower, up to 20.', 'err');
-          var nt = f.rules.teamSize.notice;
-          if (nt && nt.sizes.length && !(nt.text.en || '').trim() && !(nt.text.ar || '').trim()) return toast('Write the team size note, or switch off its sizes.', 'err');
-          patch.rules = Object.assign({}, f.rules, { teamSize: { min: min, max: max, notice: nt && nt.sizes.length ? nt : null } });
-        }
-        if (f.slots) {
-          var unnamed = f.slots.days.filter(function (d) { return !String(d.label || '').trim(); }).length;
-          if (unnamed) return toast('Give every day a date or a name.', 'err');
-          var empty = f.slots.days.filter(function (d) { return !d.times.length; })[0];
-          if (empty) return toast('"' + empty.label + '" has no time slots.', 'err');
-          patch.slots = {
-            capacity: f.slots.capacity || 1,
-            pattern: f.slots.pattern,
-            days: f.slots.days.map(function (d) { return { id: d.id, label: d.label, date: d.date, times: d.times.slice() }; })
-          };
-        }
-        var out = await A.call('admin.forms.update', { id: f.id, patch: patch });
+        var stop = problem();
+        if (stop) { show(stop.panel.tab); stop.panel.setOpen(true); return toast(stop.text, 'err'); }
+        var out = await A.call('admin.forms.update', { id: f.id, patch: buildPatch() });
+        A.unsaved = false;
         toast('Settings saved', 'ok');
         if (out.teamSizeConflicts) toast(out.teamSizeConflicts + ' saved team(s) now fall outside this team size range.', 'err');
         if (out.orphanedBookings) toast(out.orphanedBookings + ' booking(s) are on slots that no longer exist.', 'err');
@@ -596,18 +689,59 @@
       });
     });
 
-    var dangerPanel = h('section', { class: 'panel danger-zone' }, h('h2', null, 'Delete this form'),
-      h('p', { class: 'help' }, 'The link stops working and the form leaves the dashboard. Its Google Sheet moves to the Drive trash for 30 days. To stop new registrations but keep everything, set the status to Closed or Archived instead.'),
+    var dangerPanel = panel('Delete this form', 'The link stops working and the form leaves the dashboard. Its Google Sheet moves to the Drive trash for 30 days. To stop new registrations but keep everything, set the status to Closed or Archived instead.',
       h('button', { type: 'button', class: 'btn btn-danger', name: 'delete-form', onclick: function () { A.deleteForm(f, function () { window.location.hash = '#/'; }); } }, icon('trash', 18), 'Delete form'));
-    var sections = [general, majorsPanel, keyBookPanel, teammatePanel, sizePanel, fieldsPanel, slotsPanel, keyPanel, emailPanel, rulesPanel, reviewPanel, dangerPanel].filter(Boolean);
-    // A sticky bar of section names: the page is long, so admins jump instead of scrolling.
-    var jump = h('nav', { class: 'section-bar', 'aria-label': 'Settings sections' }, sections.map(function (n, i) {
-      var title = n.querySelector('h2').textContent;
-      n.id = 'sec-' + i;
-      return h('button', { type: 'button', class: 'section-link', onclick: function () { try { n.scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch (e) { n.scrollIntoView(); } } }, title.replace('Delete this form', 'Delete'));
-    }));
-    mount.appendChild(jump);
+    dangerPanel.classList.add('danger-zone');
+    /* Tabs: the two work areas (questions, timetable) and the settings proper. */
+    var tabs = [
+      { id: 'questions', label: 'Questions', panels: [fieldsPanel, sizePanel, teammatePanel] },
+      slotsPanel ? { id: 'timetable', label: 'Timetable', panels: [slotsPanel, keyBookPanel], alert: function () { return !f.slots.days.length; } } : null,
+      { id: 'settings', label: 'Setup', panels: [general, majorsPanel, keyPanel, emailPanel, rulesPanel, reviewPanel, dangerPanel] }
+    ].filter(Boolean);
+    tabs.forEach(function (tab) { tab.panels = tab.panels.filter(Boolean); tab.panels.forEach(function (n) { n.tab = tab; }); });
+    fieldsPanel.pin();
+    if (slotsPanel) slotsPanel.pin();
+    var sections = [];
+    tabs.forEach(function (tab) { sections = sections.concat(tab.panels); });
+    var open = opened[f.id] = opened[f.id] || {};
+    sections.forEach(function (n) {
+      if (n.pinned) return;
+      n.setOpen(!!open[n.panelTitle]);
+      n.onToggle = function (isOpen) { open[n.panelTitle] = isOpen; };
+    });
+
+    var tabBar = h('div');
+    var current = tabs.filter(function (tab) { return tab.id === startTab; })[0] || tabs[tabs.length - 1];
+    var show = function (tab) {
+      current = tab;
+      sections.forEach(function (n) { n.hidden = n.tab !== tab; });
+      ui.clear(tabBar);
+      tabBar.appendChild(A.formTabs(f, tab.id, function (id) {
+        var next = tabs.filter(function (x) { return x.id === id; })[0];
+        if (!next) return false;
+        // The address follows the tab without loading the page again, so changes in other tabs stay.
+        A.setHash('#/f/' + encodeURIComponent(slug) + '/' + id);
+        show(next);
+        return true;
+      }, tabs.filter(function (x) { return x.alert && x.alert(); }).map(function (x) { return x.id; })));
+    };
+
+    /* Unsaved changes: the bar exists only while there is something to save. */
+    var saved = JSON.stringify(buildPatch());
+    var bar = h('div', { class: 'savebar', hidden: true }, h('span', { class: 'savebar-note', role: 'status' }, 'You have changes that are not saved.'),
+      h('button', { type: 'button', class: 'btn btn-quiet', name: 'discard', onclick: function () { A.unsaved = false; A.render(); } }, 'Discard'), saveBtn);
+    var refresh = function () {
+      sections.forEach(function (n) { n.paintSummary(); });
+      A.unsaved = JSON.stringify(buildPatch()) !== saved;
+      bar.hidden = !A.unsaved;
+    };
+    // Controls change the form object in their own handlers; these run after them, as the event reaches the page.
+    ['input', 'change', 'click'].forEach(function (type) { mount.addEventListener(type, refresh); });
+
+    mount.appendChild(tabBar);
     sections.forEach(function (n) { mount.appendChild(n); });
-    mount.appendChild(h('div', { class: 'savebar' }, h('span', { class: 'muted-note' }, 'Changes apply to students as soon as you save.'), saveBtn));
+    mount.appendChild(bar);
+    show(current);
+    refresh();
   };
 })(window.App = window.App || {});
