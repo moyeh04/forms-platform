@@ -61,7 +61,8 @@ flowchart LR
     class student,admin,teacher cActor
 ```
 
-**To put it online, follow [docs/DEPLOY.md](docs/DEPLOY.md).** Configure the three
+**To put it online, follow [docs/DEPLOY.md](docs/DEPLOY.md).** One command,
+`npm run setup`, creates the sheet, pushes the backend, creates the web app, and stores the three
 GitHub repository Variables and the clasp credential Secret. The workflow
 generates the published browser configuration.
 
@@ -162,15 +163,16 @@ Be aware of these when you go live. They are checked on your first real run:
 See [docs/MODULES.md](docs/MODULES.md). In short: `index.html`, `admin.html`,
 `viewer.html` and `assets/` are the website; `backend/` is the Apps Script;
 `shared/rules.js` holds the validation rules used by the browser, the backend,
-and the tests alike, so they can never disagree; `scripts/` holds the bundler
-and the Excel export; `tests/` holds the automated tests.
+and the tests alike, so they can never disagree; `scripts/` holds the bundler,
+the first-deployment setup, and the Excel export; `tests/` holds the automated tests.
 
 ## Working on it
 
 ```
 npm install          # once, installs the browser test library
-npm test             # 193 tests: rules, backend, form page, dashboard, instructor page, deployment
+npm test             # 201 tests: rules, backend, form page, dashboard, instructor page, deployment
 npm run build        # writes dist/Code.gs and dist/appsscript.json for clasp
+npm run setup        # first deployment: creates the sheet, pushes the backend, creates the web app, configures GitHub
 npm run dev          # local preview on http://localhost:8080 (PIN 4321), in memory, no Google needed
 python3 -m unittest discover -s tests -p "test_*.py"   # 20 tests for the Excel export
 ```

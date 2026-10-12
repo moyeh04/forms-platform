@@ -1,8 +1,9 @@
 # Workarounds: how the platform gets a lot from free hosting
 
-The deployment guide is short on purpose: paste the backend once, set a few
-repository variables, turn on Pages. After that first setup every update is a
-push to `master`; GitHub Actions rebuilds, tests and deploys both halves. That
+The deployment guide is short on purpose: flip one Google switch, run one
+setup command, click through one permission prompt. After that first setup every
+update is a push to `master`; GitHub Actions rebuilds, tests and deploys both
+halves. That
 shortness is the result of a series of design decisions, each made to remove a
 step or a risk. This document explains every one.
 
@@ -277,9 +278,9 @@ shows up on your computer instead of in the Apps Script editor. Full details in
 
 **Cost.** A build step between the source and Apps Script. The workflow runs it
 on every push to `master` and hands `dist/` to clasp, so an update needs no
-command and no paste. Only the first deploy is by hand: `dist/Code.gs` and
-`dist/appsscript.json` are pasted once to create the Apps Script project that
-later pushes update (`npm run build` produces them if `dist/` is missing).
+command and no paste. The first deploy runs the same build on your computer:
+`npm run setup` creates the sheet, bundles, pushes with clasp and creates the web app, so nothing
+is ever pasted into the Apps Script editor.
 
 ---
 
@@ -785,8 +786,8 @@ equivalent is **Deploy > Manage deployments > Edit > New version**; creating a
 The website needs no edit when the backend changes, and the backend needs none
 when the website changes. They only agree on the JSON actions.
 
-**Cost.** Three repository variables and one credential secret to set up once
-([DEPLOY.md](../DEPLOY.md#updating-later)). If Google rejects the saved clasp
+**Cost.** Three repository variables and one credential secret, written once
+by `npm run setup` ([DEPLOY.md](../DEPLOY.md#updating-later)). If Google rejects the saved clasp
 login, the secret has to be replaced before the next deploy can run.
 
 ---

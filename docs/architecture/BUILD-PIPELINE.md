@@ -20,7 +20,7 @@ runs `scripts/bundle-backend.js`, which writes two files into `dist/`:
 
 `dist/` is listed in `.gitignore`, so it is **not committed**. It is regenerated
 from source whenever you need it: Actions builds it on every run and keeps it
-as the `backend-dist` artifact, and `npm run build` produces it locally for the
+as the `backend-dist` artifact, and `npm run setup` builds it locally for the
 first deploy.
 
 ## What compiles `dist`
