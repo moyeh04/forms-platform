@@ -42,7 +42,11 @@
 .tag.tag-subject { font-family: var(--font-code); font-style: normal; letter-spacing: .05em; border-color: var(--ink); color: var(--ink); }
 
 /* Route progress: dots joined by a dashed trail that ends in an X. */
-.trail { list-style: none; margin: 4px 0 26px; padding: 0; display: flex; align-items: flex-start; }
+.trail { list-style: none; margin: 50px 0 26px; padding: 0; display: flex; align-items: flex-start; }
+/* The ship over the current step. It faces the X, so it is turned round when the page reads right to left. */
+.trail-ship { position: absolute; z-index: 2; bottom: calc(100% + 2px); left: 50%; color: var(--ink); line-height: 0; transform: translateX(-50%); animation: sail 2.8s ease-in-out infinite; pointer-events: none; }
+[dir="rtl"] .trail-ship .icon { transform: scaleX(-1); }
+@keyframes sail { 0%, 100% { transform: translate(-50%, 0) rotate(-2deg); } 50% { transform: translate(-50%, -3px) rotate(3deg); } }
 .trail li { position: relative; flex: 1 1 0; display: flex; flex-direction: column; align-items: center; gap: 6px; min-width: 0; }
 .trail li + li::before, .trail .trail-x::before {
   content: ''; position: absolute; top: 9px; inset-inline-end: 50%; width: 100%; border-top: 2px dashed var(--line);

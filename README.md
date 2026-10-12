@@ -94,6 +94,7 @@ step needs the real Google services (see "What could not be tested here").
 |---|---|
 | English by default with an Arabic switch (RTL), mobile first, light and dark themes | Done |
 | Light paper palette meeting WCAG 2.1 AA contrast in both themes (checked by a test), **no logo on the page**, defined font sizes, bold labels, italic helper text | Done |
+| A pirate ship over the current step of the route; it moves toward the X as the student goes on, and faces the other way in Arabic | Done |
 | Branded tab icon: a form sheet whose red route ends in an X, the same trail students follow at the top of the form (SVG plus PNGs for phones) | Done |
 | Arabic-only name fields: English letters and digits are removed while typing and on paste, with a hint saying why; at least four name parts; checked again on the server | Done |
 | English-only project and task titles, Egyptian phone normalization, 7-digit codes | Done |
@@ -182,7 +183,7 @@ the first-deployment setup, and the Excel export; `tests/` holds the automated t
 
 ```
 npm install          # once, installs the browser test library
-npm test             # 229 tests: rules, backend, form page, dashboard, instructor page, deployment
+npm test             # 230 tests: rules, backend, form page, dashboard, instructor page, deployment
 npm run build        # writes dist/Code.gs and dist/appsscript.json for clasp
 npm run setup        # first deployment: creates the sheet, pushes the backend, creates the web app, configures GitHub
 npm run dev          # local preview on http://localhost:8080 (PIN 4321), in memory, no Google needed

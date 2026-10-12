@@ -182,6 +182,8 @@
   function trail() {
     var items = S.steps.map(function (s, i) {
       return h('li', { class: i < S.stepIndex ? 'is-done' : i === S.stepIndex ? 'is-current' : '', 'aria-current': i === S.stepIndex ? 'step' : null },
+        // The ship is over the step the student is on, and moves with it toward the X.
+        i === S.stepIndex ? h('span', { class: 'trail-ship' }, icon('ship', 40)) : null,
         h('span', { class: 'dot' }), h('span', { class: 'trail-label' }, stepTitle(s)));
     });
     items.push(h('li', { class: 'trail-x', 'aria-hidden': 'true' }, icon('x', 22)));
