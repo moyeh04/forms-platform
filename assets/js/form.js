@@ -561,24 +561,28 @@
 
   /* ── Slots ──────────────────────────────────────────────────── */
 
-  function slotsTaken(dayId, time) {
-    var key = Rules.slotKey(dayId, time);
-    var n = S.taken[key] || 0;
-    if (S.ownSlot === key) n -= 1;
-    return n >= ((S.form.slots && S.form.slots.capacity) || 1);
+  /** Bookings of everyone else in each slot: the student's own booking does not take a place from itself. */
+  function othersIn() {
+    var counts = Object.assign({}, S.taken);
+    if (S.ownSlot && counts[S.ownSlot]) counts[S.ownSlot] -= 1;
+    return counts;
   }
+  function roomIn(dayId, time) { return Rules.slotRoom(S.form, othersIn(), Rules.slotKey(dayId, time)); }
+  function slotsTaken(dayId, time) { return !roomIn(dayId, time); }
 
   function slotControl(field, path, id) {
     var wrap = h('div', { class: 'slot', id: id });
     function paint() {
       App.ui.clear(wrap);
       var days = (S.form.slots && S.form.slots.days) || [];
+      var many = ((S.form.slots && S.form.slots.capacity) || 1) > 1;
       var cur = getVal(path) || {};
+      // Each day says how many places it still has, so a student sees a full day before choosing it.
       var dayChips = days.map(function (d) {
-        var full = d.times.every(function (tm) { return slotsTaken(d.id, tm); });
-        return h('button', { type: 'button', class: 'slot-chip', disabled: full, 'aria-pressed': cur.day === d.id ? 'true' : 'false', onclick: function () {
+        var left = d.times.reduce(function (n, tm) { return n + roomIn(d.id, tm); }, 0);
+        return h('button', { type: 'button', class: 'slot-chip' + (left ? '' : ' is-full'), disabled: !left, 'aria-pressed': cur.day === d.id ? 'true' : 'false', onclick: function () {
           setVal(path, { day: d.id, time: '' }); delete S.errors[path]; paintError(path); saveDraft(); paint();
-        } }, d.label, full ? h('small', null, t('slotFull')) : (d.date ? h('small', null, d.date) : null));
+        } }, d.label, d.date ? h('small', null, d.date) : null, h('small', { class: 'slot-left' }, left ? t('slotsLeft', { n: left }) : t('slotFull')));
       });
       wrap.appendChild(h('div', { class: 'slot-days', role: 'group', 'aria-label': t('slotDay') }, dayChips));
       var day = days.filter(function (d) { return d.id === cur.day; })[0];
@@ -586,10 +590,11 @@
       var open = day.times.filter(function (tm) { return !slotsTaken(day.id, tm) || cur.time === tm; });
       if (!open.length) { wrap.appendChild(h('p', { class: 'help' }, t('slotNone'))); return; }
       wrap.appendChild(h('div', { class: 'slot-times', role: 'group', 'aria-label': t('slotTime') }, day.times.map(function (tm) {
-        var taken = slotsTaken(day.id, tm) && cur.time !== tm;
-        return h('button', { type: 'button', class: 'slot-chip time', disabled: taken, title: taken ? t('slotFull') : null, 'aria-pressed': cur.time === tm ? 'true' : 'false', onclick: function () {
+        var room = roomIn(day.id, tm);
+        var taken = !room && cur.time !== tm;
+        return h('button', { type: 'button', class: 'slot-chip time' + (taken ? ' is-full' : ''), disabled: taken, 'aria-pressed': cur.time === tm ? 'true' : 'false', onclick: function () {
           setVal(path, { day: day.id, time: tm }); delete S.errors[path]; paintError(path); saveDraft(); paint();
-        } }, tm);
+        } }, h('span', { dir: 'ltr' }, tm), taken ? h('small', { class: 'slot-left' }, t('slotFull')) : many ? h('small', { class: 'slot-left' }, t('slotsLeft', { n: room })) : null);
       })));
     }
     paint();

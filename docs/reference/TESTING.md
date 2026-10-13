@@ -1,11 +1,11 @@
 # Testing
 
-296 automated tests run without a Google account, a browser, or a network.
+297 automated tests run without a Google account, a browser, or a network.
 They run the **real** backend and the **real** pages. This page explains how
 that works and what it can and cannot prove.
 
 ```
-npm test    # 296 tests
+npm test    # 297 tests
 ```
 
 ## The layers
@@ -141,7 +141,7 @@ while the total above or a row below says something else.
 
 | Area | File | Tests | Examples |
 |---|---|---:|---|
-| Shared rules | `rules.test.js` | 17 | Counting the people of a form with a code counted once, Arabic filtering, name parts, phones, codes, Drive links, folder names, slots, form state |
+| Shared rules | `rules.test.js` | 18 | Counting the people of a form with a code counted once, Arabic filtering, name parts, phones, codes, Drive links, folder names, slots and the room left in one, form state |
 | Team size and audience | `teamsize.test.js` | 17 | Required question, range, exact member count, admin range, the sizes of the saved teams sent with the form, size notes, specialization limits, section limits |
 | Core and forms | `core.test.js` | 14 | Setup, PIN lockout and unlocking it from the sheet menu, forms CRUD, duplicate, delete, templates |
 | Submissions | `submissions.test.js` | 26 | Submit, edit keys, sealed keys, expiry, throttling, duplicates, Drive checks, folder names, limits, emails on and off and without a key, rows written as text past the rows a sheet starts with, team numbers that stay when a team cancels and that older rows keep |

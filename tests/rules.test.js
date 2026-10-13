@@ -172,3 +172,10 @@ test('People: leaders and members are counted, a student code once', () => {
   const solo = { fields: [{ id: 'leader_name', role: 'name' }, { id: 'leader_code', role: 'code' }, { id: 'members', role: 'members', enabled: false }] };
   assert.equal(R.countPeople(solo, [row('1', [{ name: 'a', code: '2' }])]), 1, 'teammates a form does not ask about are not counted');
 });
+
+test('Slots: the room left in a slot is its capacity less the bookings of everyone else', () => {
+  const form = { slots: { capacity: 3 } };
+  assert.equal(R.slotRoom(form, { 'd|1': 2 }, 'd|1'), 1);
+  assert.equal(R.slotRoom(form, { 'd|1': 5 }, 'd|1'), 0, 'never below none');
+  assert.equal(R.slotRoom({ slots: {} }, {}, 'd|1'), 1, 'one booking a slot when no capacity is set');
+});

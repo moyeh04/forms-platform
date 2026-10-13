@@ -229,6 +229,12 @@
     return dayId + '|' + time;
   }
 
+  /** How many more bookings a slot takes. `counts` is { "day|time": bookings } of everyone else. */
+  function slotRoom(form, counts, key) {
+    var capacity = (form.slots && form.slots.capacity) || 1;
+    return Math.max(0, capacity - ((counts && counts[key]) || 0));
+  }
+
   /* ── Form helpers ─────────────────────────────────────────────── */
 
   function fieldByRole(form, role) {
@@ -495,6 +501,7 @@
     folderPart: folderPart,
     folderNameExample: folderNameExample,
     slotKey: slotKey,
+    slotRoom: slotRoom,
     fieldByRole: fieldByRole,
     valueByRole: valueByRole,
     membersOf: membersOf,

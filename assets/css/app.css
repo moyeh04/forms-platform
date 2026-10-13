@@ -130,7 +130,18 @@
 .slot-chip small { display: block; color: var(--mute); font-size: var(--fs-help); line-height: 1.1; }
 .slot-chip[aria-pressed="true"] { background: var(--sea); border-color: var(--sea); color: var(--on-sea); font-weight: 700; }
 .slot-chip[aria-pressed="true"] small { color: inherit; }
-.slot-chip:disabled { opacity: .5; cursor: not-allowed; text-decoration: line-through; }
+/* A slot that is full is a torn ticket: ragged top and bottom, a red cut across, and it says Full. */
+.slot-chip.is-full {
+  position: relative; cursor: not-allowed; color: var(--mute); border-color: transparent; background: var(--sheet-2);
+  padding-block: 9px; clip-path: polygon(0.0% 5px, 6.25% 0px, 12.5% 5px, 18.75% 0px, 25.0% 5px, 31.25% 0px, 37.5% 5px, 43.75% 0px, 50.0% 5px, 56.25% 0px, 62.5% 5px, 68.75% 0px, 75.0% 5px, 81.25% 0px, 87.5% 5px, 93.75% 0px, 100.0% 5px, 100.0% calc(100% - 5px), 93.75% calc(100% - 0px), 87.5% calc(100% - 5px), 81.25% calc(100% - 0px), 75.0% calc(100% - 5px), 68.75% calc(100% - 0px), 62.5% calc(100% - 5px), 56.25% calc(100% - 0px), 50.0% calc(100% - 5px), 43.75% calc(100% - 0px), 37.5% calc(100% - 5px), 31.25% calc(100% - 0px), 25.0% calc(100% - 5px), 18.75% calc(100% - 0px), 12.5% calc(100% - 5px), 6.25% calc(100% - 0px), 0.0% calc(100% - 5px));
+}
+.slot-chip.is-full::after {
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(to top right, transparent calc(50% - 1px), var(--err) calc(50% - 1px), var(--err) calc(50% + 1px), transparent calc(50% + 1px));
+  opacity: .55;
+}
+.slot-chip.is-full .slot-left { color: var(--err); font-weight: 700; }
+.slot-chip .slot-left { font-family: var(--font-body); letter-spacing: 0; }
 .slot-chip.time { font-family: var(--font-code); letter-spacing: .04em; font-size: 1rem; }
 
 /* Buttons. */

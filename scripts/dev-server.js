@@ -49,12 +49,21 @@ function seed(world) {
     return r;
   });
 
-  make('reservation', 'Microprocessor Project Seminar', 'Spring 2028', {});
+  // A reservation filled in by hand, two places a time, so the places left can be seen.
+  make('reservation', 'Microprocessor Project Seminar', 'Spring 2028', {
+    slots: { days: [{ label: 'Tuesday 16 Nov', date: '2027-11-16', times: world.ctx.Rules.generateSlots({ start: '10:00', end: '11:00', length: 25, gap: 5 }) }], capacity: 2 }
+  });
   // A reservation booked with the keys of the team form, so that flow can be tried with a real key.
+  // The other two teams have taken both times of the second day, so a full day can be seen.
   const discussion = make('reservation', 'Database Project Discussion', 'Fall 2027', {
-    slots: { days: [{ label: 'Sunday 14 Nov', date: '2027-11-14', times: world.ctx.Rules.generateSlots({ start: '12:30', end: '14:00', length: 20, gap: 5 }) }], capacity: 1 },
+    slots: { days: [
+      { label: 'Sunday 14 Nov', date: '2027-11-14', times: world.ctx.Rules.generateSlots({ start: '12:30', end: '14:00', length: 20, gap: 5 }) },
+      { label: 'Monday 15 Nov', date: '2027-11-15', times: ['12:30 - 12:50', '12:55 - 1:15'] }
+    ], capacity: 1 },
     keyBooking: { enabled: true, source: team.id }
   });
+  const days = admin({ action: 'admin.forms.get', id: discussion.id }).form.slots.days;
+  [1, 2].forEach((i) => world.api({ action: 'submit', slug: discussion.slug, sourceKey: registered[i].key, data: { slot: { day: days[1].id, time: days[1].times[i - 1] } } }));
   const groups = make('whatsapp_registration', 'Level 2 WhatsApp Groups', 'Fall 2027', {});
   [['هدى سامي عادل منصور', '4230710', '01033344455', 'A'], ['كريم وليد حسن جابر', '4230722', '01144455566', 'B']].forEach(([name, code, phone, group]) => {
     world.api({ action: 'submit', slug: groups.slug, data: { email: 'student@example.com', name, phone, code, level: 'الثاني / الثالثة', major: 'حاسبات', group, section: '21', schedule: 'https://drive.google.com/file/d/1AbCdEfGhIjKlMnOpQrStUvWxYz012345/view' } });
