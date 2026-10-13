@@ -88,6 +88,11 @@ body.admin { font-size: 1rem; }
 .check input { width: 20px; height: 20px; accent-color: var(--sea); flex: none; }
 .page-head { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; margin-bottom: 16px; }
 .page-head h2 { font-size: 1.7rem; margin-inline-end: auto; }
+/* The header of a form: its More menu opens under its own right edge, and a refused status has a line of its own. */
+.page-head .more-menu { inset-inline-start: auto; inset-inline-end: 0; }
+.page-head .head-note { flex-basis: 100%; margin: 0; text-align: end; }
+.status-pick .select[data-status="open"] { border-color: var(--sea); }
+.status-pick .select[data-status="closed"] { border-color: var(--err); }
 .btn.sm { min-height: 38px; padding: 2px 14px; font-size: .95rem; }
 .actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
 
@@ -479,6 +484,10 @@ body.admin { font-size: 1rem; }
   .tool-group > * { min-width: 0; justify-content: center; }
   .page-head h2 { flex-basis: 100%; font-size: 1.45rem; }
   .page-head .btn { flex: 1 1 auto; justify-content: center; }
+  .page-head .more { flex: 1 1 auto; }
+  .page-head .more > summary { width: 100%; }
+  .page-head .status-pick { flex: 1 1 100%; }
+  .page-head .status-pick .select { flex: 1; }
   .stats { gap: 6px; }
 }
 

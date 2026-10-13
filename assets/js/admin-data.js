@@ -29,8 +29,6 @@
     var all = both[1].submissions;
     var transfers = both[1].transfers || [];
     var state = { q: '', status: 'all', tab: form.type === 'whatsapp_registration' && form.matching && form.matching.enabled ? 'matching' : 'list' };
-    var link = A.formLink(form.slug);
-    var t = A.TYPES[form.type] || { label: form.type };
 
     var content = h('div');
     var stats = h('div', { class: 'stats' });
@@ -120,16 +118,8 @@
         A.check('Include empty slots', false, function (v) { empty = v; }),
         h('button', { type: 'button', class: 'btn btn-quiet sm', name: 'printDay', onclick: function (e) { if (!dayId) return toast('Add a day in the settings first.', 'err'); printOut(e.currentTarget, 'admin.print.reservations', { dayId: dayId, includeEmpty: empty }); } }, icon('printer', 18), 'Print this day')));
     }
-    tools.push(h('button', { type: 'button', class: 'btn btn-quiet sm', name: 'rebuild', title: 'Write the tabs of the Google Sheet again from the saved answers. Use it when the sheet looks out of date.', onclick: function (e) {
-      A.busy(e.currentTarget, async function () { await A.call('admin.views.rebuild', { slug: form.slug }); toast('Google Sheet views rebuilt', 'ok'); });
-    } }, 'Rebuild sheet'));
-
     ui.clear(mount);
-    mount.appendChild(h('div', { class: 'page-head' },
-      h('h2', null, form.title), A.termTags(form), A.badge(A.STATUS_LABEL[form.status] || form.status, form.status),
-      h('span', { class: 'muted-note' }, t.label),
-      h('a', { class: 'btn btn-quiet sm', href: form.sheetUrl, target: '_blank', rel: 'noopener' }, 'Google Sheet'),
-      h('button', { type: 'button', class: 'btn btn-quiet sm', onclick: async function () { toast((await ui.copyText(link)) ? 'Form link copied' : 'Could not copy', 'ok'); } }, icon('link', 18), 'Copy form link')));
+    mount.appendChild(A.formHead(form));
     mount.appendChild(A.formTabs(form, 'responses'));
     paintStats();
     mount.appendChild(stats);

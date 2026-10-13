@@ -108,8 +108,6 @@
     f.review = f.review || { steps: [] };
     var metadata = FormMetadata.read(f);
 
-    var t = A.TYPES[f.type] || { label: f.type };
-    var link = A.formLink(f.slug);
     var hasSize = !!Rules.fieldByRole(f, 'team_size');
     var hasDrive = (f.fields || []).some(function (x) { return x.type === 'drive_link'; });
     var isTeam = f.type === 'team_registration' || f.type === 'task_submission';
@@ -117,14 +115,7 @@
     var reservationMembers = Rules.fieldByRole(f, 'members');
 
     ui.clear(mount);
-    // Status is the setting changed most often, so it is in the header of every tab.
-    var statusSel = A.select(f.status, [['draft', 'Draft (hidden)'], ['open', 'Open'], ['closed', 'Closed'], ['archived', 'Archived']], function (v) { f.status = v; });
-    statusSel.name = 'status';
-    mount.appendChild(h('div', { class: 'page-head' },
-      h('h2', null, f.title), A.termTags(f), h('span', { class: 'muted-note' }, t.label),
-      h('label', { class: 'status-pick' }, h('span', { class: 'tool-label' }, 'Status'), statusSel),
-      h('a', { class: 'btn btn-quiet sm', href: link, target: '_blank', rel: 'noopener' }, 'Open form'),
-      h('button', { type: 'button', class: 'btn btn-quiet sm', onclick: async function () { toast((await ui.copyText(link)) ? 'Form link copied' : 'Could not copy', 'ok'); } }, icon('link', 18), 'Copy link')));
+    mount.appendChild(A.formHead(f));
 
     /* General ---------------------------------------------------- */
     var general = panel('Name and dates', 'Students can only submit while the status is Open and the current time is inside the dates below.',
@@ -629,10 +620,13 @@
     reviewPanel.summary = function () { return f.review.steps.length ? f.review.steps.map(function (x) { return x.label.en; }).join(', ') : 'None'; };
 
     /* Save ------------------------------------------------------- */
-    /** Everything the page can change, as the server expects it. Also compared with the saved copy to know if there is something to save. */
+    /**
+     * Everything the page can change, as the server expects it. Also compared with the saved copy to know if there is
+     * something to save. The status is not here: the header saves it by itself.
+     */
     var buildPatch = function () {
       var patch = {
-        title: f.title, slug: f.slug, status: f.status, opensAt: f.opensAt || '', closesAt: f.closesAt || '',
+        title: f.title, slug: f.slug, opensAt: f.opensAt || '', closesAt: f.closesAt || '',
         lang: f.lang, icon: f.icon, editKey: f.editKey, rules: f.rules, notifications: f.notifications,
         fields: f.fields, review: f.review
       };

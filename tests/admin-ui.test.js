@@ -957,10 +957,9 @@ test('Setup: a section shows what it is set to, and the save bar exists only whi
   p.type('[name="keyDays"]', '7');
   assert.ok(p.$('.savebar').hidden, 'back to the saved value, so there is nothing to save');
 
-  p.pick('status', 'open');
-  assert.equal(p.$('.savebar').hidden, false);
+  p.type('[name="keyDays"]', '5');
   p.click('[name="save"]'); await settle(12);
-  assert.equal(w.admin({ action: 'admin.forms.get', id: f.id }).form.status, 'open');
+  assert.equal(w.admin({ action: 'admin.forms.get', id: f.id }).form.editKey.days, 5);
   assert.ok(p.$('.savebar').hidden);
   assert.equal(p.$('[data-panel="Edit key"] .panel-body').hidden, false, 'a section stays open after a save');
 
@@ -1234,3 +1233,35 @@ test('Responses: Download all is not offered before anyone registers', async () 
   const p = await openAdmin(w, '#/f/' + f.slug + '/responses');
   assert.equal(p.$('[name="download-all"]'), null);
 });
+
+test('Form header: the same on every tab, and the status is saved where it is changed', async () => {
+  const w = boot();
+  const f = w.make('team_registration', 'Projects');
+  const actions = (p) => p.$$('.page-head > a, .page-head > button, .page-head summary, .page-head [role="menuitem"]').map((n) => n.textContent);
+  const responses = await openAdmin(w, `#/f/${f.slug}`);
+  const setup = await openAdmin(w, `#/f/${f.slug}/settings`);
+  assert.deepEqual(actions(responses), ['Open form', 'Copy link', 'More', 'Open Google Sheet', 'Rebuild sheet', 'Duplicate for a new term', 'Delete form']);
+  assert.deepEqual(actions(setup), actions(responses));
+  assert.equal(responses.$('.toolbar [name="rebuild"]'), null, 'Rebuild sheet is under More, not among the tools');
+  responses.click('[name="rebuild"]'); await settle(8);
+  assert.ok(responses.text().includes('Google Sheet views rebuilt'));
+
+  assert.equal(responses.$('[name="status"]').value, 'open');
+  w.advanceDays(0.001);
+  responses.pick('status', 'closed'); await settle(8);
+  assert.equal(w.admin({ action: 'admin.forms.get', id: f.id }).form.status, 'closed', 'no Save is needed on Responses');
+  assert.ok(responses.text().includes('Status saved: Closed'));
+
+  // On Setup the status is not one of the unsaved changes, and a later Save still passes.
+  setup.pick('status', 'draft'); await settle(8);
+  assert.ok(setup.$('.head-note').textContent.includes('The status is still Open.'), 'a copy that is out of date is refused, with the reason');
+  assert.equal(setup.$('[name="status"]').value, 'open', 'and the saved status is back in the control');
+  const fresh = await openAdmin(w, `#/f/${f.slug}/settings`);
+  w.advanceDays(0.001);
+  fresh.pick('status', 'open'); await settle(8);
+  assert.ok(fresh.$('.savebar').hidden, 'nothing waits for Save');
+  fresh.type('[name="title"]', 'Projects 2'); fresh.click('[name="save"]'); await settle(12);
+  const saved = w.admin({ action: 'admin.forms.get', id: f.id }).form;
+  assert.deepEqual([saved.status, saved.title], ['open', 'Projects 2']);
+});
+
