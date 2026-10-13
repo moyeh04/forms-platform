@@ -688,6 +688,8 @@ test('Clients: create a private link, see it once, and it opens the instructor v
   phone.checked = true; p.fire(phone, 'change');
   assert.equal(p.$('[name="withKey"]').checked, true, 'a new link asks for a key unless unticked');
   const key = p.$('[name="withKey"]'); key.checked = false; p.fire(key, 'change');
+  assert.equal(p.$('[name="showSizeAlerts"]').checked, true, 'a new link shows the warnings about small teams unless unticked');
+  const alerts = p.$('[name="showSizeAlerts"]'); alerts.checked = false; p.fire(alerts, 'change');
   p.clickText('Create link', p.$('.dialog')); await settle(10);
   const link = p.$('.link-box code').textContent;
   assert.equal(p.$('[name="access-key"]'), null, 'no key was made');
@@ -697,6 +699,7 @@ test('Clients: create a private link, see it once, and it opens the instructor v
   assert.equal(me.client.name, 'Dr. Ahmed');
   assert.deepEqual(me.forms.map((x) => x.slug), [f.slug]);
   assert.deepEqual(w.admin({ action: 'admin.clients.list' }).clients[0].hiddenColumns, ['phone']);
+  assert.equal(w.admin({ action: 'admin.clients.list' }).clients[0].showSizeAlerts, false);
 });
 
 test('Lists: a plain list is chips, and the save bar exists only while it differs from the saved copy', async () => {
@@ -973,7 +976,7 @@ test('Responses and clients: list rows carry their column names, and the day she
 
   w.admin({ action: 'admin.clients.create', name: 'Dr. Ahmed', forms: [groups.slug], withKey: false });
   const clients = await openAdmin(w, '#/clients');
-  assert.deepEqual(clients.$$('.data-table.cards tbody td[data-label]').map((c) => c.dataset.label), ['Can see', 'Hidden columns', 'Can review', 'Link', 'Access key']);
+  assert.deepEqual(clients.$$('.data-table.cards tbody td[data-label]').map((c) => c.dataset.label), ['Can see', 'Hidden columns', 'Can review', 'Small teams', 'Link', 'Access key']);
 
   const seminar = w.admin({ action: 'admin.forms.create', type: 'reservation', title: 'Seminar', term: 'Fall 2027' }).form;
   assert.equal((await openAdmin(w, `#/f/${seminar.slug}`)).$('.tool-group'), null, 'no day sheet to print while the form has no days');
