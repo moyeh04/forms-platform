@@ -338,6 +338,57 @@ test('Responses: each team is its own tinted block with a leader star and a link
   assert.equal(p.$('[data-stat="people"]').textContent, '6People', 'three teams of 2, 3 and 1');
 });
 
+test('Small teams: the admin switches on the two warnings with their numbers, and a wrong order stays with its reason', async () => {
+  const w = boot();
+  const f = w.make('team_registration', 'Projects');
+  const p = await openAdmin(w, `#/f/${f.slug}/settings`);
+  const sub = (name) => p.$(`[name="${name}"]`).closest('.sub-setting');
+  assert.equal(p.$('[name="criticalAlert"]').checked, false);
+  assert.equal(sub('criticalBelow').hidden, true, 'a number shows only for a warning that is on');
+  assert.equal(p.$('[name="criticalAlert"]').closest('section').dataset.panel, 'Small teams');
+  assert.equal(p.$('[name="criticalAlert"]').closest('section').hidden, false, 'the warnings are in Setup');
+  assert.equal(p.$('[name="teamMax"]').closest('section').hidden, true, 'away from the team size question');
+  assert.equal(p.$('.savebar').hidden, true, 'opening the page changes nothing');
+  p.click('[name="criticalAlert"]'); p.click('[name="warningAlert"]');
+  assert.deepEqual([p.$('[name="criticalBelow"]').value, p.$('[name="warningBelow"]').value], ['3', '5'], 'the numbers start from the biggest team size');
+  assert.equal(sub('warningBelow').hidden, false);
+  assert.equal(p.$('[name="size-alerts-preview"]').textContent, 'Critical: teams of 1 or 2. Warning: teams of 3 or 4.');
+
+  p.type('[name="warningBelow"]', '3');
+  assert.ok(p.$('#size-alert-warning-err').textContent.includes('higher number than the critical warning'));
+  p.click('[name="save"]'); await settle(8);
+  assert.ok(p.$('.savebar-note').textContent.includes('higher number than the critical warning'));
+  assert.equal(p.$('[name="warningBelow"]').value, '3', 'the refused number stays in its field');
+  assert.equal(w.admin({ action: 'admin.forms.get', id: f.id }).form.rules.sizeAlerts, undefined);
+
+  p.type('[name="teamMax"]', '4');
+  p.type('[name="warningBelow"]', '5');
+  assert.ok(p.$('#size-alert-warning-err').textContent.includes('from 2 to 4'), 'the biggest team size bounds the number');
+  p.type('[name="teamMax"]', '6');
+  assert.equal(p.$('#size-alert-warning-err').textContent, '', 'and the reason goes when the range allows it again');
+  p.type('[name="criticalBelow"]', '2'); p.type('[name="warningBelow"]', '4');
+  p.click('[name="save"]'); await settle(12);
+  assert.deepEqual(w.admin({ action: 'admin.forms.get', id: f.id }).form.rules.sizeAlerts, { critical: { on: true, below: 2 }, warning: { on: true, below: 4 } });
+});
+
+test('Responses: small teams are listed by level and marked on their card', async () => {
+  const w = boot();
+  const f = w.make('team_registration', 'Projects');
+  const team = (code, title, codes) => { w.advanceDays(0.01); submit(w, f, person({ leader_code: code, title, members: codes.map((c) => member('سارة خالد حسن علي', c)) })); };
+  team('4230001', 'Alpha', []);
+  team('4230002', 'Beta', ['4230011', '4230012']);
+  team('4230003', 'Gamma', ['4230013', '4230014', '4230015', '4230016']);
+  let p = await openAdmin(w, `#/f/${f.slug}`);
+  assert.equal(p.$('.size-alerts'), null, 'nothing until a warning is switched on');
+  assert.equal(p.$('[name="size-tag"]'), null);
+
+  w.admin({ action: 'admin.forms.update', id: f.id, patch: { rules: { sizeAlerts: { critical: { on: true, below: 3 }, warning: { on: true, below: 5 } } } } });
+  p = await openAdmin(w, `#/f/${f.slug}`);
+  assert.equal(p.$('.requests [name="size-alert-critical"]').textContent, 'Critical: one team has fewer than 3 people: Team 1.');
+  assert.equal(p.$('.requests [name="size-alert-warning"]').textContent, 'Warning: one team has fewer than 5 people: Team 2.');
+  assert.deepEqual(p.$$('.team-card').map((c) => { const t = c.querySelector('[name="size-tag"]'); return t ? t.textContent : ''; }), ['Critical', 'Warning', '']);
+});
+
 test('Responses: People counts a student once however many tasks name them', async () => {
   const w = boot();
   const tasks = w.make('task_submission', 'Tasks', { rules: { uniqueBy: '', uniqueAcrossForm: false, driveCheck: 'off', maxSubmissions: null, teamSize: { min: 1, max: 5 } } });
