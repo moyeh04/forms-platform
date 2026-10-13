@@ -1,11 +1,11 @@
 # Testing
 
-285 automated tests run without a Google account, a browser, or a network.
+287 automated tests run without a Google account, a browser, or a network.
 They run the **real** backend and the **real** pages. This page explains how
 that works and what it can and cannot prove.
 
 ```
-npm test    # 285 tests
+npm test    # 287 tests
 ```
 
 ## The layers
@@ -137,7 +137,7 @@ function that calls `world.api`. Helpers `type`, `pick`, `click`,
 
 | Area | Tests | Examples |
 |---|---:|---|
-| Shared rules | 16 | Arabic filtering, name parts, phones, codes, Drive links, folder names, slots, form state |
+| Shared rules | 17 | Counting the people of a form with a code counted once, Arabic filtering, name parts, phones, codes, Drive links, folder names, slots, form state |
 | Team size and audience | 17 | Required question, range, exact member count, admin range, conflicts warning, size notes, specialization limits, section limits |
 | Core and forms | 14 | Setup, PIN lockout and unlocking it from the sheet menu, forms CRUD, duplicate, delete, templates |
 | Submissions | 26 | Submit, edit keys, sealed keys, expiry, throttling, duplicates, Drive checks, folder names, limits, emails on and off and without a key, rows written as text past the rows a sheet starts with, team numbers that stay when a team cancels and that older rows keep |
@@ -151,7 +151,7 @@ function that calls `world.api`. Helpers `type`, `pick`, `click`,
 | Matching | 6 | Paste, normalise, matched, none, duplicate, sequential review |
 | Viewer API | 13 | Tokens, hidden columns, today and by day, review rights, revoked links, access keys with the lock after wrong tries, reading a lost key again, links that end on a date and open again when it moves |
 | Student page | 35 | Steps, filters, descriptions, team size picker and notes, remove and add a member with Undo, the summary a key opens, the ship over the current step, audience line, subject tag, slots, review, ticket and email notice, edit by key, themes, Arabic, asking for a member of another team, answering a request with Approve, Reject or Later, a task locked after its deadline |
-| Admin page | 53 | Login, a refused PIN kept in its field, a lock that leaves an open window signed in, create with term chips, team size and notes, descriptions, who can register, locked fields, team cards with their stored numbers, show key, teammates of a booking (how many, title, details asked), timetable calendar, hours, a day with its own hours and booked slots, delete, matching, clients with the link shown once and the key apart, a lost key shown again, a link end picked and moved, Extend keys for expired keys and chosen teams, one registration's key extended from its details, Download all with what was not downloaded and the saved zip, lists as chips or rows with the reason for a refused save, sections built from groups and counts, number runs with steppers, new lists picked for a question, column names on list rows for the phone layout, the day sheet group, form tabs that keep edits, section summaries, save bar only while there is a change, sections by one or by year group, added questions and pages, new form preview and title reason |
+| Admin page | 54 | Login, a refused PIN kept in its field, a lock that leaves an open window signed in, create with term chips, team size and notes, descriptions, who can register, locked fields, team cards with their stored numbers, the people count, show key, teammates of a booking (how many, title, details asked), timetable calendar, hours, a day with its own hours and booked slots, delete, matching, clients with the link shown once and the key apart, a lost key shown again, a link end picked and moved, Extend keys for expired keys and chosen teams, one registration's key extended from its details, Download all with what was not downloaded and the saved zip, lists as chips or rows with the reason for a refused save, sections built from groups and counts, number runs with steppers, new lists picked for a question, column names on list rows for the phone layout, the day sheet group, form tabs that keep edits, section summaries, save bar only while there is a change, sections by one or by year group, added questions and pages, new form preview and title reason |
 | Instructor page | 11 | Team numbers with a gap where a team cancelled, today, by day, hidden columns, review rights, invalid links, member values named for the phone layout, phone as a call link |
 | Registry writes | 6 | Every change to forms, lists and links written inside the lock, a save that keeps its row while another form is deleted, a save over a newer copy refused, a busy lock, a link that keeps a renamed form, list names that stay unique |
 | Harness | 4 | The fake itself |

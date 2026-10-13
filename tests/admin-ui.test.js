@@ -333,6 +333,20 @@ test('Responses: each team is its own tinted block with a leader star and a link
   assert.equal(blocks[0].querySelector('.block-side a').getAttribute('href'), link('a'));
   assert.ok(blocks[0].querySelectorAll('.mini thead th')[2].textContent.includes('Section'));
   assert.ok(p.text().includes('3Total') || p.text().includes('Total'));
+  assert.equal(p.$('[data-stat="people"]').textContent, '6People', 'three teams of 2, 3 and 1');
+});
+
+test('Responses: People counts a student once however many tasks name them', async () => {
+  const w = boot();
+  const tasks = w.make('task_submission', 'Tasks', { rules: { uniqueBy: '', uniqueAcrossForm: false, driveCheck: 'off', maxSubmissions: null, teamSize: { min: 1, max: 5 } } });
+  const link = `https://docs.google.com/presentation/d/${ID('a')}/edit`;
+  assert.equal(submit(w, tasks, person({ title: 'Task 1', link, members: [member('سارة خالد حسن علي', '4230002')] })).ok, true);
+  assert.equal(submit(w, tasks, person({ title: 'Task 2', link, members: [member('سارة خالد حسن علي', '4230002'), member('منى أشرف كمال فؤاد', '4230003')] })).ok, true);
+  const p = await openAdmin(w, `#/f/${tasks.slug}`);
+  assert.equal(p.$$('.block').length, 2);
+  assert.equal(p.$('[data-stat="people"]').textContent, '3People', 'the same three students handed in two tasks');
+  p.type('[name="search"]', 'Task 2'); await settle(2);
+  assert.equal(p.$('[data-stat="people"]').textContent, '3People', 'the count is of the form, not of the search');
 });
 
 test('Responses: a team card shows the number the team was given, also after a cancel and in a search', async () => {

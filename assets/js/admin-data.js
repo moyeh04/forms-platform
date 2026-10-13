@@ -40,6 +40,7 @@
     function paintStats() {
       ui.clear(stats);
       stats.appendChild(h('span', { class: 'stat' }, h('b', null, String(all.length)), 'Total'));
+      stats.appendChild(h('span', { class: 'stat', title: 'Leaders and members. A student code is counted once.', dataset: { stat: 'people' } }, h('b', null, String(Rules.countPeople(form, all))), 'People'));
       A.SUB_STATUSES.forEach(function (st) {
         var n = all.filter(function (s) { return s.status === st; }).length;
         if (n) stats.appendChild(h('span', { class: 'stat' }, h('b', null, String(n)), A.SUB_LABEL[st]));
