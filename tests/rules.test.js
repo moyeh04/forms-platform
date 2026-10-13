@@ -162,3 +162,13 @@ test('Folder names: Team_Leader_Name_Project_Name_Subject_Name, no spaces, endin
   assert.equal(R.folderNameExample({ project: 'Library System' }), 'Ahmed_Mohamed_Library_System_Subject_Name');
   assert.equal(R.checkFolderName('My Folder', { subject: 'Databases', example: { project: 'Smart Parking' } }).params.example, 'Ahmed_Mohamed_Smart_Parking_Databases');
 });
+
+test('People: leaders and members are counted, a student code once', () => {
+  const row = (code, members = []) => ({ data: { leader_name: 'x', leader_code: code, members } });
+  assert.equal(R.countPeople(teamForm, []), 0);
+  assert.equal(R.countPeople(teamForm, [row('1', [{ name: 'a', code: '2' }, { name: 'b', code: '3' }]), row('4')]), 4);
+  assert.equal(R.countPeople(teamForm, [row('1', [{ name: 'a', code: '2' }]), row('2', [{ name: 'c', code: '1' }])]), 2, 'a code in two responses is one person');
+  assert.equal(R.countPeople(teamForm, [row('', [{ name: 'a', code: '' }]), row('')]), 3, 'without a code nobody can be matched, so each counts');
+  const solo = { fields: [{ id: 'leader_name', role: 'name' }, { id: 'leader_code', role: 'code' }, { id: 'members', role: 'members', enabled: false }] };
+  assert.equal(R.countPeople(solo, [row('1', [{ name: 'a', code: '2' }])]), 1, 'teammates a form does not ask about are not counted');
+});

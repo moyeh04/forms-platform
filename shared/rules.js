@@ -263,6 +263,23 @@
    return out;
  }
 
+  /**
+   * How many different people the responses of a form hold: leaders and members, a student
+   * code counted once however many responses name it. A person without a code counts each time.
+   */
+  function countPeople(form, rows) {
+    var seen = {}, n = 0;
+    (rows || []).forEach(function (r) {
+      membersOf(form, r.data).forEach(function (m) {
+        var code = String(m.code || '').trim();
+        if (code && seen[code]) return;
+        if (code) seen[code] = true;
+        n++;
+      });
+    });
+    return n;
+  }
+
   /** 'open' | 'not_yet' | 'closed' | 'draft' | 'archived' */
   function formState(form, nowMs) {
     var now = nowMs == null ? Date.now() : nowMs;
@@ -481,6 +498,7 @@
     fieldByRole: fieldByRole,
     valueByRole: valueByRole,
     membersOf: membersOf,
+    countPeople: countPeople,
     formState: formState,
     dayLabel: dayLabel,
     shiftDate: shiftDate,
