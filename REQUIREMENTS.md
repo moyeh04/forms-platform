@@ -40,6 +40,7 @@ step needs the real Google services (see "What could not be tested here").
 | Project folders must be named `Team_Leader_Name_Project_Name_Subject_Name` (no spaces, underscores, ending with the subject name, for example `Software_Engineering`); students see the rule with an example built from their project title | Done, check live |
 | Two-step review before sending | Done |
 | Success ticket: reference, key with an arrow callout, expiry, "take a screenshot" note, Save as image, Save as PDF, Copy key | Done |
+| The ticket of a booking is a stub with torn edges and draws its day and time, the same picture in both languages: a green parrot points at a ship's clock whose hands sweep to the start of the slot, with the slot shaded and a red arrow from the minute hand to its end, and a pirate with a hook and a wooden leg points at the day on a desk calendar. A booking made with a team's key shows that picture instead of the key; one made by hand shows both, and Save as image keeps both | Done |
 | Duplicate leader code says "use your key" | Done |
 | A registration opened with a key can be closed without changing it; Close asks first when something was changed and not saved | Done |
 | A booking made with a team's key asks for a key in one place, and the key that finds a team with a booking opens that booking | Done |

@@ -17,7 +17,7 @@ the instructor page (`viewer.html`).
 | 4 | **One setting, one rule, in every place it appears** | Every tab of a form has the same header: title, tags, status, **Open form**, **Copy link**, **More**. The card of a form and its header share one **More** menu. The card calls the tab **Setup**, as the tab does. One theme button is used by all three pages, before and after signing in |
 | 5 | **What is shown beside a title is the saved state** | The status in the header is saved the moment it changes, on every tab. It is not one of the unsaved changes of the Setup page |
 | 6 | **Plain words, never an id from the code** | Question types read "Drive link", "Student code", "One choice from a list". Statuses, list kinds and form types have names |
-| 7 | **A key is asked for in one place on a screen** | A booking made with a team's key starts with that key. The screen has no second key box; a team that already booked is told so there, with the way to its booking |
+| 7 | **A key is asked for in one place on a screen** | A booking made with a team's key starts with that key. The screen has no second key box; a team that already booked is told so there, with the way to its booking. Its ticket does not show that key again: it draws the day and the time |
 | 8 | **Every mode has a way out** | A registration opened with a key has **Close** on its summary. It asks first only when something was changed and not saved |
 | 9 | **A hint must not read as an answer** | The phone field hints `01xxxxxxxxx`, not a number that looks filled in |
 | 10 | **Maintenance is under More** | **Rebuild sheet**, **Duplicate** and **Delete form** are in the More menu, not among the tools used every day |
@@ -26,6 +26,7 @@ the instructor page (`viewer.html`).
 | 13 | **An action is offered where it makes sense** | The first booking of a form is offered on team and task forms, where there are teams to book. A form that already has bookings keeps them listed |
 | 14 | **Sample text is generic** | Placeholders and previews use made-up names (`Task 1`, `001`), never a real course, person or file |
 | 15 | **A limit is shown before it is hit, in the look of the site** | Every day and time of a booking says how many places are left before it is picked. A full one is not greyed out: it is a torn ticket, ragged at the top and bottom, cut by a red line and marked **Fully booked** |
+| 16 | **A picture keeps its own colours** | The ticket picture is printed on a parchment card in fixed colours, so it looks the same in both themes and in the saved image; only the card is a little darker at night |
 
 ## Screens
 
@@ -33,7 +34,7 @@ the instructor page (`viewer.html`).
 |---|---|
 | Phone and desktop | Every page is read at 390 px and at 1280 px. Nothing scrolls sideways |
 | Light and dark | Both themes are looked at, not assumed. Colours come from the tokens in `assets/css/theme.css`, and `tests/contrast.test.js` holds every pair the pages use to WCAG 2.1 AA |
-| Arabic | The student form is read right to left as well; a name, a code or a phone number keeps its own direction |
+| Arabic | The student form is read right to left as well; a name, a code or a phone number keeps its own direction. The ticket picture is the same in both languages, since a clock or a calendar read backwards would be wrong |
 | Keyboard and screen reader | A field has a label, an error is tied to its field (`aria-describedby`) and announced (`role="alert"`), the current tab and trail step carry `aria-current`. The digits of a key are read one by one from hidden text; the drawn boxes are hidden from the reader |
 
 `npm run dev` starts a preview with sample data (see

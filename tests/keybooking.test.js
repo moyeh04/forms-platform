@@ -149,7 +149,7 @@ async function openForm(w) {
   return { dom, win: dom.window, ...helpers(dom.window) };
 }
 
-test('Key booking page: the key, the team to confirm, the slot, then a ticket with the same key', async () => {
+test('Key booking page: the key, the team to confirm, the slot, then a ticket with the time instead of the key', async () => {
   const w = boot();
   const p = await openForm(w);
   assert.equal(p.$('.step-title').textContent, 'Your team');
@@ -181,7 +181,10 @@ test('Key booking page: the key, the team to confirm, the slot, then a ticket wi
   assert.ok(p.text().includes('Check your details'));
   assert.ok(p.text().includes('أحمد محمد محمود علي'));
   p.submitForm(); await settle(12);
-  assert.ok(p.text().includes(w.keyA), 'the ticket shows the key the student already has');
+  assert.ok(p.$('#ticket [name="when"]'), 'the ticket draws the day and the time');
+  assert.ok(p.$('#ticket [name="when"]').textContent.includes(slot(0).time));
+  assert.equal(p.$$('.key-digit').length, 0, 'the key the team already has is not shown again');
+  assert.ok(p.$('[name="team-key-note"]'));
   assert.equal(w.rows().length, 1);
   assert.equal(w.rows()[0].data.leader_code, '4230001');
 });

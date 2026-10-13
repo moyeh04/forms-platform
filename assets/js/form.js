@@ -953,10 +953,19 @@
     refreshAvailability().then(function () { S.view = S.state === 'open' ? 'form' : 'closed'; render(); });
   }
 
+  /** The day and time of a booking, for the picture on its ticket. */
+  function bookedWhen() {
+    var sf = slotField(), v = sf && S.data[sf.id];
+    var day = v && ((S.form.slots && S.form.slots.days) || []).filter(function (d) { return d.id === v.day; })[0];
+    return day && v.time ? { day: day, time: v.time } : null;
+  }
+
   function ticketView() {
     var em = Rules.valueByRole(S.form, S.data, 'email');
+    // A booking made with a team's key answers to that key, which the team has already; a new key is shown.
+    var key = S.form.keyBooking && S.result.key === S.sourceKey ? '' : S.result.key;
     var opts = {
-      ref: S.result.ref, key: S.result.key, keyExpires: S.result.keyExpires, edited: !!S.result.edited,
+      ref: S.result.ref, key: key, keyExpires: S.result.keyExpires, edited: !!S.result.edited, when: bookedWhen(), teamKey: !!S.form.keyBooking && !key && !S.result.edited,
       email: !S.result.edited && S.result.emailed ? em : '', summary: ticketSummary()
     };
     var asked = S.result.transfers || [];

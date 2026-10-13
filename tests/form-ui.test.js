@@ -259,8 +259,13 @@ test('Reservation: taken slots are disabled and a booking can be made', async ()
   p.submitForm(); await settle();
   p.submitForm(); await settle(12);
   assert.ok(p.$('#ticket'));
-  assert.ok(p.$('#ticket').textContent.includes('12:55 - 1:15'));
-  assert.equal(p.$$('.key-digit').length, 5);
+  assert.ok(p.$('#ticket [name="when"]').textContent.includes('12:55 - 1:15'), 'the time is drawn on a clock');
+  assert.ok(p.$('#ticket [name="when"]').textContent.includes('14'), 'and the day on a calendar');
+  assert.deepEqual([...p.$$('#ticket [name="when"] img')].map((i) => i.getAttribute('src')), ['assets/img/pirate.webp', 'assets/img/parrot.webp'], 'with the pirate and the parrot');
+  assert.deepEqual([...p.win.App.ticket.handAngles('12:55 - 1:15')], [27.5, 330], 'the hands point at 12:55');
+  assert.deepEqual([...p.win.App.ticket.slotArc('12:55 - 1:15')], [330, 450], 'the slice runs from 55 past the minute round to 15');
+  assert.deepEqual([...p.win.App.ticket.slotArc('10:00 - 11:30')], [300, 345], 'a slot of more than an hour is marked on the hours');
+  assert.equal(p.$$('.key-digit').length, 5, 'a booking made by hand keeps its own key on the ticket');
 });
 
 test('Closed form shows the message and no questions', async () => {
