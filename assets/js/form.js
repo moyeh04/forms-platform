@@ -486,7 +486,7 @@
       scrollToMembers();
     };
     var note = cur ? Rules.teamSizeNotice(S.form, cur, App.i18n.lang) : '';
-    var noteEl = note ? h('p', { class: 'size-notice', role: 'status' }, icon('info', 18), h('span', null, note)) : null;
+    var noteEl = sizeNote(note);
     if (sizes.length > 8) {
       return [h('select', { id: id, class: 'select', name: path, 'aria-describedby': id + '-help ' + id + '-err', onchange: function (e) { if (e.target.value) pick(parseInt(e.target.value, 10)); } },
         h('option', { value: '' }, t('choose')),
@@ -501,6 +501,12 @@
   }
 
   /* ── Team members ───────────────────────────────────────────── */
+
+  /** The note the admin set for a team size or a number of teammates, under its control; null when there is none. */
+  function sizeNote(text) { return text ? h('p', { class: 'size-notice', role: 'status' }, icon('info', 18), h('span', null, text)) : null; }
+
+  /** A value of the summary with the note of its number after it. */
+  function withNote(value, text) { return text ? h('span', null, value, h('span', { class: 'size-notice-inline' }, text)) : value; }
 
   /** `remove` is given only when the team can lose a member; then the card has the button. */
   function memberCard(field, path, i, remove) {
@@ -563,10 +569,12 @@
       return wrap;
     }
 
-    // Forms without a team size question have only the add and remove buttons.
+    // Forms without a team size question have only the add and remove buttons, and the note the admin set for that many teammates.
     var min = field.min == null ? 0 : field.min;
     var max = field.max == null ? range.max - 1 : field.max;
     memberList(field, path, list, min, max, function (next) { setVal(path, next); }).forEach(function (n) { if (n) wrap.appendChild(n); });
+    var note = Rules.teammateNotice(S.form, list.length, App.i18n.lang);
+    if (note) wrap.appendChild(sizeNote(note));
     return wrap;
   }
 
@@ -648,14 +656,16 @@
       return ltr((day ? day.label : value.day) + ' - ' + value.time);
     }
     if (field.type === 'members') {
-      return h('ul', { class: 'plain' }, value.map(function (m) {
+      var people = h('ul', { class: 'plain' }, value.map(function (m) {
         return h('li', { class: 'person' }, h('bdi', null, m.name || ''), m.code ? h('span', { class: 'code' }, m.code) : null);
       }));
+      var mates = sizeField() ? '' : Rules.teammateNotice(S.form, value.length, App.i18n.lang);
+      return withNote(people, mates);
     }
     if (field.type === 'code') return h('span', { class: 'code' }, value);
     if (field.type === 'team_size') {
       var note = Rules.teamSizeNotice(S.form, value, App.i18n.lang);
-      return note ? h('span', null, String(value), h('span', { class: 'size-notice-inline' }, note)) : String(value);
+      return withNote(String(value), note);
     }
     return String(value);
   }

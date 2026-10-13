@@ -59,6 +59,8 @@
 
   /* ── Small widgets ──────────────────────────────────────────── */
 
+  A.plural = function (n, one, many) { return n + ' ' + (n === 1 ? one : many); };
+
   A.badge = function (text, kind) { return h('span', { class: 'badge ' + (kind || String(text).toLowerCase()) }, text); };
 
   A.field = function (label, control, help) {

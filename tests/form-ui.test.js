@@ -270,6 +270,23 @@ test('Reservation: taken slots are disabled and a booking can be made', async ()
   assert.equal(p.$$('.key-digit').length, 5, 'a booking made by hand keeps its own key on the ticket');
 });
 
+test('Reservation teammates: the note for a number of teammates shows once the leader has added that many', async () => {
+  const w = boot('reservation', { slots: { days: [{ label: 'Week 11 - Sunday', date: '2027-11-14', times: ['12:30 - 12:50'] }], capacity: 1 } });
+  const fields = w.admin({ action: 'admin.forms.get', id: w.form.id }).form.fields;
+  Object.assign(fields.find((x) => x.role === 'members'), { enabled: true, required: false, min: 0, max: 2, notice: { sizes: [1, 7], text: { en: 'Other students may join you, up to {max}.', ar: '' } } });
+  w.admin({ action: 'admin.forms.update', id: w.form.id, patch: { fields } });
+  const saved = w.api({ action: 'getForm', slug: w.form.slug }).form.fields.find((x) => x.role === 'members');
+  assert.deepEqual(saved.notice.sizes, [1], 'a number outside 0 to 2 is dropped');
+  const p = await open(w);
+  await fillAbout(p, '4230002'); p.submitForm(); await settle();
+  await fillStudy(p); p.submitForm(); await settle();
+  assert.equal(p.$('.members-wrap .size-notice'), null, 'no note for a leader alone');
+  p.click('[name="add-member"]'); await settle();
+  assert.equal(p.$('.members-wrap .size-notice').textContent, 'Other students may join you, up to 2.');
+  p.click('[name="add-member"]'); await settle();
+  assert.equal(p.$('.members-wrap .size-notice'), null, 'and none for two');
+});
+
 test('Closed form shows the message and no questions', async () => {
   const w = boot('team_registration', { status: 'closed' });
   const p = await open(w);

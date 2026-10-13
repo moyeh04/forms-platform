@@ -313,17 +313,26 @@
   }
 
   /**
-   * The note a student sees after choosing a team size, or '' when that size has none.
-   * {n} becomes the chosen size and {max} the largest allowed size.
+   * The note of a range for the number a student picked, or '' when that number has none.
+   * notice is { sizes, text: { en, ar } }; {n} becomes the number and {max} the highest allowed.
    */
+  function sizeNotice(notice, size, max, lang) {
+    var v = parseInt(size, 10);
+    if (!notice || !Array.isArray(notice.sizes) || notice.sizes.map(Number).indexOf(v) === -1) return '';
+    var text = (notice.text && (notice.text[lang] || notice.text.en || notice.text.ar)) || '';
+    return String(text).replace(/\{n\}/g, String(v)).replace(/\{max\}/g, String(max));
+  }
+
+  /** The note a student sees after choosing a team size. */
   function teamSizeNotice(form, size, lang) {
     var ts = (form && form.rules && form.rules.teamSize) || {};
-    var n = ts.notice;
-    var v = parseInt(size, 10);
-    if (!n || !Array.isArray(n.sizes) || n.sizes.map(Number).indexOf(v) === -1) return '';
-    var text = (n.text && (n.text[lang] || n.text.en || n.text.ar)) || '';
-    var max = teamSizeRange(form).max;
-    return String(text).replace(/\{n\}/g, String(v)).replace(/\{max\}/g, String(max));
+    return sizeNotice(ts.notice, size, teamSizeRange(form).max, lang);
+  }
+
+  /** The note a leader sees for the number of teammates they added to a booking. */
+  function teammateNotice(form, count, lang) {
+    var mf = fieldByRole(form, 'members');
+    return mf ? sizeNotice(mf.notice, count, mf.max, lang) : '';
   }
 
   function validateTeamSize(raw, form) {
@@ -512,7 +521,9 @@
     validateField: validateField,
     validateSubmission: validateSubmission,
     teamSizeRange: teamSizeRange,
+    sizeNotice: sizeNotice,
     teamSizeNotice: teamSizeNotice,
+    teammateNotice: teammateNotice,
     latinDigits: latinDigits,
     isEmpty: isEmpty
   };

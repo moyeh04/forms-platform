@@ -434,12 +434,18 @@ test('Reservation teammates: how many, the title students read, and what is aske
   assert.ok(p.$('.tm-body').hidden, 'the settings exist only while teammates are asked');
   const ask = p.$('[name="reservation-members"]'); ask.checked = true; p.fire(ask, 'change');
   assert.equal(p.$('.tm-body').hidden, false);
-  assert.ok(p.text().includes('Every booking has the leader and 1 to 5 teammates.'));
-  p.click('[name="teammates-min-down"]');
-  assert.ok(p.text().includes('A leader can book alone, or add up to 5 teammates.'));
-  assert.ok(p.$('[name="teammates-min-down"]').disabled, 'fewer than none is not offered');
-  p.click('[name="teammates-max-down"]'); p.click('[name="teammates-max-down"]'); p.click('[name="teammates-max-down"]');
-  assert.equal(p.$('[name="teammates-max"]').textContent, '2');
+  const choices = () => p.$('.tm-body .size-preview').textContent;
+  assert.equal(choices(), 'A leader can bring: 12345 teammates', 'the same control as the team size');
+  p.type('[name="teammatesMin"]', '0');
+  p.type('[name="teammatesMax"]', '2');
+  assert.equal(choices(), 'A leader can bring: 012 teammates', 'a leader may book alone');
+  p.type('[name="teammatesMin"]', '3');
+  p.click('[name="save"]'); await settle(8);
+  assert.ok(p.text().includes('The number of teammates needs a minimum of at least 0 and a maximum that is not lower and at least 1, up to 19.'), 'a range upside down is refused');
+  p.type('[name="teammatesMin"]', '0');
+  p.click('[name="teammates-notice-size-0"]');
+  p.type('[name="teammates-noticeEn"]', 'Other students may join you, up to {max}.');
+  assert.ok(p.$('.tm-body .notice-preview').textContent.includes('Other students may join you, up to 2.'), 'the note is previewed as the team size note is');
   p.type('[name="teammates-title-en"]', 'Who comes with you');
   const phone = p.$('.tm-questions [data-field="phone"] .q-show input');
   phone.checked = false; p.fire(phone, 'change');
@@ -448,6 +454,7 @@ test('Reservation teammates: how many, the title students read, and what is aske
 
   const members = w.admin({ action: 'admin.forms.get', id: f.id }).form.fields.find((x) => x.role === 'members');
   assert.deepEqual([members.enabled, members.required, members.min, members.max, members.label.en], [true, false, 0, 2, 'Who comes with you']);
+  assert.deepEqual(members.notice, { sizes: [0], text: { en: 'Other students may join you, up to {max}.', ar: '' } });
   assert.equal(members.fields.find((x) => x.id === 'phone').enabled, false);
   const book = (code, time, list) => w.api({ action: 'submit', slug: f.slug, data: person({ leader_code: code, title: 'Library', slot: { day: 'one', time }, members: list }) });
   assert.equal(book('4230010', '12:30 - 12:50', []).ok, true, 'a leader books alone');
@@ -455,6 +462,13 @@ test('Reservation teammates: how many, the title students read, and what is aske
   assert.equal(book('4230020', '12:55 - 1:15', three).ok, false, 'more teammates than the most is refused');
   const noPhone = { ...member('سارة خالد حسن علي', '4230021') }; delete noPhone.phone;
   assert.equal(book('4230020', '12:55 - 1:15', [noPhone]).ok, true, 'a hidden detail is not needed');
+
+  // The saved bookings that a new range leaves outside are counted before the save, as saved teams are.
+  const again = await openAdmin(w, `#/f/${f.slug}/questions`);
+  const outside = () => again.$('[name="teammates-conflicts"]');
+  assert.ok(outside().hidden, 'both bookings fit 0 to 2');
+  again.type('[name="teammatesMin"]', '1');
+  assert.equal(outside().textContent, '1 saved booking is outside 1 to 2. It stays booked as it is. Widen the range, or ask that team to change their teammates.');
 });
 
 test('Timetable: a day with no date gets a name and the general hours, and bookings appear grouped by day', async () => {
@@ -816,7 +830,7 @@ test('Team size note: the admin picks sizes, writes the note, and it is saved', 
   p.click('[name="notice-size-3"]'); p.click('[name="notice-size-4"]');
   assert.equal(p.$('[name="notice-size-3"]').getAttribute('aria-pressed'), 'true');
   p.click('[name="save"]'); await settle(8);
-  assert.ok(p.text().includes('Write the team size note'), 'sizes without text are refused');
+  assert.ok(p.text().includes('Write the note for team size'), 'sizes without text are refused');
   p.type('[name="noticeEn"]', 'Others join to reach {max}.');
   assert.ok(p.$('.notice-preview').textContent.includes('Others join to reach 5.'), 'live preview fills the placeholders');
   p.click('[name="save"]'); await settle(12);

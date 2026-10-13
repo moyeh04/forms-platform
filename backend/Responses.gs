@@ -233,15 +233,26 @@ function checkLimits_(form, data, rows, selfId) {
   }
 }
 
-/** How many saved teams have each size: { "3": 2, "5": 7 }. A team with no size counts under 0. */
+/** How many saved responses give each number: { "3": 2, "5": 7 }. numberOf reads it from one response. */
+function countResponses_(form, numberOf) {
+  var counts = {};
+  readResponses(form).forEach(function (r) {
+    var n = numberOf(r);
+    counts[n] = (counts[n] || 0) + 1;
+  });
+  return counts;
+}
+
+/** How many saved teams have each size. A team with no size counts under 0. */
 function teamSizes_(form) {
   var field = Rules.fieldByRole(form, 'team_size');
-  var sizes = {};
-  readResponses(form).forEach(function (r) {
-    var n = parseInt(r.data[field.id], 10) || 0;
-    sizes[n] = (sizes[n] || 0) + 1;
-  });
-  return sizes;
+  return countResponses_(form, function (r) { return parseInt(r.data[field.id], 10) || 0; });
+}
+
+/** How many saved bookings have each number of teammates. */
+function teammateCounts_(form) {
+  var field = Rules.fieldByRole(form, 'members');
+  return countResponses_(form, function (r) { var list = r.data[field.id]; return Array.isArray(list) ? list.length : 0; });
 }
 
 /* ── Drive links ──────────────────────────────────────────────── */

@@ -27,8 +27,9 @@ API['admin.forms.get'] = admin(function (req) {
     out.taken = slotAvailability_(form);
     out.keySources = keyBookingSources_(form).map(function (s) { return { id: s.id, title: s.title, term: FormMetadata.slug(s) }; });
   }
-  // The team size panel counts the saved teams that a new range would leave outside.
+  // The team size and teammates panels count the saved answers that a new range would leave outside.
   if (Rules.fieldByRole(form, 'team_size')) out.teamSizes = teamSizes_(form);
+  if (form.type === 'reservation' && Rules.fieldByRole(form, 'members')) out.teammateCounts = teammateCounts_(form);
   return out;
 });
 

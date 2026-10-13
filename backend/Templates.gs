@@ -97,6 +97,10 @@ function normalizeReservationMembers_(form) {
   var min = parseInt(members.min, 10), max = parseInt(members.max, 10);
   members.min = Math.max(0, Math.min(19, isNaN(min) ? 1 : min));
   members.max = Math.max(1, members.min, Math.min(19, isNaN(max) ? 5 : max));
+  // The note for some numbers of teammates is cleaned like the team size note, and dropped when no number has it.
+  var notice = members.notice ? normalizeSizeNotice_(members.notice, members.min, members.max) : null;
+  if (notice && notice.sizes.length) members.notice = notice;
+  else delete members.notice;
   var project = form.steps.filter(function (step) { return step.id === 'project'; })[0];
   if (project && project.fields.indexOf(members.id) === -1) project.fields.push(members.id);
   return form;
