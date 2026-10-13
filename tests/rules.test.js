@@ -34,6 +34,8 @@ test('Phones: every Egyptian format maps to 01XXXXXXXXX', () => {
     .forEach((p) => assert.equal(R.normalizePhone(p), '01012345678', p));
   assert.equal(R.normalizePhone('01312345678'), '');
   assert.equal(R.normalizePhone('12345'), '');
+  assert.equal(R.whatsappLink('+20 101 234 5678'), 'https://wa.me/201012345678', 'WhatsApp takes the number with the country code');
+  assert.equal(R.whatsappLink('12345'), '', 'and there is no link for a number that is not a mobile');
 });
 
 test('Phones: extracts numbers from pasted WhatsApp lines', () => {

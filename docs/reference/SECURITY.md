@@ -201,6 +201,7 @@ Script properties hold the pepper and the PIN hash. If they are deleted:
 | Data | Where | Who can see it |
 |---|---|---|
 | Names, codes, phones, emails | The form's own Google Sheet | The sheet owner, anyone the owner shares it with, the admin dashboard, and instructors through links with those columns shown |
+| A team leader's phone | A waiting request between two teams, only when the form ticks *Show each leader the phone number of the other leader* (off by default) | The leader of the other team of that request, with the edit key, from the moment the request is made until it is answered or cancelled. A team must register and ask before it sees a number, so a code typed into the form shows none |
 | Task files and project folders | The student's Drive | Whoever the student shared the link with. **Download all** reads them as the owner |
 | Download all | The owner's Drive, in `Forms Platform / Exports / Downloads`, and wherever the admin saves the zips | The owner, and anyone the saved zips are given to. They hold the students' files and `Teams.xlsx` with names, codes and sections, but no phone numbers or emails. A new download of the same form moves the older folder to the trash |
 
