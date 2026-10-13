@@ -41,6 +41,7 @@ Each section has the same shape:
 | 21 | Email problems must not lose data | Mail is best effort and never blocks saving |
 | 22 | Deleting must free a code but keep history | Soft delete: a flag, not a removed row |
 | 23 | Sheets turns `01012345678` into a number | Every data cell is formatted as plain text |
+| 24 | A static host cannot tell browsers to drop an old page | The site carries its version; files are named by their content and an old page reloads itself |
 
 ---
 
@@ -856,6 +857,40 @@ what was written. Phone numbers are also normalised by one function
 
 **Cost.** None noticeable. Sorting a plain-text code column sorts as text, which
 is correct for fixed-length codes.
+
+---
+
+## 24. A browser keeps showing the old site after a publish
+
+**Problem.** GitHub Pages decides how long a browser may keep a file (ten
+minutes) and the project cannot change that header. After a publish a browser
+can hold a new page with an old script, or an old page altogether, and a tab
+left open for days never asks again. People were told to press Ctrl+F5.
+
+**What the platform does.** Two things, both made by `scripts/build-site.js`
+when the site is packaged:
+
+- **Every script and stylesheet is named by its content.** The address in the
+  page ends in `?v=` and a fingerprint of that file. A browser keeps a file
+  under its whole address, so a changed file is always fetched with the page
+  that names it, and a file that did not change stays cached.
+- **The site carries its version.** A fingerprint of everything a visitor can
+  load is written into `config.js` (`APP_CONFIG.VERSION`) and into
+  `version.json`. `assets/js/fresh.js`, loaded by the three pages, reads
+  `version.json` under a new address each time (so no cache answers) when the
+  page opens, when its tab is looked at again, and every five minutes. A page
+  older than the site reloads itself; a reload always asks the server for the
+  page again.
+
+The reload never throws work away. A page where something was typed or chosen,
+or with a dialog open, shows a strip at the top instead: "A newer version of
+this page is ready" with **Reload**. A tab reloads by itself once for a
+version; if it is still old after that it shows the strip, so there is no loop.
+The version comes from the files and the API address only, so a push that
+changes the backend or the docs reloads nobody.
+
+**Cost.** One small request for `version.json` per check. A page published
+before this existed has no `fresh.js`, so it needs one last manual refresh.
 
 ---
 

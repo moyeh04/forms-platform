@@ -310,7 +310,7 @@ Deploy**. This is a recovery path; routine updates use the configured workflow.
 
 | What you see | What to do |
 |---|---|
-| Website says it is not connected to the backend | Hard-refresh the page (**Ctrl+F5** on Windows/Linux, **Cmd+Shift+R** on Mac) to bypass browser caching of the placeholder `config.js`. Also verify Pages Source is **GitHub Actions** and `API_URL` is set under repository Variables. |
+| Website says it is not connected to the backend | Verify Pages Source is **GitHub Actions** and `API_URL` is set under repository Variables. |
 | Page says it could not reach the server | Run **First-time setup** in the sheet (step 4); the web app answers only after you allow the permissions. If it still fails, check under **Deploy > Manage deployments** that access is **Anyone**. |
 | `npm run setup` stops at "Creating the Forms Registry sheet" | Turn on the Apps Script API (step 1), wait a minute, and run it again. If an empty **Forms Registry** sheet was left in Google Drive by the failed attempt, delete it. |
 | `npm run setup` stops at "Pushing the backend" | Turn on the Apps Script API (step 1). If you passed a Script ID, check that it is the one from Project Settings. |
@@ -318,7 +318,7 @@ Deploy**. This is a recovery path; routine updates use the configured workflow.
 | "That PIN is not correct" | Type it again; the field keeps what you typed. To choose a new PIN, run **Forms Platform > 2. Set admin PIN...** in the sheet. |
 | "Too many wrong PINs. Wait ten minutes, or unlock the admin page from the Forms Platform menu in the sheet." | Eight wrong PINs lock the dashboard for ten minutes, for everyone. Wait, or click **Forms Platform > Unlock the admin page** in the sheet, which lifts the lock at once and keeps your PIN. A dashboard that was already open keeps working after the lock. |
 | Backend update failed | Check the **Deploy Google Apps Script** job. Renew `CLASPRC_JSON` if authentication failed; verify both IDs and enable the Apps Script API. |
-| The site did not change after a push | Open the **Actions** tab: a red run means a test failed and nothing was published. A green run means the browser cached the old file: press Ctrl+F5. |
+| The site did not change after a push | Open the **Actions** tab: a red run means a test failed and nothing was published. After a green run an open page updates by itself within a few minutes: it reloads, or shows **A newer version of this page is ready** with **Reload** when something was typed. A page opened before this was added needs one manual refresh (**Ctrl+F5**, or **Cmd+Shift+R** on a Mac). |
 | Actions says Pages is not enabled | Settings, Pages, Source: **GitHub Actions**. |
 | The menu "Forms Platform" is missing | Reload the sheet and wait a few seconds. |
 | A data tab (Forms, Responses, ...) has no dark header or row tints | Click **Forms Platform > Rebuild all views**. It repaints every form and formats every data tab; it changes no data. |

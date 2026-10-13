@@ -281,6 +281,13 @@ The last row is the quiet payoff of the whole architecture: most day-to-day
 changes (a new term, a new form, a different team size, new time slots) are
 **data edits in the dashboard** and need no push and no deploy at all.
 
+Nobody has to refresh by hand after a publish. Pages lets a browser keep a
+file for ten minutes and the project cannot change that, so the package names
+every script and stylesheet by its content and carries its own version in
+`version.json`. A page that is older than the site reloads itself, or offers
+**Reload** when something was typed
+([WORKAROUNDS.md, 24](WORKAROUNDS.md#24-a-browser-keeps-showing-the-old-site-after-a-publish)).
+
 ## Public repository: is that safe?
 
 Yes, with the usual care:

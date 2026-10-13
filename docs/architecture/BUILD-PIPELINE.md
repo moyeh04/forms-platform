@@ -287,6 +287,15 @@ For pushes to `master`, `npm run build:site` packages public files into `_site/`
 and generates `_site/assets/js/config.js` from the required `API_URL` variable.
 Invalid configuration fails before the public artifact is uploaded.
 
+The package also knows its own version. `siteVersion` fingerprints the three
+pages, everything under `assets/` and `shared/`, and the API address; the
+result goes into `config.js` as `VERSION` and into `_site/version.json`.
+`stampPage` then adds `?v=` and the fingerprint of the file to every local
+script and stylesheet address in the three pages. The pages in the repository
+stay as they are: only the published copies are stamped. `assets/js/fresh.js`
+uses the two to bring an open page up to date
+([WORKAROUNDS.md, 24](WORKAROUNDS.md#24-a-browser-keeps-showing-the-old-site-after-a-publish)).
+
 The Apps Script job generates ignored `.clasp.json` and private credentials
 from `APPS_SCRIPT_ID`, `APPS_SCRIPT_DEPLOYMENT_ID`, `API_URL`, and the
 `CLASPRC_JSON` secret. Pinned clasp pushes the tested backend artifact and
