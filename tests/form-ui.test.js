@@ -115,6 +115,8 @@ test('Form: full registration with a team member ends on a ticket with a key', a
   assert.ok(t, 'ticket is shown');
   const key = p.$$('.key-digit', t).map((d) => d.textContent).join('');
   assert.match(key, /^\d{5}$/);
+  assert.equal(p.$('.key-digits .sr-only', t).textContent, key.split('').join(' '), 'a screen reader hears the key digit by digit');
+  assert.equal(p.$('.key-digits', t).getAttribute('role'), null);
   assert.ok(t.textContent.includes('RS-') === false && t.textContent.includes('TR-2027-0001'));
   assert.ok(t.textContent.includes('Save this key'));
   assert.ok(p.$('.callout-arrow svg'));

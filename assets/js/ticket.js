@@ -13,8 +13,9 @@
   }
 
   function digits(key) {
-    return h('div', { class: 'key-digits', role: 'text', 'aria-label': key.split('').join(' ') },
-      key.split('').map(function (d) { return h('span', { class: 'key-digit code' }, d); }));
+    // A screen reader hears the digits one by one from the hidden text; the drawn boxes are for the eye.
+    return h('div', { class: 'key-digits' }, h('span', { class: 'sr-only' }, key.split('').join(' ')),
+      key.split('').map(function (d) { return h('span', { class: 'key-digit code', 'aria-hidden': 'true' }, d); }));
   }
 
   /** summary: [{ label, value }] rows shown under the key. */
