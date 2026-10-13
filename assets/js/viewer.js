@@ -66,9 +66,9 @@
   function keyView() {
     var input = h('input', { class: 'input key-input', id: 'access-key', type: 'text', inputmode: 'numeric', maxlength: '6', autocomplete: 'one-time-code', placeholder: '000000', 'aria-label': 'Access key', 'aria-describedby': 'access-key-err', value: S.key });
     var busy = false;
-    return h('div', { class: 'login' }, h('div', { class: 'sheet' }, h('div', { class: 'wrap' },
+    return h('div', { class: 'login' }, loginTop(), h('div', { class: 'sheet' }, h('div', { class: 'wrap' },
       h('h1', { class: 'step-title' }, 'Enter the access key'),
-      h('p', null, 'This link also needs the six-digit key that was sent to you separately.'),
+      h('p', null, 'This is a private page for an instructor: the teams, bookings or registrations of the forms shared with you. It also needs the six-digit key that was sent to you separately.'),
       h('form', { novalidate: 'novalidate', onsubmit: async function (e) {
         e.preventDefault();
         if (busy) return;
@@ -82,6 +82,11 @@
         h('div', { class: 'nav' }, h('button', { type: 'submit', class: 'btn btn-primary', name: 'open-view' }, 'Open'))))));
   }
 
+  /** What the page is and the theme switch, on the screens shown before a link opens. */
+  function loginTop() {
+    return h('div', { class: 'login-top' }, h('span', { class: 'tool-label' }, 'Instructor view'), ui.themeButton());
+  }
+
   async function reload(msg) {
     try { await load(); if (msg) toast(msg, 'ok'); } catch (e) { toast(e.message, 'err'); }
     render();
@@ -93,7 +98,7 @@
     var root = document.getElementById('app');
     ui.clear(root);
     if (S.error) {
-      return root.appendChild(h('div', { class: 'login' }, h('div', { class: 'sheet' }, h('div', { class: 'wrap' },
+      return root.appendChild(h('div', { class: 'login' }, loginTop(), h('div', { class: 'sheet' }, h('div', { class: 'wrap' },
         h('h1', { class: 'step-title' }, 'This link cannot be opened'), h('p', null, S.error)))));
     }
     if (S.askKey) { root.appendChild(keyView()); var el = document.getElementById('access-key'); if (el) el.focus(); return; }
@@ -102,7 +107,7 @@
       h('h1', null, d ? d.form.title : 'Registrations'),
       d && FormMetadata.display(d.form).map(function (item) { return h('span', { class: 'tag-sm' + (item.variant === 'subject' ? ' tag-subject' : '') }, item.value); }),
       h('span', { class: 'muted-note' }, 'Viewing as ' + S.me.client.name),
-      h('button', { type: 'button', class: 'icon-btn', 'aria-label': 'Switch light and dark', onclick: function () { App.theme.toggle(); render(); } }, icon(App.theme.effective() === 'dark' ? 'sun' : 'moon', 20)));
+      ui.themeButton());
     var page = h('div', { class: 'admin-page' }, bar);
     root.appendChild(page);
     if (!d) return page.appendChild(h('div', { class: 'empty' }, 'No forms have been shared with you yet.'));

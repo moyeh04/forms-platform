@@ -64,6 +64,8 @@
 @media (min-width: 561px) { .step-count { display: none; } }
 
 .step-title { font-size: var(--fs-step); margin-bottom: 4px; }
+/* The title of a step takes the focus when the step changes, for a screen reader. It is not a control, so it has no ring. */
+.step-title:focus { outline: none; }
 .step-help { color: var(--mute); margin-bottom: 18px; }
 
 /* Fields: ruled lines, like writing on a map. */

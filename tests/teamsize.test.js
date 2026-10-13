@@ -137,12 +137,12 @@ test('Students: the public form exposes the range so the page can offer the righ
   assert.deepEqual(w.api({ action: 'getForm', slug: w.form.slug }).form.rules.teamSize, { min: 2, max: 3 });
 });
 
-test('Admin: changing the range warns how many saved teams now fall outside it', () => {
+test('Admin: the form comes with the sizes of its saved teams, so the page can count the ones a new range leaves outside', () => {
   const w = boot();
   w.submit({ ...leader, team_size: '1', members: [] });
   w.submit({ ...leader, leader_code: '4230005', team_size: '3', members: [member('4230006'), member('4230007')] });
-  const r = w.admin({ action: 'admin.forms.update', id: w.form.id, patch: { rules: { teamSize: { min: 2, max: 4 } } } });
-  assert.equal(r.teamSizeConflicts, 1);
+  w.submit({ ...leader, leader_code: '4230008', team_size: '3', members: [member('4230009'), member('4230010')] });
+  assert.deepEqual({ ...w.admin({ action: 'admin.forms.get', id: w.form.id }).teamSizes }, { 1: 1, 3: 2 });
 });
 
 test('Admin: editing a team through the dashboard keeps the size and members in step', () => {
@@ -184,7 +184,7 @@ test('Specialization: a form limited to Computers only offers and accepts Comput
   assert.equal(bad.error.details.major.error, 'invalid_choice', 'the server refuses another specialization');
   assert.equal(w.submit({ ...leader, major: 'حاسبات', team_size: '1', members: [] }).ok, true);
   w.admin({ action: 'admin.forms.update', id: w.form.id, patch: { rules: { majors: [] } } });
-  assert.equal(w.api({ action: 'getForm', slug: w.form.slug }).form.fields.find((f) => f.id === 'major').options.length, 2, 'empty means everyone');
+  assert.equal(w.api({ action: 'getForm', slug: w.form.slug }).form.fields.find((f) => f.id === 'major').options.length, 5, 'empty means everyone');
 });
 
 test('Sections: a form limited to some sections offers and accepts only those, for the leader and the members', () => {

@@ -309,12 +309,14 @@ test('Settings: required team parts cannot be switched off', async () => {
   const w = boot();
   const f = w.make('team_registration', 'Projects');
   const p = await openAdmin(w, `#/f/${f.slug}/settings`);
+  // A question that is always asked has no switches to grey out: the row says so.
   ['team_size', 'members', 'leader_code', 'leader_name'].forEach((id) => {
-    const boxes = p.$$(`[data-field="${id}"] input[type="checkbox"]`);
-    assert.equal(boxes.length, 2, id);
-    assert.ok(boxes.every((b) => b.disabled && b.checked), id + ' is locked on');
+    assert.equal(p.$$(`[data-field="${id}"] input[type="checkbox"]`).length, 0, id);
+    assert.equal(p.$(`[data-field="${id}"] .q-show`).textContent, 'Always asked', id);
   });
-  assert.equal(p.$('[data-field="link"] input[type="checkbox"]').disabled, false, 'the Drive link can be hidden');
+  assert.equal(p.$$('[data-field="link"] input[type="checkbox"]').length, 2, 'the Drive link can be hidden or made optional');
+  assert.deepEqual(['team_size', 'link', 'leader_code', 'email'].map((id) => p.$(`[data-field="${id}"] .q-type`).textContent),
+    ['Team size', 'Drive link', 'Student code', 'Email address'], 'a type is named in plain words');
 });
 
 test('Responses: each team is its own tinted block with a leader star and a linked task', async () => {
@@ -441,7 +443,7 @@ test('Reservation teammates: how many, the title students read, and what is aske
   p.type('[name="teammates-title-en"]', 'Who comes with you');
   const phone = p.$('.tm-questions [data-field="phone"] .q-show input');
   phone.checked = false; p.fire(phone, 'change');
-  assert.ok(p.$('.tm-questions [data-field="name"] .q-show input').disabled, 'the name is always asked');
+  assert.equal(p.$('.tm-questions [data-field="name"] .q-show').textContent, 'Always asked');
   p.click('[name="save"]'); await settle(12);
 
   const members = w.admin({ action: 'admin.forms.get', id: f.id }).form.fields.find((x) => x.role === 'members');
@@ -670,10 +672,10 @@ test('Lists: a list with English names is rows that can be added to and reordere
   assert.ok(p.$('.used-by').textContent.includes('Projects'), 'the forms that ask the list are named');
   p.type('[name="new-value"]', 'كهرباء'); p.type('[name="new-en"]', 'Power');
   p.click('[name="add-choice"]');
-  p.click('.choice[data-i="2"] [aria-label="Move up"]');
+  p.click('.choice[data-i="5"] [aria-label="Move up"]');
   p.click('[name="save-list"]'); await settle(8);
   const major = w.api({ action: 'getForm', slug: f.slug }).form.fields.find((x) => x.id === 'major');
-  assert.deepEqual(major.options.map((o) => o.label.en), ['Computers', 'Power', 'Communications']);
+  assert.deepEqual(major.options.map((o) => o.label.en), ['Computers', 'Communications', 'Architecture', 'Mechanical', 'Power', 'Civil']);
 });
 
 test('Lists: a refused save says why next to the choices, and a removed choice names the form limited to it', async () => {
@@ -708,9 +710,15 @@ test('Lists: sections are built from year groups and counts, without typing', as
   assert.equal(p.$('[name="count-4C-O"]').value, '3');
   assert.ok(p.$('.savebar').hidden);
   assert.equal(p.$('[name="add-group"]'), null, 'Add appears once a year and a letter are picked');
-  p.click('[name="group-year-3"]'); p.click('[name="group-letter-L"]');
+  assert.equal(p.$('[name="group-missing"]').textContent, 'Pick a year and a department letter.');
+  assert.deepEqual(p.$$('[name^="group-year-"]').map((n) => n.textContent), ['1', '2', '3', '4', '5'], 'a student is in year 1 to 5');
+  assert.deepEqual(p.$$('[name^="group-letter-"]').map((n) => n.textContent), ['C', '+ New letter'], 'the letters are the ones the lists use');
+  p.click('[name="group-year-3"]');
+  assert.equal(p.$('[name="group-missing"]').textContent, 'Now pick a department letter.');
+  p.click('[name="group-letter-add"]'); p.type('[name="group-letter-new"]', 'l');
   assert.ok(p.$('[name="add-group"]').textContent.includes('Add 3L with the same kinds as 4C'));
   p.click('[name="add-group"]');
+  assert.equal(p.$('[name="group-letter-L"]').textContent, 'L', 'a letter that was typed once is a chip from then on');
   assert.equal(p.$('[name="count-3L-TH"]').value, '8');
   p.click('[name="count-3L-TH-down"]'); p.click('[name="count-3L-TH-down"]');
   p.click('[name="count-3L-O-down"]'); p.click('[name="count-3L-O-down"]'); p.click('[name="count-3L-O-down"]');
@@ -759,7 +767,7 @@ test('Lists: a new list of sections, picked for the section question of one form
   p.click('[name="create-list"]'); await settle(8);
   assert.equal(p.win.location.hash, '#/lists/third_year');
   assert.ok(p.$('[name="delete-list"]'), 'a list no form asks can be deleted');
-  p.click('[name="group-year-3"]'); p.click('[name="group-letter-L"]'); p.click('[name="add-group"]');
+  p.click('[name="group-year-3"]'); p.click('[name="group-letter-add"]'); p.type('[name="group-letter-new"]', 'L'); p.click('[name="add-group"]');
   assert.equal(p.$('[name="count-3L-TH"]').value, '1', 'the first group starts with one TH');
   p.click('[name="add-kind-3L-T"]'); p.click('[name="count-3L-T-up"]');
   p.click('[name="save-list"]'); await settle(8);
@@ -903,6 +911,8 @@ test('Responses and clients: list rows carry their column names, and the day she
   assert.deepEqual(clients.$$('.data-table.cards tbody td[data-label]').map((c) => c.dataset.label), ['Can see', 'Hidden columns', 'Can review', 'Link', 'Access key']);
 
   const seminar = w.admin({ action: 'admin.forms.create', type: 'reservation', title: 'Seminar', term: 'Fall 2027' }).form;
+  assert.equal((await openAdmin(w, `#/f/${seminar.slug}`)).$('.tool-group'), null, 'no day sheet to print while the form has no days');
+  w.admin({ action: 'admin.forms.update', id: seminar.id, patch: { slots: { days: [{ label: 'Sunday', times: ['12:30 - 12:50'] }], capacity: 1 } } });
   const res = await openAdmin(w, `#/f/${seminar.slug}`);
   const group = res.$('.tool-group');
   assert.equal(group.getAttribute('aria-label'), 'Print a day sheet');
@@ -957,10 +967,9 @@ test('Setup: a section shows what it is set to, and the save bar exists only whi
   p.type('[name="keyDays"]', '7');
   assert.ok(p.$('.savebar').hidden, 'back to the saved value, so there is nothing to save');
 
-  p.pick('status', 'open');
-  assert.equal(p.$('.savebar').hidden, false);
+  p.type('[name="keyDays"]', '5');
   p.click('[name="save"]'); await settle(12);
-  assert.equal(w.admin({ action: 'admin.forms.get', id: f.id }).form.status, 'open');
+  assert.equal(w.admin({ action: 'admin.forms.get', id: f.id }).form.editKey.days, 5);
   assert.ok(p.$('.savebar').hidden);
   assert.equal(p.$('[data-panel="Edit key"] .panel-body').hidden, false, 'a section stays open after a save');
 
@@ -1233,4 +1242,71 @@ test('Responses: Download all is not offered before anyone registers', async () 
   const f = w.make('team_registration', 'Projects');
   const p = await openAdmin(w, '#/f/' + f.slug + '/responses');
   assert.equal(p.$('[name="download-all"]'), null);
+});
+
+test('Form header: the same on every tab, and the status is saved where it is changed', async () => {
+  const w = boot();
+  const f = w.make('team_registration', 'Projects');
+  const actions = (p) => p.$$('.page-head > a, .page-head > button, .page-head summary, .page-head [role="menuitem"]').map((n) => n.textContent);
+  const responses = await openAdmin(w, `#/f/${f.slug}`);
+  const setup = await openAdmin(w, `#/f/${f.slug}/settings`);
+  assert.deepEqual(actions(responses), ['Open form', 'Copy link', 'More', 'Open Google Sheet', 'Rebuild sheet', 'Duplicate for a new term', 'Delete form']);
+  assert.deepEqual(actions(setup), actions(responses));
+  assert.equal(responses.$('.toolbar [name="rebuild"]'), null, 'Rebuild sheet is under More, not among the tools');
+  responses.click('[name="rebuild"]'); await settle(8);
+  assert.ok(responses.text().includes('Google Sheet views rebuilt'));
+
+  assert.equal(responses.$('[name="status"]').value, 'open');
+  w.advanceDays(0.001);
+  responses.pick('status', 'closed'); await settle(8);
+  assert.equal(w.admin({ action: 'admin.forms.get', id: f.id }).form.status, 'closed', 'no Save is needed on Responses');
+  assert.ok(responses.text().includes('Status saved: Closed'));
+
+  // On Setup the status is not one of the unsaved changes, and a later Save still passes.
+  setup.pick('status', 'draft'); await settle(8);
+  assert.ok(setup.$('.head-note').textContent.includes('The status is still Open.'), 'a copy that is out of date is refused, with the reason');
+  assert.equal(setup.$('[name="status"]').value, 'open', 'and the saved status is back in the control');
+  const fresh = await openAdmin(w, `#/f/${f.slug}/settings`);
+  w.advanceDays(0.001);
+  fresh.pick('status', 'open'); await settle(8);
+  assert.ok(fresh.$('.savebar').hidden, 'nothing waits for Save');
+  fresh.type('[name="title"]', 'Projects 2'); fresh.click('[name="save"]'); await settle(12);
+  const saved = w.admin({ action: 'admin.forms.get', id: f.id }).form;
+  assert.deepEqual([saved.status, saved.title], ['open', 'Projects 2']);
+});
+
+test('Forms list: grouped by status, a reservation with no days says so, and a first booking is offered only where teams are', async () => {
+  const w = boot();
+  const teams = w.make('team_registration', 'Projects');
+  const chat = w.make('whatsapp_registration', 'Groups');
+  const seminar = w.make('reservation', 'Seminar', { slots: { days: [], capacity: 1 } });
+  const draft = w.admin({ action: 'admin.forms.create', type: 'task_submission', title: 'Tasks', term: 'Fall 2027' }).form;
+  const p = await openAdmin(w);
+  assert.deepEqual(p.$$('.form-group').map((g) => [g.dataset.status, g.querySelector('.group-title').textContent]), [['open', 'Open3'], ['draft', 'Draft1']]);
+  const card = (f) => p.$(`.card[data-slug="${f.slug}"]`);
+  assert.ok(card(draft).closest('[data-status="draft"]'));
+  assert.ok(card(seminar).querySelector('[name="no-days"]').getAttribute('href').endsWith('/timetable'), 'the note leads to where days are added');
+  assert.ok(card(teams).querySelector('[name="next-booking"]'));
+  assert.equal(card(chat).querySelector('[name="next-booking"]'), null, 'a form of single students is not offered a booking');
+  assert.equal(card(seminar).querySelector('[name="next-booking"]'), null);
+  assert.deepEqual([...card(teams).querySelectorAll('.card-actions > a')].map((a) => a.textContent), ['Responses', 'Setup', 'Open form'], 'the card names the tab as the tab does');
+});
+
+test('Team size: the panel counts the saved teams a new range leaves outside, before the save', async () => {
+  const w = boot();
+  const f = w.make('team_registration', 'Projects');
+  submit(w, f, person({ title: 'Alpha' }));
+  submit(w, f, person({ leader_code: '4230010', title: 'Beta', members: [member('سارة خالد حسن علي', '4230011'), member('منى أشرف كمال فؤاد', '4230012')] }));
+  const p = await openAdmin(w, `#/f/${f.slug}/questions`);
+  const note = () => p.$('[name="size-conflicts"]');
+  assert.ok(note().hidden, 'every saved team fits the range');
+  p.type('[name="teamMin"]', '2');
+  assert.equal(note().hidden, false);
+  assert.ok(note().textContent.startsWith('1 saved team is outside 2 to '));
+  p.type('[name="teamMin"]', '4'); p.type('[name="teamMax"]', '4');
+  assert.ok(note().textContent.startsWith('2 saved teams are outside 4.'));
+  p.type('[name="teamMin"]', '2'); p.type('[name="teamMax"]', '5');
+  p.click('[name="save"]'); await settle(12);
+  assert.equal(p.$$('.toast-err').length, 0, 'the save says nothing the panel did not say');
+  assert.ok(note().textContent.startsWith('1 saved team is outside 2 to 5.'), 'the count is still in its panel after the save');
 });

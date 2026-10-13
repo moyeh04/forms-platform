@@ -111,5 +111,15 @@
     return { team: 'team', calendar: 'calendar', task: 'task', chat: 'chat' }[name] || null;
   }
 
-  App.ui = { h: h, icon: icon, clear: clear, toast: toast, confirm: confirmDialog, copyText: copyText, formIcon: formIcon };
+  /** The light and dark switch every page has. It changes its own icon, so nothing typed on the page is lost. */
+  function themeButton(label) {
+    var face = function () { return icon(App.theme.effective() === 'dark' ? 'sun' : 'moon', 20); };
+    var btn = h('button', { type: 'button', class: 'icon-btn', name: 'theme', 'aria-label': label || 'Switch light and dark', onclick: function () {
+      App.theme.toggle();
+      clear(btn).appendChild(face());
+    } }, face());
+    return btn;
+  }
+
+  App.ui = { h: h, icon: icon, clear: clear, toast: toast, confirm: confirmDialog, copyText: copyText, formIcon: formIcon, themeButton: themeButton };
 })(window.App = window.App || {});

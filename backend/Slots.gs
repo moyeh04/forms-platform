@@ -52,11 +52,3 @@ function slotLabel_(form, key) {
   return (p.day ? p.day.label : p.dayId) + '  -  ' + p.time;
 }
 
-/** Bookings whose slot no longer exists in the configuration. */
-function orphanedBookings_(form) {
-  var valid = {};
-  ((form.slots && form.slots.days) || []).forEach(function (d) {
-    d.times.forEach(function (t) { valid[Rules.slotKey(d.id, t)] = true; });
-  });
-  return readResponses(form).filter(function (r) { return r.slot && !valid[r.slot]; }).length;
-}

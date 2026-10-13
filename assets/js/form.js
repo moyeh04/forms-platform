@@ -147,10 +147,7 @@
         render();
       } }, t('langToggle')));
     }
-    bar.appendChild(h('button', { type: 'button', class: 'icon-btn', 'aria-label': t('themeToggle'), onclick: function () {
-      App.theme.toggle();
-      render();
-    } }, icon(App.theme.effective() === 'dark' ? 'sun' : 'moon', 20)));
+    bar.appendChild(App.ui.themeButton(t('themeToggle')));
     return bar;
   }
 
@@ -244,6 +241,8 @@
     // Save exists only when an answer differs from the saved registration.
     if (hub() && last && !changed()) primary = h('p', { class: 'help no-changes' }, t('noChanges'));
     var back = S.stepIndex > 0 && !hub() ? h('button', { type: 'button', class: 'btn btn-quiet', onclick: function () { go(S.stepIndex - 1); } }, t('back')) : null;
+    // The summary of a registration opened with a key is also the way out of it.
+    if (hub() && last) back = closeButton();
     var nav = h('div', { class: 'nav' }, back, primary);
     var help = !step.review ? null : hub() ? t('yourRegistrationHelp') : t(S.form.editKey && S.form.editKey.enabled ? 'reviewHelpKey' : 'reviewHelp');
     var f = h('form', { novalidate: 'novalidate', onsubmit: function (e) { e.preventDefault(); if (!S.busy) next(); } },
@@ -254,7 +253,9 @@
     var cancel = S.mode === 'edit' && S.keyInfo.canDelete && last
       ? h('p', { class: 'foot' }, h('button', { type: 'button', class: 'link-btn', onclick: askCancel }, t('cancelReg')))
       : null;
-    return sheet(head(), edit, hub() ? transferNotes() : null, hub() ? null : trail(), bannerEl(), f, cancel, S.mode === 'new' && S.stepIndex === 0 ? editLink() : null);
+    // A booking made with a team's key starts with that key, so the page asks for a key in one place only:
+    // a team that has booked is told so there, with the way to its booking.
+    return sheet(head(), edit, hub() ? transferNotes() : null, hub() ? null : trail(), bannerEl(), f, cancel, S.mode === 'new' && S.stepIndex === 0 && !keyMode() ? editLink() : null);
   }
 
   /* ── Fields ─────────────────────────────────────────────────── */
@@ -364,7 +365,8 @@
     if (S.errors[path]) { delete S.errors[path]; paintError(path); }
   }
 
-  var PLACEHOLDERS = { email: 'name@example.com', phone: '01012345678', drive_link: 'https://drive.google.com/...' };
+  // A hint of the shape of an answer. It must not read as an answer that is already there.
+  var PLACEHOLDERS = { email: 'name@example.com', phone: '01xxxxxxxxx', drive_link: 'https://drive.google.com/...' };
 
   function textControl(field, path, id) {
     var isArea = field.type === 'textarea';
@@ -639,7 +641,8 @@
         h('p', { class: 'step-help' }, t('teamIs') + ' (' + S.team.ref + ')'),
         teamSummary(),
         S.teamBooked ? h('div', { class: 'banner', role: 'alert' }, t('teamBooked'), ' ',
-          h('button', { type: 'button', class: 'link-btn', onclick: function () { S.view = 'keyEntry'; S.keyError = ''; render(); } }, t('editOpen'))) : null,
+          // The key that found the team usually opens its booking too; when it does not, the key screen says so.
+          h('button', { type: 'button', class: 'link-btn', name: 'open-booking', onclick: function () { S.view = 'keyEntry'; S.keyError = ''; openByKey(S.sourceKey); } }, t('editOpen'))) : null,
         h('p', { class: 'foot' }, h('button', { type: 'button', class: 'link-btn', name: 'other-key', onclick: function () { S.team = null; S.teamBooked = false; S.sourceKey = ''; S.teamKey = ''; S.teamError = ''; render(); } }, t('otherKey')))
       ];
     }
@@ -908,7 +911,16 @@
       h('div', { class: 'banner info', role: 'status' }, t('editing', { ref: S.keyInfo.ref }) + '. ' + t(S.keyInfo.locked ? 'deadlineLocked' : 'readOnly')),
       transferNotes(), bannerEl(),
       groups,
-      S.keyInfo.canDelete ? h('div', { class: 'nav' }, h('button', { type: 'button', class: 'btn btn-danger', onclick: askCancel }, icon('trash', 20), t('cancelReg'))) : null);
+      h('div', { class: 'nav' }, closeButton(), S.keyInfo.canDelete ? h('button', { type: 'button', class: 'btn btn-danger', onclick: askCancel }, icon('trash', 20), t('cancelReg')) : null));
+  }
+
+  /** Leaves a registration that was opened with a key. Changes that were not saved are lost only after a yes. */
+  function closeButton() {
+    var unsaved = S.view === 'form' && changed();
+    return h('button', { type: 'button', class: 'btn btn-quiet', name: 'close-edit', onclick: async function () {
+      if (unsaved && !(await App.ui.confirm({ title: t('leaveTitle'), body: t('leaveBody'), confirmText: t('leaveYes'), cancelText: t('leaveNo'), danger: true }))) return;
+      resetForNew();
+    } }, t(unsaved ? 'closeUnsaved' : 'closeEdit'));
   }
 
   async function askCancel() {
@@ -933,7 +945,7 @@
     S.mode = 'new'; S.key = ''; S.keyInfo = null; S.data = {}; S.errors = {}; S.banner = null; S.stepIndex = 0; S.ownSlot = '';
     S.team = null; S.teamBooked = false; S.sourceKey = ''; S.teamKey = ''; S.teamError = '';
     buildSteps();
-    refreshAvailability().then(function () { S.view = 'form'; render(); });
+    refreshAvailability().then(function () { S.view = S.state === 'open' ? 'form' : 'closed'; render(); });
   }
 
   function ticketView() {

@@ -29,8 +29,6 @@
     var all = both[1].submissions;
     var transfers = both[1].transfers || [];
     var state = { q: '', status: 'all', tab: form.type === 'whatsapp_registration' && form.matching && form.matching.enabled ? 'matching' : 'list' };
-    var link = A.formLink(form.slug);
-    var t = A.TYPES[form.type] || { label: form.type };
 
     var content = h('div');
     var stats = h('div', { class: 'stats' });
@@ -109,27 +107,20 @@
       // Shown only once there is something to download.
       if (all.length) tools.push(h('button', { type: 'button', class: 'btn btn-quiet sm', name: 'download-all', onclick: function () { A.downloadAll(form); } }, icon('download', 18), form.type === 'task_submission' ? 'Download all tasks' : 'Download all projects'));
     }
-    if (form.type === 'reservation') {
-      var day = ((form.slots && form.slots.days) || [])[0];
-      var dayId = day ? day.id : '';
+    // A day sheet needs a day: a reservation with no days yet has nothing to print.
+    if (form.type === 'reservation' && ((form.slots && form.slots.days) || []).length) {
+      var day = form.slots.days[0];
+      var dayId = day.id;
       var empty = false;
       var daySel = A.select(dayId, ((form.slots && form.slots.days) || []).map(function (d) { return [d.id, d.label]; }), function (v) { dayId = v; });
       daySel.setAttribute('aria-label', 'Day to print');
       // One labelled group, so the day and the option stay next to the button they belong to.
       tools.push(h('div', { class: 'tool-group', role: 'group', 'aria-label': 'Print a day sheet' }, h('span', { class: 'tool-label' }, 'Day sheet'), daySel,
         A.check('Include empty slots', false, function (v) { empty = v; }),
-        h('button', { type: 'button', class: 'btn btn-quiet sm', name: 'printDay', onclick: function (e) { if (!dayId) return toast('Add a day in the settings first.', 'err'); printOut(e.currentTarget, 'admin.print.reservations', { dayId: dayId, includeEmpty: empty }); } }, icon('printer', 18), 'Print this day')));
+        h('button', { type: 'button', class: 'btn btn-quiet sm', name: 'printDay', onclick: function (e) { printOut(e.currentTarget, 'admin.print.reservations', { dayId: dayId, includeEmpty: empty }); } }, icon('printer', 18), 'Print this day')));
     }
-    tools.push(h('button', { type: 'button', class: 'btn btn-quiet sm', name: 'rebuild', title: 'Write the tabs of the Google Sheet again from the saved answers. Use it when the sheet looks out of date.', onclick: function (e) {
-      A.busy(e.currentTarget, async function () { await A.call('admin.views.rebuild', { slug: form.slug }); toast('Google Sheet views rebuilt', 'ok'); });
-    } }, 'Rebuild sheet'));
-
     ui.clear(mount);
-    mount.appendChild(h('div', { class: 'page-head' },
-      h('h2', null, form.title), A.termTags(form), A.badge(A.STATUS_LABEL[form.status] || form.status, form.status),
-      h('span', { class: 'muted-note' }, t.label),
-      h('a', { class: 'btn btn-quiet sm', href: form.sheetUrl, target: '_blank', rel: 'noopener' }, 'Google Sheet'),
-      h('button', { type: 'button', class: 'btn btn-quiet sm', onclick: async function () { toast((await ui.copyText(link)) ? 'Form link copied' : 'Could not copy', 'ok'); } }, icon('link', 18), 'Copy form link')));
+    mount.appendChild(A.formHead(form));
     mount.appendChild(A.formTabs(form, 'responses'));
     paintStats();
     mount.appendChild(stats);

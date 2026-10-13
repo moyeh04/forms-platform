@@ -233,15 +233,15 @@ function checkLimits_(form, data, rows, selfId) {
   }
 }
 
-/** How many saved teams fall outside the allowed team size range. */
-function teamSizeConflicts_(form) {
-  var range = Rules.teamSizeRange(form);
+/** How many saved teams have each size: { "3": 2, "5": 7 }. A team with no size counts under 0. */
+function teamSizes_(form) {
   var field = Rules.fieldByRole(form, 'team_size');
-  if (!field) return 0;
-  return readResponses(form).filter(function (r) {
-    var n = parseInt(r.data[field.id], 10);
-    return isNaN(n) || n < range.min || n > range.max;
-  }).length;
+  var sizes = {};
+  readResponses(form).forEach(function (r) {
+    var n = parseInt(r.data[field.id], 10) || 0;
+    sizes[n] = (sizes[n] || 0) + 1;
+  });
+  return sizes;
 }
 
 /* ── Drive links ──────────────────────────────────────────────── */

@@ -19,6 +19,8 @@
       pages: ['About you', 'Study details', 'Schedule'], next: ['Paste the join requests under Responses to match them.'] }
   };
   A.STATUS_LABEL = { draft: 'Draft', open: 'Open', closed: 'Closed', archived: 'Archived' };
+  // The order of the forms list: what students can reach now comes first.
+  A.STATUSES = ['open', 'draft', 'closed', 'archived'];
   A.SUB_STATUSES = ['new', 'in_review', 'approved', 'rejected', 'done'];
   A.SUB_LABEL = { new: 'New', in_review: 'In review', approved: 'Approved', rejected: 'Rejected', done: 'Done', pending: 'Pending' };
   A.REVIEW = ['pending', 'approved', 'rejected'];
@@ -207,6 +209,58 @@
     }));
   };
 
+  /**
+   * The header every tab of a form shows: what the form is, its status, and the same actions.
+   * The status is saved the moment it is changed, on every tab, so the header never shows a status
+   * that is not the saved one. A refused change puts the saved status back and says why.
+   */
+  A.formHead = function (form) {
+    var t = A.TYPES[form.type] || { label: form.type };
+    var link = A.formLink(form.slug);
+    var refused = h('p', { class: 'error head-note', role: 'alert', hidden: true });
+    var statusSel = A.select(form.status, A.STATUSES.map(function (st) { return [st, st === 'draft' ? 'Draft (hidden)' : A.STATUS_LABEL[st]]; }), function (v) {
+      var was = form.status;
+      refused.hidden = true;
+      statusSel.disabled = true;
+      A.call('admin.forms.update', { id: form.id, base: form.updatedAt, patch: { status: v } }).then(function (out) {
+        form.status = out.form.status;
+        form.updatedAt = out.form.updatedAt;
+        toast('Status saved: ' + A.STATUS_LABEL[form.status], 'ok');
+      }, function (e) {
+        statusSel.value = was;
+        refused.textContent = 'The status is still ' + A.STATUS_LABEL[was] + '. ' + A.message(e);
+        refused.hidden = false;
+      }).then(function () { statusSel.disabled = false; statusSel.dataset.status = form.status; });
+    });
+    statusSel.name = 'status';
+    statusSel.dataset.status = form.status;
+    return h('div', { class: 'page-head' },
+      h('h2', null, form.title), A.termTags(form), h('span', { class: 'muted-note' }, t.label),
+      h('label', { class: 'status-pick' }, h('span', { class: 'tool-label' }, 'Status'), statusSel),
+      h('a', { class: 'btn btn-quiet sm', href: link, target: '_blank', rel: 'noopener' }, 'Open form'),
+      copyLink(form, link),
+      A.formMore(form, function () { A.unsaved = false; window.location.hash = '#/'; }),
+      refused);
+  };
+
+  function copyLink(form, link) {
+    return h('button', { type: 'button', class: 'btn btn-quiet sm', name: 'copy-link', 'aria-label': 'Copy the link of ' + form.title, onclick: async function () { toast((await ui.copyText(link)) ? 'Form link copied' : 'Could not copy', 'ok'); } }, icon('link', 18), 'Copy link');
+  }
+
+  /** What is done to a form less often, the same on its card and in its header. */
+  A.formMore = function (f, afterDelete) {
+    var more = h('details', { class: 'more' },
+      h('summary', { class: 'btn btn-quiet sm', 'aria-label': 'More actions for ' + f.title }, icon('menu', 18), 'More'),
+      h('div', { class: 'more-menu', role: 'menu' },
+        f.sheetUrl ? h('a', { role: 'menuitem', href: f.sheetUrl, target: '_blank', rel: 'noopener' }, icon('task', 16), 'Open Google Sheet') : null,
+        h('button', { type: 'button', role: 'menuitem', name: 'rebuild', title: 'Write the tabs of the Google Sheet again from the saved answers. Use it when the sheet looks out of date.', onclick: function (e) {
+          A.busy(e.currentTarget, async function () { await A.call('admin.views.rebuild', { slug: f.slug }); more.open = false; toast('Google Sheet views rebuilt', 'ok'); });
+        } }, icon('refresh', 16), 'Rebuild sheet'),
+        h('button', { type: 'button', role: 'menuitem', onclick: function () { more.open = false; duplicateDialog(f); } }, icon('copy', 16), 'Duplicate for a new term'),
+        h('button', { type: 'button', role: 'menuitem', class: 'danger', name: 'delete-form', 'aria-label': 'Delete ' + f.title, onclick: function () { more.open = false; A.deleteForm(f, afterDelete); } }, icon('trash', 16), 'Delete form')));
+    return more;
+  };
+
   /** Changes the address without drawing the page again. */
   A.setHash = function (hash) { window.history.replaceState(null, '', hash); shown = hash; };
 
@@ -241,7 +295,7 @@
         h('h1', null, 'Forms dashboard'),
         h('nav', { class: 'admin-nav', 'aria-label': 'Sections' },
           navLink('#/', 'Forms', group === 'forms'), navLink('#/clients', 'Clients', group === 'clients'), navLink('#/lists', 'Lists', group === 'lists')),
-        h('button', { type: 'button', class: 'icon-btn', 'aria-label': 'Switch light and dark', onclick: function () { App.theme.toggle(); render(); } }, icon(App.theme.effective() === 'dark' ? 'sun' : 'moon', 20)),
+        ui.themeButton(),
         h('button', { type: 'button', class: 'icon-btn', 'aria-label': 'Log out', onclick: function () { App.api.setPin(''); render(); } }, icon('logout', 20), h('span', { class: 'btn-text' }, 'Log out'))),
       mount));
     var view = A.views[r.name];
@@ -301,7 +355,7 @@
       h('p', { class: 'help' }, 'Enter the admin PIN you set from the Forms Platform menu in the registry sheet.'),
       h('label', { class: 'field', for: 'pin' }, h('span', { class: 'label' }, 'Admin PIN')),
       pin, err, h('div', { class: 'nav' }, btn));
-    root.appendChild(h('div', { class: 'login' }, h('div', { class: 'sheet' }, h('div', { class: 'wrap' }, form))));
+    root.appendChild(h('div', { class: 'login' }, h('div', { class: 'login-top' }, ui.themeButton()), h('div', { class: 'sheet' }, h('div', { class: 'wrap' }, form))));
     pin.focus();
   }
 
@@ -309,6 +363,7 @@
 
   A.views.forms = async function (mount) {
     var res = await A.call('admin.forms.list');
+    // Grouped by status, and inside a status the newest form first.
     var forms = res.forms.slice().sort(function (a, b) { return String(b.createdAt).localeCompare(String(a.createdAt)); });
     ui.clear(mount);
     mount.appendChild(h('div', { class: 'page-head' }, h('h2', null, 'Forms'),
@@ -320,45 +375,49 @@
     // A booking that is opened with the keys of a form is listed under that form, not as a card of its own.
     var ids = forms.map(function (f) { return f.id; });
     var under = function (f) { var src = bookedBy(f); return src && ids.indexOf(src) !== -1 ? src : ''; };
-    mount.appendChild(h('div', { class: 'cards' }, forms.filter(function (f) { return !under(f); }).map(function (f) {
-      return formCard(f, forms.filter(function (k) { return under(k) === f.id; }));
-    })));
+    var cards = forms.filter(function (f) { return !under(f); });
+    var known = function (f) { return A.STATUSES.indexOf(f.status) !== -1 ? f.status : 'draft'; };
+    A.STATUSES.forEach(function (st) {
+      var group = cards.filter(function (f) { return known(f) === st; });
+      if (!group.length) return;
+      mount.appendChild(h('section', { class: 'form-group', dataset: { status: st } },
+        h('h3', { class: 'group-title' }, A.STATUS_LABEL[st], h('span', { class: 'group-count' }, String(group.length))),
+        h('div', { class: 'cards' }, group.map(function (f) { return formCard(f, forms.filter(function (k) { return under(k) === f.id; })); }))));
+    });
   };
 
   function formCard(f, kids) {
     var t = A.TYPES[f.type] || { label: f.type, icon: 'task' };
     var link = A.formLink(f.slug);
-    var more = h('details', { class: 'more' },
-      h('summary', { class: 'btn btn-quiet sm', 'aria-label': 'More actions for ' + f.title }, icon('menu', 18), 'More'),
-      h('div', { class: 'more-menu', role: 'menu' },
-        f.sheetUrl ? h('a', { role: 'menuitem', href: f.sheetUrl, target: '_blank', rel: 'noopener' }, icon('task', 16), 'Open Google Sheet') : null,
-        h('button', { type: 'button', role: 'menuitem', onclick: function () { more.open = false; duplicateDialog(f); } }, icon('copy', 16), 'Duplicate for a new term'),
-        h('button', { type: 'button', role: 'menuitem', class: 'danger', name: 'delete-form', 'aria-label': 'Delete ' + f.title, onclick: function () { more.open = false; A.deleteForm(f); } }, icon('trash', 16), 'Delete form')));
     return h('article', { class: 'card' + (kids && kids.length ? ' has-series' : ''), dataset: { slug: f.slug } },
       h('div', { class: 'card-top' }, h('span', { class: 'card-icon' }, icon(t.icon, 22)),
-        h('div', null, h('h3', null, f.title), h('div', { class: 'card-tags' }, A.termTags(f)))),
-      h('div', { class: 'actions' }, A.badge(A.STATUS_LABEL[f.status] || f.status, f.status), h('span', { class: 'muted-note' }, t.label)),
+        h('div', null, h('h4', null, f.title), h('div', { class: 'card-tags' }, A.termTags(f)))),
+      h('div', { class: 'actions' }, A.badge(A.STATUS_LABEL[f.status] || f.status, f.status), h('span', { class: 'muted-note' }, t.label), f.type === 'reservation' ? daysNote(f) : null),
       h('div', { class: 'actions card-actions' },
         h('a', { class: 'btn btn-primary sm', href: '#/f/' + encodeURIComponent(f.slug) }, 'Responses'),
-        h('a', { class: 'btn btn-quiet sm', href: '#/f/' + encodeURIComponent(f.slug) + '/settings' }, 'Settings'),
+        h('a', { class: 'btn btn-quiet sm', href: '#/f/' + encodeURIComponent(f.slug) + '/settings' }, 'Setup'),
         h('a', { class: 'btn btn-quiet sm', href: link, target: '_blank', rel: 'noopener' }, 'Open form'),
-        h('button', { type: 'button', class: 'btn btn-quiet sm', 'aria-label': 'Copy the link of ' + f.title, onclick: async function () { toast((await ui.copyText(link)) ? 'Form link copied' : 'Could not copy', 'ok'); } }, icon('link', 18), 'Copy link'),
-        more),
-      issuesKeys(f) ? series(f, kids || []) : null);
+        copyLink(f, link),
+        A.formMore(f)),
+      series(f, kids || []));
   }
 
   /** A form that gives its students a key can have bookings that are opened with that key. */
   function issuesKeys(f) { return f.type !== 'reservation' && !!(f.editKey && f.editKey.enabled); }
+  /** The first booking is offered where teams are: a team or a task form. */
+  function hasTeams(f) { return f.type === 'team_registration' || f.type === 'task_submission'; }
   function bookedBy(f) { return f.type === 'reservation' && f.keyBooking && f.keyBooking.enabled ? f.keyBooking.source : ''; }
 
-  function daysText(f) {
+  /** The days a reservation offers. One with no days cannot be booked, so it says so and leads to the timetable. */
+  function daysNote(f) {
     var days = ((f.slots && f.slots.days) || []);
-    if (!days.length) return 'No days yet';
-    return days.length === 1 ? days[0].label : days[0].label + ' to ' + days[days.length - 1].label;
+    if (!days.length) return h('a', { class: 'badge none', name: 'no-days', href: '#/f/' + encodeURIComponent(f.slug) + '/timetable' }, 'No days yet');
+    return h('span', { class: 'muted-note' }, days.length === 1 ? days[0].label : days[0].label + ' to ' + days[days.length - 1].label);
   }
 
   /** The bookings under a registration form, newest first, and the button that makes the next one. */
   function series(f, kids) {
+    if (!kids.length && !(issuesKeys(f) && hasTeams(f))) return null;
     var make = function (title, btn) {
       return A.busy(btn, async function () {
         var res = await A.call('admin.bookings.next', { source: f.id, title: title || '' });
@@ -377,6 +436,8 @@
       ]);
     } }, icon('plus', 16), kids.length ? 'New booking, one week later' : 'Add a booking for this form');
     if (!kids.length) return h('div', { class: 'series' }, next);
+    // Bookings made earlier stay listed; a new one is offered only while the form still gives keys.
+    if (!issuesKeys(f)) next = null;
     // Folded until asked for: a form can have a booking for every week of a term. The fold shows the newest one.
     var box = h('details', { class: 'series', open: seriesOpen(f.id), ontoggle: function () { seriesOpen(f.id, box.open); } },
       h('summary', { name: 'bookings-' + f.slug }, icon('calendar', 18), 'Bookings', h('span', { class: 'series-count' }, String(kids.length)),
@@ -385,7 +446,7 @@
         var link = A.formLink(k.slug);
         return h('li', { dataset: { booking: k.slug } },
           h('a', { class: 'series-title', href: '#/f/' + encodeURIComponent(k.slug) }, k.title),
-          h('span', { class: 'series-meta' }, A.badge(A.STATUS_LABEL[k.status] || k.status, k.status), h('span', { class: 'muted-note' }, daysText(k))),
+          h('span', { class: 'series-meta' }, A.badge(A.STATUS_LABEL[k.status] || k.status, k.status), daysNote(k)),
           h('span', { class: 'series-links' },
             h('a', { class: 'link-btn', href: '#/f/' + encodeURIComponent(k.slug) + '/timetable' }, 'Timetable'),
             h('button', { type: 'button', class: 'link-btn', 'aria-label': 'Copy the link of ' + k.title, onclick: async function () { toast((await ui.copyText(link)) ? 'Booking link copied' : 'Could not copy', 'ok'); } }, 'Copy link')));

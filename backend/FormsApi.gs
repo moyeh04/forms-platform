@@ -27,6 +27,8 @@ API['admin.forms.get'] = admin(function (req) {
     out.taken = slotAvailability_(form);
     out.keySources = keyBookingSources_(form).map(function (s) { return { id: s.id, title: s.title, term: FormMetadata.slug(s) }; });
   }
+  // The team size panel counts the saved teams that a new range would leave outside.
+  if (Rules.fieldByRole(form, 'team_size')) out.teamSizes = teamSizes_(form);
   return out;
 });
 
@@ -36,11 +38,7 @@ API['admin.forms.create'] = admin(function (req) {
 
 /** req: id, patch, and base (the `updatedAt` of the copy the page showed, so a newer save is not overwritten). */
 API['admin.forms.update'] = admin(function (req) {
-  var f = updateForm(req.id, req.patch || {}, req.base);
-  var out = { form: f };
-  if (req.patch && req.patch.slots && f.type === 'reservation') out.orphanedBookings = orphanedBookings_(f);
-  if (req.patch && req.patch.rules && req.patch.rules.teamSize) out.teamSizeConflicts = teamSizeConflicts_(f);
-  return out;
+  return { form: updateForm(req.id, req.patch || {}, req.base) };
 });
 
 API['admin.forms.duplicate'] = admin(function (req) {

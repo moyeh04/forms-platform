@@ -193,3 +193,21 @@ test('Teams: a card shows the number the team was given, with a gap where a team
   const p = await openViewer(w, w.client());
   assert.deepEqual(p.$$('.team-no').map((n) => n.textContent), ['Team 1', 'Team 3']);
 });
+
+test('Instructor link: the key screen says what the page is, and switching the theme keeps the typed key', async () => {
+  const w = boot();
+  w.make('team_registration', 'Projects');
+  const made = w.admin({ action: 'admin.clients.create', name: 'Dr. Ahmed', forms: ['*'], withKey: true });
+  const p = await openViewer(w, made.token);
+  assert.ok(p.$('#access-key'), 'the link asks for its key');
+  assert.equal(p.$('.login-top .tool-label').textContent, 'Instructor view');
+  assert.ok(p.text().includes('a private page for an instructor'));
+  assert.ok(!p.text().includes('Dr. Ahmed'), 'the name of the link is not shown before the key');
+  p.type('#access-key', '12');
+  p.click('[name="theme"]');
+  assert.equal(p.win.document.documentElement.getAttribute('data-theme'), 'dark');
+  assert.equal(p.$('#access-key').value, '12');
+  p.type('#access-key', made.accessKey); p.submitForm(); await settle(10);
+  assert.ok(p.text().includes('Viewing as Dr. Ahmed'));
+  assert.ok(p.$('.admin-bar [name="theme"]'), 'the same switch after the link opens');
+});

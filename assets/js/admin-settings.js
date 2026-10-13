@@ -108,8 +108,6 @@
     f.review = f.review || { steps: [] };
     var metadata = FormMetadata.read(f);
 
-    var t = A.TYPES[f.type] || { label: f.type };
-    var link = A.formLink(f.slug);
     var hasSize = !!Rules.fieldByRole(f, 'team_size');
     var hasDrive = (f.fields || []).some(function (x) { return x.type === 'drive_link'; });
     var isTeam = f.type === 'team_registration' || f.type === 'task_submission';
@@ -117,14 +115,7 @@
     var reservationMembers = Rules.fieldByRole(f, 'members');
 
     ui.clear(mount);
-    // Status is the setting changed most often, so it is in the header of every tab.
-    var statusSel = A.select(f.status, [['draft', 'Draft (hidden)'], ['open', 'Open'], ['closed', 'Closed'], ['archived', 'Archived']], function (v) { f.status = v; });
-    statusSel.name = 'status';
-    mount.appendChild(h('div', { class: 'page-head' },
-      h('h2', null, f.title), A.termTags(f), h('span', { class: 'muted-note' }, t.label),
-      h('label', { class: 'status-pick' }, h('span', { class: 'tool-label' }, 'Status'), statusSel),
-      h('a', { class: 'btn btn-quiet sm', href: link, target: '_blank', rel: 'noopener' }, 'Open form'),
-      h('button', { type: 'button', class: 'btn btn-quiet sm', onclick: async function () { toast((await ui.copyText(link)) ? 'Form link copied' : 'Could not copy', 'ok'); } }, icon('link', 18), 'Copy link')));
+    mount.appendChild(A.formHead(f));
 
     /* General ---------------------------------------------------- */
     var general = panel('Name and dates', 'Students can only submit while the status is Open and the current time is inside the dates below.',
@@ -284,12 +275,21 @@
         else if (!text) noticePreview.appendChild(h('span', { class: 'muted-note' }, 'Write the note below.'));
         else noticePreview.appendChild(h('div', null, h('span', { class: 'muted-note' }, 'A student who picks ' + sample + ' sees:'), h('p', { class: 'size-notice' }, icon('info', 18), h('span', null, text))));
       };
-      var paintBoth = function () { paintPreview(); paintNotice(); };
+      // Teams saved earlier keep their size. The ones a new range leaves outside are counted here, before the save.
+      var outside = h('div', { class: 'banner', role: 'alert', name: 'size-conflicts', hidden: true });
+      var paintOutside = function () {
+        var min = parseInt(f.rules.teamSize.min, 10), max = parseInt(f.rules.teamSize.max, 10);
+        var sizes = res.teamSizes || {};
+        var n = !(min >= 1) || !(max >= min) ? 0 : Object.keys(sizes).reduce(function (sum, size) { return +size >= min && +size <= max ? sum : sum + sizes[size]; }, 0);
+        outside.hidden = !n;
+        outside.textContent = n ? plural(n, 'saved team is', 'saved teams are') + ' outside ' + (min === max ? String(min) : min + ' to ' + max) + '. ' + (n === 1 ? 'It stays' : 'They stay') + ' registered as ' + (n === 1 ? 'it is' : 'they are') + '. Widen the range, or ask ' + (n === 1 ? 'that team' : 'those teams') + ' to change the team size.' : '';
+      };
+      var paintBoth = function () { paintPreview(); paintNotice(); paintOutside(); };
       sizePanel = panel('Team size', 'Students must say how many people are in the team, then fill in exactly that many member forms. The number counts the leader, so a team of 1 works alone.',
         h('div', { class: 'row' },
           A.field('Minimum team size', A.number(f.rules.teamSize.min, function (v) { f.rules.teamSize.min = v; paintBoth(); }, { name: 'teamMin', min: '1', max: '20' })),
           A.field('Maximum team size', A.number(f.rules.teamSize.max, function (v) { f.rules.teamSize.max = v; paintBoth(); }, { name: 'teamMax', min: '1', max: '20' }))),
-        preview,
+        preview, outside,
         h('div', { class: 'subpanel' },
           h('h3', null, 'Note for some team sizes'),
           h('p', { class: 'help' }, 'Show a short note when a student picks one of the sizes you switch on, for example to say that other students will be added to small teams. Write {n} for the size they picked and {max} for the largest size.'),
@@ -349,7 +349,12 @@
     var toolsOpen = {};
     // Questions that belong to a page for a reason: the member forms follow the size, and a booking is its own page.
     var FIXED_ROLES = ['team_size', 'members', 'slot'];
-    var KINDS = [['text', 'Short answer'], ['textarea', 'Long answer'], ['select', 'One choice from a list']];
+    // What a question takes, in the words of the page. The kinds an added question can be are read from here.
+    var TYPE_NAMES = {
+      text: 'Short answer', textarea: 'Long answer', select: 'One choice from a list', english_text: 'English text', email: 'Email address',
+      phone: 'Phone number', code: 'Student code', drive_link: 'Drive link', team_size: 'Team size', members: 'Team members', slot: 'Time slot'
+    };
+    var KINDS = ['text', 'textarea', 'select'].map(function (k) { return [k, TYPE_NAMES[k]]; });
     /**
      * Which list a question reads, among the lists of the same kind. Shown only when there is
      * another list to pick. The leader's section and the members' section move together.
@@ -471,15 +476,16 @@
       var toolsBtn = tools ? h('button', { type: 'button', class: 'link-btn add-desc', name: 'tools-' + fd.id, 'aria-expanded': toolsOpen[fd.id] ? 'true' : 'false', onclick: function () {
         toolsOpen[fd.id] = tools.hidden; tools.hidden = !tools.hidden; toolsBtn.setAttribute('aria-expanded', tools.hidden ? 'false' : 'true');
       } }, fd.custom ? 'Page and kind' : 'Page') : null;
-      var kind = (KINDS.filter(function (k) { return fd.custom && k[0] === fd.type; })[0] || [])[1];
+      var typeName = TYPE_NAMES[fd.type] || fd.type.replace(/_/g, ' ');
       var row = h('div', { class: 'q-row' + (sub ? ' sub' : '') + (fd.custom ? ' custom' : ''), dataset: { field: fd.id } },
-        h('div', { class: 'q-show' }, A.check('Show', fd.enabled !== false, function (v) { fd.enabled = v; row.classList.toggle('off', !v); }, locked)),
+        // A question the form cannot work without has no switches: it says so instead.
+        h('div', { class: 'q-show' }, locked ? h('span', { class: 'q-always' }, 'Always asked') : A.check('Show', fd.enabled !== false, function (v) { fd.enabled = v; row.classList.toggle('off', !v); })),
         h('div', { class: 'q-labels' },
           A.text(fd.label.en, function (v) { fd.label.en = v; }, { 'aria-label': 'English label for ' + fd.id, placeholder: fd.custom ? 'Your question, in English' : null }),
           A.text(fd.label.ar, function (v) { fd.label.ar = v; }, { 'aria-label': 'Arabic label for ' + fd.id, dir: 'rtl', lang: 'ar', placeholder: fd.custom ? 'السؤال بالعربي' : null })),
         h('div', { class: 'q-opts' },
-          A.check('Required', fd.required !== false, function (v) { fd.required = v; }, locked),
-          fd.type === 'arabic_name' ? h('label', { class: 'q-parts' }, A.number(fd.minParts || 4, function (v) { fd.minParts = parseInt(v, 10) || 4; }, { class: 'input num', min: '2', max: '6', 'aria-label': 'Name parts for ' + fd.id }), 'name parts') : h('span', { class: 'q-type' }, kind ? 'added · ' + kind.toLowerCase() : fd.type.replace('_', ' ')),
+          locked ? null : A.check('Required', fd.required !== false, function (v) { fd.required = v; }),
+          fd.type === 'arabic_name' ? h('label', { class: 'q-parts' }, A.number(fd.minParts || 4, function (v) { fd.minParts = parseInt(v, 10) || 4; }, { class: 'input num', min: '2', max: '6', 'aria-label': 'Name parts for ' + fd.id }), 'name parts') : h('span', { class: 'q-type' }, fd.custom ? 'Added · ' + typeName : typeName),
           descBtn, toolsBtn),
         listPicker(fd));
       if (fd.enabled === false) row.classList.add('off');
@@ -629,10 +635,13 @@
     reviewPanel.summary = function () { return f.review.steps.length ? f.review.steps.map(function (x) { return x.label.en; }).join(', ') : 'None'; };
 
     /* Save ------------------------------------------------------- */
-    /** Everything the page can change, as the server expects it. Also compared with the saved copy to know if there is something to save. */
+    /**
+     * Everything the page can change, as the server expects it. Also compared with the saved copy to know if there is
+     * something to save. The status is not here: the header saves it by itself.
+     */
     var buildPatch = function () {
       var patch = {
-        title: f.title, slug: f.slug, status: f.status, opensAt: f.opensAt || '', closesAt: f.closesAt || '',
+        title: f.title, slug: f.slug, opensAt: f.opensAt || '', closesAt: f.closesAt || '',
         lang: f.lang, icon: f.icon, editKey: f.editKey, rules: f.rules, notifications: f.notifications,
         fields: f.fields, review: f.review
       };
@@ -687,8 +696,6 @@
         try { out = await A.call('admin.forms.update', { id: f.id, base: f.updatedAt, patch: patch }); } catch (e) { return say(A.message(e), true); }
         A.unsaved = false;
         toast('Settings saved', 'ok');
-        if (out.teamSizeConflicts) toast(out.teamSizeConflicts + ' saved team(s) now fall outside this team size range.', 'err');
-        if (out.orphanedBookings) toast(out.orphanedBookings + ' booking(s) are on slots that no longer exist.', 'err');
         if (out.form.slug !== slug) window.location.hash = '#/f/' + encodeURIComponent(out.form.slug) + '/settings';
         else A.render();
       });
