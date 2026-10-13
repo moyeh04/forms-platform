@@ -265,9 +265,16 @@ test('Transfer dashboard: the rule is a switch under one team per student, and R
   const mail = set.$('[name="transferEmails"]');
   assert.equal(mail.closest('.sub-setting').hidden, false);
   assert.equal(mail.checked, false, 'transfer emails start switched off');
+  const phones = set.$('[name="transferPhones"]'), whatsapp = set.$('[name="transferWhatsapp"]');
+  assert.equal(phones.closest('.sub-setting'), mail.closest('.sub-setting'), 'the phone switch sits with the other choices of a request');
+  assert.deepEqual([phones.checked, whatsapp.closest('.sub-setting').hidden], [false, true], 'the WhatsApp switch waits for the phone switch');
+  phones.checked = true; set.fire(phones, 'change');
+  assert.equal(whatsapp.closest('.sub-setting').hidden, false);
+  whatsapp.checked = true; set.fire(whatsapp, 'change');
   set.click('[name="save"]'); await settle(12);
   const saved = w.admin({ action: 'admin.forms.get', id: w.slug }).form.rules;
-  assert.deepEqual([saved.transfers, saved.transferEmails === true], [true, false]);
+  assert.deepEqual([saved.transfers, saved.transferEmails === true, saved.transferPhones, saved.transferWhatsapp], [true, false, true, true]);
+  w.admin({ action: 'admin.forms.update', id: w.slug, patch: { rules: { ...saved, transferPhones: false, transferWhatsapp: false } } });
 
   const a = send(w, team(4230001, [4230002]));
   const b = send(w, team(4230011, [4230002, 4230004], { transfer: ['4230002'] }));
