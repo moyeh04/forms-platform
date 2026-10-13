@@ -142,6 +142,8 @@
 }
 .slot-chip.is-full .slot-left { color: var(--err); font-weight: 700; }
 .slot-chip .slot-left { font-family: var(--font-body); letter-spacing: 0; }
+.slot-move { display: flex; gap: 10px; align-items: flex-start; margin: 14px 0 0; padding: 10px 14px; border: 1.5px solid var(--gold); border-inline-start-width: 5px; border-radius: 4px; background: var(--tint-b); color: var(--ink); font-size: var(--fs-label); font-weight: 700; line-height: 1.5; }
+.slot-move .icon { color: var(--gold); flex: none; margin-top: 2px; }
 .slot-chip.time { font-family: var(--font-code); letter-spacing: .04em; font-size: 1rem; }
 
 /* Buttons. */

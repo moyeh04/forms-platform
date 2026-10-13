@@ -1,11 +1,11 @@
 # Testing
 
-297 automated tests run without a Google account, a browser, or a network.
+300 automated tests run without a Google account, a browser, or a network.
 They run the **real** backend and the **real** pages. This page explains how
 that works and what it can and cannot prove.
 
 ```
-npm test    # 297 tests
+npm test    # 300 tests
 ```
 
 ## The layers
@@ -145,10 +145,10 @@ while the total above or a row below says something else.
 | Team size and audience | `teamsize.test.js` | 17 | Required question, range, exact member count, admin range, the sizes of the saved teams sent with the form, size notes, specialization limits, section limits |
 | Core and forms | `core.test.js` | 14 | Setup, PIN lockout and unlocking it from the sheet menu, forms CRUD, duplicate, delete, templates |
 | Submissions | `submissions.test.js` | 26 | Submit, edit keys, sealed keys, expiry, throttling, duplicates, Drive checks, folder names, limits, emails on and off and without a key, rows written as text past the rows a sheet starts with, team numbers that stay when a team cancels and that older rows keep |
-| Reservations | `reservations.test.js` | 11 | Slots, capacity, one booking per leader, a booking on a removed slot still counted |
+| Reservations | `reservations.test.js` | 12 | Slots, capacity, one booking per leader, a key that moves a booking and changes nothing else, a booking on a removed slot still counted |
 | Sheet views | `views.test.js` | 14 | Tinted blocks, leader star, merged task cell, bookings by day, one booked repaint for many changes that removes its trigger, a change during the repaint booking another, a failed repaint keeping its mark, the header, widths and row tints of every data tab with no value changed, a tab that refuses the look still repainted |
 | Print | `print.test.js` | 8 | Print tabs, signature column, PDF success and fallback |
-| Key booking | `keybooking.test.js` | 16 | Setting and its source form, team preview without contact details, copied answers, forged answers ignored, one booking per team, the same key cancels and moves the booking to another slot with nothing else changed, expired keys still book, the student page with one key box that also opens a booked team's booking, the admin switch, the next booking one week later, bookings listed under their form |
+| Key booking | `keybooking.test.js` | 18 | Setting and its source form, team preview without contact details, copied answers, forged answers ignored, one booking per team, the same key cancels and moves the booking to another slot with nothing else changed, a booking that may be cancelled may move, expired keys still book, the student page with one key box, a booked team told its time and moving it in one step, a ticket that draws the time instead of the key, the admin switch, the next booking one week later, bookings listed under their form |
 | Download all | `download.test.js` | 5 | Task files saved under their team number and linked from `Teams.xlsx`, Google Slides and Docs exported, a project folder with subfolders over several requests, files too big or of a kind that cannot be saved listed with the reason, zip parts and pieces that add up, only zips left in Drive, admin only, a download that expired; the deadline lock of task forms |
 | Key expiry | `key-expiry.test.js` | 6 | Which keys are given and expired, extending the expired ones from today, all of them from their own end, one date for all, chosen teams only, bad requests change nothing, cancelled registrations left out |
 | Member transfers | `transfers.test.js` | 9 | Refusal that lists who can be asked for, the request and the team saved without the member, approval by the leader and by the admin, rejection, cancelling, a full team, a leader, two requests for one student, a removed team, a team deleted by the admin, the switch and the list under Responses |

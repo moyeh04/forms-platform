@@ -323,7 +323,7 @@ sequenceDiagram
     else key expired
         G-->>P: key_expired
     else found
-        G-->>P: the registration, canEdit, canDelete
+        G-->>P: the registration, canEdit, slotOnly, canDelete
     end
     S->>P: changes answers and saves
     P->>G: update(slug, key, data)
@@ -921,6 +921,10 @@ no new record:
   (`Rules.dayLabel`), "Week 11" in a typed name becomes "Week 12", and the last
   number in the title goes up ("Discussion - Week 3" to "Week 4").
 - A team books once in each of them, because each is its own form.
+- The key that finds a team that has booked shows the team its time and opens
+  the booking on that time, to move it (`editScope_` in `Submissions.gs`
+  decides whether it may move). The ticket of such a booking draws the day and
+  the time and does not show the key again, since the team already has it.
 
 ## The pages of one form
 

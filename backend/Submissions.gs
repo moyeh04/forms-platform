@@ -32,7 +32,7 @@ API.submit = function (req) {
     try {
       checkLimits_(vform, v.data, live, null);
     } catch (e) {
-      if (source && e.code === 'duplicate') fail('already_booked', 'Your team already has a booking. Cancel it with your key to pick another slot.');
+      if (source && e.code === 'duplicate') fail('already_booked', 'Your team already has a booking. Open it with your key to change its time.');
       throw e;
     }
     var k = source ? bookingKey_(vform, live, req.sourceKey) : issueKey_(vform, live);
@@ -65,15 +65,30 @@ function assertTaskOpen_(form) {
   if (taskLocked_(form)) fail('deadline_passed', 'The deadline has passed, so this task can no longer be changed.');
 }
 
+/**
+ * What a key may change: 'all', 'slot' or nothing (''). A booking that may be cancelled may
+ * also move to another time, since cancelling and booking again does the same. A booking made
+ * with a team's key holds that team's answers, so only its slot ever changes.
+ */
+function editScope_(form) {
+  if (taskLocked_(form)) return '';
+  var edit = !!form.editKey.allowEdit;
+  if (form.type !== 'reservation') return edit ? 'all' : '';
+  if (keyBookingSource_(form)) return edit || form.editKey.allowDelete ? 'slot' : '';
+  return edit ? 'all' : form.editKey.allowDelete ? 'slot' : '';
+}
+
 API.lookup = function (req) {
   var form = requireForm(String(req.slug || ''));
   var r = findByKey_(form, req.key);
   var locked = taskLocked_(form);
+  var scope = editScope_(form);
   return {
     submission: publicSubmission_(r),
     transfers: teamTransfers_(validationForm(form), r),
     keyExpires: r.keyExpires,
-    canEdit: !!form.editKey.allowEdit && !locked,
+    canEdit: !!scope,
+    slotOnly: scope === 'slot',
     canDelete: !!form.editKey.allowDelete && !locked,
     locked: locked
   };
@@ -83,11 +98,11 @@ API.update = function (req) {
   var form = requireForm(String(req.slug || ''));
   var vform = validationForm(form);
   var found = findByKey_(form, req.key);
-  if (!form.editKey.allowEdit) fail('edit_disabled', 'Editing is turned off for this form.');
   assertTaskOpen_(form);
+  var scope = editScope_(form);
+  if (!scope) fail('edit_disabled', 'Editing is turned off for this form.');
   var v;
-  if (keyBookingSource_(form)) {
-    // A booking made with a team's key holds that team's answers. Only its slot can change.
+  if (scope === 'slot') {
     v = { ok: true, data: movedBooking_(vform, found.data, req.data || {}) };
   } else {
     v = Rules.validateSubmission(vform, req.data || {});

@@ -124,6 +124,21 @@ test('Key booking: with editing on, a booking can move to another slot and nothi
   assert.equal(w.book(w.keyB, slot(0)).ok, true, 'and the slot it left is free');
 });
 
+test('Key booking: a team that may cancel its booking may move it, and the key that finds the team says its time', () => {
+  const w = boot();
+  assert.equal(w.book(w.keyA, slot(0)).ok, true);
+  const team = w.api({ action: 'bookingTeam', slug: w.form.slug, key: w.keyA });
+  assert.deepEqual([team.booked, team.slot.time, team.canMove], [true, slot(0).time, true]);
+  assert.equal(w.api({ action: 'bookingTeam', slug: w.form.slug, key: w.keyB }).slot, undefined, 'a team with no booking has no time');
+  assert.equal(w.api({ action: 'lookup', slug: w.form.slug, key: w.keyA }).slotOnly, true);
+  assert.equal(w.api({ action: 'update', slug: w.form.slug, key: w.keyA, data: { slot: slot(1) } }).ok, true);
+  assert.equal(w.rows()[0].data.slot.time, slot(1).time);
+
+  w.update({ editKey: { enabled: true, days: 7, allowEdit: false, allowDelete: false } });
+  assert.equal(w.api({ action: 'bookingTeam', slug: w.form.slug, key: w.keyA }).canMove, false);
+  assert.equal(w.api({ action: 'update', slug: w.form.slug, key: w.keyA, data: { slot: slot(0) } }).error.code, 'edit_disabled');
+});
+
 test('Key booking: a key that expired for editing still books', () => {
   const w = boot();
   w.advanceDays(9);
@@ -189,13 +204,33 @@ test('Key booking page: the key, the team to confirm, the slot, then a ticket wi
   assert.equal(w.rows()[0].data.leader_code, '4230001');
 });
 
-test('Key booking page: a team that already booked is told so and cannot go on', async () => {
+test('Key booking page: a team that already booked is told its time and changes it from there', async () => {
   const w = boot();
   w.book(w.keyA, slot(0));
   const p = await openForm(w);
   p.type('#team-key', w.keyA); p.submitForm(); await settle();
-  assert.ok(p.text().includes('already has a booking'));
-  assert.equal(p.$('button[type="submit"]'), null, 'no button leads to a slot it cannot book');
+  assert.ok(p.$('[name="team-booked"]').textContent.includes('Sunday - 12:30 - 12:50'));
+  assert.equal(p.$('button[type="submit"]'), null, 'no button leads to a second booking');
+  assert.equal(p.$('[name="open-booking"]').textContent.trim(), 'Change the time');
+
+  p.click('[name="open-booking"]'); await settle();
+  assert.equal(p.$('.step-title').textContent, 'Time slot', 'the booking opens on its time');
+  assert.equal(p.$('[name="slot-move"]'), null, 'nothing is given up before another time is picked');
+  p.click(p.$$('.slot-chip.time')[1]); await settle();
+  assert.ok(p.$('[name="slot-move"]').textContent.includes('12:30 - 12:50'), 'the time given up is named');
+  p.submitForm(); await settle();
+  assert.equal(p.$$('.review-group .link-btn').length, 1, 'only the time can be changed');
+  p.submitForm(); await settle(12);
+  assert.equal(w.rows()[0].data.slot.time, slot(1).time);
+  assert.ok(p.$('#ticket [name="when"]').textContent.includes(slot(1).time));
+});
+
+test('Key booking page: another key can be tried after a booked team', async () => {
+  const w = boot({ editKey: { enabled: true, days: 7, allowEdit: false, allowDelete: false } });
+  w.book(w.keyA, slot(0));
+  const p = await openForm(w);
+  p.type('#team-key', w.keyA); p.submitForm(); await settle();
+  assert.equal(p.$('[name="open-booking"]').textContent.trim(), 'Open my registration', 'a booking that cannot move is only opened');
   p.click('[name="other-key"]'); await settle();
   assert.equal(p.$('#team-key').value, '');
   p.type('#team-key', w.keyB); p.submitForm(); await settle();
@@ -210,7 +245,9 @@ test('Key booking page: one key box, and the key that finds a booked team opens 
   assert.ok(!p.text().includes('Already registered'), 'no second place to type a key');
   p.type('#team-key', w.keyA); p.submitForm(); await settle();
   p.click('[name="open-booking"]'); await settle();
-  assert.ok(p.text().includes('Library System'), 'the booking opens without typing the key again');
+  assert.equal(p.$('.step-title').textContent, 'Time slot', 'the booking opens without typing the key again');
+  p.submitForm(); await settle();
+  assert.ok(p.text().includes('Library System'));
   assert.ok(p.text().includes('Cancel registration'));
 
   p.click('[name="close-edit"]'); await settle();
