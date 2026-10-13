@@ -91,6 +91,7 @@ body.admin { font-size: 1rem; }
 /* The header of a form: its More menu opens under its own right edge, and a refused status has a line of its own. */
 .page-head .more-menu { inset-inline-start: auto; inset-inline-end: 0; }
 .page-head .head-note { flex-basis: 100%; margin: 0; text-align: end; }
+.size-preview + .banner { margin: 12px 0 0; }
 .status-pick .select[data-status="open"] { border-color: var(--sea); }
 .status-pick .select[data-status="closed"] { border-color: var(--err); }
 .btn.sm { min-height: 38px; padding: 2px 14px; font-size: .95rem; }

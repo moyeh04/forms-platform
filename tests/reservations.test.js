@@ -115,12 +115,12 @@ test('Booking: when editing is allowed, moving frees the old slot and respects t
   assert.equal(taken['week-11-sunday|1:20 - 1:40'], 1);
 });
 
-test('Slots: removing a booked slot warns about orphaned bookings', () => {
+test('Slots: a booking on a removed slot is still counted, so the timetable can say it is left without a time', () => {
   const w = boot();
   w.book('4230001', sun(0));
-  const r = w.admin({
+  w.admin({
     action: 'admin.forms.update', id: w.form.id,
     patch: { slots: { days: [{ label: 'Week 11 - Sunday', times: ['12:55 - 1:15'] }], capacity: 1 } }
   });
-  assert.equal(r.orphanedBookings, 1);
+  assert.deepEqual({ ...w.admin({ action: 'admin.forms.get', id: w.form.id }).taken }, { 'week-11-sunday|12:30 - 12:50': 1 });
 });

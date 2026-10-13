@@ -1285,3 +1285,22 @@ test('Forms list: grouped by status, a reservation with no days says so, and a f
   assert.equal(card(seminar).querySelector('[name="next-booking"]'), null);
   assert.deepEqual([...card(teams).querySelectorAll('.card-actions > a')].map((a) => a.textContent), ['Responses', 'Setup', 'Open form'], 'the card names the tab as the tab does');
 });
+
+test('Team size: the panel counts the saved teams a new range leaves outside, before the save', async () => {
+  const w = boot();
+  const f = w.make('team_registration', 'Projects');
+  submit(w, f, person({ title: 'Alpha' }));
+  submit(w, f, person({ leader_code: '4230010', title: 'Beta', members: [member('سارة خالد حسن علي', '4230011'), member('منى أشرف كمال فؤاد', '4230012')] }));
+  const p = await openAdmin(w, `#/f/${f.slug}/questions`);
+  const note = () => p.$('[name="size-conflicts"]');
+  assert.ok(note().hidden, 'every saved team fits the range');
+  p.type('[name="teamMin"]', '2');
+  assert.equal(note().hidden, false);
+  assert.ok(note().textContent.startsWith('1 saved team is outside 2 to '));
+  p.type('[name="teamMin"]', '4'); p.type('[name="teamMax"]', '4');
+  assert.ok(note().textContent.startsWith('2 saved teams are outside 4.'));
+  p.type('[name="teamMin"]', '2'); p.type('[name="teamMax"]', '5');
+  p.click('[name="save"]'); await settle(12);
+  assert.equal(p.$$('.toast-err').length, 0, 'the save says nothing the panel did not say');
+  assert.ok(note().textContent.startsWith('1 saved team is outside 2 to 5.'), 'the count is still in its panel after the save');
+});

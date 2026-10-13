@@ -275,12 +275,21 @@
         else if (!text) noticePreview.appendChild(h('span', { class: 'muted-note' }, 'Write the note below.'));
         else noticePreview.appendChild(h('div', null, h('span', { class: 'muted-note' }, 'A student who picks ' + sample + ' sees:'), h('p', { class: 'size-notice' }, icon('info', 18), h('span', null, text))));
       };
-      var paintBoth = function () { paintPreview(); paintNotice(); };
+      // Teams saved earlier keep their size. The ones a new range leaves outside are counted here, before the save.
+      var outside = h('div', { class: 'banner', role: 'alert', name: 'size-conflicts', hidden: true });
+      var paintOutside = function () {
+        var min = parseInt(f.rules.teamSize.min, 10), max = parseInt(f.rules.teamSize.max, 10);
+        var sizes = res.teamSizes || {};
+        var n = !(min >= 1) || !(max >= min) ? 0 : Object.keys(sizes).reduce(function (sum, size) { return +size >= min && +size <= max ? sum : sum + sizes[size]; }, 0);
+        outside.hidden = !n;
+        outside.textContent = n ? plural(n, 'saved team is', 'saved teams are') + ' outside ' + (min === max ? String(min) : min + ' to ' + max) + '. ' + (n === 1 ? 'It stays' : 'They stay') + ' registered as ' + (n === 1 ? 'it is' : 'they are') + '. Widen the range, or ask ' + (n === 1 ? 'that team' : 'those teams') + ' to change the team size.' : '';
+      };
+      var paintBoth = function () { paintPreview(); paintNotice(); paintOutside(); };
       sizePanel = panel('Team size', 'Students must say how many people are in the team, then fill in exactly that many member forms. The number counts the leader, so a team of 1 works alone.',
         h('div', { class: 'row' },
           A.field('Minimum team size', A.number(f.rules.teamSize.min, function (v) { f.rules.teamSize.min = v; paintBoth(); }, { name: 'teamMin', min: '1', max: '20' })),
           A.field('Maximum team size', A.number(f.rules.teamSize.max, function (v) { f.rules.teamSize.max = v; paintBoth(); }, { name: 'teamMax', min: '1', max: '20' }))),
-        preview,
+        preview, outside,
         h('div', { class: 'subpanel' },
           h('h3', null, 'Note for some team sizes'),
           h('p', { class: 'help' }, 'Show a short note when a student picks one of the sizes you switch on, for example to say that other students will be added to small teams. Write {n} for the size they picked and {max} for the largest size.'),
@@ -687,8 +696,6 @@
         try { out = await A.call('admin.forms.update', { id: f.id, base: f.updatedAt, patch: patch }); } catch (e) { return say(A.message(e), true); }
         A.unsaved = false;
         toast('Settings saved', 'ok');
-        if (out.teamSizeConflicts) toast(out.teamSizeConflicts + ' saved team(s) now fall outside this team size range.', 'err');
-        if (out.orphanedBookings) toast(out.orphanedBookings + ' booking(s) are on slots that no longer exist.', 'err');
         if (out.form.slug !== slug) window.location.hash = '#/f/' + encodeURIComponent(out.form.slug) + '/settings';
         else A.render();
       });

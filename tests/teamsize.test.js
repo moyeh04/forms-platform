@@ -137,12 +137,12 @@ test('Students: the public form exposes the range so the page can offer the righ
   assert.deepEqual(w.api({ action: 'getForm', slug: w.form.slug }).form.rules.teamSize, { min: 2, max: 3 });
 });
 
-test('Admin: changing the range warns how many saved teams now fall outside it', () => {
+test('Admin: the form comes with the sizes of its saved teams, so the page can count the ones a new range leaves outside', () => {
   const w = boot();
   w.submit({ ...leader, team_size: '1', members: [] });
   w.submit({ ...leader, leader_code: '4230005', team_size: '3', members: [member('4230006'), member('4230007')] });
-  const r = w.admin({ action: 'admin.forms.update', id: w.form.id, patch: { rules: { teamSize: { min: 2, max: 4 } } } });
-  assert.equal(r.teamSizeConflicts, 1);
+  w.submit({ ...leader, leader_code: '4230008', team_size: '3', members: [member('4230009'), member('4230010')] });
+  assert.deepEqual({ ...w.admin({ action: 'admin.forms.get', id: w.form.id }).teamSizes }, { 1: 1, 3: 2 });
 });
 
 test('Admin: editing a team through the dashboard keeps the size and members in step', () => {
