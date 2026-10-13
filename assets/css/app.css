@@ -321,4 +321,6 @@ ul.plain li { padding: 1px 0; }
 .transfer-notes { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
 .transfer-notes .banner { margin: 0; }
 .transfer-actions { flex-wrap: wrap; }
+.handover { margin-top: 14px; }
+.handover .field:last-child { margin-bottom: 0; }
 @media (max-width: 480px) { .transfer-actions .btn { flex: 1 1 auto; } }

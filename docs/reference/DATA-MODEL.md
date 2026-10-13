@@ -223,7 +223,7 @@ form (`rules.transfers`). A form that never has a request has no such tab.
 | `id` | Unique id of the request |
 | `created`, `updated` | ISO timestamps |
 | `status` | `pending`, `approved`, `rejected`, `cancelled` (by the team that asked) or `closed` (the student moved elsewhere, or one of the two teams was cancelled by its leader or deleted by the admin) |
-| `code` | Code of the student |
+| `code` | Code of the student, a member or the leader of the team that holds them. Which of the two is read from that team when the request is shown or answered |
 | `member` | The member as the asking team typed it (JSON); this is what joins the team on approval |
 | `fromId`, `fromRef` | The team that holds the student |
 | `toId`, `toRef` | The team that asked |

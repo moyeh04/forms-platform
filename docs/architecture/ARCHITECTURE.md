@@ -686,11 +686,13 @@ flowchart LR
     subgraph student["index.html"]
         i18n["i18n.js<br/>English and Arabic"]
         tk["ticket.js<br/>key, image, PDF"]
+        h1["handover.js<br/>who leads a team next"]
         fm["form.js<br/>steps, members, slots, review"]
     end
     subgraph adminp["admin.html"]
         a1["admin.js<br/>shell, login, forms list"]
         a2["admin-settings.js"]
+        h2["handover.js<br/>who leads a team next"]
         a3["admin-data.js<br/>blocks, matching, print"]
         a4["admin-people.js<br/>clients"]
         a5["admin-keys.js<br/>key and link end dates"]
@@ -1020,22 +1022,48 @@ With `rules.transfers` also on, `Transfers.gs` turns the refusal into a request.
    An approval removes the member from the team that holds the code, adds the
    stored member to the team that asked, and moves both team sizes.
 
+The leader of a team can be asked for like any member, so that a team is not
+stuck with a leader who wants to leave. The team must not be left without a
+leader, so the approval carries `handover`: `{ leader, email }`, the code of
+the member who leads next and that member's email. `handOver_` copies the
+member's answers to the leader's questions of the same role or id, writes the
+email (members are not asked for one), and takes the member out of the list.
+What only a leader answers, like the major, stays. The team keeps its row, so
+its reference, team number and edit key do not change; the page tells the
+leader who left to give the key to the new leader.
+
+The offer marks such a student with `leader: true`. A waiting request for a
+leader carries `leader: true` and `heirs`, the members who can lead, both in
+`lookup` and in `admin.submissions`. Whether a student leads is read from the
+team as it is now, not stored with the request, so a request for a member who
+became the leader meanwhile asks the same question.
+
+The question is drawn once, by `App.handover` in `handover.js`: a chip for
+each member and the email field, with each reason next to its answer. The
+student page puts it in the request dialog and the dashboard in the dialog of
+"Approve and move". The backend checks both answers again.
+
 Rules of the move:
 
-- A leader of a team is never offered, and an approval is refused if the
-  student became a leader meanwhile (`transfer_leader`).
+- A leader who is alone in a team is never offered: nobody would lead it. The
+  refusal names that student and says why. An approval is refused if the
+  leader became alone meanwhile (`transfer_leader`), names nobody or somebody
+  outside the team (`transfer_heir`), or carries a refused email
+  (`transfer_email`); a refused approval changes nothing.
 - A team that is full cannot receive (`transfer_full`).
 - A team left under the minimum size is allowed; the answer carries `underMin`
   and Responses lists every team under the minimum.
 - An approval closes the other waiting requests for the same student. Removing
   a team closes its waiting requests.
-- The popup names the other team by its reference only, so a code typed at
-  random does not show who is in which team.
-- Nothing of the student who moves is asked: the two leaders, or the admin,
-  decide.
+- The popup names the other team by its reference only, and says when the
+  student leads it, so a code typed at random does not show who else is in
+  which team.
+- Nothing of a member who moves is asked: the two leaders, or the admin,
+  decide. A leader who is asked for answers for themselves.
 - A leader learns about a request by opening the form with the key. Emails to
   the two leaders go out only with `rules.transferEmails`, which is off unless
-  the admin ticks it.
+  the admin ticks it. With it on, the new leader of a team that was handed
+  over is told too; that email never holds the edit key.
 
 ## The Lists page
 

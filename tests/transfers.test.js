@@ -120,13 +120,9 @@ test('Transfer: the admin answers from the dashboard, and a team left under the 
   assert.equal(a.ok, true);
 });
 
-test('Transfer: a leader cannot be asked for, a full team cannot receive, and a second request for the same student closes', () => {
+test('Transfer: a full team cannot receive, and a second request for the same student closes', () => {
   const w = boot();
   const a = send(w, team(4230001, [4230002, 4230003]));
-  const leader = send(w, team(4230011, [4230001], { transfer: ['4230001'] }));
-  assert.equal(leader.error.code, 'duplicate_member');
-  assert.deepEqual(leader.error.details.transfer, [], 'the leader of a team is not offered');
-
   const b = send(w, team(4230011, [4230002, 4230004], { transfer: ['4230002'] }));
   const c = send(w, team(4230021, [4230002, 4230005], { transfer: ['4230002'] }));
   assert.equal(rows(w).transfers.length, 2);
@@ -138,6 +134,73 @@ test('Transfer: a leader cannot be asked for, a full team cannot receive, and a 
   assert.equal(send(w, { action: 'transfer.decide', key: a.key, id: toC.id, approve: true }).ok, true);
   assert.deepEqual(rows(w).transfers, [], 'the other request for the same student is closed');
   assert.deepEqual(send(w, { action: 'lookup', key: b.key }).transfers.outgoing.map((t) => t.status), ['closed']);
+});
+
+/** Team A (leader 4230001) holds 4230002 and 4230003; team B (leader 4230011) asks for the leader of A. */
+function leaderAsked(w) {
+  const a = send(w, team(4230001, [4230002, 4230003]));
+  const refused = send(w, team(4230011, [4230001]));
+  const b = send(w, team(4230011, [4230001], { transfer: ['4230001'] }));
+  return { a, b, refused, request: send(w, { action: 'lookup', key: a.key }).transfers.incoming[0] };
+}
+
+test('Transfer: a leader can be asked for, and approving hands the team to the member the leader names', () => {
+  const w = boot();
+  const { a, b, refused, request } = leaderAsked(w);
+  assert.deepEqual(refused.error.details.transfer, [{ code: '4230001', team: a.ref, leader: true }], 'the offer says the student leads that team');
+  assert.equal(b.ok, true);
+  assert.deepEqual([request.leader, request.sizeAfter], [true, 2]);
+  assert.deepEqual(request.heirs, [{ code: '4230002', name: NAMES[4230002] }, { code: '4230003', name: NAMES[4230003] }]);
+
+  const decide = (handover) => send(w, { action: 'transfer.decide', key: a.key, id: request.id, approve: true, handover });
+  assert.equal(decide().error.code, 'transfer_heir', 'a team is never left without a leader');
+  assert.equal(decide({ leader: '4230004', email: 'new@b.com' }).error.code, 'transfer_heir', 'the new leader is a member of the team');
+  const noMail = decide({ leader: '4230002', email: 'nobody' });
+  assert.deepEqual([noMail.error.code, noMail.error.details.error], ['transfer_email', 'invalid_email']);
+  assert.equal(rows(w).submissions[0].data.leader_code, '4230001', 'a refused answer changes nothing');
+
+  const done = decide({ leader: '4230002', email: 'new@b.com' });
+  assert.equal(done.ok, true);
+  const [teamA, teamB] = rows(w).submissions;
+  assert.deepEqual([teamA.data.leader_code, teamA.data.leader_name, teamA.data.email, teamA.data.phone], ['4230002', NAMES[4230002], 'new@b.com', '01112345678']);
+  assert.equal(teamA.data.major, 'حاسبات', 'what only the leader answered stays with the team');
+  assert.deepEqual([codesOf(teamA), teamA.data.team_size], [['4230003'], '2']);
+  assert.deepEqual([codesOf(teamB), teamB.data.team_size, teamB.data.leader_code], [['4230001'], '2', '4230011']);
+  assert.equal(teamA.ref, a.ref, 'the team keeps its reference');
+  assert.equal(send(w, { action: 'lookup', key: a.key }).submission.ref, a.ref, 'and its key');
+
+  const told = w.mail.filter((m) => /You now lead your team/.test(m.subject));
+  assert.deepEqual(told.map((m) => m.to), ['new@b.com']);
+  assert.ok(told[0].body.includes(`You now lead team ${a.ref}.`));
+  assert.equal(told[0].body.includes(a.key), false, 'the key itself is passed on by the leader who left, not by email');
+});
+
+test('Transfer: a leader who is alone in a team cannot be asked for, and one left alone cannot be moved', () => {
+  const w = boot({ teamSize: { min: 1, max: 3 } });
+  const alone = send(w, team(4230001, []));
+  const refused = send(w, team(4230011, [4230001], { transfer: ['4230001'] }));
+  assert.equal(refused.error.code, 'duplicate_member');
+  assert.deepEqual(refused.error.details.transfer, [], 'nobody would be left to lead that team');
+  send(w, { action: 'remove', key: alone.key });
+
+  const { a, request } = leaderAsked(w);
+  assert.equal(send(w, { action: 'update', key: a.key, data: team(4230001, []).data }).ok, true);
+  const now = send(w, { action: 'lookup', key: a.key }).transfers.incoming[0];
+  assert.deepEqual([now.leader, now.heirs], [true, []]);
+  assert.equal(send(w, { action: 'transfer.decide', key: a.key, id: request.id, approve: true, handover: { leader: '4230002', email: 'new@b.com' } }).error.code, 'transfer_leader');
+  assert.equal(send(w, { action: 'transfer.decide', key: a.key, id: request.id, approve: false }).ok, true);
+});
+
+test('Transfer: the admin moves a leader with the same question, and sees who can lead next', () => {
+  const w = boot();
+  const { a, b } = leaderAsked(w);
+  const [waiting] = rows(w).transfers;
+  assert.deepEqual([waiting.leader, waiting.heirs.map((m) => m.code), waiting.from, waiting.to], [true, ['4230002', '4230003'], a.ref, b.ref]);
+  assert.equal(w.admin({ action: 'admin.transfer.decide', slug: w.slug, transfer: waiting.id, approve: true }).error.code, 'transfer_heir');
+  const out = w.admin({ action: 'admin.transfer.decide', slug: w.slug, transfer: waiting.id, approve: true, handover: { leader: '4230003', email: 'new@b.com' } });
+  assert.deepEqual([out.ok, out.transfers, out.underMin], [true, [], false]);
+  const [teamA] = rows(w).submissions;
+  assert.deepEqual([teamA.data.leader_code, codesOf(teamA)], ['4230003', ['4230002']]);
 });
 
 test('Transfer: off by default, and a cancelled team takes its requests with it', () => {
@@ -192,6 +255,36 @@ test('Transfer dashboard: the rule is a switch under one team per student, and R
   assert.equal(p.$('.request-row'), null, 'an answered request leaves the list');
   assert.ok(p.$('[name="under-min"]').textContent.includes(`One team is under the minimum of 2: ${a.ref}.`));
   assert.deepEqual(codesOf(rows(w).submissions[1]), ['4230004', '4230002']);
+});
+
+test('Transfer dashboard: moving a leader asks who leads the team next, and a leader alone can only be kept', async () => {
+  const w = boot();
+  const { a, b } = leaderAsked(w);
+  const p = await openAdmin(w, `#/f/${w.slug}`);
+  assert.ok(p.$('.request-row').textContent.includes(`from ${a.ref}, which they lead, to ${b.ref}`));
+  p.click('[name="transfer-approve"]'); await settle(6);
+  const dialog = p.$('.overlay .dialog');
+  assert.ok(dialog.textContent.includes(`Who leads ${a.ref} next?`));
+  p.click('[name="confirm-yes"]'); await settle(4);
+  assert.deepEqual(p.$$('.handover .error').map((e) => e.textContent), ['Choose the new leader.', 'Write the email of the new leader.'], 'the dialog stays open with the reasons');
+  assert.equal(rows(w).transfers.length, 1);
+  p.pick('handover-leader', '4230003');
+  p.type('[name="handover-email"]', 'new@b.com');
+  p.click('[name="confirm-yes"]'); await settle(14);
+  assert.equal(p.$('.overlay'), null);
+  assert.equal(p.$('.request-row'), null, 'an answered request leaves the list');
+  const [teamA, teamB] = rows(w).submissions;
+  assert.deepEqual([teamA.data.leader_code, teamA.data.email, codesOf(teamA)], ['4230003', 'new@b.com', ['4230002']]);
+  assert.deepEqual(codesOf(teamB), ['4230001']);
+
+  const lone = boot();
+  const asked = leaderAsked(lone);
+  lone.admin({ action: 'admin.forms.update', id: lone.slug, patch: { rules: { ...lone.admin({ action: 'admin.forms.get', id: lone.slug }).form.rules, teamSize: { min: 1, max: 3 } } } });
+  send(lone, { action: 'update', key: asked.a.key, data: team(4230001, []).data });
+  const q = await openAdmin(lone, `#/f/${lone.slug}`);
+  assert.ok(q.$('.request-row').textContent.includes(`from ${asked.a.ref}, which they lead alone, to ${asked.b.ref}. Nobody is left to lead ${asked.a.ref}, so they cannot move.`));
+  assert.equal(q.$('[name="transfer-approve"]'), null, 'approving is offered only while somebody can lead');
+  assert.ok(q.$('[name="transfer-reject"]'));
 });
 
 test('Transfer: no email unless the form switches transfer emails on', () => {
