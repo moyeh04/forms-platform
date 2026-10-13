@@ -593,6 +593,7 @@ flowchart TD
     end
     subgraph admin["Admin and reviewers"]
         Views["Views.gs<br/>tinted sheet blocks"]
+        SheetStyle["SheetStyle.gs<br/>look of the data tabs"]
         Print["Print.gs<br/>print tabs and PDF"]
         Matching["Matching.gs<br/>WhatsApp matching"]
         Clients["Clients.gs<br/>private links, access keys, end dates"]
@@ -625,6 +626,9 @@ flowchart TD
     Templates --> Registry
     Menu --> Print
     Registry --> Views
+    Views --> SheetStyle
+    Registry --> SheetStyle
+    Menu --> SheetStyle
     classDef cDb fill:#F3E2B3,stroke:#B8892D,stroke-width:1.5px,color:#2F2418
     classDef cActor fill:#F4D9D3,stroke:#9A3328,stroke-width:1.5px,color:#2F2418
     classDef cDec fill:#FBEFC9,stroke:#C9A24A,stroke-width:1.5px,color:#2F2418
@@ -761,6 +765,14 @@ repaint, and it removes itself. The repaint takes no script lock, because it onl
 reads the responses and writes its own tabs. A form whose repaint fails keeps its
 mark, so its next change, or **Rebuild sheet**, paints it. A project that was set
 up while a timer ran every five minutes loses that timer on the first run.
+
+The same repaint looks after the data tabs. Responses, Transfers and Requests
+get a dark header, a frozen first row, column widths and two row tints
+(`SheetStyle.gs`); the registry's Forms, Clients and Lists get them at
+**First-time setup** and from **Rebuild all views** in the sheet menu. A tab
+that has the look costs three reads and is left alone. Only the look is set, so
+no value and no number format changes, and a tab that refuses a format is logged
+and does not stop the repaint.
 
 ## Downloading everything a team form collected
 

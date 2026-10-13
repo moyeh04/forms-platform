@@ -1,11 +1,11 @@
 # Testing
 
-288 automated tests run without a Google account, a browser, or a network.
+291 automated tests run without a Google account, a browser, or a network.
 They run the **real** backend and the **real** pages. This page explains how
 that works and what it can and cannot prove.
 
 ```
-npm test    # 288 tests
+npm test    # 291 tests
 ```
 
 ## The layers
@@ -146,7 +146,7 @@ while the total above or a row below says something else.
 | Core and forms | `core.test.js` | 14 | Setup, PIN lockout and unlocking it from the sheet menu, forms CRUD, duplicate, delete, templates |
 | Submissions | `submissions.test.js` | 26 | Submit, edit keys, sealed keys, expiry, throttling, duplicates, Drive checks, folder names, limits, emails on and off and without a key, rows written as text past the rows a sheet starts with, team numbers that stay when a team cancels and that older rows keep |
 | Reservations | `reservations.test.js` | 11 | Slots, capacity, one booking per leader, orphan warning |
-| Sheet views | `views.test.js` | 11 | Tinted blocks, leader star, merged task cell, bookings by day, one booked repaint for many changes that removes its trigger, a change during the repaint booking another, a failed repaint keeping its mark |
+| Sheet views | `views.test.js` | 14 | Tinted blocks, leader star, merged task cell, bookings by day, one booked repaint for many changes that removes its trigger, a change during the repaint booking another, a failed repaint keeping its mark, the header, widths and row tints of every data tab with no value changed, a tab that refuses the look still repainted |
 | Print | `print.test.js` | 8 | Print tabs, signature column, PDF success and fallback |
 | Key booking | `keybooking.test.js` | 16 | Setting and its source form, team preview without contact details, copied answers, forged answers ignored, one booking per team, the same key cancels and moves the booking to another slot with nothing else changed, expired keys still book, the student page and the admin switch, the next booking one week later, bookings listed under their form |
 | Download all | `download.test.js` | 5 | Task files saved under their team number and linked from `Teams.xlsx`, Google Slides and Docs exported, a project folder with subfolders over several requests, files too big or of a kind that cannot be saved listed with the reason, zip parts and pieces that add up, only zips left in Drive, admin only, a download that expired; the deadline lock of task forms |
@@ -170,6 +170,7 @@ while the total above or a row below says something else.
 | Real PDF export | Needs Google's export endpoint | Same checklist |
 | Real email delivery and quotas | Needs real mail | Submit once with your own email |
 | The booked repaint firing | Tests confirm a change books one run and fire it themselves, but cannot make Google fire it | Submit once, wait a minute, and look at the tinted tab |
+| Row tints reaching a new row | The tests record the band that was asked for; whether Google stretches it over a row added below the last one is Google's | Register once and look at the last row of Responses. A band that fell short is laid again by the next repaint |
 | Google's cross-site redirect behaviour | Needs a real web app | A real submission from the live site |
 | Fonts and exact visuals | jsdom does not render | Look at the page, or use the screenshot scripts below |
 | Excel rendering | Cell properties are asserted, not drawn | Open `Teams.xlsx` from a download in desktop Excel |

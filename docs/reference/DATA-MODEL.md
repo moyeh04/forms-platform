@@ -96,6 +96,20 @@ erDiagram
 Created by you, then prepared by **First-time setup**. It is also the
 spreadsheet the Apps Script is attached to, which is why the sheet menu exists.
 
+### How the data tabs look
+
+Every tab that holds rows of data has the same look: a dark header that stays
+in place while you scroll, a width for each column, two row tints, and long
+cells cut at the cell edge so a row stays one line tall (click a cell to read
+all of it). That covers Forms, Clients and Lists here, and Responses, Transfers
+and Requests in each form's spreadsheet.
+
+The look is only a look. The platform reads values, never colours or widths, so
+you can widen a column, sort a copy or change a tint without breaking anything.
+A tab gets the look when it is created, and a tab made before the look existed
+gets it the next time its form is repainted, or at once from **Forms Platform >
+Rebuild all views**. A column the platform adds later is dressed the same way.
+
 ### Forms tab (one row per form)
 
 | Column | Meaning |

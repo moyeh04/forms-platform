@@ -55,7 +55,7 @@ Node's built-in modules (`fs`, `path`, `vm`).
 flowchart TD
     subgraph sources["Source files you edit and commit"]
         rules["shared/rules.js, shared/form-metadata.js<br/>rules and form metadata, also loaded by the pages"]
-        gs["backend/*.gs<br/>22 modules"]
+        gs["backend/*.gs<br/>23 modules"]
         manifest["backend/appsscript.json<br/>time zone, scopes, web app mode"]
     end
 
@@ -106,10 +106,10 @@ flowchart TD
 Typical output:
 
 ```
-Bundled 24 files into dist/Code.gs (180033 chars).
+Bundled 25 files into dist/Code.gs (192797 chars).
 ```
 
-24 = the two shared files + 22 backend files.
+25 = the two shared files + 23 backend files.
 
 ## Why joining files is safe
 

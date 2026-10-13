@@ -199,11 +199,16 @@ var VIEW_BUILDERS_ = {
   whatsapp_registration: buildRegistrations_
 };
 
-/** Paints the views now. It only reads the responses and writes its own tabs, so it takes no lock. */
+/**
+ * Paints the views now, and gives the form's data tabs their look when they lack it. It reads
+ * the responses and changes only its own tabs and how cells look, so it takes no lock.
+ */
 function rebuildViews(form) {
+  var ss = SpreadsheetApp.openById(form.sheetId);
+  styleFormTabs_(ss);
   var build = VIEW_BUILDERS_[form.type];
   if (!build) return false;
-  build(validationForm(form), SpreadsheetApp.openById(form.sheetId));
+  build(validationForm(form), ss);
   return true;
 }
 

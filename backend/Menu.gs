@@ -103,6 +103,7 @@ function menuPrint(kind, slug, dayId, includeEmpty) {
 function menuRebuildViews() {
   var ui = SpreadsheetApp.getUi();
   var n = 0;
+  styleRegistryTabs_();
   readForms().forEach(function (f) { if (rebuildViews(f)) n++; });
-  ui.alert('Views rebuilt', n + ' form(s) updated.', ui.ButtonSet.OK);
+  ui.alert('Views rebuilt', n + ' form(s) updated. Every data tab has its header, widths and row tints.', ui.ButtonSet.OK);
 }
