@@ -238,14 +238,14 @@
   /* ── Teams and tasks ────────────────────────────────────────── */
 
   function teams(form, rows, reload) {
-    var sorted = rows.slice().sort(function (a, b) { return String(a.created).localeCompare(String(b.created)); });
+    var sorted = rows.slice().sort(function (a, b) { return a.number - b.number; });
     var third = form.type === 'task_submission' ? 'Task' : 'Project';
     return h('div', { class: 'team-list' }, sorted.map(function (s, i) {
       var members = Rules.membersOf(form, s.data);
       var title = s.title || '-';
       return h('article', { class: 'block team-card ' + (i % 2 ? 'tint-b' : 'tint-a'), dataset: { ref: s.ref } },
         h('header', { class: 'block-head' },
-          h('span', { class: 'team-no' }, 'Team ' + (i + 1)),
+          h('span', { class: 'team-no' }, 'Team ' + s.number),
           h('div', { class: 'block-side block-title' }, h('span', { class: 'kicker' }, third),
             s.link ? h('a', { href: s.link, target: '_blank', rel: 'noopener' }, title, icon('link', 15)) : h('span', null, title)),
           h('span', { class: 'block-meta' }, h('span', { class: 'mono' }, s.ref), ' · ', members.length === 1 ? 'Solo' : members.length + ' members'),

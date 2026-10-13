@@ -183,3 +183,13 @@ test('Instructor link: each member value names its column and the phone is a cal
   assert.deepEqual(labels, ['Section', 'Code', 'Phone'], 'the phone layout prints these in place of the table head');
   assert.equal(p.$('.team-card td.tel a').getAttribute('href'), 'tel:01012345678');
 });
+
+test('Teams: a card shows the number the team was given, with a gap where a team cancelled', async () => {
+  const w = boot();
+  const f = w.make('team_registration', 'Projects', { rules: { teamSize: { min: 1, max: 3 } } });
+  ['Alpha', 'Beta', 'Gamma'].forEach((title, i) => { w.advanceDays(0.01); w.api({ action: 'submit', slug: f.slug, data: person({ team_size: '1', leader_code: '423000' + (i + 1), title }) }); });
+  const beta = w.admin({ action: 'admin.submissions', slug: f.slug }).submissions[1];
+  w.admin({ action: 'admin.submission.delete', slug: f.slug, submissionId: beta.id });
+  const p = await openViewer(w, w.client());
+  assert.deepEqual(p.$$('.team-no').map((n) => n.textContent), ['Team 1', 'Team 3']);
+});

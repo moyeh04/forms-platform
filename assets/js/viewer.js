@@ -207,7 +207,7 @@
       var head = [h('th', null, '#'), showName ? h('th', null, 'Team member') : null, showSection ? h('th', null, 'Section') : null, showCode ? h('th', null, 'Code') : null, showPhone ? h('th', null, 'Phone') : null];
       return h('article', { class: 'block team-card ' + (i % 2 ? 'tint-b' : 'tint-a'), dataset: { ref: g.ref } },
         h('header', { class: 'block-head' },
-          h('span', { class: 'team-no' }, 'Team ' + (i + 1)),
+          h('span', { class: 'team-no' }, 'Team ' + g.number),
           hasTitle ? h('div', { class: 'block-side block-title' }, h('span', { class: 'kicker' }, third),
             g.link ? h('a', { href: g.link, target: '_blank', rel: 'noopener' }, g.title || 'Open', icon('link', 15)) : h('span', null, g.title || '-')) : h('div', { class: 'block-title' }),
           h('span', { class: 'block-meta' }, g.members.length === 1 ? 'Solo' : g.members.length + ' members')),
