@@ -335,6 +335,18 @@ test('Responses: each team is its own tinted block with a leader star and a link
   assert.ok(p.text().includes('3Total') || p.text().includes('Total'));
 });
 
+test('Responses: a team card shows the number the team was given, also after a cancel and in a search', async () => {
+  const w = boot();
+  const f = w.make('team_registration', 'Projects', { rules: { teamSize: { min: 1, max: 3 } } });
+  ['Alpha', 'Beta', 'Gamma'].forEach((title, i) => { w.advanceDays(0.01); submit(w, f, person({ leader_code: '423000' + (i + 1), title })); });
+  const beta = w.admin({ action: 'admin.submissions', slug: f.slug }).submissions[1];
+  w.admin({ action: 'admin.submission.delete', slug: f.slug, submissionId: beta.id });
+  const p = await openAdmin(w, '#/f/' + f.slug);
+  assert.deepEqual(p.$$('.team-no').map((n) => n.textContent), ['Team 1', 'Team 3']);
+  p.type('[name="search"]', 'gamma'); await settle(2);
+  assert.deepEqual(p.$$('.team-no').map((n) => n.textContent), ['Team 3'], 'a search does not renumber');
+});
+
 test('Responses: search narrows the list and a status change is saved', async () => {
   const w = boot();
   const f = w.make('team_registration', 'Projects');

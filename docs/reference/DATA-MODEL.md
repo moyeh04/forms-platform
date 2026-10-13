@@ -188,6 +188,7 @@ trash, where it can be restored for 30 days; the registry row is removed. Named 
 | `keyExpires` | ISO expiry of the key |
 | `deleted` | `1` for a cancelled registration; the row stays |
 | `keySeal` | The key sealed for the admin: `S` plus five digits, each shifted by a pad from `sha256(pepper + ':seal:' + form id + ':' + row id)`. Empty after deletion, and on rows saved before this column existed (the header is added on the next save). |
+| `number` | Team and task forms only: the team's number, given once when it registers and kept after it is cancelled, so the teams after it do not move up. Rows saved before this column existed get the numbers they showed, in the order they registered, the first time a team is added or cancelled. Empty for bookings and WhatsApp registrations. |
 
 The readable columns are derived from `data` every time a row is saved
 (`applyDerived_`). If they ever disagree, `data` wins.

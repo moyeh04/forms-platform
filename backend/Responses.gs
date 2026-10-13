@@ -19,7 +19,7 @@ function rowToResponse_(r) {
     email: String(r.email), name: String(r.name), code: String(r.code), phone: String(r.phone),
     title: String(r.title), link: String(r.link), slot: String(r.slot), members: String(r.members),
     data: parseJson(r.data, {}), keyHash: String(r.keyHash), keyExpires: String(r.keyExpires),
-    deleted: String(r.deleted) === '1', keySeal: String(r.keySeal || '')
+    deleted: String(r.deleted) === '1', keySeal: String(r.keySeal || ''), number: parseInt(r.number, 10) || 0
   };
 }
 
@@ -33,6 +33,7 @@ function responseToRow_(r) {
   o.review = JSON.stringify(r.review || {});
   o.data = JSON.stringify(r.data || {});
   o.deleted = r.deleted ? '1' : '';
+  o.number = r.number ? String(r.number) : '';
   return o;
 }
 
