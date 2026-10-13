@@ -96,6 +96,7 @@ flowchart LR
         a1["admin.js"]
         a2["admin-settings.js"]
         a5["admin-timetable.js"]
+        a9["admin-range.js"]
         a7["admin-keys.js"]
         a8["admin-download.js"]
         a3["admin-data.js"]
@@ -133,7 +134,7 @@ no validation.
 | `assets/js/config.js` | Source placeholder; `scripts/build-site.js` generates its published copy from the Actions `API_URL` variable. |
 | `assets/js/api.js` | Sends requests to the backend as plain-text JSON (avoids browser CORS checks). |
 | `assets/js/form.js`, `ticket.js`, `i18n.js` | The student page, the success ticket, English and Arabic text. |
-| `assets/js/admin*.js` | Dashboard: core and forms list, settings, the timetable editor, key and link end dates (`admin-keys.js`), responses and matching, Download all (`admin-download.js`), clients, lists. |
+| `assets/js/admin*.js` | Dashboard: core and forms list, settings, the timetable editor, the range control of the team size and the teammates (`admin-range.js`), key and link end dates (`admin-keys.js`), responses and matching, Download all (`admin-download.js`), clients, lists. |
 | `assets/js/viewer.js` | The instructor page. |
 | `shared/form-metadata.js` | What each form type shows beside its title (term, subject code, batch year) and how it is read, saved and copied. Used by the pages and the backend. |
 | `shared/rules.js` | Validation and normalization rules (Arabic names, phones, codes, Drive links, team size, slots). Used by the browser, the backend, and the tests, so all three always agree. |

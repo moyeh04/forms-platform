@@ -48,7 +48,7 @@
     return node;
   }
 
-  function plural(n, one, many) { return n + ' ' + (n === 1 ? one : many); }
+  var plural = A.plural;
 
   /** "4C-TH2" belongs to the group "4C": the part before the first dash. */
   function sectionGroup(o) { var v = String(o.value); return v.indexOf('-') > 0 ? v.slice(0, v.indexOf('-')) : 'Other'; }
@@ -240,66 +240,21 @@
     var teammatePanel = null;
 
     /* Team size -------------------------------------------------- */
-    var sizePanel = null;
+    var sizePanel = null, sizeRange = null;
     if (hasSize) {
       f.rules.teamSize = f.rules.teamSize || { min: 1, max: 6 };
-      var preview = h('div', { class: 'size-preview', 'aria-live': 'polite' });
-      var paintPreview = function () {
-        var min = parseInt(f.rules.teamSize.min, 10), max = parseInt(f.rules.teamSize.max, 10);
-        ui.clear(preview);
-        if (!(min >= 1) || !(max >= min) || max > 20) return preview.appendChild(h('span', { class: 'muted-note' }, 'Enter a minimum of at least 1 and a maximum that is not lower, up to 20.'));
-        preview.appendChild(h('span', { class: 'muted-note' }, 'Students will choose from: '));
-        for (var n = min; n <= max; n++) preview.appendChild(h('span', { class: 'num-chip' }, String(n)));
-      };
-      // A note shown to students who pick certain sizes, e.g. "others will be added to reach 5".
-      var notice = f.rules.teamSize.notice = f.rules.teamSize.notice || { sizes: [], text: { en: '', ar: '' } };
-      notice.text = notice.text || { en: '', ar: '' };
-      var noticeChips = h('div', { class: 'toggle-chips', role: 'group', 'aria-label': 'Show the note for these team sizes' });
-      var noticePreview = h('div', { class: 'notice-preview', 'aria-live': 'polite' });
-      var paintNotice = function () {
-        var min = parseInt(f.rules.teamSize.min, 10), max = parseInt(f.rules.teamSize.max, 10);
-        ui.clear(noticeChips);
-        ui.clear(noticePreview);
-        if (!(min >= 1) || !(max >= min) || max > 20) return;
-        notice.sizes = notice.sizes.filter(function (n) { return n >= min && n <= max; });
-        for (var n = min; n <= max; n++) (function (n) {
-          var on = notice.sizes.indexOf(n) !== -1;
-          noticeChips.appendChild(h('button', { type: 'button', class: 'toggle-chip', name: 'notice-size-' + n, 'aria-pressed': on ? 'true' : 'false', onclick: function () {
-            notice.sizes = on ? notice.sizes.filter(function (x) { return x !== n; }) : notice.sizes.concat([n]).sort(function (a, b) { return a - b; });
-            paintNotice();
-          } }, String(n)));
-        })(n);
-        var sample = notice.sizes[0];
-        var text = sample ? Rules.teamSizeNotice({ rules: { teamSize: { min: min, max: max, notice: notice } } }, sample, 'en') : '';
-        if (!notice.sizes.length) noticePreview.appendChild(h('span', { class: 'muted-note' }, 'Pick one or more sizes above to show the note.'));
-        else if (!text) noticePreview.appendChild(h('span', { class: 'muted-note' }, 'Write the note below.'));
-        else noticePreview.appendChild(h('div', null, h('span', { class: 'muted-note' }, 'A student who picks ' + sample + ' sees:'), h('p', { class: 'size-notice' }, icon('info', 18), h('span', null, text))));
-      };
-      // Teams saved earlier keep their size. The ones a new range leaves outside are counted here, before the save.
-      var outside = h('div', { class: 'banner', role: 'alert', name: 'size-conflicts', hidden: true });
-      var paintOutside = function () {
-        var min = parseInt(f.rules.teamSize.min, 10), max = parseInt(f.rules.teamSize.max, 10);
-        var sizes = res.teamSizes || {};
-        var n = !(min >= 1) || !(max >= min) ? 0 : Object.keys(sizes).reduce(function (sum, size) { return +size >= min && +size <= max ? sum : sum + sizes[size]; }, 0);
-        outside.hidden = !n;
-        outside.textContent = n ? plural(n, 'saved team is', 'saved teams are') + ' outside ' + (min === max ? String(min) : min + ' to ' + max) + '. ' + (n === 1 ? 'It stays' : 'They stay') + ' registered as ' + (n === 1 ? 'it is' : 'they are') + '. Widen the range, or ask ' + (n === 1 ? 'that team' : 'those teams') + ' to change the team size.' : '';
-      };
-      var paintBoth = function () { paintPreview(); paintNotice(); paintOutside(); };
-      sizePanel = panel('Team size', 'Students must say how many people are in the team, then fill in exactly that many member forms. The number counts the leader, so a team of 1 works alone.',
-        h('div', { class: 'row' },
-          A.field('Minimum team size', A.number(f.rules.teamSize.min, function (v) { f.rules.teamSize.min = v; paintBoth(); }, { name: 'teamMin', min: '1', max: '20' })),
-          A.field('Maximum team size', A.number(f.rules.teamSize.max, function (v) { f.rules.teamSize.max = v; paintBoth(); }, { name: 'teamMax', min: '1', max: '20' }))),
-        preview, outside,
-        h('div', { class: 'subpanel' },
-          h('h3', null, 'Note for some team sizes'),
-          h('p', { class: 'help' }, 'Show a short note when a student picks one of the sizes you switch on, for example to say that other students will be added to small teams. Write {n} for the size they picked and {max} for the largest size.'),
-          h('span', { class: 'label' }, 'Show the note for teams of'),
-          noticeChips,
-          h('div', { class: 'desc-pair' },
-            A.field('Note in English', h('textarea', { class: 'textarea', rows: '2', name: 'noticeEn', placeholder: 'Other students will be added to your team to reach {max}.', oninput: function (e) { notice.text.en = e.target.value; paintNotice(); } }, notice.text.en || '')),
-            A.field('Note in Arabic', h('textarea', { class: 'textarea', rows: '2', name: 'noticeAr', dir: 'rtl', lang: 'ar', placeholder: 'هيتضاف طلاب تانيين لفريقك لحد ما يبقى {max}.', oninput: function (e) { notice.text.ar = e.target.value; } }, notice.text.ar || ''))),
-          noticePreview));
-      paintBoth();
+      sizeRange = A.sizeRange(f.rules.teamSize, {
+        floor: 1, ceiling: 20, counts: res.teamSizes,
+        names: { min: 'teamMin', max: 'teamMax', outside: 'size-conflicts', note: '' },
+        words: {
+          name: 'Team size', min: 'Minimum team size', max: 'Maximum team size', choose: 'Students will choose from', who: 'A student who picks',
+          one: 'saved team', many: 'saved teams', stay: 'registered', fix: 'to change the team size',
+          note: 'Note for some team sizes', noteFor: 'Show the note for teams of',
+          noteHelp: 'Show a short note when a student picks one of the sizes you switch on, for example to say that other students will be added to small teams.',
+          placeholder: { en: 'Other students will be added to your team to reach {max}.', ar: 'هيتضاف طلاب تانيين لفريقك لحد ما يبقى {max}.' }
+        }
+      });
+      sizePanel = panel('Team size', 'Students must say how many people are in the team, then fill in exactly that many member forms. The number counts the leader, so a team of 1 works alone.', sizeRange.node);
     }
 
     /* Edit key --------------------------------------------------- */
@@ -520,31 +475,25 @@
       tm.max = Math.max(tm.max == null ? 5 : parseInt(tm.max, 10) || 1, tm.min, 1);
       tm.label = tm.label || { en: 'Teammates', ar: 'أعضاء الفريق' };
       tm.help = tm.help || { en: '', ar: '' };
-      var tmLine = h('p', { class: 'tm-line', role: 'status' });
-      var tmCount = function () {
-        return tm.min === 0 ? 'A leader can book alone, or add up to ' + plural(tm.max, 'teammate', 'teammates') + '.'
-          : 'Every booking has the leader and ' + (tm.min === tm.max ? 'exactly ' + plural(tm.max, 'teammate', 'teammates') : tm.min + ' to ' + tm.max + ' teammates') + '.';
-      };
-      var tmSteppers = [];
-      var tmStepper = function (key, label, lo, hi) {
-        var out = h('output', { class: 'stepper-val', name: 'teammates-' + key }, String(tm[key]));
-        var btn = function (by, text, aria) { return h('button', { type: 'button', class: 'icon-btn sm', name: 'teammates-' + key + (by < 0 ? '-down' : '-up'), 'aria-label': aria, onclick: function () { tm[key] += by; paintTm(); } }, text); };
-        var down = btn(-1, '−', 'Lower: ' + label), up = btn(1, '+', 'Raise: ' + label);
-        tmSteppers.push(function () { out.textContent = String(tm[key]); down.disabled = tm[key] <= lo(); up.disabled = tm[key] >= hi(); });
-        return h('div', { class: 'field-row' }, h('span', { class: 'label' }, label), h('div', { class: 'stepper' }, down, out, up));
-      };
+      // How many teammates is a range like the team size, and is set with the same control.
+      var tmRange = A.sizeRange(tm, {
+        floor: 0, ceiling: 19, counts: res.teammateCounts,
+        names: { min: 'teammatesMin', max: 'teammatesMax', outside: 'teammates-conflicts', note: 'teammates-' },
+        words: {
+          name: 'The number of teammates', min: 'Fewest teammates', max: 'Most teammates', choose: 'A leader can bring', unit: 'teammates', who: 'A leader who brings',
+          one: 'saved booking', many: 'saved bookings', stay: 'booked', fix: 'to change their teammates',
+          note: 'Note for some numbers of teammates', noteFor: 'Show the note for bookings with',
+          noteHelp: 'Show a short note when a leader adds one of the numbers of teammates you switch on, for example to say that other students may join a small team.',
+          placeholder: { en: 'Other students may join your team, up to {max} teammates.', ar: 'ممكن طلاب تانيين ينضموا لفريقك، لحد {max}.' }
+        }
+      });
       // The teammate questions are drawn by the same row as every other question.
       var keepRows = rows; rows = [];
       (tm.fields || []).forEach(function (sf) { fieldRow(sf, true); });
       var tmRows = rows; rows = keepRows;
       var tmBody = h('div', { class: 'tm-body l-stack' },
-        h('div', { class: 'subpanel' },
-          h('h3', null, 'How many'),
-          h('p', { class: 'help' }, 'Teammates do not count the leader. Set the fewest to 0 when a leader may book alone.'),
-          h('div', { class: 'row' },
-            tmStepper('min', 'Fewest teammates', function () { return 0; }, function () { return tm.max; }),
-            tmStepper('max', 'Most teammates', function () { return Math.max(1, tm.min); }, function () { return 19; })),
-          tmLine),
+        h('p', { class: 'help' }, 'Teammates do not count the leader. Set the fewest to 0 when a leader may book alone.'),
+        tmRange.node,
         h('div', { class: 'subpanel' },
           h('h3', null, 'What students read'),
           h('p', { class: 'help' }, 'The title above the teammates and the line under it.'),
@@ -558,17 +507,13 @@
           h('h3', null, 'Asked about each teammate'),
           h('p', { class: 'help' }, 'Hide what you do not need, or make it optional. The name and the code are always asked, because the lists and the duplicate check use them.'),
           h('div', { class: 'q-list tm-questions' }, tmRows)));
-      var paintTm = function () {
-        tmBody.hidden = tm.enabled === false;
-        tmLine.textContent = tmCount();
-        tmSteppers.forEach(function (paint) { paint(); });
-      };
+      var paintTm = function () { tmBody.hidden = tm.enabled === false; };
       teammatePanel = panel('Teammates', 'The other people who come with the team leader. Decide whether a booking asks for them, how many, and what is asked about each one.',
         A.check('Ask for teammates', tm.enabled !== false, function (enabled) { tm.enabled = enabled; paintTm(); }, false, 'reservation-members'),
         tmBody);
       teammatePanel.summary = function () {
         var asked = (tm.fields || []).filter(function (sf) { return sf.enabled !== false; }).length;
-        return tm.enabled === false ? 'Not asked' : (tm.min === tm.max ? String(tm.max) : tm.min + ' to ' + tm.max) + ' with the leader, ' + plural(asked, 'detail', 'details') + ' each';
+        return tm.enabled === false ? 'Not asked' : (String(tm.min) === String(tm.max) ? String(tm.max) : tm.min + ' to ' + tm.max) + ' with the leader, ' + plural(asked, 'detail', 'details') + ' each';
       };
       paintTm();
     }
@@ -648,6 +593,8 @@
       if (f.steps) patch.steps = f.steps;
       if (isReservation && reservationMembers) {
         reservationMembers.enabled = !!reservationMembers.enabled;
+        reservationMembers.min = parseInt(reservationMembers.min, 10);
+        reservationMembers.max = parseInt(reservationMembers.max, 10);
         reservationMembers.required = reservationMembers.enabled && reservationMembers.min >= 1;
       }
       Object.assign(patch, metadata);
@@ -667,12 +614,8 @@
       if (added.some(function (fd) { return !(fd.label.en || '').trim() && !(fd.label.ar || '').trim(); })) return { panel: fieldsPanel, text: 'Write the question for every question you added, or remove it.' };
       var few = added.filter(function (fd) { return fd.type === 'select' && (fd.options || []).length < 2; })[0];
       if (few) return { panel: fieldsPanel, text: '"' + (few.label.en || few.label.ar) + '" needs at least two choices.' };
-      if (hasSize) {
-        var min = parseInt(f.rules.teamSize.min, 10), max = parseInt(f.rules.teamSize.max, 10);
-        if (!(min >= 1) || !(max >= min) || max > 20) return { panel: sizePanel, text: 'Team size needs a minimum of at least 1 and a maximum that is not lower, up to 20.' };
-        var nt = f.rules.teamSize.notice;
-        if (nt && nt.sizes.length && !(nt.text.en || '').trim() && !(nt.text.ar || '').trim()) return { panel: sizePanel, text: 'Write the team size note, or switch off its sizes.' };
-      }
+      if (sizeRange && sizeRange.problem()) return { panel: sizePanel, text: sizeRange.problem() };
+      if (tmRange && reservationMembers.enabled !== false && tmRange.problem()) return { panel: teammatePanel, text: tmRange.problem() };
       if (timetable && timetable.problem()) return { panel: slotsPanel, text: timetable.problem() };
       return null;
     };

@@ -29,6 +29,7 @@ the instructor page (`viewer.html`).
 | 16 | **A picture keeps its own colours** | The ticket picture is printed on a parchment card in fixed colours, so it looks the same in both themes and in the saved image; only the card is a little darker at night. The ship, the islands and the treasure of the route are drawn the same way; the sea and the sky behind them follow the theme, by day in the light one and by night in the dark one |
 | 17 | **A change is one step, never undo and do again** | A booking that may be cancelled may also move to another time, from its own time step; cancelling to book again is never the only way |
 | 18 | **The point of a picture reads at phone size** | The thing a picture is about (the X on the treasure island, the day on the calendar, the hands of the clock) is large and bold enough to read on a phone screenshot at its real size. A drawing is detailed in the style of the others, with outlines, shading and light, not a flat pattern or a bare line icon |
+| 19 | **One meaning, one control** | Two settings that mean the same kind of thing are set with the same control and the same checks. The team size and the teammates of a booking are both ranges, so both use `A.sizeRange`: number fields, the numbers students will see, the saved answers a new range leaves outside, and a note for some numbers |
 
 ## Screens
 
