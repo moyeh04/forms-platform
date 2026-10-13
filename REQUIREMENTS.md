@@ -69,6 +69,7 @@ step needs the real Google services (see "What could not be tested here").
 | Google Sheets: every team is a block with a heavy border and alternating tints, a star on the leader, one merged project or task cell; the blocks are repainted a minute after a change, and nothing runs while nothing changes | Done |
 | Phone numbers and codes keep a leading zero in every sheet row and in `Teams.xlsx` | Done |
 | Dashboard and instructor links show each team as a card: a teal or gold band, a header with the team number, project, and size, and the leader marked; readable in light and dark and stacked on phones | Done |
+| Responses shows how many people a form holds beside its number of registrations: leaders and members of every form type, a student code counted once | Done |
 | A team keeps its number when another team cancels or is deleted: the number is the same on the dashboard, the instructor page, the printed list, the zip folders and `Teams.xlsx`, and a search does not renumber | Done |
 | Phone layout (up to 600px): member rows, bookings, WhatsApp registrations and private links stack as cards with each value under its column name; a phone number is a call link; toolbars use two equal columns and the day sheet controls stay in one labelled group | Done |
 | Weekly bookings: bookings that use the keys of a registration form are listed inside its card in a list that folds to one line, and one button makes the next one as a copy of the last, one week later, as a draft | Done |
