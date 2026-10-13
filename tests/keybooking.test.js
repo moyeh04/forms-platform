@@ -199,14 +199,20 @@ test('Key booking page: a team that already booked is told so and cannot go on',
   assert.equal(p.$('button[type="submit"]').textContent.trim(), 'Next');
 });
 
-test('Key booking page: opening the booking with the key shows the copied details', async () => {
+test('Key booking page: one key box, and the key that finds a booked team opens its booking', async () => {
   const w = boot();
   w.book(w.keyA, slot(0));
   const p = await openForm(w);
-  p.clickText('Already registered'); await settle();
-  p.type('#key-input', w.keyA); p.submitForm(); await settle();
-  assert.ok(p.text().includes('Library System'));
+  assert.equal(p.$$('.key-input').length, 1);
+  assert.ok(!p.text().includes('Already registered'), 'no second place to type a key');
+  p.type('#team-key', w.keyA); p.submitForm(); await settle();
+  p.click('[name="open-booking"]'); await settle();
+  assert.ok(p.text().includes('Library System'), 'the booking opens without typing the key again');
   assert.ok(p.text().includes('Cancel registration'));
+
+  p.click('[name="close-edit"]'); await settle();
+  assert.ok(p.$('#team-key'), 'Close leaves the booking and returns to the first step');
+  assert.equal(p.$('#team-key').value, '');
 });
 
 test('Key booking setting: offered only with a form that issues keys, and saved with its form', async () => {

@@ -612,3 +612,32 @@ test('Deadline: after a task form closes, the key shows the task but cannot chan
   assert.ok(p.text().includes('Normalization'), 'the task is still shown');
   assert.equal(p.$$('button').some((b) => b.textContent.includes('Cancel registration')), false, 'no cancel button');
 });
+
+test('Edit by key: Close leaves the registration, and asks first when something was changed', async () => {
+  const w = boot('team_registration');
+  const r = w.api({
+    action: 'submit', slug: w.form.slug,
+    data: { email: 'a@b.com', leader_name: AR_NAME, leader_code: '4230001', phone: '01012345678', major: 'حاسبات', level: 'صفر / الأولى', section: '4C-TH1', curriculum: '2020', team_size: '1', members: [], title: 'Library System' }
+  });
+  const p = await open(w);
+  assert.equal(p.$('[name="phone"]').placeholder, '01xxxxxxxxx', 'the hint shows the shape of a number, not a number');
+  const openIt = async () => { p.clickText('Edit or cancel with your key'); await settle(); p.type('#key-input', r.key); p.submitForm(); await settle(8); };
+  await openIt();
+  assert.equal(p.$('[name="close-edit"]').textContent, 'Close');
+  p.click('[name="close-edit"]'); await settle(8);
+  assert.equal(p.$('.trail .is-current .trail-label').textContent, 'About you', 'back to a new registration');
+  assert.equal(p.$('[name="leader_code"]').value, '');
+
+  await openIt();
+  p.click(p.$$('.review-group .link-btn')[3]); await settle();
+  assert.equal(p.$('[name="close-edit"]'), null, 'a page of the registration returns to the summary with Done');
+  p.type('[name="title"]', 'Library System v2'); p.submitForm(); await settle();
+  assert.equal(p.$('[name="close-edit"]').textContent, 'Close without saving');
+  p.click('[name="close-edit"]'); await settle();
+  assert.ok(p.text().includes('The changes you made are not saved.'));
+  p.clickText('Keep editing'); await settle();
+  assert.equal(p.$('#step-title').textContent, 'Your registration');
+  p.click('[name="close-edit"]'); await settle(); p.click('.overlay .btn-danger'); await settle(8);
+  assert.equal(p.$('.trail .is-current .trail-label').textContent, 'About you');
+  assert.equal(w.sheet(w.form.sheetId, 'Responses').rows()[1][10], 'Library System', 'nothing was saved');
+});
