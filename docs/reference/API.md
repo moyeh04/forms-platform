@@ -76,7 +76,7 @@ the lock.
 | Action | Lock | Writes |
 |---|---|---|
 | `admin.forms.list` | no | Nothing |
-| `admin.forms.get` | no | Nothing. Returns one form with the lists; for a reservation, the bookings in each slot; for a form with a team size, how many saved teams have each size |
+| `admin.forms.get` | no | Nothing. Returns one form with the lists; for a reservation, the bookings in each slot; for a form with a team size, how many saved teams have each size (`teamSizes`); for a reservation that asks for teammates, how many saved bookings have each number of teammates (`teammateCounts`) |
 | `admin.forms.create` | yes | A new spreadsheet in the platform's Drive folder (before the lock) and a row in the Forms tab |
 | `admin.forms.update` | yes | The form's row in the Forms tab. Refuses `stale` when `base` is older than the saved copy. Rewrites Clients rows that still hold link names before a link name changes |
 | `admin.forms.duplicate` | yes | A new spreadsheet and a row in the Forms tab |
