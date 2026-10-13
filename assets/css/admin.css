@@ -314,7 +314,11 @@ a.badge:hover { text-decoration: underline; }
 .sec-pick { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; margin-bottom: 8px; }
 .sec-pick .label { min-width: 9rem; margin: 0; }
 .sec-pick .toggle-chips { align-items: center; }
-.sec-letter { width: 5rem; min-height: 32px; }
+.sec-letter { width: 4rem; min-height: 32px; text-align: center; }
+.sec-new { display: inline-flex; align-items: center; gap: 8px; }
+.sec-adder .help { margin: 0 0 10px; }
+.sec-foot p { margin: 4px 0 0; }
+.toggle-chip.add { border-style: dashed; }
 .sec-preview .value-chips { margin-top: 8px; }
 .value-chip.plain { padding: 3px 12px; font-weight: 400; }
 .num-run { display: flex; flex-wrap: wrap; gap: 12px 28px; }

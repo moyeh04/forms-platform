@@ -184,7 +184,7 @@ test('Specialization: a form limited to Computers only offers and accepts Comput
   assert.equal(bad.error.details.major.error, 'invalid_choice', 'the server refuses another specialization');
   assert.equal(w.submit({ ...leader, major: 'حاسبات', team_size: '1', members: [] }).ok, true);
   w.admin({ action: 'admin.forms.update', id: w.form.id, patch: { rules: { majors: [] } } });
-  assert.equal(w.api({ action: 'getForm', slug: w.form.slug }).form.fields.find((f) => f.id === 'major').options.length, 2, 'empty means everyone');
+  assert.equal(w.api({ action: 'getForm', slug: w.form.slug }).form.fields.find((f) => f.id === 'major').options.length, 5, 'empty means everyone');
 });
 
 test('Sections: a form limited to some sections offers and accepts only those, for the leader and the members', () => {

@@ -672,10 +672,10 @@ test('Lists: a list with English names is rows that can be added to and reordere
   assert.ok(p.$('.used-by').textContent.includes('Projects'), 'the forms that ask the list are named');
   p.type('[name="new-value"]', 'كهرباء'); p.type('[name="new-en"]', 'Power');
   p.click('[name="add-choice"]');
-  p.click('.choice[data-i="2"] [aria-label="Move up"]');
+  p.click('.choice[data-i="5"] [aria-label="Move up"]');
   p.click('[name="save-list"]'); await settle(8);
   const major = w.api({ action: 'getForm', slug: f.slug }).form.fields.find((x) => x.id === 'major');
-  assert.deepEqual(major.options.map((o) => o.label.en), ['Computers', 'Power', 'Communications']);
+  assert.deepEqual(major.options.map((o) => o.label.en), ['Computers', 'Communications', 'Architecture', 'Mechanical', 'Power', 'Civil']);
 });
 
 test('Lists: a refused save says why next to the choices, and a removed choice names the form limited to it', async () => {
@@ -710,9 +710,15 @@ test('Lists: sections are built from year groups and counts, without typing', as
   assert.equal(p.$('[name="count-4C-O"]').value, '3');
   assert.ok(p.$('.savebar').hidden);
   assert.equal(p.$('[name="add-group"]'), null, 'Add appears once a year and a letter are picked');
-  p.click('[name="group-year-3"]'); p.click('[name="group-letter-L"]');
+  assert.equal(p.$('[name="group-missing"]').textContent, 'Pick a year and a department letter.');
+  assert.deepEqual(p.$$('[name^="group-year-"]').map((n) => n.textContent), ['1', '2', '3', '4', '5'], 'a student is in year 1 to 5');
+  assert.deepEqual(p.$$('[name^="group-letter-"]').map((n) => n.textContent), ['C', '+ New letter'], 'the letters are the ones the lists use');
+  p.click('[name="group-year-3"]');
+  assert.equal(p.$('[name="group-missing"]').textContent, 'Now pick a department letter.');
+  p.click('[name="group-letter-add"]'); p.type('[name="group-letter-new"]', 'l');
   assert.ok(p.$('[name="add-group"]').textContent.includes('Add 3L with the same kinds as 4C'));
   p.click('[name="add-group"]');
+  assert.equal(p.$('[name="group-letter-L"]').textContent, 'L', 'a letter that was typed once is a chip from then on');
   assert.equal(p.$('[name="count-3L-TH"]').value, '8');
   p.click('[name="count-3L-TH-down"]'); p.click('[name="count-3L-TH-down"]');
   p.click('[name="count-3L-O-down"]'); p.click('[name="count-3L-O-down"]'); p.click('[name="count-3L-O-down"]');
@@ -761,7 +767,7 @@ test('Lists: a new list of sections, picked for the section question of one form
   p.click('[name="create-list"]'); await settle(8);
   assert.equal(p.win.location.hash, '#/lists/third_year');
   assert.ok(p.$('[name="delete-list"]'), 'a list no form asks can be deleted');
-  p.click('[name="group-year-3"]'); p.click('[name="group-letter-L"]'); p.click('[name="add-group"]');
+  p.click('[name="group-year-3"]'); p.click('[name="group-letter-add"]'); p.type('[name="group-letter-new"]', 'L'); p.click('[name="add-group"]');
   assert.equal(p.$('[name="count-3L-TH"]').value, '1', 'the first group starts with one TH');
   p.click('[name="add-kind-3L-T"]'); p.click('[name="count-3L-T-up"]');
   p.click('[name="save-list"]'); await settle(8);

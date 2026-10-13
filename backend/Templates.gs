@@ -12,7 +12,7 @@ var DEFAULT_LISTS = {
     ['الرابع / الخامسة', 'Level 4 / Year 5']
   ],
   curricula: ['2020', '2018', '2012'],
-  majors: [['حاسبات', 'Computers'], ['اتصالات', 'Communications']],
+  majors: [['حاسبات', 'Computers'], ['اتصالات', 'Communications'], ['عمارة', 'Architecture'], ['ميكانيكا', 'Mechanical'], ['مدني', 'Civil']],
   sections: ['4C-TH1', '4C-TH2', '4C-TH3', '4C-TH4', '4C-TH5', '4C-TH6', '4C-TH7', '4C-TH8', '4C-T1', '4C-T2', '4C-T3', '4C-O1', '4C-O2', '4C-O3'],
   groups: ['A', 'B'],
   wa_sections: (function () { var a = []; for (var i = 1; i <= 33; i++) a.push(String(i)); return a; })()

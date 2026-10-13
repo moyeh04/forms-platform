@@ -29,7 +29,8 @@
     plain: { label: 'Short choices', example: 'A, B, 2020', about: 'Short values shown as chips.' }
   };
   var SECTION_CODES = ['TH', 'T', 'O'];
-  var YEARS = ['0', '1', '2', '3', '4', '5'];
+  // A student is in year 1 to 5. (A level counts from 0, but a section is named by the year.)
+  var YEARS = ['1', '2', '3', '4', '5'];
   var PEEK = 4;
 
   function plural(n, one, many) { return n + ' ' + (n === 1 ? one : many); }
@@ -292,35 +293,66 @@
       return box;
     }
 
-    /** A new group is a year and a letter picked from chips; Add appears once both are picked. */
+    /**
+     * A new group is a year and a department letter picked from chips. The letters are the ones the
+     * section lists already use, so nothing about a department is written in the code: a letter is
+     * added here once, and it is a chip from then on. Add appears once both are picked; until then
+     * the line under the chips says what is missing.
+     */
     function groupAdder(s, apply) {
-      var pick = st.groupPick = st.groupPick || { year: '', letter: '' };
-      var letters = ['C', 'L'];
+      var pick = st.groupPick = st.groupPick || { year: '', letter: '', typing: false };
+      var letters = [];
+      var know = function (l) { if (l && letters.indexOf(l) === -1) letters.push(l); };
       keys().forEach(function (k) {
         if (kind(k) !== 'sections') return;
-        readSections((lists[k] || []).map(function (o) { return String(o.value); })).groups.forEach(function (g) { var p = groupParts(g.name); if (p && letters.indexOf(p.letter) === -1) letters.push(p.letter); });
+        readSections((lists[k] || []).map(function (o) { return String(o.value); })).groups.forEach(function (g) { var p = groupParts(g.name); if (p) know(p.letter); });
       });
+      s.groups.forEach(function (g) { var p = groupParts(g.name); if (p) know(p.letter); });
+      (st.newLetters = st.newLetters || []).forEach(know);
       var box = h('div', { class: 'sec-adder' });
       var paintAdder = function () {
         ui.clear(box);
         var nameNow = pick.year && pick.letter ? pick.year + pick.letter : '';
         var exists = nameNow && s.groups.some(function (g) { return g.name === nameNow; });
-        var chipRow = function (label, values, key) {
-          return h('div', { class: 'sec-pick' }, h('span', { class: 'label' }, label), h('div', { class: 'toggle-chips' }, values.map(function (v) {
-            return h('button', { type: 'button', class: 'toggle-chip sm', name: 'group-' + key + '-' + v, 'aria-pressed': pick[key] === v ? 'true' : 'false', onclick: function () { pick[key] = pick[key] === v ? '' : v; paintAdder(); } }, v);
-          }), key === 'letter' ? h('input', { class: 'input sec-letter', name: 'group-letter-other', maxlength: '2', placeholder: 'Other', 'aria-label': 'Another department letter', value: letters.indexOf(pick.letter) === -1 ? pick.letter : '',
-            oninput: function (e) { pick.letter = e.target.value.replace(/[^A-Za-z]/g, '').toUpperCase(); var at = e.target.selectionStart; paintAdder(); var el = box.querySelector('[name="group-letter-other"]'); if (el) { el.focus(); try { el.setSelectionRange(at, at); } catch (x) { /* not a text field */ } } } }) : null));
+        // A typed letter is remembered when its field is left, and is a chip the next time the chips are drawn.
+        var remember = function () { if (pick.typing && pick.letter && st.newLetters.indexOf(pick.letter) === -1) { st.newLetters.push(pick.letter); know(pick.letter); } };
+        var chip = function (key, v) {
+          return h('button', { type: 'button', class: 'toggle-chip sm', name: 'group-' + key + '-' + v, 'aria-pressed': pick[key] === v ? 'true' : 'false', onclick: function () {
+            remember();
+            if (key === 'letter' || pick.letter) pick.typing = false;
+            pick[key] = pick[key] === v ? '' : v;
+            paintAdder();
+          } }, v);
+        };
+        var typed = h('input', { class: 'input sec-letter', name: 'group-letter-new', maxlength: '2', placeholder: 'M', 'aria-label': 'New department letter', autocomplete: 'off', value: pick.typing ? pick.letter : '',
+          oninput: function (e) { e.target.value = pick.letter = e.target.value.replace(/[^A-Za-z]/g, '').toUpperCase(); paintFoot(); },
+          onkeydown: function (e) { if (e.key === 'Enter') { e.preventDefault(); remember(); pick.typing = false; paintAdder(); } },
+          onblur: remember });
+        var newLetter = pick.typing
+          ? h('label', { class: 'sec-new' }, h('span', { class: 'tool-label' }, 'New letter'), typed)
+          : h('button', { type: 'button', class: 'toggle-chip sm add', name: 'group-letter-add', onclick: function () { pick.letter = ''; pick.typing = true; paintAdder(); var el = box.querySelector('[name="group-letter-new"]'); if (el && el.focus) el.focus(); } }, '+ New letter');
+        var foot = h('div', { class: 'sec-foot' });
+        var paintFoot = function () {
+          ui.clear(foot);
+          nameNow = pick.year && pick.letter ? pick.year + pick.letter : '';
+          exists = nameNow && s.groups.some(function (g) { return g.name === nameNow; });
+          if (exists) return foot.appendChild(h('p', { class: 'muted-note' }, nameNow + ' is already in this list.'));
+          if (!nameNow) return foot.appendChild(h('p', { class: 'muted-note', name: 'group-missing' }, !pick.year && !pick.letter ? 'Pick a year and a department letter.' : pick.year ? 'Now pick a department letter.' : 'Now pick a year.'));
+          var add = function () {
+            remember();
+            var last = s.groups[s.groups.length - 1];
+            s.groups.push({ name: nameNow, kinds: last ? last.kinds.map(function (k) { return { code: k.code, count: k.count }; }) : [{ code: 'TH', count: 1 }] });
+            st.groupPick = { year: '', letter: '', typing: false };
+            apply();
+          };
+          foot.appendChild(h('button', { type: 'button', class: 'btn btn-primary sm', name: 'add-group', onclick: add }, icon('plus', 16), 'Add ' + nameNow + (s.groups.length ? ' with the same kinds as ' + s.groups[s.groups.length - 1].name : '')));
         };
         box.appendChild(h('h3', null, 'Add a year group'));
-        box.appendChild(chipRow('Year', YEARS, 'year'));
-        box.appendChild(chipRow('Department letter', letters, 'letter'));
-        if (exists) box.appendChild(h('p', { class: 'muted-note' }, nameNow + ' is already in this list.'));
-        else if (nameNow) box.appendChild(h('button', { type: 'button', class: 'btn btn-quiet sm', name: 'add-group', onclick: function () {
-          var last = s.groups[s.groups.length - 1];
-          s.groups.push({ name: nameNow, kinds: last ? last.kinds.map(function (k) { return { code: k.code, count: k.count }; }) : [{ code: 'TH', count: 1 }] });
-          st.groupPick = { year: '', letter: '' };
-          apply();
-        } }, icon('plus', 16), 'Add ' + nameNow + (s.groups.length ? ' with the same kinds as ' + s.groups[s.groups.length - 1].name : '')));
+        box.appendChild(h('p', { class: 'help' }, 'A group is a year and a department letter, such as 4C. Its sections are numbered for you.'));
+        box.appendChild(h('div', { class: 'sec-pick' }, h('span', { class: 'label' }, 'Year'), h('div', { class: 'toggle-chips' }, YEARS.map(function (v) { return chip('year', v); }))));
+        box.appendChild(h('div', { class: 'sec-pick' }, h('span', { class: 'label' }, 'Department letter'), h('div', { class: 'toggle-chips' }, letters.map(function (v) { return chip('letter', v); }), newLetter)));
+        box.appendChild(foot);
+        paintFoot();
       };
       paintAdder();
       return box;
