@@ -277,8 +277,8 @@ shows up on your computer instead of in the Apps Script editor. Full details in
 [BUILD-PIPELINE.md](BUILD-PIPELINE.md).
 
 **Cost.** A build step between the source and Apps Script. The workflow runs it
-on every push to `master` and hands `dist/` to clasp, so an update needs no
-command and no paste. The first deploy runs the same build on your computer:
+on every push to `master` and hands `dist/` to clasp when a backend file
+changed, so an update needs no command and no paste. The first deploy runs the same build on your computer:
 `npm run setup` creates the sheet, bundles, pushes with clasp and creates the web app, so nothing
 is ever pasted into the Apps Script editor.
 
