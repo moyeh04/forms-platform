@@ -6,7 +6,7 @@ whichever page answers your question.
 | Document | Read it to learn |
 |---|---|
 | [ARCHITECTURE.md](architecture/ARCHITECTURE.md) | What runs where, how requests travel, every module, with diagrams |
-| [WORKAROUNDS.md](architecture/WORKAROUNDS.md) | The 23 clever solutions that make free hosting enough, and their trade-offs |
+| [WORKAROUNDS.md](architecture/WORKAROUNDS.md) | The 24 clever solutions that make free hosting enough, and their trade-offs |
 | [BUILD-PIPELINE.md](architecture/BUILD-PIPELINE.md) | Exactly what produces `dist/`, why files can be joined safely, when to rebuild |
 | [HOSTING.md](architecture/HOSTING.md) | What GitHub does, what Google does, how they fit, how updates flow |
 | [DATA-MODEL.md](reference/DATA-MODEL.md) | Every sheet, column, stored property, and browser key |

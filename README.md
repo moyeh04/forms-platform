@@ -139,7 +139,7 @@ Every file is described in [docs/MODULES.md](docs/MODULES.md).
 | [REQUIREMENTS.md](REQUIREMENTS.md) | Everything the platform was asked to do, and where each item stands |
 | [docs/README.md](docs/README.md) | The index of the documentation and how to read its diagrams |
 | [ARCHITECTURE.md](docs/architecture/ARCHITECTURE.md) | What runs where, how requests travel, every module |
-| [WORKAROUNDS.md](docs/architecture/WORKAROUNDS.md) | The 23 solutions that make free hosting enough, and their trade-offs |
+| [WORKAROUNDS.md](docs/architecture/WORKAROUNDS.md) | The 24 solutions that make free hosting enough, and their trade-offs |
 | [DEPLOY.md](docs/DEPLOY.md) | Click-by-click setup and the first-run checklist |
 | [COMMIT_CONVENTION.md](docs/COMMIT_CONVENTION.md) | How commits and branches are written |
 

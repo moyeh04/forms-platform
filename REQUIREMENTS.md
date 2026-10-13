@@ -92,6 +92,7 @@ step needs the real Google services (see "What could not be tested here").
 | Print team list and print a day's reservations from a sheet menu and from the dashboard, with PDF export | Done, check live |
 | WhatsApp split screen: pasted request numbers matched to registrations by phone, timetable preview, approve or reject, two review steps | Done |
 | CSV download of any form | Done |
+| After a publish nobody refreshes by hand: files are named by their content, and a page older than the site reloads itself, or offers Reload when something was typed or a dialog is open | Done |
 
 ## Instructors and clients
 | Requirement | Status |

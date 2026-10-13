@@ -1,11 +1,11 @@
 # Testing
 
-320 automated tests run without a Google account, a browser, or a network.
+321 automated tests run without a Google account, a browser, or a network.
 They run the **real** backend and the **real** pages. This page explains how
 that works and what it can and cannot prove.
 
 ```
-npm test    # 320 tests
+npm test    # 321 tests
 ```
 
 ## The layers
@@ -162,7 +162,7 @@ while the total above or a row below says something else.
 | Harness | `harness.test.js` | 4 | The fake itself |
 | Colour contrast | `contrast.test.js` | 4 | Every text and outline pair meets WCAG AA in light, dark, and device-dark themes |
 | A page older than the site | `fresh.test.js` | 4 | An untouched page reloads once for a newer site and never in a loop, a page with typed text or an open dialog offers Reload instead, the bar in the language of the form, nothing in a preview or when the version cannot be read |
-| Deployment | `deployment.test.js` | 15 | A push without a backend change skips the Apps Script job and one that cannot be compared deploys, `API_URL` validation, URL and deployment ID agree, built pages use the variable URL, clasp configuration, missing credentials, first-deployment setup with a fake `gh` and clasp |
+| Deployment | `deployment.test.js` | 16 | The built site carries its version and names every script and stylesheet by its content, a push without a backend change skips the Apps Script job and one that cannot be compared deploys, `API_URL` validation, URL and deployment ID agree, built pages use the variable URL, clasp configuration, missing credentials, first-deployment setup with a fake `gh` and clasp |
 
 ## What is not covered, and how to cover it
 
