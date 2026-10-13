@@ -711,6 +711,7 @@ single `App` object. Loading order is set by the script tags in each HTML file.
 flowchart LR
     subgraph shared["Shared"]
         cfg["config.js<br/>API address generated from Actions API_URL"]
+        fr["fresh.js<br/>reloads a page older than the site"]
         rl["shared/rules.js"]
         th["theme.js<br/>light, dark, device"]
         api["api.js<br/>POST text/plain JSON"]

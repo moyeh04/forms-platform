@@ -10,6 +10,8 @@
   var h = App.ui.h;
   var icon = App.ui.icon;
   var t = function (k, p) { return App.i18n.t(k, p); };
+  // The bar about a newer version of the page speaks the language of the form.
+  App.fresh.words = function () { return { text: t('freshReady'), action: t('freshReload') }; };
   var L = function (o) { return App.i18n.L(o); };
   var root = document.getElementById('app');
 

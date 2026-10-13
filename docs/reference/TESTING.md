@@ -1,11 +1,11 @@
 # Testing
 
-316 automated tests run without a Google account, a browser, or a network.
+320 automated tests run without a Google account, a browser, or a network.
 They run the **real** backend and the **real** pages. This page explains how
 that works and what it can and cannot prove.
 
 ```
-npm test    # 316 tests
+npm test    # 320 tests
 ```
 
 ## The layers
@@ -49,6 +49,7 @@ flowchart TD
         fui["form-ui.test.js"]
         aui["admin-ui.test.js"]
         vui["viewer-ui.test.js"]
+        fresh["fresh.test.js"]
     end
 
     harness --> backend
@@ -160,6 +161,7 @@ while the total above or a row below says something else.
 | Registry writes | `registry-writes.test.js` | 6 | Every change to forms, lists and links written inside the lock, a save that keeps its row while another form is deleted, a save over a newer copy refused, a busy lock, a link that keeps a renamed form, list names that stay unique |
 | Harness | `harness.test.js` | 4 | The fake itself |
 | Colour contrast | `contrast.test.js` | 4 | Every text and outline pair meets WCAG AA in light, dark, and device-dark themes |
+| A page older than the site | `fresh.test.js` | 4 | An untouched page reloads once for a newer site and never in a loop, a page with typed text or an open dialog offers Reload instead, the bar in the language of the form, nothing in a preview or when the version cannot be read |
 | Deployment | `deployment.test.js` | 15 | A push without a backend change skips the Apps Script job and one that cannot be compared deploys, `API_URL` validation, URL and deployment ID agree, built pages use the variable URL, clasp configuration, missing credentials, first-deployment setup with a fake `gh` and clasp |
 
 ## What is not covered, and how to cover it
