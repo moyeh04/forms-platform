@@ -466,7 +466,7 @@ flowchart TD
     I -- "no" --> Y["members_count error"]
     I -- "yes" --> J["validate every member's name, phone, code..."]
     J --> K[("Saved")]
-    A -. "range changed later" .-> L["teamSizeConflicts: how many saved teams<br/>now fall outside the new range"]
+    A -. "range being changed" .-> L["the Team size panel counts the saved teams<br/>outside the new range, before the save"]
     classDef cDb fill:#F3E2B3,stroke:#B8892D,stroke-width:1.5px,color:#2F2418
     classDef cActor fill:#F4D9D3,stroke:#9A3328,stroke-width:1.5px,color:#2F2418
     classDef cDec fill:#FBEFC9,stroke:#C9A24A,stroke-width:1.5px,color:#2F2418
@@ -1030,8 +1030,10 @@ Rules of the move:
 
 - **The kind picks the editor.** A list of `sections` is built from year group
   cards with a stepper for each kind (TH, T, O), and a group is added by
-  picking a year and a letter; a value that the groups cannot give back is
-  kept under Other sections. A list of `numbers` is two steppers. A `named`
+  picking a year (1 to 5) and a department letter. The letters offered are
+  the ones the section lists already use, and **+ New letter** takes another:
+  no letter is written in the code. A value that the groups cannot give back
+  is kept under Other sections. A list of `numbers` is two steppers. A `named`
   list is rows; a `plain` list is chips, with one link to the rows because
   chips cannot rename or reorder. Typing is needed only for names.
 - **Lists are made, not only edited.** New list asks for a name, a kind and a

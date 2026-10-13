@@ -24,6 +24,7 @@ step needs the real Google services (see "What could not be tested here").
 | A form can be limited to some specializations (for example Computers only): the Major question locks to them and the server refuses others | Done |
 | A form can be limited to some sections, picked one by one or a whole year group (4C, 3L) at once, so one Sections list serves every year | Done |
 | Editable lists behind dropdowns (levels, bylaws, majors, sections, groups), and new lists of four kinds (sections built from year groups and counts with no typing, number runs set with steppers, choices with names, short choices) that a question of any form can be pointed at: the lists at the side with their first choices, the picked list in the main part naming the forms that ask it, chips for plain values and rows for choices with English names, a save bar that says what changed and names a form limited to a removed choice, pasted lines and number runs to add many at once | Done |
+| Nothing about the faculty is in the code: majors are a list (it starts with Computers, Communications, Architecture, Mechanical and Civil), and a year group takes any department letter, typed once and offered as a chip from then on; years run from 1 to 5 | Done |
 | Two windows, or two admins, cannot undo each other: a change to a form, a list or a private link is written under one lock on a fresh copy of its row, and a Setup save over a newer one is refused with the reason, keeping what was typed | Done |
 
 ## Student experience
@@ -40,6 +41,8 @@ step needs the real Google services (see "What could not be tested here").
 | Two-step review before sending | Done |
 | Success ticket: reference, key with an arrow callout, expiry, "take a screenshot" note, Save as image, Save as PDF, Copy key | Done |
 | Duplicate leader code says "use your key" | Done |
+| A registration opened with a key can be closed without changing it; Close asks first when something was changed and not saved | Done |
+| A booking made with a team's key asks for a key in one place, and the key that finds a team with a booking opens that booking | Done |
 
 ## Edit key
 | Requirement | Status |
@@ -75,6 +78,9 @@ step needs the real Google services (see "What could not be tested here").
 | Phone layout (up to 600px): member rows, bookings, WhatsApp registrations and private links stack as cards with each value under its column name; a phone number is a call link; toolbars use two equal columns and the day sheet controls stay in one labelled group | Done |
 | Weekly bookings: bookings that use the keys of a registration form are listed inside its card in a list that folds to one line, and one button makes the next one as a copy of the last, one week later, as a draft | Done |
 | New form page: choose what the form is for, name it, and see a live preview of the title, tags and pages students get, with what to set up next | Done |
+| The same header on every tab of a form: title, tags, the status (saved the moment it is changed), Open form, Copy link, and a More menu with the Google Sheet, Rebuild sheet, Duplicate and Delete; the card of a form has the same More menu | Done |
+| The forms list is grouped Open, Draft, Closed, Archived; a reservation with no days says so on its card; the first booking of a form is offered on team and task forms | Done |
+| A question that is always asked says so instead of showing greyed switches, and question types are named in plain words; the Team size panel counts the saved teams a new range leaves outside before the save | Done |
 | One form, four tabs (Responses, Questions, Timetable, Setup) with the status in the header; settings fold to one line that says what they are set to; the save bar appears only when something changed and leaving with unsaved changes asks first | Done |
 | Questions listed under the page of the form that shows them, as rows that stack on a narrow screen | Done |
 | Your own questions (short answer, long answer, one choice from a list) on any page; answers appear in Details and in the CSV | Done |

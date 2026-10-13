@@ -13,6 +13,7 @@ whichever page answers your question.
 | [API.md](reference/API.md) | Every backend action: who may call it, whether it takes the lock, what it writes |
 | [SECURITY.md](reference/SECURITY.md) | The secrets, what protects them, and the honest weak spots |
 | [TESTING.md](reference/TESTING.md) | How the tests run without Google, and what they cannot prove |
+| [UI-UX.md](reference/UI-UX.md) | The rules every page follows, with the place that shows each one |
 | [DEPLOY.md](DEPLOY.md) | Click-by-click setup and the first-run checklist |
 | [MODULES.md](MODULES.md) | File-by-file reference |
 | [COMMIT_CONVENTION.md](COMMIT_CONVENTION.md) | How commits and branches are written |
