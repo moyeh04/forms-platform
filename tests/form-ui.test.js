@@ -669,6 +669,38 @@ test('Transfer: a leader who is asked for names the new leader, moves, and is to
   assert.deepEqual(rows[1].data.members.map((m) => m.code), ['4230001']);
 });
 
+test('Transfer: the phone of the other leader shows with a waiting request, with Copy, and as a WhatsApp link when the form says so', async () => {
+  const w = bootTransfers();
+  const setRules = (more) => w.admin({ action: 'admin.forms.update', id: w.form.id, patch: { rules: { ...w.admin({ action: 'admin.forms.get', id: w.form.id }).form.rules, ...more } } });
+  setRules({ transferPhones: true });
+  const p = await teamBWith(w, '4230002');
+  p.submitForm(); await settle(12);
+  assert.equal(p.$('.overlay .leader-contact'), null, 'no number before the team has asked');
+  p.clickText('Ask the leader', p.$('.overlay .dialog')); await settle(14);
+  const sent = p.$('[name="transfer-sent"] .leader-contact');
+  assert.ok(sent.textContent.includes(`Leader of team ${w.teamA.ref}:`) && sent.textContent.includes('01012345678'));
+  assert.equal(sent.querySelector('a'), null, 'plain text while the WhatsApp switch is off');
+  assert.equal(sent.querySelector('[name="copy-phone"]').textContent, 'Copy number');
+  let copied = '';
+  Object.defineProperty(p.win.navigator, 'clipboard', { value: { writeText: async (text) => { copied = text; } }, configurable: true });
+  p.click('[name="copy-phone"]'); await settle(4);
+  assert.equal(copied, '01012345678');
+  assert.ok(p.$('.toast').textContent.includes('Copied'));
+
+  setRules({ transferWhatsapp: true });
+  const refB = w.admin({ action: 'admin.submissions', slug: w.form.slug }).submissions[1].ref;
+  const a = await openWithKey(w, w.teamA.key);
+  const inDialog = a.$('.overlay .dialog .leader-contact');
+  assert.ok(inDialog.textContent.includes(`Leader of team ${refB}:`));
+  assert.equal(inDialog.querySelector('a').getAttribute('href'), 'https://wa.me/201012345678');
+  assert.ok(inDialog.querySelector('[name="copy-phone"]'), 'Copy stays next to the link');
+  a.click('[name="transfer-later"]'); await settle(4);
+  assert.ok(a.$('[data-transfer="incoming"] .leader-contact a'), 'the line above the registration has it too');
+  a.click('[name="transfer-answer"]'); await settle(4);
+  a.click('[name="transfer-reject"]'); await settle(12);
+  assert.equal(a.$('.leader-contact'), null, 'an answered request no longer shows the number');
+});
+
 test('Transfer: a leader who is alone in a team is not offered, and the page says why', async () => {
   const w = bootTransfers();
   w.api({ action: 'submit', slug: w.form.slug, data: { email: 'c@example.com', leader_name: AR_NAME, leader_code: '4230050', phone: '01012345678', major: 'حاسبات', level: 'صفر / الأولى', section: '4C-TH1', curriculum: '2020', title: 'Parser', team_size: '1', members: [] } });
