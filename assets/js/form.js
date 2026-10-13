@@ -179,16 +179,27 @@
     );
   }
 
+  // The step the ship was last drawn at, so that it sails on from there to the next island.
+  var shipAt = null;
+
+  function art(name, cls) { return h('img', { class: cls, src: 'assets/img/' + name + '.svg', alt: '', draggable: 'false' }); }
+
+  /** The route as a sea: an island for each step, then the treasure island, and the ship at the island of the current step. */
   function trail() {
+    var stops = S.steps.length + 1;
+    var at = function (i) { return ((i + 0.5) * 100 / stops).toFixed(3) + '%'; };
+    var from = shipAt === null ? S.stepIndex : shipAt;
+    shipAt = S.stepIndex;
     var items = S.steps.map(function (s, i) {
       return h('li', { class: i < S.stepIndex ? 'is-done' : i === S.stepIndex ? 'is-current' : '', 'aria-current': i === S.stepIndex ? 'step' : null },
-        // The ship is over the step the student is on, and moves with it toward the X.
-        i === S.stepIndex ? h('span', { class: 'trail-ship' }, icon('ship', 40)) : null,
-        h('span', { class: 'dot' }), h('span', { class: 'trail-label' }, stepTitle(s)));
+        h('span', { class: 'isle' }, art('island')), h('span', { class: 'trail-label' }, stepTitle(s)));
     });
-    items.push(h('li', { class: 'trail-x', 'aria-hidden': 'true' }, icon('x', 22)));
+    // The treasure waits at the X on the last island, at the end of the route.
+    items.push(h('li', { class: 'trail-x', 'aria-hidden': 'true' },
+      h('span', { class: 'isle' }, art('island'), art('treasure', 'trail-treasure'), icon('x', 26)), h('span', { class: 'trail-label' }, t('treasure'))));
     return [
-      h('ol', { class: 'trail' }, items),
+      h('div', { class: 'trail-sea' }, h('ol', { class: 'trail' }, items),
+        h('span', { class: 'trail-ship', style: '--at:' + at(S.stepIndex) + ';--from:' + at(from) }, art('ship'))),
       h('p', { class: 'step-count' }, t('stepOf', { n: S.stepIndex + 1, total: S.steps.length }) + ' - ' + stepTitle(S.steps[S.stepIndex]))
     ];
   }

@@ -500,15 +500,21 @@ test('Folder rule: typing the project title updates the example and keeps the ic
   assert.ok(rule.querySelector('.folder-rule-text').textContent.includes('Ahmed_Mohamed_Smart_Parking_Software_Engineering'), 'ends with the subject name, not the code');
 });
 
-test('Route: the ship is over the current step and moves with it', async () => {
+test('Route: a sea of islands, and the ship sails from island to island toward the treasure', async () => {
   const w = boot();
   const p = await open(w);
+  const steps = p.$$('.trail li:not(.trail-x)').length;
+  const at = (i) => ((i + 0.5) * 100 / (steps + 1)).toFixed(3) + '%';
+  const ship = () => Object.fromEntries(p.$('.trail-sea .trail-ship').getAttribute('style').split(';').map((d) => d.split(':')));
+  assert.equal(p.$$('.trail li .isle img[src="assets/img/island.svg"]').length, steps + 1, 'an island for each step and the treasure island');
+  assert.ok(p.$('.trail li:last-child.trail-x .isle img.trail-treasure[src="assets/img/treasure.svg"]'), 'the treasure waits on the last island');
+  assert.ok(p.$('.trail-x .isle .icon-x'), 'beside the X');
   assert.equal(p.$$('.trail-ship').length, 1);
-  assert.ok(p.$('.trail li.is-current .trail-ship .icon-ship'));
-  assert.equal(p.$$('.trail li')[0].querySelector('.trail-ship') !== null, true);
+  assert.ok(p.$('.trail-ship img[src="assets/img/ship.svg"]'));
+  assert.deepEqual(ship(), { '--at': at(0), '--from': at(0) }, 'the ship starts at the first island');
   await fillAbout(p); p.submitForm(); await settle();
   assert.equal(p.$$('.trail-ship').length, 1);
-  assert.equal(p.$$('.trail li')[1].querySelector('.trail-ship') !== null, true, 'the ship moved to the second step');
+  assert.deepEqual(ship(), { '--at': at(1), '--from': at(0) }, 'and sails from the first island to the second');
 });
 
 /** A form that lets a leader ask for a member of another team, with team A (two members) saved. */

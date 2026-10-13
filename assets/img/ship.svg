@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 62">
+  <g stroke="#2A1C12" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round">
+    <!-- Rigging from the mast tops to the bow and the stern. -->
+    <path d="M40 4 77 31M40 4 9 28M58 15 77 31" fill="none" stroke="#5A3720" stroke-width=".7"/>
+    <!-- The masts, the bowsprit and the yards. -->
+    <rect x="38.6" y="3" width="2.8" height="37" rx=".8" fill="#5A3720"/>
+    <rect x="56.8" y="14" width="2.6" height="25" rx=".8" fill="#5A3720"/>
+    <path d="M71 35 79 29.5" fill="none" stroke="#5A3720" stroke-width="2.4"/>
+    <!-- The sails, full of wind toward the bow, one of them patched. -->
+    <path d="M32 10.5Q40 9.5 48 10.5 50.5 13.5 48 17 40 16 32 17 33.5 13.5 32 10.5z" fill="#F3E9D2"/>
+    <path d="M28 19.5Q40 18 52 19.5 56 26.5 52 34 40 32.5 28 34 31 26.5 28 19.5z" fill="#F3E9D2"/>
+    <path d="M50 21.5Q58 20.5 66 21.5 69 27.5 66 34 58 33 50 34 52.5 27.5 50 21.5z" fill="#F3E9D2"/>
+    <path d="M31 26.5Q40 25.5 52.5 26.5M52 28Q58 27.2 67 28" fill="none" stroke="#D3C29C" stroke-width="1.1"/>
+    <rect x="33" y="28.4" width="6" height="4" fill="#E6CFA0" stroke-width="1"/>
+    <path d="M33.8 29.3h.8M35.6 29.3h.8M37.4 29.3h.8M33.8 31.5h.8M35.6 31.5h.8M37.4 31.5h.8" fill="none" stroke-width=".7"/>
+    <path d="M31 10h18M27 19h26M49 21h18" fill="none" stroke="#5A3720" stroke-width="2"/>
+    <!-- The Jolly Roger on the main mast, and a red pennant on the fore mast. -->
+    <path d="M38.6 2.5 28 1.8Q30.5 5 28 8.6L38.6 9z" fill="#1F1A17"/>
+    <circle cx="33.6" cy="4.7" r="1.5" fill="#FBF4E2" stroke="none"/>
+    <path d="M31.4 6.6 35.8 8M35.8 6.6 31.4 8" fill="none" stroke="#FBF4E2" stroke-width=".8"/>
+    <path d="M56.8 13.6 50 12.3 52 14.6 50 16.6z" fill="#C0392B" stroke-width="1.2"/>
+    <!-- The hull: the raised stern with its lantern, the planks, the gold trim and the portholes. -->
+    <path d="M7 27.5h17V39H7z" fill="#7A4E2D"/>
+    <rect x="11" y="30.5" width="5" height="4.5" rx="1" fill="#F6D77A" stroke-width="1.2"/>
+    <path d="M6 27.5h19" fill="none" stroke="#E2B23C" stroke-width="2.2"/>
+    <path d="M8 27.5V24H5.5V25.5" fill="none" stroke-width="1.1"/>
+    <circle cx="5.5" cy="27.3" r="2" fill="#FFD54F" stroke-width="1.1"/>
+    <path d="M7 37 23 39H60L75 34 66 56Q41 60 17 56z" fill="#7A4E2D"/>
+    <path d="M10.5 44Q40 47.5 71 41.5M13.5 50Q40 53.5 68.5 47.5" fill="none" stroke="#5A3720" stroke-width="1.2"/>
+    <path d="M8.5 39.3 23 41.3H60L73.5 36.5" fill="none" stroke="#E2B23C" stroke-width="2.4"/>
+    <g fill="#2A1C12" stroke="#E2B23C" stroke-width="1.3">
+      <circle cx="29" cy="45.6" r="2.3"/><circle cx="41" cy="46.2" r="2.3"/><circle cx="53" cy="45.7" r="2.3"/>
+    </g>
+    <path d="M18 54.5Q41 58 64.5 54.5" fill="none" stroke="#E2B23C" stroke-width="1.8"/>
+    <!-- Foam where the hull meets the water, and the wake behind. -->
+    <path d="M15 57.5Q24 61 33 57.5M37 58.5Q46 61.5 55 58.5M59 57.5Q66 60.5 72 56.5M6 55.5Q9 57.5 12 56" fill="none" stroke="#FFFFFF" stroke-width="1.8"/>
+  </g>
+</svg>

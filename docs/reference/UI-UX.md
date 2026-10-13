@@ -26,8 +26,9 @@ the instructor page (`viewer.html`).
 | 13 | **An action is offered where it makes sense** | The first booking of a form is offered on team and task forms, where there are teams to book. A form that already has bookings keeps them listed |
 | 14 | **Sample text is generic** | Placeholders and previews use made-up names (`Task 1`, `001`), never a real course, person or file |
 | 15 | **A limit is shown before it is hit, in the look of the site** | Every day and time of a booking says how many places are left before it is picked. A full one is not greyed out: it is a torn ticket, ragged at the top and bottom, cut by a red line and marked **Fully booked** |
-| 16 | **A picture keeps its own colours** | The ticket picture is printed on a parchment card in fixed colours, so it looks the same in both themes and in the saved image; only the card is a little darker at night |
+| 16 | **A picture keeps its own colours** | The ticket picture is printed on a parchment card in fixed colours, so it looks the same in both themes and in the saved image; only the card is a little darker at night. The ship, the islands and the treasure of the route are drawn the same way; the sea and the sky behind them follow the theme, by day in the light one and by night in the dark one |
 | 17 | **A change is one step, never undo and do again** | A booking that may be cancelled may also move to another time, from its own time step; cancelling to book again is never the only way |
+| 18 | **The point of a picture reads at phone size** | The thing a picture is about (the X on the treasure island, the day on the calendar, the hands of the clock) is large and bold enough to read on a phone screenshot at its real size. A drawing is detailed in the style of the others, with outlines, shading and light, not a flat pattern or a bare line icon |
 
 ## Screens
 

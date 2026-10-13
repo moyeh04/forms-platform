@@ -32,7 +32,7 @@ step needs the real Google services (see "What could not be tested here").
 |---|---|
 | English by default with an Arabic switch (RTL), mobile first, light and dark themes | Done |
 | Light paper palette meeting WCAG 2.1 AA contrast in both themes (checked by a test), **no logo on the page**, defined font sizes, bold labels, italic helper text | Done |
-| A pirate ship over the current step of the route; it moves toward the X as the student goes on, and faces the other way in Arabic | Done |
+| The route is a sea under the sky, by day in the light theme and by night in the dark one. Each step is an island, and the last one is the treasure island, with the chest, a painted X and the word Treasure! An island left behind flies a red flag; one ahead is faded. The ship waits beside the island of the current step and sails from island to island as the student goes on, facing the treasure in either language | Done |
 | Branded tab icon: a form sheet whose red route ends in an X, the same trail students follow at the top of the form (SVG plus PNGs for phones) | Done |
 | Arabic-only name fields: English letters and digits are removed while typing and on paste, with a hint saying why; at least four name parts; checked again on the server | Done |
 | English-only project and task titles, Egyptian phone normalization, 7-digit codes | Done |
