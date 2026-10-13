@@ -17,7 +17,7 @@
     slug: '', form: null, state: '', taken: {}, view: 'loading', loadError: '',
     steps: [], stepIndex: 0, data: {}, errors: {}, banner: null, busy: false,
     mode: 'new', key: '', keyInfo: null, ownSlot: '', result: null, keyError: '',
-    team: null, teamBooked: false, sourceKey: '', teamKey: '', teamError: ''
+    team: null, teamBooked: false, teamSlot: null, teamCanMove: false, sourceKey: '', teamKey: '', teamError: ''
   };
 
   /* ── Data helpers ───────────────────────────────────────────── */
@@ -47,6 +47,9 @@
 
   /** True while a new booking is made with a registration key instead of typed answers. */
   function keyMode() { return !!(S.form && S.form.keyBooking) && S.mode === 'new'; }
+
+  /** True for a booking opened with its key that may move to another time and change nothing else. */
+  function slotOnly() { return S.mode === 'edit' && !!(S.keyInfo && S.keyInfo.slotOnly) && !!slotField(); }
 
   /* ── Steps ──────────────────────────────────────────────────── */
 
@@ -236,15 +239,18 @@
     var body = step.review ? reviewBody() : step.team ? teamBody() : step.fields.map(function (f) { return renderField(f, f.id); });
     var last = S.stepIndex === S.steps.length - 1;
     var primary = h('button', { type: 'submit', class: 'btn btn-primary', disabled: S.busy }, last ? (S.busy ? t('submitting') : t(S.mode === 'edit' ? 'saveChanges' : keyMode() ? 'book' : 'submit')) : hub() ? t('done') : t(step.team && !S.team ? 'findTeam' : 'next'), last || hub() ? null : icon('arrow', 20));
-    // A team that has booked cannot go on, so the button that would take it there is not offered.
-    if (step.team && S.team && S.teamBooked) primary = null;
+    // A team that has booked does not book again: its button opens the booking, at the time when it can move.
+    if (step.team && S.team && S.teamBooked) {
+      primary = h('button', { type: 'button', class: 'btn btn-primary', name: 'open-booking', disabled: S.busy, onclick: function () { S.view = 'keyEntry'; S.keyError = ''; openByKey(S.sourceKey, S.teamCanMove); } },
+        t(S.teamCanMove ? 'moveTime' : 'editOpen'), icon('arrow', 20));
+    }
     // Save exists only when an answer differs from the saved registration.
     if (hub() && last && !changed()) primary = h('p', { class: 'help no-changes' }, t('noChanges'));
     var back = S.stepIndex > 0 && !hub() ? h('button', { type: 'button', class: 'btn btn-quiet', onclick: function () { go(S.stepIndex - 1); } }, t('back')) : null;
     // The summary of a registration opened with a key is also the way out of it.
     if (hub() && last) back = closeButton();
     var nav = h('div', { class: 'nav' }, back, primary);
-    var help = !step.review ? null : hub() ? t('yourRegistrationHelp') : t(S.form.editKey && S.form.editKey.enabled ? 'reviewHelpKey' : 'reviewHelp');
+    var help = !step.review ? null : hub() ? t(slotOnly() ? 'yourBookingHelp' : 'yourRegistrationHelp') : t(S.form.editKey && S.form.editKey.enabled ? 'reviewHelpKey' : 'reviewHelp');
     var f = h('form', { novalidate: 'novalidate', onsubmit: function (e) { e.preventDefault(); if (!S.busy) next(); } },
       title, help ? h('p', { class: 'step-help' }, help) : null, body, nav);
     var edit = S.mode === 'edit'
@@ -561,24 +567,28 @@
 
   /* ── Slots ──────────────────────────────────────────────────── */
 
-  function slotsTaken(dayId, time) {
-    var key = Rules.slotKey(dayId, time);
-    var n = S.taken[key] || 0;
-    if (S.ownSlot === key) n -= 1;
-    return n >= ((S.form.slots && S.form.slots.capacity) || 1);
+  /** Bookings of everyone else in each slot: the student's own booking does not take a place from itself. */
+  function othersIn() {
+    var counts = Object.assign({}, S.taken);
+    if (S.ownSlot && counts[S.ownSlot]) counts[S.ownSlot] -= 1;
+    return counts;
   }
+  function roomIn(dayId, time) { return Rules.slotRoom(S.form, othersIn(), Rules.slotKey(dayId, time)); }
+  function slotsTaken(dayId, time) { return !roomIn(dayId, time); }
 
   function slotControl(field, path, id) {
     var wrap = h('div', { class: 'slot', id: id });
     function paint() {
       App.ui.clear(wrap);
       var days = (S.form.slots && S.form.slots.days) || [];
+      var many = ((S.form.slots && S.form.slots.capacity) || 1) > 1;
       var cur = getVal(path) || {};
+      // Each day says how many places it still has, so a student sees a full day before choosing it.
       var dayChips = days.map(function (d) {
-        var full = d.times.every(function (tm) { return slotsTaken(d.id, tm); });
-        return h('button', { type: 'button', class: 'slot-chip', disabled: full, 'aria-pressed': cur.day === d.id ? 'true' : 'false', onclick: function () {
+        var left = d.times.reduce(function (n, tm) { return n + roomIn(d.id, tm); }, 0);
+        return h('button', { type: 'button', class: 'slot-chip' + (left ? '' : ' is-full'), disabled: !left, 'aria-pressed': cur.day === d.id ? 'true' : 'false', onclick: function () {
           setVal(path, { day: d.id, time: '' }); delete S.errors[path]; paintError(path); saveDraft(); paint();
-        } }, d.label, full ? h('small', null, t('slotFull')) : (d.date ? h('small', null, d.date) : null));
+        } }, d.label, d.date ? h('small', null, d.date) : null, h('small', { class: 'slot-left' }, left ? t('slotsLeft', { n: left }) : t('slotFull')));
       });
       wrap.appendChild(h('div', { class: 'slot-days', role: 'group', 'aria-label': t('slotDay') }, dayChips));
       var day = days.filter(function (d) { return d.id === cur.day; })[0];
@@ -586,14 +596,29 @@
       var open = day.times.filter(function (tm) { return !slotsTaken(day.id, tm) || cur.time === tm; });
       if (!open.length) { wrap.appendChild(h('p', { class: 'help' }, t('slotNone'))); return; }
       wrap.appendChild(h('div', { class: 'slot-times', role: 'group', 'aria-label': t('slotTime') }, day.times.map(function (tm) {
-        var taken = slotsTaken(day.id, tm) && cur.time !== tm;
-        return h('button', { type: 'button', class: 'slot-chip time', disabled: taken, title: taken ? t('slotFull') : null, 'aria-pressed': cur.time === tm ? 'true' : 'false', onclick: function () {
+        var room = roomIn(day.id, tm);
+        var taken = !room && cur.time !== tm;
+        return h('button', { type: 'button', class: 'slot-chip time' + (taken ? ' is-full' : ''), disabled: taken, 'aria-pressed': cur.time === tm ? 'true' : 'false', onclick: function () {
           setVal(path, { day: day.id, time: tm }); delete S.errors[path]; paintError(path); saveDraft(); paint();
-        } }, tm);
+        } }, h('span', { dir: 'ltr' }, tm), taken ? h('small', { class: 'slot-left' }, t('slotFull')) : many ? h('small', { class: 'slot-left' }, t('slotsLeft', { n: room })) : null);
       })));
+      // Moving a booking gives up the time it had; the student is told before saving that anyone can then take it.
+      var picked = cur.day && cur.time ? Rules.slotKey(cur.day, cur.time) : '';
+      if (S.mode === 'edit' && S.ownSlot && picked && picked !== S.ownSlot) {
+        wrap.appendChild(h('p', { class: 'slot-move', role: 'status', name: 'slot-move' }, App.ui.icon('info', 18), h('span', null, t('slotMove', { was: slotText(S.ownSlot) }))));
+      }
     }
     paint();
     return wrap;
+  }
+
+  /** Text that keeps its left-to-right order inside an Arabic sentence, such as a day and a time. */
+  function ltr(text) { return '\u2066' + text + '\u2069'; }
+
+  /** "Sunday 14 Nov - 12:30 - 12:50" for a slot key. */
+  function slotText(key) {
+    var parts = String(key).split('|');
+    return displayValue(slotField(), { day: parts[0], time: parts.slice(1).join('|') });
   }
 
   /* ── Review ─────────────────────────────────────────────────── */
@@ -608,7 +633,8 @@
     if (field.type === 'select') return optionLabel(field, value);
     if (field.type === 'slot') {
       var day = ((S.form.slots && S.form.slots.days) || []).filter(function (d) { return d.id === value.day; })[0];
-      return (day ? day.label : value.day) + ' - ' + value.time;
+      // A day and a time keep their order inside an Arabic page.
+      return ltr((day ? day.label : value.day) + ' - ' + value.time);
     }
     if (field.type === 'members') {
       return h('ul', { class: 'plain' }, value.map(function (m) {
@@ -627,6 +653,8 @@
     var rows = [[t('teamLeader'), S.team.leader], [t('teamCode'), S.team.code]];
     if (S.team.title) rows.push([t('teamProject'), S.team.title]);
     rows.push([t('teamPeople'), S.team.size > 1 ? t('teamPeopleN', { n: S.team.size }) : t('teamSolo')]);
+    var mates = S.team.teammates || [];
+    if (mates.length) rows.push([t('teamMates'), h('ul', { class: 'plain' }, mates.map(function (n) { return h('li', { class: 'person' }, h('bdi', null, n)); }))]);
     return rows;
   }
 
@@ -640,10 +668,9 @@
       return [
         h('p', { class: 'step-help' }, t('teamIs') + ' (' + S.team.ref + ')'),
         teamSummary(),
-        S.teamBooked ? h('div', { class: 'banner', role: 'alert' }, t('teamBooked'), ' ',
-          // The key that found the team usually opens its booking too; when it does not, the key screen says so.
-          h('button', { type: 'button', class: 'link-btn', name: 'open-booking', onclick: function () { S.view = 'keyEntry'; S.keyError = ''; openByKey(S.sourceKey); } }, t('editOpen'))) : null,
-        h('p', { class: 'foot' }, h('button', { type: 'button', class: 'link-btn', name: 'other-key', onclick: function () { S.team = null; S.teamBooked = false; S.sourceKey = ''; S.teamKey = ''; S.teamError = ''; render(); } }, t('otherKey')))
+        // The key that found the team usually opens its booking too; when it does not, the key screen says so.
+        S.teamBooked ? h('div', { class: 'banner info', role: 'status', name: 'team-booked' }, S.teamSlot ? t('teamBookedAt', { when: displayValue(slotField(), S.teamSlot) }) : t('teamBooked')) : null,
+        h('p', { class: 'foot' }, h('button', { type: 'button', class: 'link-btn', name: 'other-key', onclick: function () { forgetTeam(); render(); } }, t('otherKey')))
       ];
     }
     var input = h('input', { class: 'input key-input', id: 'team-key', type: 'text', inputmode: 'numeric', maxlength: '5', autocomplete: 'off', placeholder: '00000', value: S.teamKey });
@@ -655,12 +682,16 @@
     ];
   }
 
+  function forgetTeam() {
+    S.team = null; S.teamBooked = false; S.teamSlot = null; S.teamCanMove = false; S.sourceKey = ''; S.teamKey = ''; S.teamError = '';
+  }
+
   async function findTeam() {
     if (!/^\d{5}$/.test(S.teamKey)) { S.teamError = t('errors.bad_key'); render(); return focusFirstError(); }
     S.busy = true; S.teamError = ''; render();
     try {
       var res = await App.api.call({ action: 'bookingTeam', slug: S.slug, key: S.teamKey });
-      S.team = res.team; S.teamBooked = !!res.booked; S.sourceKey = S.teamKey;
+      S.team = res.team; S.teamBooked = !!res.booked; S.teamSlot = res.slot || null; S.teamCanMove = !!res.canMove; S.sourceKey = S.teamKey;
       S.busy = false;
       render();
       var title = document.getElementById('step-title');
@@ -684,9 +715,10 @@
   function reviewBody() {
     return S.steps.filter(function (s) { return !s.review; }).map(function (s) {
       var i = S.steps.indexOf(s);
+      var canChange = !slotOnly() || s.fields.indexOf(slotField()) !== -1;
       return h('div', { class: 'review-group' },
         h('div', { class: 'member-head' }, h('h3', { class: 'member-title' }, stepTitle(s)),
-          h('button', { type: 'button', class: 'link-btn', onclick: function () { go(i); } }, t('change'))),
+          canChange ? h('button', { type: 'button', class: 'link-btn', onclick: function () { go(i); } }, t('change')) : null),
         summaryList(s));
     });
   }
@@ -720,9 +752,9 @@
   }
 
   function validateAll() {
-    if (keyMode()) {
-      // Only the slot is answered here; everything else comes from the registration.
-      var sf = slotField(), r = Rules.validateField(sf, S.data[sf.id], { form: S.form }), out = { ok: r.ok, errors: {}, data: {} };
+    if (keyMode() || slotOnly()) {
+      // Only the slot is answered here; everything else comes from the registration, or is kept as saved.
+      var sf = slotField(), r = Rules.validateField(sf, S.data[sf.id], { form: S.form }), out = { ok: r.ok, errors: {}, data: keyMode() ? {} : Object.assign({}, S.data) };
       if (r.ok) out.data[sf.id] = r.value; else out.errors[sf.id] = { error: r.error };
       return out;
     }
@@ -830,8 +862,8 @@
       return;
     }
     if (code === 'already_booked') {
-      S.teamBooked = true; S.stepIndex = 0; S.banner = null;
-      return render();
+      S.stepIndex = 0; S.banner = null;
+      return findTeam();
     }
     if (code === 'duplicate_member') {
       // Every clashing member can be asked for: offer that before refusing.
@@ -877,7 +909,8 @@
     return sheet(head(), f);
   }
 
-  async function openByKey(key) {
+  /** Opens a registration with its key, on its summary, or on its time when `toSlot` and the time can change. */
+  async function openByKey(key, toSlot) {
     key = String(key || '').trim();
     if (!/^\d{5}$/.test(key)) { S.keyError = t('errors.bad_key'); return render(); }
     S.busy = true;
@@ -886,7 +919,7 @@
       S.busy = false;
       S.mode = 'edit';
       S.key = key;
-      S.keyInfo = { ref: res.submission.ref, keyExpires: res.keyExpires, canEdit: res.canEdit, canDelete: res.canDelete, locked: !!res.locked };
+      S.keyInfo = { ref: res.submission.ref, keyExpires: res.keyExpires, canEdit: res.canEdit, slotOnly: !!res.slotOnly, canDelete: res.canDelete, locked: !!res.locked };
       S.data = res.submission.data || {};
       var sf = slotField();
       S.ownSlot = sf && S.data[sf.id] ? Rules.slotKey(S.data[sf.id].day, S.data[sf.id].time) : '';
@@ -894,7 +927,7 @@
       S.original = JSON.stringify(S.data);
       S.transfers = res.transfers || { incoming: [], outgoing: [] };
       buildSteps();
-      S.stepIndex = S.steps.length - 1;
+      S.stepIndex = toSlot && res.canEdit && sf ? stepOfPath(sf.id) : S.steps.length - 1;
       S.view = res.canEdit ? 'form' : 'readonly';
       render();
       askTransfers();
@@ -943,15 +976,24 @@
 
   function resetForNew() {
     S.mode = 'new'; S.key = ''; S.keyInfo = null; S.data = {}; S.errors = {}; S.banner = null; S.stepIndex = 0; S.ownSlot = '';
-    S.team = null; S.teamBooked = false; S.sourceKey = ''; S.teamKey = ''; S.teamError = '';
+    forgetTeam();
     buildSteps();
     refreshAvailability().then(function () { S.view = S.state === 'open' ? 'form' : 'closed'; render(); });
   }
 
+  /** The day and time of a booking, for the picture on its ticket. */
+  function bookedWhen() {
+    var sf = slotField(), v = sf && S.data[sf.id];
+    var day = v && ((S.form.slots && S.form.slots.days) || []).filter(function (d) { return d.id === v.day; })[0];
+    return day && v.time ? { day: day, time: v.time } : null;
+  }
+
   function ticketView() {
     var em = Rules.valueByRole(S.form, S.data, 'email');
+    // A booking made with a team's key answers to that key, which the team has already; a new key is shown.
+    var key = S.form.keyBooking && S.result.key === S.sourceKey ? '' : S.result.key;
     var opts = {
-      ref: S.result.ref, key: S.result.key, keyExpires: S.result.keyExpires, edited: !!S.result.edited,
+      ref: S.result.ref, key: key, keyExpires: S.result.keyExpires, edited: !!S.result.edited, when: bookedWhen(), teamKey: !!S.form.keyBooking && !key && !S.result.edited,
       email: !S.result.edited && S.result.emailed ? em : '', summary: ticketSummary()
     };
     var asked = S.result.transfers || [];

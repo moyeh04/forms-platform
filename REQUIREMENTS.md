@@ -40,9 +40,10 @@ step needs the real Google services (see "What could not be tested here").
 | Project folders must be named `Team_Leader_Name_Project_Name_Subject_Name` (no spaces, underscores, ending with the subject name, for example `Software_Engineering`); students see the rule with an example built from their project title | Done, check live |
 | Two-step review before sending | Done |
 | Success ticket: reference, key with an arrow callout, expiry, "take a screenshot" note, Save as image, Save as PDF, Copy key | Done |
+| The ticket of a booking is a stub with torn edges and draws its day and time, the same picture in both languages: a green parrot points at a ship's clock whose hands sweep to the start of the slot, with the slot shaded and a red arrow from the minute hand to its end, and a pirate with a hook and a wooden leg points at the day on a desk calendar. A booking made with a team's key shows that picture instead of the key; one made by hand shows both, and Save as image keeps both | Done |
 | Duplicate leader code says "use your key" | Done |
 | A registration opened with a key can be closed without changing it; Close asks first when something was changed and not saved | Done |
-| A booking made with a team's key asks for a key in one place, and the key that finds a team with a booking opens that booking | Done |
+| A booking made with a team's key asks for a key in one place, and the key that finds a team with a booking shows its time and opens the booking on it, to change the time in one step. The team to confirm is shown with the names of its teammates | Done |
 
 ## Edit key
 | Requirement | Status |
@@ -62,7 +63,8 @@ step needs the real Google services (see "What could not be tested here").
 | Timetable: click dates on a month calendar to offer them, set the hours once (first slot, last slot, slot length, break), and read the result as one row of slots for each day; a click switches one slot off, a day can have its own hours or another name, a slot shows how many teams booked it, and a warning appears when a booking is left on a day or time that was removed; one team per slot (capacity adjustable) | Done |
 | Teammates of a booking: asked or not, the fewest and the most (0 lets a leader book alone), the title and line students read, and which details are asked about each teammate | Done |
 | Moving a student between teams (a switch per form): a leader who names a member of another team can ask for that member, the team registers without them, and the member moves when the leader of the other team approves with the edit key or the admin approves under Responses; emails to both leaders when the form switches them on, a full team cannot receive, a leader cannot be asked for, and a team left under the minimum is reported | Done |
-| One booking per leader code; taken slots crossed out for students | Done |
+| One booking per leader code; every day and time says how many places are left before it is picked, and a full one is drawn as a torn ticket with a red cut | Done |
+| A booking that may be cancelled may also move to another time, without cancelling first; picking another time names the time given up, which anyone can then book | Done |
 | Booking with a registration key: a reservation can take the 5-digit key of a team registration form, show the team to confirm, and ask only for the slot; the same key opens the booking, moves it to another slot and cancels it (a new key is given only when another booking of that form already holds the same digits) | Done |
 | Warning when a timetable change leaves existing bookings without a slot | Done |
 

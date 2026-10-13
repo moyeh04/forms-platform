@@ -73,7 +73,7 @@ function movedBooking_(form, saved, typed) {
   return withSlot_(form, clone(saved), typed[Rules.fieldByRole(form, 'slot').id]);
 }
 
-/** What the student sees before booking, to confirm the key is theirs. No contact details. */
+/** What the student sees before booking, to confirm the key is theirs: names, no contact details. */
 function teamPreview_(source, row) {
   var members = Rules.membersOf(source, row.data);
   return {
@@ -81,7 +81,8 @@ function teamPreview_(source, row) {
     leader: String(Rules.valueByRole(source, row.data, 'name') || ''),
     code: String(Rules.valueByRole(source, row.data, 'code') || ''),
     title: String(Rules.valueByRole(source, row.data, 'title') || ''),
-    size: members.length
+    size: members.length,
+    teammates: members.filter(function (m) { return !m.leader; }).map(function (m) { return String(m.name); })
   };
 }
 
@@ -91,8 +92,14 @@ API.bookingTeam = function (req) {
   var source = requireKeyBookingSource_(form);
   var row = registrationByKey_(source, req.key);
   var code = Rules.fieldByRole(form, 'code');
-  var booked = readResponses(form).some(function (r) { return code && String(r.data[code.id]) === String(row.data[Rules.fieldByRole(source, 'code').id]); });
-  return { team: teamPreview_(source, row), booked: booked };
+  var booking = readResponses(form).filter(function (r) { return code && String(r.data[code.id]) === String(row.data[Rules.fieldByRole(source, 'code').id]); })[0];
+  var out = { team: teamPreview_(source, row), booked: !!booking };
+  // The team's own time, so the page can show it beside the way to change it.
+  if (booking) {
+    out.slot = booking.data[Rules.fieldByRole(form, 'slot').id] || null;
+    out.canMove = editScope_(form) === 'slot';
+  }
+  return out;
 };
 
 

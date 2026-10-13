@@ -93,11 +93,23 @@ test('Booking: cancelling with the key frees the slot for someone else', () => {
   assert.equal(w.book('4230002', sun(0)).ok, true);
 });
 
-test('Booking: editing is off by default for reservations, like the old seminar form', () => {
+test('Booking: by default a key moves a booking to another time and changes nothing else', () => {
   const w = boot();
   const a = w.book('4230001', sun(0));
-  const r = w.api({ action: 'update', slug: w.form.slug, key: a.key, data: {} });
-  assert.equal(r.error.code, 'edit_disabled');
+  const opened = w.api({ action: 'lookup', slug: w.form.slug, key: a.key });
+  assert.deepEqual([opened.canEdit, opened.slotOnly, opened.canDelete], [true, true, true]);
+  assert.equal(w.api({ action: 'update', slug: w.form.slug, key: a.key, data: { slot: sun(2), title: 'Not Their Project' } }).ok, true);
+  const row = w.admin({ action: 'admin.submissions', slug: w.form.slug }).submissions[0];
+  assert.deepEqual([row.data.slot.time, row.title], [sun(2).time, 'Library System']);
+  assert.equal(w.book('4230002', sun(0)).ok, true, 'the time it left is free');
+});
+
+test('Booking: with editing and cancelling both off, a key only shows the booking', () => {
+  const w = boot(null, { editKey: { enabled: true, days: 7, allowEdit: false, allowDelete: false } });
+  const a = w.book('4230001', sun(0));
+  const opened = w.api({ action: 'lookup', slug: w.form.slug, key: a.key });
+  assert.deepEqual([opened.canEdit, opened.slotOnly, opened.canDelete], [false, false, false]);
+  assert.equal(w.api({ action: 'update', slug: w.form.slug, key: a.key, data: { slot: sun(2) } }).error.code, 'edit_disabled');
 });
 
 test('Booking: when editing is allowed, moving frees the old slot and respects taken ones', () => {

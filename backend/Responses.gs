@@ -227,9 +227,9 @@ function checkLimits_(form, data, rows, selfId) {
   var slotField = Rules.fieldByRole(form, 'slot');
   if (slotField && data[slotField.id]) {
     var key = Rules.slotKey(data[slotField.id].day, data[slotField.id].time);
-    var capacity = (form.slots && form.slots.capacity) || 1;
-    var used = others.filter(function (r) { return r.slot === key; }).length;
-    if (used >= capacity) fail('slot_taken', 'That slot was just taken. Pick another.', { slot: key });
+    var counts = {};
+    others.forEach(function (r) { if (r.slot) counts[r.slot] = (counts[r.slot] || 0) + 1; });
+    if (!Rules.slotRoom(form, counts, key)) fail('slot_taken', 'That slot was just taken. Pick another.', { slot: key });
   }
 }
 

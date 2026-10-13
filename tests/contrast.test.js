@@ -48,6 +48,7 @@ const PAIRS = [
   ['accent', 'sheet', 4.5, 'term tag, hints, trail'],
   ['sea', 'sheet', 4.5, 'links'],
   ['err', 'sheet', 4.5, 'error messages'],
+  ['err', 'sheet-2', 4.5, 'Full on a slot that is full'],
   ['on-accent', 'accent', 4.5, 'primary buttons'],
   ['on-sea', 'sea', 4.5, 'Open badge, chosen chips'],
   ['sheet', 'sea', 4.5, 'teal team pill'],
