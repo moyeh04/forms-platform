@@ -147,8 +147,9 @@ function transferResult_(form, result, data) {
   delete result.asked;
   if (!asked.length) return result;
   asked.forEach(function (t) { mailTransfer_(form, t, 'asked'); });
+  var contact = leaderContacts_(form);
   result.data = data;
-  result.transfers = asked.map(function (t) { return { code: t.code, name: t.member.name || '', team: t.fromRef }; });
+  result.transfers = asked.map(function (t) { return Object.assign({ code: t.code, name: t.member.name || '', team: t.fromRef }, contact(t.fromId)); });
   return result;
 }
 

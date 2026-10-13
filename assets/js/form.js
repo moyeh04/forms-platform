@@ -1024,7 +1024,7 @@
       email: !S.result.edited && S.result.emailed ? em : '', summary: ticketSummary()
     };
     var asked = S.result.transfers || [];
-    var note = asked.length ? h('div', { class: 'banner info', role: 'status', name: 'transfer-sent' }, t('transferSent', { list: asked.map(function (a) { return who(a.name, a.code) + ' → ' + a.team; }).join(t('listSep')) })) : null;
+    var note = asked.length ? h('div', { class: 'banner info', role: 'status', name: 'transfer-sent' }, t('transferSent', { list: asked.map(function (a) { return who(a.name, a.code) + ' → ' + a.team; }).join(t('listSep')) }), leaderContacts(asked)) : null;
     return sheet(head(), note, App.ticket.render(opts), App.ticket.actions(opts));
   }
 
@@ -1035,6 +1035,27 @@
     var mf = Rules.fieldByRole(S.form, 'members');
     var hit = ((mf && S.data[mf.id]) || []).filter(function (m) { return String(m.code) === String(code); })[0];
     return hit ? hit.name : '';
+  }
+
+  /**
+   * How to reach the leader of the other team of a request, when the form shows it: the number,
+   * as a WhatsApp link when the form says so, and a button that copies it. Null otherwise.
+   */
+  function leaderContact(r) {
+    if (!r.phone) return null;
+    var link = r.whatsapp ? Rules.whatsappLink(r.phone) : '';
+    return h('p', { class: 'leader-contact', dataset: { team: r.team } }, h('span', null, t('transferLeaderPhone', { team: r.team })),
+      link ? h('a', { class: 'mono', href: link, target: '_blank', rel: 'noopener', dir: 'ltr', title: t('openWhatsapp') }, icon('chat', 18), r.phone) : h('span', { class: 'mono', dir: 'ltr' }, r.phone),
+      h('button', { type: 'button', class: 'link-btn', name: 'copy-phone', onclick: async function () {
+        var ok = await App.ui.copyText(r.phone);
+        App.ui.toast(t(ok ? 'copied' : 'copyFail'), ok ? 'ok' : 'err');
+      } }, icon('copy', 18), t('copyNumber')));
+  }
+
+  /** One line for each other team of `list`, however many of its students were asked for. */
+  function leaderContacts(list) {
+    var seen = {};
+    return list.filter(function (r) { return r.phone && !seen[r.team] && (seen[r.team] = true); }).map(leaderContact);
   }
 
   /** What a request asks: for a member of this team, or for the leader who reads it. */
@@ -1067,6 +1088,7 @@
         h('div', { class: 'dialog', role: 'dialog', 'aria-modal': 'true', 'aria-label': title },
           h('h2', { class: 'dialog-title' }, title),
           h('p', null, askedText(r) + (heirs ? ' ' + t(next ? 'handoverChoose' : 'handoverAlone') : '')),
+          leaderContact(r),
           next ? next.node : null,
           approve ? h('p', { class: 'help' }, after + (r.sizeAfter < r.min ? ' ' + t('transferUnderMin', { min: r.min }) : '')) : null,
           h('div', { class: 'dialog-actions transfer-actions' }, later, btn('btn-quiet', 'transfer-reject', t('transferReject'), function () { done({ approve: false }); }), approve)));
@@ -1134,12 +1156,12 @@
     var tr = S.transfers || {};
     var lines = (tr.incoming || []).map(function (r) {
       return h('div', { class: 'banner info transfer-note', role: 'status', dataset: { transfer: 'incoming' } }, askedText(r), ' ',
-        h('button', { type: 'button', class: 'link-btn', name: 'transfer-answer', onclick: function () { answerTransfer(r); } }, t('transferAnswer')));
+        h('button', { type: 'button', class: 'link-btn', name: 'transfer-answer', onclick: function () { answerTransfer(r); } }, t('transferAnswer')), leaderContact(r));
     }).concat((tr.outgoing || []).map(function (r) {
       var key = { pending: 'transferWaiting', approved: 'transferJoined', rejected: 'transferKept', closed: 'transferElsewhere' }[r.status];
       if (!key) return null;
       return h('div', { class: 'banner info transfer-note', role: 'status', dataset: { transfer: r.status } }, t(key, { team: r.team, who: who(r.name, r.code) }), ' ',
-        r.status === 'pending' ? h('button', { type: 'button', class: 'link-btn', name: 'transfer-cancel', onclick: function () { cancelTransfer(r); } }, t('transferCancel')) : null);
+        r.status === 'pending' ? h('button', { type: 'button', class: 'link-btn', name: 'transfer-cancel', onclick: function () { cancelTransfer(r); } }, t('transferCancel')) : null, leaderContact(r));
     })).filter(Boolean);
     return lines.length ? h('div', { class: 'transfer-notes' }, lines) : null;
   }

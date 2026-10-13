@@ -11,6 +11,9 @@
  * the team next, so the team is never left without a leader. A leader who is alone in a team
  * has nobody to hand it to and cannot be asked for.
  *
+ * With `rules.transferPhones` the two leaders of a waiting request see each other's phone, so
+ * they can talk before one of them answers.
+ *
  * Requests are rows of the tab "Transfers" in the sheet of the form. The tab is made with the
  * first request, so a form that never has one keeps its sheet as it is.
  */
@@ -61,6 +64,23 @@ function setTeamSize_(form, data) {
   var mf = Rules.fieldByRole(form, 'members');
   var sf = Rules.fieldByRole(form, 'team_size');
   if (mf && sf && data[sf.id] != null) data[sf.id] = String((data[mf.id] || []).length + 1);
+}
+
+/**
+ * Returns a function from a team id to what a leader may see of that team's leader while a
+ * request waits: { phone }, with whatsapp: true when the form opens the number in WhatsApp.
+ * Nothing unless the form shows the phones. The teams are read once, on the first call.
+ */
+function leaderContacts_(form) {
+  var rules = form.rules || {}, rows = null;
+  return function (teamId) {
+    if (rules.transferPhones !== true) return {};
+    rows = rows || readResponses(form);
+    var team = rows.filter(function (r) { return r.id === teamId; })[0];
+    var phone = team ? String(Rules.valueByRole(form, team.data, 'phone') || '') : '';
+    if (!phone) return {};
+    return rules.transferWhatsapp === true ? { phone: phone, whatsapp: true } : { phone: phone };
+  };
 }
 
 /**
@@ -212,13 +232,14 @@ function teamTransfers_(form, team) {
   if (!all.length) return { incoming: [], outgoing: [] };
   var range = Rules.teamSizeRange(form);
   var people = Rules.membersOf(form, team.data);
+  var contact = leaderContacts_(form);
   return {
     incoming: all.filter(function (t) { return t.status === 'pending' && t.fromId === team.id; }).map(function (t) {
       var m = people.filter(function (x) { return String(x.code) === t.code; })[0] || {};
-      return Object.assign({ id: t.id, code: t.code, name: m.name || '', team: t.toRef, sizeAfter: Math.max(people.length - 1, 0), min: range.min }, leaderAsked_(form, team, t.code));
+      return Object.assign({ id: t.id, code: t.code, name: m.name || '', team: t.toRef, sizeAfter: Math.max(people.length - 1, 0), min: range.min }, leaderAsked_(form, team, t.code), contact(t.toId));
     }),
     outgoing: all.filter(function (t) { return t.toId === team.id && t.status !== 'cancelled'; }).map(function (t) {
-      return { id: t.id, code: t.code, name: t.member.name || '', team: t.fromRef, status: t.status };
+      return Object.assign({ id: t.id, code: t.code, name: t.member.name || '', team: t.fromRef, status: t.status }, t.status === 'pending' ? contact(t.fromId) : {});
     })
   };
 }

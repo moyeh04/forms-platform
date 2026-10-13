@@ -203,6 +203,31 @@ test('Transfer: the admin moves a leader with the same question, and sees who ca
   assert.deepEqual([teamA.data.leader_code, codesOf(teamA)], ['4230003', ['4230002']]);
 });
 
+test('Transfer: with the switch on, the two leaders of a waiting request see each other\'s phone', () => {
+  const phoned = (req, phone) => ({ ...req, data: { ...req.data, phone } });
+  const w = boot({ transferPhones: true });
+  const a = send(w, phoned(team(4230001, [4230002, 4230003]), '01011111111'));
+  const refused = send(w, phoned(team(4230011, [4230002, 4230004]), '01022222222'));
+  assert.deepEqual(refused.error.details.transfer, [{ code: '4230002', team: a.ref }], 'no number before the team has asked');
+  const b = send(w, phoned(team(4230011, [4230002, 4230004], { transfer: ['4230002'] }), '01022222222'));
+  assert.deepEqual(b.transfers, [{ code: '4230002', name: NAMES[4230002], team: a.ref, phone: '01011111111' }]);
+  const seen = (key) => send(w, { action: 'lookup', key }).transfers;
+  assert.deepEqual([seen(a.key).incoming[0].phone, seen(a.key).incoming[0].whatsapp], ['01022222222', undefined]);
+  assert.equal(seen(b.key).outgoing[0].phone, '01011111111');
+
+  const rules = w.admin({ action: 'admin.forms.get', id: w.slug }).form.rules;
+  w.admin({ action: 'admin.forms.update', id: w.slug, patch: { rules: { ...rules, transferWhatsapp: true } } });
+  assert.deepEqual([seen(a.key).incoming[0].whatsapp, seen(b.key).outgoing[0].whatsapp], [true, true]);
+
+  send(w, { action: 'transfer.decide', key: a.key, id: seen(a.key).incoming[0].id, approve: false });
+  assert.deepEqual(seen(b.key).outgoing.map((t) => [t.status, t.phone]), [['rejected', undefined]], 'an answered request no longer shows the number');
+
+  const off = boot({ transferWhatsapp: true });
+  const { a: a2, b: b2 } = asked(off);
+  assert.equal(b2.transfers[0].phone, undefined, 'the WhatsApp switch alone shows nothing');
+  assert.equal(send(off, { action: 'lookup', key: a2.key }).transfers.incoming[0].phone, undefined);
+});
+
 test('Transfer: off by default, and a cancelled team takes its requests with it', () => {
   const off = boot({ transfers: false });
   send(off, team(4230001, [4230002, 4230003]));
@@ -240,9 +265,16 @@ test('Transfer dashboard: the rule is a switch under one team per student, and R
   const mail = set.$('[name="transferEmails"]');
   assert.equal(mail.closest('.sub-setting').hidden, false);
   assert.equal(mail.checked, false, 'transfer emails start switched off');
+  const phones = set.$('[name="transferPhones"]'), whatsapp = set.$('[name="transferWhatsapp"]');
+  assert.equal(phones.closest('.sub-setting'), mail.closest('.sub-setting'), 'the phone switch sits with the other choices of a request');
+  assert.deepEqual([phones.checked, whatsapp.closest('.sub-setting').hidden], [false, true], 'the WhatsApp switch waits for the phone switch');
+  phones.checked = true; set.fire(phones, 'change');
+  assert.equal(whatsapp.closest('.sub-setting').hidden, false);
+  whatsapp.checked = true; set.fire(whatsapp, 'change');
   set.click('[name="save"]'); await settle(12);
   const saved = w.admin({ action: 'admin.forms.get', id: w.slug }).form.rules;
-  assert.deepEqual([saved.transfers, saved.transferEmails === true], [true, false]);
+  assert.deepEqual([saved.transfers, saved.transferEmails === true, saved.transferPhones, saved.transferWhatsapp], [true, false, true, true]);
+  w.admin({ action: 'admin.forms.update', id: w.slug, patch: { rules: { ...saved, transferPhones: false, transferWhatsapp: false } } });
 
   const a = send(w, team(4230001, [4230002]));
   const b = send(w, team(4230011, [4230002, 4230004], { transfer: ['4230002'] }));

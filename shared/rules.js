@@ -88,6 +88,12 @@
     return /^01[0125]\d{8}$/.test(d) ? d : '';
   }
 
+  /** The WhatsApp chat of an Egyptian mobile number, or '' when it is not one. */
+  function whatsappLink(raw) {
+    var p = normalizePhone(raw);
+    return p ? 'https://wa.me/2' + p : '';
+  }
+
   /** Finds every Egyptian mobile number inside free text (a pasted WhatsApp line). */
   function extractPhones(text) {
     var s = latinDigits(text);
@@ -499,6 +505,7 @@
     validateArabicName: validateArabicName,
     validateEnglishText: validateEnglishText,
     normalizePhone: normalizePhone,
+    whatsappLink: whatsappLink,
     extractPhones: extractPhones,
     validatePhone: validatePhone,
     validateCode: validateCode,

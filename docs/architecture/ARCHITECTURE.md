@@ -1058,6 +1058,14 @@ Rules of the move:
 - The popup names the other team by its reference only, and says when the
   student leads it, so a code typed at random does not show who else is in
   which team.
+- With `rules.transferPhones` the two leaders of a request see each other's
+  phone while it waits: `leaderContacts_` adds `phone` to the request in
+  `lookup` and in the answer of the `submit` or `update` that made it. The
+  refusal that offers the request carries no number, so a phone is shown only
+  to a team that registered and asked, and it goes away with the answer. With
+  `rules.transferWhatsapp` the request also carries `whatsapp: true` and the
+  page links the number with `Rules.whatsappLink`. The page draws the number
+  in one place, `leaderContact` in `form.js`, always with a Copy button.
 - Nothing of a member who moves is asked: the two leaders, or the admin,
   decide. A leader who is asked for answers for themselves.
 - A leader learns about a request by opening the form with the key. Emails to
