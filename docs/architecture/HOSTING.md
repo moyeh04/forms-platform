@@ -264,7 +264,7 @@ read, filter, and print.
 }}%%
 flowchart TD
     q{"What did you change?"}
-    q -- "pages, styles, scripts in assets" --> a1["git push<br/>Pages republishes in about a minute"]
+    q -- "pages, styles, scripts in assets" --> a1["push master<br/>Actions tests, skips the backend,<br/>Pages republishes"]
     q -- "backend or shared/rules.js" --> a2["push master<br/>Actions tests and builds<br/>clasp updates existing deployment"]
     q -- "a rule in shared/rules.js" --> a3["push master once<br/>Actions updates the server copy,<br/>then publishes the browser copy"]
     q -- "a form's questions or team sizes" --> a4["Nothing to deploy.<br/>Change it in the dashboard."]

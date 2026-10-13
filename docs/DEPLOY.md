@@ -150,7 +150,7 @@ git push -u origin master
 
 The run **Test and deploy site** starts on every push to `master`: it checks the
 workflow, runs the tests, builds the configured site, updates the Apps Script
-deployment, then publishes `index.html`, `admin.html`, `viewer.html`, `assets/`,
+deployment when a backend file changed, then publishes `index.html`, `admin.html`, `viewer.html`, `assets/`,
 and `shared/`. Follow it and read the site address with:
 
 ```bash
@@ -216,6 +216,15 @@ workflow validation and tests, backend bundle, site configuration generated from
 `API_URL`, Apps Script update, then GitHub Pages publication. Pull requests run
 checks only. Running the workflow from another branch cannot deploy.
 
+**The backend is deployed only when it changed.** A push that touches nothing
+under `backend/` or `shared/`, nor the bundler, the clasp preparation or the
+workflow itself, skips the Apps Script job and publishes the site alone, so a
+change to a page or a document does not make a new backend version. The check
+compares the push with the commit before it; when that cannot be done (a first
+push, a rewritten branch) the backend is deployed. **Run workflow** on the
+Actions tab always deploys it, which is also the way to deploy again after a
+run whose backend job failed.
+
 **Required Pages setting:** repository **Settings > Pages > Build and deployment >
 Source: GitHub Actions**. A branch deployment cannot inject repository variables
 and serves the placeholder in `assets/js/config.js` directly.
@@ -260,14 +269,33 @@ No service restart is required. Wait for **Test and deploy site** to succeed,
 then hard-refresh the website. A branch-based **pages build and deployment** run
 is not evidence that this configured workflow succeeded.
 
-### Local preview and export
+### Local preview
 
 GitHub variables are available inside Actions; they do not configure a raw
 local checkout. Use `npm run dev` for the in-memory preview (admin PIN `4321`).
 To package a site locally, set `API_URL` in your shell and run
 `npm run build:site`; serve `_site/`. Keep the source placeholder unchanged.
-For the Excel exporter, supply the existing `--api` option or `FORMS_API_URL`
-environment variable, since source `config.js` contains no deployment URL.
+
+### Going back to an earlier backend
+
+Each backend deployment writes one line to the summary of its run on the
+Actions tab: the version it made and the commit it serves. If a new version
+misbehaves, put the web app back on the one before it:
+
+1. Open the Apps Script project, then **Deploy > Manage deployments**.
+2. Press the pencil on the existing deployment, pick the earlier number under
+   **Version**, and press **Deploy**. The address does not change.
+3. Fix the code and push. The next deployment makes a newer version and moves
+   the web app to it.
+
+The same from a terminal that is signed in with clasp:
+
+```bash
+npx @google/clasp@3.4.1 deploy -i <deployment id> -V <earlier version> --description "Back to <earlier version>"
+```
+
+Going back changes the code only. Rows that the newer version wrote stay as
+they are.
 
 ### Manual backend recovery
 

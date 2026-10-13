@@ -1,11 +1,11 @@
 # Testing
 
-287 automated tests run without a Google account, a browser, or a network.
+288 automated tests run without a Google account, a browser, or a network.
 They run the **real** backend and the **real** pages. This page explains how
 that works and what it can and cannot prove.
 
 ```
-npm test    # 287 tests
+npm test    # 288 tests
 ```
 
 ## The layers
@@ -156,7 +156,7 @@ function that calls `world.api`. Helpers `type`, `pick`, `click`,
 | Registry writes | 6 | Every change to forms, lists and links written inside the lock, a save that keeps its row while another form is deleted, a save over a newer copy refused, a busy lock, a link that keeps a renamed form, list names that stay unique |
 | Harness | 4 | The fake itself |
 | Colour contrast | 4 | Every text and outline pair meets WCAG AA in light, dark, and device-dark themes |
-| Deployment | 14 | `API_URL` validation, URL and deployment ID agree, built pages use the variable URL, clasp configuration, missing credentials, first-deployment setup with a fake `gh` and clasp |
+| Deployment | 15 | A push without a backend change skips the Apps Script job and one that cannot be compared deploys, `API_URL` validation, URL and deployment ID agree, built pages use the variable URL, clasp configuration, missing credentials, first-deployment setup with a fake `gh` and clasp |
 
 ## What is not covered, and how to cover it
 
