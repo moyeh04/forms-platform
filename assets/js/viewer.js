@@ -203,7 +203,12 @@
 
   function teams(d) {
     var groups = d.groups.filter(matches);
-    if (!groups.length) return h('div', { class: 'empty' }, 'No teams to show.');
+    // The small teams are counted over the whole form, whatever the search shows.
+    var warned = App.sizeAlerts.summary(d.sizeAlerts, d.groups.map(function (g) { return { label: 'Team ' + g.number, alert: g.alert }; }));
+    return h('div', null, warned, groups.length ? teamList(d, groups) : h('div', { class: 'empty' }, 'No teams to show.'));
+  }
+
+  function teamList(d, groups) {
     var ids = colIds(d);
     var showName = ids.indexOf('name') !== -1, showSection = ids.indexOf('section') !== -1, showCode = ids.indexOf('code') !== -1, showPhone = ids.indexOf('phone') !== -1;
     var third = d.form.type === 'task_submission' ? 'Task' : 'Project';
@@ -215,7 +220,7 @@
           h('span', { class: 'team-no' }, 'Team ' + g.number),
           hasTitle ? h('div', { class: 'block-side block-title' }, h('span', { class: 'kicker' }, third),
             g.link ? h('a', { href: g.link, target: '_blank', rel: 'noopener' }, g.title || 'Open', icon('link', 15)) : h('span', null, g.title || '-')) : h('div', { class: 'block-title' }),
-          h('span', { class: 'block-meta' }, g.members.length === 1 ? 'Solo' : g.members.length + ' members')),
+          h('span', { class: 'block-meta' }, g.members.length === 1 ? 'Solo' : g.members.length + ' members', App.sizeAlerts.tag(d.sizeAlerts, g.alert))),
         h('div', { class: 'scroll-x' }, h('table', { class: 'mini' },
           h('thead', null, h('tr', null, head)),
           h('tbody', null, g.members.map(function (m, k) {

@@ -225,7 +225,7 @@ function createForm(o, adjust) {
   return addForm_(form, o.slug, adjust);
 }
 
-/** Merges new rule settings over the old ones and checks the team size range. */
+/** Merges new rule settings over the old ones and checks the team size range and the warnings about small teams. */
 function normalizeRules_(current, next) {
   var merged = Object.assign({}, current || {}, next || {});
   LIMITED_LISTS_.forEach(function (list) {
@@ -240,6 +240,15 @@ function normalizeRules_(current, next) {
     merged.teamSize = { min: min, max: max };
     var notice = next && next.teamSize && next.teamSize.notice !== undefined ? next.teamSize.notice : current && current.teamSize && current.teamSize.notice;
     if (notice) merged.teamSize.notice = normalizeSizeNotice_(notice, min, max);
+  }
+  if (merged.sizeAlerts !== undefined) {
+    var stop = Rules.sizeAlertsProblem({ rules: merged });
+    if (stop) {
+      fail('bad_size_alerts', stop.error === 'order'
+        ? 'The warning must be for a higher number than the critical warning, or no team gets it.'
+        : 'A warning about small teams needs a number from ' + stop.min + ' to ' + stop.max + '.', { level: stop.level, error: stop.error });
+    }
+    merged.sizeAlerts = Rules.sizeAlerts({ rules: merged });
   }
   return merged;
 }

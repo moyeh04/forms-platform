@@ -131,6 +131,23 @@ test('Admin: an impossible range is refused with a clear message', () => {
   assert.equal(patch({ min: '2', max: '5' }).ok, true, 'numbers typed as text are accepted');
 });
 
+test('Admin: the warnings about small teams are saved cleaned, and a wrong number or order is refused', () => {
+  const w = boot();
+  const patch = (sizeAlerts) => w.admin({ action: 'admin.forms.update', id: w.form.id, patch: { rules: { sizeAlerts } } });
+  const r = patch({ critical: { on: true, below: '3' }, warning: { on: true, below: 5 }, extra: 1 });
+  assert.deepEqual(r.form.rules.sizeAlerts, { critical: { on: true, below: 3 }, warning: { on: true, below: 5 } });
+  assert.equal(r.form.rules.uniqueBy, 'leader_code', 'other rules are kept');
+  const order = patch({ critical: { on: true, below: 4 }, warning: { on: true, below: 4 } });
+  assert.equal(order.error.code, 'bad_size_alerts');
+  assert.deepEqual(order.error.details, { level: 'warning', error: 'order' });
+  assert.equal(patch({ critical: { on: true, below: 1 } }).error.details.error, 'range');
+  assert.equal(patch({ warning: { on: true, below: 7 } }).error.code, 'bad_size_alerts', 'the template allows teams of up to 6');
+  assert.deepEqual(w.admin({ action: 'admin.forms.get', id: w.form.id }).form.rules.sizeAlerts.warning, { on: true, below: 5 }, 'a refused save changes nothing');
+  const pub = w.api({ action: 'getForm', slug: w.form.slug });
+  assert.deepEqual(pub.form.rules.teamSize, { min: 1, max: 6 });
+  assert.equal(JSON.stringify(pub).includes('sizeAlerts'), false, 'students are not sent the warnings');
+});
+
 test('Students: the public form exposes the range so the page can offer the right choices', () => {
   const w = boot();
   w.admin({ action: 'admin.forms.update', id: w.form.id, patch: { rules: { teamSize: { min: 2, max: 3 } } } });

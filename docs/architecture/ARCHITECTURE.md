@@ -496,6 +496,39 @@ and the note with its preview. `Rules.sizeNotice` fills in both notes, and the
 backend cleans both with `normalizeSizeNotice_`. A booking shows the note under
 the teammates when the leader has added one of its numbers.
 
+### Warnings about small teams
+
+A team can end up small, for example after a member moved to another team. A
+form has two warnings for that, a critical one and a normal one, each with its
+own switch and its own number: a team with fewer people than the number gets
+the level, and a team under both gets the critical one. Nothing is fixed in the
+code: `rules.sizeAlerts` holds the switches and the numbers, and a level that
+was never set starts from the biggest team size (about half of it, and one
+person under it).
+
+| Responsibility | Owner |
+|---|---|
+| The levels, their starting numbers, the level of a team, and why a setting cannot be saved | `Rules.sizeAlerts`, `Rules.sizeAlertLevels`, `Rules.sizeAlertOf`, `Rules.sizeAlertsProblem` in `shared/rules.js` |
+| Checking and cleaning the setting on a save | `normalizeRules_` in `Registry.gs`, with the same `Rules` functions (`bad_size_alerts`) |
+| The control in the Small teams panel of Setup | `A.sizeAlerts` in `admin-size-alerts.js`; it returns `{ node, refresh(), problem(), summary() }` like the range control |
+| Whether an instructor sees them | `showSizeAlerts` of each link in `Clients.gs`, set in the link dialog (`admin-people.js`) |
+| The lines above the teams and the mark on a card | `App.sizeAlerts` in `size-alerts.js`, used by the dashboard and the instructor page |
+
+The dashboard loads `shared/rules.js` and asks it for the level of each team.
+The instructor page does not, so `viewer.data` sends the levels that are on
+and the level of each small team, worked out by the same functions, and sends
+neither to a link whose `showSizeAlerts` is off. A team is counted by its people
+(`Rules.membersOf`), so hiding a column from a link does not change the count.
+The line about teams under the minimum size stays as it is: it says a team
+breaks the range of the form, while these two levels are the admin's choice.
+
+The warnings are set in Setup, not next to the team size in Questions: Questions
+holds what students are asked, and the warnings only change what the admin and
+instructors see (UI rule 20). The numbers are still bounded by the biggest team
+size, so the panel is drawn again when the range changes in the other tab.
+Whether an instructor sees them belongs to the person, not the form, so it is
+a setting of their link, next to whether they may review.
+
 ## Reviews and WhatsApp matching
 
 WhatsApp does not let a website read pending join requests. So the reviewer
@@ -692,7 +725,9 @@ flowchart LR
     subgraph adminp["admin.html"]
         a1["admin.js<br/>shell, login, forms list"]
         a2["admin-settings.js"]
+        a7["admin-size-alerts.js<br/>warnings about small teams"]
         h2["handover.js<br/>who leads a team next"]
+        s2["size-alerts.js<br/>small teams, drawn"]
         a3["admin-data.js<br/>blocks, matching, print"]
         a4["admin-people.js<br/>clients"]
         a5["admin-keys.js<br/>key and link end dates"]

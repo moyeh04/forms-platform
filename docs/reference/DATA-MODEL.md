@@ -78,6 +78,7 @@ erDiagram
         string keyHash
         string keySeal
         string expires
+        string showSizeAlerts
     }
     REQUEST {
         string id
@@ -134,7 +135,7 @@ The `config` cell is the reason new forms need no code:
 | `icon` | `team`, `calendar`, `task`, `chat`, or `none` |
 | `fields` | The questions: id, type, role, labels and an optional description (`help`) in English and Arabic, required, enabled, list name, name parts. A question added by the admin has `custom: true`, an id that starts with `q_`, the type `text`, `textarea` or `select`, and for `select` its own `options`. On a reservation the teammates question (`role: members`) also has `min` and `max` (0 to 19, not counting the leader) and an optional `notice` of the same shape as the team size note, shown for those numbers of teammates |
 | `steps` | The pages of the form in order: id, `title` in English and Arabic, and the ids of its questions in order. The admin can add, rename and reorder pages |
-| `rules` | `uniqueBy`, `uniqueAcrossForm`, `driveCheck`, `maxSubmissions`, `majors` (specializations allowed to register; empty means all), `sections` (sections offered and accepted; empty means all), `folderName { enabled, subject }` (Drive folder names must be `Team_Leader_Name_Project_Name_Subject_Name`; the subject name, for example `Software_Engineering`; empty accepts any subject name), `transfers` (a leader may ask for a student of another team), with `transferEmails` (email both leaders), `transferPhones` (show the two leaders of a waiting request each other's phone) and `transferWhatsapp` (the phone is a WhatsApp link), all off unless ticked, **`teamSize { min, max, notice }`**. `notice` is optional: `{ sizes: [3, 4], text: { en, ar } }`, a note shown to students who pick one of those sizes; `{n}` and `{max}` are filled in |
+| `rules` | `uniqueBy`, `uniqueAcrossForm`, `driveCheck`, `maxSubmissions`, `majors` (specializations allowed to register; empty means all), `sections` (sections offered and accepted; empty means all), `folderName { enabled, subject }` (Drive folder names must be `Team_Leader_Name_Project_Name_Subject_Name`; the subject name, for example `Software_Engineering`; empty accepts any subject name), `transfers` (a leader may ask for a student of another team), with `transferEmails` (email both leaders), `transferPhones` (show the two leaders of a waiting request each other's phone) and `transferWhatsapp` (the phone is a WhatsApp link), all off unless ticked, `sizeAlerts { critical { on, below }, warning { on, below } }` (the two warnings about small teams: a level that is on marks the teams with fewer people than `below`, a whole number from 2 to the biggest team size, and the warning must be above the critical one; whether an instructor sees them is `showSizeAlerts` of their link), **`teamSize { min, max, notice }`**. `notice` is optional: `{ sizes: [3, 4], text: { en, ar } }`, a note shown to students who pick one of those sizes; `{n}` and `{max}` are filled in |
 | `editKey` | `enabled`, `days`, `allowEdit`, `allowDelete`. On a reservation, a booking that may be cancelled may also move to another time, since cancelling and booking again does the same; with `allowEdit` off only its time changes. A booking made with a team's key only ever changes its time |
 | `slots` | Reservation days (id, label, date, times), `capacity`, and `pattern { start, end, length, gap }`: the session hours new days start with |
 | `keyBooking` | Reservations only: `enabled` and `source` (the id of the registration form whose keys book this one) |
@@ -174,6 +175,7 @@ whichever list of the kind `sections` a question reads.
 | `keyHash` | `sha256(pepper + ':clientkey:' + id + ':' + key)` for the six-digit access key, or empty when the link asks for none |
 | `keySeal` | The access key sealed for the admin: `S` plus six digits, each shifted by a pad from `sha256(pepper + ':clientseal:' + id)`. Empty for a link without a key, and for keys made before this column existed. |
 | `expires` | ISO time the link stops working, or empty for no end |
+| `showSizeAlerts` | `0` when the link does not show the warnings about small teams; empty or `1` shows them |
 
 `keyHash`, `keySeal` and `expires` were added after the first release. A Clients
 tab without them gets the headers the next time a link is saved; until then the

@@ -341,6 +341,63 @@
     return mf ? sizeNotice(mf.notice, count, mf.max, lang) : '';
   }
 
+  /* ── Warnings about small teams ───────────────────────────────── */
+
+  /** The levels, the stronger one first: a team gets the first one it falls under. */
+  var SIZE_ALERT_LEVELS = ['critical', 'warning'];
+
+  /** The highest number a level can ask for: a team of the biggest size is never small. */
+  function sizeAlertCeiling(form) { return Math.max(teamSizeRange(form).max, 2); }
+
+  /**
+   * The warnings about small teams of a form: { critical, warning }.
+   * A level is { on, below } and marks the teams with fewer people than `below`. A level that was
+   * never set starts from the biggest team size: about half of it, and one person under it.
+   * Whether an instructor sees them is a setting of each instructor link, not of the form.
+   */
+  function sizeAlerts(form) {
+    var raw = (form && form.rules && form.rules.sizeAlerts) || {};
+    var max = sizeAlertCeiling(form);
+    var half = Math.max(2, Math.ceil(max / 2));
+    var start = { critical: half, warning: Math.min(max, Math.max(max - 1, half + 1)) };
+    var out = {};
+    SIZE_ALERT_LEVELS.forEach(function (k) {
+      var n = parseInt(raw[k] && raw[k].below, 10);
+      out[k] = { on: !!(raw[k] && raw[k].on === true), below: n >= 2 ? Math.min(n, max) : start[k] };
+    });
+    return out;
+  }
+
+  /**
+   * Why the warnings a form was given cannot be saved: { level, error }, or null.
+   * 'range': the number of a level that is on is not a whole number from 2 to the biggest team size.
+   * 'order': the warning is not for a higher number than the critical one, so no team would get it.
+   */
+  function sizeAlertsProblem(form) {
+    var raw = (form && form.rules && form.rules.sizeAlerts) || {};
+    var max = sizeAlertCeiling(form);
+    var on = SIZE_ALERT_LEVELS.filter(function (k) { return raw[k] && raw[k].on === true; });
+    var bad = on.filter(function (k) {
+      var s = String(raw[k].below == null ? '' : raw[k].below).trim();
+      return !/^\d+$/.test(s) || +s < 2 || +s > max;
+    })[0];
+    if (bad) return { level: bad, error: 'range', min: 2, max: max };
+    if (on.length === 2 && +raw.warning.below <= +raw.critical.below) return { level: 'warning', error: 'order', min: 2, max: max };
+    return null;
+  }
+
+  /** The levels that are on, the stronger one first: [{ level, below }]. */
+  function sizeAlertLevels(alerts) {
+    return SIZE_ALERT_LEVELS.filter(function (k) { return alerts[k] && alerts[k].on; })
+      .map(function (k) { return { level: k, below: alerts[k].below }; });
+  }
+
+  /** The level a team of `count` people falls under, or ''. */
+  function sizeAlertOf(alerts, count) {
+    var hit = sizeAlertLevels(alerts).filter(function (l) { return count < l.below; })[0];
+    return hit ? hit.level : '';
+  }
+
   function validateTeamSize(raw, form) {
     var r = teamSizeRange(form);
     var s = latinDigits(raw).trim();
@@ -530,6 +587,10 @@
     teamSizeRange: teamSizeRange,
     sizeNotice: sizeNotice,
     teamSizeNotice: teamSizeNotice,
+    sizeAlerts: sizeAlerts,
+    sizeAlertsProblem: sizeAlertsProblem,
+    sizeAlertLevels: sizeAlertLevels,
+    sizeAlertOf: sizeAlertOf,
     teammateNotice: teammateNotice,
     latinDigits: latinDigits,
     isEmpty: isEmpty

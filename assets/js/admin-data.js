@@ -50,11 +50,15 @@
       return all.filter(function (s) { return (state.status === 'all' || s.status === state.status) && (!q || haystack(form, s).indexOf(q) !== -1); });
     }
 
-    /** What waits for the admin: members asked for by another team, and teams under the minimum size. */
+    /** What waits for the admin: members asked for by another team, teams under the minimum size, and the small teams the form warns about. */
     function needsYou() {
       var range = Rules.teamSizeRange(form), sizeField = Rules.fieldByRole(form, 'team_size');
       var small = sizeField ? all.filter(function (s) { return parseInt(s.data[sizeField.id], 10) < range.min; }) : [];
-      if (!transfers.length && !small.length) return null;
+      var alerts = Rules.sizeAlerts(form);
+      var warned = sizeField ? App.sizeAlerts.summary(Rules.sizeAlertLevels(alerts), all.map(function (s) {
+        return { label: 'Team ' + s.number, alert: Rules.sizeAlertOf(alerts, Rules.membersOf(form, s.data).length) };
+      })) : null;
+      if (!transfers.length && !small.length && !warned) return null;
       var emailField = Rules.fieldByRole(form, 'email');
       // Moving a leader first asks who leads the team next, with the question the leader gets on the form.
       var askNext = function (t) {
@@ -91,7 +95,8 @@
               h('button', { type: 'button', class: 'btn btn-quiet sm', name: 'transfer-reject', onclick: decide(t, false) }, 'Reject'),
               alone ? null : h('button', { type: 'button', class: 'btn btn-primary sm', name: 'transfer-approve', onclick: decide(t, true) }, 'Approve and move')));
         }),
-        small.length ? h('p', { class: 'request-warn', name: 'under-min' }, (small.length === 1 ? 'One team is' : small.length + ' teams are') + ' under the minimum of ' + range.min + ': ' + small.map(function (s) { return s.ref; }).join(', ') + '.') : null);
+        small.length ? h('p', { class: 'request-warn', name: 'under-min' }, (small.length === 1 ? 'One team is' : small.length + ' teams are') + ' under the minimum of ' + range.min + ': ' + small.map(function (s) { return s.ref; }).join(', ') + '.') : null,
+        warned);
     }
 
     function paint() {
@@ -249,6 +254,7 @@
   function teams(form, rows, reload) {
     var sorted = rows.slice().sort(function (a, b) { return a.number - b.number; });
     var third = form.type === 'task_submission' ? 'Task' : 'Project';
+    var alerts = Rules.sizeAlerts(form), levels = Rules.sizeAlertLevels(alerts);
     return h('div', { class: 'team-list' }, sorted.map(function (s, i) {
       var members = Rules.membersOf(form, s.data);
       var title = s.title || '-';
@@ -257,7 +263,7 @@
           h('span', { class: 'team-no' }, 'Team ' + s.number),
           h('div', { class: 'block-side block-title' }, h('span', { class: 'kicker' }, third),
             s.link ? h('a', { href: s.link, target: '_blank', rel: 'noopener' }, title, icon('link', 15)) : h('span', null, title)),
-          h('span', { class: 'block-meta' }, h('span', { class: 'mono' }, s.ref), ' · ', members.length === 1 ? 'Solo' : members.length + ' members'),
+          h('span', { class: 'block-meta' }, h('span', { class: 'mono' }, s.ref), ' · ', members.length === 1 ? 'Solo' : members.length + ' members', App.sizeAlerts.tag(levels, Rules.sizeAlertOf(alerts, members.length))),
           h('div', { class: 'actions block-actions' }, statusSelect(form, s), detailsButton(form, s, reload))),
        h('div', { class: 'scroll-x' }, h('table', { class: 'mini' },
           h('thead', null, h('tr', null, h('th', null, '#'), h('th', null, 'Team member'), h('th', null, 'Section'), h('th', null, 'Code'), h('th', null, 'Phone'))),

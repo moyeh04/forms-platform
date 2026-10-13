@@ -240,7 +240,7 @@
     var teammatePanel = null;
 
     /* Team size -------------------------------------------------- */
-    var sizePanel = null, sizeRange = null;
+    var sizePanel = null, sizeRange = null, sizeAlerts = null, alertsPanel = null;
     if (hasSize) {
       f.rules.teamSize = f.rules.teamSize || { min: 1, max: 6 };
       sizeRange = A.sizeRange(f.rules.teamSize, {
@@ -255,6 +255,13 @@
         }
       });
       sizePanel = panel('Team size', 'Students must say how many people are in the team, then fill in exactly that many member forms. The number counts the leader, so a team of 1 works alone.', sizeRange.node);
+      // The warnings decide what the admin and instructors see, not what students are asked, so they live in Setup.
+      sizeAlerts = A.sizeAlerts(f);
+      alertsPanel = panel('Small teams', ['A team can end up small, for example when one of its members moves to another team. Teams with fewer people than the number you set are marked under Responses. Each instructor link decides whether it shows them too, under ',
+        h('a', { href: '#/clients' }, 'Clients'), '.'], sizeAlerts.node);
+      alertsPanel.summary = sizeAlerts.summary;
+      // The warnings are bounded by the biggest team size, set in the Questions tab, so they are drawn again when the range changes.
+      sizeRange.node.addEventListener('input', sizeAlerts.refresh);
     }
 
     /* Edit key --------------------------------------------------- */
@@ -621,6 +628,7 @@
       var few = added.filter(function (fd) { return fd.type === 'select' && (fd.options || []).length < 2; })[0];
       if (few) return { panel: fieldsPanel, text: '"' + (few.label.en || few.label.ar) + '" needs at least two choices.' };
       if (sizeRange && sizeRange.problem()) return { panel: sizePanel, text: sizeRange.problem() };
+      if (sizeAlerts && sizeAlerts.problem()) return { panel: alertsPanel, text: sizeAlerts.problem() };
       if (tmRange && reservationMembers.enabled !== false && tmRange.problem()) return { panel: teammatePanel, text: tmRange.problem() };
       if (timetable && timetable.problem()) return { panel: slotsPanel, text: timetable.problem() };
       return null;
@@ -657,7 +665,7 @@
     var tabs = [
       { id: 'questions', label: 'Questions', panels: [fieldsPanel, sizePanel, teammatePanel] },
       slotsPanel ? { id: 'timetable', label: 'Timetable', panels: [slotsPanel, keyBookPanel], alert: function () { return !f.slots.days.length; } } : null,
-      { id: 'settings', label: 'Setup', panels: [general, majorsPanel, keyPanel, emailPanel, rulesPanel, reviewPanel, dangerPanel] }
+      { id: 'settings', label: 'Setup', panels: [general, majorsPanel, keyPanel, emailPanel, rulesPanel, alertsPanel, reviewPanel, dangerPanel] }
     ].filter(Boolean);
     tabs.forEach(function (tab) { tab.panels = tab.panels.filter(Boolean); tab.panels.forEach(function (n) { n.tab = tab; }); });
     fieldsPanel.pin();

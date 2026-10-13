@@ -12,6 +12,9 @@
  * A link can end on a date (`expires`); after it, the link and its key open nothing until the
  * admin moves the date.
  *
+ * A link shows the warnings about small teams of its forms unless the admin switches them off
+ * for it (`showSizeAlerts`). Links made before the switch existed show them.
+ *
  * A link names its forms by id, so renaming a form's link name does not take the form away
  * from it. Links saved with link names are read as ids and stored as ids on their next save.
  */
@@ -29,7 +32,8 @@ function rowToClient_(r) {
     _row: r._row, id: String(r.id), name: String(r.name), tokenHash: String(r.tokenHash),
     forms: parseJson(r.forms, []), hiddenColumns: parseJson(r.hiddenColumns, []),
     canReview: String(r.canReview) === '1', active: String(r.active) !== '0', createdAt: String(r.createdAt),
-    keyHash: String(r.keyHash || ''), keySeal: String(r.keySeal || ''), expires: String(r.expires || '')
+    keyHash: String(r.keyHash || ''), keySeal: String(r.keySeal || ''), expires: String(r.expires || ''),
+    showSizeAlerts: String(r.showSizeAlerts) !== '0'
   };
 }
 
@@ -68,7 +72,7 @@ function clientToRow_(c) {
   return {
     id: c.id, name: c.name, tokenHash: c.tokenHash, forms: JSON.stringify(c.forms), hiddenColumns: JSON.stringify(c.hiddenColumns),
     canReview: c.canReview ? '1' : '0', active: c.active ? '1' : '0', createdAt: c.createdAt, keyHash: c.keyHash || '',
-    keySeal: c.keySeal || '', expires: c.expires || ''
+    keySeal: c.keySeal || '', expires: c.expires || '', showSizeAlerts: c.showSizeAlerts === false ? '0' : '1'
   };
 }
 
@@ -122,8 +126,8 @@ function newToken_() {
 }
 
 function publicClient_(c) {
-  return { id: c.id, name: c.name, forms: c.forms, hiddenColumns: c.hiddenColumns, canReview: c.canReview, active: c.active, createdAt: c.createdAt,
-    hasKey: !!c.keyHash, keyKnown: !!(c.keyHash && c.keySeal), expires: c.expires, expired: clientExpired_(c) };
+  return { id: c.id, name: c.name, forms: c.forms, hiddenColumns: c.hiddenColumns, canReview: c.canReview, showSizeAlerts: c.showSizeAlerts !== false,
+    active: c.active, createdAt: c.createdAt, hasKey: !!c.keyHash, keyKnown: !!(c.keyHash && c.keySeal), expires: c.expires, expired: clientExpired_(c) };
 }
 
 function cleanClientForms_(list) {
@@ -179,8 +183,8 @@ API['admin.clients.create'] = admin(function (req) {
   var token = newToken_();
   var c = {
     id: shortId('c_'), name: name, tokenHash: clientToken_(token), forms: cleanClientForms_(req.forms),
-    hiddenColumns: Array.isArray(req.hiddenColumns) ? req.hiddenColumns : [], canReview: !!req.canReview, active: true, createdAt: nowIso(),
-    expires: cleanExpiry_(req.expires)
+    hiddenColumns: Array.isArray(req.hiddenColumns) ? req.hiddenColumns : [], canReview: !!req.canReview, showSizeAlerts: req.showSizeAlerts !== false,
+    active: true, createdAt: nowIso(), expires: cleanExpiry_(req.expires)
   };
   var key = req.withKey === false ? '' : newClientKey_();
   setClientKey_(c, key);
@@ -195,6 +199,7 @@ API['admin.clients.update'] = admin(function (req) {
     if (p.forms !== undefined) c.forms = cleanClientForms_(p.forms);
     if (p.hiddenColumns !== undefined) c.hiddenColumns = Array.isArray(p.hiddenColumns) ? p.hiddenColumns : [];
     if (p.canReview !== undefined) c.canReview = !!p.canReview;
+    if (p.showSizeAlerts !== undefined) c.showSizeAlerts = !!p.showSizeAlerts;
     if (p.active !== undefined) c.active = !!p.active;
     if (p.expires !== undefined) c.expires = cleanExpiry_(p.expires);
     return { client: publicClient_(c) };

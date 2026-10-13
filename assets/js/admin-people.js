@@ -74,12 +74,13 @@
     if (!clients.length) return mount.appendChild(h('div', { class: 'empty' }, 'No private links yet.'));
 
     mount.appendChild(h('div', { class: 'scroll-x' }, h('table', { class: 'data-table cards' },
-      h('thead', null, h('tr', null, ['Name', 'Can see', 'Hidden columns', 'Can review', 'Link', 'Access key', ''].map(function (c) { return h('th', null, c); }))),
+      h('thead', null, h('tr', null, ['Name', 'Can see', 'Hidden columns', 'Can review', 'Small teams', 'Link', 'Access key', ''].map(function (c) { return h('th', null, c); }))),
       h('tbody', null, clients.map(function (c) {
         var access = c.forms.indexOf('*') !== -1 ? 'All forms' : c.forms.map(function (id) { var f = forms.filter(function (x) { return x.id === id; })[0]; return f ? f.title : id; }).join(', ');
         return h('tr', { dataset: { client: c.id } },
           h('td', { class: 'nm' }, h('strong', null, c.name)), h('td', { dataset: { label: 'Can see' } }, access || 'No forms'),
           h('td', { dataset: { label: 'Hidden columns' } }, c.hiddenColumns.length ? c.hiddenColumns.join(', ') : 'None'), h('td', { dataset: { label: 'Can review' } }, c.canReview ? 'Yes' : 'No'),
+          h('td', { dataset: { label: 'Small teams' } }, c.showSizeAlerts ? 'Shown' : 'Hidden'),
           h('td', { dataset: { label: 'Link' } }, h('div', { class: 'client-key' },
             !c.active ? A.badge('Off', 'closed') : c.expired ? A.badge('Ended', 'closed') : A.badge('On', 'open'),
             c.active ? A.untilText(c.expires) : null,
@@ -137,7 +138,7 @@
     var st = {
       name: client ? client.name : '', all: client ? client.forms.indexOf('*') !== -1 : false,
       forms: client ? client.forms.filter(function (s) { return s !== '*'; }) : [], hidden: client ? client.hiddenColumns.slice() : [], canReview: client ? client.canReview : false,
-      withKey: true, end: { none: true }
+      showSizeAlerts: client ? client.showSizeAlerts : true, withKey: true, end: { none: true }
     };
     var formBoxes = h('div', null, forms.map(function (f) {
       var caption = FormMetadata.caption(f);
@@ -155,6 +156,8 @@
           return A.check(c[1], st.hidden.indexOf(c[0]) !== -1, function (v) { st.hidden = st.hidden.filter(function (x) { return x !== c[0]; }); if (v) st.hidden.push(c[0]); });
         }))),
       A.check('Allow them to mark review steps as approved or rejected', st.canReview, function (v) { st.canReview = v; }),
+      A.check('Show them the warnings about small teams', st.showSizeAlerts, function (v) { st.showSizeAlerts = v; }, false, 'showSizeAlerts'),
+      h('p', { class: 'help' }, 'Only on forms where you switched the warnings on, in the Small teams section of the form settings.'),
       // A key is chosen when the link is made; later it is added, changed or removed from the list.
       client ? null : A.check('Also ask for a six-digit access key (recommended)', st.withKey, function (v) { st.withKey = v; }, false, 'withKey'),
       // The end of an existing link is moved from the list, where it is shown.
@@ -167,10 +170,10 @@
         if (!formsList.length) { toast('Choose at least one form.', 'err'); return false; }
         if (!client && !st.end) { toast('Pick the date the link ends.', 'err'); return false; }
         if (client) {
-          await A.call('admin.clients.update', { id: client.id, patch: { name: st.name, forms: formsList, hiddenColumns: st.hidden, canReview: st.canReview } });
+          await A.call('admin.clients.update', { id: client.id, patch: { name: st.name, forms: formsList, hiddenColumns: st.hidden, canReview: st.canReview, showSizeAlerts: st.showSizeAlerts } });
           toast('Saved', 'ok');
         } else {
-          var r = await A.call('admin.clients.create', { name: st.name, forms: formsList, hiddenColumns: st.hidden, canReview: st.canReview, withKey: st.withKey, expires: endOf(st.end) });
+          var r = await A.call('admin.clients.create', { name: st.name, forms: formsList, hiddenColumns: st.hidden, canReview: st.canReview, showSizeAlerts: st.showSizeAlerts, withKey: st.withKey, expires: endOf(st.end) });
           revealAccess('Link for ' + r.client.name, r.token, r.accessKey);
         }
         A.render();

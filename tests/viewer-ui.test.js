@@ -128,6 +128,30 @@ test('Instructor link: teams are tinted blocks with a star and a linked task, an
   assert.equal(p.text().includes('01112345678'), false);
 });
 
+test('Instructor link: small teams are listed by level and marked on their card', async () => {
+  const w = boot();
+  const f = w.make('team_registration', 'Projects', { rules: { sizeAlerts: { critical: { on: true, below: 2 }, warning: { on: true, below: 3 } } } });
+  const m = (code) => ({ name: 'سارة خالد حسن علي', phone: '01112345678', code, level: 'صفر / الأولى', curriculum: '2020', section: '4C-TH1' });
+  const team = (code, title, members) => { w.advanceDays(0.01); w.api({ action: 'submit', slug: f.slug, data: person({ team_size: String(members.length + 1), leader_code: code, title, members }) }); };
+  team('4230001', 'Alpha', []);
+  team('4230002', 'Beta', [m('4230011')]);
+  team('4230003', 'Gamma', [m('4230012'), m('4230013')]);
+  const p = await openViewer(w, w.client());
+  assert.equal(p.$('[name="size-alert-critical"]').textContent, 'Critical: one team has fewer than 2 people: Team 1.');
+  assert.equal(p.$('[name="size-alert-warning"]').textContent, 'Warning: one team has fewer than 3 people: Team 2.');
+  const tags = p.$$('.team-card').map((c) => { const t = c.querySelector('[name="size-tag"]'); return t ? [t.textContent, t.title] : null; });
+  assert.deepEqual(tags, [['Critical', 'Fewer than 2 people'], ['Warning', 'Fewer than 3 people'], null]);
+  p.type('[name="search"]', 'Gamma');
+  assert.equal(p.$$('.team-card').length, 1);
+  assert.ok(p.$('[name="size-alert-critical"]'), 'the count is over the whole form, whatever the search shows');
+
+  const id = w.admin({ action: 'admin.clients.list' }).clients[0].id;
+  w.admin({ action: 'admin.clients.update', id, patch: { showSizeAlerts: false } });
+  p.click('[name="refresh"]'); await settle(10);
+  assert.equal(p.$('.size-alerts'), null, 'nothing when the link does not show the warnings');
+  assert.equal(p.$('[name="size-tag"]'), null);
+});
+
 test('Instructor link: WhatsApp metadata shows the batch year without subject or semester', async () => {
   const w = boot();
   const f = w.make('whatsapp_registration', 'Groups', { batchYear: '2029/2030' });

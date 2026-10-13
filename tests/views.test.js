@@ -207,7 +207,7 @@ test('Data tabs: the registry and a new form get the header, the widths and the 
   const w = boot('team_registration');
   const tinted = (cols) => ({ head: true, frozen: 1, bands: [[1000, cols, INK, '#FFFFFF', '#F8F1DE']] });
   assert.deepEqual(looks(w.registry.getSheetByName('Forms'), 13), tinted(13));
-  assert.deepEqual(looks(w.registry.getSheetByName('Clients'), 11), tinted(11));
+  assert.deepEqual(looks(w.registry.getSheetByName('Clients'), 12), tinted(12));
   assert.deepEqual(looks(w.registry.getSheetByName('Lists'), 2), tinted(2));
   const responses = w.sheet(w.form.sheetId, 'Responses');
   assert.deepEqual(looks(responses, 20), tinted(20));
