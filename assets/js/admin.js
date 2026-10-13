@@ -295,7 +295,7 @@
         h('h1', null, 'Forms dashboard'),
         h('nav', { class: 'admin-nav', 'aria-label': 'Sections' },
           navLink('#/', 'Forms', group === 'forms'), navLink('#/clients', 'Clients', group === 'clients'), navLink('#/lists', 'Lists', group === 'lists')),
-        h('button', { type: 'button', class: 'icon-btn', 'aria-label': 'Switch light and dark', onclick: function () { App.theme.toggle(); render(); } }, icon(App.theme.effective() === 'dark' ? 'sun' : 'moon', 20)),
+        ui.themeButton(),
         h('button', { type: 'button', class: 'icon-btn', 'aria-label': 'Log out', onclick: function () { App.api.setPin(''); render(); } }, icon('logout', 20), h('span', { class: 'btn-text' }, 'Log out'))),
       mount));
     var view = A.views[r.name];
@@ -355,7 +355,7 @@
       h('p', { class: 'help' }, 'Enter the admin PIN you set from the Forms Platform menu in the registry sheet.'),
       h('label', { class: 'field', for: 'pin' }, h('span', { class: 'label' }, 'Admin PIN')),
       pin, err, h('div', { class: 'nav' }, btn));
-    root.appendChild(h('div', { class: 'login' }, h('div', { class: 'sheet' }, h('div', { class: 'wrap' }, form))));
+    root.appendChild(h('div', { class: 'login' }, h('div', { class: 'login-top' }, ui.themeButton()), h('div', { class: 'sheet' }, h('div', { class: 'wrap' }, form))));
     pin.focus();
   }
 

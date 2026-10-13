@@ -10,8 +10,10 @@ body.admin { font-size: 1rem; }
 .admin-nav a:hover { background: var(--sheet-2); }
 .admin-nav a[aria-current="page"] { background: var(--ink); color: var(--sheet); }
 
-.login { max-width: 420px; margin: 12vh auto 0; }
+.login { max-width: 444px; margin: 12vh auto 0; padding: 0 12px; }
 .login .sheet { padding: 34px 30px; }
+.login-top { display: flex; align-items: center; justify-content: flex-end; gap: 12px; margin-bottom: 10px; }
+.login-top .tool-label { margin-inline-end: auto; }
 .pin-input { font-family: var(--font-code); letter-spacing: .5em; text-align: center; font-size: 1.5rem; }
 
 /* The tabs of one form: the same bar on the responses page and on every settings tab. */

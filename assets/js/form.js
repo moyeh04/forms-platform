@@ -147,10 +147,7 @@
         render();
       } }, t('langToggle')));
     }
-    bar.appendChild(h('button', { type: 'button', class: 'icon-btn', 'aria-label': t('themeToggle'), onclick: function () {
-      App.theme.toggle();
-      render();
-    } }, icon(App.theme.effective() === 'dark' ? 'sun' : 'moon', 20)));
+    bar.appendChild(App.ui.themeButton(t('themeToggle')));
     return bar;
   }
 
