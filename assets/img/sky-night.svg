@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="44" viewBox="0 0 640 44">
+  <!-- Stars, large and small. -->
+  <g fill="#FFF3C4">
+    <path d="M60 9l1.2 2.8 2.8 1.2-2.8 1.2L60 17l-1.2-2.8L56 13l2.8-1.2zM250 6l1 2.3 2.3 1-2.3 1-1 2.3-1-2.3-2.3-1 2.3-1zM420 14l1.2 2.8 2.8 1.2-2.8 1.2-1.2 2.8-1.2-2.8-2.8-1.2 2.8-1.2zM150 26l.9 2 2 .9-2 .9-.9 2-.9-2-2-.9 2-.9z"/>
+    <circle cx="24" cy="22" r="1"/><circle cx="104" cy="8" r=".9"/><circle cx="188" cy="30" r="1"/><circle cx="210" cy="12" r=".8"/>
+    <circle cx="300" cy="24" r="1.1"/><circle cx="352" cy="8" r=".9"/><circle cx="388" cy="32" r=".8"/><circle cx="480" cy="9" r="1"/>
+    <circle cx="512" cy="28" r=".9"/><circle cx="612" cy="12" r="1"/><circle cx="630" cy="34" r=".8"/>
+  </g>
+</svg>

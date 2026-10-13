@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="160" height="72" viewBox="0 0 160 72">
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Swells: a dark trough under each crest gives the water its rows. -->
+    <g stroke="#0B2A33" stroke-opacity=".14" stroke-width="2.2">
+      <path d="M38 23q8 4 16 0M100 23q8 4 16 0M6 41q11 5 22 0M64 41q11 5 22 0M122 41q11 5 22 0M30 62q14 6 28 0M98 62q14 6 28 0"/>
+    </g>
+    <!-- Crests with foam, small at the horizon and larger nearer. -->
+    <g stroke="#FFFFFF" stroke-opacity=".55" stroke-width="1.3"><path d="M14 8q4-4 8 0M72 6q4-4 8 0M124 9q4-4 8 0"/></g>
+    <g stroke="#FFFFFF" stroke-opacity=".65" stroke-width="1.7"><path d="M38 21q4-6 8-3 4-3 8 3M100 21q4-6 8-3 4-3 8 3"/></g>
+    <g stroke="#FFFFFF" stroke-opacity=".75" stroke-width="2"><path d="M6 39q5-7 11-3 5-4 11 3M64 39q5-7 11-3 5-4 11 3M122 39q5-7 11-3 5-4 11 3"/></g>
+    <g stroke="#FFFFFF" stroke-opacity=".85" stroke-width="2.3"><path d="M30 60q7-9 14-4 7-5 14 4M98 60q7-9 14-4 7-5 14 4"/></g>
+    <!-- Glints of light on the water. -->
+    <g stroke="#FFFFFF" stroke-opacity=".7" stroke-width="1.2"><path d="M46 4h6M100 13h4M150 26h5M20 52h4M86 50h6"/></g>
+  </g>
+</svg>
