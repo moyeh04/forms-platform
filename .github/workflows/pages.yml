@@ -19,6 +19,8 @@ jobs:
   test:
     name: Tests and deployment artifacts
     runs-on: ubuntu-latest
+    outputs:
+      backend: ${{ steps.backend.outputs.backend }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-go@v5
@@ -33,6 +35,11 @@ jobs:
       - run: npm ci
       - run: npm test
       - run: npm run build
+      - name: Check whether the backend changed
+        id: backend
+        env:
+          BEFORE: ${{ github.event.before }}
+        run: node scripts/backend-changed.js
       - uses: actions/upload-artifact@v4
         with:
           name: backend-dist
@@ -55,7 +62,7 @@ jobs:
   apps-script:
     name: Deploy Google Apps Script
     needs: test
-    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/master'
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/master' && needs.test.outputs.backend == 'true'
     runs-on: ubuntu-latest
     env:
       APPS_SCRIPT_ID: ${{ vars.APPS_SCRIPT_ID }}
@@ -79,7 +86,9 @@ jobs:
       - name: Update the existing web deployment
         run: |
           npx --yes @google/clasp@3.4.1 push --force
-          npx --yes @google/clasp@3.4.1 deploy -i "$APPS_SCRIPT_DEPLOYMENT_ID" --description "Commit $GITHUB_SHA"
+          npx --yes @google/clasp@3.4.1 deploy -i "$APPS_SCRIPT_DEPLOYMENT_ID" --description "Commit $GITHUB_SHA" | tee deploy.log
+          version=$(grep -o '@[0-9][0-9]*' deploy.log | tail -n 1)
+          echo "Backend version ${version:-unknown} now serves commit $GITHUB_SHA. To go back, point the deployment at the version before it (docs/DEPLOY.md, Going back to an earlier backend)." >> "$GITHUB_STEP_SUMMARY"
       - name: Remove temporary credentials
         if: always()
         run: |
@@ -88,7 +97,8 @@ jobs:
   deploy:
     name: Publish to GitHub Pages
     needs: [test, apps-script]
-    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/master'
+    # The backend job is skipped when no backend file changed; the site is still published.
+    if: always() && needs.test.result == 'success' && (needs.apps-script.result == 'success' || needs.apps-script.result == 'skipped') && github.event_name != 'pull_request' && github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
     permissions:
       contents: read
