@@ -33,6 +33,7 @@ function setup() {
   }
   var blank = ss.getSheetByName('Sheet1');
   if (blank && blank.getLastRow() === 0 && ss.getSheets().length > 1) ss.deleteSheet(blank);
+  styleRegistryTabs_();
   rootFolder();
   return { registryUrl: ss.getUrl(), folderId: getProp('ROOT_FOLDER_ID') };
 }
@@ -183,6 +184,7 @@ function attachSheet_(form) {
   first.getRange(1, 1, 1, RESPONSE_COLS.length).setValues([RESPONSE_COLS]).setFontWeight('bold');
   first.getRange(1, 1, first.getMaxRows(), RESPONSE_COLS.length).setNumberFormat('@');
   first.setFrozenRows(1);
+  styleDataTab_(first, RESPONSE_COLS);
   DriveApp.getFileById(ss.getId()).moveTo(rootFolder());
   form.sheetId = ss.getId();
   form.sheetUrl = ss.getUrl();

@@ -40,6 +40,19 @@ class MockRange {
     return this.proxy;
   }
   setFormula(f) { return this.setValue(f); }
+  setBackground(color) {
+    for (let i = 0; i < this.nr; i++) for (let j = 0; j < this.nc; j++) this.sheet.backgrounds.set(`${this.r + i},${this.c + j}`, color);
+    return this.proxy;
+  }
+  getBackground() { return this.sheet.backgrounds.get(`${this.r},${this.c}`) || '#ffffff'; }
+  /** Alternating colours over this range. The colours are kept so a test can read them. */
+  applyRowBanding() {
+    const sheet = this.sheet, range = this.proxy;
+    const band = { getRange: () => range, remove: () => { sheet.bandings = sheet.bandings.filter((b) => b !== band); } };
+    for (const part of ['HeaderRow', 'FirstRow', 'SecondRow']) band['set' + part + 'Color'] = (color) => { band[part] = color; return band; };
+    sheet.bandings.push(band);
+    return band;
+  }
   setNumberFormat(f) {
     for (let i = 0; i < this.nr; i++) for (let j = 0; j < this.nc; j++) this.sheet.formats.set(`${this.r + i},${this.c + j}`, f);
     return this.proxy;
@@ -59,6 +72,7 @@ class MockRange {
 class MockSheet {
   constructor(ss, name, id) {
     this.ss = ss; this.name = name; this.id = id; this.cells = new Map(); this.formats = new Map(); this.hidden = false;
+    this.backgrounds = new Map(); this.widths = new Map(); this.bandings = []; this.frozenRows = 0;
     this.proxy = new Proxy(this, {
       get: (t, p) => (p in t ? (typeof t[p] === 'function' ? t[p].bind(t) : t[p]) : (...a) => t.proxy)
     });
@@ -67,6 +81,9 @@ class MockSheet {
   set(r, c, v) { this.noteWrite(); if (v === '' || v === null || v === undefined) this.cells.delete(`${r},${c}`); else this.cells.set(`${r},${c}`, v); }
   /** A write to the registry while no request holds the lock is recorded, so a test can require there are none. */
   noteWrite() { const w = this.ss.world; if (w.watchLocks && this.ss === w.registry && !w.lock.held) w.unlockedWrites.push(this.name); }
+  getBandings() { return this.bandings.slice(); }
+  setColumnWidth(c, w) { this.widths.set(c, w); return this.proxy; }
+  setFrozenRows(n) { this.frozenRows = n; return this.proxy; }
   getName() { return this.name; }
   setName(n) { this.name = n; return this.proxy; }
   getSheetId() { return this.id; }
@@ -211,6 +228,8 @@ function createWorld(options = {}) {
       openById: (id) => { const s = world.spreadsheets.get(id); if (!s) throw new Error('No spreadsheet ' + id); return s.proxy; },
       create: (name) => createSs(name).proxy,
       BorderStyle: { SOLID: 'SOLID', SOLID_MEDIUM: 'SOLID_MEDIUM', SOLID_THICK: 'SOLID_THICK' },
+      BandingTheme: { LIGHT_GREY: 'LIGHT_GREY' },
+      WrapStrategy: { CLIP: 'CLIP', WRAP: 'WRAP', OVERFLOW: 'OVERFLOW' },
       getUi: () => { throw new Error('UI not available in tests'); }
     },
     DriveApp: {
