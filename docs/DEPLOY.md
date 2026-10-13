@@ -175,6 +175,7 @@ Back in the Forms Registry sheet: **Forms Platform > 3. Set website address...**
 3. A form has four tabs: **Responses**, **Questions**, **Timetable** (reservations only) and **Setup**. Set the **Status** in the header to Open when the form is ready. A bar with **Save settings** appears when you change something. Check:
    - **Who can register** (Setup): all specializations, or only some (for example Computers only).
    - **Team size** (Questions tab): minimum and maximum people per team (counting the leader), and an optional note for some sizes (for example "other students will be added to reach 5" for 3 and 4).
+   - **Small teams** (Setup tab): a critical warning and a normal one, each with its own switch and number (for example fewer than 3 and fewer than 5 people); the small teams are then listed above Responses and marked on their cards. Each instructor link shows them too unless **Show them the warnings about small teams** is unticked in its dialog under **Clients**.
    - **Questions**: rename, hide, or add a description under any question.
    - **Emails**: whether students get a confirmation email.
    - **Limits and checks**: the Drive folder name rule `Team_Leader_Name_Project_Name_Subject_Name` (on by default for new team forms). Type the subject name, for example `Software Engineering`, so folders must end with `_Software_Engineering`.
