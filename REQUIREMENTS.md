@@ -68,6 +68,7 @@ step needs the real Google services (see "What could not be tested here").
 |---|---|
 | Google Sheets: every team is a block with a heavy border and alternating tints, a star on the leader, one merged project or task cell; the blocks are repainted a minute after a change, and nothing runs while nothing changes | Done |
 | Phone numbers and codes keep a leading zero in every sheet row and in `Teams.xlsx` | Done |
+| Every data tab is formatted, not only the views: Forms, Clients and Lists in the registry, and Responses, Transfers and Requests in each form's sheet, have a dark header that stays in place, column widths that fit, two row tints and one-line rows; a sheet made before this gets the look on its next repaint | Done, check live |
 | Dashboard and instructor links show each team as a card: a teal or gold band, a header with the team number, project, and size, and the leader marked; readable in light and dark and stacked on phones | Done |
 | Responses shows how many people a form holds beside its number of registrations: leaders and members of every form type, a student code counted once | Done |
 | A team keeps its number when another team cancels or is deleted: the number is the same on the dashboard, the instructor page, the printed list, the zip folders and `Teams.xlsx`, and a search does not renumber | Done |
@@ -108,8 +109,8 @@ Be aware of these when you go live. They are checked on your first real run:
 
 - **Real Google services.** Tests run against an in-memory copy of Sheets, Drive,
   Mail, and the cache. The real "does this Drive link open for anyone" check,
-  the PDF export, the emails, and the booked repaint of the sheet views only run on
-  Google. Try each once after deploying (the guide has a checklist).
+  the PDF export, the emails, the booked repaint of the sheet views and the row
+  tints of the data tabs only run on Google. Try each once after deploying (the guide has a checklist).
 - **`admin.html` is a public page.** Anyone can open it, but it does nothing
   without the PIN, and wrong PINs lock it. Pick a PIN that is not guessable.
 - **Excel links.** The relative links in `Teams.xlsx` open in desktop Excel.

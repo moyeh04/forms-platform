@@ -195,6 +195,7 @@ Do these once with a test form:
 - [ ] Register with a folder named with spaces (for example `My Project`): refused, and the message shows the expected name such as `Ahmed_Mohamed_My_Project_Software_Engineering`.
 - [ ] Check that the confirmation email arrived with the key.
 - [ ] Open the form's Google Sheet: teams show as tinted blocks with heavy borders.
+- [ ] Open its **Responses** tab, and the **Forms** tab of the registry: a dark header that stays while you scroll, and rows in two tints. Register once more and check the new row has its tint too.
 - [ ] In the dashboard click **Print team list**: a print tab and a PDF appear.
 - [ ] Open an instructor link on a phone.
 
@@ -319,6 +320,7 @@ Deploy**. This is a recovery path; routine updates use the configured workflow.
 | The site did not change after a push | Open the **Actions** tab: a red run means a test failed and nothing was published. A green run means the browser cached the old file: press Ctrl+F5. |
 | Actions says Pages is not enabled | Settings, Pages, Source: **GitHub Actions**. |
 | The menu "Forms Platform" is missing | Reload the sheet and wait a few seconds. |
+| A data tab (Forms, Responses, ...) has no dark header or row tints | Click **Forms Platform > Rebuild all views**. It repaints every form and formats every data tab; it changes no data. |
 
 ---
 

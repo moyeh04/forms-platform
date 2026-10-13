@@ -159,6 +159,7 @@ no validation.
 | `KeyExpiry.gs` | When registration edit keys stop working, and moving that date for one, some, or all registrations of a form. |
 | `Transfers.gs` | Moving a member between two teams of a form: the rule, the requests tab, asking on submit and update, the answer of the leader or the admin, the move, and the emails. |
 | `Views.gs` | Tinted block views inside each form's Google Sheet, and the booked run that repaints them a minute after a change. |
+| `SheetStyle.gs` | How the data tabs look: the registry's Forms, Clients and Lists, and each form's Responses, Transfers and Requests get the dark header, a frozen first row, column widths and two row tints. It writes no value and no number format. |
 | `Print.gs` | Print tabs and PDF export. |
 | `Menu.gs` | The "Forms Platform" menu in the registry sheet: setup, the admin PIN, printing, rebuilding the views, and unlocking the admin page after wrong PINs. |
 | `Matching.gs` | WhatsApp request matching. |
