@@ -55,11 +55,23 @@
       var range = Rules.teamSizeRange(form), sizeField = Rules.fieldByRole(form, 'team_size');
       var small = sizeField ? all.filter(function (s) { return parseInt(s.data[sizeField.id], 10) < range.min; }) : [];
       if (!transfers.length && !small.length) return null;
+      var emailField = Rules.fieldByRole(form, 'email');
+      // Moving a leader first asks who leads the team next, with the question the leader gets on the form.
+      var askNext = function (t) {
+        return App.handover({
+          heirs: t.heirs, email: emailField && emailField.enabled !== false ? emailField : null,
+          words: { who: 'New leader of ' + t.from, email: 'Email of the new leader', choose: 'Choose the new leader.', error: function (code) { return code === 'required' ? 'Write the email of the new leader.' : 'Enter a valid email address.'; } }
+        });
+      };
       var decide = function (t, approve) {
-        return function (e) {
-          A.busy(e.currentTarget, async function () {
-            var out = await A.call('admin.transfer.decide', { slug: form.slug, transfer: t.id, approve: approve });
-            ui.toast(approve ? (t.name || t.code) + ' moved to ' + t.to + '.' + (out.underMin ? ' ' + t.from + ' is now under the minimum team size.' : '') : 'Rejected. ' + (t.name || t.code) + ' stays in ' + t.from + '.', 'ok');
+        return async function (e) {
+          var button = e.currentTarget, who = t.name || t.code;
+          var next = approve && t.leader ? askNext(t) : null;
+          if (next && !(await ui.confirm({ title: 'Who leads ' + t.from + ' next?', body: who + ' leads ' + t.from + '. Moving them to ' + t.to + ' hands that team to one of its members.', content: next.node, ready: function () { return !next.problem(); }, confirmText: 'Hand over and move' }))) return;
+          A.busy(button, async function () {
+            var out = await A.call('admin.transfer.decide', { slug: form.slug, transfer: t.id, approve: approve, handover: next ? next.value() : undefined });
+            var heir = next ? t.heirs.filter(function (m) { return m.code === next.value().leader; })[0] : null;
+            ui.toast(approve ? who + ' moved to ' + t.to + '.' + (heir ? ' ' + (heir.name || heir.code) + ' leads ' + t.from + ' now.' : '') + (out.underMin ? ' ' + t.from + ' is now under the minimum team size.' : '') : 'Rejected. ' + who + ' stays in ' + t.from + '.', 'ok');
             reload();
           });
         };
@@ -68,11 +80,16 @@
         transfers.length ? h('h3', null, transfers.length === 1 ? 'One student asked for by another team' : transfers.length + ' students asked for by another team') : null,
         transfers.length ? h('p', { class: 'help' }, 'The leader of the team that holds the student can answer with the edit key. You can answer here as well; the first answer counts.') : null,
         transfers.map(function (t) {
+          // A leader with nobody to hand the team to cannot move, so only Reject is left.
+          var alone = t.leader && !t.heirs.length;
           return h('div', { class: 'request-row', dataset: { transfer: t.id } },
-            h('span', { class: 'request-text' }, h('strong', { dir: 'auto' }, t.name || t.code), ' ', h('span', { class: 'mono' }, t.code), h('span', { class: 'muted-note' }, ' from '), h('strong', null, t.from), h('span', { class: 'muted-note' }, ' to '), h('strong', null, t.to)),
+            h('span', { class: 'request-text' }, h('strong', { dir: 'auto' }, t.name || t.code), ' ', h('span', { class: 'mono' }, t.code), h('span', { class: 'muted-note' }, ' from '), h('strong', null, t.from),
+              t.leader ? h('span', { class: 'muted-note', name: 'transfer-leads' }, alone ? ', which they lead alone,' : ', which they lead,') : null,
+              h('span', { class: 'muted-note' }, ' to '), h('strong', null, t.to),
+              alone ? h('span', { class: 'muted-note' }, '. Nobody is left to lead ' + t.from + ', so they cannot move.') : null),
             h('span', { class: 'actions' },
               h('button', { type: 'button', class: 'btn btn-quiet sm', name: 'transfer-reject', onclick: decide(t, false) }, 'Reject'),
-              h('button', { type: 'button', class: 'btn btn-primary sm', name: 'transfer-approve', onclick: decide(t, true) }, 'Approve and move')));
+              alone ? null : h('button', { type: 'button', class: 'btn btn-primary sm', name: 'transfer-approve', onclick: decide(t, true) }, 'Approve and move')));
         }),
         small.length ? h('p', { class: 'request-warn', name: 'under-min' }, (small.length === 1 ? 'One team is' : small.length + ' teams are') + ' under the minimum of ' + range.min + ': ' + small.map(function (s) { return s.ref; }).join(', ') + '.') : null);
     }

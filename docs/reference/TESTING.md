@@ -1,11 +1,11 @@
 # Testing
 
-306 automated tests run without a Google account, a browser, or a network.
+307 automated tests run without a Google account, a browser, or a network.
 They run the **real** backend and the **real** pages. This page explains how
 that works and what it can and cannot prove.
 
 ```
-npm test    # 306 tests
+npm test    # 307 tests
 ```
 
 ## The layers
@@ -151,7 +151,7 @@ while the total above or a row below says something else.
 | Key booking | `keybooking.test.js` | 18 | Setting and its source form, team preview without contact details, copied answers, forged answers ignored, one booking per team, the same key cancels and moves the booking to another slot with nothing else changed, a booking that may be cancelled may move, expired keys still book, the student page with one key box, a booked team told its time and moving it in one step, a ticket that draws the time instead of the key, the admin switch, the next booking one week later, bookings listed under their form |
 | Download all | `download.test.js` | 5 | Task files saved under their team number and linked from `Teams.xlsx`, Google Slides and Docs exported, a project folder with subfolders over several requests, files too big or of a kind that cannot be saved listed with the reason, zip parts and pieces that add up, only zips left in Drive, admin only, a download that expired; the deadline lock of task forms |
 | Key expiry | `key-expiry.test.js` | 6 | Which keys are given and expired, extending the expired ones from today, all of them from their own end, one date for all, chosen teams only, bad requests change nothing, cancelled registrations left out |
-| Member transfers | `transfers.test.js` | 12 | Refusal that lists who can be asked for, the request and the team saved without the member, approval by the leader and by the admin, rejection, cancelling, a full team, two requests for one student, a removed team, a team deleted by the admin, the switch and the list under Responses; a leader asked for and the team handed to the member named, by the leader and by the admin, an approval without a new leader or with a refused email, a leader alone in a team |
+| Member transfers | `transfers.test.js` | 13 | Refusal that lists who can be asked for, the request and the team saved without the member, approval by the leader and by the admin, rejection, cancelling, a full team, two requests for one student, a removed team, a team deleted by the admin, the switch and the list under Responses; a leader asked for and the team handed to the member named, by the leader and by the admin, an approval without a new leader or with a refused email, a leader alone in a team, the dashboard dialog that asks who leads next |
 | Matching | `matching.test.js` | 6 | Paste, normalise, matched, none, duplicate, sequential review |
 | Viewer API | `viewer.test.js` | 13 | Tokens, hidden columns, today and by day, review rights, revoked links, access keys with the lock after wrong tries, reading a lost key again, links that end on a date and open again when it moves |
 | Student page | `form-ui.test.js` | 39 | Steps, filters, descriptions, team size picker and notes, the note for a number of teammates on a booking, remove and add a member with Undo, the summary a key opens, the ship over the current step, audience line, subject tag, slots, review, ticket and email notice, edit by key, themes, Arabic, asking for a member of another team, a leader who is asked for naming the new leader and passing the key on, a leader alone in a team not offered, answering a request with Approve, Reject or Later, a task locked after its deadline, Close out of a registration opened with a key, the key read digit by digit |

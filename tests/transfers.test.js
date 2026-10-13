@@ -257,6 +257,36 @@ test('Transfer dashboard: the rule is a switch under one team per student, and R
   assert.deepEqual(codesOf(rows(w).submissions[1]), ['4230004', '4230002']);
 });
 
+test('Transfer dashboard: moving a leader asks who leads the team next, and a leader alone can only be kept', async () => {
+  const w = boot();
+  const { a, b } = leaderAsked(w);
+  const p = await openAdmin(w, `#/f/${w.slug}`);
+  assert.ok(p.$('.request-row').textContent.includes(`from ${a.ref}, which they lead, to ${b.ref}`));
+  p.click('[name="transfer-approve"]'); await settle(6);
+  const dialog = p.$('.overlay .dialog');
+  assert.ok(dialog.textContent.includes(`Who leads ${a.ref} next?`));
+  p.click('[name="confirm-yes"]'); await settle(4);
+  assert.deepEqual(p.$$('.handover .error').map((e) => e.textContent), ['Choose the new leader.', 'Write the email of the new leader.'], 'the dialog stays open with the reasons');
+  assert.equal(rows(w).transfers.length, 1);
+  p.pick('handover-leader', '4230003');
+  p.type('[name="handover-email"]', 'new@b.com');
+  p.click('[name="confirm-yes"]'); await settle(14);
+  assert.equal(p.$('.overlay'), null);
+  assert.equal(p.$('.request-row'), null, 'an answered request leaves the list');
+  const [teamA, teamB] = rows(w).submissions;
+  assert.deepEqual([teamA.data.leader_code, teamA.data.email, codesOf(teamA)], ['4230003', 'new@b.com', ['4230002']]);
+  assert.deepEqual(codesOf(teamB), ['4230001']);
+
+  const lone = boot();
+  const asked = leaderAsked(lone);
+  lone.admin({ action: 'admin.forms.update', id: lone.slug, patch: { rules: { ...lone.admin({ action: 'admin.forms.get', id: lone.slug }).form.rules, teamSize: { min: 1, max: 3 } } } });
+  send(lone, { action: 'update', key: asked.a.key, data: team(4230001, []).data });
+  const q = await openAdmin(lone, `#/f/${lone.slug}`);
+  assert.ok(q.$('.request-row').textContent.includes(`from ${asked.a.ref}, which they lead alone, to ${asked.b.ref}. Nobody is left to lead ${asked.a.ref}, so they cannot move.`));
+  assert.equal(q.$('[name="transfer-approve"]'), null, 'approving is offered only while somebody can lead');
+  assert.ok(q.$('[name="transfer-reject"]'));
+});
+
 test('Transfer: no email unless the form switches transfer emails on', () => {
   const w = boot({ transferEmails: undefined });
   const before = w.mail.length;
