@@ -1267,3 +1267,19 @@ test('Form header: the same on every tab, and the status is saved where it is ch
   assert.deepEqual([saved.status, saved.title], ['open', 'Projects 2']);
 });
 
+test('Forms list: grouped by status, a reservation with no days says so, and a first booking is offered only where teams are', async () => {
+  const w = boot();
+  const teams = w.make('team_registration', 'Projects');
+  const chat = w.make('whatsapp_registration', 'Groups');
+  const seminar = w.make('reservation', 'Seminar', { slots: { days: [], capacity: 1 } });
+  const draft = w.admin({ action: 'admin.forms.create', type: 'task_submission', title: 'Tasks', term: 'Fall 2027' }).form;
+  const p = await openAdmin(w);
+  assert.deepEqual(p.$$('.form-group').map((g) => [g.dataset.status, g.querySelector('.group-title').textContent]), [['open', 'Open3'], ['draft', 'Draft1']]);
+  const card = (f) => p.$(`.card[data-slug="${f.slug}"]`);
+  assert.ok(card(draft).closest('[data-status="draft"]'));
+  assert.ok(card(seminar).querySelector('[name="no-days"]').getAttribute('href').endsWith('/timetable'), 'the note leads to where days are added');
+  assert.ok(card(teams).querySelector('[name="next-booking"]'));
+  assert.equal(card(chat).querySelector('[name="next-booking"]'), null, 'a form of single students is not offered a booking');
+  assert.equal(card(seminar).querySelector('[name="next-booking"]'), null);
+  assert.deepEqual([...card(teams).querySelectorAll('.card-actions > a')].map((a) => a.textContent), ['Responses', 'Setup', 'Open form'], 'the card names the tab as the tab does');
+});

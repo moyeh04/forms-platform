@@ -404,6 +404,8 @@
 
   /** A form that gives its students a key can have bookings that are opened with that key. */
   function issuesKeys(f) { return f.type !== 'reservation' && !!(f.editKey && f.editKey.enabled); }
+  /** The first booking is offered where teams are: a team or a task form. */
+  function hasTeams(f) { return f.type === 'team_registration' || f.type === 'task_submission'; }
   function bookedBy(f) { return f.type === 'reservation' && f.keyBooking && f.keyBooking.enabled ? f.keyBooking.source : ''; }
 
   /** The days a reservation offers. One with no days cannot be booked, so it says so and leads to the timetable. */
@@ -415,6 +417,7 @@
 
   /** The bookings under a registration form, newest first, and the button that makes the next one. */
   function series(f, kids) {
+    if (!kids.length && !(issuesKeys(f) && hasTeams(f))) return null;
     var make = function (title, btn) {
       return A.busy(btn, async function () {
         var res = await A.call('admin.bookings.next', { source: f.id, title: title || '' });
@@ -433,6 +436,8 @@
       ]);
     } }, icon('plus', 16), kids.length ? 'New booking, one week later' : 'Add a booking for this form');
     if (!kids.length) return h('div', { class: 'series' }, next);
+    // Bookings made earlier stay listed; a new one is offered only while the form still gives keys.
+    if (!issuesKeys(f)) next = null;
     // Folded until asked for: a form can have a booking for every week of a term. The fold shows the newest one.
     var box = h('details', { class: 'series', open: seriesOpen(f.id), ontoggle: function () { seriesOpen(f.id, box.open); } },
       h('summary', { name: 'bookings-' + f.slug }, icon('calendar', 18), 'Bookings', h('span', { class: 'series-count' }, String(kids.length)),
