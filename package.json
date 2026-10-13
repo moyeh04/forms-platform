@@ -8,7 +8,8 @@
     "build": "node scripts/bundle-backend.js",
     "build:site": "node scripts/build-site.js",
     "setup": "node scripts/setup-deployment.js",
-    "dev": "node scripts/dev-server.js"
+    "dev": "node scripts/dev-server.js",
+    "prepare": "git config core.hooksPath .githooks || exit 0"
   },
   "devDependencies": {
     "jsdom": "^24.1.0"

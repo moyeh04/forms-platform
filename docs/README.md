@@ -10,6 +10,7 @@ whichever page answers your question.
 | [BUILD-PIPELINE.md](architecture/BUILD-PIPELINE.md) | Exactly what produces `dist/`, why files can be joined safely, when to rebuild |
 | [HOSTING.md](architecture/HOSTING.md) | What GitHub does, what Google does, how they fit, how updates flow |
 | [DATA-MODEL.md](reference/DATA-MODEL.md) | Every sheet, column, stored property, and browser key |
+| [API.md](reference/API.md) | Every backend action: who may call it, whether it takes the lock, what it writes |
 | [SECURITY.md](reference/SECURITY.md) | The secrets, what protects them, and the honest weak spots |
 | [TESTING.md](reference/TESTING.md) | How the tests run without Google, and what they cannot prove |
 | [DEPLOY.md](DEPLOY.md) | Click-by-click setup and the first-run checklist |
@@ -104,6 +105,7 @@ flowchart LR
     B --> E["HOSTING.md<br/>GitHub and Google"]
     C --> F["SECURITY.md"]
     B --> G["DATA-MODEL.md"]
+    G --> I["API.md"]
     B --> H["TESTING.md"]
     classDef cDb fill:#F3E2B3,stroke:#B8892D,stroke-width:1.5px,color:#2F2418
     classDef cActor fill:#F4D9D3,stroke:#9A3328,stroke-width:1.5px,color:#2F2418
