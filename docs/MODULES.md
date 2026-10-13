@@ -153,7 +153,7 @@ no validation.
 | `Slots.gs` | Reservation timetable checks and availability. |
 | `Questions.gs` | Questions and pages an admin adds: allowed types, ids, labels and choices, and pages that list each existing question once. |
 | `KeyBooking.gs` | Booking a reservation with a registration key from another form: the setting, the team preview, the copied answers, and the next booking of a series. |
-| `TeamList.gs` | The numbered teams of a team or task form with their members, read by the sheet view, the printed list and the download. |
+| `TeamList.gs` | The teams of a team or task form with their members and their numbers, which a team keeps for good. Read by the sheet view, the printed list, the dashboard, the instructor page and the download. |
 | `Download.gs` | Download all: each team's task file or project folder read as the owner, `Teams.xlsx`, zip parts, and the pieces the page saves. |
 | `Xlsx.gs` | A small writer of Excel files: styles, merged cells, links to files next to the workbook, widths that fit the content. |
 | `KeyExpiry.gs` | When registration edit keys stop working, and moving that date for one, some, or all registrations of a form. |

@@ -771,6 +771,12 @@ is one feature for both team forms: `teamBlocks_` in `TeamList.gs` gives the
 numbered teams that the sheet view, the printed list and the download all read,
 so they never disagree on the order or the numbers.
 
+A team's number is given once, when it registers, and stored in the `number`
+column of its row. A cancelled team keeps its number, so the teams after it are
+not renumbered: after Team 2 cancels, the list reads 1, 3, 4, and a folder
+`03 - ...` in last week's zip is still Team 3 this week. The dashboard and the
+instructor page show the number the server sends and never count the cards.
+
 **Why it runs inside Google, and not in a browser or a script on a laptop.**
 Downloading Drive files through their public links (what a script, `curl`, or a
 headless browser such as Playwright does) is anonymous traffic, and Google
