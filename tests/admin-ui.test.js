@@ -903,6 +903,8 @@ test('Responses and clients: list rows carry their column names, and the day she
   assert.deepEqual(clients.$$('.data-table.cards tbody td[data-label]').map((c) => c.dataset.label), ['Can see', 'Hidden columns', 'Can review', 'Link', 'Access key']);
 
   const seminar = w.admin({ action: 'admin.forms.create', type: 'reservation', title: 'Seminar', term: 'Fall 2027' }).form;
+  assert.equal((await openAdmin(w, `#/f/${seminar.slug}`)).$('.tool-group'), null, 'no day sheet to print while the form has no days');
+  w.admin({ action: 'admin.forms.update', id: seminar.id, patch: { slots: { days: [{ label: 'Sunday', times: ['12:30 - 12:50'] }], capacity: 1 } } });
   const res = await openAdmin(w, `#/f/${seminar.slug}`);
   const group = res.$('.tool-group');
   assert.equal(group.getAttribute('aria-label'), 'Print a day sheet');

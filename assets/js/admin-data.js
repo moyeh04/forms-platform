@@ -107,16 +107,17 @@
       // Shown only once there is something to download.
       if (all.length) tools.push(h('button', { type: 'button', class: 'btn btn-quiet sm', name: 'download-all', onclick: function () { A.downloadAll(form); } }, icon('download', 18), form.type === 'task_submission' ? 'Download all tasks' : 'Download all projects'));
     }
-    if (form.type === 'reservation') {
-      var day = ((form.slots && form.slots.days) || [])[0];
-      var dayId = day ? day.id : '';
+    // A day sheet needs a day: a reservation with no days yet has nothing to print.
+    if (form.type === 'reservation' && ((form.slots && form.slots.days) || []).length) {
+      var day = form.slots.days[0];
+      var dayId = day.id;
       var empty = false;
       var daySel = A.select(dayId, ((form.slots && form.slots.days) || []).map(function (d) { return [d.id, d.label]; }), function (v) { dayId = v; });
       daySel.setAttribute('aria-label', 'Day to print');
       // One labelled group, so the day and the option stay next to the button they belong to.
       tools.push(h('div', { class: 'tool-group', role: 'group', 'aria-label': 'Print a day sheet' }, h('span', { class: 'tool-label' }, 'Day sheet'), daySel,
         A.check('Include empty slots', false, function (v) { empty = v; }),
-        h('button', { type: 'button', class: 'btn btn-quiet sm', name: 'printDay', onclick: function (e) { if (!dayId) return toast('Add a day in the settings first.', 'err'); printOut(e.currentTarget, 'admin.print.reservations', { dayId: dayId, includeEmpty: empty }); } }, icon('printer', 18), 'Print this day')));
+        h('button', { type: 'button', class: 'btn btn-quiet sm', name: 'printDay', onclick: function (e) { printOut(e.currentTarget, 'admin.print.reservations', { dayId: dayId, includeEmpty: empty }); } }, icon('printer', 18), 'Print this day')));
     }
     ui.clear(mount);
     mount.appendChild(A.formHead(form));

@@ -363,6 +363,7 @@
 
   A.views.forms = async function (mount) {
     var res = await A.call('admin.forms.list');
+    // Grouped by status, and inside a status the newest form first.
     var forms = res.forms.slice().sort(function (a, b) { return String(b.createdAt).localeCompare(String(a.createdAt)); });
     ui.clear(mount);
     mount.appendChild(h('div', { class: 'page-head' }, h('h2', null, 'Forms'),
@@ -374,9 +375,15 @@
     // A booking that is opened with the keys of a form is listed under that form, not as a card of its own.
     var ids = forms.map(function (f) { return f.id; });
     var under = function (f) { var src = bookedBy(f); return src && ids.indexOf(src) !== -1 ? src : ''; };
-    mount.appendChild(h('div', { class: 'cards' }, forms.filter(function (f) { return !under(f); }).map(function (f) {
-      return formCard(f, forms.filter(function (k) { return under(k) === f.id; }));
-    })));
+    var cards = forms.filter(function (f) { return !under(f); });
+    var known = function (f) { return A.STATUSES.indexOf(f.status) !== -1 ? f.status : 'draft'; };
+    A.STATUSES.forEach(function (st) {
+      var group = cards.filter(function (f) { return known(f) === st; });
+      if (!group.length) return;
+      mount.appendChild(h('section', { class: 'form-group', dataset: { status: st } },
+        h('h3', { class: 'group-title' }, A.STATUS_LABEL[st], h('span', { class: 'group-count' }, String(group.length))),
+        h('div', { class: 'cards' }, group.map(function (f) { return formCard(f, forms.filter(function (k) { return under(k) === f.id; })); }))));
+    });
   };
 
   function formCard(f, kids) {
@@ -384,8 +391,8 @@
     var link = A.formLink(f.slug);
     return h('article', { class: 'card' + (kids && kids.length ? ' has-series' : ''), dataset: { slug: f.slug } },
       h('div', { class: 'card-top' }, h('span', { class: 'card-icon' }, icon(t.icon, 22)),
-        h('div', null, h('h3', null, f.title), h('div', { class: 'card-tags' }, A.termTags(f)))),
-      h('div', { class: 'actions' }, A.badge(A.STATUS_LABEL[f.status] || f.status, f.status), h('span', { class: 'muted-note' }, t.label)),
+        h('div', null, h('h4', null, f.title), h('div', { class: 'card-tags' }, A.termTags(f)))),
+      h('div', { class: 'actions' }, A.badge(A.STATUS_LABEL[f.status] || f.status, f.status), h('span', { class: 'muted-note' }, t.label), f.type === 'reservation' ? daysNote(f) : null),
       h('div', { class: 'actions card-actions' },
         h('a', { class: 'btn btn-primary sm', href: '#/f/' + encodeURIComponent(f.slug) }, 'Responses'),
         h('a', { class: 'btn btn-quiet sm', href: '#/f/' + encodeURIComponent(f.slug) + '/settings' }, 'Setup'),
@@ -399,10 +406,11 @@
   function issuesKeys(f) { return f.type !== 'reservation' && !!(f.editKey && f.editKey.enabled); }
   function bookedBy(f) { return f.type === 'reservation' && f.keyBooking && f.keyBooking.enabled ? f.keyBooking.source : ''; }
 
-  function daysText(f) {
+  /** The days a reservation offers. One with no days cannot be booked, so it says so and leads to the timetable. */
+  function daysNote(f) {
     var days = ((f.slots && f.slots.days) || []);
-    if (!days.length) return 'No days yet';
-    return days.length === 1 ? days[0].label : days[0].label + ' to ' + days[days.length - 1].label;
+    if (!days.length) return h('a', { class: 'badge none', name: 'no-days', href: '#/f/' + encodeURIComponent(f.slug) + '/timetable' }, 'No days yet');
+    return h('span', { class: 'muted-note' }, days.length === 1 ? days[0].label : days[0].label + ' to ' + days[days.length - 1].label);
   }
 
   /** The bookings under a registration form, newest first, and the button that makes the next one. */
@@ -433,7 +441,7 @@
         var link = A.formLink(k.slug);
         return h('li', { dataset: { booking: k.slug } },
           h('a', { class: 'series-title', href: '#/f/' + encodeURIComponent(k.slug) }, k.title),
-          h('span', { class: 'series-meta' }, A.badge(A.STATUS_LABEL[k.status] || k.status, k.status), h('span', { class: 'muted-note' }, daysText(k))),
+          h('span', { class: 'series-meta' }, A.badge(A.STATUS_LABEL[k.status] || k.status, k.status), daysNote(k)),
           h('span', { class: 'series-links' },
             h('a', { class: 'link-btn', href: '#/f/' + encodeURIComponent(k.slug) + '/timetable' }, 'Timetable'),
             h('button', { type: 'button', class: 'link-btn', 'aria-label': 'Copy the link of ' + k.title, onclick: async function () { toast((await ui.copyText(link)) ? 'Booking link copied' : 'Could not copy', 'ok'); } }, 'Copy link')));
