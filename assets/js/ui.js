@@ -73,17 +73,22 @@
     setTimeout(function () { if (t.parentNode) t.parentNode.removeChild(t); }, 3600);
   }
 
-  /** A promise-based confirmation, styled like the rest of the page. */
+  /**
+   * A promise-based confirmation, styled like the rest of the page. `o.content` is a node of
+   * questions under the text; `o.ready()` then says whether they are answered, and a "no" keeps
+   * the dialog open.
+   */
   function confirmDialog(o) {
     return new Promise(function (resolve) {
       var onKey = function (e) { if (e.key === 'Escape') done(false); };
       var done = function (v) { document.removeEventListener('keydown', onKey); if (overlay.parentNode) overlay.parentNode.removeChild(overlay); resolve(v); };
-      var yes = h('button', { type: 'button', class: 'btn ' + (o.danger ? 'btn-danger' : 'btn-primary'), onclick: function () { done(true); } }, o.confirmText || 'OK');
+      var yes = h('button', { type: 'button', class: 'btn ' + (o.danger ? 'btn-danger' : 'btn-primary'), name: 'confirm-yes', onclick: function () { if (!o.ready || o.ready()) done(true); } }, o.confirmText || 'OK');
       var no = h('button', { type: 'button', class: 'btn btn-quiet', onclick: function () { done(false); } }, o.cancelText || 'Cancel');
       var overlay = h('div', { class: 'overlay', onclick: function (e) { if (e.target === overlay) done(false); } },
         h('div', { class: 'dialog', role: 'dialog', 'aria-modal': 'true', 'aria-label': o.title },
           h('h2', { class: 'dialog-title' }, o.title),
           o.body ? h('p', null, o.body) : null,
+          o.content || null,
           h('div', { class: 'dialog-actions' }, no, yes)));
       document.body.appendChild(overlay);
       document.addEventListener('keydown', onKey);

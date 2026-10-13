@@ -686,11 +686,13 @@ flowchart LR
     subgraph student["index.html"]
         i18n["i18n.js<br/>English and Arabic"]
         tk["ticket.js<br/>key, image, PDF"]
+        h1["handover.js<br/>who leads a team next"]
         fm["form.js<br/>steps, members, slots, review"]
     end
     subgraph adminp["admin.html"]
         a1["admin.js<br/>shell, login, forms list"]
         a2["admin-settings.js"]
+        h2["handover.js<br/>who leads a team next"]
         a3["admin-data.js<br/>blocks, matching, print"]
         a4["admin-people.js<br/>clients"]
         a5["admin-keys.js<br/>key and link end dates"]
@@ -1035,6 +1037,11 @@ leader carries `leader: true` and `heirs`, the members who can lead, both in
 `lookup` and in `admin.submissions`. Whether a student leads is read from the
 team as it is now, not stored with the request, so a request for a member who
 became the leader meanwhile asks the same question.
+
+The question is drawn once, by `App.handover` in `handover.js`: a chip for
+each member and the email field, with each reason next to its answer. The
+student page puts it in the request dialog and the dashboard in the dialog of
+"Approve and move". The backend checks both answers again.
 
 Rules of the move:
 

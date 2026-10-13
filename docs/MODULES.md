@@ -89,6 +89,7 @@ flowchart LR
         r1["shared/rules.js"]
         i18n["i18n.js"]
         tk["ticket.js"]
+        h1["handover.js"]
         fm["form.js"]
     end
     subgraph admin["admin.html: the dashboard"]
@@ -99,6 +100,7 @@ flowchart LR
         a9["admin-range.js"]
         a7["admin-keys.js"]
         a8["admin-download.js"]
+        h2["handover.js"]
         a3["admin-data.js"]
         a4["admin-people.js"]
         a6["admin-lists.js"]
@@ -134,6 +136,7 @@ no validation.
 | `assets/js/config.js` | Source placeholder; `scripts/build-site.js` generates its published copy from the Actions `API_URL` variable. |
 | `assets/js/api.js` | Sends requests to the backend as plain-text JSON (avoids browser CORS checks). |
 | `assets/js/form.js`, `ticket.js`, `i18n.js` | The student page, the success ticket, English and Arabic text. |
+| `assets/js/handover.js` | The question asked before the leader of a team moves to another team: who leads next, and their email. Used by the student page and the dashboard. |
 | `assets/js/admin*.js` | Dashboard: core and forms list, settings, the timetable editor, the range control of the team size and the teammates (`admin-range.js`), key and link end dates (`admin-keys.js`), responses and matching, Download all (`admin-download.js`), clients, lists. |
 | `assets/js/viewer.js` | The instructor page. |
 | `shared/form-metadata.js` | What each form type shows beside its title (term, subject code, batch year) and how it is read, saved and copied. Used by the pages and the backend. |
