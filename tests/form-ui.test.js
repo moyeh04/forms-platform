@@ -632,6 +632,52 @@ test('Transfer: rejecting keeps the member on the team', async () => {
   assert.equal(w.admin({ action: 'admin.submissions', slug: w.form.slug }).submissions[0].data.members.length, 2);
 });
 
+test('Transfer: a leader who is asked for names the new leader, moves, and is told to pass the key on', async () => {
+  const w = bootTransfers();
+  const p = await teamBWith(w, '4230001');
+  p.submitForm(); await settle(12);
+  const offer = p.$('.overlay .dialog');
+  assert.ok(offer.textContent.includes(`(4230001) → ${w.teamA.ref} (leads that team)`), 'the popup says the student leads that team');
+  assert.ok(offer.textContent.includes('A leader who agrees hands their team to one of its members first.'));
+  p.clickText('Ask the leader', offer); await settle(14);
+  const refB = w.admin({ action: 'admin.submissions', slug: w.form.slug }).submissions[1].ref;
+
+  const a = await openWithKey(w, w.teamA.key);
+  const dialog = a.$('.overlay .dialog');
+  assert.ok(dialog.textContent.includes('A team asks for you'));
+  assert.ok(dialog.textContent.includes(`Team ${refB} asks for you to move to it. You lead this team, so choose who leads it after you.`));
+  assert.ok(dialog.textContent.includes('After you move, this is a team of 2.'));
+  assert.deepEqual(a.$$('[name="handover-leader"]', dialog).map((r) => [r.value, r.checked]), [['4230002', false], ['4230003', false]]);
+  assert.equal(a.$('[name="transfer-approve"]').textContent, 'Hand over and move');
+
+  a.click('[name="transfer-approve"]'); await settle(4);
+  assert.ok(a.$('.overlay'), 'nothing is sent until the question is answered');
+  assert.deepEqual(a.$$('.handover .error').map((e) => e.textContent), ['Choose the new leader.', 'This field is required.']);
+  a.pick('handover-leader', '4230003');
+  a.type('[name="handover-email"]', 'not an email');
+  a.click('[name="transfer-approve"]'); await settle(4);
+  assert.deepEqual(a.$$('.handover .error').map((e) => [e.hidden, e.textContent]), [[true, ''], [false, 'Enter a valid email address.']]);
+  assert.equal(a.$('[name="handover-email"]').value, 'not an email', 'a refused email stays in its field');
+
+  a.type('[name="handover-email"]', 'mona@example.com');
+  a.click('[name="transfer-approve"]'); await settle(12);
+  assert.equal(a.$('.overlay'), null);
+  assert.ok(a.text().includes(`You moved to team ${refB}`));
+  assert.ok(a.$('[name="moved-note"]').textContent.includes(`منى سعيد فؤاد علي (4230003) leads team ${w.teamA.ref} now. Give them its edit key, ${w.teamA.key}.`));
+  const rows = w.admin({ action: 'admin.submissions', slug: w.form.slug }).submissions;
+  assert.deepEqual([rows[0].data.leader_code, rows[0].data.email, rows[0].data.members.map((m) => m.code)], ['4230003', 'mona@example.com', ['4230002']]);
+  assert.deepEqual(rows[1].data.members.map((m) => m.code), ['4230001']);
+});
+
+test('Transfer: a leader who is alone in a team is not offered, and the page says why', async () => {
+  const w = bootTransfers();
+  w.api({ action: 'submit', slug: w.form.slug, data: { email: 'c@example.com', leader_name: AR_NAME, leader_code: '4230050', phone: '01012345678', major: 'حاسبات', level: 'صفر / الأولى', section: '4C-TH1', curriculum: '2020', title: 'Parser', team_size: '1', members: [] } });
+  const p = await teamBWith(w, '4230050');
+  p.submitForm(); await settle(12);
+  assert.equal(p.$('.overlay'), null, 'there is nothing to ask for');
+  assert.ok(p.text().includes('Someone in this team is already registered in another team. (4230050) سارة خالد حسن علي (4230050) cannot be asked for: they lead a team with no other member.'));
+});
+
 test('Deadline: after a task form closes, the key shows the task but cannot change or cancel it', async () => {
   const w = boot('task_submission', { closesAt: '2027-09-02T10:00:00Z', rules: { driveCheck: 'off' } });
   const r = w.api({
