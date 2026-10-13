@@ -216,3 +216,25 @@ test('Viewer link end: a link stops on its end date and opens again when the adm
   assert.equal(w.api({ action: 'viewer.me', token: made.token }).ok, true, 'no end date means it never ends');
   assert.equal(w.admin({ action: 'admin.clients.update', id: made.client.id, patch: { expires: 'soon' } }).error.code, 'bad_date');
 });
+
+test('Teams: a small team carries its level for the instructor, unless the link does not show the warnings', () => {
+  const w = boot();
+  const c = w.client({ forms: [w.team.slug] });
+  const plain = w.data(c.token, w.team.slug);
+  assert.deepEqual(plain.sizeAlerts, []);
+  assert.equal('alert' in plain.groups[0], false);
+  const set = (sizeAlerts) => w.admin({ action: 'admin.forms.update', id: w.team.id, patch: { rules: { sizeAlerts } } });
+  set({ critical: { on: true, below: 2 }, warning: { on: true, below: 4 } });
+  const r = w.data(c.token, w.team.slug);
+  assert.deepEqual(r.sizeAlerts, [{ level: 'critical', below: 2 }, { level: 'warning', below: 4 }]);
+  assert.equal(r.groups[0].members.length, 2);
+  assert.equal(r.groups[0].alert, 'warning');
+  const hidden = w.data(w.client({ forms: [w.team.slug], hiddenColumns: ['name', 'section', 'code', 'phone'] }).token, w.team.slug);
+  assert.equal(hidden.groups[0].alert, 'warning', 'hidden columns do not change the count');
+  assert.equal(c.client.showSizeAlerts, true, 'a link shows the warnings unless told otherwise');
+  w.admin({ action: 'admin.clients.update', id: c.client.id, patch: { showSizeAlerts: false } });
+  assert.equal(w.admin({ action: 'admin.clients.list' }).clients.find((x) => x.id === c.client.id).showSizeAlerts, false);
+  const kept = w.data(c.token, w.team.slug);
+  assert.deepEqual(kept.sizeAlerts, []);
+  assert.equal('alert' in kept.groups[0], false);
+});

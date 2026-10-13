@@ -57,7 +57,7 @@ Who may call an action is decided by the secret the request carries:
 | Action | Lock | Writes |
 |---|---|---|
 | `viewer.me` | no | Nothing. Returns the name of the link and the forms it may read |
-| `viewer.data` | no | Nothing. Returns the teams, bookings or registrations of one form, without the columns hidden from the link |
+| `viewer.data` | no | Nothing. Returns the teams, bookings or registrations of one form, without the columns hidden from the link. For teams it also returns `sizeAlerts`, the warnings about small teams that are on as `[{ level, below }]`, and a small team carries `alert` (`critical` or `warning`); both are empty when the link does not show the warnings (`showSizeAlerts` off) |
 | `viewer.review` | yes | One review step of one registration, only for a link that was given review rights. Marks the views |
 
 ## Admin PIN
@@ -111,8 +111,8 @@ the lock.
 | Action | Lock | Writes |
 |---|---|---|
 | `admin.clients.list` | no | Nothing |
-| `admin.clients.create` | yes | A new row in the Clients tab. The token and the access key are returned once; only their hashes and a sealed copy of the key are stored |
-| `admin.clients.update` | yes | The name, forms, hidden columns, review rights, end date or on/off state of a link |
+| `admin.clients.create` | yes | A new row in the Clients tab, with `showSizeAlerts` on unless sent `false`. The token and the access key are returned once; only their hashes and a sealed copy of the key are stored |
+| `admin.clients.update` | yes | The name, forms, hidden columns, review rights, whether it shows the warnings about small teams (`showSizeAlerts`), end date or on/off state of a link |
 | `admin.clients.regenerate` | yes | A new token for a link; the old address stops working |
 | `admin.clients.key` | yes | A new access key for a link, or none |
 | `admin.clients.showKey` | no | Nothing. Opens the sealed copy of a link's access key |

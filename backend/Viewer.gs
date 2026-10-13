@@ -73,9 +73,17 @@ function reservationRows_(form, client, mode, dayId) {
   });
 }
 
+/** The warnings about small teams that an instructor sees: the levels that are on, or none when the link does not show them. */
+function viewerSizeAlerts_(form, client) {
+  return client.showSizeAlerts ? Rules.sizeAlertLevels(Rules.sizeAlerts(form)) : [];
+}
+
 function teamGroups_(form, client) {
+  var alerts = Rules.sizeAlerts(form);
   return numberedResponses_(form).sort(byTeamNumber_).map(function (r) {
     var g = { id: r.id, ref: r.ref, number: r.number, status: r.status, title: r.title, link: r.link, members: Rules.membersOf(form, r.data) };
+    var alert = client.showSizeAlerts ? Rules.sizeAlertOf(alerts, g.members.length) : '';
+    if (alert) g.alert = alert;
     var hidden = client.hiddenColumns;
     if (hidden.indexOf('title') !== -1) delete g.title;
     if (hidden.indexOf('link') !== -1) delete g.link;
@@ -120,6 +128,7 @@ API['viewer.data'] = function (req) {
     out.rows = reservationRows_(vform, client, mode, String(req.dayId || ''));
   } else if (kind === 'team') {
     out.groups = teamGroups_(vform, client);
+    out.sizeAlerts = viewerSizeAlerts_(form, client);
   } else {
     out.rows = whatsappRows_(vform, client);
   }
