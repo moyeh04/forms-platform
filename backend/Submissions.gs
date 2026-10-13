@@ -41,6 +41,8 @@ API.submit = function (req) {
       id: id, ref: nextRef_(form), created: nowIso(), status: 'new', review: defaultReview_(form),
       data: v.data, keyHash: k.hash, keyExpires: keyExpiry_(form), deleted: false, keySeal: sealKey_(form, id, k.key)
     });
+    rows.push(r);
+    keepTeamNumbers_(form, rows);
     saveResponse_(form, r);
     var asked = recordTransfers_(form, r, wants);
     return { id: r.id, ref: r.ref, key: form.editKey.enabled ? k.key : '', keyExpires: r.keyExpires, asked: asked };
@@ -115,13 +117,7 @@ API.remove = function (req) {
   if (!form.editKey.allowDelete) fail('delete_disabled', 'Deleting is turned off for this form.');
   assertTaskOpen_(form);
   withLock_(function () {
-    var current = readResponses(form).filter(function (r) { return r.id === found.id; })[0];
-    if (!current) fail('bad_key', 'That key is not right.');
-    current.deleted = true;
-    current.keyHash = '';
-    current.keySeal = '';
-    saveResponse_(form, current);
-    closeTransfersOf_(form, current.id);
+    if (!cancelResponse_(form, found.id)) fail('bad_key', 'That key is not right.');
   });
   afterChange_(form);
   return { removed: true, ref: found.ref };
@@ -141,6 +137,24 @@ function transferResult_(form, result, data) {
   return result;
 }
 
+/**
+ * Cancels a live registration: the row stays, marked deleted, without its key, and its member
+ * requests are closed. A team keeps its number, so the teams after it do not move up. Returns
+ * the row, or null when there is no such live registration. Call it inside withLock_.
+ */
+function cancelResponse_(form, id) {
+  var rows = readResponses(form, true);
+  var r = rows.filter(function (x) { return x.id === id && !x.deleted; })[0];
+  if (!r) return null;
+  keepTeamNumbers_(form, rows);
+  r.deleted = true;
+  r.keyHash = '';
+  r.keySeal = '';
+  saveResponse_(form, r);
+  closeTransfersOf_(form, r.id);
+  return r;
+}
+
 /* ── Admin ────────────────────────────────────────────────────── */
 
 function adminView_(r) {
@@ -154,7 +168,7 @@ function adminView_(r) {
 
 API['admin.submissions'] = admin(function (req) {
   var form = requireForm(req.slug || req.id);
-  var rows = readResponses(form, !!req.includeDeleted).map(function (r) {
+  var rows = numberedResponses_(form, !!req.includeDeleted).map(function (r) {
     var view = adminView_(r);
     if (form.type === 'reservation' && Rules.fieldByRole(form, 'members').enabled === false) {
       view.data.members = [];
@@ -204,13 +218,7 @@ API['admin.submission.update'] = admin(function (req) {
 API['admin.submission.delete'] = admin(function (req) {
   var form = requireForm(req.slug || req.id);
   withLock_(function () {
-    var r = readResponses(form).filter(function (x) { return x.id === req.submissionId; })[0];
-    if (!r) fail('submission_not_found', 'That submission does not exist.');
-    r.deleted = true;
-    r.keyHash = '';
-    r.keySeal = '';
-    saveResponse_(form, r);
-    closeTransfersOf_(form, r.id);
+    if (!cancelResponse_(form, req.submissionId)) fail('submission_not_found', 'That submission does not exist.');
   });
   afterChange_(form);
   return { deleted: true };

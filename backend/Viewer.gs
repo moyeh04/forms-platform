@@ -74,8 +74,8 @@ function reservationRows_(form, client, mode, dayId) {
 }
 
 function teamGroups_(form, client) {
-  return readResponses(form).sort(byCreated_).map(function (r) {
-    var g = { id: r.id, ref: r.ref, status: r.status, title: r.title, link: r.link, members: Rules.membersOf(form, r.data) };
+  return numberedResponses_(form).sort(byTeamNumber_).map(function (r) {
+    var g = { id: r.id, ref: r.ref, number: r.number, status: r.status, title: r.title, link: r.link, members: Rules.membersOf(form, r.data) };
     var hidden = client.hiddenColumns;
     if (hidden.indexOf('title') !== -1) delete g.title;
     if (hidden.indexOf('link') !== -1) delete g.link;
