@@ -50,10 +50,10 @@ test('Key booking: the public form names the registration form and nothing else 
   assert.deepEqual(pub.keyBooking, { title: 'Database Teams' });
 });
 
-test('Key booking: a key shows the team to confirm, without contact details', () => {
+test('Key booking: a key shows the team to confirm, with the names of its teammates and no contact details', () => {
   const w = boot();
   const res = w.api({ action: 'bookingTeam', slug: w.form.slug, key: w.keyA });
-  assert.deepEqual(res.team, { ref: res.team.ref, leader: 'أحمد محمد محمود علي', code: '4230001', title: 'Library System', size: 2 });
+  assert.deepEqual(res.team, { ref: res.team.ref, leader: 'أحمد محمد محمود علي', code: '4230001', title: 'Library System', size: 2, teammates: ['سارة خالد حسن علي'] });
   assert.equal(res.booked, false);
   assert.equal(JSON.stringify(res).includes('0101'), false);
   assert.equal(JSON.stringify(res).includes('example.com'), false);
@@ -182,6 +182,7 @@ test('Key booking page: the key, the team to confirm, the slot, then a ticket wi
   assert.ok(p.text().includes('This is your team'));
   assert.ok(p.text().includes('Library System'));
   assert.ok(p.text().includes('2 people'));
+  assert.ok(p.text().includes('سارة خالد حسن علي'), 'the teammates are named so the team can check them');
   assert.equal(p.text().includes('01012345678'), false, 'no phone number is shown');
   assert.equal(p.$('button[type="submit"]').textContent.trim(), 'Next');
 

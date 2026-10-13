@@ -48,7 +48,7 @@ Who may call an action is decided by the secret the request carries:
 | `lookup` | no | Nothing. Returns the registration, its member requests, and what the key may do: `canEdit`, `slotOnly` (only the time of a booking can change) and `canDelete` |
 | `update` | yes | The registration's row; a Transfers row for each member newly asked for. Marks the views. When only the time may change (`slotOnly`), the slot is taken from the request and every other answer is kept as saved |
 | `remove` | yes | Marks the row deleted and clears its key; closes its member requests. The row and its team number stay. Marks the views |
-| `bookingTeam` | no | Nothing. Takes a key of the registration form that a reservation books with (an expired key too) and returns the team to confirm: leader, code, project and size. A team that has booked also gets its `slot`, and `canMove` when its booking may move to another time |
+| `bookingTeam` | no | Nothing. Takes a key of the registration form that a reservation books with (an expired key too) and returns the team to confirm: leader, code, project, size and the names of the teammates. A team that has booked also gets its `slot`, and `canMove` when its booking may move to another time |
 | `transfer.decide` | yes | The request's row in Transfers; on approval the rows of both teams. Marks the views. Emails both leaders when the form switches that on |
 | `transfer.cancel` | yes | The request's row in Transfers |
 

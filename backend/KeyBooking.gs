@@ -73,7 +73,7 @@ function movedBooking_(form, saved, typed) {
   return withSlot_(form, clone(saved), typed[Rules.fieldByRole(form, 'slot').id]);
 }
 
-/** What the student sees before booking, to confirm the key is theirs. No contact details. */
+/** What the student sees before booking, to confirm the key is theirs: names, no contact details. */
 function teamPreview_(source, row) {
   var members = Rules.membersOf(source, row.data);
   return {
@@ -81,7 +81,8 @@ function teamPreview_(source, row) {
     leader: String(Rules.valueByRole(source, row.data, 'name') || ''),
     code: String(Rules.valueByRole(source, row.data, 'code') || ''),
     title: String(Rules.valueByRole(source, row.data, 'title') || ''),
-    size: members.length
+    size: members.length,
+    teammates: members.filter(function (m) { return !m.leader; }).map(function (m) { return String(m.name); })
   };
 }
 

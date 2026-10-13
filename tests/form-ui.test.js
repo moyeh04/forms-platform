@@ -229,6 +229,8 @@ test('Reservation: optional teammates can be added, validated, and included on t
   p.clickText('Week 11 - Sunday'); await settle();
   p.click(p.$('.slot-chip.time')); await settle();
   p.submitForm(); await settle();
+  assert.ok(p.text().includes('Check your details'));
+  assert.ok(p.text().includes('سارة خالد حسن علي'), 'the summary before booking lists the teammate');
   p.submitForm(); await settle(12);
   assert.ok(p.$('#ticket'));
   assert.ok(p.$('#ticket').textContent.includes('سارة خالد حسن علي'));

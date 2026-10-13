@@ -653,6 +653,8 @@
     var rows = [[t('teamLeader'), S.team.leader], [t('teamCode'), S.team.code]];
     if (S.team.title) rows.push([t('teamProject'), S.team.title]);
     rows.push([t('teamPeople'), S.team.size > 1 ? t('teamPeopleN', { n: S.team.size }) : t('teamSolo')]);
+    var mates = S.team.teammates || [];
+    if (mates.length) rows.push([t('teamMates'), h('ul', { class: 'plain' }, mates.map(function (n) { return h('li', { class: 'person' }, h('bdi', null, n)); }))]);
     return rows;
   }
 
