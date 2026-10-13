@@ -309,12 +309,14 @@ test('Settings: required team parts cannot be switched off', async () => {
   const w = boot();
   const f = w.make('team_registration', 'Projects');
   const p = await openAdmin(w, `#/f/${f.slug}/settings`);
+  // A question that is always asked has no switches to grey out: the row says so.
   ['team_size', 'members', 'leader_code', 'leader_name'].forEach((id) => {
-    const boxes = p.$$(`[data-field="${id}"] input[type="checkbox"]`);
-    assert.equal(boxes.length, 2, id);
-    assert.ok(boxes.every((b) => b.disabled && b.checked), id + ' is locked on');
+    assert.equal(p.$$(`[data-field="${id}"] input[type="checkbox"]`).length, 0, id);
+    assert.equal(p.$(`[data-field="${id}"] .q-show`).textContent, 'Always asked', id);
   });
-  assert.equal(p.$('[data-field="link"] input[type="checkbox"]').disabled, false, 'the Drive link can be hidden');
+  assert.equal(p.$$('[data-field="link"] input[type="checkbox"]').length, 2, 'the Drive link can be hidden or made optional');
+  assert.deepEqual(['team_size', 'link', 'leader_code', 'email'].map((id) => p.$(`[data-field="${id}"] .q-type`).textContent),
+    ['Team size', 'Drive link', 'Student code', 'Email address'], 'a type is named in plain words');
 });
 
 test('Responses: each team is its own tinted block with a leader star and a linked task', async () => {
@@ -441,7 +443,7 @@ test('Reservation teammates: how many, the title students read, and what is aske
   p.type('[name="teammates-title-en"]', 'Who comes with you');
   const phone = p.$('.tm-questions [data-field="phone"] .q-show input');
   phone.checked = false; p.fire(phone, 'change');
-  assert.ok(p.$('.tm-questions [data-field="name"] .q-show input').disabled, 'the name is always asked');
+  assert.equal(p.$('.tm-questions [data-field="name"] .q-show').textContent, 'Always asked');
   p.click('[name="save"]'); await settle(12);
 
   const members = w.admin({ action: 'admin.forms.get', id: f.id }).form.fields.find((x) => x.role === 'members');

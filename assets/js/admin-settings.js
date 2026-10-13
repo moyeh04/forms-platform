@@ -340,7 +340,12 @@
     var toolsOpen = {};
     // Questions that belong to a page for a reason: the member forms follow the size, and a booking is its own page.
     var FIXED_ROLES = ['team_size', 'members', 'slot'];
-    var KINDS = [['text', 'Short answer'], ['textarea', 'Long answer'], ['select', 'One choice from a list']];
+    // What a question takes, in the words of the page. The kinds an added question can be are read from here.
+    var TYPE_NAMES = {
+      text: 'Short answer', textarea: 'Long answer', select: 'One choice from a list', english_text: 'English text', email: 'Email address',
+      phone: 'Phone number', code: 'Student code', drive_link: 'Drive link', team_size: 'Team size', members: 'Team members', slot: 'Time slot'
+    };
+    var KINDS = ['text', 'textarea', 'select'].map(function (k) { return [k, TYPE_NAMES[k]]; });
     /**
      * Which list a question reads, among the lists of the same kind. Shown only when there is
      * another list to pick. The leader's section and the members' section move together.
@@ -462,15 +467,16 @@
       var toolsBtn = tools ? h('button', { type: 'button', class: 'link-btn add-desc', name: 'tools-' + fd.id, 'aria-expanded': toolsOpen[fd.id] ? 'true' : 'false', onclick: function () {
         toolsOpen[fd.id] = tools.hidden; tools.hidden = !tools.hidden; toolsBtn.setAttribute('aria-expanded', tools.hidden ? 'false' : 'true');
       } }, fd.custom ? 'Page and kind' : 'Page') : null;
-      var kind = (KINDS.filter(function (k) { return fd.custom && k[0] === fd.type; })[0] || [])[1];
+      var typeName = TYPE_NAMES[fd.type] || fd.type.replace(/_/g, ' ');
       var row = h('div', { class: 'q-row' + (sub ? ' sub' : '') + (fd.custom ? ' custom' : ''), dataset: { field: fd.id } },
-        h('div', { class: 'q-show' }, A.check('Show', fd.enabled !== false, function (v) { fd.enabled = v; row.classList.toggle('off', !v); }, locked)),
+        // A question the form cannot work without has no switches: it says so instead.
+        h('div', { class: 'q-show' }, locked ? h('span', { class: 'q-always' }, 'Always asked') : A.check('Show', fd.enabled !== false, function (v) { fd.enabled = v; row.classList.toggle('off', !v); })),
         h('div', { class: 'q-labels' },
           A.text(fd.label.en, function (v) { fd.label.en = v; }, { 'aria-label': 'English label for ' + fd.id, placeholder: fd.custom ? 'Your question, in English' : null }),
           A.text(fd.label.ar, function (v) { fd.label.ar = v; }, { 'aria-label': 'Arabic label for ' + fd.id, dir: 'rtl', lang: 'ar', placeholder: fd.custom ? 'السؤال بالعربي' : null })),
         h('div', { class: 'q-opts' },
-          A.check('Required', fd.required !== false, function (v) { fd.required = v; }, locked),
-          fd.type === 'arabic_name' ? h('label', { class: 'q-parts' }, A.number(fd.minParts || 4, function (v) { fd.minParts = parseInt(v, 10) || 4; }, { class: 'input num', min: '2', max: '6', 'aria-label': 'Name parts for ' + fd.id }), 'name parts') : h('span', { class: 'q-type' }, kind ? 'added · ' + kind.toLowerCase() : fd.type.replace('_', ' ')),
+          locked ? null : A.check('Required', fd.required !== false, function (v) { fd.required = v; }),
+          fd.type === 'arabic_name' ? h('label', { class: 'q-parts' }, A.number(fd.minParts || 4, function (v) { fd.minParts = parseInt(v, 10) || 4; }, { class: 'input num', min: '2', max: '6', 'aria-label': 'Name parts for ' + fd.id }), 'name parts') : h('span', { class: 'q-type' }, fd.custom ? 'Added · ' + typeName : typeName),
           descBtn, toolsBtn),
         listPicker(fd));
       if (fd.enabled === false) row.classList.add('off');
