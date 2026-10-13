@@ -107,7 +107,7 @@ flowchart LR
 ## Quick start
 
 ```
-npm install          # once, installs the browser test library
+npm install          # once, installs the browser test library and the git hook
 npm run dev          # local preview on http://localhost:8080 (PIN 4321), in memory, no Google needed
 npm test             # rules, backend, form page, dashboard, instructor page, deployment
 npm run build        # writes dist/Code.gs and dist/appsscript.json for clasp

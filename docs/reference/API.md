@@ -14,7 +14,9 @@ An unknown action answers `unknown_action`. An error the code did not expect
 answers `server_error` and is written to the Apps Script log.
 
 This page lists every action: who may call it, whether it takes the script
-lock, and what it writes.
+lock, and what it writes. A git hook (`.githooks/pre-commit`) refuses a commit
+while the tables do not name exactly the actions the code has, so an action
+cannot be added or removed without this page.
 
 ## How to read the tables
 
