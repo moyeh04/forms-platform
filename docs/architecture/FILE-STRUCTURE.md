@@ -97,7 +97,7 @@ flowchart LR
         r2["domain/rules/"]
         a1["admin/shell/"]
         a2["admin/settings/settings.page.js"]
-        a5["admin/settings/timetable.view.js"]
+        a5["admin/settings/timetable*.js"]
         a9["admin/settings/range.view.js"]
         a11["admin/settings/range-note.view.js"]
         a10["admin/settings/size-alerts.view.js"]
@@ -199,7 +199,11 @@ The site is published at the paths it has always had: the pages at the root,
 | `web/js/admin/shell/login.view.js` | The PIN screen. |
 | `web/js/admin/shell/router.page.js` | Reads the address, draws the bar and the page it names, and guards unsaved changes. Loaded last of the shell parts. |
 | `web/js/admin/settings/settings.page.js` | Form settings: everything an admin can change without touching code. |
-| `web/js/admin/settings/timetable.view.js` | The timetable of a reservation form: dates on a calendar, the hours, and the slots of each day. |
+| `web/js/admin/settings/timetable.model.js` | The state of the timetable and its rules: the slots a day offers, the bookings counted, what stops a save, the saved shape. |
+| `web/js/admin/settings/timetable-calendar.view.js` | The month calendar where dates are added and removed. |
+| `web/js/admin/settings/timetable-hours.view.js` | The general hours and the bookings per slot. |
+| `web/js/admin/settings/timetable-day.view.js` | One day of the result: its name, its slots, its own hours. |
+| `web/js/admin/settings/timetable.view.js` | The timetable of a reservation form: the result and the layout of the parts. |
 | `web/js/admin/settings/range.view.js` | The range control of the team size and the teammates: the bounds, the numbers students see and the saved answers left outside. |
 | `web/js/admin/settings/range-note.view.js` | The note of the range control: the numbers that show it, its text and its preview. |
 | `web/js/admin/settings/size-alerts.view.js` | The two warnings about small teams. |

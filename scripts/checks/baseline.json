@@ -197,20 +197,6 @@
     "lines": 70,
     "numbers": 4
   },
-  "web/js/admin/settings/timetable.view.js": {
-    "biome/lint/complexity/noExcessiveCognitiveComplexity": 3,
-    "biome/lint/complexity/noExcessiveLinesPerFunction": 4,
-    "biome/lint/complexity/useMaxParams": 1,
-    "biome/lint/complexity/useOptionalChain": 3,
-    "biome/lint/correctness/noInnerDeclarations": 3,
-    "biome/lint/style/noExcessiveLinesPerFile": 1,
-    "biome/lint/style/noMagicNumbers": 9,
-    "biome/lint/suspicious/noAssignInExpressions": 2,
-    "biome/lint/suspicious/noGlobalIsNan": 1,
-    "jsdoc": 27,
-    "lines": 15,
-    "numbers": 2
-  },
   "web/js/viewer.js": {
     "biome/lint/complexity/noExcessiveCognitiveComplexity": 4,
     "biome/lint/complexity/noExcessiveLinesPerFunction": 5,

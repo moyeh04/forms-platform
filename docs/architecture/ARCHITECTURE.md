@@ -1037,8 +1037,12 @@ Rules for this page, to keep when a setting is added:
 - **No sideways scrolling.** Questions are rows of a grid that stack at 760px,
   not a table.
 - **A work area that is large is its own file.** The timetable is
-  `admin/settings/timetable.view.js`: `A.timetable(form, taken)` returns `{ node, summary(),
-  problem(), slots() }`, and the settings view only places the node in a
+  `admin/settings/timetable.view.js`: `A.timetable(form, taken)` returns
+  `{ node, summary(), problem(), slots() }`. Its state and rules are in
+  `timetable.model.js` (`A.tt`), and the calendar, the hours and the rows
+  of the days are drawn by `timetable-calendar.view.js`,
+  `timetable-hours.view.js` and `timetable-day.view.js`. The settings view
+  only places the node in a
   section and asks it for its part of the patch. The saved shape stays
   `slots.days` (`id`, `label`, `date`, `times`) with `slots.pattern` as the
   general hours. Which times of a day are switched off, and whether the day
