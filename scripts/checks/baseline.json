@@ -253,7 +253,7 @@
     "jsdoc": 70,
     "lines": 31
   },
-  "web/js/api.js": {
+  "web/js/app/api.js": {
     "biome/lint/complexity/useOptionalChain": 4,
     "biome/lint/correctness/noInnerDeclarations": 1,
     "biome/lint/correctness/noUnusedVariables": 2,
@@ -277,7 +277,7 @@
     "jsdoc": 121,
     "lines": 46
   },
-  "web/js/fresh.js": {
+  "web/js/app/fresh.js": {
     "biome/lint/complexity/useOptionalChain": 2,
     "biome/lint/correctness/noInnerDeclarations": 1,
     "biome/lint/correctness/noUnusedVariables": 1,
@@ -286,12 +286,12 @@
     "jsdoc": 11,
     "lines": 13
   },
-  "web/js/handover.js": {
+  "web/js/teams/handover.view.js": {
     "biome/lint/complexity/noExcessiveLinesPerFunction": 1,
     "jsdoc": 5,
     "lines": 5
   },
-  "web/js/i18n.js": {
+  "web/js/i18n/i18n.js": {
     "biome/lint/complexity/useOptionalChain": 2,
     "biome/lint/correctness/noInnerDeclarations": 2,
     "biome/lint/correctness/noUnusedVariables": 2,
@@ -301,13 +301,13 @@
     "jsdoc": 12,
     "lines": 30
   },
-  "web/js/size-alerts.js": {
+  "web/js/teams/size-alerts.view.js": {
     "biome/lint/style/noMagicNumbers": 2,
     "biome/lint/suspicious/noAssignInExpressions": 1,
     "jsdoc": 4,
     "lines": 6
   },
-  "web/js/theme.js": {
+  "web/js/app/theme.js": {
     "biome/lint/complexity/useOptionalChain": 1,
     "biome/lint/correctness/noUnusedVariables": 1,
     "biome/lint/suspicious/noAssignInExpressions": 1,
@@ -328,7 +328,7 @@
     "lines": 27,
     "numbers": 39
   },
-  "web/js/ui.js": {
+  "web/js/ui/ui.js": {
     "biome/lint/complexity/noArguments": 2,
     "biome/lint/complexity/noExcessiveCognitiveComplexity": 1,
     "biome/lint/complexity/useOptionalChain": 1,

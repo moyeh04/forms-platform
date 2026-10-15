@@ -9,7 +9,7 @@ const root = path.resolve(__dirname, '..', '..', '..');
 test('Site map: each published path finds its source file', () => {
   assert.equal(sourceOf('index.html'), 'web/index.html');
   assert.equal(sourceOf('/admin.html?x=1#y'), 'web/admin.html');
-  assert.equal(sourceOf('assets/js/api.js?v=abc'), 'web/js/api.js');
+  assert.equal(sourceOf('assets/js/app/api.js?v=abc'), 'web/js/app/api.js');
   assert.equal(sourceOf('/assets/css/theme.css'), 'web/css/theme.css');
   assert.equal(sourceOf('assets/img/ship.svg'), 'web/img/ship.svg');
   assert.equal(sourceOf('shared/rules/index.js'), 'domain/rules/index.js');

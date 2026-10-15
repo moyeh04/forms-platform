@@ -99,7 +99,7 @@ test('Deployment: built admin, student and viewer pages use the variable URL', a
   });
   vm.runInContext(config, context);
   vm.runInContext(
-    fs.readFileSync(path.join(output, 'assets/js/api.js'), 'utf8'),
+    fs.readFileSync(path.join(output, 'assets/js/app/api.js'), 'utf8'),
     context
   );
   await window.App.api.admin('admin.forms.list');
@@ -155,7 +155,7 @@ test('Deployment: the built site carries its version, and a script or stylesheet
       );
     }
     assert.ok(
-      local.some((a) => a.startsWith('assets/js/fresh.js?v=')),
+      local.some((a) => a.startsWith('assets/js/app/fresh.js?v=')),
       page + ' watches for a newer site'
     );
     assert.equal(
