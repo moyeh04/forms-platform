@@ -4,7 +4,7 @@ var RegistrySetup = (function () {
   /** First-time setup. Safe to run again. */
   function setup() {
     var ss = RegistryRepository.registry();
-    Properties.setProp('REGISTRY_ID', ss.getId());
+    Properties.setProp(Constants.PROPS.REGISTRY_ID, ss.getId());
     Properties.pepper();
     Table.ensureTab(ss, Constants.TABS.forms, FormsRepository.FORM_COLS);
     Table.ensureTab(ss, Constants.TABS.clients, ClientsRepository.CLIENT_COLS);
@@ -26,7 +26,7 @@ var RegistrySetup = (function () {
     RegistryRepository.rootFolder();
     return {
       registryUrl: ss.getUrl(),
-      folderId: Properties.getProp('ROOT_FOLDER_ID')
+      folderId: Properties.getProp(Constants.PROPS.ROOT_FOLDER_ID)
     };
   }
 

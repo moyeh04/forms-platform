@@ -65,7 +65,9 @@ var DownloadsJobs = (function () {
 
   function dlJob_(req) {
     var form = FormsRepository.requireForm(req.slug || req.id);
-    var raw = CacheService.getScriptCache().get('dl_job:' + req.job);
+    var raw = CacheService.getScriptCache().get(
+      Constants.CACHE.DL_JOB_PREFIX + req.job
+    );
     var job = raw ? Json.parseJson(raw, null) : null;
     if (!job || job.form !== form.id)
       ApiError.fail(
@@ -86,7 +88,7 @@ var DownloadsJobs = (function () {
       parts: job.parts || []
     };
     CacheService.getScriptCache().put(
-      'dl_job:' + job.id,
+      Constants.CACHE.DL_JOB_PREFIX + job.id,
       JSON.stringify(keep),
       DL_JOB_SECONDS_
     );

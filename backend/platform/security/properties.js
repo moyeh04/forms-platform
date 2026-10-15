@@ -11,10 +11,10 @@ var Properties = (function () {
 
   /** A private random value that salts every stored hash. Created once. */
   function pepper() {
-    var p = getProp('PEPPER');
+    var p = getProp(Constants.PROPS.PEPPER);
     if (!p) {
       p = Crypto.uuid() + Crypto.uuid();
-      setProp('PEPPER', p);
+      setProp(Constants.PROPS.PEPPER, p);
     }
     return p;
   }

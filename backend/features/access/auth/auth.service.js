@@ -17,7 +17,7 @@ var AuthService = (function () {
     pin = String(pin || '').trim();
     if (pin.length < 4)
       ApiError.fail('weak_pin', 'The admin PIN needs at least 4 characters.');
-    Properties.setProp('ADMIN_PIN_HASH', pinHash_(pin));
+    Properties.setProp(Constants.PROPS.ADMIN_PIN_HASH, pinHash_(pin));
     return true;
   }
 
@@ -25,20 +25,21 @@ var AuthService = (function () {
   function unlockAdmin() {
     var cache = CacheService.getScriptCache();
     var locked =
-      parseInt(cache.get('admin_fails') || '0', 10) >= ADMIN_MAX_FAILS;
-    cache.remove('admin_fails');
+      parseInt(cache.get(Constants.CACHE.ADMIN_FAILS) || '0', 10) >=
+      ADMIN_MAX_FAILS;
+    cache.remove(Constants.CACHE.ADMIN_FAILS);
     return locked;
   }
 
   function requireAdmin(req) {
-    var stored = Properties.getProp('ADMIN_PIN_HASH');
+    var stored = Properties.getProp(Constants.PROPS.ADMIN_PIN_HASH);
     if (!stored)
       ApiError.fail(
         'not_configured',
         'Set the admin PIN from the Forms Platform menu first.'
       );
     var cache = CacheService.getScriptCache();
-    var fails = parseInt(cache.get('admin_fails') || '0', 10);
+    var fails = parseInt(cache.get(Constants.CACHE.ADMIN_FAILS) || '0', 10);
     if (fails >= ADMIN_MAX_FAILS)
       ApiError.fail(
         'locked',
@@ -46,10 +47,14 @@ var AuthService = (function () {
       );
     var pin = req && req.admin && req.admin.pin;
     if (!pin || pinHash_(pin) !== stored) {
-      cache.put('admin_fails', String(fails + 1), ADMIN_LOCK_SECONDS);
+      cache.put(
+        Constants.CACHE.ADMIN_FAILS,
+        String(fails + 1),
+        ADMIN_LOCK_SECONDS
+      );
       ApiError.fail('bad_pin', 'That PIN is not correct.');
     }
-    cache.remove('admin_fails');
+    cache.remove(Constants.CACHE.ADMIN_FAILS);
     return true;
   }
 

@@ -71,7 +71,10 @@ var MenuService = (function () {
       ui.ButtonSet.OK_CANCEL
     );
     if (res.getSelectedButton() !== ui.Button.OK) return;
-    Properties.setProp('SITE_URL', String(res.getResponseText()).trim());
+    Properties.setProp(
+      Constants.PROPS.SITE_URL,
+      String(res.getResponseText()).trim()
+    );
   }
 
   function menuPrintReservations() {

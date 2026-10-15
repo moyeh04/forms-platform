@@ -5,7 +5,7 @@
 
 var ResponsesNotify = (function () {
   function siteLink_(form) {
-    var base = Properties.getProp('SITE_URL');
+    var base = Properties.getProp(Constants.PROPS.SITE_URL);
     return base ? base.replace(/\/+$/, '') + '/?f=' + form.slug : '';
   }
 

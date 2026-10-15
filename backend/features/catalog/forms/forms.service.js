@@ -196,7 +196,7 @@ var FormsService = (function () {
     }
     try {
       PropertiesService.getScriptProperties().deleteProperty(
-        'dirty:' + form.id
+        Constants.PROPS.DIRTY_PREFIX + form.id
       );
     } catch (e) {
       /* nothing to clean */

@@ -298,7 +298,7 @@
   },
   "backend/features/outputs/sheet-views/sheet-views.scheduler.js": {
     "biome/lint/complexity/noExcessiveCognitiveComplexity": 1,
-    "biome/lint/style/noMagicNumbers": 2,
+    "biome/lint/style/noMagicNumbers": 1,
     "jsdoc": 4,
     "lines": 8
   },

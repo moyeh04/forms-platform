@@ -9,7 +9,7 @@ var ClientsAccess = (function () {
   /** Resolves a token to an active client, or fails. */
   function requireClient_(req) {
     var cache = CacheService.getScriptCache();
-    var fails = parseInt(cache.get('bad_tokens') || '0', 10);
+    var fails = parseInt(cache.get(Constants.CACHE.BAD_TOKENS) || '0', 10);
     if (fails >= 30)
       ApiError.fail(
         'too_many_attempts',
@@ -22,7 +22,7 @@ var ClientsAccess = (function () {
       if (h && c.tokenHash === h) hit = c;
     });
     if (!hit) {
-      cache.put('bad_tokens', String(fails + 1), 60);
+      cache.put(Constants.CACHE.BAD_TOKENS, String(fails + 1), 60);
       ApiError.fail('bad_token', 'This link is not valid.');
     }
     if (!hit.active) ApiError.fail('revoked', 'This link was turned off.');
@@ -34,7 +34,7 @@ var ClientsAccess = (function () {
           '. Ask whoever sent it to extend it.'
       );
     if (hit.keyHash) {
-      var tag = 'client_key:' + hit.id;
+      var tag = Constants.CACHE.CLIENT_KEY_PREFIX + hit.id;
       var wrong = parseInt(cache.get(tag) || '0', 10);
       if (wrong >= CLIENT_KEY_TRIES_)
         ApiError.fail(
