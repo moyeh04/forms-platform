@@ -22,7 +22,7 @@ test('Baseline: a legacy file may keep its count, never go over it', () => {
   );
 });
 
-test('Baseline: a count that went down must be lowered, and lowering never raises', () => {
+test('Baseline: a lower count is written down, never raised', () => {
   const baseline = { 'a.js': { lines: 2, jsdoc: 1 }, 'b.js': { lines: 1 } };
   const findings = [
     at('a.js', 'lines'),
@@ -47,7 +47,7 @@ test('Baseline: a count that went down must be lowered, and lowering never raise
   ]);
 });
 
-test('Exceptions: an entry covers its path and rule, needs a reason, and fails once unused', () => {
+test('Exceptions: cover a path and rule, need a reason, fail unused', () => {
   const entries = [
     {
       path: 'index.html',

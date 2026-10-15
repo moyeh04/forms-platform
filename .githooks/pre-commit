@@ -1,3 +1,4 @@
 #!/bin/sh
-# Runs before every commit. `npm install` points git at this folder (core.hooksPath).
+# Runs before every commit. `npm install` points git at this folder
+# (core.hooksPath).
 node scripts/checks/run-checks.js --staged

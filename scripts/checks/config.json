@@ -23,5 +23,24 @@
     ],
     "extensions": [".js", ".css", ".json"],
     "exclude": ["tests/fixtures/"]
+  },
+  "lines": {
+    "limit": 80,
+    "include": [
+      "assets/",
+      "backend/",
+      "shared/",
+      "scripts/",
+      "tests/",
+      ".githooks/",
+      ".github/",
+      "index.html",
+      "admin.html",
+      "viewer.html",
+      "biome.json",
+      "package.json"
+    ],
+    "extensions": [".js", ".gs", ".css", ".html", ".sh", ".yml", ".json", ""],
+    "exclude": ["tests/fixtures/", "package-lock.json"]
   }
 }

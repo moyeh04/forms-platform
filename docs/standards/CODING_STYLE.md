@@ -18,6 +18,10 @@ Biome's formatter owns the layout. Do not lay code out by hand.
 | Trailing commas | none | the files run in Apps Script and old browsers alike |
 | Arrow parameters | always in parentheses | one shape for every arrow |
 
+Biome wraps code at 80 columns but cannot break a long string or comment;
+`check-lines.js` refuses those (see [CHECKS.md](CHECKS.md)). Split the string
+with `+`, or move it into a constant.
+
 `npx biome format --write <file>` lays a file out. `npx biome check <file>`
 reports what is wrong without changing anything.
 

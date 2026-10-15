@@ -35,4 +35,5 @@ Every path a check covers and every limit a rule sets is in
 | Check | Refuses | Fix |
 |---|---|---|
 | `check-biome.js` | anything Biome reports above "info" on the JavaScript, CSS and JSON files: layout (`biome/format`), lint rules, the size limits and unnamed numbers of [CODING_STYLE.md](CODING_STYLE.md) | `npx biome format --write <file>` for layout; otherwise change the code, or silence one line with `// biome-ignore <rule>: <reason>` |
+| `check-lines.js` | a line wider than 80 columns (Google §4.4) in JavaScript, CSS, HTML, shell, YAML, JSON and the git hooks; Arabic counts by character, and a URL does not count because it cannot be broken | split the string or the comment; Biome wraps code by itself |
 | `check-docs.js` | an action of the backend with no row in [API.md](../backend/API.md), or a row with no action; a total or a row of [TESTING.md](../process/TESTING.md) that does not match the tests in `tests/` and its sub-folders; a Markdown link to a file that does not exist | correct the document in the same commit as the code |

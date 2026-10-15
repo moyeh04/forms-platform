@@ -24,8 +24,12 @@ function repo(files) {
   return { root, files: Object.keys(files) };
 }
 
-const TWO_TESTS =
-  "const test = require('node:test');\ntest('a', () => {});\ntest('b', () => {});\n";
+const TWO_TESTS = [
+  "const test = require('node:test');",
+  "test('a', () => {});",
+  "test('b', () => {});",
+  ''
+].join('\n');
 
 const good = () => ({
   'backend/Forms.gs':
@@ -42,7 +46,7 @@ test('Docs check: a matching API page, test page and links pass', () => {
   assert.deepEqual(docs.check(root, files, CONFIG), []);
 });
 
-test('Docs check: a missing action, a wrong count and a broken link are each found', () => {
+test('Docs check: a missing action, wrong count and dead link fail', () => {
   const files = good();
   files['backend/Forms.gs'] += "API['admin.forms.delete'] = function () {};\n";
   files['tests/sub/more.test.js'] = TWO_TESTS;

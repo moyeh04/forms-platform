@@ -24,7 +24,7 @@ test('Biome check: a formatted, clean file has no findings', () => {
   assert.deepEqual(biome.check(root, ['src/ok.js'], CONFIG), []);
 });
 
-test('Biome check: layout and lint problems become findings with rule and line', () => {
+test('Biome check: layout and lint problems become findings', () => {
   const root = repo({
     'src/bad.js': 'module.exports   =  {a:1}\n',
     'src/lint.js': 'debugger;\n',
