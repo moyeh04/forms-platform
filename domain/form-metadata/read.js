@@ -13,8 +13,12 @@
   /** The oldest academic year offered, counted back from this one. */
   var YEARS_BACK = 6;
 
-  /** A term that names its season and year, such as "Fall 2027". */
-  var SEASON_TERM = /^(fall|spring|summer)\s+(\d{4})$/i;
+  /**
+   * A term that names its season and the year its academic year starts,
+   * such as "Spring 2027", or the academic year, such as "Spring
+   * 2027/2028".
+   */
+  var SEASON_TERM = /^(fall|spring|summer)\s+(\d{4}(?:\/\d{4})?)$/i;
 
   /**
    * Says whether an object has a key of its own.
@@ -59,8 +63,28 @@
   }
 
   /**
-   * Finds the academic year a term belongs to: one it names, the year a
-   * season starts, or the year at its end.
+   * Reads a term such as "Fall 2025" into its season and academic year.
+   * Every season of a year belongs to the academic year that starts in it:
+   * "Spring 2026" is 2026/2027. A term in another shape is kept as
+   * written.
+   *
+   * @param {*} term The term.
+   * @return {{season: string, year: string, custom: string}} Its parts.
+   */
+  function termParts(term) {
+    var value = text(term);
+    var m = value.match(SEASON_TERM);
+    if (!m) return { season: '', year: '', custom: value };
+    return {
+      season: m[1].charAt(0).toUpperCase() + m[1].slice(1).toLowerCase(),
+      year: m[2].indexOf('/') === -1 ? span(parseInt(m[2], 10)) : m[2],
+      custom: ''
+    };
+  }
+
+  /**
+   * Finds the academic year a term belongs to: one it names, the year of
+   * its season, or the year at its end.
    *
    * @param {*} term The term, such as "Spring 2028" or "Term 2027/2028".
    * @return {string} The year, as "2027/2028", or ''.
@@ -69,12 +93,8 @@
     var value = text(term);
     var academicYear = value.match(/(?:^|\s)(\d{4})\/(\d{4})$/);
     if (academicYear) return academicYear[1] + '/' + academicYear[2];
-    var season = value.match(SEASON_TERM);
-    var later;
-    if (season) {
-      later = /^(spring|summer)$/i.test(season[1]) ? -1 : 0;
-      return span(parseInt(season[2], 10) + later);
-    }
+    var season = termParts(value).year;
+    if (season) return season;
     var match = value.match(/(?:^|\s)(\d{4})$/);
     return match ? match[1] + '/' + (parseInt(match[1], 10) + 1) : '';
   }
@@ -112,27 +132,13 @@
       : yearFromTerm(value);
   }
 
-  /**
-   * Reads the batch year of an older form that kept it as a term, where
-   * every season but fall belongs to the year before.
-   *
-   * @param {*} term The term.
-   * @return {string} The academic year, or ''.
-   */
-  function legacyAcademicYear(term) {
-    var match = text(term).match(SEASON_TERM);
-    if (!match) return academicYear(term);
-    var back = match[1].toLowerCase() === 'fall' ? 0 : -1;
-    return span(parseInt(match[2], 10) + back);
-  }
-
   var api = {
     own: own,
     text: text,
     fieldOf: fieldOf,
     academicYears: academicYears,
     academicYear: academicYear,
-    legacyAcademicYear: legacyAcademicYear
+    termParts: termParts
   };
   if (node) module.exports = api;
   root.FormMetadataRead = api;

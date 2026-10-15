@@ -185,6 +185,7 @@
     defaults: defaults,
     fields: fields,
     academicYears: reading.academicYears,
+    termParts: reading.termParts,
     legacyFields: legacyFields,
     read: read,
     hydrate: hydrate,

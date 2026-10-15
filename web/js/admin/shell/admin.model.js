@@ -164,25 +164,4 @@
       ? String(iso)
       : d.toISOString().slice(0, ISO_DATE_LENGTH);
   };
-
-  /**
-   * Reads a term such as "Fall 2025" into its season and academic year. A
-   * term in another shape is kept as written.
-   *
-   * @param {*} term The term.
-   * @return {{season: string, year: string, custom: string}} Its parts.
-   */
-  A.parseTerm = function (term) {
-    var m = String(term || '')
-      .trim()
-      .match(/^(fall|spring|summer)\s+(\d{4}(?:\/\d{4})?)$/i);
-    if (!m) return { season: '', year: '', custom: String(term || '').trim() };
-    var year =
-      m[2].indexOf('/') === -1 ? m[2] + '/' + (parseInt(m[2], 10) + 1) : m[2];
-    return {
-      season: m[1].charAt(0).toUpperCase() + m[1].slice(1).toLowerCase(),
-      year: year,
-      custom: ''
-    };
-  };
 })(window.App);
