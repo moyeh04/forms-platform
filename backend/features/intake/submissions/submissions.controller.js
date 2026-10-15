@@ -109,7 +109,9 @@ var SubmissionsController = (function () {
    * the task but can no longer change or cancel it. Opening the form again lifts the lock.
    */
   function taskLocked_(form) {
-    return form.type === 'task_submission' && Rules.formState(form) !== 'open';
+    return (
+      form.type === FormType.TASK_SUBMISSION && Rules.formState(form) !== 'open'
+    );
   }
 
   function assertTaskOpen_(form) {
@@ -128,7 +130,7 @@ var SubmissionsController = (function () {
   function editScope_(form) {
     if (taskLocked_(form)) return '';
     var edit = !!form.editKey.allowEdit;
-    if (form.type !== 'reservation') return edit ? 'all' : '';
+    if (form.type !== FormType.RESERVATION) return edit ? 'all' : '';
     if (KeyBookingService.keyBookingSource(form))
       return edit || form.editKey.allowDelete ? 'slot' : '';
     return edit ? 'all' : form.editKey.allowDelete ? 'slot' : '';

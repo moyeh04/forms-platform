@@ -50,7 +50,7 @@ var DownloadsJobs = (function () {
   /** Where a team's things go inside the zip: "Tasks/03 - Task 3" or "Projects/03 - Library System". */
   function dlBase_(form, team) {
     return (
-      (form.type === 'task_submission' ? 'Tasks/' : 'Projects/') +
+      (form.type === FormType.TASK_SUBMISSION ? 'Tasks/' : 'Projects/') +
       dlPad_(team.number) +
       ' - ' +
       dlName_(team.title, team.ref)

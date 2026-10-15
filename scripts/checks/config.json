@@ -78,7 +78,7 @@
     "extensions": [".js"],
     "exclude": ["domain/enums.js"],
     "source": "domain/enums.js",
-    "properties": {}
+    "properties": { "type": "FormType" }
   },
   "structure": {
     "root": [

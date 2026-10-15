@@ -27,7 +27,7 @@ var FormsController = (function () {
       form: FormsPublic.publicForm(form),
       serverTime: Time.nowIso()
     };
-    if (form.type === 'reservation')
+    if (form.type === FormType.RESERVATION)
       out.taken = SlotsRules.slotAvailability(form);
     return out;
   }
@@ -55,7 +55,7 @@ var FormsController = (function () {
       listInfo: ListsRepository.readListInfo()
     };
     // The timetable editor marks slots that already have bookings.
-    if (form.type === 'reservation') {
+    if (form.type === FormType.RESERVATION) {
       out.taken = SlotsRules.slotAvailability(form);
       out.keySources = KeyBookingService.keyBookingSources(form).map(
         function (s) {
@@ -66,7 +66,10 @@ var FormsController = (function () {
     // The team size and teammates panels count the saved answers that a new range would leave outside.
     if (Rules.fieldByRole(form, 'team_size'))
       out.teamSizes = ResponsesRules.teamSizes(form);
-    if (form.type === 'reservation' && Rules.fieldByRole(form, 'members'))
+    if (
+      form.type === FormType.RESERVATION &&
+      Rules.fieldByRole(form, 'members')
+    )
       out.teammateCounts = ResponsesRules.teammateCounts(form);
     return out;
   }

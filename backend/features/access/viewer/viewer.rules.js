@@ -34,9 +34,9 @@ var ViewerRules = (function () {
   };
 
   function viewKind_(form) {
-    return form.type === 'reservation'
+    return form.type === FormType.RESERVATION
       ? 'reservation'
-      : form.type === 'whatsapp_registration'
+      : form.type === FormType.WHATSAPP_REGISTRATION
         ? 'whatsapp'
         : 'team';
   }

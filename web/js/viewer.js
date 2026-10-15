@@ -526,7 +526,7 @@
       showSection = ids.indexOf('section') !== -1,
       showCode = ids.indexOf('code') !== -1,
       showPhone = ids.indexOf('phone') !== -1;
-    var third = d.form.type === 'task_submission' ? 'Task' : 'Project';
+    var third = d.form.type === FormType.TASK_SUBMISSION ? 'Task' : 'Project';
     return h(
       'div',
       { class: 'team-list' },

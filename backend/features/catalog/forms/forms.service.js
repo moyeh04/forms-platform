@@ -68,7 +68,7 @@ var FormsService = (function () {
   }
 
   function createForm(o, adjust) {
-    if (Constants.FORM_TYPES.indexOf(o.type) === -1)
+    if (Object.values(FormType).indexOf(o.type) === -1)
       ApiError.fail('unknown_type', 'Unknown form type.');
     var title = String(o.title || '').trim();
     if (!title) ApiError.fail('title_required', 'Give the form a title.');

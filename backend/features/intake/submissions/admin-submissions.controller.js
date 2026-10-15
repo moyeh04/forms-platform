@@ -24,7 +24,7 @@ var AdminSubmissionsController = (function () {
       function (r) {
         var view = adminView_(r);
         if (
-          form.type === 'reservation' &&
+          form.type === FormType.RESERVATION &&
           Rules.fieldByRole(form, 'members').enabled === false
         ) {
           view.data.members = [];

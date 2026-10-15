@@ -55,7 +55,7 @@
   }
 
   A.downloadAll = function (form) {
-    var tasks = form.type === 'task_submission';
+    var tasks = form.type === FormType.TASK_SUBMISSION;
     var what = tasks ? 'task' : 'project';
     var body = h('div', { class: 'l-stack download' });
     var dialog = A.modal(

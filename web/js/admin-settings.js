@@ -227,8 +227,10 @@
     var hasDrive = (f.fields || []).some(function (x) {
       return x.type === 'drive_link';
     });
-    var isTeam = f.type === 'team_registration' || f.type === 'task_submission';
-    var isReservation = f.type === 'reservation';
+    var isTeam =
+      f.type === FormType.TEAM_REGISTRATION ||
+      f.type === FormType.TASK_SUBMISSION;
+    var isReservation = f.type === FormType.RESERVATION;
     var reservationMembers = Rules.fieldByRole(f, 'members');
 
     ui.clear(mount);
@@ -1797,7 +1799,7 @@
     /* Timetable: built by admin-timetable.js, which owns the days, the hours and the slots. */
     var slotsPanel = null;
     var timetable = null;
-    if (f.type === 'reservation') {
+    if (f.type === FormType.RESERVATION) {
       timetable = A.timetable(f, res.taken);
       slotsPanel = panel(
         'Timetable',
@@ -1881,7 +1883,7 @@
         icon('plus', 20),
         'Add a review step'
       ),
-      f.type === 'whatsapp_registration'
+      f.type === FormType.WHATSAPP_REGISTRATION
         ? A.check(
             'Match registrations to pasted WhatsApp requests',
             f.matching && f.matching.enabled,

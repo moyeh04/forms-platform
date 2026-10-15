@@ -95,7 +95,7 @@ var TemplateFields = (function () {
   }
 
   function normalizeReservationMembers_(form) {
-    if (form.type !== 'reservation') return form;
+    if (form.type !== FormType.RESERVATION) return form;
     form.fields = form.fields || [];
     form.steps = form.steps || [];
     var members = Rules.fieldByRole(form, 'members');

@@ -48,7 +48,7 @@ is silenced on its own line with the reason, and both checks honour it:
 
 | Owner | Holds |
 |---|---|
-| `backend/platform/config/constants.js` | The app name, the registry tab names, `FORM_TYPES`, `FORM_STATUSES` |
+| `backend/platform/config/constants.js` | The app name, the registry tab names, `FORM_STATUSES` |
 | each `*.repository.js` | The column list of its tab (`FORM_COLS`, `RESPONSE_COLS`, `CLIENT_COLS_`, `TRANSFER_COLS`, `REQUEST_COLS_`) |
 | `responses.repository.js`, `responses.review.js` | `SUBMISSION_STATUSES`, the reference prefix of each form type, `REVIEW_STATUSES` |
 | `lists.repository.js`, `forms.service.js`, `forms.public.js` | The list kinds and built-in lists, the form fields a patch may change, the ones the public may read |
