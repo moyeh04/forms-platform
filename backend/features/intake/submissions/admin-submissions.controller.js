@@ -93,10 +93,10 @@ API['admin.submission.resetKey'] = AuthService.admin(function (req) {
       return x.id === req.submissionId;
     })[0];
     if (!r) ApiError.fail('submission_not_found', 'That submission does not exist.');
-    var k = issueKey_(vform, rows);
+    var k = KeysService.issueKey(vform, rows);
     r.keyHash = k.hash;
-    r.keySeal = sealKey_(form, r.id, k.key);
-    r.keyExpires = keyExpiry_(form);
+    r.keySeal = KeysService.sealKey(form, r.id, k.key);
+    r.keyExpires = KeysService.keyExpiry(form);
     ResponsesRepository.saveResponse(form, r);
     return { key: k.key, keyExpires: r.keyExpires, ref: r.ref };
   });
@@ -109,8 +109,8 @@ API['admin.submission.key'] = AuthService.admin(function (req) {
     return x.id === req.submissionId;
   })[0];
   if (!r) ApiError.fail('submission_not_found', 'That submission does not exist.');
-  var key = unsealKey_(form, r.id, r.keySeal);
-  if (!key || keyHash_(form, key) !== r.keyHash)
+  var key = KeysService.unsealKey(form, r.id, r.keySeal);
+  if (!key || KeysService.keyHash(form, key) !== r.keyHash)
     ApiError.fail(
       'key_unknown',
       'This key was issued before keys could be shown. Reset it to give the student a new one you can see.'

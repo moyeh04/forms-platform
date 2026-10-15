@@ -31,3 +31,6 @@ API['admin.lists.set'] = AuthService.admin(ListsController.set);
 API['admin.lists.create'] = AuthService.admin(ListsController.create);
 API['admin.lists.rename'] = AuthService.admin(ListsController.rename);
 API['admin.lists.delete'] = AuthService.admin(ListsController.remove);
+
+API['admin.keys.list'] = AuthService.admin(KeysController.list);
+API['admin.keys.extend'] = AuthService.admin(KeysController.extend);

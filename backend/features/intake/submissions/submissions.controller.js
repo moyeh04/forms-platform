@@ -59,8 +59,8 @@ API.submit = function (req) {
       throw e;
     }
     var k = source
-      ? bookingKey_(vform, live, req.sourceKey)
-      : issueKey_(vform, live);
+      ? KeysService.bookingKey(vform, live, req.sourceKey)
+      : KeysService.issueKey(vform, live);
     var id = Crypto.uuid();
     var r = ResponsesRepository.applyDerived(vform, {
       id: id,
@@ -70,9 +70,9 @@ API.submit = function (req) {
       review: ResponsesReview.defaultReview(form),
       data: v.data,
       keyHash: k.hash,
-      keyExpires: keyExpiry_(form),
+      keyExpires: KeysService.keyExpiry(form),
       deleted: false,
-      keySeal: sealKey_(form, id, k.key)
+      keySeal: KeysService.sealKey(form, id, k.key)
     });
     rows.push(r);
     keepTeamNumbers_(form, rows);
@@ -124,7 +124,7 @@ function editScope_(form) {
 
 API.lookup = function (req) {
   var form = FormsRepository.requireForm(String(req.slug || ''));
-  var r = findByKey_(form, req.key);
+  var r = KeysService.findByKey(form, req.key);
   var locked = taskLocked_(form);
   var scope = editScope_(form);
   return {
@@ -141,7 +141,7 @@ API.lookup = function (req) {
 API.update = function (req) {
   var form = FormsRepository.requireForm(String(req.slug || ''));
   var vform = FormsPublic.validationForm(form);
-  var found = findByKey_(form, req.key);
+  var found = KeysService.findByKey(form, req.key);
   assertTaskOpen_(form);
   var scope = editScope_(form);
   if (!scope) ApiError.fail('edit_disabled', 'Editing is turned off for this form.');
@@ -180,7 +180,7 @@ API.update = function (req) {
 
 API.remove = function (req) {
   var form = FormsRepository.requireForm(String(req.slug || ''));
-  var found = findByKey_(form, req.key);
+  var found = KeysService.findByKey(form, req.key);
   if (!form.editKey.allowDelete)
     ApiError.fail('delete_disabled', 'Deleting is turned off for this form.');
   assertTaskOpen_(form);

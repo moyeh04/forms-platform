@@ -5,7 +5,7 @@ var API = API || {};
 API['transfer.decide'] = function (req) {
   var form = FormsRepository.requireForm(String(req.slug || ''));
   var vform = FormsPublic.validationForm(form);
-  var found = findByKey_(form, req.key);
+  var found = KeysService.findByKey(form, req.key);
   var out = Lock.withLock(function () {
     return decideTransfer_(
       vform,
@@ -31,7 +31,7 @@ API['transfer.decide'] = function (req) {
 API['transfer.cancel'] = function (req) {
   var form = FormsRepository.requireForm(String(req.slug || ''));
   var vform = FormsPublic.validationForm(form);
-  var found = findByKey_(form, req.key);
+  var found = KeysService.findByKey(form, req.key);
   Lock.withLock(function () {
     var t = readTransfers_(form).filter(function (x) {
       return (

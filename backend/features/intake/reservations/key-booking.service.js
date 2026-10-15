@@ -47,7 +47,7 @@ function requireKeyBookingSource_(form) {
 
 /** A registration key stays valid for booking after it has expired for editing. */
 function registrationByKey_(source, key) {
-  return findByKey_(source, key, true);
+  return KeysService.findByKey(source, key, true);
 }
 
 /**

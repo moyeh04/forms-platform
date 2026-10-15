@@ -91,14 +91,14 @@ test('Golden: the salted hashes and seals are the same for the same pepper', () 
     clientToken: w.call('ClientsService.clientToken', 'token-1'),
     clientKey: w.call('ClientsService.clientKeyHash', client, '12345'),
     clientPad: w.call('ClientsService.clientKeyPad', client),
-    key: w.call('keyHash_', form, '12345'),
-    keyPad: w.call('keyPad_', form, 'response-1'),
-    seal: w.call('sealKey_', form, 'response-1', '12345'),
+    key: w.call('KeysService.keyHash', form, '12345'),
+    keyPad: w.call('KeysService.keyPad', form, 'response-1'),
+    seal: w.call('KeysService.sealKey', form, 'response-1', '12345'),
     unseal: w.call(
-      'unsealKey_',
+      'KeysService.unsealKey',
       form,
       'response-1',
-      w.call('sealKey_', form, 'response-1', '12345')
+      w.call('KeysService.sealKey', form, 'response-1', '12345')
     )
   };
   matchesFixture('hashes.json', hashes);

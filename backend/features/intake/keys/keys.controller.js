@@ -4,8 +4,7 @@
  * later, so an expired key works again for the whole period.
  */
 
-var API = API || {};
-
+var KeysController = (function () {
 var KEY_EXTEND_MAX_DAYS_ = 365;
 
 function keyRow_(r) {
@@ -33,18 +32,27 @@ function extendedExpiry_(current, days, until) {
   return new Date(from + days * 86400000).toISOString();
 }
 
-API['admin.keys.list'] = AuthService.admin(function (req) {
+/**
+ * Answers the `admin.keys.list` action.
+ *
+ * @param {!Object} req The request body.
+ * @return {*} The answer, sent back as JSON.
+ */
+function list(req) {
   var form = FormsRepository.requireForm(req.slug || req.id);
   return { keys: keyedRows_(form).map(keyRow_) };
-});
+}
 
 /**
  * req: slug, which ('all', 'expired' or 'chosen'), ids (for 'chosen'), and either days
  * (1 to 365) or until (an ISO time in the future).
+ *
+ * @param {!Object} req The request body.
+ * @return {*} The answer, sent back as JSON.
  */
-API['admin.keys.extend'] = AuthService.admin(function (req) {
+function extend(req) {
   var form = FormsRepository.requireForm(req.slug || req.id);
-  requireKeyEnabled_(form);
+  KeysService.requireKeyEnabled(form);
   var days = 0,
     until = '';
   if (req.until) {
@@ -81,4 +89,7 @@ API['admin.keys.extend'] = AuthService.admin(function (req) {
     return picked.length;
   });
   return { changed: changed, keys: keyedRows_(form).map(keyRow_) };
-});
+}
+
+return { list, extend };
+})();

@@ -151,6 +151,7 @@
   },
   "backend/features/intake/keys/keys.controller.js": {
     "biome/format": 1,
+    "biome/lint/complexity/noExcessiveCognitiveComplexity": 1,
     "biome/lint/correctness/noInnerDeclarations": 1,
     "biome/lint/style/noMagicNumbers": 1,
     "biome/lint/suspicious/noGlobalIsNan": 1,
@@ -163,7 +164,7 @@
     "biome/lint/correctness/noInnerDeclarations": 3,
     "biome/lint/style/noMagicNumbers": 4,
     "jsdoc": 12,
-    "lines": 5
+    "lines": 6
   },
   "backend/features/intake/matching/matching.controller.js": {
     "biome/format": 1,

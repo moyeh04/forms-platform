@@ -2,6 +2,7 @@
  * Edit keys: issuing, sealing, expiring and finding a submission by its key.
  */
 
+var KeysService = (function () {
 function keyHash_(form, key) {
   return Crypto.sha256Hex(Properties.pepper() + ':key:' + form.id + ':' + key);
 }
@@ -84,3 +85,6 @@ function findByKey_(form, key, anyAge) {
     );
   return hit;
 }
+
+return { requireKeyEnabled: requireKeyEnabled_, findByKey: findByKey_, issueKey: issueKey_, sealKey: sealKey_, keyExpiry: keyExpiry_, unsealKey: unsealKey_, keyHash: keyHash_, bookingKey: bookingKey_, keyPad: keyPad_ };
+})();
