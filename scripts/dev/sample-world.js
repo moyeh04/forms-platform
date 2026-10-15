@@ -18,20 +18,10 @@ const HTTP_OK = 200;
 const HTTP_PARTIAL = 206;
 
 /** The times of the seminar: 25 minutes each, 5 minutes apart. */
-const SEMINAR_TIMES = {
-  start: '10:00',
-  end: '11:00',
-  length: 25,
-  gap: 5
-};
+const SEMINAR_TIMES = { start: '10:00', end: '11:00', length: 25, gap: 5 };
 
 /** The times of the first discussion day: 20 minutes each, 5 apart. */
-const DISCUSSION_TIMES = {
-  start: '12:30',
-  end: '14:00',
-  length: 20,
-  gap: 5
-};
+const DISCUSSION_TIMES = { start: '12:30', end: '14:00', length: 20, gap: 5 };
 
 /** The study details every sample student shares. */
 const STUDY = {
@@ -140,9 +130,9 @@ function seedTeams(world) {
       members: []
     })
   ];
-  const expired = teams.length - 1;
   const registered = teams.map((data, i) => {
-    if (i === expired) world.setNow(Date.now() - EXPIRED_DAYS * DAY_MS);
+    if (i === teams.length - 1)
+      world.setNow(Date.now() - EXPIRED_DAYS * DAY_MS);
     const r = world.api({ action: 'submit', slug: team.slug, data });
     world.setNow(Date.now());
     return r;
@@ -347,6 +337,17 @@ function fakeFetch(world, url, o) {
 }
 
 /**
+ * Sets up an empty world: the clock, the sheet and the admin PIN.
+ *
+ * @param {!Object} world The in-memory Google.
+ */
+function prepareWorld(world) {
+  world.setNow(Date.now());
+  world.call('setup');
+  world.call('setAdminPin', PIN);
+}
+
+/**
  * Builds a world with a few forms and registrations so every page has
  * something to show.
  *
@@ -356,9 +357,7 @@ function fakeFetch(world, url, o) {
  *     form, an instructor link and its key, and a form booked with a key.
  */
 function seed(world) {
-  world.setNow(Date.now());
-  world.call('setup');
-  world.call('setAdminPin', PIN);
+  prepareWorld(world);
   const { team, registered } = seedTeams(world);
   seedSeminar(world);
   const discussion = seedDiscussion(world, team, registered);
@@ -381,4 +380,4 @@ function seed(world) {
   };
 }
 
-module.exports = { PIN, seed };
+module.exports = { PIN, prepareWorld, seed };
