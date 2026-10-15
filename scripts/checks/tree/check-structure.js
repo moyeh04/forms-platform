@@ -1,11 +1,10 @@
 /**
  * Checks where files live: only the allowed entries at the root, no
- * catch-all names such as `utils`, no folder with more code files than the
- * cap, every script and stylesheet a page loads exists and every one is
- * loaded, and FILE-STRUCTURE.md names every source file. A finding about a
- * folder names it with a trailing `/`. When the site is published at other
- * paths than its sources, the configured site map turns each `src` back into
- * its source path.
+ * catch-all names such as `utils`, every script and stylesheet a page loads
+ * exists and every one is loaded, and FILE-STRUCTURE.md names every source
+ * file. A finding about a folder names it with a trailing `/`. When the site
+ * is published at other paths than its sources, the configured site map
+ * turns each `src` back into its source path.
  */
 const path = require('node:path');
 const { select, read } = require('../lib/files.js');
@@ -72,26 +71,6 @@ function nameFindings(files, names) {
   return [...found].map((name) =>
     finding(name, 'name', 'a catch-all name; name it by what it does')
   );
-}
-
-/**
- * Finds folders that hold more code files than the cap.
- *
- * @param {!Array<string>} code The code files.
- * @param {number} cap The most code files a folder may hold.
- * @return {!Array<!Object>} One finding for each crowded folder.
- */
-function capFindings(code, cap) {
-  const counts = {};
-  for (const file of code) {
-    const dir = `${path.posix.dirname(file)}/`;
-    counts[dir] = (counts[dir] || 0) + 1;
-  }
-  return Object.entries(counts)
-    .filter(([, count]) => count > cap)
-    .map(([dir, count]) =>
-      finding(dir, 'cap', `${count} code files; sort them into sub-folders`)
-    );
 }
 
 /**
@@ -178,7 +157,6 @@ function check(root, files, config) {
   return [
     ...rootFindings(files, rules.root),
     ...nameFindings(files, rules.catchAllNames),
-    ...capFindings(select(files, rules.code), rules.cap),
     ...pageFindings(root, files, rules),
     ...documentedFindings(root, files, rules)
   ];

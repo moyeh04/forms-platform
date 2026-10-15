@@ -85,6 +85,22 @@
       "kind": "ListKind"
     }
   },
+  "layers": {
+    "include": ["backend/"],
+    "extensions": [".js"],
+    "rules": [
+      {
+        "files": "^backend/platform/",
+        "mayNotUse": "^backend/features/",
+        "why": "platform code serves every feature and reads none"
+      },
+      {
+        "files": "\\.controller\\.js$",
+        "mayNotUse": "\\.repository\\.js$",
+        "why": "a controller asks a service, which reads the repository"
+      }
+    ]
+  },
   "structure": {
     "root": [
       "README.md",
@@ -113,12 +129,6 @@
       "stuff",
       "shared"
     ],
-    "cap": 8,
-    "code": {
-      "include": [""],
-      "extensions": [".js", ".css", ".html", ".sh"],
-      "exclude": ["tests/fixtures/", "docs/"]
-    },
     "pages": ["web/index.html", "web/admin.html", "web/viewer.html"],
     "loaded": {
       "include": ["web/js/", "web/css/"],

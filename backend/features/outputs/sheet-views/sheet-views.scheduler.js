@@ -17,7 +17,7 @@ var SheetViewsScheduler = (function () {
    */
   function rebuildViews(form) {
     var ss = SpreadsheetApp.openById(form.sheetId);
-    SheetStyle.styleFormTabs(ss);
+    SheetViewsLayout.styleFormTabs(ss);
     var build = SheetViewsBuilder.VIEW_BUILDERS[form.type];
     if (!build) return false;
     build(FormsPublic.validationForm(form), ss);

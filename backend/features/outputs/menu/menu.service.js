@@ -98,7 +98,7 @@ var MenuService = (function () {
   function menuRebuildViews() {
     var ui = SpreadsheetApp.getUi();
     var n = 0;
-    SheetStyle.styleRegistryTabs();
+    RegistrySetup.styleRegistryTabs();
     FormsRepository.readForms().forEach(function (f) {
       if (SheetViewsScheduler.rebuildViews(f)) n++;
     });

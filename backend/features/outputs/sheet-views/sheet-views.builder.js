@@ -31,7 +31,7 @@ var SheetViewsBuilder = (function () {
       shades = [],
       blocks = [];
     teams.forEach(function (t, g) {
-      var style = SheetViewsLayout.VIEW_STYLE.groups[g % 2];
+      var style = SheetStyle.PALETTE.groups[g % 2];
       var start = values.length + 2;
       t.members.forEach(function (m, i) {
         values.push([
@@ -60,7 +60,7 @@ var SheetViewsBuilder = (function () {
     sh.getRange(first, 1, values.length, 4)
       .setValues(values)
       .setBackgrounds(shades)
-      .setFontFamily(SheetViewsLayout.VIEW_STYLE.font)
+      .setFontFamily(SheetStyle.PALETTE.font)
       .setFontSize(11)
       .setVerticalAlignment('middle');
     sh.getRange(first, 1, values.length, 1)
@@ -131,7 +131,7 @@ var SheetViewsBuilder = (function () {
           label: p.day ? p.day.label : p.dayId,
           start: values.length + 2,
           length: 0,
-          style: SheetViewsLayout.VIEW_STYLE.groups[g % 2]
+          style: SheetStyle.PALETTE.groups[g % 2]
         };
         blocks.push(current);
       }
@@ -156,7 +156,7 @@ var SheetViewsBuilder = (function () {
     sh.getRange(2, 1, values.length, headers.length)
       .setValues(values)
       .setBackgrounds(shades)
-      .setFontFamily(SheetViewsLayout.VIEW_STYLE.font)
+      .setFontFamily(SheetStyle.PALETTE.font)
       .setFontSize(11)
       .setVerticalAlignment('middle');
     sh.getRange(2, 3, values.length, 1).setFontWeight('bold');
@@ -226,13 +226,13 @@ var SheetViewsBuilder = (function () {
         '',
         reviewText_(form, r)
       ]);
-      var s = SheetViewsLayout.VIEW_STYLE.groups[i % 2].shades[0];
+      var s = SheetStyle.PALETTE.groups[i % 2].shades[0];
       shades.push([s, s, s, s, s, s, s, s]);
     });
     sh.getRange(2, 1, values.length, 8)
       .setValues(values)
       .setBackgrounds(shades)
-      .setFontFamily(SheetViewsLayout.VIEW_STYLE.font)
+      .setFontFamily(SheetStyle.PALETTE.font)
       .setFontSize(11)
       .setVerticalAlignment('middle');
     rows.forEach(function (r, i) {

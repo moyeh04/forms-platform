@@ -1,20 +1,41 @@
 /**
- * How the data tabs look: the registry's Forms, Clients and Lists, and each form's Responses,
- * Transfers and Requests. They get the header of the tinted views, a frozen first row, column
- * widths that fit what a column holds, alternating row tints, and long cells cut short at the
- * cell edge so every row stays one line tall.
+ * How the sheets look: the palette every painted tab shares, and the look of
+ * a data tab, such as the registry's Forms tab or a form's Responses tab. A
+ * data tab gets the header of the tinted views, a frozen first row, column
+ * widths that fit what a column holds, alternating row tints, and long cells
+ * cut short at the cell edge so every row stays one line tall.
  *
- * Only the look changes. No value and no number format is written, so everything the platform
- * reads back is what it was.
+ * Only the look changes. No value and no number format is written, so
+ * everything the platform reads back is what it was.
  */
 
 var SheetStyle = (function () {
+  /**
+   * The colours and font of every painted tab: the dark header (`ink` with
+   * `onInk` text), the grid lines, and two groups of tints that alternate
+   * from one team or day to the next.
+   */
+  var PALETTE = Object.freeze({
+    ink: '#3A2A1A',
+    onInk: '#F3E6C4',
+    grid: '#C9B58A',
+    font: 'Arial',
+    groups: [
+      { shades: ['#DCEAE4', '#EEF5F1'], solid: '#3F6B66' },
+      { shades: ['#F0E4C6', '#F8F1DE'], solid: '#8E2B22' }
+    ]
+  });
+
   /** Tints of the rows under the header, the lighter one first. */
   var DATA_TAB_ROWS_ = ['#FFFFFF', '#F8F1DE'];
 
-  /** Width in pixels by column name; a column that is not named here gets the default. */
+  /** The height of a data tab's header row, in pixels. */
+  var DATA_TAB_HEADER_PX_ = 32;
+
+  /** The width of a column that `DATA_TAB_WIDTHS_` does not name, in pixels. */
   var DATA_TAB_WIDTH_ = 140;
 
+  /** The width of each column by its name, in pixels. */
   var DATA_TAB_WIDTHS_ = {
     id: 110,
     ref: 120,
@@ -55,12 +76,19 @@ var SheetStyle = (function () {
     added: 170
   };
 
-  /** True when the tab already has the look for exactly these columns and all of its rows. */
+  /**
+   * Says whether a tab already has the look for exactly these columns and
+   * all of its rows.
+   *
+   * @param {!SpreadsheetApp.Sheet} sh The tab.
+   * @param {!Array<string>} cols The names of its columns.
+   * @return {boolean} True when nothing needs painting.
+   */
   function dataTabStyled_(sh, cols) {
     var last = String(
       sh.getRange(1, cols.length).getBackground()
     ).toLowerCase();
-    if (last !== SheetViewsLayout.VIEW_STYLE.ink.toLowerCase()) return false;
+    if (last !== PALETTE.ink.toLowerCase()) return false;
     return sh.getBandings().some(function (b) {
       return (
         b.getRange().getNumRows() === sh.getMaxRows() &&
@@ -70,9 +98,14 @@ var SheetStyle = (function () {
   }
 
   /**
-   * Gives a data tab its look. Returns false when it had it already, which costs three reads.
-   * A tab that refuses a format stays as far as it got and is tried again on the next repaint: the
-   * look never stops a repaint or a new form.
+   * Gives a data tab its look. A tab that refuses a format stays as far as
+   * it got and is tried again on the next repaint: the look never stops a
+   * repaint or a new form.
+   *
+   * @param {?SpreadsheetApp.Sheet} sh The tab, or null when it is missing.
+   * @param {!Array<string>} cols The names of its columns.
+   * @return {boolean} True when it was painted; false when it had the look
+   *     already, which costs three reads, or could not be painted.
    */
   function styleDataTab_(sh, cols) {
     try {
@@ -85,23 +118,40 @@ var SheetStyle = (function () {
     }
   }
 
-  function paintDataTab_(sh, cols) {
-    var rows = sh.getMaxRows(),
-      n = cols.length;
+  /**
+   * Paints the header row of a data tab and freezes it.
+   *
+   * @param {!SpreadsheetApp.Sheet} sh The tab.
+   * @param {number} n How many columns it has.
+   */
+  function paintDataHeader_(sh, n) {
     sh.getRange(1, 1, 1, n)
-      .setBackground(SheetViewsLayout.VIEW_STYLE.ink)
-      .setFontColor(SheetViewsLayout.VIEW_STYLE.onInk)
+      .setBackground(PALETTE.ink)
+      .setFontColor(PALETTE.onInk)
       .setFontWeight('bold')
-      .setFontFamily(SheetViewsLayout.VIEW_STYLE.font)
+      .setFontFamily(PALETTE.font)
       .setVerticalAlignment('middle');
-    sh.setRowHeight(1, 32);
+    sh.setRowHeight(1, DATA_TAB_HEADER_PX_);
     sh.setFrozenRows(1);
+  }
+
+  /**
+   * Paints a data tab: its header, its column widths, its rows cut at the
+   * cell edge, and one banding over every row.
+   *
+   * @param {!SpreadsheetApp.Sheet} sh The tab.
+   * @param {!Array<string>} cols The names of its columns.
+   */
+  function paintDataTab_(sh, cols) {
+    var rows = sh.getMaxRows();
+    var n = cols.length;
+    paintDataHeader_(sh, n);
     cols.forEach(function (name, i) {
       sh.setColumnWidth(i + 1, DATA_TAB_WIDTHS_[name] || DATA_TAB_WIDTH_);
     });
     if (rows > 1) {
       sh.getRange(2, 1, rows - 1, n)
-        .setFontFamily(SheetViewsLayout.VIEW_STYLE.font)
+        .setFontFamily(PALETTE.font)
         .setVerticalAlignment('middle')
         .setWrapStrategy(SpreadsheetApp.WrapStrategy.CLIP);
     }
@@ -110,44 +160,10 @@ var SheetStyle = (function () {
     });
     sh.getRange(1, 1, rows, n)
       .applyRowBanding(SpreadsheetApp.BandingTheme.LIGHT_GREY, true, false)
-      .setHeaderRowColor(SheetViewsLayout.VIEW_STYLE.ink)
+      .setHeaderRowColor(PALETTE.ink)
       .setFirstRowColor(DATA_TAB_ROWS_[0])
       .setSecondRowColor(DATA_TAB_ROWS_[1]);
   }
 
-  /** The data tabs of one form's spreadsheet. Transfers and Requests exist only on forms that used them. */
-  function styleFormTabs_(ss) {
-    styleDataTab_(
-      ss.getSheetByName('Responses'),
-      ResponsesRepository.RESPONSE_COLS
-    );
-    styleDataTab_(
-      ss.getSheetByName(TransfersRepository.TRANSFER_TAB),
-      TransfersRepository.TRANSFER_COLS
-    );
-    styleDataTab_(
-      ss.getSheetByName('Requests'),
-      MatchingRepository.REQUEST_COLS
-    );
-  }
-
-  /** The three tabs of the registry. */
-  function styleRegistryTabs_() {
-    var ss = RegistryRepository.registry();
-    styleDataTab_(
-      ss.getSheetByName(Constants.TABS.forms),
-      FormsRepository.FORM_COLS
-    );
-    styleDataTab_(
-      ss.getSheetByName(Constants.TABS.clients),
-      ClientsRepository.CLIENT_COLS
-    );
-    styleDataTab_(ss.getSheetByName(Constants.TABS.lists), ['key', 'values']);
-  }
-
-  return {
-    styleDataTab: styleDataTab_,
-    styleRegistryTabs: styleRegistryTabs_,
-    styleFormTabs: styleFormTabs_
-  };
+  return { PALETTE, styleDataTab: styleDataTab_ };
 })();

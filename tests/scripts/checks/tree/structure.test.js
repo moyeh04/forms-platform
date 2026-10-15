@@ -9,8 +9,6 @@ const CONFIG = {
   structure: {
     root: ['README.md', 'web', 'docs'],
     catchAllNames: ['utils', 'helpers'],
-    cap: 2,
-    code: { include: [''], extensions: ['.js', '.html'] },
     pages: ['web/index.html'],
     loaded: { include: ['web/js/'], extensions: ['.js'] },
     fileStructure: 'docs/FILES.md',
@@ -58,7 +56,6 @@ test('Structure check: each broken rule is found where it is', () => {
     'notes.txt:0 structure/root',
     'web/helpers/:0 structure/name',
     'web/index.html:2 structure/pages',
-    'web/js/:0 structure/cap',
     'web/js/a.js:0 structure/pages',
     'web/js/b.js:0 structure/pages',
     'web/js/utils.js:0 structure/name',

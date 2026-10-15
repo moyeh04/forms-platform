@@ -380,10 +380,10 @@ test('Views: a change that arrives while a form is painted books one more run', 
   });
   // The second team registers after the run read its marks and before it
   // finished: while it styles the tabs, the first step of every repaint.
-  const style = w.ctx.SheetStyle;
-  const real = style.styleFormTabs;
-  style.styleFormTabs = (ss) => {
-    style.styleFormTabs = real;
+  const layout = w.ctx.SheetViewsLayout;
+  const real = layout.styleFormTabs;
+  layout.styleFormTabs = (ss) => {
+    layout.styleFormTabs = real;
     w.advanceDays(0.001);
     w.api({
       action: 'submit',
