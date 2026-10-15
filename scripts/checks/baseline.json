@@ -2,29 +2,6 @@
   ".github/workflows/pages.yml": {
     "lines": 8
   },
-  "backend/features/access/clients/clients.access.js": {
-    "biome/lint/complexity/noExcessiveCognitiveComplexity": 1,
-    "biome/lint/complexity/useOptionalChain": 2,
-    "biome/lint/correctness/noInnerDeclarations": 3,
-    "biome/lint/style/noMagicNumbers": 2,
-    "jsdoc": 3
-  },
-  "backend/features/access/clients/clients.controller.js": {
-    "biome/lint/complexity/noExcessiveCognitiveComplexity": 1,
-    "biome/lint/style/noMagicNumbers": 1,
-    "layers": 8,
-    "lines": 2
-  },
-  "backend/features/access/clients/clients.repository.js": {
-    "jsdoc": 9,
-    "lines": 4
-  },
-  "backend/features/access/clients/clients.service.js": {
-    "biome/lint/style/noMagicNumbers": 2,
-    "biome/lint/suspicious/noGlobalIsNan": 1,
-    "jsdoc": 11,
-    "lines": 8
-  },
   "backend/features/catalog/forms/forms.controller.js": {
     "biome/lint/correctness/noInnerDeclarations": 1,
     "layers": 6,

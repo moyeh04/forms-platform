@@ -259,6 +259,7 @@ the file name says the role:
 | `backend/features/access/clients/clients.repository.js` | The Clients tab: the private links of instructors and clients. |
 | `backend/features/access/clients/clients.service.js` | A link token, its access key and its end date, and what the admin sees of a link. |
 | `backend/features/access/clients/clients.access.js` | Who may use a link: its token, its key, its end date and the lock-out after wrong keys. |
+| `backend/features/access/clients/clients.links.js` | The admin's work on private links: list, make, change, renew, key, show and remove them. |
 | `backend/features/access/clients/clients.controller.js` | The link actions of the admin: list, make, change, renew, key, show and remove. |
 | `backend/features/access/viewer/viewer.rules.js` | What a private link may see: the forms, the kind of view and the columns. |
 | `backend/features/access/viewer/viewer.service.js` | The rows a private link reads: bookings, teams and WhatsApp registrations. |
