@@ -1,6 +1,8 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { checkSource } = require('../../../scripts/checks/check-flags.js');
+const {
+  checkSource
+} = require('../../../../scripts/checks/code/check-flags.js');
 
 const problems = (source) =>
   checkSource('a.js', source).map((f) => `${f.line} ${f.message}`);

@@ -295,13 +295,13 @@ the file name says the role:
 | `scripts/checks/run-checks.js`, `.githooks/pre-commit`, `.githooks/pre-push` | Runs every check, on the staged files before each commit (`--staged`) or on the whole tree before each push and in CI (`--all`, `npm run check`), and the git hooks that call it. `npm install` points git at `.githooks`. [CHECKS.md](../standards/CHECKS.md) lists the checks. |
 | `scripts/checks/config.json`, `baseline.json`, `exceptions.json` | What each check covers and its limits; the findings old files may still have, which may only go down; and the paths allowed to break a structure rule, each with its reason. |
 | `scripts/checks/lib/` | `files.js` (which files a run looks at), `parse.js` (acorn with comments), `jsdoc.js` (reads a JSDoc comment into its summary and tags), `baseline.js`, `exceptions.js`, `report.js`. |
-| `scripts/checks/check-biome.js` | Runs Biome on the files of a run and turns what it reports into findings. |
-| `scripts/checks/check-lines.js` | No line wider than 80 columns, URLs not counted. |
-| `scripts/checks/check-jsdoc.js` | Every named function has a Google-style JSDoc comment whose tags match its parameters and return, with no metadata tags. |
-| `scripts/checks/check-numbers.js` | Every number that initialises something, which Biome skips, is held by a CONSTANT_CASE name. |
-| `scripts/checks/check-flags.js` | Yes/no values are compared and written as `'1'`/`'0'` only in `backend/platform/sheets/cell.js`. |
-| `scripts/checks/check-structure.js` | The structure rules above. |
-| `scripts/checks/check-docs.js` | [API.md](../backend/API.md) names exactly the actions the backend has, [TESTING.md](../process/TESTING.md) gives the real number of tests, and no Markdown link points at a file that is gone. |
+| `scripts/checks/code/check-biome.js` | Runs Biome on the files of a run and turns what it reports into findings. |
+| `scripts/checks/code/check-lines.js` | No line wider than 80 columns, URLs not counted. |
+| `scripts/checks/code/check-jsdoc.js` | Every named function has a Google-style JSDoc comment whose tags match its parameters and return, with no metadata tags. |
+| `scripts/checks/code/check-numbers.js` | Every number that initialises something, which Biome skips, is held by a CONSTANT_CASE name. |
+| `scripts/checks/code/check-flags.js` | Yes/no values are compared and written as `'1'`/`'0'` only in `backend/platform/sheets/cell.js`. |
+| `scripts/checks/tree/check-structure.js` | The structure rules above. |
+| `scripts/checks/tree/check-docs.js` | [API.md](../backend/API.md) names exactly the actions the backend has, [TESTING.md](../process/TESTING.md) gives the real number of tests, and no Markdown link points at a file that is gone. |
 | `scripts/deploy/prepare-clasp.js` | Checks the deployment variables of the workflow and writes the clasp configuration git ignores. |
 | `scripts/deploy/backend-changed.js` | Tells the workflow whether a push changed a backend file, so a push of pages or documents alone does not deploy the backend. |
 | `scripts/deploy/setup-deployment.js` | First deployment from your computer (`npm run setup`): creates the sheet and its script, pushes the bundle, creates the web app, and stores the IDs, the credential and the Pages setting in GitHub. |
@@ -313,7 +313,7 @@ the file name says the role:
 
 ## Structure rules
 
-`scripts/checks/check-structure.js` checks these on the whole tree; the
+`scripts/checks/tree/check-structure.js` checks these on the whole tree; the
 paths and limits are under `structure` in `scripts/checks/config.json`.
 
 | Rule | What it means |

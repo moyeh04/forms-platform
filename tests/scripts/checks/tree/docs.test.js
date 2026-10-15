@@ -3,7 +3,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
-const docs = require('../../../scripts/checks/check-docs.js');
+const docs = require('../../../../scripts/checks/tree/check-docs.js');
 
 const CONFIG = {
   docs: {

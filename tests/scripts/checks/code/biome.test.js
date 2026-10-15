@@ -3,7 +3,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
-const biome = require('../../../scripts/checks/check-biome.js');
+const biome = require('../../../../scripts/checks/code/check-biome.js');
 
 const CONFIG = { biome: { include: ['src/'], extensions: ['.js'] } };
 

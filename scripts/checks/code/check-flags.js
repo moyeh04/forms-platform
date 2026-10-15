@@ -6,8 +6,8 @@
  * with '1' or '0', or a choice that writes '1' or '0', is refused.
  */
 const walk = require('acorn-walk');
-const { select, read } = require('./lib/files.js');
-const { parse } = require('./lib/parse.js');
+const { select, read } = require('../lib/files.js');
+const { parse } = require('../lib/parse.js');
 
 const FLAGS = ['1', '0'];
 const EQUALITY = ['===', '!==', '==', '!='];

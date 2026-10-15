@@ -41,6 +41,10 @@ Every path a check covers and every limit a rule sets is in
 
 ## The checks
 
+The checks that read one file at a time are in `scripts/checks/code/`; the
+ones that look at the whole tree (its layout and its documents) are in
+`scripts/checks/tree/`. Their tests mirror them under `tests/scripts/checks/`.
+
 | Check | Refuses | Fix |
 |---|---|---|
 | `check-biome.js` | anything Biome reports above "info" on the JavaScript, CSS and JSON files: layout (`biome/format`), lint rules, the size limits and unnamed numbers of [CODING_STYLE.md](CODING_STYLE.md) | `npx biome format --write <file>` for layout; otherwise change the code, or silence one line with `// biome-ignore <rule>: <reason>` |

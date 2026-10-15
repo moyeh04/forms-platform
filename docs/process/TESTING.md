@@ -138,7 +138,7 @@ function that calls `world.api`. Helpers `type`, `pick`, `click`,
 
 ## What is covered
 
-The numbers on this page are checked: `scripts/checks/check-docs.js` counts the
+The numbers on this page are checked: `scripts/checks/tree/check-docs.js` counts the
 tests each file defines, in `tests/` and its sub-folders, and the git hook in
 `.githooks/pre-commit` refuses a commit while the total above or a row below
 says something else.
@@ -168,13 +168,13 @@ says something else.
 | Site map | `scripts/build/site-map.test.js` | 2 | Each published path, with or without a slash, query or fragment, finds its source under `web/` or `domain/`, and every page exists; a path outside the site or one that climbs out of it with `..` has none |
 | Check baseline | `scripts/checks/lib/baseline.test.js` | 3 | A legacy file keeps its count and never goes over it, a new file has no allowance, a lowered count must be written down and lowering never raises one, and a key ending in `/` is a folder that counts as there while it holds a file |
 | Check exceptions | `scripts/checks/lib/exceptions.test.js` | 1 | An exception removes the findings of its path and rule, needs a reason, and fails once it matches nothing |
-| Biome check | `scripts/checks/biome.test.js` | 2 | A formatted, clean file has no findings; a layout problem and a lint rule become findings with their rule and line, and files outside the configured folders are left out |
-| Line check | `scripts/checks/lines.test.js` | 2 | A line over the limit is found with its width and one at the limit passes, a hook file without an extension is checked, Arabic counts by character, a URL does not count, and other folders are left out |
-| JSDoc check | `scripts/checks/jsdoc.test.js` | 4 | A full Google-style doc passes on a declaration, an arrow in a constant and an object property; a missing doc, a wrong or untyped `@param`, a missing or needless `@return`, `@returns` and `@author` are each found; a file header above a blank line does not count as the doc of the function below it, and callbacks, wrappers and handlers passed to a call need no doc |
-| Number check | `scripts/checks/numbers.test.js` | 3 | A number held by a constant variable, property, member or object passes, so do 0, 1, -1 and an ignored line; an unnamed variable, property, nested property or default parameter is found; arguments, operands and array elements are left to Biome |
-| Flag check | `scripts/checks/flags.test.js` | 2 | A field compared with `'1'` or `'0'` either way round, and a choice that writes them, are found; a menu choice in a variable, a digit test, zero padding, other labels and a boolean compare pass |
-| Structure check | `scripts/checks/structure.test.js` | 2 | A tree that keeps every rule passes; an entry outside the root allow-list, catch-all names for a file and a folder, a crowded folder, a missing page script, scripts no page loads and a file the structure page does not name are each found at their place |
-| Document check | `scripts/checks/docs.test.js` | 3 | API.md, TESTING.md (sub-folders counted) and Markdown links that match pass; a missing action, an action in the section of another access, a wrong count and a broken link are each found |
+| Biome check | `scripts/checks/code/biome.test.js` | 2 | A formatted, clean file has no findings; a layout problem and a lint rule become findings with their rule and line, and files outside the configured folders are left out |
+| Line check | `scripts/checks/code/lines.test.js` | 2 | A line over the limit is found with its width and one at the limit passes, a hook file without an extension is checked, Arabic counts by character, a URL does not count, and other folders are left out |
+| JSDoc check | `scripts/checks/code/jsdoc.test.js` | 4 | A full Google-style doc passes on a declaration, an arrow in a constant and an object property; a missing doc, a wrong or untyped `@param`, a missing or needless `@return`, `@returns` and `@author` are each found; a file header above a blank line does not count as the doc of the function below it, and callbacks, wrappers and handlers passed to a call need no doc |
+| Number check | `scripts/checks/code/numbers.test.js` | 3 | A number held by a constant variable, property, member or object passes, so do 0, 1, -1 and an ignored line; an unnamed variable, property, nested property or default parameter is found; arguments, operands and array elements are left to Biome |
+| Flag check | `scripts/checks/code/flags.test.js` | 2 | A field compared with `'1'` or `'0'` either way round, and a choice that writes them, are found; a menu choice in a variable, a digit test, zero padding, other labels and a boolean compare pass |
+| Structure check | `scripts/checks/tree/structure.test.js` | 2 | A tree that keeps every rule passes; an entry outside the root allow-list, catch-all names for a file and a folder, a crowded folder, a missing page script, scripts no page loads and a file the structure page does not name are each found at their place |
+| Document check | `scripts/checks/tree/docs.test.js` | 3 | API.md, TESTING.md (sub-folders counted) and Markdown links that match pass; a missing action, an action in the section of another access, a wrong count and a broken link are each found |
 | Harness | `harness.test.js` | 5 | The fake itself, and a seeded world that repeats its ids |
 | Colour contrast | `contrast.test.js` | 4 | Every text and outline pair meets WCAG AA in light, dark, and device-dark themes |
 | A page older than the site | `fresh.test.js` | 4 | An untouched page reloads once for a newer site and never in a loop, a page with typed text or an open dialog offers Reload instead, the bar in the language of the form, nothing in a preview or when the version cannot be read |

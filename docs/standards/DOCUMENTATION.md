@@ -2,7 +2,7 @@
 
 Every named function carries a JSDoc comment written the way the
 [Google JavaScript Style Guide §7](https://google.github.io/styleguide/jsguide.html#jsdoc)
-writes it. `scripts/checks/check-jsdoc.js` checks the shape (see
+writes it. `scripts/checks/code/check-jsdoc.js` checks the shape (see
 [CHECKS.md](CHECKS.md)); whether the words are true is for the reviewer.
 
 ## The shape
