@@ -183,7 +183,7 @@ flowchart LR
 | The script holds broad Google permissions | It must read students' linked files and manage the platform folder | The manifest lists scopes explicitly; the script is yours; only the owner can change it. The Drive scope is full because checking sharing on arbitrary student links needs it. |
 | Student data lives in the owner's Google Drive | That is the database | Share each form's sheet only with people who need it |
 | Email goes through the owner's mail quota | Apps Script MailApp | Mail is best effort and never blocks a submission |
-| Real Google behaviour is not covered by local tests | Tests use a faithful copy | First-run checklist in [DEPLOY.md](../DEPLOY.md) |
+| Real Google behaviour is not covered by local tests | Tests use a faithful copy | First-run checklist in [DEPLOY.md](../operations/DEPLOY.md) |
 
 ## If the pepper or properties are lost
 

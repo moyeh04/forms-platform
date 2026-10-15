@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 /**
  * Checks the two places where a document repeats a fact of the code, so neither can go stale:
- *   docs/reference/API.md      names exactly the actions the backend has
- *   docs/reference/TESTING.md  gives the number of tests, in total and for each test file
+ *   docs/backend/API.md      names exactly the actions the backend has
+ *   docs/process/TESTING.md  gives the number of tests, in total and for each test file
  * The pre-commit hook runs it and refuses the commit while they differ.
  */
 const fs = require('node:fs');
@@ -24,7 +24,7 @@ function backendActions(root) {
 }
 
 function documentedActions(root) {
-  const page = fs.readFileSync(path.join(root, 'docs/reference/API.md'), 'utf8');
+  const page = fs.readFileSync(path.join(root, 'docs/backend/API.md'), 'utf8');
   return [...page.matchAll(/^\| `([A-Za-z.]+)` \| (?:yes|no) \|/gm)].map((match) => match[1]).sort();
 }
 
@@ -72,7 +72,7 @@ function testCounts(root = ROOT) {
 function testCountProblems(root = ROOT) {
   const counts = testCounts(root);
   const total = Object.values(counts).reduce((a, b) => a + b, 0);
-  const page = fs.readFileSync(path.join(root, 'docs/reference/TESTING.md'), 'utf8');
+  const page = fs.readFileSync(path.join(root, 'docs/process/TESTING.md'), 'utf8');
   const out = [];
   const totals = [...page.matchAll(/(\d+) automated tests|# (\d+) tests/g)].map((match) => Number(match[1] || match[2]));
   if (!totals.length) out.push('TESTING.md does not give the number of tests.');

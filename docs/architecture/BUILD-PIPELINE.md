@@ -305,7 +305,7 @@ cannot deploy. Deployment runs are serialized rather than cancelled midway.
 
 **Pages Source must be GitHub Actions.** Deploying from a branch serves the
 source placeholder and never runs the configuration generator. See
-[DEPLOY.md](../DEPLOY.md#updating-later) for setup and manual recovery.
+[DEPLOY.md](../operations/DEPLOY.md#updating-later) for setup and manual recovery.
 
 ## Troubleshooting
 

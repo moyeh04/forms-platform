@@ -171,7 +171,7 @@ while the total above or a row below says something else.
 
 | Gap | Why | How to cover it |
 |---|---|---|
-| Real Drive sharing check | Needs real Drive files | First-run checklist in [DEPLOY.md](../DEPLOY.md) |
+| Real Drive sharing check | Needs real Drive files | First-run checklist in [DEPLOY.md](../operations/DEPLOY.md) |
 | Real PDF export | Needs Google's export endpoint | Same checklist |
 | Real email delivery and quotas | Needs real mail | Submit once with your own email |
 | The booked repaint firing | Tests confirm a change books one run and fire it themselves, but cannot make Google fire it | Submit once, wait a minute, and look at the tinted tab |

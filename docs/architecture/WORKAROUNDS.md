@@ -147,7 +147,7 @@ flowchart TD
 ```
 
 **Cost.** The platform, not Google, is now responsible for access control. That
-is why [SECURITY.md](../reference/SECURITY.md) exists and why secrets are hashed.
+is why [SECURITY.md](../backend/SECURITY.md) exists and why secrets are hashed.
 
 ---
 
@@ -427,7 +427,7 @@ flowchart LR
 
 The page tests go one step further: they open the real HTML pages and route
 `fetch` straight into the same world, so browser and backend are tested
-together. More in [TESTING.md](../reference/TESTING.md).
+together. More in [TESTING.md](../process/TESTING.md).
 
 **Cost.** The copy can only be as faithful as it is written. That is why real
 Drive sharing checks, PDF export, and email are on the first-run checklist.
@@ -507,7 +507,7 @@ registration. To make a short number safe:
 |---|---|
 | Stored as `sha256(pepper + form id + key)` | A leaked sheet reveals no keys, and the same key in two forms hashes differently |
 | Unique within a form | Two registrations never share a key, so the key identifies exactly one |
-| 10 wrong tries a minute per form | Guessing is slowed to a few hundred tries an hour. It is not stopped: [SECURITY.md](../reference/SECURITY.md#honest-weak-spots) says what is left |
+| 10 wrong tries a minute per form | Guessing is slowed to a few hundred tries an hour. It is not stopped: [SECURITY.md](../backend/SECURITY.md#honest-weak-spots) says what is left |
 | Expires after a number of days you set | A stolen old key stops working |
 | Shown once, optionally emailed | A lost key can be read back by the admin from a sealed copy, or replaced |
 
@@ -815,7 +815,7 @@ The website needs no edit when the backend changes, and the backend needs none
 when the website changes. They only agree on the JSON actions.
 
 **Cost.** Three repository variables and one credential secret, written once
-by `npm run setup` ([DEPLOY.md](../DEPLOY.md#updating-later)). If Google rejects the saved clasp
+by `npm run setup` ([DEPLOY.md](../operations/DEPLOY.md#updating-later)). If Google rejects the saved clasp
 login, the secret has to be replaced before the next deploy can run.
 
 ---

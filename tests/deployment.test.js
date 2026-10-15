@@ -259,7 +259,7 @@ test('Setup: the workstation and the workflow pin the same clasp version', () =>
 
 test('Workflow: a push that changes no backend file skips the Apps Script deployment', () => {
   const { backendChanged, touchesBackend } = require('../scripts/backend-changed.js');
-  assert.equal(touchesBackend(['README.md', 'docs/DEPLOY.md', 'assets/js/admin.js', 'index.html', 'tests/core.test.js']), false);
+  assert.equal(touchesBackend(['README.md', 'docs/operations/DEPLOY.md', 'assets/js/admin.js', 'index.html', 'tests/core.test.js']), false);
   for (const file of ['backend/Views.gs', 'backend/appsscript.json', 'shared/rules.js', 'scripts/bundle-backend.js', '.github/workflows/pages.yml']) {
     assert.equal(touchesBackend(['README.md', file]), true, file);
   }
@@ -268,7 +268,7 @@ test('Workflow: a push that changes no backend file skips the Apps Script deploy
   const before = 'a'.repeat(40);
   const git = (files) => (cmd, args) => (args[0] === 'diff' ? files.join('\n') + '\n' : '');
   const push = { GITHUB_EVENT_NAME: 'push', BEFORE: before };
-  assert.equal(backendChanged(push, git(['README.md', 'docs/DEPLOY.md'])).changed, false);
+  assert.equal(backendChanged(push, git(['README.md', 'docs/operations/DEPLOY.md'])).changed, false);
   assert.equal(backendChanged(push, git(['README.md', 'backend/Auth.gs'])).changed, true);
   // Whenever the push cannot be compared, the backend is deployed.
   assert.equal(backendChanged({ GITHUB_EVENT_NAME: 'workflow_dispatch', BEFORE: before }, git(['README.md'])).changed, true);

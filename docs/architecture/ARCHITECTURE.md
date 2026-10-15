@@ -247,7 +247,7 @@ Two details worth knowing:
 
 The key alone identifies the registration. That is a deliberate trade for
 "no accounts", and the reason the key is salted per form, throttled, and
-expiring. See [SECURITY.md](../reference/SECURITY.md).
+expiring. See [SECURITY.md](../backend/SECURITY.md).
 
 A new registration is a path: one page after another, then a review. A
 registration opened with a key is not. It opens on a summary of every answer
@@ -930,7 +930,7 @@ per form. It is not meant for tens of thousands.
 | One script lock for all writes | Guarantees no two students take one slot | Writes queue briefly. A 20 second wait fails with "busy, try again". |
 | Apps Script daily quotas (mail, runtime, URL fetch) | Google applies quotas to free accounts and Workspace differently | Check Google's current quota page. Confirmation emails are the quota most likely to matter. |
 | A 5-digit key has 100,000 values | Chosen so students can type it | Safe because it is salted per form, throttled to 10 wrong tries a minute, and expires. |
-| Real Google behaviour is untested locally | Tests use a faithful copy, not Google | Run the first-run checklist in [DEPLOY.md](../DEPLOY.md) once. |
+| Real Google behaviour is untested locally | Tests use a faithful copy, not Google | Run the first-run checklist in [DEPLOY.md](../operations/DEPLOY.md) once. |
 
 ## Colours and contrast
 
@@ -1205,8 +1205,8 @@ labels of the current tables.
 | [WORKAROUNDS.md](WORKAROUNDS.md) | The clever solutions to each hosting constraint, and why |
 | [BUILD-PIPELINE.md](BUILD-PIPELINE.md) | What produces `dist/`, step by step |
 | [HOSTING.md](HOSTING.md) | What GitHub does, what Google does, and how they fit |
-| [DATA-MODEL.md](../reference/DATA-MODEL.md) | Every sheet, column, and stored property |
-| [SECURITY.md](../reference/SECURITY.md) | The secrets, who holds them, and what a leak would mean |
-| [TESTING.md](../reference/TESTING.md) | How the tests run without Google |
-| [DEPLOY.md](../DEPLOY.md) | Click-by-click setup |
+| [DATA-MODEL.md](../backend/DATA-MODEL.md) | Every sheet, column, and stored property |
+| [SECURITY.md](../backend/SECURITY.md) | The secrets, who holds them, and what a leak would mean |
+| [TESTING.md](../process/TESTING.md) | How the tests run without Google |
+| [DEPLOY.md](../operations/DEPLOY.md) | Click-by-click setup |
 | [MODULES.md](../MODULES.md) | File-by-file reference |

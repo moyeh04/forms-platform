@@ -43,7 +43,7 @@ the instructor page (`viewer.html`).
 | Keyboard and screen reader | A field has a label, an error is tied to its field (`aria-describedby`) and announced (`role="alert"`), the current tab and trail step carry `aria-current`. The digits of a key are read one by one from hidden text; the drawn boxes are hidden from the reader |
 
 `npm run dev` starts a preview with sample data (see
-[TESTING.md](TESTING.md)); a change to a page is looked at there in the four
+[TESTING.md](../process/TESTING.md)); a change to a page is looked at there in the four
 views before it is committed.
 
 ## Words
