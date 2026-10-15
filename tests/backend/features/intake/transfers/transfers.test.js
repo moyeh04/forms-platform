@@ -79,179 +79,194 @@ function asked(w) {
   return { a, b, refused };
 }
 
-test('Transfer: a member of another team is refused with what can be asked for, then saved as a request', () => {
-  const w = boot();
-  const { a, b, refused } = asked(w);
-  assert.equal(refused.error.code, 'duplicate_member');
-  assert.deepEqual(refused.error.details.codes, ['4230002']);
-  assert.deepEqual(refused.error.details.transfer, [
-    { code: '4230002', team: a.ref }
-  ]);
-  assert.equal(b.ok, true);
-  assert.deepEqual(b.transfers, [
-    { code: '4230002', name: NAMES[4230002], team: a.ref }
-  ]);
-  assert.deepEqual(
-    b.data.members.map((m) => m.code),
-    ['4230004'],
-    'the team is saved without the member'
-  );
-  assert.equal(b.data.team_size, '2', 'and its size follows');
-  const all = rows(w);
-  assert.deepEqual(
-    codesOf(all.submissions[0]),
-    ['4230002', '4230003'],
-    'the other team is untouched until an answer'
-  );
-  assert.deepEqual(
-    all.transfers.map((t) => [t.code, t.name, t.from, t.to]),
-    [['4230002', NAMES[4230002], a.ref, b.ref]]
-  );
-  const mail = w.mail.filter((m) =>
-    m.subject.includes('asks for one of your members')
-  );
-  assert.equal(mail.length, 1);
-  assert.equal(mail[0].to, 'l4230001@b.com');
-  assert.ok(
-    mail[0].body.includes(`Team ${b.ref} asks for ${NAMES[4230002]} (4230002)`)
-  );
-});
+test(
+  'Transfer: a member of another team is refused with what can be ' +
+    'asked for, then saved as a request',
+  () => {
+    const w = boot();
+    const { a, b, refused } = asked(w);
+    assert.equal(refused.error.code, 'duplicate_member');
+    assert.deepEqual(refused.error.details.codes, ['4230002']);
+    assert.deepEqual(refused.error.details.transfer, [
+      { code: '4230002', team: a.ref }
+    ]);
+    assert.equal(b.ok, true);
+    assert.deepEqual(b.transfers, [
+      { code: '4230002', name: NAMES[4230002], team: a.ref }
+    ]);
+    assert.deepEqual(
+      b.data.members.map((m) => m.code),
+      ['4230004'],
+      'the team is saved without the member'
+    );
+    assert.equal(b.data.team_size, '2', 'and its size follows');
+    const all = rows(w);
+    assert.deepEqual(
+      codesOf(all.submissions[0]),
+      ['4230002', '4230003'],
+      'the other team is untouched until an answer'
+    );
+    assert.deepEqual(
+      all.transfers.map((t) => [t.code, t.name, t.from, t.to]),
+      [['4230002', NAMES[4230002], a.ref, b.ref]]
+    );
+    const mail = w.mail.filter((m) =>
+      m.subject.includes('asks for one of your members')
+    );
+    assert.equal(mail.length, 1);
+    assert.equal(mail[0].to, 'l4230001@b.com');
+    assert.ok(
+      mail[0].body.includes(
+        `Team ${b.ref} asks for ${NAMES[4230002]} (4230002)`
+      )
+    );
+  }
+);
 
-test('Transfer: the leader of the other team sees the request with the key and approving moves the member', () => {
-  const w = boot();
-  const { a, b } = asked(w);
-  const seen = send(w, { action: 'lookup', key: a.key });
-  assert.deepEqual(seen.transfers.incoming, [
-    {
+test(
+  'Transfer: the leader of the other team sees the request with the ' +
+    'key and approving moves the member',
+  () => {
+    const w = boot();
+    const { a, b } = asked(w);
+    const seen = send(w, { action: 'lookup', key: a.key });
+    assert.deepEqual(seen.transfers.incoming, [
+      {
+        id: seen.transfers.incoming[0].id,
+        code: '4230002',
+        name: NAMES[4230002],
+        team: b.ref,
+        sizeAfter: 2,
+        min: 2
+      }
+    ]);
+    assert.deepEqual(
+      send(w, { action: 'lookup', key: b.key }).transfers.outgoing.map((t) => [
+        t.code,
+        t.status,
+        t.team
+      ]),
+      [['4230002', 'pending', a.ref]]
+    );
+    const wrong = send(w, {
+      action: 'transfer.decide',
+      key: b.key,
       id: seen.transfers.incoming[0].id,
-      code: '4230002',
-      name: NAMES[4230002],
-      team: b.ref,
-      sizeAfter: 2,
-      min: 2
-    }
-  ]);
-  assert.deepEqual(
-    send(w, { action: 'lookup', key: b.key }).transfers.outgoing.map((t) => [
-      t.code,
-      t.status,
-      t.team
-    ]),
-    [['4230002', 'pending', a.ref]]
-  );
-  const wrong = send(w, {
-    action: 'transfer.decide',
-    key: b.key,
-    id: seen.transfers.incoming[0].id,
-    approve: true
-  });
-  assert.equal(
-    wrong.error.code,
-    'transfer_gone',
-    'the team that asked cannot approve its own request'
-  );
+      approve: true
+    });
+    assert.equal(
+      wrong.error.code,
+      'transfer_gone',
+      'the team that asked cannot approve its own request'
+    );
 
-  const done = send(w, {
-    action: 'transfer.decide',
-    key: a.key,
-    id: seen.transfers.incoming[0].id,
-    approve: true
-  });
-  assert.equal(done.ok, true);
-  assert.deepEqual(
-    done.submission.data.members.map((m) => m.code),
-    ['4230003']
-  );
-  assert.equal(done.submission.data.team_size, '2');
-  assert.deepEqual(done.transfers.incoming, []);
-  const all = rows(w);
-  assert.deepEqual(codesOf(all.submissions[1]), ['4230004', '4230002']);
-  assert.equal(all.submissions[1].data.team_size, '3');
-  assert.ok(
-    all.submissions[1].members.includes('4230002'),
-    'the readable members column follows'
-  );
-  assert.deepEqual(all.transfers, []);
-  assert.deepEqual(
-    send(w, { action: 'lookup', key: b.key }).transfers.outgoing.map(
-      (t) => t.status
-    ),
-    ['approved']
-  );
-  assert.ok(
-    w.mail.some(
-      (m) =>
-        m.to === 'l4230011@b.com' &&
-        m.subject.includes('Your request was approved')
-    )
-  );
-  assert.equal(
-    send(w, {
+    const done = send(w, {
       action: 'transfer.decide',
       key: a.key,
       id: seen.transfers.incoming[0].id,
       approve: true
-    }).error.code,
-    'transfer_gone',
-    'a request is answered once'
-  );
-});
+    });
+    assert.equal(done.ok, true);
+    assert.deepEqual(
+      done.submission.data.members.map((m) => m.code),
+      ['4230003']
+    );
+    assert.equal(done.submission.data.team_size, '2');
+    assert.deepEqual(done.transfers.incoming, []);
+    const all = rows(w);
+    assert.deepEqual(codesOf(all.submissions[1]), ['4230004', '4230002']);
+    assert.equal(all.submissions[1].data.team_size, '3');
+    assert.ok(
+      all.submissions[1].members.includes('4230002'),
+      'the readable members column follows'
+    );
+    assert.deepEqual(all.transfers, []);
+    assert.deepEqual(
+      send(w, { action: 'lookup', key: b.key }).transfers.outgoing.map(
+        (t) => t.status
+      ),
+      ['approved']
+    );
+    assert.ok(
+      w.mail.some(
+        (m) =>
+          m.to === 'l4230011@b.com' &&
+          m.subject.includes('Your request was approved')
+      )
+    );
+    assert.equal(
+      send(w, {
+        action: 'transfer.decide',
+        key: a.key,
+        id: seen.transfers.incoming[0].id,
+        approve: true
+      }).error.code,
+      'transfer_gone',
+      'a request is answered once'
+    );
+  }
+);
 
-test('Transfer: rejecting keeps both teams, and the team that asked can cancel while it waits', () => {
-  const w = boot();
-  const { a, b } = asked(w);
-  const id = send(w, { action: 'lookup', key: a.key }).transfers.incoming[0].id;
-  assert.equal(
-    send(w, { action: 'transfer.decide', key: a.key, id, approve: false }).ok,
-    true
-  );
-  let all = rows(w);
-  assert.deepEqual(
-    [codesOf(all.submissions[0]), codesOf(all.submissions[1])],
-    [['4230002', '4230003'], ['4230004']]
-  );
-  assert.deepEqual(
-    send(w, { action: 'lookup', key: b.key }).transfers.outgoing.map(
-      (t) => t.status
-    ),
-    ['rejected']
-  );
-  assert.ok(
-    w.mail.some(
-      (m) =>
-        m.to === 'l4230011@b.com' &&
-        m.subject.includes('Your request was rejected')
-    )
-  );
+test(
+  'Transfer: rejecting keeps both teams, and the team that asked can ' +
+    'cancel while it waits',
+  () => {
+    const w = boot();
+    const { a, b } = asked(w);
+    const id = send(w, { action: 'lookup', key: a.key }).transfers.incoming[0]
+      .id;
+    assert.equal(
+      send(w, { action: 'transfer.decide', key: a.key, id, approve: false }).ok,
+      true
+    );
+    let all = rows(w);
+    assert.deepEqual(
+      [codesOf(all.submissions[0]), codesOf(all.submissions[1])],
+      [['4230002', '4230003'], ['4230004']]
+    );
+    assert.deepEqual(
+      send(w, { action: 'lookup', key: b.key }).transfers.outgoing.map(
+        (t) => t.status
+      ),
+      ['rejected']
+    );
+    assert.ok(
+      w.mail.some(
+        (m) =>
+          m.to === 'l4230011@b.com' &&
+          m.subject.includes('Your request was rejected')
+      )
+    );
 
-  const again = send(w, {
-    action: 'update',
-    key: b.key,
-    data: team(4230011, [4230004, 4230003]).data,
-    transfer: ['4230003']
-  });
-  assert.equal(again.ok, true, 'an edit can ask as well');
-  const mine = send(w, {
-    action: 'lookup',
-    key: b.key
-  }).transfers.outgoing.filter((t) => t.status === 'pending');
-  assert.equal(mine.length, 1);
-  assert.equal(
-    send(w, { action: 'transfer.cancel', key: a.key, id: mine[0].id }).error
-      .code,
-    'transfer_gone',
-    'only the team that asked cancels'
-  );
-  assert.equal(
-    send(w, { action: 'transfer.cancel', key: b.key, id: mine[0].id }).ok,
-    true
-  );
-  assert.deepEqual(rows(w).transfers, []);
-  assert.deepEqual(
-    send(w, { action: 'lookup', key: a.key }).transfers.incoming,
-    []
-  );
-});
+    const again = send(w, {
+      action: 'update',
+      key: b.key,
+      data: team(4230011, [4230004, 4230003]).data,
+      transfer: ['4230003']
+    });
+    assert.equal(again.ok, true, 'an edit can ask as well');
+    const mine = send(w, {
+      action: 'lookup',
+      key: b.key
+    }).transfers.outgoing.filter((t) => t.status === 'pending');
+    assert.equal(mine.length, 1);
+    assert.equal(
+      send(w, { action: 'transfer.cancel', key: a.key, id: mine[0].id }).error
+        .code,
+      'transfer_gone',
+      'only the team that asked cancels'
+    );
+    assert.equal(
+      send(w, { action: 'transfer.cancel', key: b.key, id: mine[0].id }).ok,
+      true
+    );
+    assert.deepEqual(rows(w).transfers, []);
+    assert.deepEqual(
+      send(w, { action: 'lookup', key: a.key }).transfers.incoming,
+      []
+    );
+  }
+);
 
 test('Transfer: a team deleted by the admin takes its requests with it', () => {
   const w = boot();
@@ -273,90 +288,99 @@ test('Transfer: a team deleted by the admin takes its requests with it', () => {
   );
 });
 
-test('Transfer: the admin answers from the dashboard, and a team left under the minimum is reported', () => {
-  const w = boot();
-  const a = send(w, team(4230001, [4230002]));
-  const b = send(
-    w,
-    team(4230011, [4230002, 4230004], { transfer: ['4230002'] })
-  );
-  assert.equal(b.ok, true);
-  const waiting = rows(w).transfers;
-  const out = w.admin({
-    action: 'admin.transfer.decide',
-    slug: w.slug,
-    transfer: waiting[0].id,
-    approve: true
-  });
-  assert.equal(
-    out.underMin,
-    true,
-    'team A is alone now, under the minimum of 2'
-  );
-  assert.deepEqual(out.transfers, []);
-  const all = rows(w);
-  assert.deepEqual(
-    [codesOf(all.submissions[0]), all.submissions[0].data.team_size],
-    [[], '1']
-  );
-  assert.deepEqual(codesOf(all.submissions[1]), ['4230004', '4230002']);
-  assert.equal(a.ok, true);
-});
+test(
+  'Transfer: the admin answers from the dashboard, and a team left ' +
+    'under the minimum is reported',
+  () => {
+    const w = boot();
+    const a = send(w, team(4230001, [4230002]));
+    const b = send(
+      w,
+      team(4230011, [4230002, 4230004], { transfer: ['4230002'] })
+    );
+    assert.equal(b.ok, true);
+    const waiting = rows(w).transfers;
+    const out = w.admin({
+      action: 'admin.transfer.decide',
+      slug: w.slug,
+      transfer: waiting[0].id,
+      approve: true
+    });
+    assert.equal(
+      out.underMin,
+      true,
+      'team A is alone now, under the minimum of 2'
+    );
+    assert.deepEqual(out.transfers, []);
+    const all = rows(w);
+    assert.deepEqual(
+      [codesOf(all.submissions[0]), all.submissions[0].data.team_size],
+      [[], '1']
+    );
+    assert.deepEqual(codesOf(all.submissions[1]), ['4230004', '4230002']);
+    assert.equal(a.ok, true);
+  }
+);
 
-test('Transfer: a full team cannot receive, and a second request for the same student closes', () => {
-  const w = boot();
-  const a = send(w, team(4230001, [4230002, 4230003]));
-  const b = send(
-    w,
-    team(4230011, [4230002, 4230004], { transfer: ['4230002'] })
-  );
-  const c = send(
-    w,
-    team(4230021, [4230002, 4230005], { transfer: ['4230002'] })
-  );
-  assert.equal(rows(w).transfers.length, 2);
-  // Team B fills up before the answer.
-  assert.equal(
-    send(w, {
-      action: 'update',
-      key: b.key,
-      data: team(4230011, [4230004, 4230006]).data
-    }).ok,
-    true
-  );
-  const incoming = send(w, { action: 'lookup', key: a.key }).transfers.incoming;
-  const toB = incoming.find((t) => t.team === b.ref),
-    toC = incoming.find((t) => t.team === c.ref);
-  assert.equal(
-    send(w, {
-      action: 'transfer.decide',
-      key: a.key,
-      id: toB.id,
-      approve: true
-    }).error.code,
-    'transfer_full'
-  );
-  assert.equal(
-    send(w, {
-      action: 'transfer.decide',
-      key: a.key,
-      id: toC.id,
-      approve: true
-    }).ok,
-    true
-  );
-  assert.deepEqual(
-    rows(w).transfers,
-    [],
-    'the other request for the same student is closed'
-  );
-  assert.deepEqual(
-    send(w, { action: 'lookup', key: b.key }).transfers.outgoing.map(
-      (t) => t.status
-    ),
-    ['closed']
-  );
-});
+test(
+  'Transfer: a full team cannot receive, and a second request for the ' +
+    'same student closes',
+  () => {
+    const w = boot();
+    const a = send(w, team(4230001, [4230002, 4230003]));
+    const b = send(
+      w,
+      team(4230011, [4230002, 4230004], { transfer: ['4230002'] })
+    );
+    const c = send(
+      w,
+      team(4230021, [4230002, 4230005], { transfer: ['4230002'] })
+    );
+    assert.equal(rows(w).transfers.length, 2);
+    // Team B fills up before the answer.
+    assert.equal(
+      send(w, {
+        action: 'update',
+        key: b.key,
+        data: team(4230011, [4230004, 4230006]).data
+      }).ok,
+      true
+    );
+    const incoming = send(w, { action: 'lookup', key: a.key }).transfers
+      .incoming;
+    const toB = incoming.find((t) => t.team === b.ref),
+      toC = incoming.find((t) => t.team === c.ref);
+    assert.equal(
+      send(w, {
+        action: 'transfer.decide',
+        key: a.key,
+        id: toB.id,
+        approve: true
+      }).error.code,
+      'transfer_full'
+    );
+    assert.equal(
+      send(w, {
+        action: 'transfer.decide',
+        key: a.key,
+        id: toC.id,
+        approve: true
+      }).ok,
+      true
+    );
+    assert.deepEqual(
+      rows(w).transfers,
+      [],
+      'the other request for the same student is closed'
+    );
+    assert.deepEqual(
+      send(w, { action: 'lookup', key: b.key }).transfers.outgoing.map(
+        (t) => t.status
+      ),
+      ['closed']
+    );
+  }
+);
 
 /** Team A (leader 4230001) holds 4230002 and 4230003; team B (leader 4230011) asks for the leader of A. */
 function leaderAsked(w) {
@@ -371,265 +395,297 @@ function leaderAsked(w) {
   };
 }
 
-test('Transfer: a leader can be asked for, and approving hands the team to the member the leader names', () => {
-  const w = boot();
-  const { a, b, refused, request } = leaderAsked(w);
-  assert.deepEqual(
-    refused.error.details.transfer,
-    [{ code: '4230001', team: a.ref, leader: true }],
-    'the offer says the student leads that team'
-  );
-  assert.equal(b.ok, true);
-  assert.deepEqual([request.leader, request.sizeAfter], [true, 2]);
-  assert.deepEqual(request.heirs, [
-    { code: '4230002', name: NAMES[4230002] },
-    { code: '4230003', name: NAMES[4230003] }
-  ]);
+test(
+  'Transfer: a leader can be asked for, and approving hands the team ' +
+    'to the member the leader names',
+  () => {
+    const w = boot();
+    const { a, b, refused, request } = leaderAsked(w);
+    assert.deepEqual(
+      refused.error.details.transfer,
+      [{ code: '4230001', team: a.ref, leader: true }],
+      'the offer says the student leads that team'
+    );
+    assert.equal(b.ok, true);
+    assert.deepEqual([request.leader, request.sizeAfter], [true, 2]);
+    assert.deepEqual(request.heirs, [
+      { code: '4230002', name: NAMES[4230002] },
+      { code: '4230003', name: NAMES[4230003] }
+    ]);
 
-  const decide = (handover) =>
-    send(w, {
-      action: 'transfer.decide',
-      key: a.key,
-      id: request.id,
-      approve: true,
-      handover
-    });
-  assert.equal(
-    decide().error.code,
-    'transfer_heir',
-    'a team is never left without a leader'
-  );
-  assert.equal(
-    decide({ leader: '4230004', email: 'new@b.com' }).error.code,
-    'transfer_heir',
-    'the new leader is a member of the team'
-  );
-  const noMail = decide({ leader: '4230002', email: 'nobody' });
-  assert.deepEqual(
-    [noMail.error.code, noMail.error.details.error],
-    ['transfer_email', 'invalid_email']
-  );
-  assert.equal(
-    rows(w).submissions[0].data.leader_code,
-    '4230001',
-    'a refused answer changes nothing'
-  );
+    const decide = (handover) =>
+      send(w, {
+        action: 'transfer.decide',
+        key: a.key,
+        id: request.id,
+        approve: true,
+        handover
+      });
+    assert.equal(
+      decide().error.code,
+      'transfer_heir',
+      'a team is never left without a leader'
+    );
+    assert.equal(
+      decide({ leader: '4230004', email: 'new@b.com' }).error.code,
+      'transfer_heir',
+      'the new leader is a member of the team'
+    );
+    const noMail = decide({ leader: '4230002', email: 'nobody' });
+    assert.deepEqual(
+      [noMail.error.code, noMail.error.details.error],
+      ['transfer_email', 'invalid_email']
+    );
+    assert.equal(
+      rows(w).submissions[0].data.leader_code,
+      '4230001',
+      'a refused answer changes nothing'
+    );
 
-  const done = decide({ leader: '4230002', email: 'new@b.com' });
-  assert.equal(done.ok, true);
-  const [teamA, teamB] = rows(w).submissions;
-  assert.deepEqual(
-    [
-      teamA.data.leader_code,
-      teamA.data.leader_name,
-      teamA.data.email,
-      teamA.data.phone
-    ],
-    ['4230002', NAMES[4230002], 'new@b.com', '01112345678']
-  );
-  assert.equal(
-    teamA.data.major,
-    'حاسبات',
-    'what only the leader answered stays with the team'
-  );
-  assert.deepEqual([codesOf(teamA), teamA.data.team_size], [['4230003'], '2']);
-  assert.deepEqual(
-    [codesOf(teamB), teamB.data.team_size, teamB.data.leader_code],
-    [['4230001'], '2', '4230011']
-  );
-  assert.equal(teamA.ref, a.ref, 'the team keeps its reference');
-  assert.equal(
-    send(w, { action: 'lookup', key: a.key }).submission.ref,
-    a.ref,
-    'and its key'
-  );
+    const done = decide({ leader: '4230002', email: 'new@b.com' });
+    assert.equal(done.ok, true);
+    const [teamA, teamB] = rows(w).submissions;
+    assert.deepEqual(
+      [
+        teamA.data.leader_code,
+        teamA.data.leader_name,
+        teamA.data.email,
+        teamA.data.phone
+      ],
+      ['4230002', NAMES[4230002], 'new@b.com', '01112345678']
+    );
+    assert.equal(
+      teamA.data.major,
+      'حاسبات',
+      'what only the leader answered stays with the team'
+    );
+    assert.deepEqual(
+      [codesOf(teamA), teamA.data.team_size],
+      [['4230003'], '2']
+    );
+    assert.deepEqual(
+      [codesOf(teamB), teamB.data.team_size, teamB.data.leader_code],
+      [['4230001'], '2', '4230011']
+    );
+    assert.equal(teamA.ref, a.ref, 'the team keeps its reference');
+    assert.equal(
+      send(w, { action: 'lookup', key: a.key }).submission.ref,
+      a.ref,
+      'and its key'
+    );
 
-  const told = w.mail.filter((m) => /You now lead your team/.test(m.subject));
-  assert.deepEqual(
-    told.map((m) => m.to),
-    ['new@b.com']
-  );
-  assert.ok(told[0].body.includes(`You now lead team ${a.ref}.`));
-  assert.equal(
-    told[0].body.includes(a.key),
-    false,
-    'the key itself is passed on by the leader who left, not by email'
-  );
-});
+    const told = w.mail.filter((m) => /You now lead your team/.test(m.subject));
+    assert.deepEqual(
+      told.map((m) => m.to),
+      ['new@b.com']
+    );
+    assert.ok(told[0].body.includes(`You now lead team ${a.ref}.`));
+    assert.equal(
+      told[0].body.includes(a.key),
+      false,
+      'the key itself is passed on by the leader who left, not by email'
+    );
+  }
+);
 
-test('Transfer: a leader who is alone in a team cannot be asked for, and one left alone cannot be moved', () => {
-  const w = boot({ teamSize: { min: 1, max: 3 } });
-  const alone = send(w, team(4230001, []));
-  const refused = send(w, team(4230011, [4230001], { transfer: ['4230001'] }));
-  assert.equal(refused.error.code, 'duplicate_member');
-  assert.deepEqual(
-    refused.error.details.transfer,
-    [],
-    'nobody would be left to lead that team'
-  );
-  send(w, { action: 'remove', key: alone.key });
+test(
+  'Transfer: a leader who is alone in a team cannot be asked for, and ' +
+    'one left alone cannot be moved',
+  () => {
+    const w = boot({ teamSize: { min: 1, max: 3 } });
+    const alone = send(w, team(4230001, []));
+    const refused = send(
+      w,
+      team(4230011, [4230001], { transfer: ['4230001'] })
+    );
+    assert.equal(refused.error.code, 'duplicate_member');
+    assert.deepEqual(
+      refused.error.details.transfer,
+      [],
+      'nobody would be left to lead that team'
+    );
+    send(w, { action: 'remove', key: alone.key });
 
-  const { a, request } = leaderAsked(w);
-  assert.equal(
-    send(w, { action: 'update', key: a.key, data: team(4230001, []).data }).ok,
-    true
-  );
-  const now = send(w, { action: 'lookup', key: a.key }).transfers.incoming[0];
-  assert.deepEqual([now.leader, now.heirs], [true, []]);
-  assert.equal(
-    send(w, {
-      action: 'transfer.decide',
-      key: a.key,
-      id: request.id,
-      approve: true,
-      handover: { leader: '4230002', email: 'new@b.com' }
-    }).error.code,
-    'transfer_leader'
-  );
-  assert.equal(
-    send(w, {
-      action: 'transfer.decide',
-      key: a.key,
-      id: request.id,
-      approve: false
-    }).ok,
-    true
-  );
-});
+    const { a, request } = leaderAsked(w);
+    assert.equal(
+      send(w, { action: 'update', key: a.key, data: team(4230001, []).data })
+        .ok,
+      true
+    );
+    const now = send(w, { action: 'lookup', key: a.key }).transfers.incoming[0];
+    assert.deepEqual([now.leader, now.heirs], [true, []]);
+    assert.equal(
+      send(w, {
+        action: 'transfer.decide',
+        key: a.key,
+        id: request.id,
+        approve: true,
+        handover: { leader: '4230002', email: 'new@b.com' }
+      }).error.code,
+      'transfer_leader'
+    );
+    assert.equal(
+      send(w, {
+        action: 'transfer.decide',
+        key: a.key,
+        id: request.id,
+        approve: false
+      }).ok,
+      true
+    );
+  }
+);
 
-test('Transfer: the admin moves a leader with the same question, and sees who can lead next', () => {
-  const w = boot();
-  const { a, b } = leaderAsked(w);
-  const [waiting] = rows(w).transfers;
-  assert.deepEqual(
-    [
-      waiting.leader,
-      waiting.heirs.map((m) => m.code),
-      waiting.from,
-      waiting.to
-    ],
-    [true, ['4230002', '4230003'], a.ref, b.ref]
-  );
-  assert.equal(
-    w.admin({
+test(
+  'Transfer: the admin moves a leader with the same question, and sees ' +
+    'who can lead next',
+  () => {
+    const w = boot();
+    const { a, b } = leaderAsked(w);
+    const [waiting] = rows(w).transfers;
+    assert.deepEqual(
+      [
+        waiting.leader,
+        waiting.heirs.map((m) => m.code),
+        waiting.from,
+        waiting.to
+      ],
+      [true, ['4230002', '4230003'], a.ref, b.ref]
+    );
+    assert.equal(
+      w.admin({
+        action: 'admin.transfer.decide',
+        slug: w.slug,
+        transfer: waiting.id,
+        approve: true
+      }).error.code,
+      'transfer_heir'
+    );
+    const out = w.admin({
       action: 'admin.transfer.decide',
       slug: w.slug,
       transfer: waiting.id,
-      approve: true
-    }).error.code,
-    'transfer_heir'
-  );
-  const out = w.admin({
-    action: 'admin.transfer.decide',
-    slug: w.slug,
-    transfer: waiting.id,
-    approve: true,
-    handover: { leader: '4230003', email: 'new@b.com' }
-  });
-  assert.deepEqual([out.ok, out.transfers, out.underMin], [true, [], false]);
-  const [teamA] = rows(w).submissions;
-  assert.deepEqual(
-    [teamA.data.leader_code, codesOf(teamA)],
-    ['4230003', ['4230002']]
-  );
-});
+      approve: true,
+      handover: { leader: '4230003', email: 'new@b.com' }
+    });
+    assert.deepEqual([out.ok, out.transfers, out.underMin], [true, [], false]);
+    const [teamA] = rows(w).submissions;
+    assert.deepEqual(
+      [teamA.data.leader_code, codesOf(teamA)],
+      ['4230003', ['4230002']]
+    );
+  }
+);
 
-test("Transfer: with the switch on, the two leaders of a waiting request see each other's phone", () => {
-  const phoned = (req, phone) => ({ ...req, data: { ...req.data, phone } });
-  const w = boot({ transferPhones: true });
-  const a = send(w, phoned(team(4230001, [4230002, 4230003]), '01011111111'));
-  const refused = send(
-    w,
-    phoned(team(4230011, [4230002, 4230004]), '01022222222')
-  );
-  assert.deepEqual(
-    refused.error.details.transfer,
-    [{ code: '4230002', team: a.ref }],
-    'no number before the team has asked'
-  );
-  const b = send(
-    w,
-    phoned(
-      team(4230011, [4230002, 4230004], { transfer: ['4230002'] }),
-      '01022222222'
-    )
-  );
-  assert.deepEqual(b.transfers, [
-    { code: '4230002', name: NAMES[4230002], team: a.ref, phone: '01011111111' }
-  ]);
-  const seen = (key) => send(w, { action: 'lookup', key }).transfers;
-  assert.deepEqual(
-    [seen(a.key).incoming[0].phone, seen(a.key).incoming[0].whatsapp],
-    ['01022222222', undefined]
-  );
-  assert.equal(seen(b.key).outgoing[0].phone, '01011111111');
+test(
+  'Transfer: with the switch on, the two leaders of a waiting request ' +
+    "see each other's phone",
+  () => {
+    const phoned = (req, phone) => ({ ...req, data: { ...req.data, phone } });
+    const w = boot({ transferPhones: true });
+    const a = send(w, phoned(team(4230001, [4230002, 4230003]), '01011111111'));
+    const refused = send(
+      w,
+      phoned(team(4230011, [4230002, 4230004]), '01022222222')
+    );
+    assert.deepEqual(
+      refused.error.details.transfer,
+      [{ code: '4230002', team: a.ref }],
+      'no number before the team has asked'
+    );
+    const b = send(
+      w,
+      phoned(
+        team(4230011, [4230002, 4230004], { transfer: ['4230002'] }),
+        '01022222222'
+      )
+    );
+    assert.deepEqual(b.transfers, [
+      {
+        code: '4230002',
+        name: NAMES[4230002],
+        team: a.ref,
+        phone: '01011111111'
+      }
+    ]);
+    const seen = (key) => send(w, { action: 'lookup', key }).transfers;
+    assert.deepEqual(
+      [seen(a.key).incoming[0].phone, seen(a.key).incoming[0].whatsapp],
+      ['01022222222', undefined]
+    );
+    assert.equal(seen(b.key).outgoing[0].phone, '01011111111');
 
-  const rules = w.admin({ action: 'admin.forms.get', id: w.slug }).form.rules;
-  w.admin({
-    action: 'admin.forms.update',
-    id: w.slug,
-    patch: { rules: { ...rules, transferWhatsapp: true } }
-  });
-  assert.deepEqual(
-    [seen(a.key).incoming[0].whatsapp, seen(b.key).outgoing[0].whatsapp],
-    [true, true]
-  );
+    const rules = w.admin({ action: 'admin.forms.get', id: w.slug }).form.rules;
+    w.admin({
+      action: 'admin.forms.update',
+      id: w.slug,
+      patch: { rules: { ...rules, transferWhatsapp: true } }
+    });
+    assert.deepEqual(
+      [seen(a.key).incoming[0].whatsapp, seen(b.key).outgoing[0].whatsapp],
+      [true, true]
+    );
 
-  send(w, {
-    action: 'transfer.decide',
-    key: a.key,
-    id: seen(a.key).incoming[0].id,
-    approve: false
-  });
-  assert.deepEqual(
-    seen(b.key).outgoing.map((t) => [t.status, t.phone]),
-    [['rejected', undefined]],
-    'an answered request no longer shows the number'
-  );
+    send(w, {
+      action: 'transfer.decide',
+      key: a.key,
+      id: seen(a.key).incoming[0].id,
+      approve: false
+    });
+    assert.deepEqual(
+      seen(b.key).outgoing.map((t) => [t.status, t.phone]),
+      [['rejected', undefined]],
+      'an answered request no longer shows the number'
+    );
 
-  const off = boot({ transferWhatsapp: true });
-  const { a: a2, b: b2 } = asked(off);
-  assert.equal(
-    b2.transfers[0].phone,
-    undefined,
-    'the WhatsApp switch alone shows nothing'
-  );
-  assert.equal(
-    send(off, { action: 'lookup', key: a2.key }).transfers.incoming[0].phone,
-    undefined
-  );
-});
+    const off = boot({ transferWhatsapp: true });
+    const { a: a2, b: b2 } = asked(off);
+    assert.equal(
+      b2.transfers[0].phone,
+      undefined,
+      'the WhatsApp switch alone shows nothing'
+    );
+    assert.equal(
+      send(off, { action: 'lookup', key: a2.key }).transfers.incoming[0].phone,
+      undefined
+    );
+  }
+);
 
-test('Transfer: off by default, and a cancelled team takes its requests with it', () => {
-  const off = boot({ transfers: false });
-  send(off, team(4230001, [4230002, 4230003]));
-  const refused = send(
-    off,
-    team(4230011, [4230002, 4230004], { transfer: ['4230002'] })
-  );
-  assert.equal(refused.error.code, 'duplicate_member');
-  assert.equal(
-    refused.error.details.transfer,
-    undefined,
-    'nothing is offered while the rule is off'
-  );
-  assert.deepEqual(
-    send(off, {
-      action: 'lookup',
-      key: send(off, team(4230021, [4230022])).key
-    }).transfers,
-    { incoming: [], outgoing: [] }
-  );
+test(
+  'Transfer: off by default, and a cancelled team takes its requests ' +
+    'with it',
+  () => {
+    const off = boot({ transfers: false });
+    send(off, team(4230001, [4230002, 4230003]));
+    const refused = send(
+      off,
+      team(4230011, [4230002, 4230004], { transfer: ['4230002'] })
+    );
+    assert.equal(refused.error.code, 'duplicate_member');
+    assert.equal(
+      refused.error.details.transfer,
+      undefined,
+      'nothing is offered while the rule is off'
+    );
+    assert.deepEqual(
+      send(off, {
+        action: 'lookup',
+        key: send(off, team(4230021, [4230022])).key
+      }).transfers,
+      { incoming: [], outgoing: [] }
+    );
 
-  const w = boot();
-  const { a, b } = asked(w);
-  assert.equal(send(w, { action: 'remove', key: b.key }).ok, true);
-  assert.deepEqual(rows(w).transfers, []);
-  assert.deepEqual(
-    send(w, { action: 'lookup', key: a.key }).transfers.incoming,
-    []
-  );
-});
+    const w = boot();
+    const { a, b } = asked(w);
+    assert.equal(send(w, { action: 'remove', key: b.key }).ok, true);
+    assert.deepEqual(rows(w).transfers, []);
+    assert.deepEqual(
+      send(w, { action: 'lookup', key: a.key }).transfers.incoming,
+      []
+    );
+  }
+);
 
 test('Transfer: no email unless the form switches transfer emails on', () => {
   const w = boot({ transferEmails: undefined });

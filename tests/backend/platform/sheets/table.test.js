@@ -53,28 +53,36 @@ const team = (o = {}) =>
     ...o
   });
 
-test('Rows: a new row is written as plain text, also past the rows the sheet was made with', () => {
-  const w = boot();
-  w.submit(team());
-  const sheet = w.sheet(w.form.sheetId, 'Responses');
-  assert.equal(sheet.formats.get('2,10'), '@', 'the phone cell of the new row');
-  // The sheet has 1000 formatted rows; the next row is beyond them.
-  sheet.set(1000, 1, 'filler');
-  w.submit(
-    team({
-      leader_code: '4230777',
-      members: [
-        {
-          name: 'سارة خالد حسن علي',
-          phone: '01112345678',
-          code: '4230778',
-          level: 'صفر / الأولى',
-          curriculum: '2020',
-          section: '4C-TH1'
-        }
-      ]
-    })
-  );
-  assert.equal(sheet.get(1001, 10), '01012345678');
-  assert.equal(sheet.formats.get('1001,10'), '@');
-});
+test(
+  'Rows: a new row is written as plain text, also past the rows the ' +
+    'sheet was made with',
+  () => {
+    const w = boot();
+    w.submit(team());
+    const sheet = w.sheet(w.form.sheetId, 'Responses');
+    assert.equal(
+      sheet.formats.get('2,10'),
+      '@',
+      'the phone cell of the new row'
+    );
+    // The sheet has 1000 formatted rows; the next row is beyond them.
+    sheet.set(1000, 1, 'filler');
+    w.submit(
+      team({
+        leader_code: '4230777',
+        members: [
+          {
+            name: 'سارة خالد حسن علي',
+            phone: '01112345678',
+            code: '4230778',
+            level: 'صفر / الأولى',
+            curriculum: '2020',
+            section: '4C-TH1'
+          }
+        ]
+      })
+    );
+    assert.equal(sheet.get(1001, 10), '01012345678');
+    assert.equal(sheet.formats.get('1001,10'), '@');
+  }
+);

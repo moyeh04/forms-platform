@@ -76,93 +76,101 @@ const numbers = (w) =>
     .submissions.map((x) => x.title + ' is ' + x.number);
 const NUMBER = 20;
 
-test('Team numbers: a team keeps its number when another one cancels, and the gap stays', () => {
-  const w = boot();
-  const keys = [1, 2, 3].map((n) => {
+test(
+  'Team numbers: a team keeps its number when another one cancels, and ' +
+    'the gap stays',
+  () => {
+    const w = boot();
+    const keys = [1, 2, 3].map((n) => {
+      w.advanceDays(0.01);
+      return w.submit(squad(n)).key;
+    });
+    assert.deepEqual(numbers(w), [
+      'Project 1 is 1',
+      'Project 2 is 2',
+      'Project 3 is 3'
+    ]);
+    assert.equal(
+      w.api({ action: 'remove', slug: w.form.slug, key: keys[1] }).removed,
+      true
+    );
+    assert.deepEqual(
+      numbers(w),
+      ['Project 1 is 1', 'Project 3 is 3'],
+      'the third team is still Team 3'
+    );
     w.advanceDays(0.01);
-    return w.submit(squad(n)).key;
-  });
-  assert.deepEqual(numbers(w), [
-    'Project 1 is 1',
-    'Project 2 is 2',
-    'Project 3 is 3'
-  ]);
-  assert.equal(
-    w.api({ action: 'remove', slug: w.form.slug, key: keys[1] }).removed,
-    true
-  );
-  assert.deepEqual(
-    numbers(w),
-    ['Project 1 is 1', 'Project 3 is 3'],
-    'the third team is still Team 3'
-  );
-  w.advanceDays(0.01);
-  w.submit(squad(4));
-  assert.deepEqual(
-    numbers(w),
-    ['Project 1 is 1', 'Project 3 is 3', 'Project 4 is 4'],
-    'the number of a cancelled team is not given again'
-  );
-  assert.deepEqual(
-    w.rows().map((row) => row[NUMBER - 1]),
-    ['number', '1', '2', '3', '4'],
-    'the sheet holds the numbers, also of the cancelled team'
-  );
-  assert.deepEqual(
-    w
-      .call(
-        'TeamsService.teamBlocks',
-        w.call('FormsRepository.findForm', w.form.id)
-      )
-      .map((t) => t.number),
-    [1, 3, 4],
-    'the sheet view, the print and the download read the same numbers'
-  );
-  const sub = w.admin({ action: 'admin.submissions', slug: w.form.slug })
-    .submissions[0];
-  assert.equal(
-    w.admin({
-      action: 'admin.submission.delete',
-      slug: w.form.slug,
-      submissionId: sub.id
-    }).deleted,
-    true
-  );
-  assert.deepEqual(
-    numbers(w),
-    ['Project 3 is 3', 'Project 4 is 4'],
-    'a team deleted by the admin leaves a gap too'
-  );
-});
+    w.submit(squad(4));
+    assert.deepEqual(
+      numbers(w),
+      ['Project 1 is 1', 'Project 3 is 3', 'Project 4 is 4'],
+      'the number of a cancelled team is not given again'
+    );
+    assert.deepEqual(
+      w.rows().map((row) => row[NUMBER - 1]),
+      ['number', '1', '2', '3', '4'],
+      'the sheet holds the numbers, also of the cancelled team'
+    );
+    assert.deepEqual(
+      w
+        .call(
+          'TeamsService.teamBlocks',
+          w.call('FormsRepository.findForm', w.form.id)
+        )
+        .map((t) => t.number),
+      [1, 3, 4],
+      'the sheet view, the print and the download read the same numbers'
+    );
+    const sub = w.admin({ action: 'admin.submissions', slug: w.form.slug })
+      .submissions[0];
+    assert.equal(
+      w.admin({
+        action: 'admin.submission.delete',
+        slug: w.form.slug,
+        submissionId: sub.id
+      }).deleted,
+      true
+    );
+    assert.deepEqual(
+      numbers(w),
+      ['Project 3 is 3', 'Project 4 is 4'],
+      'a team deleted by the admin leaves a gap too'
+    );
+  }
+);
 
-test('Team numbers: teams registered before the column existed keep the numbers they showed', () => {
-  const w = boot();
-  const keys = [1, 2, 3].map((n) => {
-    w.advanceDays(0.01);
-    return w.submit(squad(n)).key;
-  });
-  const sheet = w.sheet(w.form.sheetId, 'Responses');
-  for (let row = 1; row <= 4; row++) sheet.set(row, NUMBER, '');
-  assert.deepEqual(
-    numbers(w),
-    ['Project 1 is 1', 'Project 2 is 2', 'Project 3 is 3'],
-    'shown as before, although nothing is stored'
-  );
-  assert.equal(
-    w.api({ action: 'remove', slug: w.form.slug, key: keys[0] }).removed,
-    true
-  );
-  assert.deepEqual(
-    numbers(w),
-    ['Project 2 is 2', 'Project 3 is 3'],
-    'the first cancellation stores them and moves nobody up'
-  );
-  assert.deepEqual(
-    w.rows().map((row) => row[NUMBER - 1]),
-    ['number', '1', '2', '3']
-  );
-  assert.equal(sheet.formats.get('3,' + NUMBER), '@', 'written as text');
-});
+test(
+  'Team numbers: teams registered before the column existed keep the ' +
+    'numbers they showed',
+  () => {
+    const w = boot();
+    const keys = [1, 2, 3].map((n) => {
+      w.advanceDays(0.01);
+      return w.submit(squad(n)).key;
+    });
+    const sheet = w.sheet(w.form.sheetId, 'Responses');
+    for (let row = 1; row <= 4; row++) sheet.set(row, NUMBER, '');
+    assert.deepEqual(
+      numbers(w),
+      ['Project 1 is 1', 'Project 2 is 2', 'Project 3 is 3'],
+      'shown as before, although nothing is stored'
+    );
+    assert.equal(
+      w.api({ action: 'remove', slug: w.form.slug, key: keys[0] }).removed,
+      true
+    );
+    assert.deepEqual(
+      numbers(w),
+      ['Project 2 is 2', 'Project 3 is 3'],
+      'the first cancellation stores them and moves nobody up'
+    );
+    assert.deepEqual(
+      w.rows().map((row) => row[NUMBER - 1]),
+      ['number', '1', '2', '3']
+    );
+    assert.equal(sheet.formats.get('3,' + NUMBER), '@', 'written as text');
+  }
+);
 
 test('Team numbers: a booking or a WhatsApp registration gets none', () => {
   const w = boot('whatsapp_registration');

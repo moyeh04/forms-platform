@@ -55,24 +55,27 @@ const team = (o = {}) =>
     ...o
   });
 
-test('Submit: stores a clean row and returns a reference and a 5-digit key', () => {
-  const w = boot();
-  const r = w.submit(team());
-  assert.equal(r.ok, true);
-  assert.match(r.ref, /^TR-2027-0001$/);
-  assert.match(r.key, /^\d{5}$/);
-  assert.ok(Date.parse(r.keyExpires) > Date.parse('2027-09-07T00:00:00Z'));
-  const [, row] = w.rows();
-  assert.equal(row[6], 'sara@example.com');
-  assert.equal(row[8], '4230999');
-  assert.equal(row[9], '01012345678');
-  assert.ok(row[13].includes('4230998'));
-  assert.equal(
-    row[15].includes(r.key),
-    false,
-    'the key itself is never stored'
-  );
-});
+test(
+  'Submit: stores a clean row and ' + 'returns a reference and a 5-digit key',
+  () => {
+    const w = boot();
+    const r = w.submit(team());
+    assert.equal(r.ok, true);
+    assert.match(r.ref, /^TR-2027-0001$/);
+    assert.match(r.key, /^\d{5}$/);
+    assert.ok(Date.parse(r.keyExpires) > Date.parse('2027-09-07T00:00:00Z'));
+    const [, row] = w.rows();
+    assert.equal(row[6], 'sara@example.com');
+    assert.equal(row[8], '4230999');
+    assert.equal(row[9], '01012345678');
+    assert.ok(row[13].includes('4230998'));
+    assert.equal(
+      row[15].includes(r.key),
+      false,
+      'the key itself is never stored'
+    );
+  }
+);
 
 test('Submit: invalid answers return field errors and store nothing', () => {
   const w = boot();
@@ -286,105 +289,122 @@ test('Admin: list, change status and review, reset key, delete', () => {
   );
 });
 
-test('Folder name: a team project folder must be named Team_Leader_Name_Project_Name_Subject_Name', () => {
-  const w = createWorld();
-  w.call('setup');
-  w.call('setAdminPin', '4321');
-  const admin = (b) => w.api({ ...b, admin: { pin: '4321' } });
-  const f = admin({
-    action: 'admin.forms.create',
-    type: 'team_registration',
-    title: 'DB Projects',
-    term: 'Fall 2027',
-    subject: 'CMPn323'
-  }).form;
-  admin({ action: 'admin.forms.update', id: f.id, patch: { status: 'open' } });
-  assert.deepEqual(
-    w.api({ action: 'getForm', slug: f.slug }).form.rules.folderName,
-    { enabled: true, subject: '' },
-    'on by default for team forms, with no subject name yet'
-  );
-  admin({
-    action: 'admin.forms.update',
-    id: f.id,
-    patch: {
-      rules: { folderName: { enabled: true, subject: 'Software_Engineering' } }
-    }
-  });
-  const data = (code, link) => ({
-    email: 'a@b.com',
-    leader_name: 'أحمد محمد محمود أحمد',
-    leader_code: code,
-    phone: '01012345678',
-    major: 'حاسبات',
-    level: 'صفر / الأولى',
-    section: '4C-TH1',
-    curriculum: '2020',
-    team_size: '1',
-    members: [],
-    title: 'Library System',
-    link
-  });
-  const id = ID('f');
-  const link = `https://drive.google.com/drive/folders/${id}`;
-  w.drive.setFolderName(id, 'Library System');
-  const bad = w.api({
-    action: 'submit',
-    slug: f.slug,
-    data: data('4230001', link)
-  });
-  assert.equal(bad.error.details.link.error, 'folder_name_spaces');
-  assert.equal(
-    bad.error.details.link.params.example,
-    'Ahmed_Mohamed_Library_System_Software_Engineering'
-  );
-  w.drive.setFolderName(id, 'Ahmed_Library_System_Database');
-  assert.equal(
-    w.api({ action: 'submit', slug: f.slug, data: data('4230001', link) }).error
-      .details.link.error,
-    'folder_name_subject'
-  );
-  w.drive.setFolderName(
-    id,
-    'Ahmed_Mohamed_Library_System_Software_Engineering'
-  );
-  assert.equal(
-    w.api({ action: 'submit', slug: f.slug, data: data('4230001', link) }).ok,
-    true
-  );
-  admin({
-    action: 'admin.forms.update',
-    id: f.id,
-    patch: { rules: { folderName: { enabled: false } } }
-  });
-  w.drive.setFolderName(id, 'anything goes');
-  assert.equal(
-    w.api({ action: 'submit', slug: f.slug, data: data('4230002', link) }).ok,
-    true,
-    'the rule can be switched off'
-  );
-});
+test(
+  'Folder name: a team project folder must be named ' +
+    'Team_Leader_Name_Project_Name_Subject_Name',
+  () => {
+    const w = createWorld();
+    w.call('setup');
+    w.call('setAdminPin', '4321');
+    const admin = (b) => w.api({ ...b, admin: { pin: '4321' } });
+    const f = admin({
+      action: 'admin.forms.create',
+      type: 'team_registration',
+      title: 'DB Projects',
+      term: 'Fall 2027',
+      subject: 'CMPn323'
+    }).form;
+    admin({
+      action: 'admin.forms.update',
+      id: f.id,
+      patch: { status: 'open' }
+    });
+    assert.deepEqual(
+      w.api({ action: 'getForm', slug: f.slug }).form.rules.folderName,
+      { enabled: true, subject: '' },
+      'on by default for team forms, with no subject name yet'
+    );
+    admin({
+      action: 'admin.forms.update',
+      id: f.id,
+      patch: {
+        rules: {
+          folderName: { enabled: true, subject: 'Software_Engineering' }
+        }
+      }
+    });
+    const data = (code, link) => ({
+      email: 'a@b.com',
+      leader_name: 'أحمد محمد محمود أحمد',
+      leader_code: code,
+      phone: '01012345678',
+      major: 'حاسبات',
+      level: 'صفر / الأولى',
+      section: '4C-TH1',
+      curriculum: '2020',
+      team_size: '1',
+      members: [],
+      title: 'Library System',
+      link
+    });
+    const id = ID('f');
+    const link = `https://drive.google.com/drive/folders/${id}`;
+    w.drive.setFolderName(id, 'Library System');
+    const bad = w.api({
+      action: 'submit',
+      slug: f.slug,
+      data: data('4230001', link)
+    });
+    assert.equal(bad.error.details.link.error, 'folder_name_spaces');
+    assert.equal(
+      bad.error.details.link.params.example,
+      'Ahmed_Mohamed_Library_System_Software_Engineering'
+    );
+    w.drive.setFolderName(id, 'Ahmed_Library_System_Database');
+    assert.equal(
+      w.api({ action: 'submit', slug: f.slug, data: data('4230001', link) })
+        .error.details.link.error,
+      'folder_name_subject'
+    );
+    w.drive.setFolderName(
+      id,
+      'Ahmed_Mohamed_Library_System_Software_Engineering'
+    );
+    assert.equal(
+      w.api({ action: 'submit', slug: f.slug, data: data('4230001', link) }).ok,
+      true
+    );
+    admin({
+      action: 'admin.forms.update',
+      id: f.id,
+      patch: { rules: { folderName: { enabled: false } } }
+    });
+    w.drive.setFolderName(id, 'anything goes');
+    assert.equal(
+      w.api({ action: 'submit', slug: f.slug, data: data('4230002', link) }).ok,
+      true,
+      'the rule can be switched off'
+    );
+  }
+);
 
-test('Email: a form without edit keys still confirms, with no key in the message', () => {
-  const w = boot('team_registration', {
-    editKey: { enabled: false, days: 7, allowEdit: false, allowDelete: false }
-  });
-  const r = w.submit(team());
-  assert.equal(r.key, '');
-  assert.equal(r.emailed, true);
-  assert.equal(w.mail.length, 1);
-  assert.match(w.mail[0].body, /Reference: TR-/);
-  assert.doesNotMatch(w.mail[0].body, /Edit key|The key works until|المفتاح/);
-});
+test(
+  'Email: a form without edit keys still confirms, with no key in the ' +
+    'message',
+  () => {
+    const w = boot('team_registration', {
+      editKey: { enabled: false, days: 7, allowEdit: false, allowDelete: false }
+    });
+    const r = w.submit(team());
+    assert.equal(r.key, '');
+    assert.equal(r.emailed, true);
+    assert.equal(w.mail.length, 1);
+    assert.match(w.mail[0].body, /Reference: TR-/);
+    assert.doesNotMatch(w.mail[0].body, /Edit key|The key works until|المفتاح/);
+  }
+);
 
-test('Email: with confirmations off nothing is sent and the answer says so', () => {
-  const w = boot('team_registration', {
-    notifications: { confirmEmail: false, alertEmail: '' }
-  });
-  const r = w.submit(team());
-  assert.equal(r.ok, true);
-  assert.equal(r.emailed, false);
-  assert.equal(w.mail.length, 0);
-  const w2 = boot();
-  assert.equal(w2.submit(team()).emailed, true);
-});
+test(
+  'Email: with confirmations off nothing is ' + 'sent and the answer says so',
+  () => {
+    const w = boot('team_registration', {
+      notifications: { confirmEmail: false, alertEmail: '' }
+    });
+    const r = w.submit(team());
+    assert.equal(r.ok, true);
+    assert.equal(r.emailed, false);
+    assert.equal(w.mail.length, 0);
+    const w2 = boot();
+    assert.equal(w2.submit(team()).emailed, true);
+  }
+);

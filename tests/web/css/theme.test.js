@@ -78,17 +78,24 @@ for (const [name, theme] of [
   ['dark (toggle)', darkToggle],
   ['dark (device)', darkDevice]
 ]) {
-  test(`Contrast: ${name} theme meets WCAG AA for every pair the pages use`, () => {
-    const failures = PAIRS.filter(
-      ([fg, bg, min]) => ratio(theme[fg], theme[bg]) < min
-    ).map(
-      ([fg, bg, min, use]) =>
-        `${fg} on ${bg} (${use}): ${ratio(theme[fg], theme[bg]).toFixed(2)} < ${min}`
-    );
-    assert.deepEqual(failures, []);
-  });
+  test(
+    `Contrast: ${name} theme meets WCAG AA ` + 'for every pair the pages use',
+    () => {
+      const failures = PAIRS.filter(
+        ([fg, bg, min]) => ratio(theme[fg], theme[bg]) < min
+      ).map(
+        ([fg, bg, min, use]) =>
+          `${fg} on ${bg} (${use}): ${ratio(theme[fg], theme[bg]).toFixed(2)} < ${min}`
+      );
+      assert.deepEqual(failures, []);
+    }
+  );
 }
 
-test('Contrast: the device dark theme and the dark toggle use the same colours', () => {
-  assert.deepEqual(darkDevice, darkToggle);
-});
+test(
+  'Contrast: the device dark theme and the dark toggle use the same ' +
+    'colours',
+  () => {
+    assert.deepEqual(darkDevice, darkToggle);
+  }
+);

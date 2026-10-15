@@ -43,16 +43,20 @@ test('Harness: clock and cache respect the controlled time', () => {
   assert.equal(new w.ctx.Date().toISOString(), '2027-09-02T00:00:00.000Z');
 });
 
-test('Harness: a seeded world gives the same ids and random numbers every time', () => {
-  const run = (seed) => {
-    const w = createWorld({ seed });
-    w.call('setup');
-    return [
-      w.props.get('REGISTRY_ID'),
-      w.props.get('PEPPER'),
-      w.ctx.Math.random()
-    ];
-  };
-  assert.deepEqual(run(7), run(7));
-  assert.notDeepEqual(run(7), run(8));
-});
+test(
+  'Harness: a seeded world gives the same ids and random numbers every ' +
+    'time',
+  () => {
+    const run = (seed) => {
+      const w = createWorld({ seed });
+      w.call('setup');
+      return [
+        w.props.get('REGISTRY_ID'),
+        w.props.get('PEPPER'),
+        w.ctx.Math.random()
+      ];
+    };
+    assert.deepEqual(run(7), run(7));
+    assert.notDeepEqual(run(7), run(8));
+  }
+);

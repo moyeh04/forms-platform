@@ -162,109 +162,129 @@ test('Booking: cancelling with the key frees the slot for someone else', () => {
   assert.equal(w.book('4230002', sun(0)).ok, true);
 });
 
-test('Booking: by default a key moves a booking to another time and changes nothing else', () => {
-  const w = boot();
-  const a = w.book('4230001', sun(0));
-  const opened = w.api({ action: 'lookup', slug: w.form.slug, key: a.key });
-  assert.deepEqual(
-    [opened.canEdit, opened.slotOnly, opened.canDelete],
-    [true, true, true]
-  );
-  assert.equal(
-    w.api({
-      action: 'update',
-      slug: w.form.slug,
-      key: a.key,
-      data: { slot: sun(2), title: 'Not Their Project' }
-    }).ok,
-    true
-  );
-  const row = w.admin({ action: 'admin.submissions', slug: w.form.slug })
-    .submissions[0];
-  assert.deepEqual(
-    [row.data.slot.time, row.title],
-    [sun(2).time, 'Library System']
-  );
-  assert.equal(w.book('4230002', sun(0)).ok, true, 'the time it left is free');
-});
+test(
+  'Booking: by default a key moves a booking to another time and ' +
+    'changes nothing else',
+  () => {
+    const w = boot();
+    const a = w.book('4230001', sun(0));
+    const opened = w.api({ action: 'lookup', slug: w.form.slug, key: a.key });
+    assert.deepEqual(
+      [opened.canEdit, opened.slotOnly, opened.canDelete],
+      [true, true, true]
+    );
+    assert.equal(
+      w.api({
+        action: 'update',
+        slug: w.form.slug,
+        key: a.key,
+        data: { slot: sun(2), title: 'Not Their Project' }
+      }).ok,
+      true
+    );
+    const row = w.admin({ action: 'admin.submissions', slug: w.form.slug })
+      .submissions[0];
+    assert.deepEqual(
+      [row.data.slot.time, row.title],
+      [sun(2).time, 'Library System']
+    );
+    assert.equal(
+      w.book('4230002', sun(0)).ok,
+      true,
+      'the time it left is free'
+    );
+  }
+);
 
-test('Booking: with editing and cancelling both off, a key only shows the booking', () => {
-  const w = boot(null, {
-    editKey: { enabled: true, days: 7, allowEdit: false, allowDelete: false }
-  });
-  const a = w.book('4230001', sun(0));
-  const opened = w.api({ action: 'lookup', slug: w.form.slug, key: a.key });
-  assert.deepEqual(
-    [opened.canEdit, opened.slotOnly, opened.canDelete],
-    [false, false, false]
-  );
-  assert.equal(
-    w.api({
-      action: 'update',
-      slug: w.form.slug,
-      key: a.key,
-      data: { slot: sun(2) }
-    }).error.code,
-    'edit_disabled'
-  );
-});
+test(
+  'Booking: with editing and cancelling both off, a key only shows the ' +
+    'booking',
+  () => {
+    const w = boot(null, {
+      editKey: { enabled: true, days: 7, allowEdit: false, allowDelete: false }
+    });
+    const a = w.book('4230001', sun(0));
+    const opened = w.api({ action: 'lookup', slug: w.form.slug, key: a.key });
+    assert.deepEqual(
+      [opened.canEdit, opened.slotOnly, opened.canDelete],
+      [false, false, false]
+    );
+    assert.equal(
+      w.api({
+        action: 'update',
+        slug: w.form.slug,
+        key: a.key,
+        data: { slot: sun(2) }
+      }).error.code,
+      'edit_disabled'
+    );
+  }
+);
 
-test('Booking: when editing is allowed, moving frees the old slot and respects taken ones', () => {
-  const w = boot(null, {
-    editKey: { enabled: true, days: 7, allowEdit: true, allowDelete: true }
-  });
-  const a = w.book('4230001', sun(0));
-  w.book('4230002', sun(1));
-  const data = (slot) => ({
-    email: 'a@b.com',
-    leader_name: 'أحمد محمد محمود أحمد',
-    leader_code: '4230001',
-    phone: '01012345678',
-    major: 'حاسبات',
-    level: 'صفر / الأولى',
-    section: '4C-TH1',
-    curriculum: '2020',
-    title: 'Library System',
-    slot
-  });
-  assert.equal(
-    w.api({
-      action: 'update',
-      slug: w.form.slug,
-      key: a.key,
-      data: data(sun(1))
-    }).error.code,
-    'slot_taken'
-  );
-  assert.equal(
-    w.api({
-      action: 'update',
-      slug: w.form.slug,
-      key: a.key,
-      data: data(sun(2))
-    }).ok,
-    true
-  );
-  const taken = w.api({ action: 'getForm', slug: w.form.slug }).taken;
-  assert.equal(taken['week-11-sunday|12:30 - 12:50'], undefined);
-  assert.equal(taken['week-11-sunday|1:20 - 1:40'], 1);
-});
+test(
+  'Booking: when editing is allowed, moving frees the old slot and ' +
+    'respects taken ones',
+  () => {
+    const w = boot(null, {
+      editKey: { enabled: true, days: 7, allowEdit: true, allowDelete: true }
+    });
+    const a = w.book('4230001', sun(0));
+    w.book('4230002', sun(1));
+    const data = (slot) => ({
+      email: 'a@b.com',
+      leader_name: 'أحمد محمد محمود أحمد',
+      leader_code: '4230001',
+      phone: '01012345678',
+      major: 'حاسبات',
+      level: 'صفر / الأولى',
+      section: '4C-TH1',
+      curriculum: '2020',
+      title: 'Library System',
+      slot
+    });
+    assert.equal(
+      w.api({
+        action: 'update',
+        slug: w.form.slug,
+        key: a.key,
+        data: data(sun(1))
+      }).error.code,
+      'slot_taken'
+    );
+    assert.equal(
+      w.api({
+        action: 'update',
+        slug: w.form.slug,
+        key: a.key,
+        data: data(sun(2))
+      }).ok,
+      true
+    );
+    const taken = w.api({ action: 'getForm', slug: w.form.slug }).taken;
+    assert.equal(taken['week-11-sunday|12:30 - 12:50'], undefined);
+    assert.equal(taken['week-11-sunday|1:20 - 1:40'], 1);
+  }
+);
 
-test('Slots: a booking on a removed slot is still counted, so the timetable can say it is left without a time', () => {
-  const w = boot();
-  w.book('4230001', sun(0));
-  w.admin({
-    action: 'admin.forms.update',
-    id: w.form.id,
-    patch: {
-      slots: {
-        days: [{ label: 'Week 11 - Sunday', times: ['12:55 - 1:15'] }],
-        capacity: 1
+test(
+  'Slots: a booking on a removed slot is still counted, so the ' +
+    'timetable can say it is left without a time',
+  () => {
+    const w = boot();
+    w.book('4230001', sun(0));
+    w.admin({
+      action: 'admin.forms.update',
+      id: w.form.id,
+      patch: {
+        slots: {
+          days: [{ label: 'Week 11 - Sunday', times: ['12:55 - 1:15'] }],
+          capacity: 1
+        }
       }
-    }
-  });
-  assert.deepEqual(
-    { ...w.admin({ action: 'admin.forms.get', id: w.form.id }).taken },
-    { 'week-11-sunday|12:30 - 12:50': 1 }
-  );
-});
+    });
+    assert.deepEqual(
+      { ...w.admin({ action: 'admin.forms.get', id: w.form.id }).taken },
+      { 'week-11-sunday|12:30 - 12:50': 1 }
+    );
+  }
+);
