@@ -34,7 +34,6 @@
   .team-card .mini td {
     padding: 0;
     border: 0;
-    background: none !important;
     min-width: 0;
   }
   .team-card .mini td.num {
@@ -243,6 +242,7 @@
   .block.single .mini tr {
     display: block;
     padding: 10px 16px;
+    background: none;
     border-top: 1px solid color-mix(in srgb, var(--line) 70%, transparent);
   }
   .block.single .mini td {
@@ -251,7 +251,6 @@
     gap: 10px;
     padding: 2px 0;
     border: 0;
-    background: none !important;
     white-space: normal;
   }
   .block.single .mini td[data-label]::before {

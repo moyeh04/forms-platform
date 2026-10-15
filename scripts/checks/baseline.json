@@ -10,17 +10,11 @@
     "lines": 1
   },
   "web/css/admin/phone-tables.css": {
-    "biome/lint/complexity/noImportantStyles": 4,
+    "biome/lint/complexity/noImportantStyles": 3,
     "biome/lint/style/noDescendingSpecificity": 1
-  },
-  "web/css/admin/phone.css": {
-    "biome/lint/complexity/noImportantStyles": 2
   },
   "web/css/admin/questions.css": {
     "biome/lint/style/noDescendingSpecificity": 3
-  },
-  "web/css/admin/responses.css": {
-    "biome/lint/style/noDescendingSpecificity": 1
   },
   "web/css/admin/teammates.css": {
     "biome/lint/complexity/noImportantStyles": 1

@@ -150,7 +150,7 @@
   font-size: var(--fs-label);
   color: var(--mute);
 }
-.data-table tr:nth-child(even) td {
+.data-table tr:nth-child(even) {
   background: var(--sheet-2);
 }
 .scroll-x {
