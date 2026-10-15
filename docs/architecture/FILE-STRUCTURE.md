@@ -30,7 +30,7 @@ Each folder goes somewhere different. Only one of them needs a build step.
 flowchart TD
     repo["Repository"]
     repo --> web["web/<br/>index.html, admin.html, viewer.html<br/>css, js, img"]
-    repo --> shared["domain/<br/>rules.js, form-metadata.js"]
+    repo --> shared["domain/<br/>rules/, form-metadata/"]
     repo --> be["backend/<br/>23 .js files + appsscript.json"]
     repo --> sc["scripts/<br/>build/, dev/, deploy/, checks/"]
     repo --> ts["tests/<br/>JavaScript"]
@@ -87,14 +87,14 @@ flowchart LR
         ui["ui.js"]
     end
     subgraph index["index.html: the student form"]
-        r1["domain/rules.js"]
+        r1["domain/rules/"]
         i18n["i18n.js"]
         tk["ticket.js"]
         h1["handover.js"]
         fm["form.js"]
     end
     subgraph admin["admin.html: the dashboard"]
-        r2["domain/rules.js"]
+        r2["domain/rules/"]
         a1["admin.js"]
         a2["admin-settings.js"]
         a5["admin-timetable.js"]
@@ -122,7 +122,7 @@ flowchart LR
     classDef cOk fill:#BFD9CF,stroke:#2E5A55,stroke-width:1.5px,color:#17302D
 ```
 
-The instructor page does not load `rules.js`: it only reads data, so it needs
+The instructor page does not load the rules: it only reads data, so it needs
 no validation.
 
 ## Website (static files, no build step)
@@ -160,8 +160,19 @@ The site is published at the paths it has always had: the pages at the root,
 | `web/js/size-alerts.js` | The warnings about small teams as they are drawn: a line for each level and a mark on the card of a small team. Used by the dashboard and the instructor page. |
 | `web/js/viewer.js` | The instructor page. |
 | `domain/enums.js` | The words the pages and the backend share, as frozen enums of stored values: `FormType`, `FormStatus`, `ReviewStatus` and `ListKind`. Loaded before the other domain files. |
-| `domain/form-metadata.js` | What each form type shows beside its title (term, subject code, batch year) and how it is read, saved and copied. Used by the pages and the backend. |
-| `domain/rules.js` | Validation and normalization rules (Arabic names, phones, codes, Drive links, team size, slots). Used by the browser, the backend, and the tests, so all three always agree. |
+| `domain/form-metadata/index.js` | What each form type shows beside its title (term, subject code, batch year) and how it is read, saved and copied. Used by the pages and the backend. It picks the part of the form type; the pages and the bundle load the parts before it. |
+| `domain/form-metadata/read.js` | How the metadata reads what it is given: text, own keys, a field of a form that may be missing, and academic years from years and terms. |
+| `domain/form-metadata/subject.js` | The metadata of a form with a term and a subject code: team registrations, task submissions and reservations. |
+| `domain/form-metadata/batch.js` | The metadata of a WhatsApp registration: the batch year, also read from the term an older form kept it in. |
+| `domain/rules/index.js` | The loader of the validation and normalization rules: it gathers the parts below into the one global `Rules`. Used by the browser, the backend, and the tests, so all three always agree. The pages and the bundle load the parts before it. |
+| `domain/rules/text.js` | Arabic digits read as Latin ones, empty values, Arabic names, English-only titles and email addresses. |
+| `domain/rules/phone.js` | Egyptian mobile numbers: the canonical form, the WhatsApp chat of a number, and the numbers inside pasted text. |
+| `domain/rules/codes.js` | Student codes: digits only, of the length the field asks. |
+| `domain/rules/drive-link.js` | Google Drive and Docs links, and the Drive folder name rule (Team_Leader_Name_Project_Name_Subject_Name). |
+| `domain/rules/slots.js` | Reservation slots: the times of a day, the key and the room left in a slot, the names of dated days, and the check of a chosen slot. |
+| `domain/rules/form.js` | Reading a form and its responses: a field by its role, the people on a submission, how many people a form holds, and whether it is open. |
+| `domain/rules/team-size.js` | Team size: the sizes a form allows, the notes a student sees for a size, and the warnings about small teams. |
+| `domain/rules/submission.js` | A whole submission: each field checked by its type, the member forms of a team, and nobody named twice. |
 
 ## Backend (`backend/`, becomes one `Code.gs`)
 
@@ -303,8 +314,8 @@ the file name says the role:
 | `backend/entry-points.js` | The functions Apps Script calls by name (the sheet menu, its print dialog, setup, the PIN commands and the view trigger), each handing the call to its namespace. |
 | `backend/main.js` | The web app: every request arrives here, is read as JSON, and goes to the router. |
 
-`npm run build` joins `domain/enums.js`, `domain/rules.js`,
-`domain/form-metadata.js` and every backend file into `dist/Code.gs`: `platform/` first, then `features/`, then
+`npm run build` joins `domain/enums.js`, the parts of `domain/rules/` and
+`domain/form-metadata/` and every backend file into `dist/Code.gs`: `platform/` first, then `features/`, then
 `routes.js`, `entry-points.js` and `main.js`.
 
 ## Tools and tests

@@ -21,7 +21,7 @@ sheet, not code.
 |---|---|
 | **No server, no bill** | GitHub Pages serves files; Apps Script runs the logic; Sheets and Drive store the data. All free for classroom scale. |
 | **Visitors never log in** | The script runs as the owner. Students get an edit key; instructors get a private link; the admin gets a PIN. Each is its own small, hashed secret. |
-| **One source of truth for rules** | `domain/rules.js` is used by the browser, the backend, and the tests. They cannot disagree. |
+| **One source of truth for rules** | `domain/rules/` is used by the browser, the backend, and the tests. They cannot disagree. |
 | **Forms are data** | A form is a JSON definition in one cell. New questions and new form types need no code. |
 | **Boring technology** | Plain JavaScript, no framework, no bundler for the website, one concatenation script for the backend. Easy to read, easy to fix later. |
 | **Testable without Google** | An in-memory copy of Google's services runs the real backend code, so the tests cover it without touching a real account. |
@@ -62,7 +62,7 @@ flowchart LR
         idx["index.html<br/>the student form"]
         adm["admin.html<br/>the dashboard"]
         vwr["viewer.html<br/>read-only page"]
-        rules["domain/rules.js"]
+        rules["domain/rules/"]
     end
 
     subgraph google["Google - runs as the owner"]
@@ -508,13 +508,13 @@ person under it).
 
 | Responsibility | Owner |
 |---|---|
-| The levels, their starting numbers, the level of a team, and why a setting cannot be saved | `Rules.sizeAlerts`, `Rules.sizeAlertLevels`, `Rules.sizeAlertOf`, `Rules.sizeAlertsProblem` in `domain/rules.js` |
+| The levels, their starting numbers, the level of a team, and why a setting cannot be saved | `Rules.sizeAlerts`, `Rules.sizeAlertLevels`, `Rules.sizeAlertOf`, `Rules.sizeAlertsProblem` in `domain/rules/team-size.js` |
 | Checking and cleaning the setting on a save | `normalizeRules_` in `forms.rules.js`, with the same `Rules` functions (`bad_size_alerts`) |
 | The control in the Small teams panel of Setup | `A.sizeAlerts` in `admin-size-alerts.js`; it returns `{ node, refresh(), problem(), summary() }` like the range control |
 | Whether an instructor sees them | `showSizeAlerts` of each link in `clients.repository.js`, set in the link dialog (`admin-people.js`) |
 | The lines above the teams and the mark on a card | `App.sizeAlerts` in `size-alerts.js`, used by the dashboard and the instructor page |
 
-The dashboard loads `domain/rules.js` and asks it for the level of each team.
+The dashboard loads `domain/rules/` and asks it for the level of each team.
 The instructor page does not, so `viewer.data` sends the levels that are on
 and the level of each small team, worked out by the same functions, and sends
 neither to a link whose `showSizeAlerts` is off. A team is counted by its people
@@ -588,7 +588,7 @@ flowchart LR
 ## Backend modules
 
 Small files under `backend/platform/` and `backend/features/<area>/<feature>/`
-that the bundler joins with `domain/rules.js`. They do not import each other;
+that the bundler joins with `domain/rules/`. They do not import each other;
 they share one global scope (this is how Apps Script works), and each file
 defines one namespace named after it (`clients.repository.js` defines
 `ClientsRepository`) that holds its functions. `routes.js` joins each action to
@@ -650,7 +650,7 @@ flowchart TD
         Download["downloads<br/>files and folders in zips"]
     end
     Platform["platform/<br/>errors, sheet tables, lock, sheet style,<br/>crypto, properties, format, xlsx"]
-    Rules["domain/rules.js<br/>pure validation"]
+    Rules["domain/rules/<br/>pure validation"]
 
     Main --> Platform
     Auth --> Platform
@@ -718,7 +718,7 @@ flowchart LR
     subgraph shared["Shared"]
         cfg["config.js<br/>API address generated from Actions API_URL"]
         fr["fresh.js<br/>reloads a page older than the site"]
-        rl["domain/rules.js"]
+        rl["domain/rules/"]
         th["theme.js<br/>light, dark, device"]
         api["api.js<br/>POST text/plain JSON"]
         ui["ui.js<br/>h(), icons, dialogs, toast"]
@@ -1197,11 +1197,11 @@ labels of the current tables.
 | Reword a message or translate | `web/js/i18n.js` |
 | Add a question to a form | Admin dashboard, or `template-fields.js` for new forms by default |
 | Add a new form type | A new function in `templates.service.js`, a label in `web/js/admin.js` |
-| Change a validation rule | `domain/rules.js` (browser, server, and tests all follow) |
+| Change a validation rule | its part in `domain/rules/` (browser, server, and tests all follow) |
 | Add a backend action | A named function in the feature's `*.controller.js`, returned by its namespace; a row in `backend/routes.js` with its `Access`; a row in the section of that access in [API.md](../backend/API.md) |
 | Change sheet colours | `PALETTE` in `sheet-style.js` |
 | Change the downloaded Excel list | `DownloadsWorkbook.build` in `downloads.workbook.js` (the file format is in `backend/platform/xlsx/`) |
-| Change the Drive folder name rule | `Rules.checkFolderName` in `domain/rules.js` |
+| Change the Drive folder name rule | `Rules.checkFolderName` in `domain/rules/drive-link.js` |
 | Change the tab icon | `web/img/favicon.svg`, then regenerate the PNGs in `web/img/` |
 | See a change in a real browser before deploying | `npm run dev` (`scripts/dev/dev-server.js`) |
 | Change what CI runs or publishes | `.github/workflows/pages.yml` |

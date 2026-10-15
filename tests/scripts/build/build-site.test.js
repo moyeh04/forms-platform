@@ -165,6 +165,18 @@ test('Deployment: the built site carries its version, and a script or stylesheet
     );
   }
 
+  // A page kept from before a script was split still finds the old address.
+  const { JOINED } = require('../../../scripts/build/site-map.js');
+  for (const { published, sources } of JOINED) {
+    assert.equal(
+      fs.readFileSync(path.join(output, published), 'utf8'),
+      sources
+        .map((source) => fs.readFileSync(path.join(root, source), 'utf8'))
+        .join('\n'),
+      published + ' joins its parts'
+    );
+  }
+
   // The same files give the same version, so a push that changes nothing a visitor loads reloads nobody.
   const again = buildSite(env, path.join(dir, 'again'));
   assert.equal(

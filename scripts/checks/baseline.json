@@ -2,27 +2,6 @@
   ".github/workflows/pages.yml": {
     "lines": 8
   },
-  "domain/form-metadata.js": {
-    "biome/lint/complexity/useOptionalChain": 13,
-    "biome/lint/correctness/noInnerDeclarations": 3,
-    "biome/lint/correctness/noUnusedVariables": 1,
-    "biome/lint/style/noMagicNumbers": 3,
-    "biome/lint/suspicious/noPrototypeBuiltins": 1,
-    "jsdoc": 41
-  },
-  "domain/rules.js": {
-    "biome/lint/complexity/noExcessiveCognitiveComplexity": 7,
-    "biome/lint/complexity/noExcessiveLinesPerFunction": 2,
-    "biome/lint/complexity/useOptionalChain": 15,
-    "biome/lint/correctness/noInnerDeclarations": 14,
-    "biome/lint/style/noExcessiveLinesPerFile": 1,
-    "biome/lint/style/noMagicNumbers": 12,
-    "biome/lint/suspicious/noAssignInExpressions": 7,
-    "biome/lint/suspicious/noGlobalIsNan": 5,
-    "jsdoc": 69,
-    "lines": 26,
-    "numbers": 2
-  },
   "package.json": {
     "lines": 1
   },
@@ -113,10 +92,6 @@
   },
   "tests/backend/features/intake/reservations/reservations.test.js": {
     "lines": 4
-  },
-  "tests/domain/rules.test.js": {
-    "biome/lint/suspicious/useIterableCallbackReturn": 1,
-    "lines": 6
   },
   "tests/backend/features/intake/submissions/submissions.test.js": {
     "lines": 4

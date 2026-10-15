@@ -1,11 +1,11 @@
 # Testing
 
-364 automated tests run without a Google account, a browser, or a network.
+367 automated tests run without a Google account, a browser, or a network.
 They run the **real** backend and the **real** pages. This page explains how
 that works and what it can and cannot prove.
 
 ```
-npm test    # 364 tests
+npm test    # 367 tests
 ```
 
 ## The layers
@@ -39,7 +39,7 @@ flowchart TD
         dom["dom.js<br/>jsdom pages wired to the harness"]
     end
     subgraph units["Unit"]
-        rules["domain/rules.test.js<br/>pure validation"]
+        rules["domain/rules/*.test.js<br/>pure validation"]
         enums["domain/enums.test.js"]
     end
     subgraph backend["Backend through the in-memory world"]
@@ -146,7 +146,15 @@ says something else.
 | Area | File | Tests | Examples |
 |---|---|---:|---|
 | Shared enums | `domain/enums.test.js` | 2 | Each enum frozen, with distinct values and CONSTANT_CASE members, and the same in the backend bundle as in Node |
-| Shared rules | `domain/rules.test.js` | 20 | The two warnings about small teams (starting numbers, the level of a team, a wrong number or order), counting the people of a form with a code counted once, Arabic filtering, name parts, phones, codes, Drive links, folder names, slots and the room left in one, form state |
+| Rules loader | `domain/rules/index.test.js` | 2 | Rules holds every function of every part, and a page that loads the enums and the parts gets the same Rules |
+| Rules: text | `domain/rules/text.test.js` | 4 | Arabic filtering and name parts, live cleaning while typing, English-only titles |
+| Rules: phones | `domain/rules/phone.test.js` | 2 | Every Egyptian way of writing a mobile number, numbers found in pasted WhatsApp lines |
+| Rules: codes | `domain/rules/codes.test.js` | 1 | Seven digits by default |
+| Rules: Drive links | `domain/rules/drive-link.test.js` | 2 | Files, folders and slides, other hosts refused; folder names |
+| Rules: slots | `domain/rules/slots.test.js` | 2 | The generated times of a day, and the room left in a slot |
+| Rules: forms | `domain/rules/form.test.js` | 2 | Members list, role lookup and form state; counting the people of a form with a code counted once |
+| Rules: team size | `domain/rules/team-size.test.js` | 2 | The two warnings about small teams: starting numbers, the level of a team, a wrong number or order |
+| Rules: submission | `domain/rules/submission.test.js` | 5 | Cleaned data, field and member errors, the same code twice, too many members, slot choices, disabled fields |
 | Team size and audience | `backend/features/intake/teams/team-size.test.js` | 18 | Required question, range, exact member count, admin range, the warnings about small teams saved cleaned and refused when wrong, the sizes of the saved teams sent with the form, size notes, specialization limits, section limits |
 | Forms | `backend/features/catalog/forms/forms.test.js` | 8 | Every template created with its own spreadsheet, type and title checked, the public form of a draft and of an open form, open and close dates, unique link names, duplicate, delete, WhatsApp metadata kept on a copy |
 | Submissions | `backend/features/intake/submissions/submissions.test.js` | 13 | Submit, closed and draft forms, duplicates, a student in another team, capacity, Drive checks, folder names, the confirmation email on and off and without a key, WhatsApp registrations, the admin list, status, review, reset key and delete |
@@ -165,7 +173,7 @@ says something else.
 | Registry writes | `backend/features/catalog/registry/registry-writes.test.js` | 6 | Every change to forms, lists and links written inside the lock, a save that keeps its row while another form is deleted, a save over a newer copy refused, a busy lock, a link that keeps a renamed form, list names that stay unique |
 | Flag cells | `backend/platform/sheets/cell.test.js` | 2 | A stored flag read as yes, no or its column's default (empty, missing and legacy text), and written as `1` or the column's own cell for no |
 | Golden copies | `golden.test.js` | 5 | What the live system depends on, compared with saved copies in `tests/fixtures/golden/`: every function Apps Script calls by name, the salted hashes and seals for a fixed pepper, the error code of every action for five kinds of request, legacy flag cells read and written back, and every sheet, property, cache entry, mail and trigger after one scripted run. `GOLDEN_UPDATE=1` writes the copies again, only for a change meant to alter them |
-| Site map | `scripts/build/site-map.test.js` | 2 | Each published path, with or without a slash, query or fragment, finds its source under `web/` or `domain/`, and every page exists; a path outside the site or one that climbs out of it with `..` has none |
+| Site map | `scripts/build/site-map.test.js` | 3 | Each published path, with or without a slash, query or fragment, finds its source under `web/` or `domain/`, and every page exists; a path outside the site or one that climbs out of it with `..` has none; each split script, its old address, the pages and the bundle load its parts in one order |
 | Check baseline | `scripts/checks/lib/baseline.test.js` | 3 | A legacy file keeps its count and never goes over it, a new file has no allowance, a lowered count must be written down and lowering never raises one, and a key ending in `/` is a folder that counts as there while it holds a file |
 | Check exceptions | `scripts/checks/lib/exceptions.test.js` | 1 | An exception removes the findings of its path and rule, needs a reason, and fails once it matches nothing |
 | Biome check | `scripts/checks/code/biome.test.js` | 2 | A formatted, clean file has no findings; a layout problem and a lint rule become findings with their rule and line, and files outside the configured folders are left out |
@@ -226,7 +234,7 @@ is `4321`. Nothing is saved: stopping the server forgets everything.
 ## Adding a test
 
 1. Pick the lowest layer that can see the behaviour: a rule goes in
-   `domain/rules.test.js`, a backend behaviour in the test folder of its
+   the test of its part under `domain/rules/`, a backend behaviour in the test folder of its
    feature, a screen behaviour in the test of its page. A test sits at the
    path of the code it checks under `tests/`, and a test of the whole system
    at the root of `tests/`.

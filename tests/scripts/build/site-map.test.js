@@ -12,7 +12,7 @@ test('Site map: each published path finds its source file', () => {
   assert.equal(sourceOf('assets/js/api.js?v=abc'), 'web/js/api.js');
   assert.equal(sourceOf('/assets/css/theme.css'), 'web/css/theme.css');
   assert.equal(sourceOf('assets/img/ship.svg'), 'web/img/ship.svg');
-  assert.equal(sourceOf('shared/rules.js'), 'domain/rules.js');
+  assert.equal(sourceOf('shared/rules/index.js'), 'domain/rules/index.js');
   for (const page of PAGES) {
     assert.ok(fs.existsSync(path.join(root, sourceOf(page))), page);
   }
@@ -23,4 +23,25 @@ test('Site map: paths outside the site, or leaving it, have no source', () => {
   assert.equal(sourceOf('backend/main.js'), null);
   assert.equal(sourceOf('/assets/js/../../../package.json'), null);
   assert.equal(sourceOf('/.git/config'), null);
+});
+
+test('Site map: a split script loads its parts in one order', () => {
+  const { JOINED } = require('../../../scripts/build/site-map.js');
+  const { bundleSource } = require('../../../scripts/build/bundle-backend.js');
+  const bundled = bundleSource().files;
+  for (const { published, sources } of JOINED) {
+    const folder = sources[0].replace(/[^/]+$/, '');
+    for (const page of PAGES) {
+      const html = fs.readFileSync(path.join(root, sourceOf(page)), 'utf8');
+      const loaded = [...html.matchAll(/<script src="([^"]+)"/g)]
+        .map((m) => sourceOf(m[1]))
+        .filter((file) => file?.startsWith(folder));
+      if (loaded.length) assert.deepEqual(loaded, sources, page);
+    }
+    assert.deepEqual(
+      bundled.filter((file) => file.startsWith(folder)),
+      sources,
+      published + ' in the bundle'
+    );
+  }
 });

@@ -23,7 +23,7 @@ test('Workflow: a push that changes no backend file skips the Apps Script deploy
   for (const file of [
     'backend/main.js',
     'backend/appsscript.json',
-    'domain/rules.js',
+    'domain/rules/index.js',
     'scripts/build/bundle-backend.js',
     '.github/workflows/pages.yml'
   ]) {

@@ -22,6 +22,37 @@ const FOLDERS = [
 ];
 
 /**
+ * The published scripts made by joining several sources in order. A page a
+ * browser kept from before a script was split still asks for the old
+ * address, so it stays for one release, made of the new parts.
+ */
+const JOINED = [
+  {
+    published: 'shared/rules.js',
+    sources: [
+      'domain/rules/text.js',
+      'domain/rules/phone.js',
+      'domain/rules/codes.js',
+      'domain/rules/drive-link.js',
+      'domain/rules/slots.js',
+      'domain/rules/form.js',
+      'domain/rules/team-size.js',
+      'domain/rules/submission.js',
+      'domain/rules/index.js'
+    ]
+  },
+  {
+    published: 'shared/form-metadata.js',
+    sources: [
+      'domain/form-metadata/read.js',
+      'domain/form-metadata/subject.js',
+      'domain/form-metadata/batch.js',
+      'domain/form-metadata/index.js'
+    ]
+  }
+];
+
+/**
  * Finds the source file of a published path.
  *
  * @param {string} published A path of the site, with or without a leading
@@ -38,4 +69,4 @@ function sourceOf(published) {
   return folder.source + clean.slice(folder.published.length);
 }
 
-module.exports = { PAGES, PAGE_SOURCE, FOLDERS, sourceOf };
+module.exports = { PAGES, PAGE_SOURCE, FOLDERS, JOINED, sourceOf };

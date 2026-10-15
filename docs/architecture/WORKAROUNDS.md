@@ -256,7 +256,7 @@ validation by hand into the website. The two copies drift apart.
   'sequence': {'mirrorActors': false, 'messageMargin': 34, 'boxMargin': 8}
 }}%%
 flowchart LR
-    r["domain/rules.js"] --> bundle
+    r["domain/rules/"] --> bundle
     b1["backend/platform/..."] --> bundle
     b2["backend/features/..."] --> bundle
     b3["... 66 backend files in all"] --> bundle
@@ -364,7 +364,7 @@ that attaches itself correctly wherever it is loaded.
   'sequence': {'mirrorActors': false, 'messageMargin': 34, 'boxMargin': 8}
 }}%%
 flowchart TD
-    f["domain/rules.js<br/>pure functions, no DOM, no Google services"]
+    f["domain/rules/<br/>pure functions, no DOM, no Google services"]
     f -->|"script tag"| b["Browser: window.Rules"]
     f -->|"bundler prepends it"| g["Apps Script: global Rules"]
     f -->|"require()"| t["Node tests: module.exports"]
@@ -420,7 +420,7 @@ Apps Script.
   'sequence': {'mirrorActors': false, 'messageMargin': 34, 'boxMargin': 8}
 }}%%
 flowchart LR
-    src["backend/*.js + domain/rules.js"] --> bundle["bundleSource()"]
+    src["backend/*.js + domain/rules/"] --> bundle["bundleSource()"]
     bundle --> vm["Node vm context"]
     mocks["Fake SpreadsheetApp, DriveApp,<br/>LockService, CacheService,<br/>MailApp, UrlFetchApp, clock"] --> vm
     vm --> world["world.api({ action: ... })"]

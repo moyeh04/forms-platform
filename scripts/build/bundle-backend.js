@@ -32,12 +32,24 @@ const BACKEND_LAST = ['routes.js', 'entry-points.js', 'main.js'];
 
 /**
  * The domain files, which the browser loads too, in the order they come
- * before the backend: the enums first, since the others read them.
+ * before the backend: the enums first, since the others read them, and each
+ * part of the rules and of the form metadata after the parts it reads.
  */
 const DOMAIN_FIRST = [
   'domain/enums.js',
-  'domain/rules.js',
-  'domain/form-metadata.js'
+  'domain/rules/text.js',
+  'domain/rules/phone.js',
+  'domain/rules/codes.js',
+  'domain/rules/drive-link.js',
+  'domain/rules/slots.js',
+  'domain/rules/form.js',
+  'domain/rules/team-size.js',
+  'domain/rules/submission.js',
+  'domain/rules/index.js',
+  'domain/form-metadata/read.js',
+  'domain/form-metadata/subject.js',
+  'domain/form-metadata/batch.js',
+  'domain/form-metadata/index.js'
 ];
 
 /**
