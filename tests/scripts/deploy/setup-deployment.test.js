@@ -4,12 +4,12 @@ const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
 const { apiUrl } = require('../../../scripts/build/build-site.js');
+const deployment = require('../../../scripts/deploy/setup-deployment.js');
+const { CLASP, setup } = deployment;
 const {
-  CLASP,
   createdProject,
-  deploymentId,
-  setup
-} = require('../../../scripts/deploy/setup-deployment.js');
+  deploymentId
+} = require('../../../scripts/deploy/clasp-output.js');
 
 const root = path.resolve(__dirname, '..', '..', '..');
 const env = {

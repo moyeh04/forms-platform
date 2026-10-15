@@ -5,12 +5,16 @@
   "package.json": {
     "lines": 1
   },
+  "scripts/deploy/clasp-output.js": {
+    "jsdoc": 4,
+    "lines": 2
+  },
   "scripts/deploy/setup-deployment.js": {
     "biome/lint/complexity/noExcessiveCognitiveComplexity": 1,
     "biome/lint/complexity/noExcessiveLinesPerFunction": 1,
     "biome/lint/style/noMagicNumbers": 3,
-    "jsdoc": 13,
-    "lines": 17
+    "jsdoc": 9,
+    "lines": 15
   },
   "scripts/dev/dev-server.js": {
     "biome/lint/complexity/noCommaOperator": 1,

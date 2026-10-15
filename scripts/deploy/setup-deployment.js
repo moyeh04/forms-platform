@@ -5,6 +5,7 @@ const os = require('node:os');
 const path = require('node:path');
 const { spawnSync } = require('node:child_process');
 const { claspProject } = require('./prepare-clasp.js');
+const { createdProject, deploymentId } = require('./clasp-output.js');
 
 const ROOT = path.resolve(__dirname, '..', '..');
 const CLASP = '@google/clasp@3.4.1'; // Same pinned version as .github/workflows/pages.yml.
@@ -19,17 +20,6 @@ function execute(command, args, options = {}) {
     input: options.input,
     stdio: options.interactive ? 'inherit' : ['pipe', 'pipe', 'pipe']
   });
-}
-
-/** clasp prints "Deployed <id> @<version>"; the ID is the only long token before the version. */
-function deploymentId(output) {
-  const match = /([A-Za-z0-9_-]{20,})\s+@\d+/.exec(output || '');
-  if (!match)
-    throw new Error(
-      'clasp did not report a deployment ID. Its output was:\n' +
-        (output || '(empty)')
-    );
-  return match[1];
 }
 
 /** Ask one question on the terminal and return the trimmed answer. */
@@ -80,30 +70,6 @@ function chooseSheet(prompt, log) {
     );
   }
   return id;
-}
-
-/** `clasp create --json` prints one object; anything around it is progress text. */
-function createdProject(output) {
-  const text = output || '';
-  let created = {};
-  try {
-    created = JSON.parse(
-      text.slice(text.indexOf('{'), text.lastIndexOf('}') + 1)
-    );
-  } catch (_) {
-    /* reported below */
-  }
-  if (!/^[A-Za-z0-9_-]+$/.test(created.scriptId || '')) {
-    throw new Error(
-      'clasp did not report a Script ID. Its output was:\n' +
-        (text || '(empty)')
-    );
-  }
-  return {
-    scriptId: created.scriptId,
-    sheetUrl:
-      'https://docs.google.com/spreadsheets/d/' + created.parentId + '/edit'
-  };
 }
 
 function setup(scriptId, options = {}) {
@@ -270,4 +236,4 @@ if (require.main === module) {
   }
 }
 
-module.exports = { CLASP, createdProject, deploymentId, setup };
+module.exports = { CLASP, setup };
