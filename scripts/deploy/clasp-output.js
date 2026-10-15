@@ -1,6 +1,17 @@
 /** Reads what clasp prints when it creates a project or a deployment. */
 
-/** clasp prints "Deployed <id> @<version>"; the ID is the only long token before the version. */
+/** A Script ID or a deployment ID: letters, digits, `_` and `-`. */
+const ID_PATTERN = /^[A-Za-z0-9_-]+$/;
+
+/**
+ * Reads the deployment ID that clasp printed. clasp prints
+ * "Deployed <id> @<version>"; the ID is the only long token before the
+ * version.
+ *
+ * @param {string} output What clasp printed.
+ * @return {string} The deployment ID.
+ * @throws {Error} When clasp printed none.
+ */
 function deploymentId(output) {
   const match = /([A-Za-z0-9_-]{20,})\s+@\d+/.exec(output || '');
   if (!match)
@@ -11,7 +22,15 @@ function deploymentId(output) {
   return match[1];
 }
 
-/** `clasp create --json` prints one object; anything around it is progress text. */
+/**
+ * Reads the project that `clasp create --json` made. It prints one object;
+ * anything around it is progress text.
+ *
+ * @param {string} output What clasp printed.
+ * @return {{scriptId: string, sheetUrl: string}} The Script ID and the
+ *     address of the sheet.
+ * @throws {Error} When clasp printed no Script ID.
+ */
 function createdProject(output) {
   const text = output || '';
   let created = {};
@@ -22,7 +41,7 @@ function createdProject(output) {
   } catch (_) {
     /* reported below */
   }
-  if (!/^[A-Za-z0-9_-]+$/.test(created.scriptId || '')) {
+  if (!ID_PATTERN.test(created.scriptId || '')) {
     throw new Error(
       'clasp did not report a Script ID. Its output was:\n' +
         (text || '(empty)')
@@ -35,4 +54,4 @@ function createdProject(output) {
   };
 }
 
-module.exports = { createdProject, deploymentId };
+module.exports = { ID_PATTERN, createdProject, deploymentId };
