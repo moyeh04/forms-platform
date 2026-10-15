@@ -77,6 +77,14 @@ App.idle = function () {};
   ]);
 });
 
+test('JSDoc check: a header comment above a blank line is not a doc', () => {
+  const source = `/** What the file is for. */
+
+function bare() {}
+`;
+  assert.deepEqual(problems(source), ['3 no JSDoc comment']);
+});
+
 test('JSDoc check: callbacks and wrappers passed to a call need no doc', () => {
   const source = `
 (function (App) {

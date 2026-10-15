@@ -1,11 +1,11 @@
 # Testing
 
-350 automated tests run without a Google account, a browser, or a network.
+351 automated tests run without a Google account, a browser, or a network.
 They run the **real** backend and the **real** pages. This page explains how
 that works and what it can and cannot prove.
 
 ```
-npm test    # 350 tests
+npm test    # 351 tests
 ```
 
 ## The layers
@@ -168,7 +168,7 @@ says something else.
 | Check exceptions | `scripts/checks/lib/exceptions.test.js` | 1 | An exception removes the findings of its path and rule, needs a reason, and fails once it matches nothing |
 | Biome check | `scripts/checks/biome.test.js` | 2 | A formatted, clean file has no findings; a layout problem and a lint rule become findings with their rule and line, and files outside the configured folders are left out |
 | Line check | `scripts/checks/lines.test.js` | 2 | A line over the limit is found with its width and one at the limit passes, a hook file without an extension is checked, Arabic counts by character, a URL does not count, and other folders are left out |
-| JSDoc check | `scripts/checks/jsdoc.test.js` | 3 | A full Google-style doc passes on a declaration, an arrow in a constant and an object property; a missing doc, a wrong or untyped `@param`, a missing or needless `@return`, `@returns` and `@author` are each found; callbacks, wrappers and handlers passed to a call need no doc |
+| JSDoc check | `scripts/checks/jsdoc.test.js` | 4 | A full Google-style doc passes on a declaration, an arrow in a constant and an object property; a missing doc, a wrong or untyped `@param`, a missing or needless `@return`, `@returns` and `@author` are each found; a file header above a blank line does not count as the doc of the function below it, and callbacks, wrappers and handlers passed to a call need no doc |
 | Number check | `scripts/checks/numbers.test.js` | 3 | A number held by a constant variable, property, member or object passes, so do 0, 1, -1 and an ignored line; an unnamed variable, property, nested property or default parameter is found; arguments, operands and array elements are left to Biome |
 | Flag check | `scripts/checks/flags.test.js` | 2 | A field compared with `'1'` or `'0'` either way round, and a choice that writes them, are found; a menu choice in a variable, a digit test, zero padding, other labels and a boolean compare pass |
 | Structure check | `scripts/checks/structure.test.js` | 2 | A tree that keeps every rule passes; an entry outside the root allow-list, catch-all names for a file and a folder, a crowded folder, a missing page script, scripts no page loads and a file the structure page does not name are each found at their place |

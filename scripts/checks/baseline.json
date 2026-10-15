@@ -74,7 +74,7 @@
   "backend/Menu.js": {
     "biome/lint/complexity/useOptionalChain": 1,
     "biome/lint/style/noMagicNumbers": 2,
-    "jsdoc": 14,
+    "jsdoc": 15,
     "lines": 11
   },
   "backend/Print.js": {
@@ -132,7 +132,7 @@
     "lines": 12
   },
   "backend/TeamList.js": {
-    "jsdoc": 11,
+    "jsdoc": 10,
     "lines": 8
   },
   "backend/Templates.js": {
@@ -179,7 +179,7 @@
     "biome/lint/correctness/noUnusedFunctionParameters": 2,
     "biome/lint/style/noMagicNumbers": 6,
     "biome/lint/suspicious/noControlCharactersInRegex": 6,
-    "jsdoc": 11,
+    "jsdoc": 10,
     "lines": 20
   },
   "domain/form-metadata.js": {
