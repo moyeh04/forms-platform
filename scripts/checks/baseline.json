@@ -40,8 +40,5 @@
   "web/css/theme.css": {
     "biome/lint/complexity/noImportantStyles": 3,
     "lines": 3
-  },
-  "web/index.html": {
-    "lines": 4
   }
 }
