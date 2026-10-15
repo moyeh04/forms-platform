@@ -29,14 +29,14 @@ var BUILTIN_LIST_NAMES_ = {
 };
 
 function listRows_() {
-  var sh = registry().getSheetByName(TABS.lists);
+  var sh = registry().getSheetByName(Constants.TABS.lists);
   return sh ? Table.readTable(sh, ['key', 'values']) : [];
 }
 
 function readLists() {
   var out = {};
   listRows_().forEach(function (r) {
-    if (String(r.key).charAt(0) !== '_') out[r.key] = parseJson(r.values, []);
+    if (String(r.key).charAt(0) !== '_') out[r.key] = Json.parseJson(r.values, []);
   });
   return out;
 }
@@ -46,7 +46,7 @@ function readListInfo() {
   var row = listRows_().filter(function (r) {
     return r.key === LIST_INFO_KEY_;
   })[0];
-  return row ? parseJson(row.values, {}) : {};
+  return row ? Json.parseJson(row.values, {}) : {};
 }
 
 function listKind_(key, info) {
@@ -56,7 +56,7 @@ function listKind_(key, info) {
 }
 
 function writeListRow_(key, json) {
-  var sh = registry().getSheetByName(TABS.lists);
+  var sh = registry().getSheetByName(Constants.TABS.lists);
   var rows = Table.readTable(sh, ['key', 'values']);
   for (var i = 0; i < rows.length; i++) {
     if (rows[i].key === key) {
@@ -76,7 +76,7 @@ function saveListInfo_(info) {
 }
 
 function deleteList_(key) {
-  var sh = registry().getSheetByName(TABS.lists);
+  var sh = registry().getSheetByName(Constants.TABS.lists);
   var row = Table.readTable(sh, ['key', 'values']).filter(function (r) {
     return r.key === key;
   })[0];

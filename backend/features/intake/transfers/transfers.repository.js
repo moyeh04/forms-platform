@@ -43,7 +43,7 @@ function readTransfers_(form) {
       updated: String(r.updated),
       status: String(r.status),
       code: String(r.code),
-      member: parseJson(r.member, {}),
+      member: Json.parseJson(r.member, {}),
       fromId: String(r.fromId),
       fromRef: String(r.fromRef),
       toId: String(r.toId),
@@ -54,9 +54,9 @@ function readTransfers_(form) {
 }
 
 function saveTransfer_(form, t) {
-  t.updated = nowIso();
+  t.updated = Time.nowIso();
   var sh = transfersSheet_(form, true);
-  var o = clone(t);
+  var o = Json.clone(t);
   o.member = JSON.stringify(t.member || {});
   if (t._row) Table.writeRow(sh, t._row, TRANSFER_COLS, o);
   else t._row = Table.appendPlain(sh, Table.rowValues(TRANSFER_COLS, o));

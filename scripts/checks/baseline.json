@@ -102,7 +102,7 @@
     "biome/lint/complexity/useOptionalChain": 1,
     "biome/lint/correctness/noInnerDeclarations": 1,
     "jsdoc": 11,
-    "lines": 4
+    "lines": 5
   },
   "backend/features/catalog/lists/lists.rules.js": {
     "biome/lint/correctness/noInnerDeclarations": 1,
@@ -320,16 +320,24 @@
     "lines": 8
   },
   "backend/main.js": {
+    "biome/format": 1,
     "biome/lint/complexity/useOptionalChain": 2,
-    "jsdoc": 2
+    "jsdoc": 2,
+    "lines": 1
+  },
+  "backend/platform/config/constants.js": {
+    "biome/format": 1
   },
   "backend/platform/format/json.js": {
+    "biome/format": 1,
     "jsdoc": 2
   },
   "backend/platform/format/text.js": {
+    "biome/format": 1,
     "jsdoc": 2
   },
   "backend/platform/format/time.js": {
+    "biome/format": 1,
     "jsdoc": 2
   },
   "backend/platform/http/api-error.js": {

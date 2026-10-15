@@ -4,7 +4,7 @@
  */
 
 function doGet() {
-  return ApiError.json({ ok: true, service: APP.name, version: APP.version });
+  return ApiError.json({ ok: true, service: Constants.APP.name, version: Constants.APP.version });
 }
 
 function doPost(e) {

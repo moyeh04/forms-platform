@@ -45,7 +45,7 @@ function rowToResponse_(r) {
     created: String(r.created),
     updated: String(r.updated),
     status: String(r.status || 'new'),
-    review: parseJson(r.review, {}),
+    review: Json.parseJson(r.review, {}),
     email: String(r.email),
     name: String(r.name),
     code: String(r.code),
@@ -54,7 +54,7 @@ function rowToResponse_(r) {
     link: String(r.link),
     slot: String(r.slot),
     members: String(r.members),
-    data: parseJson(r.data, {}),
+    data: Json.parseJson(r.data, {}),
     keyHash: String(r.keyHash),
     keyExpires: String(r.keyExpires),
     deleted: String(r.deleted) === '1',
@@ -73,7 +73,7 @@ function readResponses(form, includeDeleted) {
 }
 
 function responseToRow_(r) {
-  var o = clone(r);
+  var o = Json.clone(r);
   o.review = JSON.stringify(r.review || {});
   o.data = JSON.stringify(r.data || {});
   o.deleted = r.deleted ? '1' : '';
@@ -82,7 +82,7 @@ function responseToRow_(r) {
 }
 
 function saveResponse_(form, r) {
-  r.updated = nowIso();
+  r.updated = Time.nowIso();
   var sh = responsesSheet(form);
   Table.ensureHeaders(sh, RESPONSE_COLS);
   if (r._row) Table.writeRow(sh, r._row, RESPONSE_COLS, responseToRow_(r));

@@ -22,7 +22,7 @@ API['admin.clients.create'] = admin(function (req) {
     canReview: !!req.canReview,
     showSizeAlerts: req.showSizeAlerts !== false,
     active: true,
-    createdAt: nowIso(),
+    createdAt: Time.nowIso(),
     expires: cleanExpiry_(req.expires)
   };
   var key = req.withKey === false ? '' : newClientKey_();

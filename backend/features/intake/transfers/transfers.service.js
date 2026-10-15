@@ -209,7 +209,7 @@ function recordTransfers_(form, team, wants) {
     .map(function (w) {
       return saveTransfer_(form, {
         id: Crypto.uuid(),
-        created: nowIso(),
+        created: Time.nowIso(),
         status: 'pending',
         code: w.code,
         member: w.member,

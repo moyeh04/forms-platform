@@ -49,7 +49,7 @@ API['admin.matching.import'] = admin(function (req) {
             line,
             p.phone,
             label,
-            nowIso(),
+            Time.nowIso(),
             'pending',
             ''
           ]);

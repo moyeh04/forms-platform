@@ -13,7 +13,7 @@ function normalizeSlots_(slots) {
         'bad_slots',
         'Every day needs a name, for example "Week 11 - Sunday".'
       );
-    var id = slugify(d.id || label);
+    var id = Text.slugify(d.id || label);
     var base = id,
       n = 2;
     while (seen[id]) id = base + '-' + n++;

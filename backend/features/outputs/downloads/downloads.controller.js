@@ -28,7 +28,7 @@ API['admin.download.start'] = admin(function (req) {
     if (String(f.getName()).indexOf(form.slug + ' ') === 0) f.setTrashed(true);
   }
   var folder = downloads.createFolder(
-    form.slug + ' ' + nowIso().slice(0, 16).replace('T', ' ')
+    form.slug + ' ' + Time.nowIso().slice(0, 16).replace('T', ' ')
   );
   var job = {
     id: folder.getId(),

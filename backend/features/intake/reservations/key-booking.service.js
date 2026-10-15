@@ -66,7 +66,7 @@ function bookingData_(form, source, row, slot) {
         return s.role === f.role && s.type === f.type;
       })[0];
     var value = from ? row.data[from.id] : undefined;
-    if (value !== undefined && value !== '') data[f.id] = clone(value);
+    if (value !== undefined && value !== '') data[f.id] = Json.clone(value);
   });
   return withSlot_(form, data, slot);
 }
@@ -88,7 +88,7 @@ function withSlot_(form, data, slot) {
 function movedBooking_(form, saved, typed) {
   return withSlot_(
     form,
-    clone(saved),
+    Json.clone(saved),
     typed[Rules.fieldByRole(form, 'slot').id]
   );
 }

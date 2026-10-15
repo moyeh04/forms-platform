@@ -65,7 +65,7 @@ function dlDownloadsFolder_() {
 function dlJob_(req) {
   var form = requireForm(req.slug || req.id);
   var raw = CacheService.getScriptCache().get('dl_job:' + req.job);
-  var job = raw ? parseJson(raw, null) : null;
+  var job = raw ? Json.parseJson(raw, null) : null;
   if (!job || job.form !== form.id)
     ApiError.fail('download_gone', 'This download has expired. Start it again.');
   job.id = req.job;

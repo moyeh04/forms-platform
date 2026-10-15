@@ -32,11 +32,11 @@ var FORM_BASE_ = [
 ];
 
 function formsSheet() {
-  return registry().getSheetByName(TABS.forms);
+  return registry().getSheetByName(Constants.TABS.forms);
 }
 
 function rowToForm_(row) {
-  var form = parseJson(row.config, {});
+  var form = Json.parseJson(row.config, {});
   FORM_BASE_.forEach(function (k) {
     form[k] = row[k] === undefined ? '' : String(row[k]);
   });
@@ -46,7 +46,7 @@ function rowToForm_(row) {
 }
 
 function formToRow_(form) {
-  var config = clone(form);
+  var config = Json.clone(form);
   FORM_BASE_.forEach(function (k) {
     delete config[k];
   });
@@ -87,7 +87,7 @@ function formRow_(sh, id) {
 
 /** Writes a form to its row, or to a new row when it has none. Call it inside withLock_. */
 function saveForm(form) {
-  form.updatedAt = nowIso();
+  form.updatedAt = Time.nowIso();
   var sh = formsSheet();
   var at = formRow_(sh, form.id);
   if (at) Table.writeRow(sh, at, FORM_COLS, formToRow_(form));

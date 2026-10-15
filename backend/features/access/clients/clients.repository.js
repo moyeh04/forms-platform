@@ -16,7 +16,7 @@ var CLIENT_COLS_ = [
 ];
 
 function clientsSheet_() {
-  return registry().getSheetByName(TABS.clients);
+  return registry().getSheetByName(Constants.TABS.clients);
 }
 
 function rowToClient_(r) {
@@ -25,8 +25,8 @@ function rowToClient_(r) {
     id: String(r.id),
     name: String(r.name),
     tokenHash: String(r.tokenHash),
-    forms: parseJson(r.forms, []),
-    hiddenColumns: parseJson(r.hiddenColumns, []),
+    forms: Json.parseJson(r.forms, []),
+    hiddenColumns: Json.parseJson(r.hiddenColumns, []),
     canReview: String(r.canReview) === '1',
     active: String(r.active) !== '0',
     createdAt: String(r.createdAt),

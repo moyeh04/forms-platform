@@ -5,7 +5,7 @@ function uniqueSlug_(wanted) {
   readForms().forEach(function (f) {
     taken[f.slug] = true;
   });
-  var base = slugify(wanted),
+  var base = Text.slugify(wanted),
     slug = base,
     n = 2;
   while (taken[slug]) slug = base + '-' + n++;
@@ -50,7 +50,7 @@ function cleanSubject_(v) {
 function addForm_(form, wantedSlug, adjust) {
   form.id = Crypto.shortId('f_');
   form.status = 'draft';
-  form.createdAt = nowIso();
+  form.createdAt = Time.nowIso();
   attachSheet_(form);
   return Lock.withLock(function () {
     form.slug = uniqueSlug_(
@@ -62,7 +62,7 @@ function addForm_(form, wantedSlug, adjust) {
 }
 
 function createForm(o, adjust) {
-  if (FORM_TYPES.indexOf(o.type) === -1)
+  if (Constants.FORM_TYPES.indexOf(o.type) === -1)
     ApiError.fail('unknown_type', 'Unknown form type.');
   var title = String(o.title || '').trim();
   if (!title) ApiError.fail('title_required', 'Give the form a title.');
@@ -115,7 +115,7 @@ function applyFormPatch_(form, patch, base) {
   FormMetadata.update(form, patch);
   PATCHABLE_.forEach(function (k) {
     if (patch[k] === undefined) return;
-    if (k === 'status' && FORM_STATUSES.indexOf(patch[k]) === -1)
+    if (k === 'status' && Constants.FORM_STATUSES.indexOf(patch[k]) === -1)
       ApiError.fail('bad_status', 'Status must be draft, open, closed, or archived.');
     if (k === 'rules') {
       form.rules = normalizeRules_(form.rules, patch.rules);
@@ -130,7 +130,7 @@ function applyFormPatch_(form, patch, base) {
       return;
     }
     if (k === 'slug') {
-      var wanted = slugify(patch.slug);
+      var wanted = Text.slugify(patch.slug);
       var clash = findForm(wanted);
       if (clash && clash.id !== form.id)
         ApiError.fail('slug_taken', 'Another form already uses that link name.');
@@ -147,7 +147,7 @@ function applyFormPatch_(form, patch, base) {
 
 function duplicateForm(id, o, adjust) {
   var src = requireForm(id);
-  var copy = clone(src);
+  var copy = Json.clone(src);
   copy.title = (o && o.title) || src.title;
   var metadata = FormMetadata.duplicate(src, o || {});
   FormMetadata.legacyFields(src.type).forEach(function (key) {

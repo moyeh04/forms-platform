@@ -65,7 +65,7 @@ API.submit = function (req) {
     var r = applyDerived_(vform, {
       id: id,
       ref: nextRef_(form),
-      created: nowIso(),
+      created: Time.nowIso(),
       status: 'new',
       review: defaultReview_(form),
       data: v.data,

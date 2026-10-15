@@ -5,9 +5,9 @@ function setup() {
   var ss = registry();
   Properties.setProp('REGISTRY_ID', ss.getId());
   Properties.pepper();
-  Table.ensureTab(ss, TABS.forms, FORM_COLS);
-  Table.ensureTab(ss, TABS.clients, CLIENT_COLS_);
-  var lists = Table.ensureTab(ss, TABS.lists, ['key', 'values']);
+  Table.ensureTab(ss, Constants.TABS.forms, FORM_COLS);
+  Table.ensureTab(ss, Constants.TABS.clients, CLIENT_COLS_);
+  var lists = Table.ensureTab(ss, Constants.TABS.lists, ['key', 'values']);
   if (lists.getLastRow() < 2) {
     Object.keys(DEFAULT_LISTS).forEach(function (k) {
       Table.appendPlain(lists, [

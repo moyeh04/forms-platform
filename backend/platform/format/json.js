@@ -1,5 +1,6 @@
 /** Copying values and reading JSON text safely. */
 
+var Json = (function () {
 function clone(o) {
   return o === undefined ? undefined : JSON.parse(JSON.stringify(o));
 }
@@ -12,3 +13,6 @@ function parseJson(text, fallback) {
     return fallback;
   }
 }
+
+return { parseJson, clone };
+})();

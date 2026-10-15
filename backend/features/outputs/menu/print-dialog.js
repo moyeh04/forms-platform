@@ -27,7 +27,7 @@ function printDialogHtml_(kind) {
   var forms = menuPrintOptions(kind);
   var formOpts = forms
     .map(function (f, i) {
-      return '<option value="' + i + '">' + esc_(f.label) + '</option>';
+      return '<option value="' + i + '">' + Text.esc(f.label) + '</option>';
     })
     .join('');
   var needsDay = kind === 'reservations';

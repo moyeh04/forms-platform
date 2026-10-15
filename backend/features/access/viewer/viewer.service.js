@@ -15,7 +15,7 @@ function requireClientForm_(client, slug) {
 
 function reservationRows_(form, client, mode, dayId) {
   var days = (form.slots && form.slots.days) || [];
-  var today = todayIso_();
+  var today = Time.todayIso();
   var membersField = Rules.fieldByRole(form, 'members');
   var includeMembers = !!(membersField && membersField.enabled !== false);
   var rows = readResponses(form)

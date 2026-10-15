@@ -5,7 +5,7 @@
 var API = API || {};
 
 function adminView_(r) {
-  var o = clone(r);
+  var o = Json.clone(r);
   o.keyKnown = !!(r.keyHash && r.keySeal);
   delete o._row;
   delete o.keyHash;

@@ -17,7 +17,7 @@ API.getForm = function (req) {
     Object.assign(draft, FormMetadata.public(form));
     return { state: state, form: draft };
   }
-  var out = { state: state, form: publicForm(form), serverTime: nowIso() };
+  var out = { state: state, form: publicForm(form), serverTime: Time.nowIso() };
   if (form.type === 'reservation') out.taken = slotAvailability_(form);
   return out;
 };

@@ -27,10 +27,10 @@ API['viewer.data'] = function (req) {
     columns: visibleColumns_(client, form),
     canReview: client.canReview,
     steps: (form.review && form.review.steps) || [],
-    generatedAt: nowIso()
+    generatedAt: Time.nowIso()
   };
   if (kind === 'reservation') {
-    out.today = todayIso_();
+    out.today = Time.todayIso();
     out.days = ((form.slots && form.slots.days) || []).map(function (d) {
       return { id: d.id, label: d.label, date: d.date };
     });

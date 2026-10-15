@@ -1,5 +1,6 @@
 /** Turning text into link names and into safe HTML. */
 
+var Text = (function () {
 function slugify(s) {
   var out = String(s || '')
     .toLowerCase()
@@ -15,3 +16,6 @@ function esc_(s) {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;');
 }
+
+return { slugify, esc: esc_ };
+})();

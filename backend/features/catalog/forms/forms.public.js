@@ -61,7 +61,7 @@ var PUBLIC_KEYS_ = [
 ];
 
 function publicForm(form) {
-  var full = resolveOptions_(clone(form), readLists());
+  var full = resolveOptions_(Json.clone(form), readLists());
   var out = {};
   PUBLIC_KEYS_.forEach(function (k) {
     if (full[k] !== undefined) out[k] = full[k];
@@ -90,5 +90,5 @@ function publicForm(form) {
 
 /** The form with options resolved, for server-side validation. */
 function validationForm(form) {
-  return resolveOptions_(clone(form), readLists());
+  return resolveOptions_(Json.clone(form), readLists());
 }
