@@ -1,0 +1,209 @@
+/* Questions: one row per question under the page that shows it. Nothing here needs sideways scrolling. */
+.q-page {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 6px 12px;
+  margin: 22px 0 6px;
+  padding: 8px 10px;
+  background: var(--sheet-2);
+  border-radius: 4px;
+}
+.q-page .input {
+  font-weight: 700;
+}
+.q-empty {
+  margin: 6px 0;
+}
+.q-add-page {
+  display: flex;
+  width: fit-content;
+  margin-top: 22px;
+}
+.q-page:first-child {
+  margin-top: 4px;
+}
+.q-row {
+  display: grid;
+  grid-template-columns: 5.5rem minmax(0, 1fr) auto;
+  gap: 6px 14px;
+  align-items: center;
+  padding: 8px 0;
+  border-top: 1px solid var(--line);
+}
+.q-row.sub {
+  margin-inline-start: 28px;
+}
+.q-row.off .q-labels {
+  opacity: 0.5;
+}
+.q-labels {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  min-width: 0;
+}
+.q-labels .input {
+  min-height: 38px;
+  font-size: 1rem;
+  width: 100%;
+}
+.q-opts {
+  display: flex;
+  align-items: center;
+  gap: 4px 14px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+.q-opts .num {
+  width: 4rem;
+  min-height: 36px;
+}
+.q-parts {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--mute);
+  font-size: var(--fs-help);
+}
+.q-type {
+  color: var(--mute);
+  font-size: var(--fs-help);
+  font-style: italic;
+}
+.q-opts .add-desc {
+  padding: 2px 0;
+  font-size: var(--fs-help);
+}
+.q-row.custom {
+  border-inline-start: 3px solid var(--gold);
+  padding-inline-start: 8px;
+}
+.q-tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 18px;
+  margin: 0 0 10px 5.5rem;
+  padding: 8px 12px;
+  background: var(--sheet-2);
+  border-radius: 2px;
+}
+.q-tool {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.q-tool .select {
+  width: auto;
+  min-height: 36px;
+  font-size: 0.95rem;
+}
+.q-choices {
+  flex-basis: 100%;
+  margin: 0;
+}
+.q-add {
+  display: flex;
+  width: fit-content;
+  margin: 8px 0 4px;
+}
+.q-desc {
+  margin: 0 0 10px 5.5rem;
+  padding: 8px 12px 10px;
+  border-inline-start: 3px solid var(--sea);
+  background: var(--sheet-2);
+  border-radius: 2px;
+}
+.q-desc.sub {
+  margin-inline-start: calc(5.5rem + 28px);
+}
+.q-desc .label {
+  font-size: var(--fs-help);
+  color: var(--mute);
+}
+.q-desc .link-btn {
+  font-size: var(--fs-help);
+  color: var(--err);
+  padding: 2px 0;
+}
+@media (max-width: 760px) {
+  .q-row {
+    grid-template-columns: 1fr;
+    gap: 2px;
+    padding: 10px 0;
+  }
+  .q-page {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+  .q-page .q-opts {
+    grid-column: 1 / -1;
+  }
+  .q-row.sub {
+    margin-inline-start: 14px;
+  }
+  .q-labels {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+  .q-opts {
+    justify-content: flex-start;
+  }
+  .q-desc,
+  .q-desc.sub,
+  .q-tools {
+    margin-inline-start: 0;
+  }
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px 18px;
+  align-items: flex-end;
+}
+.row > .field-row {
+  flex: 1 1 200px;
+  min-width: 0;
+}
+.field-row {
+  display: block;
+  margin-bottom: 10px;
+}
+.field-row > .label {
+  display: block;
+  margin-bottom: 4px;
+}
+.field-row .input,
+.field-row .select,
+.field-row .textarea {
+  width: 100%;
+}
+.check {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 40px;
+  font-weight: 700;
+  font-size: var(--fs-label);
+  cursor: pointer;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.check input {
+  width: 20px;
+  height: 20px;
+  accent-color: var(--sea);
+  flex: none;
+}
+.page-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 16px;
+  margin-bottom: 16px;
+}
+.page-head h2 {
+  font-size: 1.7rem;
+  margin-inline-end: auto;
+}

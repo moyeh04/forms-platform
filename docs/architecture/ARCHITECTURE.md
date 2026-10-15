@@ -1186,7 +1186,7 @@ scroll sideways. Each row becomes a card:
 
 ### Layout pieces
 
-A new page is built from the layout classes at the top of `admin.css`, which
+A new page is built from the layout classes in `admin/layout.css`, which
 change shape from the width they are given, so the page has no media query of
 its own:
 

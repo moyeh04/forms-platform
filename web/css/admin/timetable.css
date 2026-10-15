@@ -1,0 +1,236 @@
+/*
+ * Timetable: the days and the hours at the side, the result in the main part (.l-split).
+ * A day is a row of slot chips that wrap, so the page never needs sideways scrolling.
+ */
+.tt-setup {
+  max-width: 400px;
+}
+.tt-card {
+  padding: 16px;
+  border: 1.5px solid var(--line);
+  border-radius: 6px;
+  background: var(--sheet-2);
+}
+.tt-cal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.tt-cal-month {
+  font-family: var(--font-title);
+  font-size: 1.15rem;
+  font-weight: 400;
+}
+.tt-cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 4px;
+  margin-bottom: 8px;
+}
+.tt-cal-dow {
+  text-align: center;
+  color: var(--mute);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.tt-cal-day {
+  position: relative;
+  aspect-ratio: 1;
+  min-height: 36px;
+  padding: 0;
+  border: 1.5px solid transparent;
+  border-radius: 8px;
+  background: var(--sheet);
+  color: var(--ink);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+.tt-cal-day:hover {
+  border-color: var(--ink);
+}
+.tt-cal-day.today {
+  border-color: var(--line);
+  border-style: dashed;
+}
+.tt-cal-day[aria-pressed="true"] {
+  background: var(--sea);
+  border-color: var(--sea);
+  color: var(--on-sea);
+}
+.tt-cal-day.has-bookings::after {
+  content: "";
+  position: absolute;
+  bottom: 4px;
+  left: 50%;
+  width: 5px;
+  height: 5px;
+  margin-left: -2.5px;
+  border-radius: 50%;
+  background: var(--gold);
+}
+.tt-hours {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px 14px;
+}
+.tt-unit {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  color: var(--mute);
+  font-size: var(--fs-help);
+}
+.tt-unit .input {
+  min-width: 0;
+}
+.tt-capacity {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px dashed var(--line);
+}
+.tt-capacity .help {
+  margin: 0;
+}
+.tt-result-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 4px 16px;
+  margin-bottom: 10px;
+}
+.tt-result-head h3 {
+  font-size: 1.25rem;
+}
+.tt-row {
+  padding: 12px 14px;
+  margin-bottom: 10px;
+  border: 1.5px solid var(--line);
+  border-radius: 6px;
+  background: var(--sheet);
+}
+.tt-row.bad {
+  border-color: var(--err);
+}
+.tt-row-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 14px;
+  margin-bottom: 8px;
+}
+.tt-row-name {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  flex: 1 1 14rem;
+  min-width: 0;
+  font-size: 1.05rem;
+}
+.tt-row-name .input {
+  min-height: 36px;
+  font-size: 1rem;
+  width: 100%;
+}
+.tt-row-name .link-btn,
+.tt-row-tools .link-btn {
+  padding: 0;
+  font-size: var(--fs-help);
+}
+.tt-row-tools {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  margin-inline-start: auto;
+}
+.tt-own {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 6px 14px;
+  margin-bottom: 10px;
+  padding: 8px 12px;
+  background: var(--sheet-2);
+  border-radius: 4px;
+}
+.tt-own .field-row {
+  margin: 0;
+}
+.tt-own .link-btn {
+  font-size: var(--fs-help);
+}
+.tt-slots {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.tt-slot {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 34px;
+  padding: 2px 10px;
+  border: 1.5px solid var(--sea);
+  border-radius: 999px;
+  background: var(--sea);
+  color: var(--on-sea);
+  font-family: var(--font-code);
+  font-size: 0.85rem;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.tt-slot[aria-pressed="false"] {
+  background: transparent;
+  border-color: var(--line);
+  border-style: dashed;
+  color: var(--mute);
+  text-decoration: line-through;
+}
+.tt-slot.booked[aria-pressed="false"] {
+  border-color: var(--err);
+  color: var(--err);
+}
+.tt-slot-n {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  border-radius: 999px;
+  background: var(--sheet);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+.savebar {
+  position: sticky;
+  bottom: 0;
+  z-index: 5;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 12px 16px;
+  background: var(--sheet);
+  border-top: 1.5px solid var(--ink);
+  margin-top: 18px;
+}
+.savebar-note {
+  margin-inline-end: auto;
+  font-weight: 700;
+}
+.savebar-note.is-error {
+  color: var(--err);
+}

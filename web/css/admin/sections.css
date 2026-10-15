@@ -1,0 +1,166 @@
+/* A list of sections: one card for each year group, a stepper for each kind of section. */
+.sec-editor {
+  --l-gap: 12px;
+}
+.sec-group {
+  padding: 12px 14px;
+  border: 1.5px solid var(--line);
+  border-radius: 4px;
+  background: var(--sheet-2);
+}
+.sec-group-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 6px;
+}
+.sec-group-name {
+  font-family: var(--font-title);
+  font-size: 1.5rem;
+}
+.sec-group-head .icon-btn {
+  margin-inline-start: auto;
+}
+.sec-kinds {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.sec-kind {
+  display: grid;
+  grid-template-columns: 3rem auto minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+}
+.sec-kind.removable {
+  grid-template-columns: 3rem auto minmax(0, 1fr) auto;
+}
+.sec-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 12px;
+}
+.sec-code {
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+.sec-range {
+  overflow-wrap: anywhere;
+}
+.sec-kind .stepper {
+  margin: 0;
+}
+.stepper-input {
+  width: 4.2rem;
+  min-height: 36px;
+  text-align: center;
+  font-weight: 700;
+}
+.sec-more {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 8px;
+  margin-top: 8px;
+}
+.sec-draft {
+  border-style: dashed;
+  background: var(--sheet);
+}
+.sec-draft h3 {
+  font-size: 1.1rem;
+  margin-bottom: 8px;
+}
+.sec-draft .sec-kinds {
+  margin: 4px 0 2px;
+}
+.sec-pick {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 12px;
+  margin-bottom: 8px;
+}
+.sec-pick .label {
+  min-width: 9rem;
+  margin: 0;
+}
+.sec-pick .toggle-chips {
+  align-items: center;
+}
+.sec-letter {
+  width: 4rem;
+  min-height: 32px;
+  text-align: center;
+}
+.sec-new {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.sec-new {
+  flex-wrap: wrap;
+}
+.sec-new .error {
+  margin: 0;
+  flex-basis: 100%;
+}
+.sec-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 12px;
+  margin-top: 10px;
+}
+.sec-foot p {
+  margin: 0;
+}
+.sec-foot .actions {
+  margin-inline-start: auto;
+}
+.toggle-chip.add {
+  border-style: dashed;
+}
+.sec-preview .value-chips {
+  margin-top: 8px;
+}
+.value-chip.plain {
+  padding: 3px 12px;
+  font-weight: 400;
+}
+.num-run {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 28px;
+}
+.kind-cards {
+  --l-min: 200px;
+  margin: 6px 0 14px;
+}
+.kind-card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px 14px;
+  text-align: start;
+  border: 1.5px solid var(--line);
+  border-radius: 4px;
+  background: var(--sheet);
+  color: var(--ink);
+  cursor: pointer;
+}
+.kind-card:hover {
+  border-color: var(--ink);
+}
+.kind-card[aria-checked="true"] {
+  border-color: var(--sea);
+  box-shadow: inset 0 0 0 1.5px var(--sea);
+  background: var(--sheet-2);
+}
+.kind-example {
+  font-weight: 700;
+  color: var(--sea);
+}

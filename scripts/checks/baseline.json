@@ -115,11 +115,59 @@
   "web/admin.html": {
     "lines": 5
   },
-  "web/css/admin.css": {
-    "biome/lint/complexity/noImportantStyles": 7,
-    "biome/lint/style/noDescendingSpecificity": 18,
-    "biome/lint/style/noExcessiveLinesPerFile": 1,
-    "lines": 28
+  "web/css/admin/bookings.css": {
+    "biome/lint/style/noDescendingSpecificity": 1,
+    "lines": 3
+  },
+  "web/css/admin/forms-list.css": {
+    "lines": 2
+  },
+  "web/css/admin/keys.css": {
+    "lines": 3
+  },
+  "web/css/admin/layout.css": {
+    "biome/lint/style/noDescendingSpecificity": 1,
+    "lines": 3
+  },
+  "web/css/admin/lists.css": {
+    "biome/lint/style/noDescendingSpecificity": 1,
+    "lines": 1
+  },
+  "web/css/admin/matching.css": {
+    "lines": 1
+  },
+  "web/css/admin/new-form.css": {
+    "lines": 1
+  },
+  "web/css/admin/phone-tables.css": {
+    "biome/lint/complexity/noImportantStyles": 4,
+    "biome/lint/style/noDescendingSpecificity": 1,
+    "lines": 1
+  },
+  "web/css/admin/phone.css": {
+    "biome/lint/complexity/noImportantStyles": 2,
+    "lines": 4
+  },
+  "web/css/admin/questions.css": {
+    "biome/lint/style/noDescendingSpecificity": 3,
+    "lines": 1
+  },
+  "web/css/admin/responses-alerts.css": {
+    "lines": 1
+  },
+  "web/css/admin/responses.css": {
+    "biome/lint/style/noDescendingSpecificity": 1,
+    "lines": 2
+  },
+  "web/css/admin/sections.css": {
+    "lines": 1
+  },
+  "web/css/admin/teammates.css": {
+    "biome/lint/complexity/noImportantStyles": 1,
+    "lines": 2
+  },
+  "web/css/admin/timetable.css": {
+    "lines": 2
   },
   "web/css/app.css": {
     "biome/lint/complexity/noImportantStyles": 5,

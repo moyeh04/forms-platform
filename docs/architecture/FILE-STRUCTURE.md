@@ -139,7 +139,22 @@ The site is published at the paths it has always had: the pages at the root,
 | `web/viewer.html` | The read-only instructor and client page (`?t=private-token`). |
 | `web/css/theme.css` | Colors, fonts, and the type scale as variables. Change the look here; the contrast standard is in its header and enforced by `tests/web/css/theme.test.js`. |
 | `web/css/app.css` | Components of the student page. |
-| `web/css/admin.css` | Dashboard and instructor layout, including the team cards (a coloured band per team, header strip, leader tag). |
+| `web/css/admin/layout.css` | The dashboard layout classes, the tabs of a form and the settings sections. The dashboard and the instructor page load the `admin/` files in the order of these rows, so the cascade is the one the single file had. |
+| `web/css/admin/questions.css` | The Questions tab: a row per question under its page. |
+| `web/css/admin/forms-list.css` | The header of a form and the forms list grouped by status. |
+| `web/css/admin/bookings.css` | The bookings of a registration form inside its card. |
+| `web/css/admin/new-form.css` | New form: the steps and the preview at the side. |
+| `web/css/admin/fields.css` | The fields editor: descriptions, size preview, chips and steppers. |
+| `web/css/admin/timetable.css` | The timetable editor and the save bar. |
+| `web/css/admin/responses-alerts.css` | What waits for the admin above Responses, and the warnings about small teams. |
+| `web/css/admin/teammates.css` | The teammates settings of a booking. |
+| `web/css/admin/sections.css` | A section list: a card for each year group. |
+| `web/css/admin/lists.css` | The Lists page: kind cards, chips, choice rows and the index. |
+| `web/css/admin/responses.css` | Responses blocks and the team cards (a coloured band per team, header strip, leader tag). |
+| `web/css/admin/matching.css` | WhatsApp matching. |
+| `web/css/admin/phone.css` | The phone layout of team members, the page header and bookings. |
+| `web/css/admin/phone-tables.css` | The phone layout of wide tables: one card per row. |
+| `web/css/admin/keys.css` | Client links, the until picker of keys and links, and Download all. |
 | `web/img/` | The tab icon (`favicon.svg`), PNG sizes for phones and older browsers, and `site.webmanifest`. The pirate and the parrot of the ticket picture (`pirate.webp`, `parrot.webp`), with clear backgrounds; `web/js/form/ticket/` draws the clock and the calendar around them. The pictures of the route: the ship (`ship.svg`), an island (`island.svg`), the treasure chest (`treasure.svg`), the waves (`sea.svg`), the sky by day and by night (`sky-day.svg`, `sky-night.svg`) and the sun and moon (`sun.svg`, `moon.svg`). They have their own colours; the sea and sky behind them take theirs from the theme. |
 | `web/js/config.js` | Source placeholder; `scripts/build/build-site.js` generates its published copy from the Actions `API_URL` variable, with the version of the site. |
 | `web/js/app/fresh.js` | Keeps an open page on the published version: compares the version in `config.js` with `version.json`, reloads an older page when nothing would be lost, and offers **Reload** otherwise. |

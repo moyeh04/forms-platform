@@ -1,0 +1,215 @@
+/* The bookings of a registration form, inside its card. */
+.series {
+  margin-top: 4px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--line);
+}
+.series > summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+  padding: 6px 8px;
+  margin: 0 -8px;
+  border-radius: 4px;
+  font-weight: 700;
+  font-size: var(--fs-label);
+  cursor: pointer;
+  list-style: none;
+}
+.series > summary::-webkit-details-marker {
+  display: none;
+}
+.series > summary:hover {
+  background: var(--sheet-2);
+}
+.series > summary::after {
+  content: "";
+  flex: none;
+  width: 8px;
+  height: 8px;
+  margin-inline-start: auto;
+  border-inline-end: 2px solid var(--mute);
+  border-bottom: 2px solid var(--mute);
+  transform: rotate(45deg);
+  transition: transform 0.15s;
+}
+.series[open] > summary::after {
+  transform: rotate(-135deg);
+}
+.series-latest {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  color: var(--mute);
+  font-weight: 400;
+  font-size: var(--fs-help);
+}
+.series[open] .series-latest {
+  display: none;
+}
+.series[open] > summary {
+  margin-bottom: 2px;
+}
+.series-count {
+  padding: 0 8px;
+  border-radius: 999px;
+  background: var(--sheet-2);
+  color: var(--mute);
+  font-size: var(--fs-help);
+}
+.series-list {
+  margin: 8px 0 10px;
+  padding: 0;
+  list-style: none;
+}
+.series-list li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px 12px;
+  padding: 8px 0;
+  border-top: 1px solid color-mix(in srgb, var(--line) 70%, transparent);
+}
+.series-title {
+  flex: 1 1 100%;
+  color: var(--ink);
+  font-weight: 700;
+  text-decoration: none;
+}
+.series-title:hover {
+  text-decoration: underline;
+}
+.series-meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-inline-end: auto;
+}
+.series-links {
+  display: inline-flex;
+  gap: 14px;
+}
+.series-links .link-btn {
+  padding: 2px 0;
+  font-size: var(--fs-help);
+}
+.more {
+  position: relative;
+}
+.more > summary {
+  list-style: none;
+  cursor: pointer;
+}
+.more > summary::-webkit-details-marker {
+  display: none;
+}
+.more-menu {
+  position: absolute;
+  z-index: 20;
+  inset-inline-start: 0;
+  top: calc(100% + 6px);
+  min-width: 230px;
+  padding: 6px;
+  background: var(--sheet);
+  border: 1.5px solid var(--ink);
+  border-radius: 6px;
+  box-shadow: 0 8px 22px var(--shadow);
+  display: flex;
+  flex-direction: column;
+}
+.more-menu a,
+.more-menu button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  border: 0;
+  border-radius: 4px;
+  background: none;
+  color: var(--ink);
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 0.95rem;
+  text-align: start;
+  cursor: pointer;
+}
+.more-menu a:hover,
+.more-menu button:hover {
+  background: var(--sheet-2);
+}
+.more-menu .danger {
+  color: var(--err);
+  border-top: 1px solid var(--line);
+  border-radius: 0 0 4px 4px;
+  margin-top: 4px;
+}
+.term-picker {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(110px, 0.6fr) minmax(0, 1fr);
+  gap: 4px 18px;
+  align-items: start;
+}
+.term-picker .toggle-chips {
+  margin: 2px 0 0;
+}
+.term-picker .select:disabled {
+  opacity: 0.45;
+}
+@media (max-width: 760px) {
+  .term-picker {
+    grid-template-columns: 1fr 1fr;
+  }
+  .term-season {
+    grid-column: 1 / -1;
+  }
+}
+.tag-sm.tag-subject {
+  font-family: var(--font-code);
+  font-style: normal;
+  letter-spacing: 0.04em;
+  padding: 0 8px;
+  border: 1.5px solid var(--line);
+  border-radius: 3px;
+  margin-inline-end: 6px;
+}
+.tag-sm {
+  font-family: var(--font-title);
+  font-style: italic;
+  color: var(--mute);
+}
+/*
+ * Layout pieces. Each one changes shape from the width it is given, so a page built from
+ * them works on a phone with no media query of its own.
+ *   .l-split  a main part (.l-main) and a narrower side (.l-side); the side goes under the main part when both do not fit
+ *   .l-grid   equal columns, as many as fit; --l-min is the narrowest a column may be
+ *   .l-stack  children under each other with one gap (--l-gap)
+ */
+.l-split {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 20px;
+}
+.l-split > .l-main {
+  flex: 999 1 520px;
+  min-width: 0;
+}
+.l-split > .l-side {
+  flex: 1 1 320px;
+  min-width: 0;
+}
+.l-grid {
+  display: grid;
+  grid-template-columns: repeat(
+      auto-fit,
+      minmax(min(100%, var(--l-min, 260px)), 1fr)
+    );
+  gap: 12px;
+}
+.l-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--l-gap, 10px);
+}

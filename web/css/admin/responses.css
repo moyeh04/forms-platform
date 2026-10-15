@@ -1,0 +1,236 @@
+/* Responses: every team, day and registration is a block with its own tint and a heavy border. */
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 14px;
+}
+.toolbar .input,
+.toolbar .select {
+  width: auto;
+  min-width: 180px;
+  min-height: 42px;
+  font-size: 1rem;
+}
+.tool-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  padding: 6px 10px;
+  border: 1.5px dashed var(--line);
+  border-radius: 4px;
+}
+.tool-label {
+  color: var(--mute);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.stats {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+.stat {
+  padding: 6px 14px;
+  border: 1.5px solid var(--line);
+  border-radius: 4px;
+  background: var(--sheet);
+  font-weight: 700;
+  font-size: var(--fs-label);
+}
+.stat b {
+  font-size: 1.15rem;
+  margin-inline-end: 6px;
+}
+
+/* Team cards: neutral paper, a coloured band on the leading edge, and a header strip. */
+.team-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.block {
+  --band: var(--sea);
+  position: relative;
+  background: var(--sheet);
+  border: 1.5px solid var(--line);
+  border-inline-start: 5px solid var(--band);
+  border-radius: 6px;
+  box-shadow: 0 1px 2px var(--shadow);
+  overflow: hidden;
+  margin-bottom: 14px;
+}
+.team-list > .block {
+  margin-bottom: 0;
+}
+.block.tint-a {
+  --band: var(--sea);
+}
+.block.tint-b {
+  --band: var(--gold);
+}
+.block-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 14px;
+  padding: 10px 16px;
+  background: color-mix(in srgb, var(--band) 9%, var(--sheet));
+  border-bottom: 1px solid var(--line);
+}
+.team-no {
+  flex: none;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: var(--band);
+  color: var(--sheet);
+  font-size: var(--fs-help);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+.block-title {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1 1 220px;
+  line-height: 1.25;
+}
+.block-title .kicker {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--mute);
+}
+.block-title a,
+.block-title > span:last-child {
+  font-weight: 700;
+  font-size: 1.08rem;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+.block-title a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  text-decoration-color: color-mix(in srgb, var(--band) 60%, transparent);
+}
+.block-title a .icon {
+  color: var(--band);
+}
+.block-meta {
+  color: var(--mute);
+  font-size: var(--fs-help);
+  white-space: nowrap;
+}
+.block-meta .mono {
+  font-family: var(--font-code);
+  letter-spacing: 0.04em;
+}
+.block-actions {
+  margin-inline-start: auto;
+}
+.block-actions .select {
+  min-height: 34px;
+  font-size: 0.95rem;
+  width: auto;
+  padding: 0 26px 0 6px;
+}
+.mini {
+  width: 100%;
+  border-collapse: collapse;
+}
+.mini th {
+  text-align: start;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--mute);
+  font-weight: 700;
+  padding: 8px 14px 4px;
+}
+.mini td {
+  padding: 8px 14px;
+  border-top: 1px solid color-mix(in srgb, var(--line) 70%, transparent);
+  vertical-align: middle;
+}
+.mini tbody tr:nth-child(even) td {
+  background: color-mix(in srgb, var(--ink) 3%, transparent);
+}
+.mini tr.leader td {
+  background: color-mix(in srgb, var(--band) 10%, transparent);
+}
+.team-card .mini {
+  table-layout: fixed;
+  min-width: 560px;
+}
+.team-card .mini th:first-child {
+  width: 3rem;
+}
+.team-card .mini th:nth-child(2) {
+  width: 48%;
+}
+.mini td.num {
+  width: 2.5rem;
+  color: var(--mute);
+  font-size: var(--fs-help);
+}
+.mini .nm {
+  font-weight: 700;
+}
+.lead-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  margin-inline-start: 10px;
+  padding: 0 8px;
+  border-radius: 999px;
+  border: 1px solid var(--band);
+  color: var(--band);
+  font-size: 0.72rem;
+  font-weight: 700;
+  vertical-align: 2px;
+}
+.lead-tag .icon svg {
+  fill: currentColor;
+}
+.mini .mono {
+  font-family: var(--font-code);
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+}
+.mini .select {
+  min-height: 36px;
+  font-size: 0.95rem;
+  padding: 0 8px;
+  width: auto;
+}
+.day-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 10px 16px;
+  background: color-mix(in srgb, var(--band) 12%, var(--sheet));
+  border-bottom: 1px solid var(--line);
+  color: var(--ink);
+  font-weight: 700;
+}
+.day-head span:last-child {
+  color: var(--mute);
+  font-weight: 400;
+  font-size: var(--fs-help);
+}
+.block.single {
+  display: block;
+}
+.empty {
+  padding: 30px;
+  text-align: center;
+  color: var(--mute);
+  border: 1.5px dashed var(--line);
+  border-radius: 4px;
+}
