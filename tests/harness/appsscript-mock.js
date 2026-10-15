@@ -69,7 +69,10 @@ class MockRange {
   getBackground() {
     return this.sheet.backgrounds.get(`${this.r},${this.c}`) || '#ffffff';
   }
-  /** Alternating colours over this range. The colours are kept so a test can read them. */
+  /**
+   * Alternating colours over this range. The colours are kept so a test can
+   * read them.
+   */
   applyRowBanding() {
     const sheet = this.sheet,
       range = this.proxy;
@@ -150,7 +153,10 @@ class MockSheet {
       this.cells.delete(`${r},${c}`);
     else this.cells.set(`${r},${c}`, v);
   }
-  /** A write to the registry while no request holds the lock is recorded, so a test can require there are none. */
+  /**
+   * A write to the registry while no request holds the lock is recorded, so a
+   * test can require there are none.
+   */
   noteWrite() {
     const w = this.ss.world;
     if (w.watchLocks && this.ss === w.registry && !w.lock.held)
@@ -294,7 +300,10 @@ class MockSpreadsheet {
 
 /* ── World ───────────────────────────────────────────────────── */
 
-/** A small repeatable random source (mulberry32): the same seed gives the same numbers. */
+/**
+ * A small repeatable random source (mulberry32): the same seed gives the same
+ * numbers.
+ */
 function seededRandom(seed) {
   let a = seed >>> 0;
   return () => {
@@ -314,7 +323,8 @@ function createWorld(options = {}) {
     cache: new Map(),
     mail: [],
     triggers: [],
-    // The script lock: `busy` makes the next wait time out, `beforeLock` runs once just before a lock is taken.
+    // The script lock: `busy` makes the next wait time out, `beforeLock` runs
+    // once just before a lock is taken.
     lock: { held: false, busy: false },
     unlockedWrites: [],
     watchLocks: false,
@@ -328,7 +338,8 @@ function createWorld(options = {}) {
     },
     logs: []
   };
-  // With `options.seed`, ids, uuids and Math.random repeat from run to run, so stored data can be compared whole.
+  // With `options.seed`, ids, uuids and Math.random repeat from run to run, so
+  // stored data can be compared whole.
   const seeded = options.seed === undefined ? null : seededRandom(options.seed);
   const randomBytes = (n) =>
     seeded
@@ -356,7 +367,8 @@ function createWorld(options = {}) {
   };
   world.registry = createSs('Forms Registry');
 
-  // Blobs hold real bytes, so a zip or a workbook the backend builds can be opened in a test.
+  // Blobs hold real bytes, so a zip or a workbook the backend builds can be
+  // opened in a test.
   class MockBlob {
     constructor(bytes, type, name) {
       this.buf = Buffer.from(bytes == null ? '' : bytes);
@@ -440,7 +452,10 @@ function createWorld(options = {}) {
     );
   }
   world.MockBlob = MockBlob;
-  /** Puts a file in pretend Drive: { name, mime, bytes, parent }. Returns its id. */
+  /**
+   * Puts a file in pretend Drive: { name, mime, bytes, parent }. Returns its
+   * id.
+   */
   world.drive.addFile = (o) => {
     const id = o.id || uid();
     world.drive.files.set(id, {
@@ -663,7 +678,8 @@ function createWorld(options = {}) {
       },
       getOAuthToken: () => 'test-token',
       newTrigger: (fn) => {
-        // { fn, id, kind: 'after' or 'everyMinutes', arg: the delay or the interval }
+        // { fn, id, kind: 'after' or 'everyMinutes', arg: the delay or the
+        // interval }
         const made = { fn, id: uid() };
         const chain = new Proxy(
           {},
@@ -777,7 +793,10 @@ function createWorld(options = {}) {
     return JSON.parse(out.getContent());
   };
   world.call = (name, ...args) => vm.runInContext(name, ctx)(...args);
-  /** Fires every trigger that is booked now, as Google would when its time comes. Returns how many ran. */
+  /**
+   * Fires every trigger that is booked now, as Google would when its time
+   * comes. Returns how many ran.
+   */
   world.runTriggers = () => {
     const due = world.triggers.slice();
     due.forEach((t) => world.call(t.fn));

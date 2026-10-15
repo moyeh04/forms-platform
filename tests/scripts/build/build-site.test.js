@@ -175,7 +175,8 @@ test(
       );
     }
 
-    // The same files give the same version, so a push that changes nothing a visitor loads reloads nobody.
+    // The same files give the same version, so a push that changes nothing a
+    // visitor loads reloads nobody.
     const again = buildSite(env, path.join(dir, 'again'));
     assert.equal(
       fs.readFileSync(path.join(again, 'version.json'), 'utf8'),

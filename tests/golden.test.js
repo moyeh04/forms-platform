@@ -240,7 +240,10 @@ function openForm(w, type, title, patch = {}) {
   return form;
 }
 
-/** One run through every kind of form and most actions, so every sheet and tab exists. */
+/**
+ * One run through every kind of form and most actions, so every sheet and tab
+ * exists.
+ */
 function scenario(w) {
   ok(w.admin({ action: 'admin.lists.create', name: 'Labs', kind: 'plain' }));
   const teams = openForm(w, 'team_registration', 'Team Form 1', {
@@ -366,7 +369,9 @@ function scenario(w) {
   w.runTriggers();
 }
 
-/** Everything the run left behind: sheets, properties, cache, mail and triggers. */
+/**
+ * Everything the run left behind: sheets, properties, cache, mail and triggers.
+ */
 function stored(w) {
   const sheets = [...w.spreadsheets.values()].map((ss) => ({
     name: ss.name,

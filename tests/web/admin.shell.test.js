@@ -572,7 +572,8 @@ test(
     );
     assert.ok(responses.text().includes('Status saved: Closed'));
 
-    // On Setup the status is not one of the unsaved changes, and a later Save still passes.
+    // On Setup the status is not one of the unsaved changes, and a later Save
+    // still passes.
     setup.pick('status', 'draft');
     await settle(8);
     assert.ok(

@@ -68,7 +68,10 @@ const send = (w, req) => w.api({ ...req, slug: w.slug });
 const rows = (w) => w.admin({ action: 'admin.submissions', slug: w.slug });
 const codesOf = (r) => r.data.members.map((m) => m.code);
 
-/** Team A (leader 4230001) holds 4230002 and 4230003; team B (leader 4230011) asks for 4230002. */
+/**
+ * Team A (leader 4230001) holds 4230002 and 4230003; team B (leader 4230011)
+ * asks for 4230002.
+ */
 function asked(w) {
   const a = send(w, team(4230001, [4230002, 4230003]));
   const refused = send(w, team(4230011, [4230002, 4230004]));
@@ -382,7 +385,10 @@ test(
   }
 );
 
-/** Team A (leader 4230001) holds 4230002 and 4230003; team B (leader 4230011) asks for the leader of A. */
+/**
+ * Team A (leader 4230001) holds 4230002 and 4230003; team B (leader 4230011)
+ * asks for the leader of A.
+ */
 function leaderAsked(w) {
   const a = send(w, team(4230001, [4230002, 4230003]));
   const refused = send(w, team(4230011, [4230001]));

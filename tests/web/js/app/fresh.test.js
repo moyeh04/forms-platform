@@ -1,6 +1,6 @@
 /**
- * A page that is older than the published site: it reloads itself when nothing would be lost,
- * and offers a Reload button when something would.
+ * A page that is older than the published site: it reloads itself when nothing
+ * would be lost, and offers a Reload button when something would.
  */
 const test = require('node:test');
 const assert = require('node:assert/strict');
@@ -27,7 +27,10 @@ function boot() {
   return w;
 }
 
-/** Opens a page and puts the published version and the reload in the hands of the test. */
+/**
+ * Opens a page and puts the published version and the reload in the hands of
+ * the test.
+ */
 async function open(t, file, w, options) {
   const dom = await openPage(file, w, options);
   t.after(() => dom.window.close());
@@ -59,7 +62,8 @@ test(
     );
     assert.equal(p.$('.fresh-bar'), null);
 
-    // The browser gave the old page again: the same tab does not reload a second time for that version.
+    // The browser gave the old page again: the same tab does not reload a
+    // second time for that version.
     await p.fresh.check(true);
     assert.equal(p.site.reloads, 1);
     assert.equal(p.$('.fresh-bar').getAttribute('role'), 'status');

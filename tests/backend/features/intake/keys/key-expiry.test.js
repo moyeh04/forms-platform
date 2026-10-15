@@ -4,7 +4,10 @@ const { createWorld } = require('../../../../harness/appsscript-mock.js');
 
 const DAY = 86400000;
 
-/** A team form with three registrations: one from ten days ago, whose 7-day key has expired. */
+/**
+ * A team form with three registrations: one from ten days ago, whose 7-day key
+ * has expired.
+ */
 function boot() {
   const w = createWorld({ now: Date.parse('2027-09-01T10:00:00Z') });
   w.call('setup');

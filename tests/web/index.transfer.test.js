@@ -9,7 +9,10 @@ const {
   fillStudy
 } = require('../harness/form-page.js');
 
-/** A form that lets a leader ask for a member of another team, with team A (two members) saved. */
+/**
+ * A form that lets a leader ask for a member of another team, with team A (two
+ * members) saved.
+ */
 function bootTransfers() {
   const w = boot();
   const rules = w.admin({ action: 'admin.forms.get', id: w.form.id }).form
@@ -50,7 +53,9 @@ function bootTransfers() {
   return w;
 }
 
-/** Registers team B from the page with one member, and stops on the review page. */
+/**
+ * Registers team B from the page with one member, and stops on the review page.
+ */
 async function teamBWith(w, code) {
   const p = await open(w);
   await fillAbout(p);

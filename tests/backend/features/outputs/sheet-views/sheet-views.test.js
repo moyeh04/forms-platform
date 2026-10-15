@@ -21,7 +21,8 @@ function boot(type, patch = {}) {
     patch: { status: 'open', ...patch }
   });
   w.form = form;
-  // The views are painted by the run a change books, so reading one lets that run happen first.
+  // The views are painted by the run a change books, so reading one lets that
+  // run happen first.
   w.view = (name) => {
     w.runTriggers();
     return w.sheet(form.sheetId, name);

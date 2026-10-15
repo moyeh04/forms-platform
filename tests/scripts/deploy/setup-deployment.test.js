@@ -27,7 +27,10 @@ function temp(t) {
   return dir;
 }
 
-/** Records every command of a setup run and answers from a table of canned results. */
+/**
+ * Records every command of a setup run and answers from a table of canned
+ * results.
+ */
 function fakeSetup(t, answers = {}) {
   const dir = temp(t);
   const home = path.join(dir, 'home');

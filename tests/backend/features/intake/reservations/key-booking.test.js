@@ -15,7 +15,10 @@ const member = (name, code) => ({
   section: '4C-TH2'
 });
 
-/** A team form with two registered teams and a reservation that is booked with their keys. */
+/**
+ * A team form with two registered teams and a reservation that is booked with
+ * their keys.
+ */
 function boot(patch = {}) {
   const w = createWorld();
   w.call('setup');

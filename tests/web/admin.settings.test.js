@@ -149,7 +149,8 @@ test('Settings: required team parts cannot be switched off', async () => {
   const w = boot();
   const f = w.make('team_registration', 'Projects');
   const p = await openAdmin(w, `#/f/${f.slug}/settings`);
-  // A question that is always asked has no switches to grey out: the row says so.
+  // A question that is always asked has no switches to grey out: the row says
+  // so.
   ['team_size', 'members', 'leader_code', 'leader_name'].forEach((id) => {
     assert.equal(
       p.$$(`[data-field="${id}"] input[type="checkbox"]`).length,
@@ -462,7 +463,8 @@ test(
       'a hidden detail is not needed'
     );
 
-    // The saved bookings that a new range leaves outside are counted before the save, as saved teams are.
+    // The saved bookings that a new range leaves outside are counted before the
+    // save, as saved teams are.
     const again = await openAdmin(w, `#/f/${f.slug}/questions`);
     const outside = () => again.$('[name="teammates-conflicts"]');
     assert.ok(outside().hidden, 'both bookings fit 0 to 2');

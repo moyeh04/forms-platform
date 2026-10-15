@@ -3,7 +3,10 @@ const assert = require('node:assert/strict');
 const { settle } = require('../harness/dom.js');
 const { boot, openAdmin, person } = require('../harness/admin-page.js');
 
-/** Moves the timetable calendar to a month, written as it is shown: "March 2028". */
+/**
+ * Moves the timetable calendar to a month, written as it is shown: "March
+ * 2028".
+ */
 function showMonth(p, month) {
   for (let i = 0; i < 240 && p.$('.tt-cal-month').textContent !== month; i++)
     p.click('[name="cal-next"]');

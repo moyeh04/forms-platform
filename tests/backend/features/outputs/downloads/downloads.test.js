@@ -39,7 +39,8 @@ function boot() {
     });
     return f;
   };
-  // Google files are exported through the export address; a zip piece is read with a range.
+  // Google files are exported through the export address; a zip piece is read
+  // with a range.
   w.exports = [];
   w.fetch = (url, opts) => {
     assert.equal(
@@ -90,7 +91,10 @@ const mate = (name, code) => ({
   section: '4C-TH2'
 });
 
-/** Runs the whole download the way the page does, and returns the zip entries of every part. */
+/**
+ * Runs the whole download the way the page does, and returns the zip entries of
+ * every part.
+ */
 function download(w, slug) {
   const start = w.admin({ action: 'admin.download.start', slug });
   assert.equal(start.ok, true, JSON.stringify(start.error));
