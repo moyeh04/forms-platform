@@ -1,11 +1,11 @@
 # Testing
 
-356 automated tests run without a Google account, a browser, or a network.
+358 automated tests run without a Google account, a browser, or a network.
 They run the **real** backend and the **real** pages. This page explains how
 that works and what it can and cannot prove.
 
 ```
-npm test    # 356 tests
+npm test    # 358 tests
 ```
 
 ## The layers
@@ -145,6 +145,7 @@ says something else.
 
 | Area | File | Tests | Examples |
 |---|---|---:|---|
+| Shared enums | `enums.test.js` | 2 | Each enum frozen, with distinct values and CONSTANT_CASE members, and the same in the backend bundle as in Node |
 | Shared rules | `rules.test.js` | 20 | The two warnings about small teams (starting numbers, the level of a team, a wrong number or order), counting the people of a form with a code counted once, Arabic filtering, name parts, phones, codes, Drive links, folder names, slots and the room left in one, form state |
 | Team size and audience | `teamsize.test.js` | 18 | Required question, range, exact member count, admin range, the warnings about small teams saved cleaned and refused when wrong, the sizes of the saved teams sent with the form, size notes, specialization limits, section limits |
 | Core and forms | `core.test.js` | 16 | Setup, PIN lockout and unlocking it from the sheet menu, the routes the router refuses and the checks it runs, forms CRUD, duplicate, delete, templates |

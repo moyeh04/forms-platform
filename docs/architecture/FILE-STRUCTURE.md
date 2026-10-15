@@ -159,6 +159,7 @@ The site is published at the paths it has always had: the pages at the root,
 | `web/js/admin-lists.js` | The lists behind dropdown questions, each edited the way its kind needs. |
 | `web/js/size-alerts.js` | The warnings about small teams as they are drawn: a line for each level and a mark on the card of a small team. Used by the dashboard and the instructor page. |
 | `web/js/viewer.js` | The instructor page. |
+| `domain/enums.js` | The words the pages and the backend share, as frozen enums of stored values: `FormType`, `FormStatus`, `ReviewStatus` and `ListKind`. Loaded before the other domain files. |
 | `domain/form-metadata.js` | What each form type shows beside its title (term, subject code, batch year) and how it is read, saved and copied. Used by the pages and the backend. |
 | `domain/rules.js` | Validation and normalization rules (Arabic names, phones, codes, Drive links, team size, slots). Used by the browser, the backend, and the tests, so all three always agree. |
 
@@ -281,8 +282,8 @@ the file name says the role:
 | `backend/entry-points.js` | The functions Apps Script calls by name (the sheet menu, its print dialog, setup, the PIN commands and the view trigger), each handing the call to its namespace. |
 | `backend/main.js` | The web app: every request arrives here, is read as JSON, and goes to the router. |
 
-`npm run build` joins `domain/rules.js`, `domain/form-metadata.js` and every
-backend file into `dist/Code.gs`: `platform/` first, then `features/`, then
+`npm run build` joins `domain/enums.js`, `domain/rules.js`,
+`domain/form-metadata.js` and every backend file into `dist/Code.gs`: `platform/` first, then `features/`, then
 `routes.js`, `entry-points.js` and `main.js`.
 
 ## Tools and tests
