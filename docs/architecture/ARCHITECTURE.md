@@ -590,7 +590,10 @@ flowchart LR
 Small files under `backend/platform/` and `backend/features/<area>/<feature>/`
 that the bundler joins with `domain/rules.js`. They do not import each other;
 they share one global scope (this is how Apps Script works), and each file
-only declares functions or registers handlers. The diagram shows the features;
+defines one namespace named after it (`clients.repository.js` defines
+`ClientsRepository`) that holds its functions. `routes.js` joins each action to
+its handler, and `entry-points.js` holds the functions Apps Script calls by
+name. The diagram shows the features;
 [FILE-STRUCTURE.md](FILE-STRUCTURE.md) lists every file.
 
 ```mermaid
@@ -1194,7 +1197,7 @@ labels of the current tables.
 | Add a question to a form | Admin dashboard, or `template-fields.js` for new forms by default |
 | Add a new form type | A new function in `templates.service.js`, a label in `web/js/admin.js` |
 | Change a validation rule | `domain/rules.js` (browser, server, and tests all follow) |
-| Add a backend action | A file in `backend/` that sets `API['name'] = ...` (wrap with `admin()` if private) |
+| Add a backend action | A named function in the feature's `*.controller.js`, returned by its namespace, and a line in `backend/routes.js` (wrap it in `AuthService.admin(...)` if private) |
 | Change sheet colours | `sheet-views.layout.js` |
 | Change the downloaded Excel list | `dlWorkbook_` in `downloads.workbook.js` (the file format is in `backend/platform/xlsx/`) |
 | Change the Drive folder name rule | `Rules.checkFolderName` in `domain/rules.js` |
