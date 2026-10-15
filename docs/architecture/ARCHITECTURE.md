@@ -509,7 +509,7 @@ person under it).
 
 | Responsibility | Owner |
 |---|---|
-| The levels, their starting numbers, the level of a team, and why a setting cannot be saved, the numbers a level can ask for | `Rules.sizeAlerts`, `Rules.sizeAlertLevels`, `Rules.sizeAlertOf`, `Rules.sizeAlertsProblem`, `Rules.sizeAlertBounds` in `domain/rules/team-size.js` |
+| The levels, their starting numbers, the level of a team, and why a setting cannot be saved, the numbers a level can ask for | `Rules.sizeAlerts`, `Rules.sizeAlertLevels`, `Rules.sizeAlertOf`, `Rules.sizeAlertsProblem`, `Rules.sizeAlertBounds`, `Rules.sizeAlertLevelIds` in `domain/rules/team-size.js` |
 | Checking and cleaning the setting on a save | `normalizeRules_` in `forms.rules.js`, with the same `Rules` functions (`bad_size_alerts`) |
 | The control in the Small teams panel of Setup | `A.sizeAlerts` in `admin/settings/size-alerts.view.js`; it returns `{ node, refresh(), problem(), summary() }` like the range control |
 | Whether an instructor sees them | `showSizeAlerts` of each link in `clients.repository.js`, set in the link dialog (`admin/people/client-dialog.view.js`) |

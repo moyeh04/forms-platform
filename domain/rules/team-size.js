@@ -103,6 +103,16 @@
   }
 
   /**
+   * Gives the warning levels a form can have, the stronger one first, so
+   * the dashboard draws the same levels the save reads.
+   *
+   * @return {!Array<string>} The levels.
+   */
+  function sizeAlertLevelIds() {
+    return SIZE_ALERT_LEVELS.slice();
+  }
+
+  /**
    * Gives the numbers a warning level can ask for, so the dashboard bounds
    * its inputs by the same rule as the save.
    *
@@ -231,6 +241,7 @@
     sizeAlerts: sizeAlerts,
     sizeAlertsProblem: sizeAlertsProblem,
     sizeAlertBounds: sizeAlertBounds,
+    sizeAlertLevelIds: sizeAlertLevelIds,
     sizeAlertLevels: sizeAlertLevels,
     sizeAlertOf: sizeAlertOf,
     validateTeamSize: validateTeamSize

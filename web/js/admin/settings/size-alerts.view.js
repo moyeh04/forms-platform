@@ -10,20 +10,24 @@
     h = ui.h,
     A = App.admin;
 
-  var LEVELS = [
-    {
-      id: 'critical',
+  /** The words of each warning level. */
+  var TEXT = {
+    critical: {
       name: 'The critical warning',
       check: 'Critical warning for very small teams',
       field: 'Critical when a team has fewer people than'
     },
-    {
-      id: 'warning',
+    warning: {
       name: 'The warning',
       check: 'Warning for small teams',
       field: 'Warning when a team has fewer people than'
     }
-  ];
+  };
+
+  /** The levels the rules know, in their order, each with its words. */
+  var LEVELS = Rules.sizeAlertLevelIds().map(function (id) {
+    return Object.assign({ id: id }, TEXT[id]);
+  });
 
   /**
    * Names the team sizes from a to b: "1", "1 or 2", "3 to 5".
