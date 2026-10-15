@@ -253,21 +253,6 @@
     "jsdoc": 70,
     "lines": 31
   },
-  "web/js/form/fields.view.js": {
-    "biome/lint/complexity/noExcessiveCognitiveComplexity": 1,
-    "biome/lint/complexity/useOptionalChain": 4,
-    "biome/lint/style/noMagicNumbers": 3,
-    "jsdoc": 9,
-    "lines": 2
-  },
-  "web/js/form/text-input.view.js": {
-    "biome/lint/complexity/noExcessiveCognitiveComplexity": 2,
-    "biome/lint/correctness/noInnerDeclarations": 6,
-    "biome/lint/correctness/noUnusedVariables": 1,
-    "biome/lint/style/noMagicNumbers": 2,
-    "jsdoc": 2,
-    "lines": 2
-  },
   "web/js/form/team-size.view.js": {
     "biome/lint/complexity/noExcessiveLinesPerFunction": 1,
     "biome/lint/complexity/useOptionalChain": 1,

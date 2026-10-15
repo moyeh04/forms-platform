@@ -117,6 +117,17 @@
   }
 
   /**
+   * Says whether a choice question is drawn as chips.
+   *
+   * @param {!Object} field The question.
+   * @return {boolean} True for a few choices.
+   */
+  function usesChips(field) {
+    var count = (field.options || []).length;
+    return count > 0 && count <= MAX_CHIPS;
+  }
+
+  /**
    * Draws a question answered by picking from a list.
    *
    * @param {!Object} field The question.
@@ -125,11 +136,11 @@
    * @return {!Element} Chips for a few choices, a dropdown for more.
    */
   function selectControl(field, path, id) {
-    var count = (field.options || []).length;
     var cur = onlyChoice(field, path);
-    if (count > 0 && count <= MAX_CHIPS) return chips(field, path, id, cur);
+    if (usesChips(field)) return chips(field, path, id, cur);
     return dropdown(field, path, id, cur);
   }
 
   P.selectControl = selectControl;
+  P.usesChips = usesChips;
 })(window.App);
