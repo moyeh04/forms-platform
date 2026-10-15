@@ -1,11 +1,13 @@
 #!/usr/bin/env node
 /**
- * Says whether a push changed what the Apps Script deployment is made of, so a push of pages
- * or documents alone does not publish a new backend version.
+ * Says whether a push changed what the Apps Script deployment is made of,
+ * so a push of pages or documents alone does not publish a new backend
+ * version.
  *
- * It compares the pushed commit with the one before the push. Whenever that cannot be done
- * (a first push, a rewritten branch, a run started by hand) the answer is yes: deploying an
- * unchanged backend costs a minute, skipping a changed one leaves the site on old code.
+ * It compares the pushed commit with the one before the push. Whenever that
+ * cannot be done (a first push, a rewritten branch, a run started by hand)
+ * the answer is yes: deploying an unchanged backend costs a minute, skipping
+ * a changed one leaves the site on old code.
  */
 const fs = require('node:fs');
 const { execFileSync } = require('node:child_process');
@@ -19,6 +21,12 @@ const BACKEND_PATHS = [
   '.github/workflows/pages.yml'
 ];
 
+/**
+ * Whether any of the files is part of the backend deployment.
+ *
+ * @param {!Array<string>} files Paths from the repository root.
+ * @return {boolean} True when one of them is.
+ */
 function touchesBackend(files) {
   return files.some((file) =>
     BACKEND_PATHS.some((p) =>
@@ -27,6 +35,14 @@ function touchesBackend(files) {
   );
 }
 
+/**
+ * Lists the files changed since the commit before the push.
+ *
+ * @param {string|undefined} before The commit before the push.
+ * @param {function(string, !Array<string>, !Object=)} run Runs a command.
+ * @return {?Array<string>} The changed files, or null when they cannot be
+ *     compared.
+ */
 function changedFiles(before, run = execFileSync) {
   if (!/^[0-9a-f]{40}$/.test(before || '') || /^0+$/.test(before)) return null;
   try {
@@ -41,6 +57,13 @@ function changedFiles(before, run = execFileSync) {
   }
 }
 
+/**
+ * Says whether to deploy the backend, and why.
+ *
+ * @param {!Object<string, string>} env The environment of the run.
+ * @param {function(string, !Array<string>, !Object=)} run Runs a command.
+ * @return {{changed: boolean, why: string}} The answer and its reason.
+ */
 function backendChanged(env = process.env, run = execFileSync) {
   if (env.GITHUB_EVENT_NAME !== 'push')
     return { changed: true, why: 'the run was not started by a push' };

@@ -11,18 +11,6 @@
     "jsdoc": 10,
     "lines": 11
   },
-  "scripts/build/bundle-backend.js": {
-    "jsdoc": 3
-  },
-  "scripts/deploy/backend-changed.js": {
-    "jsdoc": 3,
-    "lines": 4
-  },
-  "scripts/deploy/prepare-clasp.js": {
-    "jsdoc": 3,
-    "lines": 1,
-    "numbers": 1
-  },
   "scripts/deploy/setup-deployment.js": {
     "biome/lint/complexity/noExcessiveCognitiveComplexity": 1,
     "biome/lint/complexity/noExcessiveLinesPerFunction": 1,
