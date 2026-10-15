@@ -71,27 +71,6 @@
     "jsdoc": 4,
     "lines": 1
   },
-  "backend/features/outputs/sheet-views/sheet-views.builder.js": {
-    "biome/lint/complexity/noExcessiveLinesPerFunction": 3,
-    "biome/lint/complexity/useOptionalChain": 2,
-    "biome/lint/correctness/noInnerDeclarations": 1,
-    "biome/lint/style/noMagicNumbers": 41,
-    "jsdoc": 6
-  },
-  "backend/features/outputs/sheet-views/sheet-views.controller.js": {
-    "layers": 1
-  },
-  "backend/features/outputs/sheet-views/sheet-views.layout.js": {
-    "biome/lint/complexity/useMaxParams": 2,
-    "biome/lint/style/noMagicNumbers": 3,
-    "jsdoc": 6
-  },
-  "backend/features/outputs/sheet-views/sheet-views.scheduler.js": {
-    "biome/lint/complexity/noExcessiveCognitiveComplexity": 1,
-    "biome/lint/style/noMagicNumbers": 1,
-    "jsdoc": 4,
-    "lines": 8
-  },
   "domain/form-metadata.js": {
     "biome/lint/complexity/useOptionalChain": 13,
     "biome/lint/correctness/noInnerDeclarations": 3,

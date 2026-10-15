@@ -8,7 +8,7 @@ var SheetViewsController = (function () {
    * @return {*} The answer, sent back as JSON.
    */
   function rebuild(req) {
-    var form = FormsRepository.requireForm(req.slug || req.id);
+    var form = FormsService.requireForm(req.slug || req.id);
     SheetViewsScheduler.rebuildViews(form);
     return { rebuilt: true, sheetUrl: form.sheetUrl };
   }

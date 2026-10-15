@@ -75,16 +75,16 @@ var PrintTeamList = (function () {
       ? SheetViewsLayout.hyperlink(b.response.link, title)
       : '';
     var fill = PrintLayout.LABEL_FILL;
-    SheetViewsLayout.mergedLabel(sh, b.start, 1, b.length, b.number, '', fill);
+    SheetViewsLayout.mergedLabel(
+      sh,
+      { row: b.start, col: 1, length: b.length },
+      { value: b.number, formula: '', fill: fill }
+    );
     sh.getRange(b.start, 1).setFontColor(PrintLayout.BLACK);
     SheetViewsLayout.mergedLabel(
       sh,
-      b.start,
-      TASK_COL_,
-      b.length,
-      title,
-      link,
-      fill
+      { row: b.start, col: TASK_COL_, length: b.length },
+      { value: title, formula: link, fill: fill }
     );
     sh.getRange(b.start, TASK_COL_).setFontColor(PrintLayout.BLACK);
   }
@@ -113,7 +113,11 @@ var PrintTeamList = (function () {
       labelBlock_(sh, b);
     });
     var last = n + PrintLayout.HEADER_ROW;
-    SheetViewsLayout.frameBlocks(sh, first, COLS_, last, rows.blocks);
+    SheetViewsLayout.frameBlocks(
+      sh,
+      { cols: COLS_, first: first, last: last },
+      rows.blocks
+    );
     PrintLayout.frame(
       sh.getRange(PrintLayout.HEADER_ROW, 1, 1, COLS_),
       SheetStyle.PALETTE.ink

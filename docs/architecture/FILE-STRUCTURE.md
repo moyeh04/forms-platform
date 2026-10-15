@@ -274,7 +274,10 @@ the file name says the role:
 | File | What it does |
 |---|---|
 | `backend/features/outputs/sheet-views/sheet-views.layout.js` | The look of the sheet views: headers, frames, merged labels and links; and the look of a form's data tabs. |
-| `backend/features/outputs/sheet-views/sheet-views.builder.js` | Styled views inside each form's own spreadsheet: the team list, the bookings and the registrations. Every team (or day, or registration) is a block with its own tint and a heavy border around it, so the eye can match a name to its task, code or slot at a glance. |
+| `backend/features/outputs/sheet-views/sheet-views.builder.js` | Which view each type of form gets, and the order by creation the views share. |
+| `backend/features/outputs/sheet-views/sheet-views.team-list.js` | The Team Members List view: each team a tinted block with its task merged down the side. |
+| `backend/features/outputs/sheet-views/sheet-views.bookings.js` | The Bookings view: every booking in timetable order, each day a block with its label merged down the side. |
+| `backend/features/outputs/sheet-views/sheet-views.registrations.js` | The Registrations view: everyone by group and section, with the timetable link and the review. |
 | `backend/features/outputs/sheet-views/sheet-views.scheduler.js` | When the sheet views are rebuilt. A change only marks the form's views as out of date and books one run a minute later. The run repaints every marked form and removes itself, so students never wait for formatting and nothing runs while nothing changes. |
 | `backend/features/outputs/sheet-views/sheet-views.controller.js` | The admin action that rebuilds the sheet views. |
 | `backend/features/outputs/downloads/downloads.jobs.js` | A Download all job: its folder, its saved parts, retries and file names. |
