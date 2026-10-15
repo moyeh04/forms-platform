@@ -11,7 +11,7 @@
   var h = ui.h;
 
   /** How many digits an access key has. */
-  var KEY_DIGITS = 6;
+  var KEY_DIGITS = Rules.accessKeyDigits();
 
   /**
    * Draws what the page is and the theme switch.
@@ -77,7 +77,7 @@
         inputmode: 'numeric',
         maxlength: String(KEY_DIGITS),
         autocomplete: 'one-time-code',
-        placeholder: '000000',
+        placeholder: '0'.repeat(KEY_DIGITS),
         'aria-label': 'Access key',
         'aria-describedby': 'access-key-err',
         value: S.key

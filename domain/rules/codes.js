@@ -1,6 +1,7 @@
 /**
  * The rules of codes and keys: a student code is digits only, of the length
- * the field asks; a registration key has five digits.
+ * the field asks; a registration key has five digits, and the access key
+ * of a private link six.
  */
 (function (root) {
   'use strict';
@@ -13,6 +14,9 @@
 
   /** The digits of the key a student opens a registration with. */
   var EDIT_KEY_DIGITS = 5;
+
+  /** The digits of the access key of a private link. */
+  var ACCESS_KEY_DIGITS = 6;
 
   /** A whole registration key. */
   var EDIT_KEY = new RegExp('^\\d{' + EDIT_KEY_DIGITS + '}$');
@@ -67,11 +71,22 @@
     return EDIT_KEY.test(key);
   }
 
+  /**
+   * Gives the digits of the access key of a private link, so the
+   * instructor page that asks for it and the backend that makes it agree.
+   *
+   * @return {number} The digits.
+   */
+  function accessKeyDigits() {
+    return ACCESS_KEY_DIGITS;
+  }
+
   var api = {
     codeLength: codeLength,
     validateCode: validateCode,
     editKeyDigits: editKeyDigits,
-    isEditKey: isEditKey
+    isEditKey: isEditKey,
+    accessKeyDigits: accessKeyDigits
   };
   if (node) module.exports = api;
   root.RulesCodes = api;
