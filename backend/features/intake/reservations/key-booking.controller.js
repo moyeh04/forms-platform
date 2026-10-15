@@ -29,7 +29,7 @@ var KeyBookingController = (function () {
     // The team's own time, so the page can show it beside the way to change it.
     if (booking) {
       out.slot = booking.data[Rules.fieldByRole(form, 'slot').id] || null;
-      out.canMove = SubmissionsController.editScope(form) === 'slot';
+      out.canMove = SubmissionsService.editScope(form) === 'slot';
     }
     return out;
   }

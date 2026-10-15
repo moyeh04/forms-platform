@@ -235,6 +235,8 @@ the file name says the role:
 | `backend/features/intake/keys/keys.controller.js` | The key actions of the admin: list keys and extend their end dates. |
 | `backend/features/intake/submissions/submissions.controller.js` | The student actions: submit, look up, update and cancel a submission. |
 | `backend/features/intake/submissions/admin-submissions.controller.js` | The admin actions on submissions: list, edit, delete and reset or show a key. |
+| `backend/features/intake/submissions/submissions.service.js` | Submissions: checking the answers, saving a new one, changing and cancelling one, and what the student sees of it. |
+| `backend/features/intake/submissions/admin-submissions.service.js` | The admin side of submissions: the list, changes to review, status and answers, and resetting or showing a key. |
 | `backend/features/intake/teams/team-numbers.js` | The number of each team, given once and kept. |
 | `backend/features/intake/teams/teams.service.js` | Which forms gather teams, and the teams as blocks of members. |
 | `backend/features/intake/transfers/transfers.repository.js` | The Transfers tab of a form: reading and saving move requests. |

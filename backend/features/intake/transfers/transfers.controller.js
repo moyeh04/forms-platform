@@ -27,7 +27,7 @@ var TransfersController = (function () {
       return r.id === found.id;
     })[0];
     return {
-      submission: SubmissionsController.publicSubmission(fresh),
+      submission: SubmissionsService.publicSubmission(fresh),
       transfers: TransfersService.teamTransfers(vform, fresh),
       underMin: out.underMin
     };

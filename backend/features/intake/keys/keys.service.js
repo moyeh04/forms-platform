@@ -292,6 +292,7 @@ var KeysService = (function () {
     keyHash: keyHash_,
     bookingKey: bookingKey_,
     keyPad: keyPad_,
+    keyExpired: keyExpired_,
     listKeys: listKeys_,
     extendKeys: extendKeys_
   };

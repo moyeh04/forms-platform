@@ -23,7 +23,7 @@ var MatchingController = (function () {
     var match = MatchingService.matchList(form);
     return {
       requests: match.requests,
-      submissions: match.submissions.map(AdminSubmissionsController.adminView),
+      submissions: match.submissions.map(AdminSubmissionsService.adminView),
       notRequested: match.notRequested
     };
   }
