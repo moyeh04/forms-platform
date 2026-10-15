@@ -32,11 +32,15 @@ function listBackend() {
 
 function bundleSource() {
   const files = [];
-  if (fs.existsSync(path.join(root, 'domain', 'rules.js'))) files.push('domain/rules.js');
-  if (fs.existsSync(path.join(root, 'domain', 'form-metadata.js'))) files.push('domain/form-metadata.js');
+  if (fs.existsSync(path.join(root, 'domain', 'rules.js')))
+    files.push('domain/rules.js');
+  if (fs.existsSync(path.join(root, 'domain', 'form-metadata.js')))
+    files.push('domain/form-metadata.js');
   files.push(...listBackend());
 
-  const parts = files.map((rel) => `// ===== ${rel} =====\n${read(rel).trim()}\n`);
+  const parts = files.map(
+    (rel) => `// ===== ${rel} =====\n${read(rel).trim()}\n`
+  );
   const code = parts.join('\n');
 
   // Fail loudly on syntax errors instead of discovering them in the editor.
@@ -49,9 +53,12 @@ function bundle() {
   fs.mkdirSync(out, { recursive: true });
   fs.writeFileSync(path.join(out, 'Code.gs'), code);
   const manifest = path.join(root, 'backend', 'appsscript.json');
-  if (fs.existsSync(manifest)) fs.copyFileSync(manifest, path.join(out, 'appsscript.json'));
+  if (fs.existsSync(manifest))
+    fs.copyFileSync(manifest, path.join(out, 'appsscript.json'));
 
-  console.log(`Bundled ${files.length} files into dist/Code.gs (${code.length} chars).`);
+  console.log(
+    `Bundled ${files.length} files into dist/Code.gs (${code.length} chars).`
+  );
 }
 
 if (require.main === module) bundle();

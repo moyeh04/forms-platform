@@ -207,43 +207,38 @@
     "lines": 1
   },
   "scripts/build/build-site.js": {
-    "biome/format": 1,
     "biome/lint/correctness/noUnusedFunctionParameters": 1,
     "biome/lint/style/noMagicNumbers": 1,
     "jsdoc": 10,
-    "lines": 24
+    "lines": 11
   },
   "scripts/build/bundle-backend.js": {
-    "biome/format": 1,
-    "jsdoc": 4,
-    "lines": 5
+    "jsdoc": 4
   },
   "scripts/deploy/backend-changed.js": {
-    "biome/format": 1,
     "jsdoc": 3,
-    "lines": 13
+    "lines": 4
   },
   "scripts/deploy/prepare-clasp.js": {
-    "biome/format": 1,
     "jsdoc": 3,
-    "lines": 6,
+    "lines": 1,
     "numbers": 1
   },
   "scripts/deploy/setup-deployment.js": {
-    "biome/format": 1,
     "biome/lint/complexity/noExcessiveCognitiveComplexity": 1,
     "biome/lint/complexity/noExcessiveLinesPerFunction": 1,
     "biome/lint/style/noMagicNumbers": 3,
     "jsdoc": 13,
-    "lines": 42
+    "lines": 17
   },
   "scripts/dev/dev-server.js": {
-    "biome/format": 1,
     "biome/lint/complexity/noCommaOperator": 1,
+    "biome/lint/complexity/noExcessiveLinesPerFunction": 1,
+    "biome/lint/style/noExcessiveLinesPerFile": 1,
     "biome/lint/style/noMagicNumbers": 10,
     "biome/lint/suspicious/useIterableCallbackReturn": 2,
     "jsdoc": 12,
-    "lines": 44,
+    "lines": 12,
     "numbers": 4
   },
   "tests/": {
