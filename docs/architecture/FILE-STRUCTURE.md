@@ -184,7 +184,6 @@ the file name says the role:
 
 | File | What it does |
 |---|---|
-| `backend/platform/http/access.js` | Who may call an action: the admin, a private link, the holder of a registration key, or anyone. |
 | `backend/platform/http/api-error.js` | The error every handler throws and the JSON reply the web app sends. |
 | `backend/platform/http/router.js` | Finds the handler of each request in the routes table, runs the admin or link check its access asks for, and turns what it returns or throws into the reply. |
 | `backend/platform/sheets/table.js` | Reading and writing the rows of a sheet tab by its header names. |
@@ -196,6 +195,7 @@ the file name says the role:
 | `backend/platform/format/time.js` | The current time and date as ISO text. |
 | `backend/platform/format/json.js` | Copying values and reading JSON text safely. |
 | `backend/platform/config/constants.js` | The name of the app, the registry tab names, and the form types and statuses. |
+| `backend/platform/config/access.js` | Who may call an action: the admin, a private link, the holder of a registration key, or anyone. |
 | `backend/platform/xlsx/xml.js` | The XML pieces of an Excel file: escaped text, column letters and colours. |
 | `backend/platform/xlsx/workbook.js` | An Excel workbook built by hand: styles, column widths, sheets and the zipped file. |
 
