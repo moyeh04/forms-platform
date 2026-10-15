@@ -69,6 +69,7 @@ is silenced on its own line with the reason, and both checks honour it:
 | `domain/rules/team-size.js` | `SIZE_ALERT_LEVELS`, the biggest team when a form does not say, the smallest number a warning can ask for |
 | `domain/rules/submission.js` | The longest answer of a short and of a long text field |
 | `domain/form-metadata/*.js` | The longest subject code, how many academic years are offered ahead and back |
+| `web/js/ui/icons.js`, `dialogs.js`, `theme-button.js` | The icon paths, their default size and stroke, the icons a form may use, how long a toast stays |
 | `web/js/*.js` | Each page module's own labels, choices and browser storage keys (`fp_*`) at the top of its wrapper |
 | `web/js/config.js` | The backend URL, written by the deploy workflow |
 

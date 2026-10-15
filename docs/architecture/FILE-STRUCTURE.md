@@ -84,7 +84,7 @@ flowchart LR
         fr["fresh.js"]
         th["theme.js"]
         api["api.js"]
-        ui["ui.js"]
+        ui["ui/: dom, icons, dialogs,<br/>clipboard, theme-button"]
     end
     subgraph index["index.html: the student form"]
         r1["domain/rules/"]
@@ -146,7 +146,11 @@ The site is published at the paths it has always had: the pages at the root,
 | `web/js/form.js`, `ticket.js`, `i18n.js` | The student page, the success ticket, English and Arabic text. |
 | `web/js/teams/handover.view.js` | The question asked before the leader of a team moves to another team: who leads next, and their email. Used by the student page and the dashboard. |
 | `web/js/app/theme.js` | Light, dark, or follow the device; the choice is remembered on this device only. |
-| `web/js/ui/ui.js` | DOM building, inline icons, dialogs and the clipboard, used by every page. |
+| `web/js/ui/dom.js` | `App.ui.h` builds an element with its attributes and children; `clear` empties one. Loaded first of the `ui/` parts, since the others draw with it. |
+| `web/js/ui/icons.js` | The inline SVG icons and the icons a form may show. |
+| `web/js/ui/dialogs.js` | The toast and the confirmation dialog. |
+| `web/js/ui/clipboard.js` | Copies text, with a fallback for browsers without the clipboard API. |
+| `web/js/ui/theme-button.js` | The light and dark switch every page has. |
 | `web/js/admin.js` | Dashboard core: login with the PIN, navigation, the widgets the dashboard modules share, and the forms list. |
 | `web/js/admin-settings.js` | Form settings: everything an admin can change without touching code. |
 | `web/js/admin-timetable.js` | The timetable of a reservation form: dates on a calendar, the hours, and the slots of each day. |

@@ -33,7 +33,16 @@ const JOINED = [
   { published: 'assets/js/api.js', sources: ['web/js/app/api.js'] },
   { published: 'assets/js/theme.js', sources: ['web/js/app/theme.js'] },
   { published: 'assets/js/i18n.js', sources: ['web/js/i18n/i18n.js'] },
-  { published: 'assets/js/ui.js', sources: ['web/js/ui/ui.js'] },
+  {
+    published: 'assets/js/ui.js',
+    sources: [
+      'web/js/ui/dom.js',
+      'web/js/ui/icons.js',
+      'web/js/ui/dialogs.js',
+      'web/js/ui/clipboard.js',
+      'web/js/ui/theme-button.js'
+    ]
+  },
   {
     published: 'assets/js/handover.js',
     sources: ['web/js/teams/handover.view.js']

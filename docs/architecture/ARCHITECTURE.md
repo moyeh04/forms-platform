@@ -721,7 +721,7 @@ flowchart LR
         rl["domain/rules/"]
         th["theme.js<br/>light, dark, device"]
         api["api.js<br/>POST text/plain JSON"]
-        ui["ui.js<br/>h(), icons, dialogs, toast"]
+        ui["ui/<br/>h(), icons, dialogs, toast"]
     end
     subgraph student["index.html"]
         i18n["i18n.js<br/>English and Arabic"]
