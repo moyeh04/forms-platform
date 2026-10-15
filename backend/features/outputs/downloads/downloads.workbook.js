@@ -107,5 +107,5 @@ function dlWorkbook_(form, job, saved) {
       )
     });
   }
-  return xlsxBlob_('Teams.xlsx', sheets, styles);
+  return Workbook.xlsxBlob('Teams.xlsx', sheets, styles);
 }

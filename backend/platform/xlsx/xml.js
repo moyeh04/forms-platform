@@ -2,6 +2,7 @@
  * The XML pieces of an Excel file: escaped text, column letters and colours.
  */
 
+var Xml = (function () {
 function xmlText_(v) {
   return String(v == null ? '' : v)
     .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, '')
@@ -27,3 +28,6 @@ function xlsxColor_(hex) {
       .toUpperCase()
   );
 }
+
+return { xlsxColor: xlsxColor_, xlsxColumn: xlsxColumn_, xmlText: xmlText_ };
+})();

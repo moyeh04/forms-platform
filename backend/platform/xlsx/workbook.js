@@ -12,6 +12,7 @@
  * relative path. A sheet prints one page wide.
  */
 
+var Workbook = (function () {
 function xlsxStyles_(styles) {
   var fonts = ['<font><sz val="11"/><name val="Arial"/></font>'];
   var fills = [
@@ -25,14 +26,14 @@ function xlsxStyles_(styles) {
         (s.bold ? '<b/>' : '') +
         (s.underline ? '<u/>' : '') +
         '<sz val="11"/>' +
-        (s.color ? '<color rgb="' + xlsxColor_(s.color) + '"/>' : '') +
+        (s.color ? '<color rgb="' + Xml.xlsxColor(s.color) + '"/>' : '') +
         '<name val="Arial"/></font>'
     );
     var fillId = 0;
     if (s.fill) {
       fills.push(
         '<fill><patternFill patternType="solid"><fgColor rgb="' +
-          xlsxColor_(s.fill) +
+          Xml.xlsxColor(s.fill) +
           '"/><bgColor indexed="64"/></patternFill></fill>'
       );
       fillId = fills.length - 1;
@@ -111,7 +112,7 @@ function xlsxSheet_(sheet) {
         .map(function (cell, c) {
           if (cell == null || cell === '') return '';
           var o = typeof cell === 'object' ? cell : { v: cell };
-          var ref = xlsxColumn_(c) + (r + 1);
+          var ref = Xml.xlsxColumn(c) + (r + 1);
           var s = o.style ? ' s="' + o.style + '"' : '';
           if (o.link) links.push({ ref: ref, target: o.link });
           if (o.v == null || o.v === '') return '<c r="' + ref + '"' + s + '/>';
@@ -123,7 +124,7 @@ function xlsxSheet_(sheet) {
             '"' +
             s +
             ' t="inlineStr"><is><t xml:space="preserve">' +
-            xmlText_(o.v) +
+            Xml.xmlText(o.v) +
             '</t></is></c>'
           );
         })
@@ -193,7 +194,7 @@ function xlsxSheet_(sheet) {
             '<Relationship Id="rId' +
             (i + 1) +
             '" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink" Target="' +
-            xmlText_(l.target) +
+            Xml.xmlText(l.target) +
             '" TargetMode="External"/>'
           );
         })
@@ -241,7 +242,7 @@ function xlsxBlob_(name, sheets, styles) {
         .map(function (s, i) {
           return (
             '<sheet name="' +
-            xmlText_(String(s.name).slice(0, 31)) +
+            Xml.xmlText(String(s.name).slice(0, 31)) +
             '" sheetId="' +
             (i + 1) +
             '" r:id="rId' +
@@ -282,3 +283,6 @@ function xlsxBlob_(name, sheets, styles) {
     'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
   );
 }
+
+return { xlsxBlob: xlsxBlob_ };
+})();
