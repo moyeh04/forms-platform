@@ -10,7 +10,16 @@ node scripts/checks/run-checks.js --staged     # the staged files
 npm run check -- --update-baseline             # write down what was fixed
 ```
 
-The git hook `.githooks/pre-commit` runs the staged form before every commit.
+Three places run them:
+
+| Where | What runs |
+|---|---|
+| `.githooks/pre-commit` | the staged form, before every commit |
+| `.githooks/pre-push` | the full form and the tests of the checks, before every push |
+| `.github/workflows/pages.yml` | `npm run check` before `npm test`, so a push that breaks a rule never deploys |
+
+`npm install` points git at `.githooks`. A hook can be skipped on one
+machine; CI cannot.
 
 ## How a run decides
 

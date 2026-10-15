@@ -116,8 +116,8 @@ sequenceDiagram
 
     Dev->>Git: git push
     Git->>CI: Test and deploy site
-    CI->>CI: npm test
-    alt a test fails
+    CI->>CI: npm run check, npm test
+    alt a check or a test fails
         CI-->>Dev: red cross, the old site stays online
     else all pass
         CI->>Pages: publish index, admin, viewer, assets, shared

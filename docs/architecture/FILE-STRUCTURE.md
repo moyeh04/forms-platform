@@ -192,7 +192,7 @@ no validation.
 | Path | What it is |
 |---|---|
 | `scripts/bundle-backend.js` | The bundler. |
-| `scripts/checks/run-checks.js`, `.githooks/pre-commit` | Runs every check, on the staged files before each commit (`--staged`) or on the whole tree (`--all`, `npm run check`), and the git hook that calls it. `npm install` points git at `.githooks`. [CHECKS.md](../standards/CHECKS.md) lists the checks. |
+| `scripts/checks/run-checks.js`, `.githooks/pre-commit`, `.githooks/pre-push` | Runs every check, on the staged files before each commit (`--staged`) or on the whole tree before each push and in CI (`--all`, `npm run check`), and the git hooks that call it. `npm install` points git at `.githooks`. [CHECKS.md](../standards/CHECKS.md) lists the checks. |
 | `scripts/checks/config.json`, `baseline.json`, `exceptions.json` | What each check covers and its limits; the findings old files may still have, which may only go down; and the paths allowed to break a structure rule, each with its reason. |
 | `scripts/checks/lib/` | `files.js` (which files a run looks at), `parse.js` (acorn with comments), `jsdoc.js` (reads a JSDoc comment into its summary and tags), `baseline.js`, `exceptions.js`, `report.js`. |
 | `scripts/checks/check-biome.js` | Runs Biome on the files of a run and turns what it reports into findings. |
