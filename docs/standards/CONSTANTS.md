@@ -18,6 +18,10 @@ change it.
   stays readable, so write it out instead of `41943040`.
 - **A set of allowed values is one list**, declared once, and every check
   reads it: `FORM_STATUSES`, not `'draft'` compared by hand in five files.
+- **Yes/no is a boolean in code.** Only a row codec, the code that turns a
+  sheet row into an object and back, reads or writes the stored strings
+  `'1'` and `'0'`. A codec file is listed under `flags.exclude` in
+  `scripts/checks/config.json`.
 - **No meaning-free names.** `FIVE = 5` names nothing; `MAX_TEAM_SIZE = 5`
   does.
 
@@ -58,7 +62,10 @@ Known gaps, counted in the check baseline until they are fixed:
 
 - Month names are declared in both `shared/rules.js` and
   `assets/js/admin-timetable.js`.
-- Yes/no values are written to the sheet as the strings `'1'` and `'0'` and
-  compared as strings in many places.
+- Yes/no values are stored in the sheet as the strings `'1'` and `'0'`
+  (`deleted` as `'1'` or empty). The row readers and writers of
+  `backend/Clients.gs` and `backend/Responses.gs` convert them inline, each
+  in its own way, instead of through one codec; `check-flags.js` counts
+  them.
 - The ticket drawing in `assets/js/ticket.js` places its shapes with unnamed
   numbers.

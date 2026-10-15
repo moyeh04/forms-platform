@@ -64,5 +64,10 @@
     "include": ["assets/js/", "backend/", "shared/", "scripts/"],
     "extensions": [".js", ".gs"],
     "allowed": [0, 1, 2, 10, 24, 60]
+  },
+  "flags": {
+    "include": ["assets/js/", "backend/", "shared/"],
+    "extensions": [".js", ".gs"],
+    "exclude": []
   }
 }

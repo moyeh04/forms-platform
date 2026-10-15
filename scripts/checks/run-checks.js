@@ -22,6 +22,7 @@ const CHECKS = [
   require('./check-lines.js'),
   require('./check-jsdoc.js'),
   require('./check-numbers.js'),
+  require('./check-flags.js'),
   require('./check-docs.js')
 ];
 
