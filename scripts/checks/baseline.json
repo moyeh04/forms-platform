@@ -269,17 +269,6 @@
     "jsdoc": 121,
     "lines": 46
   },
-  "web/js/teams/handover.view.js": {
-    "biome/lint/complexity/noExcessiveLinesPerFunction": 1,
-    "jsdoc": 5,
-    "lines": 5
-  },
-  "web/js/teams/size-alerts.view.js": {
-    "biome/lint/style/noMagicNumbers": 2,
-    "biome/lint/suspicious/noAssignInExpressions": 1,
-    "jsdoc": 4,
-    "lines": 6
-  },
   "web/js/ticket.js": {
     "biome/lint/complexity/noExcessiveCognitiveComplexity": 1,
     "biome/lint/complexity/noExcessiveLinesPerFunction": 1,
