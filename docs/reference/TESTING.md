@@ -1,11 +1,11 @@
 # Testing
 
-323 automated tests run without a Google account, a browser, or a network.
+328 automated tests run without a Google account, a browser, or a network.
 They run the **real** backend and the **real** pages. This page explains how
 that works and what it can and cannot prove.
 
 ```
-npm test    # 323 tests
+npm test    # 328 tests
 ```
 
 ## The layers
@@ -161,6 +161,7 @@ while the total above or a row below says something else.
 | Admin page | `admin-ui.test.js` | 60 | The two warnings about small teams switched on in Setup with their numbers and a wrong order kept with its reason, small teams listed by level and marked on their card, login, a refused PIN kept in its field, a lock that leaves an open window signed in, create with term chips, team size and notes, descriptions, who can register, locked fields, team cards with their stored numbers, the people count, show key, teammates of a booking (how many, title, details asked), timetable calendar, hours, a day with its own hours and booked slots, delete, matching, clients with the link shown once and the key apart and whether the link shows small teams, a lost key shown again, a link end picked and moved, Extend keys for expired keys and chosen teams, one registration's key extended from its details, Download all with what was not downloaded and the saved zip, lists as chips or rows with the reason for a refused save, sections built from groups and counts, number runs with steppers, new lists picked for a question, column names on list rows for the phone layout, the day sheet group, form tabs that keep edits, section summaries, save bar only while there is a change, sections by one or by year group, a year group added from its own card with the counts set there, a section kind added by name or removed with its own button, added questions and pages, new form preview and title reason, the same header on every tab with a status saved at once, the forms list grouped by status, the count of teams outside a new size range, a new department letter kept as a chip |
 | Instructor page | `viewer-ui.test.js` | 13 | Small teams listed by level and marked on their card, team numbers with a gap where a team cancelled, today, by day, hidden columns, review rights, invalid links, member values named for the phone layout, phone as a call link, the key screen and its theme switch |
 | Registry writes | `registry-writes.test.js` | 6 | Every change to forms, lists and links written inside the lock, a save that keeps its row while another form is deleted, a save over a newer copy refused, a busy lock, a link that keeps a renamed form, list names that stay unique |
+| Golden copies | `golden.test.js` | 5 | What the live system depends on, compared with saved copies in `tests/fixtures/golden/`: every function Apps Script calls by name, the salted hashes and seals for a fixed pepper, the error code of every action for five kinds of request, legacy flag cells read and written back, and every sheet, property, cache entry, mail and trigger after one scripted run. `GOLDEN_UPDATE=1` writes the copies again, only for a change meant to alter them |
 | Harness | `harness.test.js` | 5 | The fake itself, and a seeded world that repeats its ids |
 | Colour contrast | `contrast.test.js` | 4 | Every text and outline pair meets WCAG AA in light, dark, and device-dark themes |
 | A page older than the site | `fresh.test.js` | 4 | An untouched page reloads once for a newer site and never in a loop, a page with typed text or an open dialog offers Reload instead, the bar in the language of the form, nothing in a preview or when the version cannot be read |

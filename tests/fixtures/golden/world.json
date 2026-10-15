@@ -1,0 +1,632 @@
+{
+ "sheets": [
+  {
+   "name": "Forms Registry",
+   "tabs": [
+    {
+     "name": "Forms",
+     "rows": [
+      [
+       "id",
+       "slug",
+       "type",
+       "title",
+       "term",
+       "status",
+       "opensAt",
+       "closesAt",
+       "sheetId",
+       "sheetUrl",
+       "config",
+       "createdAt",
+       "updatedAt"
+      ],
+      [
+       "f_48cadc01",
+       "team-form-1-fall-2027",
+       "team_registration",
+       "Team Form 1",
+       "Fall 2027",
+       "open",
+       "",
+       "",
+       "ab80d5dc0cb546f0b50736a891ffcdef",
+       "https://docs.google.com/spreadsheets/d/ab80d5dc0cb546f0b50736a891ffcdef/edit",
+       "{\"lang\":{\"default\":\"en\",\"allowSwitch\":true},\"icon\":\"team\",\"rules\":{\"uniqueBy\":\"leader_code\",\"uniqueAcrossForm\":true,\"driveCheck\":\"strict\",\"maxSubmissions\":null,\"teamSize\":{\"min\":2,\"max\":3},\"folderName\":{\"enabled\":true,\"subject\":\"\"},\"transfers\":true,\"transferEmails\":true},\"editKey\":{\"enabled\":true,\"days\":7,\"allowEdit\":true,\"allowDelete\":true},\"notifications\":{\"confirmEmail\":true,\"alertEmail\":\"\"},\"review\":{\"sequential\":true,\"steps\":[]},\"messages\":{\"closed\":{\"en\":\"This form is closed.\",\"ar\":\"الفورم ده مقفول.\"},\"notYet\":{\"en\":\"This form has not opened yet.\",\"ar\":\"الفورم لسه مفتحش.\"},\"draft\":{\"en\":\"This form is not available yet.\",\"ar\":\"الفورم ده لسه مش متاح.\"}},\"fields\":[{\"id\":\"email\",\"type\":\"email\",\"label\":{\"en\":\"Email\",\"ar\":\"البريد الإلكتروني\"},\"required\":true,\"role\":\"email\"},{\"id\":\"leader_name\",\"type\":\"arabic_name\",\"label\":{\"en\":\"Team leader name\",\"ar\":\"اسم قائد الفريق\"},\"required\":true,\"role\":\"name\",\"minParts\":4,\"help\":{\"en\":\"Four-part name, in Arabic letters only\",\"ar\":\"الاسم رباعي وبالعربي فقط\"}},{\"id\":\"leader_code\",\"type\":\"code\",\"label\":{\"en\":\"Team leader code\",\"ar\":\"كود قائد الفريق\"},\"required\":true,\"role\":\"code\",\"length\":7},{\"id\":\"phone\",\"type\":\"phone\",\"label\":{\"en\":\"Team leader phone\",\"ar\":\"رقم تليفون قائد الفريق\"},\"required\":true,\"role\":\"phone\"},{\"id\":\"major\",\"type\":\"select\",\"label\":{\"en\":\"Major\",\"ar\":\"التخصص\"},\"required\":true,\"list\":\"majors\"},{\"id\":\"level\",\"type\":\"select\",\"label\":{\"en\":\"Level / year\",\"ar\":\"المستوى / الفرقة\"},\"required\":true,\"list\":\"levels\"},{\"id\":\"section\",\"type\":\"select\",\"label\":{\"en\":\"Section\",\"ar\":\"السكشن\"},\"required\":true,\"list\":\"sections\"},{\"id\":\"curriculum\",\"type\":\"select\",\"label\":{\"en\":\"Bylaw\",\"ar\":\"اللائحة\"},\"required\":true,\"list\":\"curricula\"},{\"id\":\"team_size\",\"type\":\"team_size\",\"label\":{\"en\":\"Team size\",\"ar\":\"عدد أعضاء الفريق\"},\"required\":true,\"role\":\"team_size\",\"help\":{\"en\":\"How many people are in the team, including you\",\"ar\":\"كام فرد في الفريق، شاملًا حضرتك\"}},{\"id\":\"members\",\"type\":\"members\",\"label\":{\"en\":\"Team members\",\"ar\":\"أعضاء الفريق\"},\"required\":true,\"role\":\"members\",\"fields\":[{\"id\":\"name\",\"type\":\"arabic_name\",\"label\":{\"en\":\"Full name\",\"ar\":\"الاسم رباعي\"},\"required\":true,\"role\":\"name\",\"minParts\":4},{\"id\":\"phone\",\"type\":\"phone\",\"label\":{\"en\":\"Phone\",\"ar\":\"رقم التليفون\"},\"required\":true,\"role\":\"phone\"},{\"id\":\"code\",\"type\":\"code\",\"label\":{\"en\":\"Code\",\"ar\":\"الكود\"},\"required\":true,\"role\":\"code\",\"length\":7},{\"id\":\"level\",\"type\":\"select\",\"label\":{\"en\":\"Level / year\",\"ar\":\"المستوى / الفرقة\"},\"required\":true,\"list\":\"levels\"},{\"id\":\"curriculum\",\"type\":\"select\",\"label\":{\"en\":\"Bylaw\",\"ar\":\"اللائحة\"},\"required\":true,\"list\":\"curricula\"},{\"id\":\"section\",\"type\":\"select\",\"label\":{\"en\":\"Section\",\"ar\":\"السكشن\"},\"required\":true,\"list\":\"sections\"}]},{\"id\":\"title\",\"type\":\"english_text\",\"label\":{\"en\":\"Project title\",\"ar\":\"اسم المشروع (بالإنجليزي)\"},\"required\":true,\"role\":\"title\",\"help\":{\"en\":\"In English\",\"ar\":\"بالإنجليزي\"}},{\"id\":\"link\",\"type\":\"drive_link\",\"label\":{\"en\":\"Project Drive folder link\",\"ar\":\"لينك فولدر المشروع على Drive\"},\"required\":false,\"role\":\"link\",\"kinds\":[\"folder\"]}],\"steps\":[{\"id\":\"you\",\"title\":{\"en\":\"About you\",\"ar\":\"عنك\"},\"fields\":[\"email\",\"leader_name\",\"leader_code\",\"phone\"]},{\"id\":\"study\",\"title\":{\"en\":\"Study details\",\"ar\":\"بيانات الدراسة\"},\"fields\":[\"major\",\"level\",\"section\",\"curriculum\"]},{\"id\":\"members\",\"title\":{\"en\":\"Team members\",\"ar\":\"أعضاء الفريق\"},\"fields\":[\"team_size\",\"members\"]},{\"id\":\"project\",\"title\":{\"en\":\"Project\",\"ar\":\"المشروع\"},\"fields\":[\"title\",\"link\"]}],\"subject\":\"\"}",
+       "2027-09-01T10:00:00.000Z",
+       "2027-09-01T10:00:00.000Z"
+      ],
+      [
+       "f_9e651b02",
+       "task-form-1-fall-2027",
+       "task_submission",
+       "Task Form 1",
+       "Fall 2027",
+       "open",
+       "",
+       "",
+       "54362486ac751a1c2cfe0b14a29fdeba",
+       "https://docs.google.com/spreadsheets/d/54362486ac751a1c2cfe0b14a29fdeba/edit",
+       "{\"lang\":{\"default\":\"en\",\"allowSwitch\":true},\"icon\":\"task\",\"rules\":{\"uniqueBy\":\"leader_code\",\"uniqueAcrossForm\":false,\"driveCheck\":\"strict\",\"maxSubmissions\":null,\"teamSize\":{\"min\":1,\"max\":5}},\"editKey\":{\"enabled\":true,\"days\":7,\"allowEdit\":true,\"allowDelete\":true},\"notifications\":{\"confirmEmail\":true,\"alertEmail\":\"\"},\"review\":{\"sequential\":true,\"steps\":[]},\"messages\":{\"closed\":{\"en\":\"This form is closed.\",\"ar\":\"الفورم ده مقفول.\"},\"notYet\":{\"en\":\"This form has not opened yet.\",\"ar\":\"الفورم لسه مفتحش.\"},\"draft\":{\"en\":\"This form is not available yet.\",\"ar\":\"الفورم ده لسه مش متاح.\"}},\"fields\":[{\"id\":\"email\",\"type\":\"email\",\"label\":{\"en\":\"Email\",\"ar\":\"البريد الإلكتروني\"},\"required\":true,\"role\":\"email\"},{\"id\":\"leader_name\",\"type\":\"arabic_name\",\"label\":{\"en\":\"Team leader name\",\"ar\":\"اسم قائد الفريق\"},\"required\":true,\"role\":\"name\",\"minParts\":4,\"help\":{\"en\":\"Four-part name, in Arabic letters only\",\"ar\":\"الاسم رباعي وبالعربي فقط\"}},{\"id\":\"leader_code\",\"type\":\"code\",\"label\":{\"en\":\"Team leader code\",\"ar\":\"كود قائد الفريق\"},\"required\":true,\"role\":\"code\",\"length\":7},{\"id\":\"phone\",\"type\":\"phone\",\"label\":{\"en\":\"Team leader phone\",\"ar\":\"رقم تليفون قائد الفريق\"},\"required\":true,\"role\":\"phone\"},{\"id\":\"major\",\"type\":\"select\",\"label\":{\"en\":\"Major\",\"ar\":\"التخصص\"},\"required\":true,\"list\":\"majors\"},{\"id\":\"level\",\"type\":\"select\",\"label\":{\"en\":\"Level / year\",\"ar\":\"المستوى / الفرقة\"},\"required\":true,\"list\":\"levels\"},{\"id\":\"section\",\"type\":\"select\",\"label\":{\"en\":\"Section\",\"ar\":\"السكشن\"},\"required\":true,\"list\":\"sections\"},{\"id\":\"curriculum\",\"type\":\"select\",\"label\":{\"en\":\"Bylaw\",\"ar\":\"اللائحة\"},\"required\":true,\"list\":\"curricula\"},{\"id\":\"team_size\",\"type\":\"team_size\",\"label\":{\"en\":\"Team size\",\"ar\":\"عدد أعضاء الفريق\"},\"required\":true,\"role\":\"team_size\",\"help\":{\"en\":\"How many people are in the team, including you\",\"ar\":\"كام فرد في الفريق، شاملًا حضرتك\"}},{\"id\":\"members\",\"type\":\"members\",\"label\":{\"en\":\"Team members\",\"ar\":\"أعضاء الفريق\"},\"required\":true,\"role\":\"members\",\"fields\":[{\"id\":\"name\",\"type\":\"arabic_name\",\"label\":{\"en\":\"Full name\",\"ar\":\"الاسم رباعي\"},\"required\":true,\"role\":\"name\",\"minParts\":4},{\"id\":\"phone\",\"type\":\"phone\",\"label\":{\"en\":\"Phone\",\"ar\":\"رقم التليفون\"},\"required\":true,\"role\":\"phone\"},{\"id\":\"code\",\"type\":\"code\",\"label\":{\"en\":\"Code\",\"ar\":\"الكود\"},\"required\":true,\"role\":\"code\",\"length\":7},{\"id\":\"level\",\"type\":\"select\",\"label\":{\"en\":\"Level / year\",\"ar\":\"المستوى / الفرقة\"},\"required\":true,\"list\":\"levels\"},{\"id\":\"curriculum\",\"type\":\"select\",\"label\":{\"en\":\"Bylaw\",\"ar\":\"اللائحة\"},\"required\":true,\"list\":\"curricula\"},{\"id\":\"section\",\"type\":\"select\",\"label\":{\"en\":\"Section\",\"ar\":\"السكشن\"},\"required\":true,\"list\":\"sections\"}]},{\"id\":\"title\",\"type\":\"english_text\",\"label\":{\"en\":\"Task name\",\"ar\":\"اسم التاسك (بالإنجليزي)\"},\"required\":true,\"role\":\"title\",\"help\":{\"en\":\"In English\",\"ar\":\"بالإنجليزي\"}},{\"id\":\"link\",\"type\":\"drive_link\",\"label\":{\"en\":\"Task slides link\",\"ar\":\"لينك التاسك (Drive أو Google Slides)\"},\"required\":true,\"role\":\"link\",\"kinds\":[\"file\",\"slides\"],\"help\":{\"en\":\"Share it as \\\"Anyone with the link\\\". The first slide has your name and section.\",\"ar\":\"اعمله شير \\\"Anyone with the link\\\". أول سلايد فيها الاسم والسكشن.\"}}],\"steps\":[{\"id\":\"you\",\"title\":{\"en\":\"About you\",\"ar\":\"عنك\"},\"fields\":[\"email\",\"leader_name\",\"leader_code\",\"phone\"]},{\"id\":\"study\",\"title\":{\"en\":\"Study details\",\"ar\":\"بيانات الدراسة\"},\"fields\":[\"major\",\"level\",\"section\",\"curriculum\"]},{\"id\":\"members\",\"title\":{\"en\":\"Team members\",\"ar\":\"أعضاء الفريق\"},\"fields\":[\"team_size\",\"members\"]},{\"id\":\"task\",\"title\":{\"en\":\"Task\",\"ar\":\"التاسك\"},\"fields\":[\"title\",\"link\"]}],\"subject\":\"\"}",
+       "2027-09-01T10:00:00.000Z",
+       "2027-09-01T10:00:00.000Z"
+      ],
+      [
+       "f_8071f7de",
+       "booking-form-1-fall-2027",
+       "reservation",
+       "Booking Form 1",
+       "Fall 2027",
+       "open",
+       "",
+       "",
+       "b31b42101a6d774b92fcdb527ab7063e",
+       "https://docs.google.com/spreadsheets/d/b31b42101a6d774b92fcdb527ab7063e/edit",
+       "{\"lang\":{\"default\":\"en\",\"allowSwitch\":true},\"icon\":\"calendar\",\"rules\":{\"uniqueBy\":\"leader_code\",\"uniqueAcrossForm\":false,\"driveCheck\":\"strict\",\"maxSubmissions\":null},\"editKey\":{\"enabled\":true,\"days\":7,\"allowEdit\":false,\"allowDelete\":true},\"notifications\":{\"confirmEmail\":true,\"alertEmail\":\"\"},\"review\":{\"sequential\":true,\"steps\":[]},\"messages\":{\"closed\":{\"en\":\"This form is closed.\",\"ar\":\"الفورم ده مقفول.\"},\"notYet\":{\"en\":\"This form has not opened yet.\",\"ar\":\"الفورم لسه مفتحش.\"},\"draft\":{\"en\":\"This form is not available yet.\",\"ar\":\"الفورم ده لسه مش متاح.\"}},\"fields\":[{\"id\":\"email\",\"type\":\"email\",\"label\":{\"en\":\"Email\",\"ar\":\"البريد الإلكتروني\"},\"required\":true,\"role\":\"email\"},{\"id\":\"leader_name\",\"type\":\"arabic_name\",\"label\":{\"en\":\"Team leader name\",\"ar\":\"اسم قائد الفريق\"},\"required\":true,\"role\":\"name\",\"minParts\":4,\"help\":{\"en\":\"Four-part name, in Arabic letters only\",\"ar\":\"الاسم رباعي وبالعربي فقط\"}},{\"id\":\"leader_code\",\"type\":\"code\",\"label\":{\"en\":\"Team leader code\",\"ar\":\"كود قائد الفريق\"},\"required\":true,\"role\":\"code\",\"length\":7},{\"id\":\"phone\",\"type\":\"phone\",\"label\":{\"en\":\"Team leader phone\",\"ar\":\"رقم تليفون قائد الفريق\"},\"required\":true,\"role\":\"phone\"},{\"id\":\"major\",\"type\":\"select\",\"label\":{\"en\":\"Major\",\"ar\":\"التخصص\"},\"required\":true,\"list\":\"majors\"},{\"id\":\"level\",\"type\":\"select\",\"label\":{\"en\":\"Level / year\",\"ar\":\"المستوى / الفرقة\"},\"required\":true,\"list\":\"levels\"},{\"id\":\"section\",\"type\":\"select\",\"label\":{\"en\":\"Section\",\"ar\":\"السكشن\"},\"required\":true,\"list\":\"sections\"},{\"id\":\"curriculum\",\"type\":\"select\",\"label\":{\"en\":\"Bylaw\",\"ar\":\"اللائحة\"},\"required\":true,\"list\":\"curricula\"},{\"id\":\"title\",\"type\":\"english_text\",\"label\":{\"en\":\"Project title\",\"ar\":\"اسم المشروع (بالإنجليزي)\"},\"required\":true,\"role\":\"title\"},{\"id\":\"members\",\"type\":\"members\",\"label\":{\"en\":\"Teammates\",\"ar\":\"أعضاء الفريق\"},\"required\":true,\"role\":\"members\",\"fields\":[{\"id\":\"name\",\"type\":\"arabic_name\",\"label\":{\"en\":\"Full name\",\"ar\":\"الاسم رباعي\"},\"required\":true,\"role\":\"name\",\"minParts\":4},{\"id\":\"phone\",\"type\":\"phone\",\"label\":{\"en\":\"Phone\",\"ar\":\"رقم التليفون\"},\"required\":true,\"role\":\"phone\"},{\"id\":\"code\",\"type\":\"code\",\"label\":{\"en\":\"Code\",\"ar\":\"الكود\"},\"required\":true,\"role\":\"code\",\"length\":7},{\"id\":\"level\",\"type\":\"select\",\"label\":{\"en\":\"Level / year\",\"ar\":\"المستوى / الفرقة\"},\"required\":true,\"list\":\"levels\"},{\"id\":\"curriculum\",\"type\":\"select\",\"label\":{\"en\":\"Bylaw\",\"ar\":\"اللائحة\"},\"required\":true,\"list\":\"curricula\"},{\"id\":\"section\",\"type\":\"select\",\"label\":{\"en\":\"Section\",\"ar\":\"السكشن\"},\"required\":true,\"list\":\"sections\"}],\"enabled\":false,\"min\":1,\"max\":5,\"help\":{\"en\":\"Add the other people on your team.\",\"ar\":\"أضف باقي أعضاء فريقك.\"}},{\"id\":\"slot\",\"type\":\"slot\",\"label\":{\"en\":\"Booking slot\",\"ar\":\"ميعاد المناقشة\"},\"required\":true,\"role\":\"slot\"}],\"slots\":{\"days\":[{\"id\":\"day-1\",\"label\":\"Day 1\",\"date\":\"2027-11-14\",\"times\":[\"12:30 - 12:50\",\"12:55 - 1:15\"]}],\"capacity\":1},\"steps\":[{\"id\":\"you\",\"title\":{\"en\":\"About you\",\"ar\":\"عنك\"},\"fields\":[\"email\",\"leader_name\",\"leader_code\",\"phone\"]},{\"id\":\"study\",\"title\":{\"en\":\"Study details\",\"ar\":\"بيانات الدراسة\"},\"fields\":[\"major\",\"level\",\"section\",\"curriculum\"]},{\"id\":\"project\",\"title\":{\"en\":\"Project\",\"ar\":\"المشروع\"},\"fields\":[\"title\",\"members\"]},{\"id\":\"slot\",\"title\":{\"en\":\"Time slot\",\"ar\":\"الميعاد\"},\"fields\":[\"slot\"]}],\"subject\":\"\",\"keyBooking\":{\"enabled\":true,\"source\":\"f_48cadc01\"}}",
+       "2027-09-01T10:00:00.000Z",
+       "2027-09-01T10:00:00.000Z"
+      ],
+      [
+       "f_c4890c78",
+       "group-form-1-2027-2028",
+       "whatsapp_registration",
+       "Group Form 1",
+       "",
+       "open",
+       "",
+       "",
+       "8e3679e75105079480695c898ca73a67",
+       "https://docs.google.com/spreadsheets/d/8e3679e75105079480695c898ca73a67/edit",
+       "{\"lang\":{\"default\":\"en\",\"allowSwitch\":true},\"icon\":\"chat\",\"rules\":{\"uniqueBy\":\"code\",\"uniqueAcrossForm\":false,\"driveCheck\":\"strict\",\"maxSubmissions\":null},\"editKey\":{\"enabled\":true,\"days\":7,\"allowEdit\":true,\"allowDelete\":true},\"notifications\":{\"confirmEmail\":true,\"alertEmail\":\"\"},\"review\":{\"sequential\":true,\"steps\":[{\"id\":\"schedule\",\"label\":{\"en\":\"Timetable check\",\"ar\":\"مراجعة الجدول\"}},{\"id\":\"group\",\"label\":{\"en\":\"Group match\",\"ar\":\"مطابقة الجروب\"}}]},\"messages\":{\"closed\":{\"en\":\"This form is closed.\",\"ar\":\"الفورم ده مقفول.\"},\"notYet\":{\"en\":\"This form has not opened yet.\",\"ar\":\"الفورم لسه مفتحش.\"},\"draft\":{\"en\":\"This form is not available yet.\",\"ar\":\"الفورم ده لسه مش متاح.\"}},\"fields\":[{\"id\":\"email\",\"type\":\"email\",\"label\":{\"en\":\"Email\",\"ar\":\"البريد الإلكتروني\"},\"required\":true,\"role\":\"email\"},{\"id\":\"name\",\"type\":\"arabic_name\",\"label\":{\"en\":\"Full name\",\"ar\":\"الاسم رباعي\"},\"required\":true,\"role\":\"name\",\"minParts\":4,\"help\":{\"en\":\"Four-part name, in Arabic letters only\",\"ar\":\"الاسم رباعي وبالعربي فقط\"}},{\"id\":\"phone\",\"type\":\"phone\",\"label\":{\"en\":\"Phone number\",\"ar\":\"رقم التليفون\"},\"required\":true,\"role\":\"phone\"},{\"id\":\"code\",\"type\":\"code\",\"label\":{\"en\":\"Code in your timetable\",\"ar\":\"الكود اللي في الجدول\"},\"required\":true,\"role\":\"code\",\"length\":7},{\"id\":\"level\",\"type\":\"select\",\"label\":{\"en\":\"Level / year\",\"ar\":\"المستوى / الفرقة\"},\"required\":true,\"list\":\"levels\"},{\"id\":\"major\",\"type\":\"select\",\"label\":{\"en\":\"Major\",\"ar\":\"التخصص\"},\"required\":true,\"list\":\"majors\"},{\"id\":\"group\",\"type\":\"select\",\"label\":{\"en\":\"Group\",\"ar\":\"الجروب\"},\"required\":true,\"list\":\"groups\",\"help\":{\"en\":\"Pick A if your timetable includes Chemistry, B if it does not\",\"ar\":\"اختار A لو الجدول فيه كيمياء، و B لو مفيهوش\"}},{\"id\":\"section\",\"type\":\"select\",\"label\":{\"en\":\"Section number\",\"ar\":\"رقم السكشن\"},\"required\":true,\"list\":\"wa_sections\",\"help\":{\"en\":\"The number next to TH in your timetable, for example 21 in 1B-TH21\",\"ar\":\"الرقم اللي جنب TH في جدولك\"}},{\"id\":\"schedule\",\"type\":\"drive_link\",\"label\":{\"en\":\"Screenshot of your timetable\",\"ar\":\"صورة الجدول بتاعك\"},\"required\":true,\"role\":\"link\",\"kinds\":[\"file\"],\"help\":{\"en\":\"A Google Drive link showing your full name and code\",\"ar\":\"لينك Drive ظاهر فيه الاسم والكود\"}}],\"steps\":[{\"id\":\"you\",\"title\":{\"en\":\"About you\",\"ar\":\"عنك\"},\"fields\":[\"email\",\"name\",\"phone\",\"code\"]},{\"id\":\"study\",\"title\":{\"en\":\"Study details\",\"ar\":\"بيانات الدراسة\"},\"fields\":[\"level\",\"major\",\"group\",\"section\"]},{\"id\":\"schedule\",\"title\":{\"en\":\"Schedule\",\"ar\":\"الجدول\"},\"fields\":[\"schedule\"]}],\"matching\":{\"enabled\":true,\"field\":\"phone\"},\"batchYear\":\"2027/2028\"}",
+       "2027-09-01T10:00:00.000Z",
+       "2027-09-01T10:00:00.000Z"
+      ]
+     ]
+    },
+    {
+     "name": "Clients",
+     "rows": [
+      [
+       "id",
+       "name",
+       "tokenHash",
+       "forms",
+       "hiddenColumns",
+       "canReview",
+       "active",
+       "createdAt",
+       "keyHash",
+       "keySeal",
+       "expires",
+       "showSizeAlerts"
+      ],
+      [
+       "c_9f82dc2f",
+       "Client 1",
+       "007d2ad43d2115e6281d4fa6b5ff233a53dfed37f4439ea68434e19247930ff1",
+       "[\"f_48cadc01\"]",
+       "[]",
+       "1",
+       "1",
+       "2027-09-01T10:00:00.000Z",
+       "a9a4faba2726e3ca81d2dcdea2924c2d23835619d40150e671decb104b9f43ad",
+       "S311760",
+       "",
+       "0"
+      ]
+     ]
+    },
+    {
+     "name": "Lists",
+     "rows": [
+      [
+       "key",
+       "values"
+      ],
+      [
+       "levels",
+       "[{\"value\":\"صفر / الأولى\",\"label\":{\"ar\":\"صفر / الأولى\",\"en\":\"Level 0 / Year 1\"}},{\"value\":\"الأول / الثانية\",\"label\":{\"ar\":\"الأول / الثانية\",\"en\":\"Level 1 / Year 2\"}},{\"value\":\"الثاني / الثالثة\",\"label\":{\"ar\":\"الثاني / الثالثة\",\"en\":\"Level 2 / Year 3\"}},{\"value\":\"الثالث / الرابعة\",\"label\":{\"ar\":\"الثالث / الرابعة\",\"en\":\"Level 3 / Year 4\"}},{\"value\":\"الرابع / الخامسة\",\"label\":{\"ar\":\"الرابع / الخامسة\",\"en\":\"Level 4 / Year 5\"}}]"
+      ],
+      [
+       "curricula",
+       "[{\"value\":\"2020\",\"label\":{\"en\":\"2020\",\"ar\":\"2020\"}},{\"value\":\"2018\",\"label\":{\"en\":\"2018\",\"ar\":\"2018\"}},{\"value\":\"2012\",\"label\":{\"en\":\"2012\",\"ar\":\"2012\"}}]"
+      ],
+      [
+       "majors",
+       "[{\"value\":\"حاسبات\",\"label\":{\"ar\":\"حاسبات\",\"en\":\"Computers\"}},{\"value\":\"اتصالات\",\"label\":{\"ar\":\"اتصالات\",\"en\":\"Communications\"}},{\"value\":\"عمارة\",\"label\":{\"ar\":\"عمارة\",\"en\":\"Architecture\"}},{\"value\":\"ميكانيكا\",\"label\":{\"ar\":\"ميكانيكا\",\"en\":\"Mechanical\"}},{\"value\":\"مدني\",\"label\":{\"ar\":\"مدني\",\"en\":\"Civil\"}}]"
+      ],
+      [
+       "sections",
+       "[{\"value\":\"4C-TH1\",\"label\":{\"en\":\"4C-TH1\",\"ar\":\"4C-TH1\"}},{\"value\":\"4C-TH2\",\"label\":{\"en\":\"4C-TH2\",\"ar\":\"4C-TH2\"}},{\"value\":\"4C-TH3\",\"label\":{\"en\":\"4C-TH3\",\"ar\":\"4C-TH3\"}},{\"value\":\"4C-TH4\",\"label\":{\"en\":\"4C-TH4\",\"ar\":\"4C-TH4\"}},{\"value\":\"4C-TH5\",\"label\":{\"en\":\"4C-TH5\",\"ar\":\"4C-TH5\"}},{\"value\":\"4C-TH6\",\"label\":{\"en\":\"4C-TH6\",\"ar\":\"4C-TH6\"}},{\"value\":\"4C-TH7\",\"label\":{\"en\":\"4C-TH7\",\"ar\":\"4C-TH7\"}},{\"value\":\"4C-TH8\",\"label\":{\"en\":\"4C-TH8\",\"ar\":\"4C-TH8\"}},{\"value\":\"4C-T1\",\"label\":{\"en\":\"4C-T1\",\"ar\":\"4C-T1\"}},{\"value\":\"4C-T2\",\"label\":{\"en\":\"4C-T2\",\"ar\":\"4C-T2\"}},{\"value\":\"4C-T3\",\"label\":{\"en\":\"4C-T3\",\"ar\":\"4C-T3\"}},{\"value\":\"4C-O1\",\"label\":{\"en\":\"4C-O1\",\"ar\":\"4C-O1\"}},{\"value\":\"4C-O2\",\"label\":{\"en\":\"4C-O2\",\"ar\":\"4C-O2\"}},{\"value\":\"4C-O3\",\"label\":{\"en\":\"4C-O3\",\"ar\":\"4C-O3\"}}]"
+      ],
+      [
+       "groups",
+       "[{\"value\":\"A\",\"label\":{\"en\":\"A\",\"ar\":\"A\"}},{\"value\":\"B\",\"label\":{\"en\":\"B\",\"ar\":\"B\"}}]"
+      ],
+      [
+       "wa_sections",
+       "[{\"value\":\"1\",\"label\":{\"en\":\"1\",\"ar\":\"1\"}},{\"value\":\"2\",\"label\":{\"en\":\"2\",\"ar\":\"2\"}},{\"value\":\"3\",\"label\":{\"en\":\"3\",\"ar\":\"3\"}},{\"value\":\"4\",\"label\":{\"en\":\"4\",\"ar\":\"4\"}},{\"value\":\"5\",\"label\":{\"en\":\"5\",\"ar\":\"5\"}},{\"value\":\"6\",\"label\":{\"en\":\"6\",\"ar\":\"6\"}},{\"value\":\"7\",\"label\":{\"en\":\"7\",\"ar\":\"7\"}},{\"value\":\"8\",\"label\":{\"en\":\"8\",\"ar\":\"8\"}},{\"value\":\"9\",\"label\":{\"en\":\"9\",\"ar\":\"9\"}},{\"value\":\"10\",\"label\":{\"en\":\"10\",\"ar\":\"10\"}},{\"value\":\"11\",\"label\":{\"en\":\"11\",\"ar\":\"11\"}},{\"value\":\"12\",\"label\":{\"en\":\"12\",\"ar\":\"12\"}},{\"value\":\"13\",\"label\":{\"en\":\"13\",\"ar\":\"13\"}},{\"value\":\"14\",\"label\":{\"en\":\"14\",\"ar\":\"14\"}},{\"value\":\"15\",\"label\":{\"en\":\"15\",\"ar\":\"15\"}},{\"value\":\"16\",\"label\":{\"en\":\"16\",\"ar\":\"16\"}},{\"value\":\"17\",\"label\":{\"en\":\"17\",\"ar\":\"17\"}},{\"value\":\"18\",\"label\":{\"en\":\"18\",\"ar\":\"18\"}},{\"value\":\"19\",\"label\":{\"en\":\"19\",\"ar\":\"19\"}},{\"value\":\"20\",\"label\":{\"en\":\"20\",\"ar\":\"20\"}},{\"value\":\"21\",\"label\":{\"en\":\"21\",\"ar\":\"21\"}},{\"value\":\"22\",\"label\":{\"en\":\"22\",\"ar\":\"22\"}},{\"value\":\"23\",\"label\":{\"en\":\"23\",\"ar\":\"23\"}},{\"value\":\"24\",\"label\":{\"en\":\"24\",\"ar\":\"24\"}},{\"value\":\"25\",\"label\":{\"en\":\"25\",\"ar\":\"25\"}},{\"value\":\"26\",\"label\":{\"en\":\"26\",\"ar\":\"26\"}},{\"value\":\"27\",\"label\":{\"en\":\"27\",\"ar\":\"27\"}},{\"value\":\"28\",\"label\":{\"en\":\"28\",\"ar\":\"28\"}},{\"value\":\"29\",\"label\":{\"en\":\"29\",\"ar\":\"29\"}},{\"value\":\"30\",\"label\":{\"en\":\"30\",\"ar\":\"30\"}},{\"value\":\"31\",\"label\":{\"en\":\"31\",\"ar\":\"31\"}},{\"value\":\"32\",\"label\":{\"en\":\"32\",\"ar\":\"32\"}},{\"value\":\"33\",\"label\":{\"en\":\"33\",\"ar\":\"33\"}}]"
+      ],
+      [
+       "labs",
+       "[]"
+      ],
+      [
+       "_info",
+       "{\"labs\":{\"name\":\"Labs\",\"kind\":\"plain\"}}"
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "name": "Team Form 1 - Fall 2027",
+   "tabs": [
+    {
+     "name": "Responses",
+     "rows": [
+      [
+       "id",
+       "ref",
+       "created",
+       "updated",
+       "status",
+       "review",
+       "email",
+       "name",
+       "code",
+       "phone",
+       "title",
+       "link",
+       "slot",
+       "members",
+       "data",
+       "keyHash",
+       "keyExpires",
+       "deleted",
+       "keySeal",
+       "number"
+      ],
+      [
+       "cb20fbde-b090-3821-9db7-5710dcccac8d",
+       "TR-2027-0001",
+       "2027-09-01T10:00:00.000Z",
+       "2027-09-01T10:00:00.000Z",
+       "in_review",
+       "{}",
+       "student4230001@example.com",
+       "طالب أول اسم تجريبي",
+       "4230001",
+       "01012345678",
+       "Project 4230001",
+       "",
+       "",
+       "طالب ثالث اسم تجريبي (4230003)",
+       "{\"email\":\"student4230001@example.com\",\"leader_name\":\"طالب أول اسم تجريبي\",\"leader_code\":\"4230001\",\"phone\":\"01012345678\",\"major\":\"حاسبات\",\"level\":\"صفر / الأولى\",\"section\":\"4C-TH1\",\"curriculum\":\"2020\",\"team_size\":\"2\",\"members\":[{\"name\":\"طالب ثالث اسم تجريبي\",\"phone\":\"01112345678\",\"code\":\"4230003\",\"level\":\"صفر / الأولى\",\"curriculum\":\"2020\",\"section\":\"4C-TH1\"}],\"title\":\"Project 4230001\",\"link\":\"\"}",
+       "29d3788d54e53c8b9eae8ce781088cdbc3edab43eaf7b0d68e686d1f46dcd1c3",
+       "2027-09-08T10:00:00.000Z",
+       "",
+       "S31586",
+       "1"
+      ],
+      [
+       "0ec4e315-2cd9-2d1e-5269-6af5b22e03ee",
+       "TR-2027-0002",
+       "2027-09-01T10:00:00.000Z",
+       "2027-09-01T10:00:00.000Z",
+       "new",
+       "{}",
+       "student4230011@example.com",
+       "طالب أول اسم تجريبي",
+       "4230011",
+       "01012345678",
+       "Project 4230011",
+       "",
+       "",
+       "طالب رابع اسم تجريبي (4230004); طالب ثاني اسم تجريبي (4230002)",
+       "{\"email\":\"student4230011@example.com\",\"leader_name\":\"طالب أول اسم تجريبي\",\"leader_code\":\"4230011\",\"phone\":\"01012345678\",\"major\":\"حاسبات\",\"level\":\"صفر / الأولى\",\"section\":\"4C-TH1\",\"curriculum\":\"2020\",\"team_size\":\"3\",\"members\":[{\"name\":\"طالب رابع اسم تجريبي\",\"phone\":\"01112345678\",\"code\":\"4230004\",\"level\":\"صفر / الأولى\",\"curriculum\":\"2020\",\"section\":\"4C-TH1\"},{\"name\":\"طالب ثاني اسم تجريبي\",\"phone\":\"01112345678\",\"code\":\"4230002\",\"level\":\"صفر / الأولى\",\"curriculum\":\"2020\",\"section\":\"4C-TH1\"}],\"title\":\"Project 4230011\",\"link\":\"\"}",
+       "056b3444248cce4f8caabb79688ab256b6577fc18d4c6f81604679b9be4b4f03",
+       "2027-09-08T10:00:00.000Z",
+       "",
+       "S47226",
+       "2"
+      ],
+      [
+       "9538d569-7cd9-6e2e-78ea-8db6ee9144d8",
+       "TR-2027-0003",
+       "2027-09-01T10:00:00.000Z",
+       "2027-09-01T10:00:00.000Z",
+       "new",
+       "{}",
+       "student4230021@example.com",
+       "طالب أول اسم تجريبي",
+       "4230021",
+       "01012345678",
+       "Project 4230021",
+       "",
+       "",
+       "طالب خامس اسم تجريبي (4230022)",
+       "{\"email\":\"student4230021@example.com\",\"leader_name\":\"طالب أول اسم تجريبي\",\"leader_code\":\"4230021\",\"phone\":\"01012345678\",\"major\":\"حاسبات\",\"level\":\"صفر / الأولى\",\"section\":\"4C-TH1\",\"curriculum\":\"2020\",\"team_size\":\"2\",\"members\":[{\"name\":\"طالب خامس اسم تجريبي\",\"phone\":\"01112345678\",\"code\":\"4230022\",\"level\":\"صفر / الأولى\",\"curriculum\":\"2020\",\"section\":\"4C-TH1\"}],\"title\":\"Project 4230021\",\"link\":\"\"}",
+       "",
+       "2027-09-08T10:00:00.000Z",
+       "1",
+       "",
+       "3"
+      ]
+     ]
+    },
+    {
+     "name": "Transfers",
+     "rows": [
+      [
+       "id",
+       "created",
+       "updated",
+       "status",
+       "code",
+       "member",
+       "fromId",
+       "fromRef",
+       "toId",
+       "toRef",
+       "decidedBy"
+      ],
+      [
+       "5ed02d67-abec-accf-4331-b2d47bab676f",
+       "2027-09-01T10:00:00.000Z",
+       "2027-09-01T10:00:00.000Z",
+       "approved",
+       "4230002",
+       "{\"name\":\"طالب ثاني اسم تجريبي\",\"phone\":\"01112345678\",\"code\":\"4230002\",\"level\":\"صفر / الأولى\",\"curriculum\":\"2020\",\"section\":\"4C-TH1\"}",
+       "cb20fbde-b090-3821-9db7-5710dcccac8d",
+       "TR-2027-0001",
+       "0ec4e315-2cd9-2d1e-5269-6af5b22e03ee",
+       "TR-2027-0002",
+       "leader"
+      ]
+     ]
+    },
+    {
+     "name": "Team Members List",
+     "rows": [
+      [
+       "Team member name",
+       "Section",
+       "Code",
+       "Project"
+      ],
+      [
+       "1.  طالب أول اسم تجريبي  ★",
+       "4C-TH1",
+       "4230001",
+       "Project 4230001"
+      ],
+      [
+       "2.  طالب ثالث اسم تجريبي",
+       "4C-TH1",
+       "4230003",
+       ""
+      ],
+      [
+       "1.  طالب أول اسم تجريبي  ★",
+       "4C-TH1",
+       "4230011",
+       "Project 4230011"
+      ],
+      [
+       "2.  طالب رابع اسم تجريبي",
+       "4C-TH1",
+       "4230004",
+       ""
+      ],
+      [
+       "3.  طالب ثاني اسم تجريبي",
+       "4C-TH1",
+       "4230002",
+       ""
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "name": "Task Form 1 - Fall 2027",
+   "tabs": [
+    {
+     "name": "Responses",
+     "rows": [
+      [
+       "id",
+       "ref",
+       "created",
+       "updated",
+       "status",
+       "review",
+       "email",
+       "name",
+       "code",
+       "phone",
+       "title",
+       "link",
+       "slot",
+       "members",
+       "data",
+       "keyHash",
+       "keyExpires",
+       "deleted",
+       "keySeal",
+       "number"
+      ],
+      [
+       "3b567d5a-ab22-0638-4eba-50dc20694fb2",
+       "TK-2027-0001",
+       "2027-09-01T10:00:00.000Z",
+       "2027-09-01T10:00:00.000Z",
+       "new",
+       "{}",
+       "student4230031@example.com",
+       "طالب أول اسم تجريبي",
+       "4230031",
+       "01012345678",
+       "Task 1",
+       "https://docs.google.com/presentation/d/kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk/edit",
+       "",
+       "طالب ثاني اسم تجريبي (4230032)",
+       "{\"email\":\"student4230031@example.com\",\"leader_name\":\"طالب أول اسم تجريبي\",\"leader_code\":\"4230031\",\"phone\":\"01012345678\",\"major\":\"حاسبات\",\"level\":\"صفر / الأولى\",\"section\":\"4C-TH1\",\"curriculum\":\"2020\",\"team_size\":\"2\",\"members\":[{\"name\":\"طالب ثاني اسم تجريبي\",\"phone\":\"01112345678\",\"code\":\"4230032\",\"level\":\"صفر / الأولى\",\"curriculum\":\"2020\",\"section\":\"4C-TH1\"}],\"title\":\"Task 1\",\"link\":\"https://docs.google.com/presentation/d/kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk/edit\"}",
+       "efdae84f06b24d94bc6bfba3084d4b46a72d677484776f21c369527d4087b92d",
+       "2027-09-08T10:00:00.000Z",
+       "",
+       "S73950",
+       "1"
+      ]
+     ]
+    },
+    {
+     "name": "Team Members List",
+     "rows": [
+      [
+       "Team member name",
+       "Section",
+       "Code",
+       "Task"
+      ],
+      [
+       "1.  طالب أول اسم تجريبي  ★",
+       "4C-TH1",
+       "4230031",
+       "=HYPERLINK(\"https://docs.google.com/presentation/d/kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk/edit\",\"Task 1\")"
+      ],
+      [
+       "2.  طالب ثاني اسم تجريبي",
+       "4C-TH1",
+       "4230032",
+       ""
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "name": "Booking Form 1 - Fall 2027",
+   "tabs": [
+    {
+     "name": "Responses",
+     "rows": [
+      [
+       "id",
+       "ref",
+       "created",
+       "updated",
+       "status",
+       "review",
+       "email",
+       "name",
+       "code",
+       "phone",
+       "title",
+       "link",
+       "slot",
+       "members",
+       "data",
+       "keyHash",
+       "keyExpires",
+       "deleted",
+       "keySeal",
+       "number"
+      ],
+      [
+       "e706df04-d7d7-30e7-0d49-3a7c254262c6",
+       "RS-2027-0001",
+       "2027-09-01T10:00:00.000Z",
+       "2027-09-01T10:00:00.000Z",
+       "new",
+       "{}",
+       "student4230011@example.com",
+       "طالب أول اسم تجريبي",
+       "4230011",
+       "01012345678",
+       "Project 4230011",
+       "",
+       "day-1|12:30 - 12:50",
+       "",
+       "{\"email\":\"student4230011@example.com\",\"leader_name\":\"طالب أول اسم تجريبي\",\"leader_code\":\"4230011\",\"phone\":\"01012345678\",\"major\":\"حاسبات\",\"level\":\"صفر / الأولى\",\"section\":\"4C-TH1\",\"curriculum\":\"2020\",\"title\":\"Project 4230011\",\"slot\":{\"day\":\"day-1\",\"time\":\"12:30 - 12:50\"},\"_source\":{\"form\":\"f_48cadc01\",\"ref\":\"TR-2027-0002\"}}",
+       "96c95e11048bc0bb8eefe0439c2025848fdbaab03d2bdd07fd6e351810663c21",
+       "2027-09-08T10:00:00.000Z",
+       "",
+       "S26790",
+       ""
+      ]
+     ]
+    },
+    {
+     "name": "Bookings",
+     "rows": [
+      [
+       "Day",
+       "Time",
+       "Team leader",
+       "Code",
+       "Phone",
+       "Project"
+      ],
+      [
+       "Day 1",
+       "12:30 - 12:50",
+       "طالب أول اسم تجريبي",
+       "4230011",
+       "01012345678",
+       "Project 4230011"
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "name": "Group Form 1 - Batch 2027/2028",
+   "tabs": [
+    {
+     "name": "Responses",
+     "rows": [
+      [
+       "id",
+       "ref",
+       "created",
+       "updated",
+       "status",
+       "review",
+       "email",
+       "name",
+       "code",
+       "phone",
+       "title",
+       "link",
+       "slot",
+       "members",
+       "data",
+       "keyHash",
+       "keyExpires",
+       "deleted",
+       "keySeal",
+       "number"
+      ],
+      [
+       "daaa655d-1927-564d-b6f3-1dcd5ee6b353",
+       "WA-2027-0001",
+       "2027-09-01T10:00:00.000Z",
+       "2027-09-01T10:00:00.000Z",
+       "new",
+       "{\"schedule\":\"pending\",\"group\":\"pending\"}",
+       "student@example.com",
+       "طالب أول اسم تجريبي",
+       "4230041",
+       "01033344455",
+       "",
+       "https://drive.google.com/file/d/ttttttttttttttttttttttttttttttttt/view",
+       "",
+       "",
+       "{\"email\":\"student@example.com\",\"name\":\"طالب أول اسم تجريبي\",\"phone\":\"01033344455\",\"code\":\"4230041\",\"level\":\"صفر / الأولى\",\"major\":\"حاسبات\",\"group\":\"A\",\"section\":\"21\",\"schedule\":\"https://drive.google.com/file/d/ttttttttttttttttttttttttttttttttt/view\"}",
+       "224794fbf1723de1d3e1554714eb396cdb3490ae1281bd3d08a71aeb5ce787d5",
+       "2027-09-08T10:00:00.000Z",
+       "",
+       "S91569",
+       ""
+      ]
+     ]
+    },
+    {
+     "name": "Requests",
+     "rows": [
+      [
+       "id",
+       "raw",
+       "phone",
+       "label",
+       "added",
+       "decision",
+       "note"
+      ],
+      [
+       "9e42b891-b266-4c55-beba-283b1eb1b3ee",
+       "01199988877",
+       "01199988877",
+       "",
+       "2027-09-01T10:00:00.000Z",
+       "pending",
+       ""
+      ]
+     ]
+    },
+    {
+     "name": "Registrations",
+     "rows": [
+      [
+       "No.",
+       "Name",
+       "Code",
+       "Phone",
+       "Group",
+       "Section",
+       "Timetable",
+       "Review"
+      ],
+      [
+       1,
+       "طالب أول اسم تجريبي",
+       "4230041",
+       "01033344455",
+       "A",
+       "21",
+       "=HYPERLINK(\"https://drive.google.com/file/d/ttttttttttttttttttttttttttttttttt/view\",\"Open\")",
+       "Timetable check: pending  |  Group match: pending"
+      ]
+     ]
+    }
+   ]
+  }
+ ],
+ "properties": {
+  "ADMIN_PIN_HASH": "3ad48e880af8682a0784a57efb44f6faaf872c52ded55b0cc1f66949d30810e3",
+  "PEPPER": "22491bba-e008-2eea-2951-a3a157259684782d3cb7-8108-a6c8-782c-e24f440995b4",
+  "REGISTRY_ID": "1f1b9f8cf1bd01f930604804ec69b07b",
+  "ROOT_FOLDER_ID": "3492e04b7de07afb9ff69b784cd702fa"
+ },
+ "cache": {
+  "admin_fails": "1",
+  "badkey:f_48cadc01": "1"
+ },
+ "mail": [
+  {
+   "to": "student4230001@example.com",
+   "subject": "[Team Form 1] Registration received - TR-2027-0001"
+  },
+  {
+   "to": "student4230011@example.com",
+   "subject": "[Team Form 1] Registration received - TR-2027-0002"
+  },
+  {
+   "to": "student4230001@example.com",
+   "subject": "[Team Form 1] A team asks for one of your members"
+  },
+  {
+   "to": "student4230011@example.com",
+   "subject": "[Team Form 1] Your request was approved"
+  },
+  {
+   "to": "student4230021@example.com",
+   "subject": "[Team Form 1] Registration received - TR-2027-0003"
+  },
+  {
+   "to": "student4230031@example.com",
+   "subject": "[Task Form 1] Registration received - TK-2027-0001"
+  },
+  {
+   "to": "student4230011@example.com",
+   "subject": "[Booking Form 1] Registration received - RS-2027-0001"
+  },
+  {
+   "to": "student@example.com",
+   "subject": "[Group Form 1] Registration received - WA-2027-0001"
+  }
+ ],
+ "triggers": []
+}
