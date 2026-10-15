@@ -234,16 +234,6 @@
     "jsdoc": 4,
     "lines": 1
   },
-  "backend/features/outputs/menu/menu.service.js": {
-    "jsdoc": 10,
-    "lines": 5
-  },
-  "backend/features/outputs/menu/print-dialog.js": {
-    "biome/lint/complexity/useOptionalChain": 1,
-    "biome/lint/style/noMagicNumbers": 2,
-    "jsdoc": 4,
-    "lines": 8
-  },
   "backend/features/outputs/print/print.controller.js": {
     "layers": 2
   },
