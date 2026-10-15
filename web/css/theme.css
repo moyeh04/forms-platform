@@ -179,7 +179,9 @@ textarea {
   border-radius: 3px;
 }
 @media (prefers-reduced-motion: reduce) {
-  * {
+  *,
+  *::before,
+  *::after {
     /* biome-ignore-start lint/complexity/noImportantStyles: a reduced-motion
        setting must beat the motion of every component, whatever its
        specificity. */
