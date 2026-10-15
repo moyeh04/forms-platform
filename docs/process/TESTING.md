@@ -1,11 +1,11 @@
 # Testing
 
-340 automated tests run without a Google account, a browser, or a network.
+343 automated tests run without a Google account, a browser, or a network.
 They run the **real** backend and the **real** pages. This page explains how
 that works and what it can and cannot prove.
 
 ```
-npm test    # 340 tests
+npm test    # 343 tests
 ```
 
 ## The layers
@@ -167,6 +167,7 @@ says something else.
 | Biome check | `scripts/checks/biome.test.js` | 2 | A formatted, clean file has no findings; a layout problem and a lint rule become findings with their rule and line, and files outside the configured folders are left out |
 | Line check | `scripts/checks/lines.test.js` | 2 | A line over the limit is found with its width and one at the limit passes, a hook file without an extension is checked, Arabic counts by character, a URL does not count, and other folders are left out |
 | JSDoc check | `scripts/checks/jsdoc.test.js` | 3 | A full Google-style doc passes on a declaration, an arrow in a constant and an object property; a missing doc, a wrong or untyped `@param`, a missing or needless `@return`, `@returns` and `@author` are each found; callbacks, wrappers and handlers passed to a call need no doc |
+| Number check | `scripts/checks/numbers.test.js` | 3 | A number held by a constant variable, property, member or object passes, so do 0, 1, -1 and an ignored line; an unnamed variable, property, nested property or default parameter is found; arguments, operands and array elements are left to Biome |
 | Document check | `scripts/checks/docs.test.js` | 2 | API.md, TESTING.md (sub-folders counted) and Markdown links that match pass; a missing action, a wrong count and a broken link are each found |
 | Harness | `harness.test.js` | 5 | The fake itself, and a seeded world that repeats its ids |
 | Colour contrast | `contrast.test.js` | 4 | Every text and outline pair meets WCAG AA in light, dark, and device-dark themes |

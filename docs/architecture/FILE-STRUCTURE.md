@@ -187,6 +187,7 @@ no validation.
 | `scripts/checks/check-biome.js` | Runs Biome on the files of a run and turns what it reports into findings. |
 | `scripts/checks/check-lines.js` | No line wider than 80 columns, URLs not counted. |
 | `scripts/checks/check-jsdoc.js` | Every named function has a Google-style JSDoc comment whose tags match its parameters and return, with no metadata tags. |
+| `scripts/checks/check-numbers.js` | Every number that initialises something, which Biome skips, is held by a CONSTANT_CASE name. |
 | `scripts/checks/check-docs.js` | [API.md](../backend/API.md) names exactly the actions the backend has, [TESTING.md](../process/TESTING.md) gives the real number of tests, and no Markdown link points at a file that is gone. |
 | `scripts/backend-changed.js` | Tells the workflow whether a push changed a backend file, so a push of pages or documents alone does not deploy the backend. |
 | `scripts/setup-deployment.js` | First deployment from your computer (`npm run setup`): creates the sheet and its script, pushes the bundle, creates the web app, and stores the IDs, the credential and the Pages setting in GitHub. |

@@ -36,7 +36,7 @@ Biome's defaults, not chosen by hand:
 | `complexity/noExcessiveLinesPerFunction` | 50 lines, blank lines not counted, the wrapping IIFE not counted | long functions |
 | `style/noExcessiveLinesPerFile` | 300 lines | a file with more than one job |
 | `complexity/useMaxParams` | 4 parameters | long parameter lists; pass one options object instead |
-| `style/noMagicNumbers` | error | unnamed numbers (see CONSTANTS.md) |
+| `style/noMagicNumbers` | error | unnamed numbers (see [CONSTANTS.md](CONSTANTS.md)) |
 
 Rules turned off, each for a reason:
 
