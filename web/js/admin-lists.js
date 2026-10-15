@@ -22,7 +22,7 @@
     levels: {
       name: 'Levels',
       about: 'The level or year question.',
-      kind: 'named',
+      kind: ListKind.NAMED,
       types: [
         'team_registration',
         'task_submission',
@@ -33,14 +33,14 @@
     curricula: {
       name: 'Bylaws',
       about: 'The bylaw (curriculum year) question.',
-      kind: 'plain',
+      kind: ListKind.PLAIN,
       types: ['team_registration', 'task_submission', 'reservation']
     },
     majors: {
       name: 'Majors',
       about:
         'Specializations. A form can also be limited to some of them in its setup.',
-      kind: 'named',
+      kind: ListKind.NAMED,
       types: [
         'team_registration',
         'task_submission',
@@ -52,19 +52,19 @@
       name: 'Sections',
       about:
         'Lecture sections such as 4C-TH1. A form can also be limited to some of them in its setup.',
-      kind: 'sections',
+      kind: ListKind.SECTIONS,
       types: ['team_registration', 'task_submission', 'reservation']
     },
     groups: {
       name: 'Groups',
       about: 'WhatsApp group letters (A with Chemistry, B without).',
-      kind: 'plain',
+      kind: ListKind.PLAIN,
       types: ['whatsapp_registration']
     },
     wa_sections: {
       name: 'WhatsApp section numbers',
       about: 'The number next to TH in a student timetable.',
-      kind: 'numbers',
+      kind: ListKind.NUMBERS,
       types: ['whatsapp_registration']
     }
   };
@@ -426,7 +426,7 @@
       st.renaming = false;
       st.draft = null;
       st.sections =
-        kind() === 'sections'
+        kind() === ListKind.SECTIONS
           ? readSections(
               st.rows.map(function (r) {
                 return r.value;
@@ -451,7 +451,7 @@
     }
     /** Rows are needed for names and order; plain values read best as chips. */
     function asRows() {
-      return kind() === 'named' || st.order || named();
+      return kind() === ListKind.NAMED || st.order || named();
     }
 
     /** The first thing that stops a save, or ''. `at` is the row to mark. */
@@ -503,7 +503,7 @@
       var rule =
         st.key === 'majors'
           ? 'majors'
-          : kind() === 'sections'
+          : kind() === ListKind.SECTIONS
             ? 'sections'
             : '';
       var limited = !rule
@@ -710,7 +710,7 @@
       take(s.groups);
       keys().forEach(function (k) {
         // The saved copy of this list counts too, so a kind removed in this edit can be added back.
-        if (kind(k) === 'sections')
+        if (kind(k) === ListKind.SECTIONS)
           take(
             readSections(
               (lists[k] || []).map(function (o) {
@@ -1501,7 +1501,7 @@
       }
       box.appendChild(adder(rows));
       // Chips cannot rename or reorder, so a plain list offers the rows; rows of a plain list offer the way back.
-      if (st.rows.length && kind() !== 'named' && !named())
+      if (st.rows.length && kind() !== ListKind.NAMED && !named())
         box.appendChild(
           h(
             'button',
@@ -1643,14 +1643,14 @@
       ui.clear(rowsBox);
       var k = kind();
       var ed =
-        k === 'sections'
+        k === ListKind.SECTIONS
           ? sectionsEditor()
-          : k === 'numbers'
+          : k === ListKind.NUMBERS
             ? numbersEditor()
             : null;
       st.preview = null;
       rowsBox.appendChild(ed || choicesEditor());
-      if (k === 'sections') {
+      if (k === ListKind.SECTIONS) {
         st.preview = h('div');
         rowsBox.appendChild(st.preview);
         paintPreview();
@@ -1688,7 +1688,7 @@
     function createPane() {
       var form = (st.newList = st.newList || {
         name: '',
-        kind: 'sections',
+        kind: ListKind.SECTIONS,
         copyOf: ''
       });
       var err = h('p', { class: 'error', role: 'alert', hidden: true });

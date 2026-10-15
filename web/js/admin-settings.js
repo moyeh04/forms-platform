@@ -382,7 +382,7 @@
             !key &&
             y.list &&
             y.enabled !== false &&
-            A.listKind(y.list, res.listInfo) === 'sections'
+            A.listKind(y.list, res.listInfo) === ListKind.SECTIONS
           )
             key = y.list;
         });

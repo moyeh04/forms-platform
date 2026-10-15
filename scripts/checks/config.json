@@ -81,7 +81,8 @@
     "properties": {
       "type": "FormType",
       "status": "FormStatus",
-      "review": "ReviewStatus"
+      "review": "ReviewStatus",
+      "kind": "ListKind"
     }
   },
   "structure": {

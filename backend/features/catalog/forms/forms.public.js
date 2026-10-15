@@ -10,7 +10,7 @@ var FormsPublic = (function () {
   /** The rule that limits the choices of a list, or '' when none does. */
   function limitRuleOf_(list, info) {
     if (list === 'majors') return 'majors';
-    return ListsRepository.listKind(list, info) === 'sections'
+    return ListsRepository.listKind(list, info) === ListKind.SECTIONS
       ? 'sections'
       : '';
   }
