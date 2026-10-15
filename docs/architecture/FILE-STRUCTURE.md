@@ -194,7 +194,7 @@ the file name says the role:
 | `backend/platform/security/crypto.js` | Ids, random digits, SHA-256 and the sealing of short digit strings. |
 | `backend/platform/security/properties.js` | Script properties, including the secret pepper of every hash. |
 | `backend/platform/format/text.js` | Turning text into link names and into safe HTML. |
-| `backend/platform/format/time.js` | The current time and date as ISO text. |
+| `backend/platform/format/time.js` | The current time and date as ISO text, and instants some days away. |
 | `backend/platform/format/json.js` | Copying values and reading JSON text safely. |
 | `backend/platform/config/constants.js` | The name of the app, the registry tab names, and the names of the script properties and cache keys. |
 | `backend/platform/config/access.js` | Who may call an action: the admin, a private link, the holder of a registration key, or anyone. |
