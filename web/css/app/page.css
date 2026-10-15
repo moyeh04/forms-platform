@@ -42,11 +42,7 @@
   background-color: var(--sheet);
   background-image:
     radial-gradient(120% 90% at 0% 0%, rgba(154, 51, 40, 0.05), transparent 55%),
-    radial-gradient(
-      100% 80% at 100% 100%,
-      rgba(63, 107, 102, 0.06),
-      transparent 60%
-    );
+    radial-gradient(100% 80% at 100% 100%, rgba(63, 107, 102, 0.06), transparent 60%);
   padding: 38px 34px 34px;
   clip-path: polygon(
     0 7px,

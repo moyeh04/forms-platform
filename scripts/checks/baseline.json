@@ -1,16 +1,9 @@
 {
   "web/css/app/dialogs.css": {
-    "biome/lint/complexity/noImportantStyles": 1,
-    "lines": 1
+    "biome/lint/complexity/noImportantStyles": 1
   },
   "web/css/app/fields.css": {
     "biome/lint/style/noDescendingSpecificity": 1,
-    "lines": 2
-  },
-  "web/css/app/notes.css": {
-    "lines": 2
-  },
-  "web/css/app/page.css": {
     "lines": 2
   },
   "web/css/app/print.css": {
@@ -18,13 +11,12 @@
   },
   "web/css/app/route.css": {
     "biome/lint/style/noDescendingSpecificity": 4,
-    "lines": 8
+    "lines": 2
   },
   "web/css/app/slots.css": {
-    "biome/lint/style/noDescendingSpecificity": 1,
-    "lines": 1
+    "biome/lint/style/noDescendingSpecificity": 1
   },
   "web/css/app/ticket.css": {
-    "lines": 6
+    "lines": 1
   }
 }

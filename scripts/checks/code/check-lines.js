@@ -1,9 +1,12 @@
 /**
- * Checks that no line is longer than the limit (80 columns, Google §4.4).
+ * Checks that no line is longer than the limit: 80 columns (Google §4.4),
+ * or the width the configuration gives the extension of a file (120 for
+ * CSS, the line width Biome formats CSS at).
  * Biome wraps code but not strings or comments, so this check covers what
  * the formatter leaves. A URL cannot be broken, so it does not count toward
  * the length of its line.
  */
+const path = require('node:path');
 const { select, read } = require('../lib/files.js');
 
 const URL = /https?:\/\/\S+/g;
@@ -42,6 +45,18 @@ function longLines(file, text, limit) {
 }
 
 /**
+ * Reads the limit of a file: the width of its extension, or the default.
+ *
+ * @param {string} file The path of the file.
+ * @param {{limit: number, byExtension: (!Object<string, number>|undefined)}}
+ *     lines The configuration of the check.
+ * @return {number} The most columns a line of the file may take.
+ */
+function limitOf(file, lines) {
+  return lines.byExtension?.[path.extname(file)] || lines.limit;
+}
+
+/**
  * Checks the line length of the files of a run.
  *
  * @param {string} root The repository root.
@@ -51,7 +66,7 @@ function longLines(file, text, limit) {
  */
 function check(root, files, config) {
   return select(files, config.lines).flatMap((file) =>
-    longLines(file, read(root, file), config.lines.limit)
+    longLines(file, read(root, file), limitOf(file, config.lines))
   );
 }
 

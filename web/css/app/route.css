@@ -30,8 +30,7 @@
   border-radius: 18px;
   border: 2px solid var(--frame);
   background:
-    var(--sky-light) right 6% top 2px / calc(var(--horizon) - 4px) auto
-    no-repeat,
+    var(--sky-light) right 6% top 2px / calc(var(--horizon) - 4px) auto no-repeat,
     var(--sky-art) 0 0 / auto var(--horizon) repeat-x,
     url(../../img/sea.svg) 0 calc(var(--horizon) + 4px) / 160px 72px repeat-x,
     linear-gradient(

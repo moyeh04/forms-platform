@@ -32,6 +32,7 @@
   },
   "lines": {
     "limit": 80,
+    "byExtension": { ".css": 120 },
     "include": [
       "web/",
       "backend/",

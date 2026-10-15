@@ -8,8 +8,9 @@ const lines = require('../../../../scripts/checks/code/check-lines.js');
 const CONFIG = {
   lines: {
     limit: 10,
+    byExtension: { '.css': 12 },
     include: ['src/'],
-    extensions: ['.js', ''],
+    extensions: ['.js', '.css', ''],
     exclude: ['src/skip/']
   }
 };
@@ -36,6 +37,16 @@ test('Line check: a line over the limit is found, one at it passes', () => {
       'src/a.js:2 11 columns; the limit is 10',
       'src/hook:1 11 columns; the limit is 10'
     ]
+  );
+});
+
+test('Line check: an extension with its own width uses it', () => {
+  const root = repo({ 'src/e.css': '123456789012\n1234567890123\n' });
+  assert.deepEqual(
+    lines
+      .check(root, ['src/e.css'], CONFIG)
+      .map((f) => f.line + ' ' + f.message),
+    ['2 13 columns; the limit is 12']
   );
 });
 

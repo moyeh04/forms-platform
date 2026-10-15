@@ -12,13 +12,13 @@ Biome's formatter owns the layout. Do not lay code out by hand.
 | Setting | Value | Source |
 |---|---|---|
 | Indent | 2 spaces | Google §4.2 |
-| Line width | 80 columns | Google §4.4 |
+| Line width | 80 columns; 120 for CSS | Google §4.4; CSS is a list of short declarations that stays readable at 120, so the project gives it the wider width |
 | Quotes | single | Google §5.6.1 |
 | Semicolons | always | Google §4.3.2 |
 | Trailing commas | none | the files run in Apps Script and old browsers alike |
 | Arrow parameters | always in parentheses | one shape for every arrow |
 
-Biome wraps code at 80 columns but cannot break a long string or comment;
+Biome wraps code at its width but cannot break a long string or comment;
 `check-lines.js` refuses those (see [CHECKS.md](CHECKS.md)). Split the string
 with `+`, or move it into a constant.
 
