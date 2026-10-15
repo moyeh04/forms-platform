@@ -316,21 +316,6 @@
     "jsdoc": 2,
     "lines": 2
   },
-  "web/js/form/transfer.view.js": {
-    "biome/lint/complexity/noExcessiveCognitiveComplexity": 1,
-    "biome/lint/complexity/noExcessiveLinesPerFunction": 2,
-    "biome/lint/complexity/useOptionalChain": 2,
-    "jsdoc": 6,
-    "lines": 2
-  },
-  "web/js/form/transfer.page.js": {
-    "biome/lint/complexity/noExcessiveCognitiveComplexity": 1,
-    "biome/lint/complexity/noExcessiveLinesPerFunction": 1,
-    "biome/lint/correctness/noInnerDeclarations": 3,
-    "biome/lint/correctness/noUnusedVariables": 1,
-    "jsdoc": 4,
-    "lines": 5
-  },
   "web/js/form/ticket/ticket.js": {
     "biome/lint/complexity/noExcessiveCognitiveComplexity": 1,
     "biome/lint/complexity/noExcessiveLinesPerFunction": 1,
