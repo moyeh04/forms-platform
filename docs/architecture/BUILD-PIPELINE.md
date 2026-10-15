@@ -146,10 +146,10 @@ flowchart LR
         fn["var ResponsesRules = (function () { ... })();<br/>reads other namespaces only inside its functions"]
     end
     subgraph rule2["Rule 2: routes.js comes after the namespaces"]
-        reg["var API = {};<br/>API['submit'] = SubmissionsController.submit;"]
+        reg["var Routes = Router.create([<br/>{ action: 'submit', access: Access.PUBLIC,<br/>handler: SubmissionsController.submit }, ...])"]
     end
     subgraph rule3["Rule 3: no handler runs while loading"]
-        none["AuthService.admin(...) only wraps a handler.<br/>No handler runs until a request arrives."]
+        none["Router.create only checks and stores the rows.<br/>No handler runs until a request arrives."]
     end
     rule1 --> ok(("One order rule"))
     rule2 --> ok
@@ -169,11 +169,11 @@ functions and constants and returns the ones other files use; it calls into
 another namespace only from inside those functions, which run later. So the
 namespaces load in any order.
 
-`routes.js` is the exception. A line such as
-`API['admin.clients.list'] = AuthService.admin(ClientsController.list);` reads
-two namespaces while it loads, so `routes.js` comes after all of them
-(`BACKEND_LAST` in the bundler). `AuthService.admin` only wraps the handler; the
-PIN check happens later, when a request arrives. `entry-points.js` and `main.js`
+`routes.js` is the exception. Its rows, such as
+`{ action: 'admin.clients.list', access: Access.ADMIN, handler: ClientsController.list }`,
+read the namespaces while it loads, so `routes.js` comes after all of them
+(`BACKEND_LAST` in the bundler). `Router.create` only checks and stores the
+rows; the PIN check happens later, when a request arrives. `entry-points.js` and `main.js`
 only declare functions, so they could go anywhere; they come last because they
 read best at the end. The test suite loads the bundle in this exact order, so a
 mistake here would fail every test.

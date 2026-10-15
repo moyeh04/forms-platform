@@ -306,12 +306,14 @@ runs. So the namespaces load in any order. One file, `routes.js`, joins every
 action to its handler:
 
 ```js
-var API = {};
-API['admin.clients.list'] = AuthService.admin(ClientsController.list);
+var Routes = Router.create([
+  { action: 'admin.clients.list', access: Access.ADMIN, handler: ClientsController.list },
+  // ...
+], { requireAdmin: AuthService.requireAdmin, requireClient: ClientsAccess.requireClient });
 ```
 
 It reads the namespaces while it loads, so the bundler puts it after them.
-`AuthService.admin` only wraps the handler; the PIN check runs later, per
+`Router.create` only checks and stores the rows; the PIN check runs later, per
 request. The bundler therefore only needs a stable order (rules first, then the
 namespaces, then `routes.js`), not a clever one.
 
