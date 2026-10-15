@@ -110,7 +110,7 @@ flowchart LR
         a6["admin/lists/"]
     end
     subgraph viewer["viewer.html: instructor page"]
-        v1["viewer.js"]
+        v1["viewer/"]
     end
     common --> index
     common --> admin
@@ -286,7 +286,7 @@ The site is published at the paths it has always had: the pages at the root,
 | `web/js/admin/lists/list-head.view.js` | The head of the open list: name, Rename, Delete, what it is for and the forms that ask it. |
 | `web/js/admin/lists/lists.page.js` | The Lists page: its page object, opening a list, and drawing the pane and the editor of each kind. |
 | `web/js/teams/size-alerts.view.js` | The warnings about small teams as they are drawn: a line for each level and a mark on the card of a small team. Used by the dashboard and the instructor page. |
-| `web/js/viewer.js` | The instructor page. |
+| `web/js/viewer/viewer.page.js` | The instructor page. |
 | `domain/enums.js` | The words the pages and the backend share, as frozen enums of stored values: `FormType`, `FormStatus`, `ReviewStatus` and `ListKind`. Loaded before the other domain files. |
 | `domain/form-metadata/index.js` | What each form type shows beside its title (term, subject code, batch year) and how it is read, saved and copied. Used by the pages and the backend. It picks the part of the form type; the pages and the bundle load the parts before it. |
 | `domain/form-metadata/read.js` | How the metadata reads what it is given: text, own keys, a field of a form that may be missing, and academic years from years and terms. |

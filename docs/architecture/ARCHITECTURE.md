@@ -743,7 +743,7 @@ flowchart LR
         a6["admin/responses/download*.js<br/>Download all"]
     end
     subgraph viewerp["viewer.html"]
-        v1["viewer.js"]
+        v1["viewer/"]
     end
     cfg --> api
     api --> fm

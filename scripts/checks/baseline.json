@@ -151,7 +151,7 @@
   "web/index.html": {
     "lines": 4
   },
-  "web/js/viewer.js": {
+  "web/js/viewer/viewer.page.js": {
     "biome/lint/complexity/noExcessiveCognitiveComplexity": 4,
     "biome/lint/complexity/noExcessiveLinesPerFunction": 5,
     "biome/lint/complexity/useOptionalChain": 1,
