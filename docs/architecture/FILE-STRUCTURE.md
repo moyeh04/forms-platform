@@ -100,7 +100,7 @@ flowchart LR
         a5["admin/settings/timetable.view.js"]
         a9["admin/settings/range.view.js"]
         a10["admin/settings/size-alerts.view.js"]
-        a7["admin/keys/keys.view.js"]
+        a7["admin/keys/"]
         a8["admin/responses/download.view.js"]
         h2["handover.js"]
         s2["size-alerts.js"]
@@ -201,7 +201,11 @@ The site is published at the paths it has always had: the pages at the root,
 | `web/js/admin/settings/timetable.view.js` | The timetable of a reservation form: dates on a calendar, the hours, and the slots of each day. |
 | `web/js/admin/settings/range.view.js` | The range control of the team size and the teammates. |
 | `web/js/admin/settings/size-alerts.view.js` | The two warnings about small teams. |
-| `web/js/admin/keys/keys.view.js` | Key and link end dates. |
+| `web/js/admin/keys/until.model.js` | The dates keys and links work until: how a date is written, the end of a picked day, and where a key ends once given more time. |
+| `web/js/admin/keys/until-picker.view.js` | The line that says until when a key or a link works, and the one picker for how long, shared by Clients, a registration and Extend keys. |
+| `web/js/admin/keys/key-teams.view.js` | The keys the Extend keys dialog acts on: the groups to pick from, and the teams to choose with their search. |
+| `web/js/admin/keys/extend-keys.view.js` | The Extend keys dialog. |
+| `web/js/admin/keys/keys-summary.view.js` | The keys line of a form's Setup, with the Extend keys button. |
 | `web/js/admin/responses/responses.page.js` | Responses, each team, day or registration in its own block as in the sheet, and WhatsApp matching. |
 | `web/js/admin/responses/download.view.js` | Download all. |
 | `web/js/admin/people/people.page.js` | Instructor and client links. |

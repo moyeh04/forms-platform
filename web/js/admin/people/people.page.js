@@ -83,9 +83,9 @@
   }
 
   var LINK_PERIODS = [
-    [7, '1 week'],
-    [30, '1 month'],
-    [90, '3 months']
+    { days: 7, label: '1 week' },
+    { days: 30, label: '1 month' },
+    { days: 90, label: '3 months' }
   ];
 
   /** The link's end as the server takes it: an ISO time, or empty for no end. Periods count from today. */

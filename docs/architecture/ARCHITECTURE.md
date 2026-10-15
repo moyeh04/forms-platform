@@ -264,7 +264,7 @@ Opening the form again, or moving its close date, lifts the lock. Team
 registrations are not locked this way.
 
 A key works for the number of days set in **Setup, Edit key**, counted from
-when it is given. The admin moves that date in `admin/keys/keys.view.js`, backed by
+when it is given. The admin moves that date in `admin/keys/extend-keys.view.js`, backed by
 `keys.controller.js`: **Extend** in a registration's details changes one key, and
 **Extend keys** in Setup changes all keys, the expired ones, the ones ending in
 three days, or teams picked from a list. A period is added to the later of
@@ -737,7 +737,7 @@ flowchart LR
         s2["size-alerts.js<br/>small teams, drawn"]
         a3["admin/responses/responses.page.js<br/>blocks, matching, print"]
         a4["admin/people/people.page.js<br/>clients"]
-        a5["admin/keys/keys.view.js<br/>key and link end dates"]
+        a5["admin/keys/<br/>key and link end dates"]
         a6["admin/responses/download.view.js<br/>Download all"]
     end
     subgraph viewerp["viewer.html"]
