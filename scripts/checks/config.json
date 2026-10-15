@@ -7,7 +7,7 @@
     "tests": "tests",
     "backend": {
       "include": ["backend/"],
-      "extensions": [".gs", ".js"]
+      "extensions": [".js"]
     }
   },
   "biome": {
@@ -40,12 +40,12 @@
       "biome.json",
       "package.json"
     ],
-    "extensions": [".js", ".gs", ".css", ".html", ".sh", ".yml", ".json", ""],
+    "extensions": [".js", ".css", ".html", ".sh", ".yml", ".json", ""],
     "exclude": ["tests/fixtures/", "package-lock.json"]
   },
   "jsdoc": {
     "include": ["assets/js/", "backend/", "shared/", "scripts/"],
-    "extensions": [".js", ".gs"],
+    "extensions": [".js"],
     "exclude": ["assets/js/config.js"],
     "forbiddenTags": [
       "author",
@@ -62,12 +62,12 @@
   },
   "numbers": {
     "include": ["assets/js/", "backend/", "shared/", "scripts/"],
-    "extensions": [".js", ".gs"],
+    "extensions": [".js"],
     "allowed": [0, 1, 2, 10, 24, 60]
   },
   "flags": {
     "include": ["assets/js/", "backend/", "shared/"],
-    "extensions": [".js", ".gs"],
+    "extensions": [".js"],
     "exclude": []
   },
   "structure": {
@@ -101,7 +101,7 @@
     "cap": 8,
     "code": {
       "include": [""],
-      "extensions": [".js", ".gs", ".css", ".html", ".sh"],
+      "extensions": [".js", ".css", ".html", ".sh"],
       "exclude": ["tests/fixtures/", "docs/"]
     },
     "pages": ["index.html", "admin.html", "viewer.html"],
@@ -119,7 +119,7 @@
         "scripts/",
         ".githooks/"
       ],
-      "extensions": [".js", ".gs", ".css", ".sh", ""]
+      "extensions": [".js", ".css", ".sh", ""]
     }
   }
 }

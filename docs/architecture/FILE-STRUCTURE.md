@@ -31,7 +31,7 @@ flowchart TD
     repo["Repository"]
     repo --> web["Website<br/>index.html, admin.html, viewer.html<br/>assets/css, assets/js"]
     repo --> shared["shared/rules.js<br/>validation rules"]
-    repo --> be["backend/<br/>22 .gs files + appsscript.json"]
+    repo --> be["backend/<br/>23 .js files + appsscript.json"]
     repo --> sc["scripts/<br/>bundle-backend.js, build-site.js,<br/>setup-deployment.js, dev-server.js"]
     repo --> ts["tests/<br/>JavaScript"]
     repo --> dc["docs/"]
@@ -162,28 +162,28 @@ no validation.
 
 | File | What it does |
 |---|---|
-| `Code.gs` | Entry point. Routes each request to its handler. |
-| `Config.gs` | Constants and small helpers. |
-| `Auth.gs` | Admin PIN (salted hash, lockout). |
-| `Registry.gs` | The registry sheet: setup, reading and writing forms and lists, and creating, updating, duplicating and deleting a form under the lock. |
-| `Templates.gs` | The four form types and the default lists, all as data. |
-| `FormsApi.gs` | The API of forms and lists: the public form definition, the admin's form actions, and making, renaming, filling and deleting lists. |
-| `Responses.gs` | Reading and writing rows, edit keys, limits, Drive checks, emails. |
-| `Submissions.gs` | Student submit, lookup, update, cancel; admin edits and key reset. |
-| `Slots.gs` | Reservation timetable checks and availability. |
-| `Questions.gs` | Questions and pages an admin adds: allowed types, ids, labels and choices, and pages that list each existing question once. |
-| `KeyBooking.gs` | Booking a reservation with a registration key from another form: the setting, the team preview, the copied answers, and the next booking of a series. |
-| `TeamList.gs` | The teams of a team or task form with their members and their numbers, which a team keeps for good. Read by the sheet view, the printed list, the dashboard, the instructor page and the download. |
-| `Download.gs` | Download all: each team's task file or project folder read as the owner, `Teams.xlsx`, zip parts, and the pieces the page saves. |
-| `Xlsx.gs` | A small writer of Excel files: styles, merged cells, links to files next to the workbook, widths that fit the content. |
-| `KeyExpiry.gs` | When registration edit keys stop working, and moving that date for one, some, or all registrations of a form. |
-| `Transfers.gs` | Moving a member between two teams of a form: the rule, the requests tab, asking on submit and update, the answer of the leader or the admin, the move, and the emails. |
-| `Views.gs` | Tinted block views inside each form's Google Sheet, and the booked run that repaints them a minute after a change. |
-| `SheetStyle.gs` | How the data tabs look: the registry's Forms, Clients and Lists, and each form's Responses, Transfers and Requests get the dark header, a frozen first row, column widths and two row tints. It writes no value and no number format. |
-| `Print.gs` | Print tabs and PDF export. |
-| `Menu.gs` | The "Forms Platform" menu in the registry sheet: setup, the admin PIN, printing, rebuilding the views, and unlocking the admin page after wrong PINs. |
-| `Matching.gs` | WhatsApp request matching. |
-| `Clients.gs`, `Viewer.gs` | Private instructor links, their access keys and end dates, and what they can see. |
+| `Code.js` | Entry point. Routes each request to its handler. |
+| `Config.js` | Constants and small helpers. |
+| `Auth.js` | Admin PIN (salted hash, lockout). |
+| `Registry.js` | The registry sheet: setup, reading and writing forms and lists, and creating, updating, duplicating and deleting a form under the lock. |
+| `Templates.js` | The four form types and the default lists, all as data. |
+| `FormsApi.js` | The API of forms and lists: the public form definition, the admin's form actions, and making, renaming, filling and deleting lists. |
+| `Responses.js` | Reading and writing rows, edit keys, limits, Drive checks, emails. |
+| `Submissions.js` | Student submit, lookup, update, cancel; admin edits and key reset. |
+| `Slots.js` | Reservation timetable checks and availability. |
+| `Questions.js` | Questions and pages an admin adds: allowed types, ids, labels and choices, and pages that list each existing question once. |
+| `KeyBooking.js` | Booking a reservation with a registration key from another form: the setting, the team preview, the copied answers, and the next booking of a series. |
+| `TeamList.js` | The teams of a team or task form with their members and their numbers, which a team keeps for good. Read by the sheet view, the printed list, the dashboard, the instructor page and the download. |
+| `Download.js` | Download all: each team's task file or project folder read as the owner, `Teams.xlsx`, zip parts, and the pieces the page saves. |
+| `Xlsx.js` | A small writer of Excel files: styles, merged cells, links to files next to the workbook, widths that fit the content. |
+| `KeyExpiry.js` | When registration edit keys stop working, and moving that date for one, some, or all registrations of a form. |
+| `Transfers.js` | Moving a member between two teams of a form: the rule, the requests tab, asking on submit and update, the answer of the leader or the admin, the move, and the emails. |
+| `Views.js` | Tinted block views inside each form's Google Sheet, and the booked run that repaints them a minute after a change. |
+| `SheetStyle.js` | How the data tabs look: the registry's Forms, Clients and Lists, and each form's Responses, Transfers and Requests get the dark header, a frozen first row, column widths and two row tints. It writes no value and no number format. |
+| `Print.js` | Print tabs and PDF export. |
+| `Menu.js` | The "Forms Platform" menu in the registry sheet: setup, the admin PIN, printing, rebuilding the views, and unlocking the admin page after wrong PINs. |
+| `Matching.js` | WhatsApp request matching. |
+| `Clients.js`, `Viewer.js` | Private instructor links, their access keys and end dates, and what they can see. |
 
 `npm run build` joins `shared/rules.js`, `shared/form-metadata.js` and every backend file into `dist/Code.gs`.
 

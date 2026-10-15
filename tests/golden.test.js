@@ -55,7 +55,7 @@ test('Golden: every function Apps Script calls by name exists in the bundle', ()
   for (const name of names) {
     assert.equal(typeof w.ctx[name], 'function', name);
   }
-  const menu = fs.readFileSync(path.join(__dirname, '..', 'backend', 'Menu.gs'), 'utf8');
+  const menu = fs.readFileSync(path.join(__dirname, '..', 'backend', 'Menu.js'), 'utf8');
   const named = [...menu.matchAll(/addItem\('[^']*', '(\w+)'\)/g)].map((m) => m[1]);
   assert.ok(named.length > 0);
   for (const name of named) assert.ok(names.includes(name), `menu item ${name} is pinned`);

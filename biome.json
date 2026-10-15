@@ -76,6 +76,17 @@
           }
         }
       }
+    },
+    {
+      "includes": ["backend/**"],
+      "linter": {
+        "rules": {
+          "correctness": {
+            "noUnusedVariables": "off",
+            "noInvalidUseBeforeDeclaration": "off"
+          }
+        }
+      }
     }
   ]
 }
