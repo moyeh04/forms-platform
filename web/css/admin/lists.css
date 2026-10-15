@@ -1,0 +1,259 @@
+.list-pane > .actions {
+  margin-top: 16px;
+}
+.q-list-pick {
+  grid-column: 2 / -1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.q-list-pick .select {
+  max-width: 22rem;
+  min-height: 34px;
+}
+.list-head h2 {
+  font-size: 1.4rem;
+}
+.used-by {
+  margin: 4px 0 16px;
+  font-size: var(--fs-help);
+  color: var(--mute);
+}
+.used-by a {
+  color: var(--sea);
+  font-weight: 700;
+}
+.value-chips {
+  list-style: none;
+  margin: 0;
+  padding: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  border: 1.5px solid var(--line);
+  border-radius: 4px;
+  background: var(--sheet-2);
+}
+.value-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 4px 3px 12px;
+  border: 1.5px solid var(--line);
+  border-radius: 999px;
+  background: var(--sheet);
+  font-weight: 700;
+}
+[dir="rtl"] .value-chip {
+  padding: 3px 12px 3px 4px;
+}
+.value-chip.bad {
+  border-color: var(--err);
+  color: var(--err);
+}
+.value-chip button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--mute);
+  cursor: pointer;
+}
+.value-chip button:hover {
+  background: var(--tint-b);
+  color: var(--err);
+}
+.choice-head,
+.choice {
+  display: grid;
+  grid-template-columns: 2rem minmax(0, 1fr) minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+}
+.choice-head.with-ar,
+.with-ar > .choice {
+  grid-template-columns: 2rem minmax(0, 1.2fr) minmax(0, 1fr) minmax(0, 1fr) auto;
+}
+.choice-head {
+  font-size: var(--fs-help);
+  color: var(--mute);
+  font-weight: 700;
+  padding: 0 4px 4px;
+}
+.choices {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid var(--line);
+}
+.choice {
+  padding: 4px;
+  border-bottom: 1px solid var(--line);
+}
+.choice:hover {
+  background: var(--sheet-2);
+}
+.choice.bad {
+  background: var(--tint-b);
+}
+.choice .input {
+  min-height: 38px;
+  font-size: 1rem;
+}
+.choice-n {
+  color: var(--mute);
+  font-size: var(--fs-help);
+  text-align: center;
+}
+.choice-tools {
+  display: flex;
+  gap: 4px;
+}
+.toggle-chip.sm {
+  min-height: 32px;
+  padding: 2px 12px;
+  font-size: var(--fs-help);
+}
+.icon-btn.sm {
+  min-width: 34px;
+  min-height: 34px;
+  padding: 0 8px;
+  font-size: 1rem;
+}
+.icon-btn.sm:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+.icon-btn.danger {
+  color: var(--err);
+}
+.choice-add {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+  margin: 12px 0 4px;
+  padding: 10px 12px;
+  border: 1.5px dashed var(--line);
+  border-radius: 4px;
+}
+.choice-add.short {
+  grid-template-columns: minmax(0, 1fr) auto;
+  max-width: 30rem;
+}
+.list-pane > .error {
+  margin: 8px 0 0;
+}
+.list-many {
+  margin-top: 14px;
+}
+.list-many summary {
+  cursor: pointer;
+  font-weight: 700;
+  color: var(--sea);
+}
+.list-many .textarea {
+  margin: 8px 0;
+}
+.list-many .actions:empty {
+  display: none;
+}
+.list-range {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+}
+.list-range .label {
+  margin: 0 6px 0 0;
+}
+.list-range .num {
+  width: 5.5rem;
+  min-height: 38px;
+}
+.list-range .error {
+  flex-basis: 100%;
+}
+.savebar-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-inline-end: auto;
+}
+.savebar-text .savebar-note {
+  margin: 0;
+}
+.savebar-warn {
+  color: var(--err);
+  font-size: var(--fs-help);
+  font-weight: 700;
+}
+.savebar-warn:empty {
+  display: none;
+}
+@media (max-width: 940px) {
+  .lists-index {
+    position: static;
+  }
+  .lists.picked > .lists-index,
+  .lists:not(.picked) > .list-pane {
+    display: none;
+  }
+  .lists-back {
+    display: inline-block;
+    margin-bottom: 6px;
+  }
+}
+@media (max-width: 600px) {
+  .sec-kind {
+    grid-template-columns: 2.6rem auto;
+  }
+  .sec-kind.removable {
+    grid-template-columns: 2.6rem auto auto;
+  }
+  .sec-kind.removable > .icon-btn {
+    justify-self: end;
+  }
+  .sec-range {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+  .sec-pick .label {
+    min-width: 0;
+    flex-basis: 100%;
+  }
+  .q-list-pick {
+    grid-column: 1;
+  }
+  .choice-head {
+    display: none;
+  }
+  .choice,
+  .with-ar > .choice {
+    grid-template-columns: 1.6rem minmax(0, 1fr) auto;
+    gap: 6px 8px;
+    padding: 8px 4px;
+  }
+  .choice-tools {
+    grid-column: 3;
+    grid-row: 1;
+  }
+  .choice-en,
+  .choice-ar {
+    grid-column: 2 / -1;
+  }
+  .choice-add {
+    grid-template-columns: 1fr;
+  }
+  .choice-add.short {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+  .savebar-text {
+    flex-basis: 100%;
+  }
+}

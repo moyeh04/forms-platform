@@ -24,24 +24,3 @@ test('Site map: paths outside the site, or leaving it, have no source', () => {
   assert.equal(sourceOf('/assets/js/../../../package.json'), null);
   assert.equal(sourceOf('/.git/config'), null);
 });
-
-test('Site map: a split script loads its parts in one order', () => {
-  const { JOINED } = require('../../../scripts/build/site-map.js');
-  const { bundleSource } = require('../../../scripts/build/bundle-backend.js');
-  const bundled = bundleSource().files;
-  for (const { published, sources } of JOINED) {
-    const inParts = (file) => sources.includes(file);
-    const last = sources[sources.length - 1];
-    for (const page of PAGES) {
-      const html = fs.readFileSync(path.join(root, sourceOf(page)), 'utf8');
-      const loaded = [...html.matchAll(/<script src="([^"]+)"/g)]
-        .map((m) => sourceOf(m[1]))
-        .filter(inParts);
-      if (loaded.includes(last)) assert.deepEqual(loaded, sources, page);
-    }
-    const inBundle = bundled.filter(inParts);
-    if (inBundle.includes(last)) {
-      assert.deepEqual(inBundle, sources, published);
-    }
-  }
-});

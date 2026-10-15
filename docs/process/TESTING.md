@@ -1,11 +1,11 @@
 # Testing
 
-369 automated tests run without a Google account, a browser, or a network.
+368 automated tests run without a Google account, a browser, or a network.
 They run the **real** backend and the **real** pages. This page explains how
 that works and what it can and cannot prove.
 
 ```
-npm test    # 369 tests
+npm test    # 368 tests
 ```
 
 ## The layers
@@ -153,7 +153,7 @@ says something else.
 | Rules: Drive links | `domain/rules/drive-link.test.js` | 2 | Files, folders and slides, other hosts refused; folder names |
 | Rules: slots | `domain/rules/slots.test.js` | 2 | The generated times of a day, and the room left in a slot |
 | Rules: forms | `domain/rules/form.test.js` | 2 | Members list, role lookup and form state; counting the people of a form with a code counted once |
-| Rules: team size | `domain/rules/team-size.test.js` | 2 | The two warnings about small teams: starting numbers, the level of a team, a wrong number or order |
+| Rules: team size | `domain/rules/team-size.test.js` | 3 | The two warnings about small teams: starting numbers, the level of a team, a wrong number or order, the numbers a level can ask for |
 | Rules: submission | `domain/rules/submission.test.js` | 5 | Cleaned data, field and member errors, the same code twice, too many members, slot choices, disabled fields |
 | Team size and audience | `backend/features/intake/teams/team-size.test.js` | 18 | Required question, range, exact member count, admin range, the warnings about small teams saved cleaned and refused when wrong, the sizes of the saved teams sent with the form, size notes, specialization limits, section limits |
 | Forms | `backend/features/catalog/forms/forms.test.js` | 8 | Every template created with its own spreadsheet, type and title checked, the public form of a draft and of an open form, open and close dates, unique link names, duplicate, delete, WhatsApp metadata kept on a copy |
@@ -173,7 +173,7 @@ says something else.
 | Registry writes | `backend/features/catalog/registry/registry-writes.test.js` | 6 | Every change to forms, lists and links written inside the lock, a save that keeps its row while another form is deleted, a save over a newer copy refused, a busy lock, a link that keeps a renamed form, list names that stay unique |
 | Flag cells | `backend/platform/sheets/cell.test.js` | 2 | A stored flag read as yes, no or its column's default (empty, missing and legacy text), and written as `1` or the column's own cell for no |
 | Golden copies | `golden.test.js` | 5 | What the live system depends on, compared with saved copies in `tests/fixtures/golden/`: every function Apps Script calls by name, the salted hashes and seals for a fixed pepper, the error code of every action for five kinds of request, legacy flag cells read and written back, and every sheet, property, cache entry, mail and trigger after one scripted run. `GOLDEN_UPDATE=1` writes the copies again, only for a change meant to alter them |
-| Site map | `scripts/build/site-map.test.js` | 3 | Each published path, with or without a slash, query or fragment, finds its source under `web/` or `domain/`, and every page exists; a path outside the site or one that climbs out of it with `..` has none; each split script, its old address, the pages and the bundle load its parts in one order |
+| Site map | `scripts/build/site-map.test.js` | 2 | Each published path, with or without a slash, query or fragment, finds its source under `web/` or `domain/`, and every page exists; a path outside the site or one that climbs out of it with `..` has none |
 | Check baseline | `scripts/checks/lib/baseline.test.js` | 3 | A legacy file keeps its count and never goes over it, a new file has no allowance, a lowered count must be written down and lowering never raises one, and a key ending in `/` is a folder that counts as there while it holds a file |
 | Check exceptions | `scripts/checks/lib/exceptions.test.js` | 1 | An exception removes the findings of its path and rule, needs a reason, and fails once it matches nothing |
 | Biome check | `scripts/checks/code/biome.test.js` | 2 | A formatted, clean file has no findings; a layout problem and a lint rule become findings with their rule and line, and files outside the configured folders are left out |
@@ -199,7 +199,7 @@ says something else.
 | Sheet rows | `backend/platform/sheets/table.test.js` | 1 | A new row is written as plain text, also past the rows the sheet was made with |
 | Data tab look | `backend/platform/sheets/sheet-style.test.js` | 3 | The registry and a new form get the header, widths and row tints, an older sheet gets them on the next repaint with no value changed, a tab that refuses the look is still repainted |
 | Sheet menu | `backend/features/outputs/menu/menu.test.js` | 2 | Print dialogs list the right forms and days with escaped titles, and the menu call creates the tab |
-| Site build | `scripts/build/build-site.test.js` | 6 | `API_URL` validation, the URL and the deployment ID agree, built pages use the variable URL, the built site carries its version and names every script and stylesheet by its content, a page kept from the last release finds every file and its old rules read the enums, the command line fails without `API_URL` |
+| Site build | `scripts/build/build-site.test.js` | 5 | `API_URL` validation, the URL and the deployment ID agree, built pages use the variable URL, the built site carries its version and names every script and stylesheet by its content, the command line fails without `API_URL` |
 | Clasp configuration | `scripts/deploy/prepare-clasp.test.js` | 2 | Missing IDs or credentials fail without showing a token, and clasp targets `dist/` with the credentials written apart |
 | First deployment | `scripts/deploy/setup-deployment.test.js` | 8 | A first run creates the web app and stores its address, the credential reaches GitHub on standard input only, a stored deployment updated in place, a branch-built Pages site switched to Actions, a failed step stops early, a bound sheet created once, the choice on a terminal, the same clasp version as the workflow |
 | Backend change | `scripts/deploy/backend-changed.test.js` | 1 | A push without a backend change skips the Apps Script job, and one that cannot be compared deploys |

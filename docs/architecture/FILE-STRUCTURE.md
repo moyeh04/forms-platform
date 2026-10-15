@@ -95,18 +95,19 @@ flowchart LR
     end
     subgraph admin["admin.html: the dashboard"]
         r2["domain/rules/"]
-        a1["admin.js"]
-        a2["admin-settings.js"]
-        a5["admin-timetable.js"]
-        a9["admin-range.js"]
-        a10["admin-size-alerts.js"]
-        a7["admin-keys.js"]
-        a8["admin-download.js"]
+        a1["admin/shell/"]
+        a2["admin/settings/"]
+        a12["admin/questions/"]
+        a5["admin/settings/timetable*.js"]
+        a9["admin/settings/range.view.js"]
+        a11["admin/settings/range-note.view.js"]
+        a10["admin/settings/size-alerts.view.js"]
+        a7["admin/keys/"]
         h2["handover.js"]
         s2["size-alerts.js"]
-        a3["admin-data.js"]
-        a4["admin-people.js"]
-        a6["admin-lists.js"]
+        a3["admin/responses/"]
+        a4["admin/people/"]
+        a6["admin/lists/"]
     end
     subgraph viewer["viewer.html: instructor page"]
         v1["viewer.js"]
@@ -138,7 +139,22 @@ The site is published at the paths it has always had: the pages at the root,
 | `web/viewer.html` | The read-only instructor and client page (`?t=private-token`). |
 | `web/css/theme.css` | Colors, fonts, and the type scale as variables. Change the look here; the contrast standard is in its header and enforced by `tests/web/css/theme.test.js`. |
 | `web/css/app.css` | Components of the student page. |
-| `web/css/admin.css` | Dashboard and instructor layout, including the team cards (a coloured band per team, header strip, leader tag). |
+| `web/css/admin/layout.css` | The dashboard layout classes, the tabs of a form and the settings sections. The dashboard and the instructor page load the `admin/` files in the order of these rows, so the cascade is the one the single file had. |
+| `web/css/admin/questions.css` | The Questions tab: a row per question under its page. |
+| `web/css/admin/forms-list.css` | The header of a form and the forms list grouped by status. |
+| `web/css/admin/bookings.css` | The bookings of a registration form inside its card. |
+| `web/css/admin/new-form.css` | New form: the steps and the preview at the side. |
+| `web/css/admin/fields.css` | The fields editor: descriptions, size preview, chips and steppers. |
+| `web/css/admin/timetable.css` | The timetable editor and the save bar. |
+| `web/css/admin/responses-alerts.css` | What waits for the admin above Responses, and the warnings about small teams. |
+| `web/css/admin/teammates.css` | The teammates settings of a booking. |
+| `web/css/admin/sections.css` | A section list: a card for each year group. |
+| `web/css/admin/lists.css` | The Lists page: kind cards, chips, choice rows and the index. |
+| `web/css/admin/responses.css` | Responses blocks and the team cards (a coloured band per team, header strip, leader tag). |
+| `web/css/admin/matching.css` | WhatsApp matching. |
+| `web/css/admin/phone.css` | The phone layout of team members, the page header and bookings. |
+| `web/css/admin/phone-tables.css` | The phone layout of wide tables: one card per row. |
+| `web/css/admin/keys.css` | Client links, the until picker of keys and links, and Download all. |
 | `web/img/` | The tab icon (`favicon.svg`), PNG sizes for phones and older browsers, and `site.webmanifest`. The pirate and the parrot of the ticket picture (`pirate.webp`, `parrot.webp`), with clear backgrounds; `web/js/form/ticket/` draws the clock and the calendar around them. The pictures of the route: the ship (`ship.svg`), an island (`island.svg`), the treasure chest (`treasure.svg`), the waves (`sea.svg`), the sky by day and by night (`sky-day.svg`, `sky-night.svg`) and the sun and moon (`sun.svg`, `moon.svg`). They have their own colours; the sea and sky behind them take theirs from the theme. |
 | `web/js/config.js` | Source placeholder; `scripts/build/build-site.js` generates its published copy from the Actions `API_URL` variable, with the version of the site. |
 | `web/js/app/fresh.js` | Keeps an open page on the published version: compares the version in `config.js` with `version.json`, reloads an older page when nothing would be lost, and offers **Reload** otherwise. |
@@ -184,16 +200,91 @@ The site is published at the paths it has always had: the pages at the root,
 | `web/js/ui/dialogs.js` | The toast and the confirmation dialog. |
 | `web/js/ui/clipboard.js` | Copies text, with a fallback for browsers without the clipboard API. |
 | `web/js/ui/theme-button.js` | The light and dark switch every page has. |
-| `web/js/admin.js` | Dashboard core: login with the PIN, navigation, the widgets the dashboard modules share, and the forms list. |
-| `web/js/admin-settings.js` | Form settings: everything an admin can change without touching code. |
-| `web/js/admin-timetable.js` | The timetable of a reservation form: dates on a calendar, the hours, and the slots of each day. |
-| `web/js/admin-range.js` | The range control of the team size and the teammates. |
-| `web/js/admin-size-alerts.js` | The two warnings about small teams. |
-| `web/js/admin-keys.js` | Key and link end dates. |
-| `web/js/admin-data.js` | Responses, each team, day or registration in its own block as in the sheet, and WhatsApp matching. |
-| `web/js/admin-download.js` | Download all. |
-| `web/js/admin-people.js` | Instructor and client links. |
-| `web/js/admin-lists.js` | The lists behind dropdown questions, each edited the way its kind needs. |
+| `web/js/admin/shell/admin.model.js` | The kinds of form, the statuses and their labels, the tabs of a form, the icon sizes, and the links of a form and an instructor page. Loaded first of the dashboard parts; creates `App.admin`. |
+| `web/js/admin/shell/calls.page.js` | Calls to the backend, and what the admin is told when one fails. |
+| `web/js/admin/shell/widgets.view.js` | The small controls every screen is built from: badge, field, checkbox, text, number, dropdown. |
+| `web/js/admin/shell/dialogs.view.js` | A dialog with its own buttons, and the dialog that shows a link or a key once. |
+| `web/js/admin/shell/metadata.view.js` | The editors of what a form shows beside its title: a term with a subject code, or a batch year. |
+| `web/js/admin/shell/form-head.view.js` | The header and the tab bar of a form: its status, its link and the More menu. |
+| `web/js/admin/shell/form-actions.page.js` | Deleting a form, and copying it for a new term. |
+| `web/js/admin/shell/forms.model.js` | Which forms give keys, which can start bookings, and which form a booking belongs to. |
+| `web/js/admin/shell/series.view.js` | The bookings under a registration form and the button that makes the next one. |
+| `web/js/admin/shell/forms-list.view.js` | The forms list, grouped by status. |
+| `web/js/admin/shell/create.view.js` | The page that makes a new form. |
+| `web/js/admin/shell/login.view.js` | The PIN screen. |
+| `web/js/admin/shell/router.page.js` | Reads the address, draws the bar and the page it names, and guards unsaved changes. Loaded last of the shell parts. |
+| `web/js/admin/settings/settings.page.js` | The settings page of a form: loads it, places the panels in the Questions, Timetable and Setup tabs, and keeps the open sections. |
+| `web/js/admin/settings/panel.view.js` | A settings section folded to one line: its name and what it is set to now. |
+| `web/js/admin/settings/allow-picker.view.js` | The chips that limit a form to some values of a list, grouped by section year. |
+| `web/js/admin/settings/general.view.js` | The Name and dates panel: title, subject and term, link name, opening and closing, language, icon. |
+| `web/js/admin/settings/who.view.js` | The Who can register panel: the specializations and sections a form is limited to. |
+| `web/js/admin/settings/key-booking.view.js` | The Booking with a key panel of a reservation. |
+| `web/js/admin/settings/team-size.view.js` | The Team size panel and the Small teams panel. |
+| `web/js/admin/settings/edit-key.view.js` | The Edit key panel: whether students get a key, for how long, and what it lets them do. |
+| `web/js/admin/settings/limits.view.js` | The Limits and checks panel: most submissions, Drive check, one team per student with transfer requests, folder names. |
+| `web/js/admin/settings/emails.view.js` | The Emails panel: the confirmation to students and the note to the admin. |
+| `web/js/admin/settings/review.view.js` | The Review steps panel, and matching to pasted WhatsApp requests. |
+| `web/js/admin/settings/settings.model.js` | What the settings page saves, and the first thing that stops a save with its panel. |
+| `web/js/admin/settings/savebar.view.js` | The save bar: shown while something changed, sends only what changed, shows why a save was refused. |
+| `web/js/admin/questions/questions.model.js` | The questions and pages of a form as the Questions tab changes them: kinds, moves, adding and removing, choices, what stops a save. |
+| `web/js/admin/questions/page-head.view.js` | The heading of a page in the Questions list, and the picker of the list a choice question reads. |
+| `web/js/admin/questions/question-tools.view.js` | The folded tools of a question: its page, its order, and for an added question its kind, choices and Remove. |
+| `web/js/admin/questions/question-row.view.js` | A question in the list: Show, Required, its labels, kind and description, and the rows of the questions about each member. |
+| `web/js/admin/questions/questions.view.js` | The Questions panel: each page and its questions, the questions on no page, and Add a page. |
+| `web/js/admin/questions/teammates.view.js` | The Teammates panel of a booking: whether they are asked, how many, the words students read, and what is asked about each. |
+| `web/js/admin/settings/timetable.model.js` | The state of the timetable and its rules: the slots a day offers, the bookings counted, what stops a save, the saved shape. |
+| `web/js/admin/settings/timetable-calendar.view.js` | The month calendar where dates are added and removed. |
+| `web/js/admin/settings/timetable-hours.view.js` | The general hours and the bookings per slot. |
+| `web/js/admin/settings/timetable-day.view.js` | One day of the result: its name, its slots, its own hours. |
+| `web/js/admin/settings/timetable.view.js` | The timetable of a reservation form: the result and the layout of the parts. |
+| `web/js/admin/settings/range.view.js` | The range control of the team size and the teammates: the bounds, the numbers students see and the saved answers left outside. |
+| `web/js/admin/settings/range-note.view.js` | The note of the range control: the numbers that show it, its text and its preview. |
+| `web/js/admin/settings/size-alerts.view.js` | The two warnings about small teams. |
+| `web/js/admin/keys/until.model.js` | The dates keys and links work until: how a date is written, the end of a picked day, and where a key ends once given more time. |
+| `web/js/admin/keys/until-picker.view.js` | The line that says until when a key or a link works, and the one picker for how long, shared by Clients, a registration and Extend keys. |
+| `web/js/admin/keys/key-teams.view.js` | The keys the Extend keys dialog acts on: the groups to pick from, and the teams to choose with their search. |
+| `web/js/admin/keys/extend-keys.view.js` | The Extend keys dialog. |
+| `web/js/admin/keys/keys-summary.view.js` | The keys line of a form's Setup, with the Extend keys button. |
+| `web/js/admin/responses/responses.model.js` | The rules of Responses that draw nothing: the search, the teams under the minimum size, bookings by day, the order of WhatsApp registrations and the CSV rows. |
+| `web/js/admin/responses/row-controls.view.js` | What every list of responses shares: Arabic names, labelled cells, the status and review selects and the Details button. |
+| `web/js/admin/responses/details-key.view.js` | The edit key rows of the Details dialog: the key shown on request and the date it works until. |
+| `web/js/admin/responses/details.view.js` | The Details dialog of a submission: every answer, the review steps, Reset key and Delete. |
+| `web/js/admin/responses/teams.view.js` | Teams and tasks, each team in its own block with its members. |
+| `web/js/admin/responses/bookings.view.js` | Reservations, each day in its own block with its bookings in timetable order. |
+| `web/js/admin/responses/registrations.view.js` | WhatsApp registrations in one table, with a column for each review step. |
+| `web/js/admin/responses/transfers.view.js` | The students another team asked for, with Reject and Approve and move, and the new leader when a leader moves. |
+| `web/js/admin/responses/matching.view.js` | WhatsApp matching: its shared state, loading, filtering and deciding. |
+| `web/js/admin/responses/matching-list.view.js` | The left side of matching: the pasted requests, the filters and the list. |
+| `web/js/admin/responses/matching-detail.view.js` | The right side of matching: the registrations of a phone number, the note and the decision buttons. |
+| `web/js/admin/responses/print.view.js` | The print tabs made in the Google Sheet, and the CSV file. |
+| `web/js/admin/responses/toolbar.view.js` | The toolbar of Responses: search, status filter, Refresh, Download CSV and the print and download buttons of each form type. |
+| `web/js/admin/responses/responses.page.js` | The Responses page: its stats, what needs the admin, the matching tabs and the list. |
+| `web/js/admin/responses/download.model.js` | The steps of Download all: start the job, save the teams, pack the parts and save each part from its pieces. |
+| `web/js/admin/responses/download-result.view.js` | The end of Download all: the parts to save, the items not downloaded and the Drive folder. |
+| `web/js/admin/responses/download.view.js` | The Download all dialog: what it saves, its progress, and Start again when it stops. |
+| `web/js/admin/people/access.view.js` | The dialog that shows a private link and its access key apart. |
+| `web/js/admin/people/link-end.view.js` | How long a private link works: the picker of its end and the dialog that moves it. |
+| `web/js/admin/people/client-row.view.js` | A private link in the Clients table, with its key and its actions. |
+| `web/js/admin/people/client-dialog.view.js` | The dialog that makes a private link or edits one. |
+| `web/js/admin/people/people.page.js` | The Clients page: its head and the table of links. |
+| `web/js/admin/lists/lists.model.js` | The lists that came with the platform, the kinds a list can be, and how a saved list turns into rows and back. Also the kind, name and swap rule the Questions tab reads. |
+| `web/js/admin/lists/list-edit.model.js` | The open list as it is edited: loading it, whether it differs from its saved copy, what stops a save and what a save would change. |
+| `web/js/admin/lists/sections.model.js` | A section list as year groups, kinds and counts: reading and writing the values, where a new group goes, and the kinds, letters and years in use. |
+| `web/js/admin/lists/stepper.view.js` | A number with − and + buttons around its field. |
+| `web/js/admin/lists/new-kind.view.js` | The "+ New kind" chip that turns into a field. |
+| `web/js/admin/lists/section-extras.view.js` | The sections kept as written because they follow no pattern. |
+| `web/js/admin/lists/sections.view.js` | The editor of a section list: a card for each year group with a stepper for each kind. |
+| `web/js/admin/lists/group-draft.model.js` | The rules of a new year group: its name, its sections and what stops it being added. |
+| `web/js/admin/lists/group-draft-pick.view.js` | The year and department letter chips of a new year group. |
+| `web/js/admin/lists/group-draft.view.js` | The card of a new year group: its counts, its footer and Add. |
+| `web/js/admin/lists/numbers.view.js` | The editor of a number list: a run from one number to another. |
+| `web/js/admin/lists/choices.view.js` | The editor of named and short choices, as rows or chips. |
+| `web/js/admin/lists/choice-add.view.js` | Adding choices one at a time or many at once from pasted lines. |
+| `web/js/admin/lists/list-index.view.js` | The index of the Lists page: New list and a card for each list. |
+| `web/js/admin/lists/list-savebar.view.js` | The save bar of the open list and what follows the rows as they are typed. |
+| `web/js/admin/lists/create-pane.view.js` | The New list pane: name, kind and what it starts with. |
+| `web/js/admin/lists/list-head.view.js` | The head of the open list: name, Rename, Delete, what it is for and the forms that ask it. |
+| `web/js/admin/lists/lists.page.js` | The Lists page: its page object, opening a list, and drawing the pane and the editor of each kind. |
 | `web/js/teams/size-alerts.view.js` | The warnings about small teams as they are drawn: a line for each level and a mark on the card of a small team. Used by the dashboard and the instructor page. |
 | `web/js/viewer.js` | The instructor page. |
 | `domain/enums.js` | The words the pages and the backend share, as frozen enums of stored values: `FormType`, `FormStatus`, `ReviewStatus` and `ListKind`. Loaded before the other domain files. |

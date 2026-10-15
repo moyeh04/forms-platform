@@ -8,7 +8,7 @@ const crypto = require('node:crypto');
 const fs = require('node:fs');
 const path = require('node:path');
 
-const { PAGES, FOLDERS, JOINED, sourceOf } = require('./site-map.js');
+const { PAGES, FOLDERS, sourceOf } = require('./site-map.js');
 
 const ROOT = path.resolve(__dirname, '..', '..');
 const DIRS = ['assets', 'shared'];
@@ -106,12 +106,6 @@ function buildSite(env = process.env, output = path.join(ROOT, '_site')) {
     fs.cpSync(path.join(ROOT, source), path.join(output, published), {
       recursive: true
     });
-  }
-  for (const { published, sources } of JOINED) {
-    const parts = sources.map((source) =>
-      fs.readFileSync(path.join(ROOT, source), 'utf8')
-    );
-    fs.writeFileSync(path.join(output, published), parts.join('\n'));
   }
   // The version is taken from the files as they are in the repository, before anything is stamped.
   const version = siteVersion(output, url);

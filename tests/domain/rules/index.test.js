@@ -4,10 +4,14 @@ const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
 const R = require('../../../domain/rules/index.js');
-const { JOINED } = require('../../../scripts/build/site-map.js');
+const { sourceOf } = require('../../../scripts/build/site-map.js');
 
 const root = path.resolve(__dirname, '..', '..', '..');
-const parts = JOINED.find((j) => j.published === 'shared/rules.js').sources;
+// The domain files in the order the student page loads them.
+const page = fs.readFileSync(path.join(root, 'web/index.html'), 'utf8');
+const parts = [...page.matchAll(/<script src="([^"]+)"/g)]
+  .map((m) => sourceOf(m[1]))
+  .filter((file) => file?.startsWith('domain/'));
 
 test('Rules: the loader gathers every function of every part', () => {
   const own = parts.filter((f) => /^domain\/rules\/(?!index)/.test(f));

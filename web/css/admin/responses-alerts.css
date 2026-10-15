@@ -1,0 +1,107 @@
+/* Responses: what waits for the admin, above the answers. */
+.requests {
+  margin-bottom: 18px;
+  padding: 14px 16px;
+  border: 1.5px solid var(--sea);
+  border-radius: 4px;
+  background: var(--sheet);
+}
+.requests h3 {
+  font-size: 1.15rem;
+}
+.requests .help {
+  margin: 2px 0 8px;
+}
+.request-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 16px;
+  padding: 8px 0;
+  border-top: 1px solid var(--line);
+}
+.request-text {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.request-warn {
+  margin: 8px 0 0;
+  padding-top: 8px;
+  border-top: 1px solid var(--line);
+  color: var(--err);
+  font-weight: 700;
+}
+.requests > .request-warn:first-child {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+/*
+ * Warnings about small teams: a line for each level, and a mark on the card of
+ * each small team.
+ */
+.size-alerts {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+.requests > .size-alerts {
+  margin: 10px 0 0;
+}
+.requests > .size-alerts:first-child {
+  margin: 0;
+}
+.size-alert {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  margin: 0;
+  padding: 8px 12px;
+  border: 1.5px solid var(--alert);
+  border-inline-start-width: 5px;
+  border-radius: 4px;
+  background: var(--sheet);
+}
+.size-alert .icon {
+  flex: none;
+  margin-top: 3px;
+  color: var(--alert);
+}
+.size-alert strong {
+  color: var(--alert);
+}
+.size-alert.is-critical,
+.size-tag.is-critical {
+  --alert: var(--err);
+}
+.size-alert.is-warning,
+.size-tag.is-warning {
+  --alert: var(--gold);
+}
+.size-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  margin-inline-start: 8px;
+  padding: 0 8px;
+  border: 1.5px solid var(--alert);
+  border-radius: 999px;
+  background: var(--sheet);
+  color: var(--alert);
+  font-weight: 700;
+  white-space: nowrap;
+}
+.size-alert-settings .sub-setting .field-row {
+  max-width: 22rem;
+}
+.sub-setting {
+  margin-inline-start: 34px;
+}
+.sub-setting[hidden] {
+  display: none;
+}
+.sub-setting > .help {
+  margin: 0 0 6px;
+  padding-inline-start: 34px;
+}

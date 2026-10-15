@@ -165,18 +165,6 @@ test('Deployment: the built site carries its version, and a script or stylesheet
     );
   }
 
-  // A page kept from before a script was split still finds the old address.
-  const { JOINED } = require('../../../scripts/build/site-map.js');
-  for (const { published, sources } of JOINED) {
-    assert.equal(
-      fs.readFileSync(path.join(output, published), 'utf8'),
-      sources
-        .map((source) => fs.readFileSync(path.join(root, source), 'utf8'))
-        .join('\n'),
-      published + ' joins its parts'
-    );
-  }
-
   // The same files give the same version, so a push that changes nothing a visitor loads reloads nobody.
   const again = buildSite(env, path.join(dir, 'again'));
   assert.equal(
@@ -193,35 +181,6 @@ test('Deployment: the built site carries its version, and a script or stylesheet
     version,
     'a new backend address is a new version'
   );
-});
-
-test('Deployment: a page kept from the last release still runs', (t) => {
-  const output = buildSite(env, path.join(temp(t), 'site'));
-  const lastRelease = require('../../fixtures/last-release.json');
-  for (const [page, files] of Object.entries(lastRelease)) {
-    for (const file of files) {
-      assert.ok(fs.existsSync(path.join(output, file)), page + ': ' + file);
-    }
-    const context = vm.createContext({});
-    for (const file of files.filter((f) => f.startsWith('shared/'))) {
-      vm.runInContext(
-        fs.readFileSync(path.join(output, file), 'utf8'),
-        context
-      );
-    }
-    assert.equal(
-      vm.runInContext("FormMetadata.caption({ term: 'Fall 2027' })", context),
-      'Fall 2027',
-      page
-    );
-    if (files.includes('shared/rules.js')) {
-      assert.equal(
-        vm.runInContext("Rules.formState({ status: 'draft' })", context),
-        'draft',
-        page + ': the old rules read the enums'
-      );
-    }
-  }
 });
 
 test('Deployment: command line returns failure when API_URL is missing', () => {

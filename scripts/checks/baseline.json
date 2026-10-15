@@ -112,14 +112,31 @@
   "tests/backend/features/outputs/sheet-views/sheet-views.test.js": {
     "lines": 10
   },
-  "web/admin.html": {
-    "lines": 5
+  "web/css/admin/bookings.css": {
+    "biome/lint/style/noDescendingSpecificity": 1
   },
-  "web/css/admin.css": {
-    "biome/lint/complexity/noImportantStyles": 7,
-    "biome/lint/style/noDescendingSpecificity": 18,
-    "biome/lint/style/noExcessiveLinesPerFile": 1,
-    "lines": 28
+  "web/css/admin/layout.css": {
+    "biome/lint/style/noDescendingSpecificity": 1
+  },
+  "web/css/admin/lists.css": {
+    "biome/lint/style/noDescendingSpecificity": 1,
+    "lines": 1
+  },
+  "web/css/admin/phone-tables.css": {
+    "biome/lint/complexity/noImportantStyles": 4,
+    "biome/lint/style/noDescendingSpecificity": 1
+  },
+  "web/css/admin/phone.css": {
+    "biome/lint/complexity/noImportantStyles": 2
+  },
+  "web/css/admin/questions.css": {
+    "biome/lint/style/noDescendingSpecificity": 3
+  },
+  "web/css/admin/responses.css": {
+    "biome/lint/style/noDescendingSpecificity": 1
+  },
+  "web/css/admin/teammates.css": {
+    "biome/lint/complexity/noImportantStyles": 1
   },
   "web/css/app.css": {
     "biome/lint/complexity/noImportantStyles": 5,
@@ -133,125 +150,6 @@
   },
   "web/index.html": {
     "lines": 4
-  },
-  "web/js/admin-data.js": {
-    "biome/lint/complexity/noExcessiveCognitiveComplexity": 8,
-    "biome/lint/complexity/noExcessiveLinesPerFunction": 14,
-    "biome/lint/complexity/useOptionalChain": 9,
-    "biome/lint/correctness/noInnerDeclarations": 9,
-    "biome/lint/correctness/noUnusedVariables": 1,
-    "biome/lint/style/noExcessiveLinesPerFile": 1,
-    "biome/lint/style/noMagicNumbers": 15,
-    "biome/lint/suspicious/noAssignInExpressions": 1,
-    "jsdoc": 37,
-    "lines": 15
-  },
-  "web/js/admin-download.js": {
-    "biome/lint/complexity/noExcessiveCognitiveComplexity": 1,
-    "biome/lint/complexity/noExcessiveLinesPerFunction": 3,
-    "biome/lint/complexity/useOptionalChain": 1,
-    "biome/lint/correctness/noInnerDeclarations": 12,
-    "biome/lint/correctness/noUnusedVariables": 1,
-    "biome/lint/style/noExcessiveLinesPerFile": 1,
-    "biome/lint/style/noMagicNumbers": 7,
-    "biome/lint/suspicious/noAssignInExpressions": 1,
-    "jsdoc": 9,
-    "lines": 10
-  },
-  "web/js/admin-keys.js": {
-    "biome/lint/complexity/noExcessiveCognitiveComplexity": 2,
-    "biome/lint/complexity/noExcessiveLinesPerFunction": 3,
-    "biome/lint/complexity/useOptionalChain": 2,
-    "biome/lint/correctness/noUnusedVariables": 1,
-    "biome/lint/style/noExcessiveLinesPerFile": 1,
-    "biome/lint/style/noMagicNumbers": 8,
-    "biome/lint/suspicious/noAssignInExpressions": 1,
-    "biome/lint/suspicious/noGlobalIsNan": 1,
-    "jsdoc": 30,
-    "lines": 12,
-    "numbers": 1
-  },
-  "web/js/admin-lists.js": {
-    "biome/lint/complexity/noExcessiveCognitiveComplexity": 7,
-    "biome/lint/complexity/noExcessiveLinesPerFunction": 12,
-    "biome/lint/complexity/useMaxParams": 1,
-    "biome/lint/complexity/useOptionalChain": 15,
-    "biome/lint/correctness/noInnerDeclarations": 9,
-    "biome/lint/style/noExcessiveLinesPerFile": 1,
-    "biome/lint/style/noMagicNumbers": 16,
-    "biome/lint/suspicious/noAssignInExpressions": 4,
-    "biome/lint/suspicious/noGlobalIsNan": 2,
-    "biome/lint/suspicious/noPrototypeBuiltins": 1,
-    "jsdoc": 88,
-    "lines": 44
-  },
-  "web/js/admin-people.js": {
-    "biome/lint/complexity/noExcessiveCognitiveComplexity": 3,
-    "biome/lint/complexity/noExcessiveLinesPerFunction": 3,
-    "biome/lint/correctness/noInnerDeclarations": 1,
-    "biome/lint/style/noExcessiveLinesPerFile": 1,
-    "biome/lint/style/noMagicNumbers": 6,
-    "biome/lint/suspicious/noAssignInExpressions": 1,
-    "jsdoc": 13,
-    "lines": 10
-  },
-  "web/js/admin-range.js": {
-    "biome/lint/complexity/noExcessiveCognitiveComplexity": 2,
-    "biome/lint/complexity/noExcessiveLinesPerFunction": 2,
-    "biome/lint/correctness/noInnerDeclarations": 1,
-    "biome/lint/style/noMagicNumbers": 1,
-    "biome/lint/suspicious/noAssignInExpressions": 1,
-    "jsdoc": 10,
-    "lines": 9
-  },
-  "web/js/admin-settings.js": {
-    "biome/lint/complexity/noArguments": 1,
-    "biome/lint/complexity/noExcessiveCognitiveComplexity": 5,
-    "biome/lint/complexity/noExcessiveLinesPerFunction": 8,
-    "biome/lint/complexity/useMaxParams": 1,
-    "biome/lint/complexity/useOptionalChain": 16,
-    "biome/lint/correctness/noInnerDeclarations": 18,
-    "biome/lint/style/noExcessiveLinesPerFile": 1,
-    "biome/lint/style/noMagicNumbers": 13,
-    "biome/lint/suspicious/noAssignInExpressions": 3,
-    "biome/lint/suspicious/noGlobalIsNan": 2,
-    "jsdoc": 65,
-    "lines": 70,
-    "numbers": 4
-  },
-  "web/js/admin-size-alerts.js": {
-    "biome/lint/complexity/noExcessiveLinesPerFunction": 1,
-    "biome/lint/suspicious/noAssignInExpressions": 1,
-    "jsdoc": 9,
-    "lines": 8
-  },
-  "web/js/admin-timetable.js": {
-    "biome/lint/complexity/noExcessiveCognitiveComplexity": 3,
-    "biome/lint/complexity/noExcessiveLinesPerFunction": 4,
-    "biome/lint/complexity/useMaxParams": 1,
-    "biome/lint/complexity/useOptionalChain": 3,
-    "biome/lint/correctness/noInnerDeclarations": 3,
-    "biome/lint/style/noExcessiveLinesPerFile": 1,
-    "biome/lint/style/noMagicNumbers": 9,
-    "biome/lint/suspicious/noAssignInExpressions": 2,
-    "biome/lint/suspicious/noGlobalIsNan": 1,
-    "jsdoc": 27,
-    "lines": 15,
-    "numbers": 2
-  },
-  "web/js/admin.js": {
-    "biome/lint/complexity/noExcessiveCognitiveComplexity": 1,
-    "biome/lint/complexity/noExcessiveLinesPerFunction": 8,
-    "biome/lint/complexity/useMaxParams": 1,
-    "biome/lint/complexity/useOptionalChain": 5,
-    "biome/lint/correctness/noInnerDeclarations": 3,
-    "biome/lint/correctness/noUnusedVariables": 1,
-    "biome/lint/style/noExcessiveLinesPerFile": 1,
-    "biome/lint/style/noMagicNumbers": 12,
-    "biome/lint/suspicious/noAssignInExpressions": 2,
-    "biome/lint/suspicious/noGlobalIsNan": 1,
-    "jsdoc": 70,
-    "lines": 31
   },
   "web/js/viewer.js": {
     "biome/lint/complexity/noExcessiveCognitiveComplexity": 4,

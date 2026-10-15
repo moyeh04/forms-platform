@@ -1,0 +1,222 @@
+/*
+ * Dashboard layout. Same paper palette and type scale as the public form, tuned
+ * for dense data.
+ */
+
+body.admin {
+  font-size: 1rem;
+}
+.admin-page {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 14px 16px 90px;
+}
+
+.admin-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 18px;
+  padding: 10px 0 16px;
+  border-bottom: 1.5px dashed var(--line);
+  margin-bottom: 22px;
+}
+.admin-bar h1 {
+  font-size: 1.6rem;
+  margin-inline-end: auto;
+}
+.admin-nav {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.admin-nav a {
+  padding: 8px 16px;
+  border: 1.5px solid transparent;
+  border-radius: 999px;
+  color: var(--ink);
+  text-decoration: none;
+  font-weight: 700;
+  font-size: var(--fs-label);
+}
+.admin-nav a:hover {
+  background: var(--sheet-2);
+}
+.admin-nav a[aria-current="page"] {
+  background: var(--ink);
+  color: var(--sheet);
+}
+
+.login {
+  max-width: 444px;
+  margin: 12vh auto 0;
+  padding: 0 12px;
+}
+.login .sheet {
+  padding: 34px 30px;
+}
+.login-top {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+.login-top .tool-label {
+  margin-inline-end: auto;
+}
+.pin-input {
+  font-family: var(--font-code);
+  letter-spacing: 0.5em;
+  text-align: center;
+  font-size: 1.5rem;
+}
+
+/*
+ * The tabs of one form: the same bar on the responses page and on every
+ * settings tab.
+ */
+.form-tabs {
+  display: flex;
+  gap: 4px;
+  margin: 0 0 16px;
+  border-bottom: 1.5px solid var(--line);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.form-tabs a {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 16px;
+  margin-bottom: -1.5px;
+  border-bottom: 3px solid transparent;
+  color: var(--mute);
+  text-decoration: none;
+  font-weight: 700;
+  font-size: var(--fs-label);
+}
+.form-tabs a:hover {
+  color: var(--ink);
+}
+.form-tabs a[aria-current="page"] {
+  color: var(--ink);
+  border-bottom-color: var(--accent);
+}
+.tab-alert {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--err);
+  color: var(--sheet);
+  font-size: 0.75rem;
+}
+.status-pick {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.status-pick .select {
+  width: auto;
+  min-height: 38px;
+  font-size: 1rem;
+}
+
+/*
+ * A settings section: one line (name and current value) that opens to its
+ * controls.
+ */
+.panel {
+  background: var(--sheet);
+  border: 1.5px solid var(--line);
+  border-radius: 4px;
+  padding: 18px 20px;
+  margin-bottom: 18px;
+}
+.panel > h2 {
+  font-size: 1.3rem;
+  margin-bottom: 4px;
+}
+.panel > .help {
+  margin: 0 0 14px;
+}
+.panel.fold {
+  padding: 0;
+  margin-bottom: 10px;
+}
+.panel.fold > h2 {
+  font-size: 1.15rem;
+  margin: 0;
+}
+.panel-head {
+  display: flex;
+  align-items: baseline;
+  gap: 6px 14px;
+  flex-wrap: wrap;
+  width: 100%;
+  padding: 14px 18px;
+  border: 0;
+  background: none;
+  color: var(--ink);
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+.panel-head::after {
+  content: "";
+  flex: none;
+  align-self: center;
+  width: 9px;
+  height: 9px;
+  margin-inline-start: auto;
+  border-inline-end: 2px solid var(--mute);
+  border-bottom: 2px solid var(--mute);
+  transform: rotate(45deg);
+  transition: transform 0.15s;
+}
+.panel.open > h2 .panel-head::after {
+  transform: rotate(-135deg);
+}
+.panel-head:hover {
+  background: var(--sheet-2);
+}
+.panel-title {
+  flex: none;
+  font-weight: 700;
+}
+.panel-sum {
+  flex: 1 1 12rem;
+  min-width: 0;
+  color: var(--mute);
+  font-family: var(--font-body);
+  font-size: var(--fs-help);
+  font-weight: 400;
+}
+.panel.open .panel-sum {
+  visibility: hidden;
+}
+.panel-body {
+  padding: 4px 18px 18px;
+}
+.panel-body > .help {
+  margin: 0 0 14px;
+}
+.panel.pinned {
+  margin-bottom: 18px;
+}
+.panel.pinned .panel-head {
+  cursor: default;
+  padding-bottom: 6px;
+  font-size: 1.3rem;
+}
+.panel.pinned .panel-head:hover {
+  background: none;
+}
+.panel.pinned .panel-head::after,
+.panel.pinned .panel-sum {
+  display: none;
+}
