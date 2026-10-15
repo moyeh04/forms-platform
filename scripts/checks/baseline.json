@@ -253,28 +253,6 @@
     "jsdoc": 70,
     "lines": 31
   },
-  "web/js/form/team-size.view.js": {
-    "biome/lint/complexity/noExcessiveLinesPerFunction": 1,
-    "biome/lint/complexity/useOptionalChain": 1,
-    "biome/lint/correctness/noInnerDeclarations": 1,
-    "biome/lint/correctness/noUnusedFunctionParameters": 1,
-    "biome/lint/correctness/noUnusedVariables": 2,
-    "biome/lint/style/noMagicNumbers": 2,
-    "jsdoc": 11,
-    "lines": 2
-  },
-  "web/js/form/members.view.js": {
-    "biome/lint/complexity/noExcessiveCognitiveComplexity": 1,
-    "biome/lint/complexity/noExcessiveLinesPerFunction": 1,
-    "biome/lint/complexity/useMaxParams": 1,
-    "biome/lint/complexity/useOptionalChain": 1,
-    "biome/lint/correctness/noInnerDeclarations": 1,
-    "biome/lint/correctness/noUnusedFunctionParameters": 2,
-    "biome/lint/style/noMagicNumbers": 2,
-    "biome/lint/suspicious/noGlobalIsNan": 1,
-    "jsdoc": 7,
-    "lines": 6
-  },
   "web/js/form/slots.view.js": {
     "biome/lint/complexity/noExcessiveCognitiveComplexity": 3,
     "biome/lint/complexity/noExcessiveLinesPerFunction": 2,

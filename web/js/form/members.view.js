@@ -12,36 +12,59 @@
   var root = P.root;
   var S = P.S;
 
-  /** `remove` is given only when the team can lose a member; then the card has the button. */
+  /** The size of the icons on the member buttons, in pixels. */
+  var BUTTON_ICON_SIZE = 18;
+
+  /** The size of the icon on the add button, in pixels. */
+  var ADD_ICON_SIZE = 20;
+
+  /**
+   * Makes the remove button of a member card.
+   *
+   * @param {number} i The member.
+   * @param {function(number)} remove Removes a member.
+   * @return {!Element} The button.
+   */
+  function removeButton(i, remove) {
+    return h(
+      'button',
+      {
+        type: 'button',
+        class: 'btn btn-quiet',
+        name: 'remove-member-' + i,
+        'aria-label': t('removeMember') + ' ' + (i + 1),
+        onclick: function () {
+          remove(i);
+        }
+      },
+      icon('trash', BUTTON_ICON_SIZE),
+      t('removeMember')
+    );
+  }
+
+  /**
+   * Draws the card of a member, with its questions. `remove` is given only
+   * when the team can lose a member; then the card has the button.
+   *
+   * @param {!Object} field The members question.
+   * @param {string} path The path of the list.
+   * @param {number} i The member.
+   * @param {?function(number)} remove Removes a member, or null.
+   * @return {!Element} The card.
+   */
   function memberCard(field, path, i, remove) {
     var subs = (field.fields || []).filter(function (sf) {
       return sf.enabled !== false;
     });
-    var head = h(
-      'div',
-      { class: 'member-head' },
-      h('span', { class: 'member-title' }, t('memberN', { n: i + 1 })),
-      remove
-        ? h(
-            'button',
-            {
-              type: 'button',
-              class: 'btn btn-quiet',
-              name: 'remove-member-' + i,
-              'aria-label': t('removeMember') + ' ' + (i + 1),
-              onclick: function () {
-                remove(i);
-              }
-            },
-            icon('trash', 18),
-            t('removeMember')
-          )
-        : null
-    );
     return h(
       'div',
       { class: 'member' },
-      head,
+      h(
+        'div',
+        { class: 'member-head' },
+        h('span', { class: 'member-title' }, t('memberN', { n: i + 1 })),
+        remove ? removeButton(i, remove) : null
+      ),
       subs.map(function (sf) {
         return P.renderField(sf, path + '.' + i + '.' + sf.id);
       })
@@ -49,135 +72,183 @@
   }
 
   /**
-   * The member forms with one remove button each and one add button. `resize(list)` stores the
-   * new list; with a team size question it also moves the chosen size, so the two never disagree.
-   * A removed member comes back with Undo, because the form it held may have been filled in.
+   * Makes the Undo button of a removed member.
+   *
+   * @param {function()} undo Brings the member back.
+   * @return {!Element} The button.
    */
-  function memberList(field, path, list, min, max, resize) {
-    var commit = function (next, banner) {
+  function undoButton(undo) {
+    return h(
+      'button',
+      { type: 'button', class: 'link-btn', name: 'undo-remove', onclick: undo },
+      t('undo')
+    );
+  }
+
+  /** Focuses the first box of the last member card. */
+  function focusLastMember() {
+    var cards = root.querySelectorAll('.member');
+    var last = cards.length ? cards[cards.length - 1] : null;
+    var input = last?.querySelector('input, select');
+    if (input?.focus) input.focus();
+  }
+
+  /**
+   * Draws the member forms with one remove button each and one add button.
+   * `limits.resize(list)` stores the new list; with a team size question
+   * it also moves the chosen size, so the two never disagree. A removed
+   * member comes back with Undo, because the form it held may have been
+   * filled in.
+   *
+   * @param {!Object} field The members question.
+   * @param {string} path The path of the list.
+   * @param {!Array<!Object>} list The members.
+   * @param {{min: number, max: number, resize: function(!Array)}} limits
+   *     The fewest and most members, and how to store a new list.
+   * @return {!Array<?Element>} The cards, the size line and the add button.
+   */
+  function memberList(field, path, list, limits) {
+    /**
+     * Stores a new list and draws it.
+     *
+     * @param {!Array<!Object>} next The new list.
+     * @param {?Object=} banner The banner to show, such as the Undo note.
+     */
+    function commit(next, banner) {
       S.errors = dropErrors(path);
       delete S.errors[path];
-      resize(next);
+      limits.resize(next);
       S.banner = banner || null;
       P.saveDraft();
       P.render();
-    };
-    var remove =
-      list.length > min
-        ? function (i) {
-            var before = list.slice();
-            commit(
-              list.filter(function (m, k) {
-                return k !== i;
-              }),
-              {
-                kind: 'info',
-                text: t('memberRemoved', { n: i + 1 }),
-                action: h(
-                  'button',
-                  {
-                    type: 'button',
-                    class: 'link-btn',
-                    name: 'undo-remove',
-                    onclick: function () {
-                      commit(before);
-                    }
-                  },
-                  t('undo')
-                )
-              }
-            );
-          }
-        : null;
+    }
+
+    /**
+     * Removes a member, with Undo in the banner.
+     *
+     * @param {number} i The member.
+     */
+    function remove(i) {
+      var before = list.slice();
+      var undo = undoButton(function () {
+        commit(before);
+      });
+      commit(
+        list.filter(function (_m, k) {
+          return k !== i;
+        }),
+        { kind: 'info', text: t('memberRemoved', { n: i + 1 }), action: undo }
+      );
+    }
+
+    var canRemove = list.length > limits.min;
+    var cards = list.map(function (_m, i) {
+      return memberCard(field, path, i, canRemove ? remove : null);
+    });
+    var add = h(
+      'button',
+      {
+        type: 'button',
+        class: 'btn btn-quiet',
+        name: 'add-member',
+        onclick: function () {
+          commit(list.concat([P.freshMember(field)]));
+          focusLastMember();
+        }
+      },
+      icon('plus', ADD_ICON_SIZE),
+      t('addMember')
+    );
     return [
-      list.length
-        ? h(
-            'div',
-            { class: 'members' },
-            list.map(function (m, i) {
-              return memberCard(field, path, i, remove);
-            })
-          )
-        : null,
+      list.length ? h('div', { class: 'members' }, cards) : null,
       list.length
         ? h('p', { class: 'team-size' }, t('teamSize', { n: list.length + 1 }))
         : null,
-      list.length < max
-        ? h(
-            'button',
-            {
-              type: 'button',
-              class: 'btn btn-quiet',
-              name: 'add-member',
-              onclick: function () {
-                commit(list.concat([P.freshMember(field)]));
-                var cards = root.querySelectorAll('.member');
-                var input =
-                  cards.length &&
-                  cards[cards.length - 1].querySelector('input, select');
-                if (input && input.focus) input.focus();
-              }
-            },
-            icon('plus', 20),
-            t('addMember')
-          )
-        : null
+      list.length < limits.max ? add : null
     ];
   }
 
-  function membersControl(field, path) {
-    var wrap = h('div', { class: 'members-wrap' });
-    var sf = P.sizeField();
-    var list = P.getVal(path);
-    if (!Array.isArray(list)) {
-      list = [];
-      P.setVal(path, list);
+  /**
+   * Draws the members of a form with a team size question: the chosen
+   * size decides how many member forms are shown, and add and remove move
+   * it.
+   *
+   * @param {!Object} field The members question.
+   * @param {string} path The path of the list.
+   * @param {!Object} sf The team size question.
+   * @param {!Element} wrap The box the members go in.
+   */
+  function sizedMembers(field, path, sf, wrap) {
+    var size = parseInt(S.data[sf.id], 10);
+    if (Number.isNaN(size)) {
+      wrap.appendChild(h('p', { class: 'help pick-size' }, t('pickSize')));
+      return;
+    }
+    if (P.getVal(path).length !== size - 1) P.syncMembers(size);
+    if (size === 1) {
+      wrap.appendChild(h('p', { class: 'help solo-team' }, t('soloTeam')));
     }
     var range = Rules.teamSizeRange(S.form);
-
-    if (sf) {
-      // The chosen team size decides how many member forms are shown; add and remove move it.
-      var size = parseInt(S.data[sf.id], 10);
-      if (isNaN(size)) {
-        wrap.appendChild(h('p', { class: 'help pick-size' }, t('pickSize')));
-        return wrap;
-      }
-      if (list.length !== size - 1) {
-        P.syncMembers(size);
-        list = P.getVal(path);
-      }
-      if (size === 1)
-        wrap.appendChild(h('p', { class: 'help solo-team' }, t('soloTeam')));
-      memberList(
-        field,
-        path,
-        list,
-        range.min - 1,
-        range.max - 1,
-        function (next) {
+    wrap.append(
+      ...memberList(field, path, P.getVal(path), {
+        min: range.min - 1,
+        max: range.max - 1,
+        resize: function (next) {
           P.setVal(path, next);
           P.setVal(sf.id, String(next.length + 1));
           delete S.errors[sf.id];
         }
-      ).forEach(function (n) {
-        if (n) wrap.appendChild(n);
-      });
-      return wrap;
-    }
+      }).filter(Boolean)
+    );
+  }
 
-    // Forms without a team size question have only the add and remove buttons, and the note the admin set for that many teammates.
-    var min = field.min == null ? 0 : field.min;
-    var max = field.max == null ? range.max - 1 : field.max;
-    memberList(field, path, list, min, max, function (next) {
-      P.setVal(path, next);
-    }).forEach(function (n) {
-      if (n) wrap.appendChild(n);
-    });
+  /**
+   * Draws the members of a form without a team size question: only the add
+   * and remove buttons, and the note the admin set for that many
+   * teammates.
+   *
+   * @param {!Object} field The members question.
+   * @param {string} path The path of the list.
+   * @param {!Element} wrap The box the members go in.
+   */
+  function freeMembers(field, path, wrap) {
+    var list = P.getVal(path);
+    var range = Rules.teamSizeRange(S.form);
+    wrap.append(
+      ...memberList(field, path, list, {
+        min: field.min == null ? 0 : field.min,
+        max: field.max == null ? range.max - 1 : field.max,
+        resize: function (next) {
+          P.setVal(path, next);
+        }
+      }).filter(Boolean)
+    );
     var note = Rules.teammateNotice(S.form, list.length, App.i18n.lang);
     if (note) wrap.appendChild(P.sizeNote(note));
+  }
+
+  /**
+   * Draws the members question.
+   *
+   * @param {!Object} field The question.
+   * @param {string} path The path of its list.
+   * @return {!Element} The members.
+   */
+  function membersControl(field, path) {
+    var wrap = h('div', { class: 'members-wrap' });
+    if (!Array.isArray(P.getVal(path))) P.setVal(path, []);
+    var sf = P.sizeField();
+    if (sf) sizedMembers(field, path, sf, wrap);
+    else freeMembers(field, path, wrap);
     return wrap;
   }
 
+  /**
+   * Gives the errors without those of a list's items.
+   *
+   * @param {string} prefix The path of the list.
+   * @return {!Object} The other errors.
+   */
   function dropErrors(prefix) {
     var out = {};
     Object.keys(S.errors).forEach(function (k) {
