@@ -207,13 +207,6 @@
     "layers": 13,
     "lines": 11
   },
-  "backend/features/intake/teams/team-numbers.js": {
-    "jsdoc": 6,
-    "lines": 8
-  },
-  "backend/features/intake/teams/teams.service.js": {
-    "jsdoc": 4
-  },
   "backend/features/intake/transfers/transfers.controller.js": {
     "jsdoc": 2,
     "layers": 8,
