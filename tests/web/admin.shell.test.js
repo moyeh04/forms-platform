@@ -537,7 +537,8 @@ test(
     const actions = (p) =>
       p
         .$$(
-          '.page-head > a, .page-head > button, .page-head summary, .page-head [role="menuitem"]'
+          '.page-head > a, .page-head > button, .page-head summary, ' +
+            '.page-head [role="menuitem"]'
         )
         .map((n) => n.textContent);
     const responses = await openAdmin(w, `#/f/${f.slug}`);

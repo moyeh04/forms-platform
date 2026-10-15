@@ -255,7 +255,8 @@ test(
       q
         .$('.request-row')
         .textContent.includes(
-          `from ${asked.a.ref}, which they lead alone, to ${asked.b.ref}. Nobody is left to lead ${asked.a.ref}, so they cannot move.`
+          `from ${asked.a.ref}, which they lead alone, to ${asked.b.ref}. ` +
+            `Nobody is left to lead ${asked.a.ref}, so they cannot move.`
         )
     );
     assert.equal(

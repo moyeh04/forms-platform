@@ -9,6 +9,10 @@ const crypto = require('node:crypto');
 const { apiUrl, buildSite } = require('../../../scripts/build/build-site.js');
 
 const root = path.resolve(__dirname, '..', '..', '..');
+
+/** A script or stylesheet of the site that a page names. */
+const LOCAL_FILE =
+  /<(?:script src|link rel="stylesheet" href)="((?:assets|shared)\/[^"]+)"/g;
 const env = {
   API_URL: 'https://script.google.com/macros/s/test-deployment/exec',
   APPS_SCRIPT_DEPLOYMENT_ID: 'test-deployment',
@@ -150,11 +154,7 @@ test(
         .slice(0, 12);
     for (const page of ['admin.html', 'index.html', 'viewer.html']) {
       const html = fs.readFileSync(path.join(output, page), 'utf8');
-      const local = [
-        ...html.matchAll(
-          /<(?:script src|link rel="stylesheet" href)="((?:assets|shared)\/[^"]+)"/g
-        )
-      ].map((m) => m[1]);
+      const local = [...html.matchAll(LOCAL_FILE)].map((m) => m[1]);
       assert.ok(local.length >= 6, page + ' names its files');
       for (const address of local) {
         const [file, stamp] = address.split('?v=');

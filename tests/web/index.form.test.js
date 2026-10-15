@@ -437,7 +437,8 @@ test(
     );
     assert.ok(
       p.$(
-        '.trail li:last-child.trail-x .isle img.trail-treasure[src="assets/img/treasure.svg"]'
+        '.trail li:last-child.trail-x .isle ' +
+          'img.trail-treasure[src="assets/img/treasure.svg"]'
       ),
       'the treasure waits on the last island'
     );

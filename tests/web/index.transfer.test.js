@@ -144,7 +144,8 @@ test(
       b
         .$('[data-transfer="pending"]')
         .textContent.includes(
-          `Waiting for team ${w.teamA.ref} to release سارة خالد حسن علي (4230002).`
+          `Waiting for team ${w.teamA.ref} to release سارة خالد حسن علي ` +
+            `(4230002).`
         )
     );
     b.click('[name="transfer-cancel"]');
@@ -277,7 +278,8 @@ test(
     assert.ok(dialog.textContent.includes('A team asks for you'));
     assert.ok(
       dialog.textContent.includes(
-        `Team ${refB} asks for you to move to it. You lead this team, so choose who leads it after you.`
+        `Team ${refB} asks for you to move to it. You lead this team, so ` +
+          `choose who leads it after you.`
       )
     );
     assert.ok(
@@ -331,7 +333,8 @@ test(
       a
         .$('[name="moved-note"]')
         .textContent.includes(
-          `منى سعيد فؤاد علي (4230003) leads team ${w.teamA.ref} now. Give them its edit key, ${w.teamA.key}.`
+          `منى سعيد فؤاد علي (4230003) leads team ${w.teamA.ref} now. ` +
+            `Give them its edit key, ${w.teamA.key}.`
         )
     );
     const rows = w.admin({
@@ -470,7 +473,9 @@ test(
       p
         .text()
         .includes(
-          'Someone in this team is already registered in another team. (4230050) سارة خالد حسن علي (4230050) cannot be asked for: they lead a team with no other member.'
+          'Someone in this team is already registered in another team. ' +
+            '(4230050) سارة خالد حسن علي (4230050) cannot be asked for: ' +
+            'they lead a team with no other member.'
         )
     );
   }

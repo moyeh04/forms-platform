@@ -318,7 +318,8 @@ test(
     );
     assert.ok(
       p.text().includes('4C-TH01'),
-      'a number written with a leading zero is kept as written, under Other sections'
+      'a number written with a leading zero is kept as written, under ' +
+        'Other sections'
     );
     assert.equal(
       p.$('[name="count-4C-T-down"]').disabled,
@@ -361,7 +362,8 @@ test(
     assert.equal(
       p.$('[name="remove-kind-4C-LAB"]'),
       null,
-      'the last kind of a group has no remove of its own: it goes with the group'
+      'the last kind of a group has no remove of its own: it goes with ' +
+        'the group'
     );
     p.click('[name="save-list"]');
     await settle(8);

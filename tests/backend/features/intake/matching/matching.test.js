@@ -49,7 +49,12 @@ test(
   () => {
     const w = boot();
     const r = w.import(
-      'Sara Ali  +20 10 1234 5678\n01112345678\n\n٠١٢١٢٣٤٥٦٧٨\nno number here\n+201012345678'
+      'Sara Ali  +20 10 1234 5678\n' +
+        '01112345678\n' +
+        '\n' +
+        '٠١٢١٢٣٤٥٦٧٨\n' +
+        'no number here\n' +
+        '+201012345678'
     );
     assert.equal(r.added, 3);
     assert.equal(r.duplicates, 1);

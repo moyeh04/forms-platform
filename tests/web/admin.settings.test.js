@@ -386,7 +386,8 @@ test(
       p
         .text()
         .includes(
-          'The number of teammates needs a minimum of at least 0 and a maximum that is not lower and at least 1, up to 19.'
+          'The number of teammates needs a minimum of at least 0 and a ' +
+            'maximum that is not lower and at least 1, up to 19.'
         ),
       'a range upside down is refused'
     );
@@ -471,7 +472,8 @@ test(
     again.type('[name="teammatesMin"]', '1');
     assert.equal(
       outside().textContent,
-      '1 saved booking is outside 1 to 2. It stays booked as it is. Widen the range, or ask that team to change their teammates.'
+      '1 saved booking is outside 1 to 2. It stays booked as it is. Widen ' +
+        'the range, or ask that team to change their teammates.'
     );
   }
 );

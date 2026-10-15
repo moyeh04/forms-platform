@@ -85,7 +85,8 @@ for (const [name, theme] of [
         ([fg, bg, min]) => ratio(theme[fg], theme[bg]) < min
       ).map(
         ([fg, bg, min, use]) =>
-          `${fg} on ${bg} (${use}): ${ratio(theme[fg], theme[bg]).toFixed(2)} < ${min}`
+          `${fg} on ${bg} (${use}): ` +
+          `${ratio(theme[fg], theme[bg]).toFixed(2)} < ${min}`
       );
       assert.deepEqual(failures, []);
     }
