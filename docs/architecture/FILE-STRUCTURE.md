@@ -244,7 +244,8 @@ the file name says the role:
 | `backend/features/intake/reservations/key-booking.service.js` | Booking a slot with the key of a registration, and the next week of slots. |
 | `backend/features/intake/reservations/key-booking.controller.js` | The booking actions: the team behind a key, and the next week of bookings. |
 | `backend/features/intake/matching/matching.repository.js` | The WhatsApp requests tab of a form. |
-| `backend/features/intake/matching/matching.controller.js` | The WhatsApp matching actions of the admin: import, list, decide and remove. |
+| `backend/features/intake/matching/matching.service.js` | WhatsApp matching: reads a form with matching on, imports pasted numbers, matches requests to submissions by phone, records decisions and deletes requests. |
+| `backend/features/intake/matching/matching.controller.js` | The WhatsApp matching actions of the admin: import, list, decide and remove. Each checks the request and asks MatchingService. |
 
 ### Access: who may see what
 

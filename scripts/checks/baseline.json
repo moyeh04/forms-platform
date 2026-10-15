@@ -115,15 +115,6 @@
     "jsdoc": 12,
     "lines": 3
   },
-  "backend/features/intake/matching/matching.controller.js": {
-    "biome/lint/complexity/useOptionalChain": 2,
-    "biome/lint/suspicious/noAssignInExpressions": 1,
-    "jsdoc": 1,
-    "layers": 15
-  },
-  "backend/features/intake/matching/matching.repository.js": {
-    "jsdoc": 2
-  },
   "backend/features/intake/reservations/key-booking.controller.js": {
     "biome/lint/complexity/useOptionalChain": 1,
     "layers": 3,
