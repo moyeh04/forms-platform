@@ -471,7 +471,7 @@ the file name says the role:
 | `scripts/checks/config.json`, `baseline.json`, `exceptions.json` | What each check covers and its limits; the findings old files may still have, which may only go down; and the paths allowed to break a structure rule, each with its reason. |
 | `scripts/checks/lib/` | `files.js` (which files a run looks at), `parse.js` (acorn with comments), `jsdoc.js` (reads a JSDoc comment into its summary and tags), `baseline.js`, `exceptions.js`, `report.js`. |
 | `scripts/checks/code/check-biome.js` | Runs Biome on the files of a run and turns what it reports into findings. |
-| `scripts/checks/code/check-lines.js` | No line wider than 80 columns, URLs not counted. |
+| `scripts/checks/code/check-lines.js` | No line wider than 80 columns, or 120 in CSS, URLs not counted. |
 | `scripts/checks/code/check-jsdoc.js` | Every named function has a Google-style JSDoc comment whose tags match its parameters and return, with no metadata tags. |
 | `scripts/checks/code/check-comments.js` | Every shell script, git hook and CI workflow says in a comment what it does and when it runs, and every workflow job says why it runs. |
 | `scripts/checks/code/check-numbers.js` | Every number that initialises something, which Biome skips, is held by a CONSTANT_CASE name. |
