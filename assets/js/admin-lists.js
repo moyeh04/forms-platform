@@ -117,14 +117,31 @@
   /** "4C" is the year 4 and the letter C. */
   function groupParts(name) { var m = /^(\d+)([A-Za-z]+)$/.exec(name); return m ? { year: m[1], letter: m[2].toUpperCase() } : null; }
 
-  /** A number a stepper and its field share; typing is possible, never needed. */
-  function stepper(name, label, value, lo, hi, set) {
-    var input = h('input', { class: 'input num stepper-input', type: 'number', inputmode: 'numeric', name: name, min: String(lo), max: String(hi), value: String(value), 'aria-label': label,
-      onchange: function (e) { var v = parseInt(e.target.value, 10); if (isNaN(v)) v = value; set(Math.max(lo, Math.min(hi, v))); } });
-    return h('span', { class: 'stepper' },
-      h('button', { type: 'button', class: 'icon-btn sm', name: name + '-down', 'aria-label': 'Fewer: ' + label, disabled: value <= lo, onclick: function () { set(value - 1); } }, '−'),
-      input,
-      h('button', { type: 'button', class: 'icon-btn sm', name: name + '-up', 'aria-label': 'More: ' + label, disabled: value >= hi, onclick: function () { set(value + 1); } }, '+'));
+  /**
+   * A number a stepper and its field share; typing is possible, never needed. The stepper keeps its own
+   * buttons and field up to date, so `set` may redraw the page or not. opts.enter runs on Enter in the
+   * field, after the typed number is taken.
+   */
+  function stepper(name, label, value, lo, hi, set, opts) {
+    opts = opts || {};
+    var down, up, input;
+    var take = function (v) {
+      v = Math.max(lo, Math.min(hi, v));
+      value = v;
+      input.value = String(v);
+      down.disabled = v <= lo;
+      up.disabled = v >= hi;
+      set(v);
+    };
+    var typed = function () { var v = parseInt(input.value, 10); take(isNaN(v) ? value : v); };
+    input = h('input', { class: 'input num stepper-input', type: 'number', inputmode: 'numeric', name: name, min: String(lo), max: String(hi), value: String(value), 'aria-label': label,
+      onchange: typed,
+      // The number is typed over, not added to.
+      onfocus: function (e) { if (e.target.select) e.target.select(); },
+      onkeydown: function (e) { if (e.key === 'Enter' && opts.enter) { e.preventDefault(); typed(); opts.enter(); } } });
+    down = h('button', { type: 'button', class: 'icon-btn sm', name: name + '-down', 'aria-label': 'Fewer: ' + label, disabled: value <= lo, onclick: function () { take(value - 1); } }, '−');
+    up = h('button', { type: 'button', class: 'icon-btn sm', name: name + '-up', 'aria-label': 'More: ' + label, disabled: value >= hi, onclick: function () { take(value + 1); } }, '+');
+    return h('span', { class: 'stepper' }, down, input, up);
   }
 
   A.views.lists = async function (mount, picked) {
