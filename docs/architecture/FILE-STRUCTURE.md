@@ -280,7 +280,10 @@ the file name says the role:
 | `backend/features/outputs/sheet-views/sheet-views.registrations.js` | The Registrations view: everyone by group and section, with the timetable link and the review. |
 | `backend/features/outputs/sheet-views/sheet-views.scheduler.js` | When the sheet views are rebuilt. A change only marks the form's views as out of date and books one run a minute later. The run repaints every marked form and removes itself, so students never wait for formatting and nothing runs while nothing changes. |
 | `backend/features/outputs/sheet-views/sheet-views.controller.js` | The admin action that rebuilds the sheet views. |
-| `backend/features/outputs/downloads/downloads.jobs.js` | A Download all job: its folder, its saved parts, retries and file names. |
+| `backend/features/outputs/downloads/downloads.jobs.js` | A Download all job: its folder, its saved state between requests, and where a team goes in the zip. |
+| `backend/features/outputs/downloads/downloads.files.js` | The files of a job: their bytes, read or exported to Office, their names in the zip, and retries while Google is busy. |
+| `backend/features/outputs/downloads/downloads.team.js` | Saving one team's file or folder, as far as one request may. |
+| `backend/features/outputs/downloads/downloads.service.js` | Starting a job, splitting the saved files into zip parts, packing a part and reading a zip in pieces. |
 | `backend/features/outputs/downloads/downloads.workbook.js` | The Excel workbook a Download all job puts beside the files. |
 | `backend/features/outputs/downloads/downloads.controller.js` | The Download all actions: start, one team, finish, pack and send in chunks. |
 | `backend/features/outputs/print/print.service.js` | The print actions behind one door, and the PDF export of a print tab to Drive. |

@@ -47,30 +47,6 @@
   "backend/features/intake/transfers/transfers.mail.js": {
     "biome/lint/complexity/useOptionalChain": 1
   },
-  "backend/features/outputs/downloads/downloads.controller.js": {
-    "biome/lint/complexity/noExcessiveCognitiveComplexity": 2,
-    "biome/lint/complexity/noExcessiveLinesPerFunction": 1,
-    "biome/lint/correctness/noInnerDeclarations": 12,
-    "biome/lint/style/noMagicNumbers": 5,
-    "jsdoc": 2,
-    "layers": 1,
-    "lines": 16
-  },
-  "backend/features/outputs/downloads/downloads.jobs.js": {
-    "biome/lint/correctness/noInnerDeclarations": 4,
-    "biome/lint/style/noMagicNumbers": 17,
-    "biome/lint/suspicious/noControlCharactersInRegex": 2,
-    "jsdoc": 15,
-    "lines": 3,
-    "numbers": 1
-  },
-  "backend/features/outputs/downloads/downloads.workbook.js": {
-    "biome/lint/complexity/noExcessiveCognitiveComplexity": 1,
-    "biome/lint/complexity/noExcessiveLinesPerFunction": 1,
-    "biome/lint/style/noMagicNumbers": 4,
-    "jsdoc": 4,
-    "lines": 1
-  },
   "domain/form-metadata.js": {
     "biome/lint/complexity/useOptionalChain": 13,
     "biome/lint/correctness/noInnerDeclarations": 3,
