@@ -8,13 +8,66 @@ var APP = { name: 'Forms Platform', version: '1.0.0' };
 
 var TABS = { forms: 'Forms', clients: 'Clients', lists: 'Lists' };
 
-var FORM_COLS = ['id', 'slug', 'type', 'title', 'term', 'status', 'opensAt', 'closesAt', 'sheetId', 'sheetUrl', 'config', 'createdAt', 'updatedAt'];
+var FORM_COLS = [
+  'id',
+  'slug',
+  'type',
+  'title',
+  'term',
+  'status',
+  'opensAt',
+  'closesAt',
+  'sheetId',
+  'sheetUrl',
+  'config',
+  'createdAt',
+  'updatedAt'
+];
 
-var RESPONSE_COLS = ['id', 'ref', 'created', 'updated', 'status', 'review', 'email', 'name', 'code', 'phone', 'title', 'link', 'slot', 'members', 'data', 'keyHash', 'keyExpires', 'deleted', 'keySeal', 'number'];
+var RESPONSE_COLS = [
+  'id',
+  'ref',
+  'created',
+  'updated',
+  'status',
+  'review',
+  'email',
+  'name',
+  'code',
+  'phone',
+  'title',
+  'link',
+  'slot',
+  'members',
+  'data',
+  'keyHash',
+  'keyExpires',
+  'deleted',
+  'keySeal',
+  'number'
+];
 
-var CLIENT_COLS_ = ['id', 'name', 'tokenHash', 'forms', 'hiddenColumns', 'canReview', 'active', 'createdAt', 'keyHash', 'keySeal', 'expires', 'showSizeAlerts'];
+var CLIENT_COLS_ = [
+  'id',
+  'name',
+  'tokenHash',
+  'forms',
+  'hiddenColumns',
+  'canReview',
+  'active',
+  'createdAt',
+  'keyHash',
+  'keySeal',
+  'expires',
+  'showSizeAlerts'
+];
 
-var FORM_TYPES = ['team_registration', 'task_submission', 'reservation', 'whatsapp_registration'];
+var FORM_TYPES = [
+  'team_registration',
+  'task_submission',
+  'reservation',
+  'whatsapp_registration'
+];
 var FORM_STATUSES = ['draft', 'open', 'closed', 'archived'];
 
 /* ── Errors and responses ─────────────────────────────────────── */
@@ -32,7 +85,9 @@ function fail(code, message, details) {
 }
 
 function json(obj) {
-  return ContentService.createTextOutput(JSON.stringify(obj)).setMimeType(ContentService.MimeType.JSON);
+  return ContentService.createTextOutput(JSON.stringify(obj)).setMimeType(
+    ContentService.MimeType.JSON
+  );
 }
 
 /* ── Small utilities ──────────────────────────────────────────── */
@@ -54,8 +109,15 @@ function shortId(prefix) {
 }
 
 function sha256Hex(s) {
-  var bytes = Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, String(s));
-  return bytes.map(function (b) { return ('0' + ((b + 256) % 256).toString(16)).slice(-2); }).join('');
+  var bytes = Utilities.computeDigest(
+    Utilities.DigestAlgorithm.SHA_256,
+    String(s)
+  );
+  return bytes
+    .map(function (b) {
+      return ('0' + ((b + 256) % 256).toString(16)).slice(-2);
+    })
+    .join('');
 }
 
 function randomDigits(n) {
@@ -65,7 +127,10 @@ function randomDigits(n) {
 }
 
 function slugify(s) {
-  var out = String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+  var out = String(s || '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
   return out || 'form';
 }
 
@@ -89,7 +154,11 @@ function pepper() {
 
 function parseJson(text, fallback) {
   if (text === '' || text === null || text === undefined) return fallback;
-  try { return JSON.parse(text); } catch (e) { return fallback; }
+  try {
+    return JSON.parse(text);
+  } catch (e) {
+    return fallback;
+  }
 }
 
 /* ── The script lock ──────────────────────────────────────────── */
@@ -104,9 +173,18 @@ var LOCK_DEPTH_ = 0;
 function withLock_(fn) {
   if (LOCK_DEPTH_) return fn();
   var lock = LockService.getScriptLock();
-  try { lock.waitLock(20000); } catch (e) { fail('busy', 'The server is busy. Try again in a moment.'); }
+  try {
+    lock.waitLock(20000);
+  } catch (e) {
+    fail('busy', 'The server is busy. Try again in a moment.');
+  }
   LOCK_DEPTH_++;
-  try { return fn(); } finally { LOCK_DEPTH_--; lock.releaseLock(); }
+  try {
+    return fn();
+  } finally {
+    LOCK_DEPTH_--;
+    lock.releaseLock();
+  }
 }
 
 /* ── Sheet table helpers ──────────────────────────────────────── */
@@ -117,13 +195,17 @@ function readTable(sheet, cols) {
   var vals = sheet.getRange(2, 1, last - 1, cols.length).getValues();
   return vals.map(function (r, i) {
     var o = { _row: i + 2 };
-    cols.forEach(function (c, j) { o[c] = r[j]; });
+    cols.forEach(function (c, j) {
+      o[c] = r[j];
+    });
     return o;
   });
 }
 
 function rowValues(cols, obj) {
-  return cols.map(function (c) { return obj[c] === undefined || obj[c] === null ? '' : obj[c]; });
+  return cols.map(function (c) {
+    return obj[c] === undefined || obj[c] === null ? '' : obj[c];
+  });
 }
 
 function writeRow(sheet, rowIndex, cols, obj) {
@@ -138,7 +220,10 @@ function writeRow(sheet, rowIndex, cols, obj) {
 function appendPlain_(sheet, values) {
   var at = sheet.getLastRow() + 1;
   if (at > sheet.getMaxRows()) sheet.insertRowsAfter(sheet.getMaxRows(), 50);
-  sheet.getRange(at, 1, 1, values.length).setNumberFormat('@').setValues([values]);
+  sheet
+    .getRange(at, 1, 1, values.length)
+    .setNumberFormat('@')
+    .setValues([values]);
   return at;
 }
 
@@ -146,14 +231,21 @@ function appendPlain_(sheet, values) {
 function ensureHeaders_(sheet, cols) {
   var have = sheet.getRange(1, 1, 1, cols.length).getValues()[0];
   cols.forEach(function (name, i) {
-    if (String(have[i]) !== name) sheet.getRange(1, i + 1).setValue(name).setFontWeight('bold');
+    if (String(have[i]) !== name)
+      sheet
+        .getRange(1, i + 1)
+        .setValue(name)
+        .setFontWeight('bold');
   });
 }
 
 /** Creates a tab with a bold header, frozen first row and plain-text cells. */
 function ensureTab(ss, name, headers) {
   var sh = ss.getSheetByName(name) || ss.insertSheet(name);
-  if (sh.getLastRow() === 0) sh.getRange(1, 1, 1, headers.length).setValues([headers]).setFontWeight('bold');
+  if (sh.getLastRow() === 0)
+    sh.getRange(1, 1, 1, headers.length)
+      .setValues([headers])
+      .setFontWeight('bold');
   sh.getRange(1, 1, sh.getMaxRows(), headers.length).setNumberFormat('@');
   sh.setFrozenRows(1);
   return sh;

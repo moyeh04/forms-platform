@@ -10,14 +10,20 @@ var KEY_EXTEND_MAX_DAYS_ = 365;
 
 function keyRow_(r) {
   return {
-    id: r.id, ref: r.ref, name: String(r.name || ''), title: String(r.title || ''),
-    keyExpires: r.keyExpires, expired: !!(r.keyExpires && Date.parse(r.keyExpires) < Date.now())
+    id: r.id,
+    ref: r.ref,
+    name: String(r.name || ''),
+    title: String(r.title || ''),
+    keyExpires: r.keyExpires,
+    expired: !!(r.keyExpires && Date.parse(r.keyExpires) < Date.now())
   };
 }
 
 /** The live registrations of a form that hold a key. */
 function keyedRows_(form) {
-  return readResponses(form).filter(function (r) { return r.keyHash; });
+  return readResponses(form).filter(function (r) {
+    return r.keyHash;
+  });
 }
 
 /** The new end of one key: `until` as given, or `days` added to the later of now and its end. */
@@ -39,7 +45,8 @@ API['admin.keys.list'] = admin(function (req) {
 API['admin.keys.extend'] = admin(function (req) {
   var form = requireForm(req.slug || req.id);
   requireKeyEnabled_(form);
-  var days = 0, until = '';
+  var days = 0,
+    until = '';
   if (req.until) {
     var t = Date.parse(String(req.until));
     if (isNaN(t)) fail('bad_date', 'That end date is not a date.');
@@ -47,11 +54,13 @@ API['admin.keys.extend'] = admin(function (req) {
     until = new Date(t).toISOString();
   } else {
     days = parseInt(req.days, 10);
-    if (!(days >= 1 && days <= KEY_EXTEND_MAX_DAYS_)) fail('bad_days', 'Extend by 1 to ' + KEY_EXTEND_MAX_DAYS_ + ' days.');
+    if (!(days >= 1 && days <= KEY_EXTEND_MAX_DAYS_))
+      fail('bad_days', 'Extend by 1 to ' + KEY_EXTEND_MAX_DAYS_ + ' days.');
   }
   var which = String(req.which || 'chosen');
   var ids = Array.isArray(req.ids) ? req.ids.map(String) : [];
-  if (which === 'chosen' && !ids.length) fail('none_chosen', 'Choose at least one registration.');
+  if (which === 'chosen' && !ids.length)
+    fail('none_chosen', 'Choose at least one registration.');
 
   var changed = withLock_(function () {
     var rows = keyedRows_(form);
@@ -60,7 +69,11 @@ API['admin.keys.extend'] = admin(function (req) {
       if (which === 'expired') return keyRow_(r).expired;
       return ids.indexOf(r.id) !== -1;
     });
-    if (which === 'chosen' && picked.length !== ids.length) fail('submission_not_found', 'A chosen registration no longer exists. Open the list again.');
+    if (which === 'chosen' && picked.length !== ids.length)
+      fail(
+        'submission_not_found',
+        'A chosen registration no longer exists. Open the list again.'
+      );
     picked.forEach(function (r) {
       r.keyExpires = extendedExpiry_(r.keyExpires, days, until);
       saveResponse_(form, r);

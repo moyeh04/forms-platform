@@ -3,7 +3,13 @@
 var API = API || {};
 
 function publicSubmission_(r) {
-  return { ref: r.ref, status: r.status, created: r.created, updated: r.updated, data: r.data };
+  return {
+    ref: r.ref,
+    status: r.status,
+    created: r.created,
+    updated: r.updated,
+    data: r.data
+  };
 }
 
 API.submit = function (req) {
@@ -11,12 +17,21 @@ API.submit = function (req) {
   assertAcceptingSubmissions_(form);
   var vform = validationForm(form);
   var source = keyBookingSource_(form);
-  var v, registration = null;
+  var v,
+    registration = null;
   if (source) {
     // The answers come from the registration the key opens; the student only picks the slot.
     registration = registrationByKey_(source, req.sourceKey);
     var slotField = Rules.fieldByRole(vform, 'slot');
-    v = { ok: true, data: bookingData_(vform, source, registration, (req.data || {})[slotField.id]) };
+    v = {
+      ok: true,
+      data: bookingData_(
+        vform,
+        source,
+        registration,
+        (req.data || {})[slotField.id]
+      )
+    };
     v.data._source = { form: source.id, ref: registration.ref };
   } else {
     v = Rules.validateSubmission(vform, req.data || {});
@@ -26,26 +41,50 @@ API.submit = function (req) {
 
   var result = withLock_(function () {
     var rows = readResponses(form, true);
-    var live = rows.filter(function (r) { return !r.deleted; });
+    var live = rows.filter(function (r) {
+      return !r.deleted;
+    });
     // Members that another team holds are asked for, not saved with this team.
-    var wants = source ? [] : takeOutTransfers_(vform, v.data, live, null, req.transfer);
+    var wants = source
+      ? []
+      : takeOutTransfers_(vform, v.data, live, null, req.transfer);
     try {
       checkLimits_(vform, v.data, live, null);
     } catch (e) {
-      if (source && e.code === 'duplicate') fail('already_booked', 'Your team already has a booking. Open it with your key to change its time.');
+      if (source && e.code === 'duplicate')
+        fail(
+          'already_booked',
+          'Your team already has a booking. Open it with your key to change its time.'
+        );
       throw e;
     }
-    var k = source ? bookingKey_(vform, live, req.sourceKey) : issueKey_(vform, live);
+    var k = source
+      ? bookingKey_(vform, live, req.sourceKey)
+      : issueKey_(vform, live);
     var id = uuid();
     var r = applyDerived_(vform, {
-      id: id, ref: nextRef_(form), created: nowIso(), status: 'new', review: defaultReview_(form),
-      data: v.data, keyHash: k.hash, keyExpires: keyExpiry_(form), deleted: false, keySeal: sealKey_(form, id, k.key)
+      id: id,
+      ref: nextRef_(form),
+      created: nowIso(),
+      status: 'new',
+      review: defaultReview_(form),
+      data: v.data,
+      keyHash: k.hash,
+      keyExpires: keyExpiry_(form),
+      deleted: false,
+      keySeal: sealKey_(form, id, k.key)
     });
     rows.push(r);
     keepTeamNumbers_(form, rows);
     saveResponse_(form, r);
     var asked = recordTransfers_(form, r, wants);
-    return { id: r.id, ref: r.ref, key: form.editKey.enabled ? k.key : '', keyExpires: r.keyExpires, asked: asked };
+    return {
+      id: r.id,
+      ref: r.ref,
+      key: form.editKey.enabled ? k.key : '',
+      keyExpires: r.keyExpires,
+      asked: asked
+    };
   });
 
   afterChange_(form);
@@ -62,7 +101,11 @@ function taskLocked_(form) {
 }
 
 function assertTaskOpen_(form) {
-  if (taskLocked_(form)) fail('deadline_passed', 'The deadline has passed, so this task can no longer be changed.');
+  if (taskLocked_(form))
+    fail(
+      'deadline_passed',
+      'The deadline has passed, so this task can no longer be changed.'
+    );
 }
 
 /**
@@ -74,7 +117,8 @@ function editScope_(form) {
   if (taskLocked_(form)) return '';
   var edit = !!form.editKey.allowEdit;
   if (form.type !== 'reservation') return edit ? 'all' : '';
-  if (keyBookingSource_(form)) return edit || form.editKey.allowDelete ? 'slot' : '';
+  if (keyBookingSource_(form))
+    return edit || form.editKey.allowDelete ? 'slot' : '';
   return edit ? 'all' : form.editKey.allowDelete ? 'slot' : '';
 }
 
@@ -112,9 +156,17 @@ API.update = function (req) {
 
   var asked = withLock_(function () {
     var live = readResponses(form);
-    var current = live.filter(function (r) { return r.id === found.id; })[0];
+    var current = live.filter(function (r) {
+      return r.id === found.id;
+    })[0];
     if (!current) fail('bad_key', 'That key is not right.');
-    var wants = takeOutTransfers_(vform, v.data, live, current.id, req.transfer);
+    var wants = takeOutTransfers_(
+      vform,
+      v.data,
+      live,
+      current.id,
+      req.transfer
+    );
     checkLimits_(vform, v.data, live, current.id);
     current.data = v.data;
     applyDerived_(vform, current);
@@ -129,10 +181,12 @@ API.update = function (req) {
 API.remove = function (req) {
   var form = requireForm(String(req.slug || ''));
   var found = findByKey_(form, req.key);
-  if (!form.editKey.allowDelete) fail('delete_disabled', 'Deleting is turned off for this form.');
+  if (!form.editKey.allowDelete)
+    fail('delete_disabled', 'Deleting is turned off for this form.');
   assertTaskOpen_(form);
   withLock_(function () {
-    if (!cancelResponse_(form, found.id)) fail('bad_key', 'That key is not right.');
+    if (!cancelResponse_(form, found.id))
+      fail('bad_key', 'That key is not right.');
   });
   afterChange_(form);
   return { removed: true, ref: found.ref };
@@ -146,10 +200,17 @@ function transferResult_(form, result, data) {
   var asked = result.asked || [];
   delete result.asked;
   if (!asked.length) return result;
-  asked.forEach(function (t) { mailTransfer_(form, t, 'asked'); });
+  asked.forEach(function (t) {
+    mailTransfer_(form, t, 'asked');
+  });
   var contact = leaderContacts_(form);
   result.data = data;
-  result.transfers = asked.map(function (t) { return Object.assign({ code: t.code, name: t.member.name || '', team: t.fromRef }, contact(t.fromId)); });
+  result.transfers = asked.map(function (t) {
+    return Object.assign(
+      { code: t.code, name: t.member.name || '', team: t.fromRef },
+      contact(t.fromId)
+    );
+  });
   return result;
 }
 
@@ -160,7 +221,9 @@ function transferResult_(form, result, data) {
  */
 function cancelResponse_(form, id) {
   var rows = readResponses(form, true);
-  var r = rows.filter(function (x) { return x.id === id && !x.deleted; })[0];
+  var r = rows.filter(function (x) {
+    return x.id === id && !x.deleted;
+  })[0];
   if (!r) return null;
   keepTeamNumbers_(form, rows);
   r.deleted = true;
@@ -186,7 +249,10 @@ API['admin.submissions'] = admin(function (req) {
   var form = requireForm(req.slug || req.id);
   var rows = numberedResponses_(form, !!req.includeDeleted).map(function (r) {
     var view = adminView_(r);
-    if (form.type === 'reservation' && Rules.fieldByRole(form, 'members').enabled === false) {
+    if (
+      form.type === 'reservation' &&
+      Rules.fieldByRole(form, 'members').enabled === false
+    ) {
       view.data.members = [];
       view.members = '';
     }
@@ -202,19 +268,28 @@ API['admin.submission.update'] = admin(function (req) {
   var changedData = false;
   withLock_(function () {
     var live = readResponses(form);
-    var r = live.filter(function (x) { return x.id === req.submissionId; })[0];
+    var r = live.filter(function (x) {
+      return x.id === req.submissionId;
+    })[0];
     if (!r) fail('submission_not_found', 'That submission does not exist.');
     if (patch.review) {
       var steps = (form.review && form.review.steps) || [];
       Object.keys(patch.review).forEach(function (k) {
-        if (!steps.some(function (s) { return s.id === k; })) fail('bad_step', 'Unknown review step.');
+        if (
+          !steps.some(function (s) {
+            return s.id === k;
+          })
+        )
+          fail('bad_step', 'Unknown review step.');
       });
       steps.forEach(function (s) {
-        if (patch.review[s.id] !== undefined) setReviewStep_(form, r, s.id, patch.review[s.id]);
+        if (patch.review[s.id] !== undefined)
+          setReviewStep_(form, r, s.id, patch.review[s.id]);
       });
     }
     if (patch.status !== undefined) {
-      if (SUBMISSION_STATUSES.indexOf(patch.status) === -1) fail('bad_status', 'Unknown status.');
+      if (SUBMISSION_STATUSES.indexOf(patch.status) === -1)
+        fail('bad_status', 'Unknown status.');
       r.status = patch.status;
     }
     if (patch.data) {
@@ -234,7 +309,8 @@ API['admin.submission.update'] = admin(function (req) {
 API['admin.submission.delete'] = admin(function (req) {
   var form = requireForm(req.slug || req.id);
   withLock_(function () {
-    if (!cancelResponse_(form, req.submissionId)) fail('submission_not_found', 'That submission does not exist.');
+    if (!cancelResponse_(form, req.submissionId))
+      fail('submission_not_found', 'That submission does not exist.');
   });
   afterChange_(form);
   return { deleted: true };
@@ -245,7 +321,9 @@ API['admin.submission.resetKey'] = admin(function (req) {
   var vform = validationForm(form);
   return withLock_(function () {
     var rows = readResponses(form);
-    var r = rows.filter(function (x) { return x.id === req.submissionId; })[0];
+    var r = rows.filter(function (x) {
+      return x.id === req.submissionId;
+    })[0];
     if (!r) fail('submission_not_found', 'That submission does not exist.');
     var k = issueKey_(vform, rows);
     r.keyHash = k.hash;
@@ -259,9 +337,20 @@ API['admin.submission.resetKey'] = admin(function (req) {
 /** The admin reads a student's current key, for example when the student lost it. */
 API['admin.submission.key'] = admin(function (req) {
   var form = requireForm(req.slug || req.id);
-  var r = readResponses(form).filter(function (x) { return x.id === req.submissionId; })[0];
+  var r = readResponses(form).filter(function (x) {
+    return x.id === req.submissionId;
+  })[0];
   if (!r) fail('submission_not_found', 'That submission does not exist.');
   var key = unsealKey_(form, r.id, r.keySeal);
-  if (!key || keyHash_(form, key) !== r.keyHash) fail('key_unknown', 'This key was issued before keys could be shown. Reset it to give the student a new one you can see.');
-  return { key: key, keyExpires: r.keyExpires, ref: r.ref, expired: !!(r.keyExpires && Date.parse(r.keyExpires) < Date.now()) };
+  if (!key || keyHash_(form, key) !== r.keyHash)
+    fail(
+      'key_unknown',
+      'This key was issued before keys could be shown. Reset it to give the student a new one you can see.'
+    );
+  return {
+    key: key,
+    keyExpires: r.keyExpires,
+    ref: r.ref,
+    expired: !!(r.keyExpires && Date.parse(r.keyExpires) < Date.now())
+  };
 });

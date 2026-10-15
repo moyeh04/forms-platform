@@ -8,13 +8,19 @@ function normalizeSlots_(slots) {
   var seen = {};
   var out = days.map(function (d, i) {
     var label = String(d.label || '').trim();
-    if (!label) fail('bad_slots', 'Every day needs a name, for example "Week 11 - Sunday".');
+    if (!label)
+      fail(
+        'bad_slots',
+        'Every day needs a name, for example "Week 11 - Sunday".'
+      );
     var id = slugify(d.id || label);
-    var base = id, n = 2;
+    var base = id,
+      n = 2;
     while (seen[id]) id = base + '-' + n++;
     seen[id] = true;
     var date = String(d.date || '').trim();
-    if (date && !/^\d{4}-\d{2}-\d{2}$/.test(date)) fail('bad_slots', 'Dates must look like 2027-11-14.');
+    if (date && !/^\d{4}-\d{2}-\d{2}$/.test(date))
+      fail('bad_slots', 'Dates must look like 2027-11-14.');
     var times = [];
     (d.times || []).forEach(function (t) {
       t = String(t).replace(/\s+/g, ' ').trim();
@@ -25,8 +31,17 @@ function normalizeSlots_(slots) {
   });
   var result = { days: out, capacity: capacity };
   var p = slots && slots.pattern;
-  if (p && /^\d{1,2}:\d{2}$/.test(String(p.start)) && /^\d{1,2}:\d{2}$/.test(String(p.end))) {
-    result.pattern = { start: String(p.start), end: String(p.end), length: Math.max(1, parseInt(p.length, 10) || 20), gap: Math.max(0, parseInt(p.gap, 10) || 0) };
+  if (
+    p &&
+    /^\d{1,2}:\d{2}$/.test(String(p.start)) &&
+    /^\d{1,2}:\d{2}$/.test(String(p.end))
+  ) {
+    result.pattern = {
+      start: String(p.start),
+      end: String(p.end),
+      length: Math.max(1, parseInt(p.length, 10) || 20),
+      gap: Math.max(0, parseInt(p.gap, 10) || 0)
+    };
   }
   return result;
 }
@@ -43,7 +58,9 @@ function slotAvailability_(form) {
 function slotParts_(form, key) {
   var parts = String(key).split('|');
   var days = (form.slots && form.slots.days) || [];
-  var day = days.filter(function (d) { return d.id === parts[0]; })[0];
+  var day = days.filter(function (d) {
+    return d.id === parts[0];
+  })[0];
   return { dayId: parts[0], time: parts.slice(1).join('|'), day: day || null };
 }
 
@@ -51,4 +68,3 @@ function slotLabel_(form, key) {
   var p = slotParts_(form, key);
   return (p.day ? p.day.label : p.dayId) + '  -  ' + p.time;
 }
-

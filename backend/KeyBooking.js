@@ -14,16 +14,27 @@ function normalizeKeyBooking_(form, next) {
   var enabled = !!(next && next.enabled);
   var source = String((next && next.source) || '');
   if (!enabled) return { enabled: false, source: source };
-  if (form.type !== 'reservation') fail('bad_key_booking', 'Only a reservation form can be booked with a key.');
-  var ok = keyBookingSources_(form).some(function (f) { return f.id === source; });
-  if (!ok) fail('bad_key_booking', 'Choose the registration form whose keys students book with.');
+  if (form.type !== 'reservation')
+    fail(
+      'bad_key_booking',
+      'Only a reservation form can be booked with a key.'
+    );
+  var ok = keyBookingSources_(form).some(function (f) {
+    return f.id === source;
+  });
+  if (!ok)
+    fail(
+      'bad_key_booking',
+      'Choose the registration form whose keys students book with.'
+    );
   return { enabled: true, source: source };
 }
 
 /** The form whose keys open this reservation, or null when it is filled in by hand. */
 function keyBookingSource_(form) {
   var kb = form.keyBooking;
-  if (form.type !== 'reservation' || !kb || !kb.enabled || !kb.source) return null;
+  if (form.type !== 'reservation' || !kb || !kb.enabled || !kb.source)
+    return null;
   var source = findForm(kb.source);
   return source && source.id !== form.id ? source : null;
 }
@@ -47,8 +58,13 @@ function bookingData_(form, source, row, slot) {
   var data = {};
   (form.fields || []).forEach(function (f) {
     if (f.enabled === false || f.role === 'slot') return;
-    var from = (source.fields || []).filter(function (s) { return s.id === f.id && s.type === f.type; })[0];
-    if (!from && f.role) from = (source.fields || []).filter(function (s) { return s.role === f.role && s.type === f.type; })[0];
+    var from = (source.fields || []).filter(function (s) {
+      return s.id === f.id && s.type === f.type;
+    })[0];
+    if (!from && f.role)
+      from = (source.fields || []).filter(function (s) {
+        return s.role === f.role && s.type === f.type;
+      })[0];
     var value = from ? row.data[from.id] : undefined;
     if (value !== undefined && value !== '') data[f.id] = clone(value);
   });
@@ -70,7 +86,11 @@ function withSlot_(form, data, slot) {
 
 /** The saved answers of a booking with the slot from `typed`; anything else that was typed is ignored. */
 function movedBooking_(form, saved, typed) {
-  return withSlot_(form, clone(saved), typed[Rules.fieldByRole(form, 'slot').id]);
+  return withSlot_(
+    form,
+    clone(saved),
+    typed[Rules.fieldByRole(form, 'slot').id]
+  );
 }
 
 /** What the student sees before booking, to confirm the key is theirs: names, no contact details. */
@@ -82,7 +102,13 @@ function teamPreview_(source, row) {
     code: String(Rules.valueByRole(source, row.data, 'code') || ''),
     title: String(Rules.valueByRole(source, row.data, 'title') || ''),
     size: members.length,
-    teammates: members.filter(function (m) { return !m.leader; }).map(function (m) { return String(m.name); })
+    teammates: members
+      .filter(function (m) {
+        return !m.leader;
+      })
+      .map(function (m) {
+        return String(m.name);
+      })
   };
 }
 
@@ -92,7 +118,13 @@ API.bookingTeam = function (req) {
   var source = requireKeyBookingSource_(form);
   var row = registrationByKey_(source, req.key);
   var code = Rules.fieldByRole(form, 'code');
-  var booking = readResponses(form).filter(function (r) { return code && String(r.data[code.id]) === String(row.data[Rules.fieldByRole(source, 'code').id]); })[0];
+  var booking = readResponses(form).filter(function (r) {
+    return (
+      code &&
+      String(r.data[code.id]) ===
+        String(row.data[Rules.fieldByRole(source, 'code').id])
+    );
+  })[0];
   var out = { team: teamPreview_(source, row), booked: !!booking };
   // The team's own time, so the page can show it beside the way to change it.
   if (booking) {
@@ -102,19 +134,31 @@ API.bookingTeam = function (req) {
   return out;
 };
 
-
 /* ── A series of bookings under one registration form ───────────── */
 
 /** True for a form whose keys can book: it issues keys and asks for a code. */
 function issuesKeys_(f) {
-  return f.type !== 'reservation' && !!(f.editKey && f.editKey.enabled) && !!Rules.fieldByRole(f, 'code');
+  return (
+    f.type !== 'reservation' &&
+    !!(f.editKey && f.editKey.enabled) &&
+    !!Rules.fieldByRole(f, 'code')
+  );
 }
 
 /** The reservations that are booked with the keys of this form, oldest first. */
 function bookingsOf_(source) {
-  return readForms().filter(function (f) {
-    return f.type === 'reservation' && f.keyBooking && f.keyBooking.enabled && f.keyBooking.source === source.id;
-  }).sort(function (a, b) { return String(a.createdAt).localeCompare(String(b.createdAt)); });
+  return readForms()
+    .filter(function (f) {
+      return (
+        f.type === 'reservation' &&
+        f.keyBooking &&
+        f.keyBooking.enabled &&
+        f.keyBooking.source === source.id
+      );
+    })
+    .sort(function (a, b) {
+      return String(a.createdAt).localeCompare(String(b.createdAt));
+    });
 }
 
 /** "Discussion - Week 3" gives "Discussion - Week 4"; a title with no number gets " 2". */
@@ -131,11 +175,19 @@ function nextWeekSlots_(slots) {
   var days = ((slots && slots.days) || []).map(function (d) {
     if (!d.date) return { label: d.label, date: '', times: d.times.slice() };
     var date = Rules.shiftDate(d.date, 7);
-    var label = d.label === Rules.dayLabel(d.date) ? Rules.dayLabel(date)
-      : String(d.label).replace(/(week\s*)(\d+)/i, function (all, word, n) { return word + (parseInt(n, 10) + 1); });
+    var label =
+      d.label === Rules.dayLabel(d.date)
+        ? Rules.dayLabel(date)
+        : String(d.label).replace(/(week\s*)(\d+)/i, function (all, word, n) {
+            return word + (parseInt(n, 10) + 1);
+          });
     return { label: label, date: date, times: d.times.slice() };
   });
-  return normalizeSlots_({ days: days, capacity: slots && slots.capacity, pattern: slots && slots.pattern });
+  return normalizeSlots_({
+    days: days,
+    capacity: slots && slots.capacity,
+    pattern: slots && slots.pattern
+  });
 }
 
 /**
@@ -145,22 +197,37 @@ function nextWeekSlots_(slots) {
  */
 API['admin.bookings.next'] = admin(function (req) {
   var source = requireForm(req.source);
-  if (!issuesKeys_(source)) fail('bad_key_booking', 'Only a form that gives its students a key can have bookings.');
+  if (!issuesKeys_(source))
+    fail(
+      'bad_key_booking',
+      'Only a form that gives its students a key can have bookings.'
+    );
   var series = bookingsOf_(source);
   var last = series[series.length - 1];
   var title = String(req.title || '').trim();
   var form;
   if (last) {
-    form = duplicateForm(last.id, { title: title || nextTitle_(last.title) }, function (copy) {
-      if (copy.slots && copy.slots.days.length) copy.slots = nextWeekSlots_(copy.slots);
-      copy.opensAt = '';
-      copy.closesAt = '';
-    });
+    form = duplicateForm(
+      last.id,
+      { title: title || nextTitle_(last.title) },
+      function (copy) {
+        if (copy.slots && copy.slots.days.length)
+          copy.slots = nextWeekSlots_(copy.slots);
+        copy.opensAt = '';
+        copy.closesAt = '';
+      }
+    );
   } else {
     if (!title) fail('title_required', 'Give the booking a title.');
-    form = createForm(Object.assign({ type: 'reservation', title: title }, FormMetadata.read(source)), function (made) {
-      made.keyBooking = { enabled: true, source: source.id };
-    });
+    form = createForm(
+      Object.assign(
+        { type: 'reservation', title: title },
+        FormMetadata.read(source)
+      ),
+      function (made) {
+        made.keyBooking = { enabled: true, source: source.id };
+      }
+    );
   }
   return { form: form, copied: !!last, number: series.length + 1 };
 });

@@ -35,23 +35,51 @@ function freshView_(ss, name) {
 }
 
 function paintHeader_(sh, headers) {
-  sh.getRange(1, 1, 1, headers.length).setValues([headers])
-    .setBackground(VIEW_STYLE_.ink).setFontColor(VIEW_STYLE_.onInk).setFontWeight('bold')
-    .setFontSize(12).setFontFamily(VIEW_STYLE_.font)
-    .setHorizontalAlignment('center').setVerticalAlignment('middle');
+  sh.getRange(1, 1, 1, headers.length)
+    .setValues([headers])
+    .setBackground(VIEW_STYLE_.ink)
+    .setFontColor(VIEW_STYLE_.onInk)
+    .setFontWeight('bold')
+    .setFontSize(12)
+    .setFontFamily(VIEW_STYLE_.font)
+    .setHorizontalAlignment('center')
+    .setVerticalAlignment('middle');
   sh.setRowHeight(1, 40);
   sh.setFrozenRows(1);
 }
 
 function emptyView_(sh, cols, text) {
-  sh.getRange(2, 1, 1, cols).merge().setValue(text).setHorizontalAlignment('center').setFontColor('#6B5535').setFontFamily(VIEW_STYLE_.font);
+  sh.getRange(2, 1, 1, cols)
+    .merge()
+    .setValue(text)
+    .setHorizontalAlignment('center')
+    .setFontColor('#6B5535')
+    .setFontFamily(VIEW_STYLE_.font);
 }
 
 /** Thin grid inside, heavy frame around each block. */
 function frameBlocks_(sh, cols, firstRow, lastRow, blocks) {
-  sh.getRange(firstRow, 1, lastRow - firstRow + 1, cols).setBorder(true, true, true, true, true, true, VIEW_STYLE_.grid, SpreadsheetApp.BorderStyle.SOLID);
+  sh.getRange(firstRow, 1, lastRow - firstRow + 1, cols).setBorder(
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    VIEW_STYLE_.grid,
+    SpreadsheetApp.BorderStyle.SOLID
+  );
   blocks.forEach(function (b) {
-    sh.getRange(b.start, 1, b.length, cols).setBorder(true, true, true, true, false, false, VIEW_STYLE_.ink, SpreadsheetApp.BorderStyle.SOLID_THICK);
+    sh.getRange(b.start, 1, b.length, cols).setBorder(
+      true,
+      true,
+      true,
+      true,
+      false,
+      false,
+      VIEW_STYLE_.ink,
+      SpreadsheetApp.BorderStyle.SOLID_THICK
+    );
   });
 }
 
@@ -59,13 +87,26 @@ function mergedLabel_(sh, row, col, length, value, formula, solid) {
   var r = sh.getRange(row, col, length, 1);
   if (length > 1) r.merge();
   var anchor = sh.getRange(row, col);
-  if (formula) anchor.setFormula(formula); else anchor.setValue(value);
-  r.setBackground(solid).setFontColor(VIEW_STYLE_.onInk).setFontWeight('bold').setFontSize(13).setFontFamily(VIEW_STYLE_.font)
-    .setHorizontalAlignment('center').setVerticalAlignment('middle').setWrap(true);
+  if (formula) anchor.setFormula(formula);
+  else anchor.setValue(value);
+  r.setBackground(solid)
+    .setFontColor(VIEW_STYLE_.onInk)
+    .setFontWeight('bold')
+    .setFontSize(13)
+    .setFontFamily(VIEW_STYLE_.font)
+    .setHorizontalAlignment('center')
+    .setVerticalAlignment('middle')
+    .setWrap(true);
 }
 
 function hyperlink_(url, text) {
-  return '=HYPERLINK("' + String(url).replace(/"/g, '""') + '","' + String(text).replace(/"/g, '""') + '")';
+  return (
+    '=HYPERLINK("' +
+    String(url).replace(/"/g, '""') +
+    '","' +
+    String(text).replace(/"/g, '""') +
+    '")'
+  );
 }
 
 function byCreated_(a, b) {
@@ -77,32 +118,69 @@ function byCreated_(a, b) {
 function buildTeamList_(form, ss) {
   var sh = freshView_(ss, 'Team Members List');
   paintHeader_(sh, ['Team member name', 'Section', 'Code', teamThing_(form)]);
-  sh.setColumnWidth(1, 300); sh.setColumnWidth(2, 100); sh.setColumnWidth(3, 110); sh.setColumnWidth(4, 280);
+  sh.setColumnWidth(1, 300);
+  sh.setColumnWidth(2, 100);
+  sh.setColumnWidth(3, 110);
+  sh.setColumnWidth(4, 280);
 
   var teams = teamBlocks_(form);
   if (!teams.length) return emptyView_(sh, 4, 'No registrations yet.');
 
-  var values = [], shades = [], blocks = [];
+  var values = [],
+    shades = [],
+    blocks = [];
   teams.forEach(function (t, g) {
     var style = VIEW_STYLE_.groups[g % 2];
     var start = values.length + 2;
     t.members.forEach(function (m, i) {
-      values.push([(i + 1) + '.  ' + m.name + (m.leader ? '  \u2605' : ''), m.section || '', m.code, '']);
-      shades.push([style.shades[i % 2], style.shades[i % 2], style.shades[i % 2], style.solid]);
+      values.push([
+        i + 1 + '.  ' + m.name + (m.leader ? '  \u2605' : ''),
+        m.section || '',
+        m.code,
+        ''
+      ]);
+      shades.push([
+        style.shades[i % 2],
+        style.shades[i % 2],
+        style.shades[i % 2],
+        style.solid
+      ]);
     });
-    blocks.push({ start: start, length: t.members.length, response: t.response, style: style });
+    blocks.push({
+      start: start,
+      length: t.members.length,
+      response: t.response,
+      style: style
+    });
   });
 
-  var first = 2, last = values.length + 1;
-  sh.getRange(first, 1, values.length, 4).setValues(values).setBackgrounds(shades)
-    .setFontFamily(VIEW_STYLE_.font).setFontSize(11).setVerticalAlignment('middle');
-  sh.getRange(first, 1, values.length, 1).setFontWeight('bold').setHorizontalAlignment('left');
-  sh.getRange(first, 2, values.length, 2).setHorizontalAlignment('center').setFontWeight('bold');
+  var first = 2,
+    last = values.length + 1;
+  sh.getRange(first, 1, values.length, 4)
+    .setValues(values)
+    .setBackgrounds(shades)
+    .setFontFamily(VIEW_STYLE_.font)
+    .setFontSize(11)
+    .setVerticalAlignment('middle');
+  sh.getRange(first, 1, values.length, 1)
+    .setFontWeight('bold')
+    .setHorizontalAlignment('left');
+  sh.getRange(first, 2, values.length, 2)
+    .setHorizontalAlignment('center')
+    .setFontWeight('bold');
   sh.setRowHeights(first, values.length, 32);
 
   blocks.forEach(function (b) {
     var title = b.response.title || '\u2014';
-    mergedLabel_(sh, b.start, 4, b.length, title, b.response.link ? hyperlink_(b.response.link, title) : '', b.style.solid);
+    mergedLabel_(
+      sh,
+      b.start,
+      4,
+      b.length,
+      title,
+      b.response.link ? hyperlink_(b.response.link, title) : '',
+      b.style.solid
+    );
   });
   frameBlocks_(sh, 4, first, last, blocks);
 }
@@ -116,7 +194,11 @@ function buildBookings_(form, ss) {
   var headers = ['Day', 'Time', 'Team leader', 'Code', 'Phone', 'Project'];
   if (includeMembers) headers.push('Teammates');
   paintHeader_(sh, headers);
-  [190, 140, 300, 110, 130, 280].concat(includeMembers ? [240] : []).forEach(function (w, i) { sh.setColumnWidth(i + 1, w); });
+  [190, 140, 300, 110, 130, 280]
+    .concat(includeMembers ? [240] : [])
+    .forEach(function (w, i) {
+      sh.setColumnWidth(i + 1, w);
+    });
 
   var days = (form.slots && form.slots.days) || [];
   function order(r) {
@@ -125,63 +207,125 @@ function buildBookings_(form, ss) {
     var ti = p.day ? p.day.times.indexOf(p.time) : 0;
     return (di < 0 ? 999 : di) * 1000 + (ti < 0 ? 999 : ti);
   }
-  var rows = readResponses(form).filter(function (r) { return r.slot; }).sort(function (a, b) { return order(a) - order(b); });
+  var rows = readResponses(form)
+    .filter(function (r) {
+      return r.slot;
+    })
+    .sort(function (a, b) {
+      return order(a) - order(b);
+    });
   if (!rows.length) return emptyView_(sh, 6, 'No bookings yet.');
 
-  var values = [], shades = [], blocks = [], current = null;
+  var values = [],
+    shades = [],
+    blocks = [],
+    current = null;
   rows.forEach(function (r) {
     var p = slotParts_(form, r.slot);
     if (!current || current.dayId !== p.dayId) {
       var g = blocks.length;
-      current = { dayId: p.dayId, label: p.day ? p.day.label : p.dayId, start: values.length + 2, length: 0, style: VIEW_STYLE_.groups[g % 2] };
+      current = {
+        dayId: p.dayId,
+        label: p.day ? p.day.label : p.dayId,
+        start: values.length + 2,
+        length: 0,
+        style: VIEW_STYLE_.groups[g % 2]
+      };
       blocks.push(current);
     }
     var i = current.length++;
     var row = ['', p.time, r.name, r.code, r.phone, r.title];
-    if (includeMembers) row.push((r.data.members || []).map(function (member) { return member.name; }).filter(Boolean).join(', '));
+    if (includeMembers)
+      row.push(
+        (r.data.members || [])
+          .map(function (member) {
+            return member.name;
+          })
+          .filter(Boolean)
+          .join(', ')
+      );
     values.push(row);
     var s = current.style.shades[i % 2];
-    shades.push([current.style.solid, s, s, s, s, s].concat(includeMembers ? [s] : []));
+    shades.push(
+      [current.style.solid, s, s, s, s, s].concat(includeMembers ? [s] : [])
+    );
   });
 
-  sh.getRange(2, 1, values.length, headers.length).setValues(values).setBackgrounds(shades)
-    .setFontFamily(VIEW_STYLE_.font).setFontSize(11).setVerticalAlignment('middle');
+  sh.getRange(2, 1, values.length, headers.length)
+    .setValues(values)
+    .setBackgrounds(shades)
+    .setFontFamily(VIEW_STYLE_.font)
+    .setFontSize(11)
+    .setVerticalAlignment('middle');
   sh.getRange(2, 3, values.length, 1).setFontWeight('bold');
   sh.getRange(2, 2, values.length, 1).setHorizontalAlignment('center');
   sh.getRange(2, 4, values.length, 2).setHorizontalAlignment('center');
   sh.setRowHeights(2, values.length, 32);
-  blocks.forEach(function (b) { mergedLabel_(sh, b.start, 1, b.length, b.label, '', b.style.solid); });
+  blocks.forEach(function (b) {
+    mergedLabel_(sh, b.start, 1, b.length, b.label, '', b.style.solid);
+  });
   frameBlocks_(sh, 6, 2, values.length + 1, blocks);
 }
 
 /* ── Registrations: WhatsApp requests ─────────────────────────── */
 
 function reviewText_(form, r) {
-  return ((form.review && form.review.steps) || []).map(function (s) {
-    return s.label.en + ': ' + (r.review[s.id] || 'pending');
-  }).join('  |  ');
+  return ((form.review && form.review.steps) || [])
+    .map(function (s) {
+      return s.label.en + ': ' + (r.review[s.id] || 'pending');
+    })
+    .join('  |  ');
 }
 
 function buildRegistrations_(form, ss) {
   var sh = freshView_(ss, 'Registrations');
-  paintHeader_(sh, ['No.', 'Name', 'Code', 'Phone', 'Group', 'Section', 'Timetable', 'Review']);
-  [60, 300, 110, 130, 80, 90, 120, 320].forEach(function (w, i) { sh.setColumnWidth(i + 1, w); });
+  paintHeader_(sh, [
+    'No.',
+    'Name',
+    'Code',
+    'Phone',
+    'Group',
+    'Section',
+    'Timetable',
+    'Review'
+  ]);
+  [60, 300, 110, 130, 80, 90, 120, 320].forEach(function (w, i) {
+    sh.setColumnWidth(i + 1, w);
+  });
 
   var rows = readResponses(form).sort(function (a, b) {
-    var ga = String(a.data.group), gb = String(b.data.group);
+    var ga = String(a.data.group),
+      gb = String(b.data.group);
     if (ga !== gb) return ga < gb ? -1 : 1;
-    return (parseInt(a.data.section, 10) || 0) - (parseInt(b.data.section, 10) || 0) || byCreated_(a, b);
+    return (
+      (parseInt(a.data.section, 10) || 0) -
+        (parseInt(b.data.section, 10) || 0) || byCreated_(a, b)
+    );
   });
   if (!rows.length) return emptyView_(sh, 8, 'No registrations yet.');
 
-  var values = [], shades = [];
+  var values = [],
+    shades = [];
   rows.forEach(function (r, i) {
-    values.push([i + 1, r.name, r.code, r.phone, r.data.group || '', r.data.section || '', '', reviewText_(form, r)]);
+    values.push([
+      i + 1,
+      r.name,
+      r.code,
+      r.phone,
+      r.data.group || '',
+      r.data.section || '',
+      '',
+      reviewText_(form, r)
+    ]);
     var s = VIEW_STYLE_.groups[i % 2].shades[0];
     shades.push([s, s, s, s, s, s, s, s]);
   });
-  sh.getRange(2, 1, values.length, 8).setValues(values).setBackgrounds(shades)
-    .setFontFamily(VIEW_STYLE_.font).setFontSize(11).setVerticalAlignment('middle');
+  sh.getRange(2, 1, values.length, 8)
+    .setValues(values)
+    .setBackgrounds(shades)
+    .setFontFamily(VIEW_STYLE_.font)
+    .setFontSize(11)
+    .setVerticalAlignment('middle');
   rows.forEach(function (r, i) {
     if (r.link) sh.getRange(i + 2, 7).setFormula(hyperlink_(r.link, 'Open'));
   });
@@ -219,7 +363,9 @@ function refreshViews(form) {
 }
 
 function viewRunBooked_() {
-  return ScriptApp.getProjectTriggers().some(function (t) { return t.getHandlerFunction() === 'processDirtyViews'; });
+  return ScriptApp.getProjectTriggers().some(function (t) {
+    return t.getHandlerFunction() === 'processDirtyViews';
+  });
 }
 
 /** Books one run of processDirtyViews. The cache note saves looking at the triggers on every change. */
@@ -227,7 +373,11 @@ function bookViewRun_() {
   var cache = CacheService.getScriptCache();
   if (cache.get('views_booked')) return;
   withLock_(function () {
-    if (!viewRunBooked_()) ScriptApp.newTrigger('processDirtyViews').timeBased().after(VIEW_DELAY_MS_).create();
+    if (!viewRunBooked_())
+      ScriptApp.newTrigger('processDirtyViews')
+        .timeBased()
+        .after(VIEW_DELAY_MS_)
+        .create();
   });
   cache.put('views_booked', '1', 300);
 }
@@ -239,19 +389,29 @@ function bookViewRun_() {
  */
 function processDirtyViews() {
   ScriptApp.getProjectTriggers().forEach(function (t) {
-    if (t.getHandlerFunction() === 'processDirtyViews') ScriptApp.deleteTrigger(t);
+    if (t.getHandlerFunction() === 'processDirtyViews')
+      ScriptApp.deleteTrigger(t);
   });
   CacheService.getScriptCache().remove('views_booked');
   var store = PropertiesService.getScriptProperties();
   var marks = store.getProperties();
   var forms = {};
-  readForms().forEach(function (f) { forms[f.id] = f; });
-  var started = Date.now(), again = false;
+  readForms().forEach(function (f) {
+    forms[f.id] = f;
+  });
+  var started = Date.now(),
+    again = false;
   Object.keys(marks).forEach(function (k) {
     if (k.indexOf('dirty:') !== 0) return;
     var form = forms[k.slice(6)];
-    if (!form) { store.deleteProperty(k); return; }
-    if (Date.now() - started > VIEW_RUN_BUDGET_MS_) { again = true; return; }
+    if (!form) {
+      store.deleteProperty(k);
+      return;
+    }
+    if (Date.now() - started > VIEW_RUN_BUDGET_MS_) {
+      again = true;
+      return;
+    }
     try {
       rebuildViews(form);
     } catch (e) {
