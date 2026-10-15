@@ -1115,11 +1115,17 @@ Rules of the move:
 (`.l-side`) and the choices of the picked one in the main part (`.l-main`).
 
 - **The kind picks the editor.** A list of `sections` is built from year group
-  cards with a stepper for each kind (TH, T, O), and a group is added by
-  picking a year (1 to 5) and a department letter. The letters offered are
-  the ones the section lists already use, and **+ New letter** takes another:
-  no letter is written in the code. A value that the groups cannot give back
-  is kept under Other sections. A list of `numbers` is two steppers. A `named`
+  cards with a stepper for each kind; a count runs from 1 to 99, and a kind
+  leaves a card with its own remove button while the card has another kind.
+  **Add a year group** opens a draft card: a year (1 to 5, or a higher one a
+  list uses), a department letter, and a count for each kind, every one at 0.
+  Nothing is copied from another group; **Add 3C** appears once the group can
+  be added, Enter in a count adds it, and the card goes in year and letter
+  order. The letters and kinds offered are the ones the section lists use,
+  with **+ New letter** and **+ New kind** for another: none is written in the
+  code, and a typed one stays only if a group uses it. A value that the groups
+  cannot give back exactly (a gap, a leading zero) is kept under Other
+  sections. A list of `numbers` is two steppers. A `named`
   list is rows; a `plain` list is chips, with one link to the rows because
   chips cannot rename or reorder. Typing is needed only for names.
 - **Lists are made, not only edited.** New list asks for a name, a kind and a

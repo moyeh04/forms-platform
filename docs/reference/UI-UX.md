@@ -11,7 +11,7 @@ the instructor page (`viewer.html`).
 
 | # | Rule | Where to see it |
 |---|---|---|
-| 1 | **A control is shown only when it can act.** No greyed-out switch, no button that answers "nothing to do" | The save bar exists only while something differs from the saved copy. A question the form cannot work without says "Always asked" where the others have Show and Required. **Add** for a year group appears once a year and a letter are picked; until then one line says what is missing. A team that already booked gets no Next button; its button is **Change the time** |
+| 1 | **A control is shown only when it can act.** No greyed-out switch, no button that answers "nothing to do" | The save bar exists only while something differs from the saved copy. A question the form cannot work without says "Always asked" where the others have Show and Required. **Add a year group** opens a card only when asked, and its **Add 3C** appears once a year, a letter and one count above 0 are chosen; until then one line says what is missing. A team that already booked gets no Next button; its button is **Change the time** |
 | 2 | **A refused input stays in its field, with the reason next to it.** Never a toast for something the person must correct | A wrong PIN stays selected in the login field. A wrong access key stays in the instructor key box. A form with no title keeps the page and marks the title. A status the server refuses puts the saved status back and says why under the header |
 | 3 | **A warning is shown where its cause is, before the save, with the count** | The timetable counts the bookings left on a day or time that was removed. The team size panel counts the saved teams a new range leaves outside. Picking another time for a booking names the time it gives up, which anyone can then book. A save says nothing more than "saved" |
 | 4 | **One setting, one rule, in every place it appears** | Every tab of a form has the same header: title, tags, status, **Open form**, **Copy link**, **More**. The card of a form and its header share one **More** menu. The card calls the tab **Setup**, as the tab does. One theme button is used by all three pages, before and after signing in |
@@ -22,7 +22,7 @@ the instructor page (`viewer.html`).
 | 9 | **A hint must not read as an answer** | The phone field hints `01xxxxxxxxx`, not a number that looks filled in |
 | 10 | **Maintenance is under More** | **Rebuild sheet**, **Duplicate** and **Delete form** are in the More menu, not among the tools used every day |
 | 11 | **Lists are ordered by what matters now** | The forms list is grouped Open, Draft, Closed, Archived, newest first inside a group. A reservation with no days says "No days yet" on its card, and the note leads to the timetable |
-| 12 | **Nothing about the university is written in the code** | Majors, levels, bylaws, sections and groups are lists edited under **Lists**. The department letters of year groups are the letters the section lists use; a new one is typed once in **Add a year group** and is a chip from then on |
+| 12 | **Nothing about the university is written in the code** | Majors, levels, bylaws, sections and groups are lists edited under **Lists**. The department letters and the section kinds (TH, T …) are the ones the section lists use; a new one is typed once, in the new year group or on a card, and is a chip from then on because a group uses it |
 | 13 | **An action is offered where it makes sense** | The first booking of a form is offered on team and task forms, where there are teams to book. A form that already has bookings keeps them listed |
 | 14 | **Sample text is generic** | Placeholders and previews use made-up names (`Task 1`, `001`), never a real course, person or file |
 | 15 | **A limit is shown before it is hit, in the look of the site** | Every day and time of a booking says how many places are left before it is picked. A full one is not greyed out: it is a torn ticket, ragged at the top and bottom, cut by a red line and marked **Fully booked** |
@@ -50,8 +50,8 @@ views before it is committed.
 
 - Say what happens, in the order it happens: "The copy keeps every setting,
   starts as a draft, and gets its own empty Google Sheet."
-- A button names its action and its object: **Copy link**, **Add 3L with the
-  same kinds as 4C**, **Close without saving**.
+- A button names its action and its object: **Copy link**, **Add 3L**,
+  **Remove TH from 4C**, **Close without saving**.
 - A warning ends with what to do: "Widen the range, or ask those teams to
   change the team size."
 - No "please", no "successfully", no exclamation marks.

@@ -770,38 +770,76 @@ test('Lists: a refused save says why next to the choices, and a removed choice n
   assert.ok(p.text().includes('Leave without saving?'), 'another list is opened only after the admin agrees');
 });
 
-test('Lists: sections are built from year groups and counts, without typing', async () => {
+test('Lists: a year group is added from its own card, with the counts the admin sets and nothing copied', async () => {
   const w = boot();
   w.make('team_registration', 'Projects', { rules: { sections: ['4C-O3'] } });
   const p = await openAdmin(w, '#/lists/sections');
   assert.equal(p.$('[name="count-4C-TH"]').value, '8', 'the saved list reads as 4C with 8 TH, 3 T and 3 O');
   assert.equal(p.$('[name="count-4C-O"]').value, '3');
   assert.ok(p.$('.savebar').hidden);
-  assert.equal(p.$('[name="add-group"]'), null, 'Add appears once a year and a letter are picked');
+  assert.equal(p.$('[name="group-draft"]'), null, 'nothing about adding is open until it is asked for');
+  p.click('[name="add-group-open"]');
+  assert.equal(p.$('[name="add-group-open"]'), null);
+  assert.equal(p.$('[name="add-group"]'), null, 'Add appears once the group can be added');
   assert.equal(p.$('[name="group-missing"]').textContent, 'Pick a year and a department letter.');
-  assert.deepEqual(p.$$('[name^="group-year-"]').map((n) => n.textContent), ['1', '2', '3', '4', '5'], 'a student is in year 1 to 5');
+  assert.deepEqual(p.$$('[name^="group-year-"]').map((n) => n.textContent), ['1', '2', '3', '4', '5']);
   assert.deepEqual(p.$$('[name^="group-letter-"]').map((n) => n.textContent), ['C', '+ New letter'], 'the letters are the ones the lists use');
+  assert.deepEqual(p.$$('[name^="draft-count-"].stepper-input').map((n) => [n.name, n.value]), [['draft-count-TH', '0'], ['draft-count-T', '0'], ['draft-count-O', '0']], 'every kind of the lists starts at 0');
   p.click('[name="group-year-3"]');
-  assert.equal(p.$('[name="group-missing"]').textContent, 'Now pick a department letter.');
+  assert.equal(p.$('[name="group-missing"]').textContent, 'Pick a department letter.');
   p.click('[name="group-letter-add"]'); p.type('[name="group-letter-new"]', 'l');
-  assert.ok(p.$('[name="add-group"]').textContent.includes('Add 3L with the same kinds as 4C'));
-  p.click('[name="add-group"]');
-  assert.equal(p.$('[name="group-letter-L"]').textContent, 'L', 'a letter that was typed once is a chip from then on');
-  assert.equal(p.$('[name="count-3L-TH"]').value, '8');
-  p.click('[name="count-3L-TH-down"]'); p.click('[name="count-3L-TH-down"]');
-  p.click('[name="count-3L-O-down"]'); p.click('[name="count-3L-O-down"]'); p.click('[name="count-3L-O-down"]');
-  assert.equal(p.$('[name="count-3L-O"]'), null, 'a kind counted down to none leaves the group');
-  assert.ok(p.$('[name="add-kind-3L-O"]'), 'and can be added back');
+  assert.equal(p.$('[name="group-missing"]').textContent, 'Set at least one kind above 0.');
+  p.type('[name="draft-count-TH"]', '6');
+  p.type('[name="draft-count-T"]', '3');
+  assert.equal(p.$('[name="group-missing"]').textContent, '');
+  assert.equal(p.$('[name="add-group"]').textContent, 'Add 3L', 'the button names the group, and nothing else is taken from 4C');
+  assert.ok(p.$('.savebar').hidden, 'a group being drawn is not a change yet');
+  p.$('[name="draft-count-T"]').dispatchEvent(new p.win.KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+  assert.equal(p.$('[name="group-draft"]'), null, 'Enter in a count adds the group');
+  assert.deepEqual(p.$$('[data-group]').map((g) => g.dataset.group), ['3L', '4C'], 'a new group goes in year order');
+  assert.equal(p.$('[name="count-3L-TH"]').value, '6');
+  assert.equal(p.$('[name="count-3L-O"]'), null, 'a kind left at 0 is not in the group');
+  assert.equal(p.$('[name="group-letter-L"]'), null, 'the typed letter is used by a group, not kept as a chip of its own');
   p.click('[name="count-4C-O-down"]');
   assert.ok(p.$('.savebar').textContent.includes('Sections: 9 added, 1 removed. Not saved yet.'));
   assert.ok(p.$('.savebar-warn').textContent.includes('Limited to a removed choice: Projects.'));
-  p.click('[name="group-year-4"]'); p.click('[name="group-letter-C"]');
-  assert.ok(p.text().includes('4C is already in this list.'));
+  p.click('[name="add-group-open"]');
+  assert.ok(p.$('[name="group-letter-L"]'), 'once a group uses a letter, it is a chip');
+  p.click('[name="group-year-4"]'); p.click('[name="group-letter-C"]'); p.type('[name="draft-count-TH"]', '1');
+  assert.equal(p.$('[name="group-missing"]').textContent, '4C is already in this list.');
   assert.equal(p.$('[name="add-group"]'), null);
+  p.click('[name="add-group-cancel"]');
+  assert.equal(p.$('[name="group-draft"]'), null);
   p.click('[name="save-list"]'); await settle(8);
   const saved = w.admin({ action: 'admin.lists.get' }).lists.sections.map((o) => o.value);
   assert.equal(saved.length, 22);
-  assert.deepEqual(saved.slice(13), ['3L-TH1', '3L-TH2', '3L-TH3', '3L-TH4', '3L-TH5', '3L-TH6', '3L-T1', '3L-T2', '3L-T3']);
+  assert.deepEqual(saved.slice(0, 9), ['3L-TH1', '3L-TH2', '3L-TH3', '3L-TH4', '3L-TH5', '3L-TH6', '3L-T1', '3L-T2', '3L-T3']);
+});
+
+test('Lists: a kind is added by name or removed with its own button, and a count never reaches 0', async () => {
+  const w = boot();
+  w.admin({ action: 'admin.lists.set', key: 'sections', values: ['4C-TH1', '4C-TH2', '4C-T1', '4C-TH01'] });
+  const p = await openAdmin(w, '#/lists/sections');
+  assert.deepEqual(p.$$('[name^="count-4C-"].stepper-input').map((n) => n.name), ['count-4C-TH', 'count-4C-T']);
+  assert.ok(p.text().includes('4C-TH01'), 'a number written with a leading zero is kept as written, under Other sections');
+  assert.equal(p.$('[name="count-4C-T-down"]').disabled, true, 'a count stops at 1');
+  p.type('[name="count-4C-T"]', '0');
+  assert.equal(p.$('[name="count-4C-T"]').value, '1', 'a typed 0 is taken as 1');
+  p.click('[name="kind-4C-add"]');
+  p.type('[name="kind-4C-new"]', 't');
+  p.click('[name="kind-4C-take"]');
+  assert.equal(p.$('#kind-4C-err').textContent, 'T is already a kind.', 'a kind that exists is refused with the reason');
+  assert.equal(p.$('[name="kind-4C-new"]').value, 'T', 'and stays in its field');
+  p.type('[name="kind-4C-new"]', 'lab');
+  p.click('[name="kind-4C-take"]');
+  assert.equal(p.$('[name="count-4C-LAB"]').value, '1', 'a typed kind is added in capitals with one section');
+  p.click('[name="remove-kind-4C-T"]');
+  assert.equal(p.$('[name="count-4C-T"]'), null);
+  assert.ok(p.$('[name="add-kind-4C-T"]'), 'a removed kind can be added back');
+  p.click('[name="remove-kind-4C-TH"]');
+  assert.equal(p.$('[name="remove-kind-4C-LAB"]'), null, 'the last kind of a group has no remove of its own: it goes with the group');
+  p.click('[name="save-list"]'); await settle(8);
+  assert.deepEqual(w.admin({ action: 'admin.lists.get' }).lists.sections.map((o) => o.value), ['4C-LAB1', '4C-TH01']);
 });
 
 test('Lists: a run of numbers is set with two steppers', async () => {
@@ -835,9 +873,10 @@ test('Lists: a new list of sections, picked for the section question of one form
   p.click('[name="create-list"]'); await settle(8);
   assert.equal(p.win.location.hash, '#/lists/third_year');
   assert.ok(p.$('[name="delete-list"]'), 'a list no form asks can be deleted');
-  p.click('[name="group-year-3"]'); p.click('[name="group-letter-add"]'); p.type('[name="group-letter-new"]', 'L'); p.click('[name="add-group"]');
-  assert.equal(p.$('[name="count-3L-TH"]').value, '1', 'the first group starts with one TH');
-  p.click('[name="add-kind-3L-T"]'); p.click('[name="count-3L-T-up"]');
+  assert.ok(p.$('[name="add-group-open"]').classList.contains('btn-primary'), 'an empty list leads with Add a year group');
+  p.click('[name="add-group-open"]');
+  p.click('[name="group-year-3"]'); p.click('[name="group-letter-add"]'); p.type('[name="group-letter-new"]', 'L');
+  p.click('[name="draft-count-TH-up"]'); p.type('[name="draft-count-T"]', '2'); p.click('[name="add-group"]');
   p.click('[name="save-list"]'); await settle(8);
   assert.deepEqual(w.admin({ action: 'admin.lists.get' }).lists.third_year.map((o) => o.value), ['3L-TH1', '3L-T1', '3L-T2']);
 
