@@ -4,8 +4,8 @@
  */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { createWorld } = require('../../harness/appsscript-mock.js');
-const { openPage, helpers, settle } = require('../../harness/dom.js');
+const { createWorld } = require('../../../harness/appsscript-mock.js');
+const { openPage, helpers, settle } = require('../../../harness/dom.js');
 
 function boot() {
   const w = createWorld();

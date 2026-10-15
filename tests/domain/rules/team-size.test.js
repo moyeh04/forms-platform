@@ -91,6 +91,12 @@ test('Small teams: the stronger level wins; wrong numbers are named', () => {
   );
 });
 
+test('Small teams: the levels are critical then warning', () => {
+  assert.deepEqual(R.sizeAlertLevelIds(), ['critical', 'warning']);
+  R.sizeAlertLevelIds().pop();
+  assert.equal(R.sizeAlertLevelIds().length, 2, 'each call gives a copy');
+});
+
 test('Small teams: a level asks for 2 up to the biggest team size', () => {
   const sized = (max) => ({ rules: { teamSize: { min: 1, max } } });
   assert.deepEqual(R.sizeAlertBounds(sized(6)), { min: 2, max: 6 });

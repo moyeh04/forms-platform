@@ -40,8 +40,26 @@
     "lines": 12,
     "numbers": 4
   },
-  "tests/web/admin.test.js": {
-    "lines": 65
+  "tests/web/admin.lists.test.js": {
+    "lines": 8
+  },
+  "tests/web/admin.people.test.js": {
+    "lines": 3
+  },
+  "tests/web/admin.questions.test.js": {
+    "lines": 3
+  },
+  "tests/web/admin.responses.test.js": {
+    "lines": 12
+  },
+  "tests/web/admin.settings.test.js": {
+    "lines": 18
+  },
+  "tests/web/admin.shell.test.js": {
+    "lines": 15
+  },
+  "tests/web/admin.timetable.test.js": {
+    "lines": 6
   },
   "tests/web/css/theme.test.js": {
     "lines": 3
@@ -53,10 +71,22 @@
     "biome/lint/suspicious/noAssignInExpressions": 1,
     "lines": 7
   },
-  "tests/web/index.test.js": {
-    "lines": 40
+  "tests/web/index.edit.test.js": {
+    "lines": 3
   },
-  "tests/web/js/fresh.test.js": {
+  "tests/web/index.form.test.js": {
+    "lines": 17
+  },
+  "tests/web/index.reservation.test.js": {
+    "lines": 3
+  },
+  "tests/web/index.team-size.test.js": {
+    "lines": 6
+  },
+  "tests/web/index.transfer.test.js": {
+    "lines": 11
+  },
+  "tests/web/js/app/fresh.test.js": {
     "lines": 6
   },
   "tests/golden.test.js": {
@@ -149,21 +179,6 @@
     "lines": 3
   },
   "web/index.html": {
-    "lines": 4
-  },
-  "web/js/viewer.js": {
-    "biome/lint/complexity/noExcessiveCognitiveComplexity": 4,
-    "biome/lint/complexity/noExcessiveLinesPerFunction": 5,
-    "biome/lint/complexity/useOptionalChain": 1,
-    "biome/lint/correctness/noInnerDeclarations": 4,
-    "biome/lint/correctness/noUnusedVariables": 2,
-    "biome/lint/style/noExcessiveLinesPerFile": 1,
-    "biome/lint/style/noMagicNumbers": 5,
-    "biome/lint/suspicious/noAssignInExpressions": 2,
-    "jsdoc": 24,
-    "lines": 5
-  },
-  "web/viewer.html": {
     "lines": 4
   },
   "tests/scripts/deploy/backend-changed.test.js": {

@@ -509,7 +509,7 @@ person under it).
 
 | Responsibility | Owner |
 |---|---|
-| The levels, their starting numbers, the level of a team, and why a setting cannot be saved, the numbers a level can ask for | `Rules.sizeAlerts`, `Rules.sizeAlertLevels`, `Rules.sizeAlertOf`, `Rules.sizeAlertsProblem`, `Rules.sizeAlertBounds` in `domain/rules/team-size.js` |
+| The levels, their starting numbers, the level of a team, and why a setting cannot be saved, the numbers a level can ask for | `Rules.sizeAlerts`, `Rules.sizeAlertLevels`, `Rules.sizeAlertOf`, `Rules.sizeAlertsProblem`, `Rules.sizeAlertBounds`, `Rules.sizeAlertLevelIds` in `domain/rules/team-size.js` |
 | Checking and cleaning the setting on a save | `normalizeRules_` in `forms.rules.js`, with the same `Rules` functions (`bad_size_alerts`) |
 | The control in the Small teams panel of Setup | `A.sizeAlerts` in `admin/settings/size-alerts.view.js`; it returns `{ node, refresh(), problem(), summary() }` like the range control |
 | Whether an instructor sees them | `showSizeAlerts` of each link in `clients.repository.js`, set in the link dialog (`admin/people/client-dialog.view.js`) |
@@ -743,7 +743,7 @@ flowchart LR
         a6["admin/responses/download*.js<br/>Download all"]
     end
     subgraph viewerp["viewer.html"]
-        v1["viewer.js"]
+        v1["viewer/"]
     end
     cfg --> api
     api --> fm
@@ -1201,7 +1201,7 @@ query is for a thing that changes what it is on a phone (a table that becomes
 cards), not for a thing that only needs fewer columns.
 
 A new list table must set `data-label` on its cells and use one of these
-classes; `tests/web/admin.test.js` and `tests/web/viewer.test.js` check the
+classes; `tests/web/admin.responses.test.js` and `tests/web/viewer.test.js` check the
 labels of the current tables.
 
 ## Where to change what
