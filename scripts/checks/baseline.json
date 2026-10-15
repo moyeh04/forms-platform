@@ -253,15 +253,6 @@
     "jsdoc": 70,
     "lines": 31
   },
-  "web/js/form/slots.view.js": {
-    "biome/lint/complexity/noExcessiveCognitiveComplexity": 3,
-    "biome/lint/complexity/noExcessiveLinesPerFunction": 2,
-    "biome/lint/complexity/useOptionalChain": 2,
-    "biome/lint/correctness/noUnusedFunctionParameters": 1,
-    "biome/lint/style/noMagicNumbers": 1,
-    "jsdoc": 9,
-    "lines": 4
-  },
   "web/js/form/ticket/ticket.js": {
     "biome/lint/complexity/noExcessiveCognitiveComplexity": 1,
     "biome/lint/complexity/noExcessiveLinesPerFunction": 1,
