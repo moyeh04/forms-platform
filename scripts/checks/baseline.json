@@ -151,9 +151,6 @@
   "web/index.html": {
     "lines": 4
   },
-  "web/viewer.html": {
-    "lines": 4
-  },
   "tests/scripts/deploy/backend-changed.test.js": {
     "biome/lint/correctness/noUnusedFunctionParameters": 1,
     "lines": 1
