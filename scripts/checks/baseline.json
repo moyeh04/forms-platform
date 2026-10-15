@@ -86,7 +86,7 @@
   "tests/web/index.transfer.test.js": {
     "lines": 11
   },
-  "tests/web/js/fresh.test.js": {
+  "tests/web/js/app/fresh.test.js": {
     "lines": 6
   },
   "tests/golden.test.js": {

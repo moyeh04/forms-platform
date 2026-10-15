@@ -49,7 +49,7 @@ flowchart TD
         fui["web/index.&lt;feature&gt;.test.js"]
         aui["web/admin.&lt;feature&gt;.test.js"]
         vui["web/viewer.test.js"]
-        fresh["web/js/fresh.test.js"]
+        fresh["web/js/app/fresh.test.js"]
     end
 
     harness --> backend
@@ -198,7 +198,7 @@ says something else.
 | Document check | `scripts/checks/tree/docs.test.js` | 3 | API.md, TESTING.md (sub-folders counted) and Markdown links that match pass; a missing action, an action in the section of another access, a wrong count and a broken link are each found |
 | Harness | `harness/appsscript-mock.test.js` | 5 | The fake itself, and a seeded world that repeats its ids |
 | Colour contrast | `web/css/theme.test.js` | 4 | Every text and outline pair meets WCAG AA in light, dark, and device-dark themes |
-| A page older than the site | `web/js/fresh.test.js` | 4 | An untouched page reloads once for a newer site and never in a loop, a page with typed text or an open dialog offers Reload instead, the bar in the language of the form, nothing in a preview or when the version cannot be read |
+| A page older than the site | `web/js/app/fresh.test.js` | 4 | An untouched page reloads once for a newer site and never in a loop, a page with typed text or an open dialog offers Reload instead, the bar in the language of the form, nothing in a preview or when the version cannot be read |
 | Router | `backend/platform/http/router.test.js` | 3 | Unknown actions and bad JSON answered with clean errors, a route table that could open an action refused at load, and the link and admin checks run before the handler |
 | Admin PIN | `backend/features/access/auth/auth.test.js` | 3 | A wrong PIN refused and repeated guesses locked out, unlocking from the sheet menu keeps the PIN, actions need the PIN and a PIN must be long enough |
 | Registry setup | `backend/features/catalog/registry/registry.setup.test.js` | 1 | Setup creates the registry tabs and default lists and is safe to repeat |
