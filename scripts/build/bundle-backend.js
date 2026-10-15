@@ -3,7 +3,7 @@
  * Bundles the Apps Script backend into one paste-ready file.
  *
  * Output (git-ignored):
- *   dist/Code.gs          shared rules + every backend/*.js module
+ *   dist/Code.gs          the domain rules + every .js file under backend/
  *   dist/appsscript.json  the manifest (time zone, scopes, web app settings)
  *
  * Module load order does not matter: every module only declares functions
@@ -20,13 +20,35 @@ function read(rel) {
   return fs.readFileSync(path.join(root, rel), 'utf8');
 }
 
+/** The order of the backend folders in the bundle; main.js comes last. */
+const BACKEND_ORDER = ['platform/', 'features/'];
+
+/**
+ * Ranks a backend file for the bundle: platform code first, then the
+ * features, then the files at the top of backend/, with main.js last.
+ *
+ * @param {string} file A path inside backend/, with forward slashes.
+ * @return {number} The rank; lower comes first.
+ */
+function rankOf(file) {
+  if (file === 'main.js') return BACKEND_ORDER.length + 1;
+  const index = BACKEND_ORDER.findIndex((dir) => file.startsWith(dir));
+  return index === -1 ? BACKEND_ORDER.length : index;
+}
+
+/**
+ * Lists every backend source file, in bundle order.
+ *
+ * @return {!Array<string>} Paths from the repository root.
+ */
 function listBackend() {
   const dir = path.join(root, 'backend');
   if (!fs.existsSync(dir)) return [];
   return fs
-    .readdirSync(dir)
+    .readdirSync(dir, { recursive: true })
+    .map((f) => f.split(path.sep).join('/'))
     .filter((f) => f.endsWith('.js'))
-    .sort((a, b) => (a === 'Code.js') - (b === 'Code.js') || a.localeCompare(b))
+    .sort((a, b) => rankOf(a) - rankOf(b) || a.localeCompare(b))
     .map((f) => path.posix.join('backend', f));
 }
 

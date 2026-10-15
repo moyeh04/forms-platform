@@ -20,7 +20,7 @@ test('Site map: each published path finds its source file', () => {
 
 test('Site map: paths outside the site, or leaving it, have no source', () => {
   assert.equal(sourceOf('README.md'), null);
-  assert.equal(sourceOf('backend/Code.js'), null);
+  assert.equal(sourceOf('backend/main.js'), null);
   assert.equal(sourceOf('/assets/js/../../../package.json'), null);
   assert.equal(sourceOf('/.git/config'), null);
 });

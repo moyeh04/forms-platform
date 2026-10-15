@@ -259,13 +259,13 @@ the Back button belong to the path, so they are not shown here.
 A task is handed in by its deadline. Once a task form stops taking answers
 (closed, or past its close date), its key still opens the task to read, but
 **update** and **remove** refuse with `deadline_passed`, and the page says why
-instead of offering Change or Cancel (`taskLocked_` in `Submissions.js`).
+instead of offering Change or Cancel (`taskLocked_` in `submissions.controller.js`).
 Opening the form again, or moving its close date, lifts the lock. Team
 registrations are not locked this way.
 
 A key works for the number of days set in **Setup, Edit key**, counted from
 when it is given. The admin moves that date in `admin-keys.js`, backed by
-`KeyExpiry.js`: **Extend** in a registration's details changes one key, and
+`keys.controller.js`: **Extend** in a registration's details changes one key, and
 **Extend keys** in Setup changes all keys, the expired ones, the ones ending in
 three days, or teams picked from a list. A period is added to the later of
 today and the key's own end, so an expired key works again for the whole
@@ -509,9 +509,9 @@ person under it).
 | Responsibility | Owner |
 |---|---|
 | The levels, their starting numbers, the level of a team, and why a setting cannot be saved | `Rules.sizeAlerts`, `Rules.sizeAlertLevels`, `Rules.sizeAlertOf`, `Rules.sizeAlertsProblem` in `domain/rules.js` |
-| Checking and cleaning the setting on a save | `normalizeRules_` in `Registry.js`, with the same `Rules` functions (`bad_size_alerts`) |
+| Checking and cleaning the setting on a save | `normalizeRules_` in `forms.rules.js`, with the same `Rules` functions (`bad_size_alerts`) |
 | The control in the Small teams panel of Setup | `A.sizeAlerts` in `admin-size-alerts.js`; it returns `{ node, refresh(), problem(), summary() }` like the range control |
-| Whether an instructor sees them | `showSizeAlerts` of each link in `Clients.js`, set in the link dialog (`admin-people.js`) |
+| Whether an instructor sees them | `showSizeAlerts` of each link in `clients.repository.js`, set in the link dialog (`admin-people.js`) |
 | The lines above the teams and the mark on a card | `App.sizeAlerts` in `size-alerts.js`, used by the dashboard and the instructor page |
 
 The dashboard loads `domain/rules.js` and asks it for the level of each team.
@@ -587,9 +587,11 @@ flowchart LR
 
 ## Backend modules
 
-Sixteen small files that the bundler joins with `domain/rules.js`. They do not
-import each other; they share one global scope (this is how Apps Script
-works), and each file only declares functions or registers handlers.
+Small files under `backend/platform/` and `backend/features/<area>/<feature>/`
+that the bundler joins with `domain/rules.js`. They do not import each other;
+they share one global scope (this is how Apps Script works), and each file
+only declares functions or registers handlers. The diagram shows the features;
+[FILE-STRUCTURE.md](FILE-STRUCTURE.md) lists every file.
 
 ```mermaid
 %%{init: {
@@ -616,62 +618,63 @@ works), and each file only declares functions or registers handlers.
 }}%%
 flowchart TD
     subgraph entry["Entry"]
-        Code["Code.js<br/>doGet, doPost, routing"]
-        Menu["Menu.js<br/>onOpen sheet menu"]
+        Main["main.js<br/>doGet, doPost, routing"]
+        Menu["outputs/menu<br/>onOpen sheet menu, print dialog"]
     end
-    subgraph core["Core"]
-        Config["Config.js<br/>helpers, hashes, sheet tables, API table"]
-        Auth["Auth.js<br/>PIN, lockout, admin wrapper"]
-        Registry["Registry.js<br/>setup, forms, lists, triggers"]
-        Templates["Templates.js<br/>four form types as data"]
+    subgraph catalog["features/catalog"]
+        Registry["registry<br/>registry sheet and folder, setup"]
+        Forms["forms<br/>forms tab, rules, public form, questions"]
+        Lists["lists<br/>shared lists"]
+        Templates["templates<br/>four form types as data"]
     end
-    subgraph public["Student facing"]
-        FormsApi["FormsApi.js<br/>getForm, admin forms CRUD"]
-        Submissions["Submissions.js<br/>submit, lookup, update, remove"]
-        Responses["Responses.js<br/>rows, keys, limits, Drive checks, emails"]
-        Slots["Slots.js<br/>timetable and availability"]
-        KeyBooking["KeyBooking.js<br/>booking with a registration key"]
-        Transfers["Transfers.js<br/>moving a member between teams"]
-        KeyExpiry["KeyExpiry.js<br/>when keys stop working"]
+    subgraph intake["features/intake"]
+        Submissions["submissions<br/>submit, lookup, update, remove"]
+        Responses["responses<br/>rows, limits, review, Drive checks, emails"]
+        Keys["keys<br/>edit keys and when they stop working"]
+        Teams["teams<br/>numbered teams, shared"]
+        Transfers["transfers<br/>moving a member between teams"]
+        Reservations["reservations<br/>slots, booking with a registration key"]
+        Matching["matching<br/>WhatsApp matching"]
     end
-    subgraph admin["Admin and reviewers"]
-        Views["Views.js<br/>tinted sheet blocks"]
-        SheetStyle["SheetStyle.js<br/>look of the data tabs"]
-        Print["Print.js<br/>print tabs and PDF"]
-        Matching["Matching.js<br/>WhatsApp matching"]
-        Clients["Clients.js<br/>private links, access keys, end dates"]
-        Viewer["Viewer.js<br/>read-only data"]
-        TeamList["TeamList.js<br/>numbered teams, shared"]
-        Download["Download.js<br/>files and folders in zips"]
-        Xlsx["Xlsx.js<br/>Excel file writer"]
+    subgraph access["features/access"]
+        Auth["auth<br/>PIN, lockout, admin wrapper"]
+        Clients["clients<br/>private links, access keys, end dates"]
+        Viewer["viewer<br/>read-only data"]
     end
+    subgraph outputs["features/outputs"]
+        Views["sheet-views<br/>tinted sheet blocks"]
+        Print["print<br/>print tabs and PDF"]
+        Download["downloads<br/>files and folders in zips"]
+    end
+    Platform["platform/<br/>errors, sheet tables, lock, sheet style,<br/>crypto, properties, format, xlsx"]
     Rules["domain/rules.js<br/>pure validation"]
 
-    Code --> Config
-    Auth --> Config
-    Registry --> Config
-    FormsApi --> Registry
+    Main --> Platform
+    Auth --> Platform
+    Registry --> Platform
+    Forms --> Registry
+    Forms --> Lists
+    Templates --> Forms
     Submissions --> Responses
+    Submissions --> Keys
+    Submissions --> Transfers
     Submissions --> Rules
     Responses --> Rules
-    Responses --> Config
-    Slots --> Rules
+    Responses --> Platform
+    Reservations --> Rules
+    Reservations --> Keys
     Views --> Responses
+    Views --> Teams
     Print --> Views
+    Print --> Teams
     Matching --> Responses
-    KeyExpiry --> Responses
-    Download --> TeamList
-    Download --> Xlsx
-    Views --> TeamList
-    Print --> TeamList
+    Keys --> Responses
+    Download --> Teams
+    Download --> Platform
     Viewer --> Clients
     Viewer --> Responses
-    Templates --> Registry
     Menu --> Print
-    Registry --> Views
-    Views --> SheetStyle
-    Registry --> SheetStyle
-    Menu --> SheetStyle
+    Forms --> Views
     classDef cDb fill:#F3E2B3,stroke:#B8892D,stroke-width:1.5px,color:#2F2418
     classDef cActor fill:#F4D9D3,stroke:#9A3328,stroke-width:1.5px,color:#2F2418
     classDef cDec fill:#FBEFC9,stroke:#C9A24A,stroke-width:1.5px,color:#2F2418
@@ -816,7 +819,7 @@ up while a timer ran every five minutes loses that timer on the first run.
 
 The same repaint looks after the data tabs. Responses, Transfers and Requests
 get a dark header, a frozen first row, column widths and two row tints
-(`SheetStyle.js`); the registry's Forms, Clients and Lists get them at
+(`sheet-style.js`); the registry's Forms, Clients and Lists get them at
 **First-time setup** and from **Rebuild all views** in the sheet menu. A tab
 that has the look costs three reads and is left alone. Only the look is set, so
 no value and no number format changes, and a tab that refuses a format is logged
@@ -827,7 +830,7 @@ and does not stop the repaint.
 **Download all tasks** (or **projects**) under Responses saves every team's task
 file or project folder in zip parts, with a `Teams.xlsx` that lists the teams,
 one tinted block per team, and links each task or project to its saved copy. It
-is one feature for both team forms: `teamBlocks_` in `TeamList.js` gives the
+is one feature for both team forms: `teamBlocks_` in `teams.service.js` gives the
 numbered teams that the sheet view, the printed list and the download all read,
 so they never disagree on the order or the numbers.
 
@@ -841,7 +844,8 @@ instructor page show the number the server sends and never count the cards.
 Downloading Drive files through their public links (what a script, `curl`, or a
 headless browser such as Playwright does) is anonymous traffic, and Google
 limits it: "too many users have downloaded this file", a virus-scan page for big
-files, and bot checks after a burst of requests. `Download.js` instead reads each
+files, and bot checks after a burst of requests. The download feature
+(`backend/features/outputs/downloads/`) instead reads each
 file as the owner: `DriveApp` for ordinary files, and the export address with the
 owner's token for Google Slides, Docs and Sheets, which come as Office files.
 That is not public-link traffic, so those limits do not apply. A headless
@@ -867,7 +871,7 @@ ever shared by link. What could not be saved (no link, a Google Form, a file too
 big, a link that does not open) is listed in the window and on the sheet "Not
 downloaded" of `Teams.xlsx`, each with the reason and its Drive link.
 
-`Teams.xlsx` is written by `Xlsx.js`, a small writer of the Excel file format.
+`Teams.xlsx` is written by `backend/platform/xlsx/`, a small writer of the Excel file format.
 Google Sheets cannot save a link to a file that sits next to the workbook, and
 that is the whole point of the list. Each column is as wide as its longest value
 (a file cannot ask Excel to autofit, so the width is measured when it is
@@ -961,7 +965,7 @@ no new record:
   folded to one line (the count and the newest booking) until it is opened,
   because a form can have a booking for every week of a term; which forms are
   open is kept in `sessionStorage` for the browser tab.
-- `admin.bookings.next` (`KeyBooking.js`) makes the next one. The first is a new
+- `admin.bookings.next` (`key-booking.controller.js`) makes the next one. The first is a new
   reservation that books with the keys of the form. Each later one is a copy of
   the newest: the same questions, rules, hours and bookings per slot, its own
   empty sheet, status Draft, and every dated day seven days later
@@ -970,7 +974,7 @@ no new record:
   number in the title goes up ("Discussion - Week 3" to "Week 4").
 - A team books once in each of them, because each is its own form.
 - The key that finds a team that has booked shows the team its time and opens
-  the booking on that time, to move it (`editScope_` in `Submissions.js`
+  the booking on that time, to move it (`editScope_` in `submissions.controller.js`
   decides whether it may move). The ticket of such a booking draws the day and
   the time and does not show the key again, since the team already has it.
 
@@ -1015,7 +1019,7 @@ Rules for this page, to keep when a setting is added:
   moved and, while it is empty, removed; a question can be moved to another
   page or up and down. A question the admin adds has `custom: true`, an id that
   starts with `q_`, and the type `text`, `textarea` or `select` with its own
-  `options`. `normalizeQuestions_` in `Questions.js` cleans both lists on every
+  `options`. `normalizeQuestions_` in `forms.questions.js` cleans both lists on every
   save. The student form already draws any question of a page and skips a page
   with no questions, and an answer is stored under the id of its question in
   the `data` JSON, so no sheet column changes. Team size, team members and the
@@ -1023,7 +1027,7 @@ Rules for this page, to keep when a setting is added:
 - **Limit a list with `allowPicker`.** A rule that keeps some values of a list
   (specializations, sections) uses the `allowPicker` chips, stores the values
   under the name of the list in `rules`, and adds that name to
-  `LIMITED_LISTS_` in `Registry.js`, which filters the options for the browser
+  `LIMITED_LISTS_` in `forms.public.js`, which filters the options for the browser
   and for validation. An empty rule means every value.
 - **No sideways scrolling.** Questions are rows of a grid that stack at 760px,
   not a table.
@@ -1041,7 +1045,7 @@ Rules for this page, to keep when a setting is added:
 ## Moving a member between teams
 
 `rules.uniqueAcrossForm` refuses a team that names a member of another team.
-With `rules.transfers` also on, `Transfers.js` turns the refusal into a request.
+With `rules.transfers` also on, `transfers.service.js` turns the refusal into a request.
 
 1. `submit` and `update` call `takeOutTransfers_` inside the lock. It fails with
    `duplicate_member` and lists, under `transfer`, the members that can be asked
@@ -1187,12 +1191,12 @@ labels of the current tables.
 |---|---|
 | Change a colour, font, or size | `web/css/theme.css` (variables only); `npm test` checks the contrast |
 | Reword a message or translate | `web/js/i18n.js` |
-| Add a question to a form | Admin dashboard, or `backend/Templates.js` for new forms by default |
-| Add a new form type | A new function in `backend/Templates.js`, a label in `web/js/admin.js` |
+| Add a question to a form | Admin dashboard, or `template-fields.js` for new forms by default |
+| Add a new form type | A new function in `templates.service.js`, a label in `web/js/admin.js` |
 | Change a validation rule | `domain/rules.js` (browser, server, and tests all follow) |
 | Add a backend action | A file in `backend/` that sets `API['name'] = ...` (wrap with `admin()` if private) |
-| Change sheet colours | `backend/Views.js` |
-| Change the downloaded Excel list | `dlWorkbook_` in `backend/Download.js` (the file format is in `backend/Xlsx.js`) |
+| Change sheet colours | `sheet-views.layout.js` |
+| Change the downloaded Excel list | `dlWorkbook_` in `downloads.workbook.js` (the file format is in `backend/platform/xlsx/`) |
 | Change the Drive folder name rule | `Rules.checkFolderName` in `domain/rules.js` |
 | Change the tab icon | `web/img/favicon.svg`, then regenerate the PNGs in `web/img/` |
 | See a change in a real browser before deploying | `npm run dev` (`scripts/dev/dev-server.js`) |

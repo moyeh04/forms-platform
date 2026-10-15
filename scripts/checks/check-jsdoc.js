@@ -54,7 +54,9 @@ function holderOf(parent, above) {
 }
 
 /**
- * Finds the JSDoc comment right before a node, with only space between.
+ * Finds the JSDoc comment right before a node. Only spaces and one line break
+ * may come between, so a file's header comment followed by a blank line is
+ * not taken for the doc of the first function.
  *
  * @param {!Object} anchor The node.
  * @param {!Array<!Object>} comments Every comment of the file.
@@ -67,7 +69,9 @@ function docBefore(anchor, comments, source) {
   if (last?.type !== 'Block' || !last.value.startsWith('*')) {
     return null;
   }
-  return /^\s*$/.test(source.slice(last.end, anchor.start)) ? last : null;
+  return /^[ \t]*\n?[ \t]*$/.test(source.slice(last.end, anchor.start))
+    ? last
+    : null;
 }
 
 /**

@@ -10,7 +10,7 @@
   var started = false;
 
   // What each kind of form is: `text` says what it is for, `pages` are the pages students go
-  // through (the same as the template in Templates.js), `next` is what to set up after creating it.
+  // through (the same as the template in templates.service.js), `next` is what to set up after creating it.
   A.TYPES = {
     team_registration: {
       label: 'Team registration',

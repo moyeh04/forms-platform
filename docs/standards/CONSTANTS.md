@@ -12,7 +12,7 @@ change it.
   `_DAYS`, `_BYTES`, `_PX`.
 - **Declared at the top of the file that owns it**, under the imports, never
   inside a function. A value two files need belongs to the lower layer they
-  share: `backend/Config.js` for the backend, `domain/rules.js` for both
+  share: `backend/platform/config/constants.js` for the backend, `domain/rules.js` for both
   sides.
 - **Built from smaller names** when it is a product: `40 * 1024 * 1024`
   stays readable, so write it out instead of `41943040`.
@@ -47,13 +47,14 @@ is silenced on its own line with the reason, and both checks honour it:
 
 | Owner | Holds |
 |---|---|
-| `backend/Config.js` | Sheet tab names, the column lists of the Forms, Responses and Clients tabs, `FORM_TYPES`, `FORM_STATUSES` |
-| `backend/Responses.js` | `SUBMISSION_STATUSES`, `REVIEW_STATUSES`, the reference prefix of each form type |
-| `backend/Registry.js` | The list kinds, the built-in lists, the form fields a patch may change and the ones the public may read |
-| `backend/Auth.js` | `ADMIN_MAX_FAILS`, `ADMIN_LOCK_SECONDS` |
-| `backend/Clients.js` | `CLIENT_KEY_TRIES_` |
-| `backend/Download.js` | The size, time and file limits of a download job |
-| `backend/KeyExpiry.js`, `Questions.js`, `Views.js`, `Xlsx.js`, `SheetStyle.js` | The limits and sizes of their own feature |
+| `backend/platform/config/constants.js` | The app name, the registry tab names, `FORM_TYPES`, `FORM_STATUSES` |
+| each `*.repository.js` | The column list of its tab (`FORM_COLS`, `RESPONSE_COLS`, `CLIENT_COLS_`, `TRANSFER_COLS`, `REQUEST_COLS_`) |
+| `responses.repository.js`, `responses.review.js` | `SUBMISSION_STATUSES`, the reference prefix of each form type, `REVIEW_STATUSES` |
+| `lists.repository.js`, `forms.service.js`, `forms.public.js` | The list kinds and built-in lists, the form fields a patch may change, the ones the public may read |
+| `auth.service.js` | `ADMIN_MAX_FAILS`, `ADMIN_LOCK_SECONDS` |
+| `clients.access.js` | `CLIENT_KEY_TRIES_` |
+| `downloads.jobs.js` | The size, time and file limits of a download job |
+| `keys.controller.js`, `forms.questions.js`, `sheet-views.*.js`, `workbook.js`, `sheet-style.js` | The limits and sizes of their own feature |
 | `domain/rules.js` | The Arabic letter and digit tables, `SIZE_ALERT_LEVELS`, week day and month names |
 | `web/js/*.js` | Each page module's own labels, choices and browser storage keys (`fp_*`) at the top of its wrapper |
 | `web/js/config.js` | The backend URL, written by the deploy workflow |
@@ -64,7 +65,7 @@ Known gaps, counted in the check baseline until they are fixed:
   `web/js/admin-timetable.js`.
 - Yes/no values are stored in the sheet as the strings `'1'` and `'0'`
   (`deleted` as `'1'` or empty). The row readers and writers of
-  `backend/Clients.js` and `backend/Responses.js` convert them inline, each
+  `clients.repository.js` and `responses.repository.js` convert them inline, each
   in its own way, instead of through one codec; `check-flags.js` counts
   them.
 - The ticket drawing in `web/js/ticket.js` places its shapes with unnamed

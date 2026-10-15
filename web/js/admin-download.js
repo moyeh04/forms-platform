@@ -1,6 +1,6 @@
 /**
  * Admin: download everything a team or task form collected, as zip parts with Teams.xlsx.
- * The backend (Download.js) does the work one team at a time; this window drives it, shows how
+ * The backend (features/outputs/downloads) does the work one team at a time; this window drives it, shows how
  * far it is, and saves each part from pieces it reads through the API.
  */
 (function (App) {

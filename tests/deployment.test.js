@@ -519,7 +519,7 @@ test('Workflow: a push that changes no backend file skips the Apps Script deploy
     false
   );
   for (const file of [
-    'backend/Views.js',
+    'backend/main.js',
     'backend/appsscript.json',
     'domain/rules.js',
     'scripts/build/bundle-backend.js',
@@ -546,7 +546,10 @@ test('Workflow: a push that changes no backend file skips the Apps Script deploy
     false
   );
   assert.equal(
-    backendChanged(push, git(['README.md', 'backend/Auth.js'])).changed,
+    backendChanged(
+      push,
+      git(['README.md', 'backend/features/access/auth/auth.service.js'])
+    ).changed,
     true
   );
   // Whenever the push cannot be compared, the backend is deployed.
