@@ -45,7 +45,7 @@ API['admin.matching.import'] = admin(function (req) {
             .replace(/[\s,;:|\-]+/g, ' ')
             .trim();
           Table.appendPlain(sh, [
-            uuid(),
+            Crypto.uuid(),
             line,
             p.phone,
             label,

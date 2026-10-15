@@ -14,7 +14,7 @@ API['admin.clients.create'] = admin(function (req) {
   if (!name) ApiError.fail('name_required', 'Give this person or group a name.');
   var token = newToken_();
   var c = {
-    id: shortId('c_'),
+    id: Crypto.shortId('c_'),
     name: name,
     tokenHash: clientToken_(token),
     forms: cleanClientForms_(req.forms),
@@ -74,7 +74,7 @@ API['admin.clients.showKey'] = admin(function (req) {
   })[0];
   if (!c) ApiError.fail('client_not_found', 'That client does not exist.');
   if (!c.keyHash) ApiError.fail('no_key', 'This link does not ask for a key.');
-  var key = unsealDigits_(clientKeyPad_(c), c.keySeal, 6);
+  var key = Crypto.unsealDigits(clientKeyPad_(c), c.keySeal, 6);
   if (!key || clientKeyHash_(c, key) !== c.keyHash)
     ApiError.fail(
       'key_unknown',

@@ -1,5 +1,6 @@
 /** Ids, random digits, SHA-256 and the sealing of short digit strings. */
 
+var Crypto = (function () {
 function uuid() {
   return Utilities.getUuid();
 }
@@ -52,3 +53,6 @@ function unsealDigits_(pad, seal, length) {
     })
     .join('');
 }
+
+return { uuid, sha256Hex, shortId, unsealDigits: unsealDigits_, sealDigits: sealDigits_, randomDigits };
+})();

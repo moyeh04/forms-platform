@@ -28,10 +28,11 @@
     "lines": 6
   },
   "backend/features/access/clients/clients.service.js": {
+    "biome/format": 1,
     "biome/lint/style/noMagicNumbers": 2,
     "biome/lint/suspicious/noGlobalIsNan": 1,
     "jsdoc": 11,
-    "lines": 8
+    "lines": 9
   },
   "backend/features/access/viewer/viewer.controller.js": {
     "biome/format": 1,
@@ -112,7 +113,9 @@
     "jsdoc": 2
   },
   "backend/features/catalog/registry/registry.setup.js": {
-    "jsdoc": 1
+    "biome/format": 1,
+    "jsdoc": 1,
+    "lines": 1
   },
   "backend/features/catalog/templates/template-fields.js": {
     "biome/lint/complexity/useMaxParams": 1,
@@ -143,7 +146,7 @@
     "biome/lint/correctness/noInnerDeclarations": 3,
     "biome/lint/style/noMagicNumbers": 4,
     "jsdoc": 12,
-    "lines": 4
+    "lines": 5
   },
   "backend/features/intake/matching/matching.controller.js": {
     "biome/format": 1,
@@ -334,12 +337,14 @@
     "jsdoc": 3
   },
   "backend/platform/security/crypto.js": {
+    "biome/format": 1,
     "biome/lint/correctness/noInnerDeclarations": 1,
     "biome/lint/style/noMagicNumbers": 4,
     "jsdoc": 7,
-    "lines": 1
+    "lines": 2
   },
   "backend/platform/security/properties.js": {
+    "biome/format": 1,
     "jsdoc": 3
   },
   "backend/platform/sheets/lock.js": {

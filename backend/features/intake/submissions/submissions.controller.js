@@ -61,7 +61,7 @@ API.submit = function (req) {
     var k = source
       ? bookingKey_(vform, live, req.sourceKey)
       : issueKey_(vform, live);
-    var id = uuid();
+    var id = Crypto.uuid();
     var r = applyDerived_(vform, {
       id: id,
       ref: nextRef_(form),

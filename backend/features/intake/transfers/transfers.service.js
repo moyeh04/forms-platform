@@ -208,7 +208,7 @@ function recordTransfers_(form, team, wants) {
     })
     .map(function (w) {
       return saveTransfer_(form, {
-        id: uuid(),
+        id: Crypto.uuid(),
         created: nowIso(),
         status: 'pending',
         code: w.code,

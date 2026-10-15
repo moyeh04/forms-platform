@@ -20,21 +20,21 @@
  */
 
 function clientToken_(token) {
-  return sha256Hex(pepper() + ':client:' + token);
+  return Crypto.sha256Hex(Properties.pepper() + ':client:' + token);
 }
 
 function clientKeyHash_(c, key) {
-  return sha256Hex(pepper() + ':clientkey:' + c.id + ':' + key);
+  return Crypto.sha256Hex(Properties.pepper() + ':clientkey:' + c.id + ':' + key);
 }
 
 function clientKeyPad_(c) {
-  return sha256Hex(pepper() + ':clientseal:' + c.id);
+  return Crypto.sha256Hex(Properties.pepper() + ':clientseal:' + c.id);
 }
 
 /** Gives the link `key`, or no key when it is empty. */
 function setClientKey_(c, key) {
   c.keyHash = key ? clientKeyHash_(c, key) : '';
-  c.keySeal = key ? sealDigits_(clientKeyPad_(c), key) : '';
+  c.keySeal = key ? Crypto.sealDigits(clientKeyPad_(c), key) : '';
 }
 
 function clientExpired_(c) {
@@ -51,12 +51,12 @@ function cleanExpiry_(value) {
 }
 
 function newClientKey_() {
-  var n = parseInt(uuid().replace(/-/g, '').slice(0, 10), 16) % 1000000;
+  var n = parseInt(Crypto.uuid().replace(/-/g, '').slice(0, 10), 16) % 1000000;
   return ('00000' + n).slice(-6);
 }
 
 function newToken_() {
-  return (uuid() + uuid()).replace(/-/g, '').slice(0, 24);
+  return (Crypto.uuid() + Crypto.uuid()).replace(/-/g, '').slice(0, 24);
 }
 
 function publicClient_(c) {

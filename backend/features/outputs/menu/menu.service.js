@@ -70,7 +70,7 @@ function menuSetSiteUrl() {
     ui.ButtonSet.OK_CANCEL
   );
   if (res.getSelectedButton() !== ui.Button.OK) return;
-  setProp('SITE_URL', String(res.getResponseText()).trim());
+  Properties.setProp('SITE_URL', String(res.getResponseText()).trim());
 }
 
 function menuPrintReservations() {

@@ -25,7 +25,7 @@ function rebuildViews(form) {
 
 /** Marks a form's views as out of date, with the time, and makes sure a run is booked. */
 function refreshViews(form) {
-  setProp('dirty:' + form.id, nowIso());
+  Properties.setProp('dirty:' + form.id, nowIso());
   bookViewRun_();
 }
 

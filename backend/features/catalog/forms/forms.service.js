@@ -48,7 +48,7 @@ function cleanSubject_(v) {
  * `adjust` may change the form before it is saved.
  */
 function addForm_(form, wantedSlug, adjust) {
-  form.id = shortId('f_');
+  form.id = Crypto.shortId('f_');
   form.status = 'draft';
   form.createdAt = nowIso();
   attachSheet_(form);

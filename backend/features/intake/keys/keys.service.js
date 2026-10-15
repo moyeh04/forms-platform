@@ -3,7 +3,7 @@
  */
 
 function keyHash_(form, key) {
-  return sha256Hex(pepper() + ':key:' + form.id + ':' + key);
+  return Crypto.sha256Hex(Properties.pepper() + ':key:' + form.id + ':' + key);
 }
 
 /**
@@ -12,15 +12,15 @@ function keyHash_(form, key) {
  * pepper, the form, and the registration: the sheet alone reveals nothing.
  */
 function keyPad_(form, responseId) {
-  return sha256Hex(pepper() + ':seal:' + form.id + ':' + responseId);
+  return Crypto.sha256Hex(Properties.pepper() + ':seal:' + form.id + ':' + responseId);
 }
 
 function sealKey_(form, responseId, key) {
-  return sealDigits_(keyPad_(form, responseId), key);
+  return Crypto.sealDigits(keyPad_(form, responseId), key);
 }
 
 function unsealKey_(form, responseId, seal) {
-  return unsealDigits_(keyPad_(form, responseId), seal, 5);
+  return Crypto.unsealDigits(keyPad_(form, responseId), seal, 5);
 }
 
 function issueKey_(form, rows) {
@@ -29,7 +29,7 @@ function issueKey_(form, rows) {
     if (!r.deleted && r.keyHash) used[r.keyHash] = true;
   });
   for (var i = 0; i < 60; i++) {
-    var key = randomDigits(5);
+    var key = Crypto.randomDigits(5);
     var h = keyHash_(form, key);
     if (!used[h]) return { key: key, hash: h };
   }

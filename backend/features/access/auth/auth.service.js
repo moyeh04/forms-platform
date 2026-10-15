@@ -8,7 +8,7 @@ var ADMIN_MAX_FAILS = 8;
 var ADMIN_LOCK_SECONDS = 600;
 
 function pinHash_(pin) {
-  return sha256Hex(pepper() + ':admin:' + pin);
+  return Crypto.sha256Hex(Properties.pepper() + ':admin:' + pin);
 }
 
 /** Called from the menu: stores a new admin PIN. */
@@ -16,7 +16,7 @@ function setAdminPin(pin) {
   pin = String(pin || '').trim();
   if (pin.length < 4)
     ApiError.fail('weak_pin', 'The admin PIN needs at least 4 characters.');
-  setProp('ADMIN_PIN_HASH', pinHash_(pin));
+  Properties.setProp('ADMIN_PIN_HASH', pinHash_(pin));
   return true;
 }
 
@@ -29,7 +29,7 @@ function unlockAdmin() {
 }
 
 function requireAdmin(req) {
-  var stored = getProp('ADMIN_PIN_HASH');
+  var stored = Properties.getProp('ADMIN_PIN_HASH');
   if (!stored)
     ApiError.fail(
       'not_configured',

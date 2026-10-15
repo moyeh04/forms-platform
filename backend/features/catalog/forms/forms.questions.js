@@ -52,7 +52,7 @@ function customField_(f, taken) {
   var id =
     /^q_[a-z0-9]{1,16}$/.test(String(f.id)) && !taken[f.id]
       ? String(f.id)
-      : shortId('q_')
+      : Crypto.shortId('q_')
           .toLowerCase()
           .replace(/[^a-z0-9_]/g, '');
   var out = {
@@ -110,7 +110,7 @@ function normalizeQuestions_(form) {
   (form.steps || []).forEach(function (step) {
     // A page keeps its id; a new or repeated one gets a fresh id. The title is what students read on the route.
     if (!/^[a-z0-9_]{1,24}$/.test(String(step.id)) || pages[step.id])
-      step.id = shortId('p_')
+      step.id = Crypto.shortId('p_')
         .toLowerCase()
         .replace(/[^a-z0-9_]/g, '');
     pages[step.id] = true;

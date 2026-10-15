@@ -3,8 +3,8 @@
 /** First-time setup. Safe to run again. */
 function setup() {
   var ss = registry();
-  setProp('REGISTRY_ID', ss.getId());
-  pepper();
+  Properties.setProp('REGISTRY_ID', ss.getId());
+  Properties.pepper();
   Table.ensureTab(ss, TABS.forms, FORM_COLS);
   Table.ensureTab(ss, TABS.clients, CLIENT_COLS_);
   var lists = Table.ensureTab(ss, TABS.lists, ['key', 'values']);
@@ -21,5 +21,5 @@ function setup() {
     ss.deleteSheet(blank);
   SheetStyle.styleRegistryTabs();
   rootFolder();
-  return { registryUrl: ss.getUrl(), folderId: getProp('ROOT_FOLDER_ID') };
+  return { registryUrl: ss.getUrl(), folderId: Properties.getProp('ROOT_FOLDER_ID') };
 }
