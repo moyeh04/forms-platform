@@ -137,7 +137,7 @@ function printTeamList_(form) {
   var vform = FormsPublic.validationForm(form);
   var ss = SpreadsheetApp.openById(form.sheetId);
   var sh = freshView_(ss, 'Print - Team list');
-  var headers = ['Team', 'Team member name', 'Code', teamThing_(form)];
+  var headers = ['Team', 'Team member name', 'Code', TeamsService.teamThing(form)];
   var metadata = FormMetadata.caption(vform);
   paintPrintHeader_(
     sh,
@@ -151,7 +151,7 @@ function printTeamList_(form) {
   var values = [],
     shades = [],
     blocks = [];
-  teamBlocks_(form).forEach(function (t, g) {
+  TeamsService.teamBlocks(form).forEach(function (t, g) {
     var style = VIEW_STYLE_.groups[g % 2];
     var start = values.length + 4;
     t.members.forEach(function (m, i) {

@@ -75,7 +75,7 @@ API.submit = function (req) {
       keySeal: KeysService.sealKey(form, id, k.key)
     });
     rows.push(r);
-    keepTeamNumbers_(form, rows);
+    TeamNumbers.keepTeamNumbers(form, rows);
     ResponsesRepository.saveResponse(form, r);
     var asked = recordTransfers_(form, r, wants);
     return {
@@ -225,7 +225,7 @@ function cancelResponse_(form, id) {
     return x.id === id && !x.deleted;
   })[0];
   if (!r) return null;
-  keepTeamNumbers_(form, rows);
+  TeamNumbers.keepTeamNumbers(form, rows);
   r.deleted = true;
   r.keyHash = '';
   r.keySeal = '';

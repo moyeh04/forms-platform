@@ -14,7 +14,7 @@ API['admin.print.reservations'] = AuthService.admin(function (req) {
 
 API['admin.print.teamList'] = AuthService.admin(function (req) {
   var form = FormsRepository.requireForm(req.slug || req.id);
-  if (!isTeamForm_(form))
+  if (!TeamsService.isTeamForm(form))
     ApiError.fail('wrong_type', 'Only team and task forms have a team list.');
   return printResult_(form, printTeamList_(form));
 });

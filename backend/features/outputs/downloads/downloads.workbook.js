@@ -2,7 +2,7 @@
 
 /** The workbook: every team with its members, and its task or project linked to the saved copy. */
 function dlWorkbook_(form, job, saved) {
-  var thing = teamThing_(form);
+  var thing = TeamsService.teamThing(form);
   var styles = [
     {
       fill: VIEW_STYLE_.ink,
@@ -54,7 +54,7 @@ function dlWorkbook_(form, job, saved) {
     ]
   ];
   var merges = [];
-  teamBlocks_(form).forEach(function (t, g) {
+  TeamsService.teamBlocks(form).forEach(function (t, g) {
     var start = rows.length + 1;
     var link = localLink(dlBase_(form, t)) || t.link || '';
     t.members.forEach(function (m, i) {

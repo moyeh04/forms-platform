@@ -11,13 +11,13 @@ function byCreated_(a, b) {
 
 function buildTeamList_(form, ss) {
   var sh = freshView_(ss, 'Team Members List');
-  paintHeader_(sh, ['Team member name', 'Section', 'Code', teamThing_(form)]);
+  paintHeader_(sh, ['Team member name', 'Section', 'Code', TeamsService.teamThing(form)]);
   sh.setColumnWidth(1, 300);
   sh.setColumnWidth(2, 100);
   sh.setColumnWidth(3, 110);
   sh.setColumnWidth(4, 280);
 
-  var teams = teamBlocks_(form);
+  var teams = TeamsService.teamBlocks(form);
   if (!teams.length) return emptyView_(sh, 4, 'No registrations yet.');
 
   var values = [],

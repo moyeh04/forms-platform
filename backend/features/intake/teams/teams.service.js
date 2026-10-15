@@ -1,13 +1,14 @@
 /** Which forms gather teams, and the teams as blocks of members. */
 
+var TeamsService = (function () {
 function isTeamForm_(form) {
   return form.type === 'team_registration' || form.type === 'task_submission';
 }
 
 function teamBlocks_(form) {
   var vform = FormsPublic.validationForm(form);
-  return numberedResponses_(form)
-    .sort(byTeamNumber_)
+  return TeamNumbers.numberedResponses(form)
+    .sort(TeamNumbers.byTeamNumber)
     .map(function (r) {
       return {
         number: r.number,
@@ -25,3 +26,6 @@ function teamBlocks_(form) {
 function teamThing_(form) {
   return form.type === 'task_submission' ? 'Task' : 'Project';
 }
+
+return { isTeamForm: isTeamForm_, teamBlocks: teamBlocks_, teamThing: teamThing_ };
+})();

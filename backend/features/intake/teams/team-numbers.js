@@ -8,6 +8,7 @@
  * column existed get the numbers they had, in the order they registered.
  */
 
+var TeamNumbers = (function () {
 /** Gives each live row without a number the next one, in the order they registered. Returns the rows it numbered. */
 function numberTeams_(rows) {
   var top = 0;
@@ -28,7 +29,7 @@ function numberTeams_(rows) {
 /** The responses of a form with their team numbers, whether or not the numbers are stored yet. */
 function numberedResponses_(form, includeDeleted) {
   var rows = ResponsesRepository.readResponses(form, true);
-  if (isTeamForm_(form)) numberTeams_(rows);
+  if (TeamsService.isTeamForm(form)) numberTeams_(rows);
   return includeDeleted
     ? rows
     : rows.filter(function (r) {
@@ -41,7 +42,7 @@ function numberedResponses_(form, includeDeleted) {
  * write of the column. Call it inside withLock_ before a team is added or cancelled.
  */
 function keepTeamNumbers_(form, rows) {
-  if (!isTeamForm_(form)) return;
+  if (!TeamsService.isTeamForm(form)) return;
   var stored = numberTeams_(rows).filter(function (r) {
     return r._row;
   });
@@ -64,3 +65,6 @@ function keepTeamNumbers_(form, rows) {
 function byTeamNumber_(a, b) {
   return a.number - b.number;
 }
+
+return { numberedResponses: numberedResponses_, byTeamNumber: byTeamNumber_, keepTeamNumbers: keepTeamNumbers_ };
+})();

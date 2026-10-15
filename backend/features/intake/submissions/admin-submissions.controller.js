@@ -15,7 +15,7 @@ function adminView_(r) {
 
 API['admin.submissions'] = AuthService.admin(function (req) {
   var form = FormsRepository.requireForm(req.slug || req.id);
-  var rows = numberedResponses_(form, !!req.includeDeleted).map(function (r) {
+  var rows = TeamNumbers.numberedResponses(form, !!req.includeDeleted).map(function (r) {
     var view = adminView_(r);
     if (
       form.type === 'reservation' &&

@@ -17,9 +17,9 @@ var API = API || {};
 /** Starts a download: a fresh work folder (the form's older ones go to the trash) and the list of teams. */
 API['admin.download.start'] = AuthService.admin(function (req) {
   var form = FormsRepository.requireForm(req.slug || req.id);
-  if (!isTeamForm_(form))
+  if (!TeamsService.isTeamForm(form))
     ApiError.fail('wrong_type', 'Only team and task forms can be downloaded.');
-  var teams = teamBlocks_(form);
+  var teams = TeamsService.teamBlocks(form);
   if (!teams.length) ApiError.fail('nothing_to_download', 'Nobody has registered yet.');
   var downloads = dlDownloadsFolder_();
   var old = downloads.getFolders();
@@ -60,7 +60,7 @@ API['admin.download.team'] = AuthService.admin(function (req) {
   var x = dlJob_(req),
     form = x.form,
     job = x.job;
-  var team = teamBlocks_(form).filter(function (t) {
+  var team = TeamsService.teamBlocks(form).filter(function (t) {
     return t.ref === req.ref;
   })[0];
   if (!team) ApiError.fail('submission_not_found', 'That team no longer exists.');

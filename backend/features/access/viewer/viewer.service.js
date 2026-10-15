@@ -80,8 +80,8 @@ function viewerSizeAlerts_(form, client) {
 
 function teamGroups_(form, client) {
   var alerts = Rules.sizeAlerts(form);
-  return numberedResponses_(form)
-    .sort(byTeamNumber_)
+  return TeamNumbers.numberedResponses(form)
+    .sort(TeamNumbers.byTeamNumber)
     .map(function (r) {
       var g = {
         id: r.id,
