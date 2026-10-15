@@ -88,7 +88,7 @@ jobs:
           npx --yes @google/clasp@3.4.1 push --force
           npx --yes @google/clasp@3.4.1 deploy -i "$APPS_SCRIPT_DEPLOYMENT_ID" --description "Commit $GITHUB_SHA" | tee deploy.log
           version=$(grep -o '@[0-9][0-9]*' deploy.log | tail -n 1)
-          echo "Backend version ${version:-unknown} now serves commit $GITHUB_SHA. To go back, point the deployment at the version before it (docs/DEPLOY.md, Going back to an earlier backend)." >> "$GITHUB_STEP_SUMMARY"
+          echo "Backend version ${version:-unknown} now serves commit $GITHUB_SHA. To go back, point the deployment at the version before it (docs/operations/DEPLOY.md, Going back to an earlier backend)." >> "$GITHUB_STEP_SUMMARY"
       - name: Remove temporary credentials
         if: always()
         run: |

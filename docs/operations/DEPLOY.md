@@ -329,8 +329,8 @@ Deploy**. This is a recovery path; routine updates use the configured workflow.
 
 | Question | Read |
 |---|---|
-| How are configuration and hosting split? | [HOSTING.md](architecture/HOSTING.md) |
-| What exactly is `dist/Code.gs`, and who builds it? | [BUILD-PIPELINE.md](architecture/BUILD-PIPELINE.md) |
-| Why "Execute as Me" and "Anyone" is safe here | [WORKAROUNDS.md](architecture/WORKAROUNDS.md) and [SECURITY.md](reference/SECURITY.md) |
-| What is stored where? | [DATA-MODEL.md](reference/DATA-MODEL.md) |
-| The whole picture | [ARCHITECTURE.md](architecture/ARCHITECTURE.md) |
+| How are configuration and hosting split? | [HOSTING.md](../architecture/HOSTING.md) |
+| What exactly is `dist/Code.gs`, and who builds it? | [BUILD-PIPELINE.md](../architecture/BUILD-PIPELINE.md) |
+| Why "Execute as Me" and "Anyone" is safe here | [WORKAROUNDS.md](../architecture/WORKAROUNDS.md) and [SECURITY.md](../backend/SECURITY.md) |
+| What is stored where? | [DATA-MODEL.md](../backend/DATA-MODEL.md) |
+| The whole picture | [ARCHITECTURE.md](../architecture/ARCHITECTURE.md) |

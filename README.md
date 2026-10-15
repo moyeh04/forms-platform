@@ -114,7 +114,7 @@ npm run build        # writes dist/Code.gs and dist/appsscript.json for clasp
 npm run setup        # first deployment: creates the sheet, pushes the backend, creates the web app, configures GitHub
 ```
 
-To put it online, follow [docs/DEPLOY.md](docs/DEPLOY.md). After that, a push to `master`
+To put it online, follow [docs/operations/DEPLOY.md](docs/operations/DEPLOY.md). After that, a push to `master`
 runs [`.github/workflows/pages.yml`](.github/workflows/pages.yml): the tests, then the Apps
 Script deployment and the configured website.
 
@@ -130,17 +130,17 @@ Script deployment and the configured website.
 | `tests/` | The automated tests and the in-memory copy of Google's services |
 | `docs/` | Architecture, data model, security, testing and deployment |
 
-Every file is described in [docs/MODULES.md](docs/MODULES.md).
+Every file is described in [docs/architecture/FILE-STRUCTURE.md](docs/architecture/FILE-STRUCTURE.md).
 
 ## Documentation
 
 | Read | To learn |
 |---|---|
-| [REQUIREMENTS.md](REQUIREMENTS.md) | Everything the platform was asked to do, and where each item stands |
+| [REQUIREMENTS.md](docs/product/REQUIREMENTS.md) | Everything the platform was asked to do, and where each item stands |
 | [docs/README.md](docs/README.md) | The index of the documentation and how to read its diagrams |
 | [ARCHITECTURE.md](docs/architecture/ARCHITECTURE.md) | What runs where, how requests travel, every module |
 | [WORKAROUNDS.md](docs/architecture/WORKAROUNDS.md) | The 24 solutions that make free hosting enough, and their trade-offs |
-| [DEPLOY.md](docs/DEPLOY.md) | Click-by-click setup and the first-run checklist |
-| [COMMIT_CONVENTION.md](docs/COMMIT_CONVENTION.md) | How commits and branches are written |
+| [DEPLOY.md](docs/operations/DEPLOY.md) | Click-by-click setup and the first-run checklist |
+| [COMMIT_CONVENTION.md](docs/process/COMMIT_CONVENTION.md) | How commits and branches are written |
 
 Generated files (`dist/`, `_site/`, `node_modules/`) are not committed.
