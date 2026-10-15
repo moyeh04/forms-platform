@@ -85,8 +85,7 @@
           alerts[l.id].on = v;
           paint();
         },
-        false,
-        l.id + 'Alert'
+        { name: l.id + 'Alert' }
       );
       return {
         id: l.id,

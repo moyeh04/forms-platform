@@ -122,7 +122,21 @@ const JOINED = [
   },
   {
     published: 'assets/js/admin.js',
-    sources: ['web/js/admin/shell/admin.page.js']
+    sources: [
+      'web/js/admin/shell/admin.model.js',
+      'web/js/admin/shell/calls.page.js',
+      'web/js/admin/shell/widgets.view.js',
+      'web/js/admin/shell/dialogs.view.js',
+      'web/js/admin/shell/metadata.view.js',
+      'web/js/admin/shell/form-head.view.js',
+      'web/js/admin/shell/form-actions.page.js',
+      'web/js/admin/shell/forms.model.js',
+      'web/js/admin/shell/series.view.js',
+      'web/js/admin/shell/forms-list.view.js',
+      'web/js/admin/shell/create.view.js',
+      'web/js/admin/shell/login.view.js',
+      'web/js/admin/shell/router.page.js'
+    ]
   },
   {
     published: 'assets/js/admin-timetable.js',

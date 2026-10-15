@@ -593,8 +593,7 @@
         function (v) {
           st.showSizeAlerts = v;
         },
-        false,
-        'showSizeAlerts'
+        { name: 'showSizeAlerts' }
       ),
       h(
         'p',
@@ -610,8 +609,7 @@
             function (v) {
               st.withKey = v;
             },
-            false,
-            'withKey'
+            { name: 'withKey' }
           ),
       // The end of an existing link is moved from the list, where it is shown.
       client

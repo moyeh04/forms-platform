@@ -562,8 +562,7 @@
               if (v && !known) f.keyBooking.source = sources[0].id;
               paintKb();
             },
-            false,
-            'keyBooking'
+            { name: 'keyBooking' }
           )
         );
         if (!f.keyBooking.enabled) return;
@@ -805,8 +804,7 @@
         function (v) {
           f.rules.transferWhatsapp = v;
         },
-        false,
-        'transferWhatsapp'
+        { name: 'transferWhatsapp' }
       )
     );
     var transferOptions = h(
@@ -818,8 +816,7 @@
         function (v) {
           f.rules.transferEmails = v;
         },
-        false,
-        'transferEmails'
+        { name: 'transferEmails' }
       ),
       A.check(
         'Show each leader the phone number of the other leader',
@@ -828,8 +825,7 @@
           f.rules.transferPhones = v;
           whatsappRow.hidden = !v;
         },
-        false,
-        'transferPhones'
+        { name: 'transferPhones' }
       ),
       h(
         'p',
@@ -849,8 +845,7 @@
               f.rules.transfers = v;
               transferOptions.hidden = !v;
             },
-            false,
-            'transfers'
+            { name: 'transfers' }
           ),
           h(
             'p',
@@ -904,8 +899,7 @@
               f.rules.uniqueAcrossForm = v;
               transferRow.hidden = !v;
             },
-            false,
-            'uniqueAcrossForm'
+            { name: 'uniqueAcrossForm' }
           )
         : null,
       transferRow,
@@ -920,8 +914,7 @@
         function (v) {
           f.notifications.confirmEmail = v;
         },
-        false,
-        'confirmEmail'
+        { name: 'confirmEmail' }
       ),
       h(
         'p',
@@ -1754,8 +1747,7 @@
             tm.enabled = enabled;
             paintTm();
           },
-          false,
-          'reservation-members'
+          { name: 'reservation-members' }
         ),
         tmBody
       );

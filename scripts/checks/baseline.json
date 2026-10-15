@@ -239,20 +239,6 @@
     "lines": 15,
     "numbers": 2
   },
-  "web/js/admin/shell/admin.page.js": {
-    "biome/lint/complexity/noExcessiveCognitiveComplexity": 1,
-    "biome/lint/complexity/noExcessiveLinesPerFunction": 8,
-    "biome/lint/complexity/useMaxParams": 1,
-    "biome/lint/complexity/useOptionalChain": 5,
-    "biome/lint/correctness/noInnerDeclarations": 3,
-    "biome/lint/correctness/noUnusedVariables": 1,
-    "biome/lint/style/noExcessiveLinesPerFile": 1,
-    "biome/lint/style/noMagicNumbers": 12,
-    "biome/lint/suspicious/noAssignInExpressions": 2,
-    "biome/lint/suspicious/noGlobalIsNan": 1,
-    "jsdoc": 70,
-    "lines": 31
-  },
   "web/js/viewer.js": {
     "biome/lint/complexity/noExcessiveCognitiveComplexity": 4,
     "biome/lint/complexity/noExcessiveLinesPerFunction": 5,

@@ -730,7 +730,7 @@ flowchart LR
         fm["form/<br/>steps, members, slots, review"]
     end
     subgraph adminp["admin.html"]
-        a1["admin/shell/admin.page.js<br/>shell, login, forms list"]
+        a1["admin/shell/<br/>shell, login, forms list"]
         a2["admin/settings/settings.page.js"]
         a7["admin/settings/size-alerts.view.js<br/>warnings about small teams"]
         h2["handover.js<br/>who leads a team next"]
@@ -984,7 +984,7 @@ no new record:
 
 ## The pages of one form
 
-A form has one header and one tab bar, built by `A.formTabs` in `admin/shell/admin.page.js` and
+A form has one header and one tab bar, built by `A.formTabs` in `admin/shell/form-head.view.js` and
 used by both the responses page and the settings page:
 
 | Tab | Address | What it holds |
@@ -1196,7 +1196,7 @@ labels of the current tables.
 | Change a colour, font, or size | `web/css/theme.css` (variables only); `npm test` checks the contrast |
 | Reword a message or translate | `web/js/i18n/en.js` and `ar.js` |
 | Add a question to a form | Admin dashboard, or `template-fields.js` for new forms by default |
-| Add a new form type | A new function in `templates.service.js`, a label in `web/js/admin/shell/admin.page.js` |
+| Add a new form type | A new function in `templates.service.js`, a label in `web/js/admin/shell/admin.model.js` |
 | Change a validation rule | its part in `domain/rules/` (browser, server, and tests all follow) |
 | Add a backend action | A named function in the feature's `*.controller.js`, returned by its namespace; a row in `backend/routes.js` with its `Access`; a row in the section of that access in [API.md](../backend/API.md) |
 | Change sheet colours | `PALETTE` in `sheet-style.js` |

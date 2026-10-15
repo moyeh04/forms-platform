@@ -95,7 +95,7 @@ flowchart LR
     end
     subgraph admin["admin.html: the dashboard"]
         r2["domain/rules/"]
-        a1["admin/shell/admin.page.js"]
+        a1["admin/shell/"]
         a2["admin/settings/settings.page.js"]
         a5["admin/settings/timetable.view.js"]
         a9["admin/settings/range.view.js"]
@@ -184,7 +184,19 @@ The site is published at the paths it has always had: the pages at the root,
 | `web/js/ui/dialogs.js` | The toast and the confirmation dialog. |
 | `web/js/ui/clipboard.js` | Copies text, with a fallback for browsers without the clipboard API. |
 | `web/js/ui/theme-button.js` | The light and dark switch every page has. |
-| `web/js/admin/shell/admin.page.js` | Dashboard core: login with the PIN, navigation, the widgets the dashboard modules share, and the forms list. |
+| `web/js/admin/shell/admin.model.js` | The kinds of form, the statuses and their labels, the tabs of a form, the icon sizes, and the links of a form and an instructor page. Loaded first of the dashboard parts; creates `App.admin`. |
+| `web/js/admin/shell/calls.page.js` | Calls to the backend, and what the admin is told when one fails. |
+| `web/js/admin/shell/widgets.view.js` | The small controls every screen is built from: badge, field, checkbox, text, number, dropdown. |
+| `web/js/admin/shell/dialogs.view.js` | A dialog with its own buttons, and the dialog that shows a link or a key once. |
+| `web/js/admin/shell/metadata.view.js` | The editors of what a form shows beside its title: a term with a subject code, or a batch year. |
+| `web/js/admin/shell/form-head.view.js` | The header and the tab bar of a form: its status, its link and the More menu. |
+| `web/js/admin/shell/form-actions.page.js` | Deleting a form, and copying it for a new term. |
+| `web/js/admin/shell/forms.model.js` | Which forms give keys, which can start bookings, and which form a booking belongs to. |
+| `web/js/admin/shell/series.view.js` | The bookings under a registration form and the button that makes the next one. |
+| `web/js/admin/shell/forms-list.view.js` | The forms list, grouped by status. |
+| `web/js/admin/shell/create.view.js` | The page that makes a new form. |
+| `web/js/admin/shell/login.view.js` | The PIN screen. |
+| `web/js/admin/shell/router.page.js` | Reads the address, draws the bar and the page it names, and guards unsaved changes. Loaded last of the shell parts. |
 | `web/js/admin/settings/settings.page.js` | Form settings: everything an admin can change without touching code. |
 | `web/js/admin/settings/timetable.view.js` | The timetable of a reservation form: dates on a calendar, the hours, and the slots of each day. |
 | `web/js/admin/settings/range.view.js` | The range control of the team size and the teammates. |
