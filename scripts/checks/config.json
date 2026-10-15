@@ -12,10 +12,10 @@
   },
   "biome": {
     "include": [
-      "assets/js/",
-      "assets/css/",
+      "web/js/",
+      "web/css/",
       "backend/",
-      "shared/",
+      "domain/",
       "scripts/",
       "tests/",
       "package.json",
@@ -27,16 +27,13 @@
   "lines": {
     "limit": 80,
     "include": [
-      "assets/",
+      "web/",
       "backend/",
-      "shared/",
+      "domain/",
       "scripts/",
       "tests/",
       ".githooks/",
       ".github/",
-      "index.html",
-      "admin.html",
-      "viewer.html",
       "biome.json",
       "package.json"
     ],
@@ -44,9 +41,9 @@
     "exclude": ["tests/fixtures/", "package-lock.json"]
   },
   "jsdoc": {
-    "include": ["assets/js/", "backend/", "shared/", "scripts/"],
+    "include": ["web/js/", "backend/", "domain/", "scripts/"],
     "extensions": [".js"],
-    "exclude": ["assets/js/config.js"],
+    "exclude": ["web/js/config.js"],
     "forbiddenTags": [
       "author",
       "date",
@@ -61,12 +58,12 @@
     ]
   },
   "numbers": {
-    "include": ["assets/js/", "backend/", "shared/", "scripts/"],
+    "include": ["web/js/", "backend/", "domain/", "scripts/"],
     "extensions": [".js"],
     "allowed": [0, 1, 2, 10, 24, 60]
   },
   "flags": {
-    "include": ["assets/js/", "backend/", "shared/"],
+    "include": ["web/js/", "backend/", "domain/"],
     "extensions": [".js"],
     "exclude": []
   },
@@ -104,22 +101,23 @@
       "extensions": [".js", ".css", ".html", ".sh"],
       "exclude": ["tests/fixtures/", "docs/"]
     },
-    "pages": ["index.html", "admin.html", "viewer.html"],
+    "pages": ["web/index.html", "web/admin.html", "web/viewer.html"],
     "loaded": {
-      "include": ["assets/js/", "assets/css/"],
+      "include": ["web/js/", "web/css/"],
       "extensions": [".js", ".css"]
     },
     "fileStructure": "docs/architecture/FILE-STRUCTURE.md",
     "documented": {
       "include": [
-        "assets/js/",
-        "assets/css/",
+        "web/js/",
+        "web/css/",
         "backend/",
-        "shared/",
+        "domain/",
         "scripts/",
         ".githooks/"
       ],
       "extensions": [".js", ".css", ".sh", ""]
-    }
+    },
+    "siteMap": "scripts/build/site-map.js"
   }
 }

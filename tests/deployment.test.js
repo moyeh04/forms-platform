@@ -41,7 +41,7 @@ test('Deployment: API_URL must match the deployment being updated', () => {
 
 test('Deployment: built admin, student and viewer pages use the variable URL', async (t) => {
   const output = path.join(temp(t), 'site');
-  const sourceConfig = fs.readFileSync(path.join(root, 'assets/js/config.js'), 'utf8');
+  const sourceConfig = fs.readFileSync(path.join(root, 'web/js/config.js'), 'utf8');
   buildSite(env, output);
   fs.writeFileSync(path.join(output, 'private-marker'), 'must not be published');
   buildSite(env, output);
@@ -71,7 +71,7 @@ test('Deployment: built admin, student and viewer pages use the variable URL', a
   assert.equal(calledUrl, env.API_URL);
   await window.App.api.viewer('viewer.data', 'test-token');
   assert.equal(calledUrl, env.API_URL);
-  assert.equal(fs.readFileSync(path.join(root, 'assets/js/config.js'), 'utf8'), sourceConfig);
+  assert.equal(fs.readFileSync(path.join(root, 'web/js/config.js'), 'utf8'), sourceConfig);
 });
 
 test('Deployment: the built site carries its version, and a script or stylesheet address changes with its file', (t) => {
@@ -93,7 +93,7 @@ test('Deployment: the built site carries its version, and a script or stylesheet
       assert.equal(stamp, print(file), page + ': ' + file + ' is named with the fingerprint of its content');
     }
     assert.ok(local.some((a) => a.startsWith('assets/js/fresh.js?v=')), page + ' watches for a newer site');
-    assert.equal(fs.readFileSync(path.join(root, page), 'utf8').includes('?v='), false, 'the source page is not stamped');
+    assert.equal(fs.readFileSync(path.join(root, 'web', page), 'utf8').includes('?v='), false, 'the source page is not stamped');
   }
 
   // The same files give the same version, so a push that changes nothing a visitor loads reloads nobody.
@@ -259,8 +259,8 @@ test('Setup: the workstation and the workflow pin the same clasp version', () =>
 
 test('Workflow: a push that changes no backend file skips the Apps Script deployment', () => {
   const { backendChanged, touchesBackend } = require('../scripts/deploy/backend-changed.js');
-  assert.equal(touchesBackend(['README.md', 'docs/operations/DEPLOY.md', 'assets/js/admin.js', 'index.html', 'tests/core.test.js']), false);
-  for (const file of ['backend/Views.js', 'backend/appsscript.json', 'shared/rules.js', 'scripts/build/bundle-backend.js', '.github/workflows/pages.yml']) {
+  assert.equal(touchesBackend(['README.md', 'docs/operations/DEPLOY.md', 'web/js/admin.js', 'web/index.html', 'tests/core.test.js']), false);
+  for (const file of ['backend/Views.js', 'backend/appsscript.json', 'domain/rules.js', 'scripts/build/bundle-backend.js', '.github/workflows/pages.yml']) {
     assert.equal(touchesBackend(['README.md', file]), true, file);
   }
   assert.equal(touchesBackend(['docs/backend/notes.md', 'scripts/build/bundle-backend.js.bak']), false, 'only the real paths count');

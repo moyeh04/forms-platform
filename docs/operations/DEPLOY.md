@@ -150,8 +150,8 @@ git push -u origin master
 
 The run **Test and deploy site** starts on every push to `master`: it checks the
 workflow, runs the tests, builds the configured site, updates the Apps Script
-deployment when a backend file changed, then publishes `index.html`, `admin.html`, `viewer.html`, `assets/`,
-and `shared/`. Follow it and read the site address with:
+deployment when a backend file changed, then publishes the pages and files of `web/`
+and `domain/`. Follow it and read the site address with:
 
 ```bash
 gh run watch
@@ -219,7 +219,7 @@ workflow validation and tests, backend bundle, site configuration generated from
 checks only. Running the workflow from another branch cannot deploy.
 
 **The backend is deployed only when it changed.** A push that touches nothing
-under `backend/` or `shared/`, nor the bundler, the clasp preparation or the
+under `backend/` or `domain/`, nor the bundler, the clasp preparation or the
 workflow itself, skips the Apps Script job and publishes the site alone, so a
 change to a page or a document does not make a new backend version. The check
 compares the push with the commit before it; when that cannot be done (a first
@@ -229,7 +229,7 @@ run whose backend job failed.
 
 **Required Pages setting:** repository **Settings > Pages > Build and deployment >
 Source: GitHub Actions**. A branch deployment cannot inject repository variables
-and serves the placeholder in `assets/js/config.js` directly.
+and serves the placeholder in `web/js/config.js` directly.
 
 ### What the setup stored, and how to renew it
 

@@ -3,10 +3,10 @@
   "vcs": { "enabled": true, "clientKind": "git", "useIgnoreFile": true },
   "files": {
     "includes": [
-      "assets/js/**",
-      "assets/css/**",
+      "web/js/**",
+      "web/css/**",
       "backend/**",
-      "shared/**",
+      "domain/**",
       "scripts/**",
       "tests/**",
       "*.json",
