@@ -211,5 +211,16 @@ var FormsService = (function () {
     return { deleted: true, sheetTrashed: trashed, title: form.title };
   }
 
-  return { createForm, updateForm, duplicateForm, deleteForm };
+  /**
+   * Reads a form by its slug or id, for the controllers of every feature.
+   *
+   * @param {*} slugOrId The slug or id of the form.
+   * @return {!Object} The form.
+   * @throws {ApiError} `form_not_found` when there is no such form.
+   */
+  function requireForm(slugOrId) {
+    return FormsRepository.requireForm(slugOrId);
+  }
+
+  return { createForm, updateForm, duplicateForm, deleteForm, requireForm };
 })();
