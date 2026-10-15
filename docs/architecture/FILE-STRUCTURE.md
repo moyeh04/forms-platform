@@ -478,6 +478,7 @@ the file name says the role:
 | `scripts/deploy/clasp-output.js` | Reads the Script ID and the deployment ID from what clasp prints, for the first deployment. |
 | `scripts/dev/setup-git.sh` | Run by `npm install`: points git at `.githooks/` and at `.git-blame-ignore-revs`, the layout-only commits `git blame` skips. |
 | `scripts/dev/dev-server.js` | `npm run dev`: serves the site and answers its API calls from the in-memory Google, with sample forms, so pages can be opened in a real browser. |
+| `scripts/dev/sample-world.js` | The admin PIN and the sample forms and registrations of the preview, made through the API as a person would. |
 | `tests/harness/appsscript-mock.js` | An in-memory Sheets, Drive, Mail, Cache, and clock, so the real backend code runs in tests. |
 | `tests/harness/dom.js` | Opens the real pages in jsdom wired to that backend. |
 | `tests/harness/admin-page.js` | What the dashboard tests share: a world with an admin PIN that makes open forms, the dashboard opened in it, and the answers of a team. |
