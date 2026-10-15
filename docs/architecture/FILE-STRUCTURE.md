@@ -217,6 +217,7 @@ the file name says the role:
 | `backend/features/catalog/forms/forms.controller.js` | The form actions: the public form definition and the admin form actions. |
 | `backend/features/catalog/lists/lists.repository.js` | The Lists tab: the values of each list and what kind of list it is. |
 | `backend/features/catalog/lists/lists.rules.js` | The lists a new registry starts with, and how list values are cleaned. |
+| `backend/features/catalog/lists/lists.service.js` | The lists of the registry: read, fill, make, rename and delete them, with the checks on keys and names. |
 | `backend/features/catalog/lists/lists.controller.js` | The list actions of the admin: read, fill, make, rename and delete lists. |
 | `backend/features/catalog/templates/template-fields.js` | The fields every form template is built from: people, study, team size and members. |
 | `backend/features/catalog/templates/templates.service.js` | The starting definition of each form type. |
