@@ -4,20 +4,25 @@
  * normalized phone, to what each student submitted.
  */
 
-var API = API || {};
-
+var MatchingController = (function () {
 function requireMatching_(form) {
   if (!form.matching || !form.matching.enabled)
     ApiError.fail('no_matching', 'Matching is not turned on for this form.');
 }
 
-API['admin.matching.import'] = AuthService.admin(function (req) {
+/**
+ * Answers the `admin.matching.import` action.
+ *
+ * @param {!Object} req The request body.
+ * @return {*} The answer, sent back as JSON.
+ */
+function importNumbers(req) {
   var form = FormsRepository.requireForm(req.slug || req.id);
   requireMatching_(form);
   return Lock.withLock(function () {
-    var sh = requestsSheet_(form);
+    var sh = MatchingRepository.requestsSheet(form);
     var have = {};
-    readRequests_(form).forEach(function (r) {
+    MatchingRepository.readRequests(form).forEach(function (r) {
       have[r.phone] = true;
     });
     var added = 0,
@@ -58,9 +63,15 @@ API['admin.matching.import'] = AuthService.admin(function (req) {
       });
     return { added: added, duplicates: duplicates, unparsed: unparsed };
   });
-});
+}
 
-API['admin.matching.list'] = AuthService.admin(function (req) {
+/**
+ * Answers the `admin.matching.list` action.
+ *
+ * @param {!Object} req The request body.
+ * @return {*} The answer, sent back as JSON.
+ */
+function list(req) {
   var form = FormsRepository.requireForm(req.slug || req.id);
   requireMatching_(form);
   var subs = ResponsesRepository.readResponses(form);
@@ -69,7 +80,7 @@ API['admin.matching.list'] = AuthService.admin(function (req) {
     var p = Rules.normalizePhone(r.phone);
     if (p) (byPhone[p] = byPhone[p] || []).push(r.id);
   });
-  var requests = readRequests_(form);
+  var requests = MatchingRepository.readRequests(form);
   var requested = {};
   var out = requests.map(function (q) {
     requested[q.phone] = true;
@@ -98,9 +109,15 @@ API['admin.matching.list'] = AuthService.admin(function (req) {
     submissions: subs.map(AdminSubmissionsController.adminView),
     notRequested: notRequested
   };
-});
+}
 
-API['admin.matching.decide'] = AuthService.admin(function (req) {
+/**
+ * Answers the `admin.matching.decide` action.
+ *
+ * @param {!Object} req The request body.
+ * @return {*} The answer, sent back as JSON.
+ */
+function decide(req) {
   var form = FormsRepository.requireForm(req.slug || req.id);
   requireMatching_(form);
   var decision = String(req.decision);
@@ -112,7 +129,7 @@ API['admin.matching.decide'] = AuthService.admin(function (req) {
   });
   var linked = null;
   Lock.withLock(function () {
-    var q = readRequests_(form).filter(function (x) {
+    var q = MatchingRepository.readRequests(form).filter(function (x) {
       return x.id === req.requestId;
     })[0];
     if (!q) ApiError.fail('request_not_found', 'That request does not exist.');
@@ -124,16 +141,22 @@ API['admin.matching.decide'] = AuthService.admin(function (req) {
       ResponsesRepository.saveResponse(form, subs[0]);
       linked = subs[0].id;
     }
-    var sh = requestsSheet_(form);
+    var sh = MatchingRepository.requestsSheet(form);
     q.decision = decision;
     if (req.note !== undefined) q.note = String(req.note);
-    Table.writeRow(sh, q._row, REQUEST_COLS_, q);
+    Table.writeRow(sh, q._row, MatchingRepository.REQUEST_COLS, q);
   });
   if (linked) ResponsesNotify.afterChange(form);
   return { decided: true, submissionId: linked };
-});
+}
 
-API['admin.matching.remove'] = AuthService.admin(function (req) {
+/**
+ * Answers the `admin.matching.remove` action.
+ *
+ * @param {!Object} req The request body.
+ * @return {*} The answer, sent back as JSON.
+ */
+function remove(req) {
   var form = FormsRepository.requireForm(req.slug || req.id);
   requireMatching_(form);
   var ids = {};
@@ -142,8 +165,8 @@ API['admin.matching.remove'] = AuthService.admin(function (req) {
   });
   var removed = 0;
   Lock.withLock(function () {
-    var sh = requestsSheet_(form);
-    readRequests_(form)
+    var sh = MatchingRepository.requestsSheet(form);
+    MatchingRepository.readRequests(form)
       .filter(function (q) {
         return ids[q.id];
       })
@@ -156,4 +179,7 @@ API['admin.matching.remove'] = AuthService.admin(function (req) {
       });
   });
   return { removed: removed };
-});
+}
+
+return { importNumbers, list, decide, remove };
+})();

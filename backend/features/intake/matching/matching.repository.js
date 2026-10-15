@@ -1,5 +1,6 @@
 /** The WhatsApp requests tab of a form. */
 
+var MatchingRepository = (function () {
 var REQUEST_COLS_ = [
   'id',
   'raw',
@@ -32,3 +33,6 @@ function readRequests_(form) {
     };
   });
 }
+
+return { REQUEST_COLS: REQUEST_COLS_, requestsSheet: requestsSheet_, readRequests: readRequests_ };
+})();

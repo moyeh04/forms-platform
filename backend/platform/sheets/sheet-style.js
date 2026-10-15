@@ -117,7 +117,7 @@ function paintDataTab_(sh, cols) {
 function styleFormTabs_(ss) {
   styleDataTab_(ss.getSheetByName('Responses'), ResponsesRepository.RESPONSE_COLS);
   styleDataTab_(ss.getSheetByName(TransfersRepository.TRANSFER_TAB), TransfersRepository.TRANSFER_COLS);
-  styleDataTab_(ss.getSheetByName('Requests'), REQUEST_COLS_);
+  styleDataTab_(ss.getSheetByName('Requests'), MatchingRepository.REQUEST_COLS);
 }
 
 /** The three tabs of the registry. */

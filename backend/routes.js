@@ -63,3 +63,10 @@ API['submit'] = SubmissionsController.submit;
 API['lookup'] = SubmissionsController.lookup;
 API['update'] = SubmissionsController.update;
 API['remove'] = SubmissionsController.remove;
+
+API['admin.matching.import'] = AuthService.admin(
+  MatchingController.importNumbers
+);
+API['admin.matching.list'] = AuthService.admin(MatchingController.list);
+API['admin.matching.decide'] = AuthService.admin(MatchingController.decide);
+API['admin.matching.remove'] = AuthService.admin(MatchingController.remove);
