@@ -274,8 +274,8 @@ above it. Inside a feature the file name says the role:
 | `backend/main.js` | The web app: every request arrives here and goes to its handler. |
 
 `npm run build` joins `domain/rules.js`, `domain/form-metadata.js` and every
-backend file into `dist/Code.gs`: `platform/` first, then `features/`, with
-`main.js` last.
+backend file into `dist/Code.gs`: `platform/` first, then `features/`, then
+`routes.js`, `entry-points.js` and `main.js`.
 
 ## Tools and tests
 

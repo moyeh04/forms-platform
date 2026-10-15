@@ -89,8 +89,8 @@ flowchart TD
 1. **List the files.** `domain/rules.js` and `domain/form-metadata.js` go
    first so the globals `Rules` and `FormMetadata` exist. Every `.js` file
    under `backend/` follows: `platform/` first, then `features/`, each in
-   alphabetical order of its path, with `main.js` last (`rankOf` in the
-   bundler).
+   alphabetical order of its path, then `routes.js`, `entry-points.js` and
+   `main.js` (`rankOf` in the bundler).
 2. **Read and label.** Each file is trimmed and prefixed with a comment such as
    `// ===== backend/features/access/auth/auth.service.js =====`, so when you read the deployed code in the
    Apps Script editor you can still see where every part came from.
