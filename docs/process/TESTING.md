@@ -1,11 +1,11 @@
 # Testing
 
-368 automated tests run without a Google account, a browser, or a network.
+369 automated tests run without a Google account, a browser, or a network.
 They run the **real** backend and the **real** pages. This page explains how
 that works and what it can and cannot prove.
 
 ```
-npm test    # 368 tests
+npm test    # 369 tests
 ```
 
 ## The layers
@@ -149,7 +149,7 @@ says something else.
 | Rules loader | `domain/rules/index.test.js` | 2 | Rules holds every function of every part, and a page that loads the enums and the parts gets the same Rules |
 | Rules: text | `domain/rules/text.test.js` | 4 | Arabic filtering and name parts, live cleaning while typing, English-only titles |
 | Rules: phones | `domain/rules/phone.test.js` | 2 | Every Egyptian way of writing a mobile number, numbers found in pasted WhatsApp lines |
-| Rules: codes | `domain/rules/codes.test.js` | 1 | Seven digits by default |
+| Rules: codes | `domain/rules/codes.test.js` | 2 | Seven digits by default, or the length the question gives |
 | Rules: Drive links | `domain/rules/drive-link.test.js` | 2 | Files, folders and slides, other hosts refused; folder names |
 | Rules: slots | `domain/rules/slots.test.js` | 2 | The generated times of a day, and the room left in a slot |
 | Rules: forms | `domain/rules/form.test.js` | 2 | Members list, role lookup and form state; counting the people of a form with a code counted once |

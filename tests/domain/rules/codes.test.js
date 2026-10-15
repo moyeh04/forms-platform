@@ -8,3 +8,9 @@ test('Codes: seven digits by default', () => {
   assert.equal(R.validateCode('42309').error, 'invalid_code');
   assert.equal(R.validateCode('42A0999').error, 'invalid_code');
 });
+
+test('Codes: a question gives its own length, seven when it has none', () => {
+  assert.equal(R.codeLength({ length: 9 }), 9);
+  assert.equal(R.codeLength({}), 7);
+  assert.equal(R.codeLength(null), 7);
+});

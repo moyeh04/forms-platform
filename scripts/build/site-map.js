@@ -51,6 +51,48 @@ const JOINED = [
     sources: ['web/js/teams/handover.view.js']
   },
   {
+    published: 'assets/js/form.js',
+    sources: [
+      'web/js/form/form.model.js',
+      'web/js/form/steps.model.js',
+      'web/js/form/drafts.model.js',
+      'web/js/form/chrome.view.js',
+      'web/js/form/route.view.js',
+      'web/js/form/fields.view.js',
+      'web/js/form/text-input.view.js',
+      'web/js/form/select.view.js',
+      'web/js/form/team-size.view.js',
+      'web/js/form/members.view.js',
+      'web/js/form/slots.view.js',
+      'web/js/form/review.view.js',
+      'web/js/form/form.view.js',
+      'web/js/form/team-key.page.js',
+      'web/js/form/navigation.page.js',
+      'web/js/form/submit.page.js',
+      'web/js/form/submit-errors.page.js',
+      'web/js/form/key-entry.page.js',
+      'web/js/form/edit.page.js',
+      'web/js/form/success.view.js',
+      'web/js/form/contacts.view.js',
+      'web/js/form/transfer.view.js',
+      'web/js/form/transfer.page.js',
+      'web/js/form/form.page.js'
+    ]
+  },
+  {
+    published: 'assets/js/ticket.js',
+    sources: [
+      'web/js/form/ticket/time.model.js',
+      'web/js/form/ticket/shapes.view.js',
+      'web/js/form/ticket/calendar.view.js',
+      'web/js/form/ticket/clock-hands.view.js',
+      'web/js/form/ticket/clock.view.js',
+      'web/js/form/ticket/when.view.js',
+      'web/js/form/ticket/save-image.page.js',
+      'web/js/form/ticket/ticket.view.js'
+    ]
+  },
+  {
     published: 'assets/js/size-alerts.js',
     sources: ['web/js/teams/size-alerts.view.js']
   },

@@ -89,9 +89,9 @@ flowchart LR
     subgraph index["index.html: the student form"]
         r1["domain/rules/"]
         i18n["i18n/: en, ar, i18n"]
-        tk["ticket.js"]
+        tk["form/ticket/"]
         h1["handover.js"]
-        fm["form.js"]
+        fm["form/: model, views, pages"]
     end
     subgraph admin["admin.html: the dashboard"]
         r2["domain/rules/"]
@@ -139,11 +139,42 @@ The site is published at the paths it has always had: the pages at the root,
 | `web/css/theme.css` | Colors, fonts, and the type scale as variables. Change the look here; the contrast standard is in its header and enforced by `tests/web/css/theme.test.js`. |
 | `web/css/app.css` | Components of the student page. |
 | `web/css/admin.css` | Dashboard and instructor layout, including the team cards (a coloured band per team, header strip, leader tag). |
-| `web/img/` | The tab icon (`favicon.svg`), PNG sizes for phones and older browsers, and `site.webmanifest`. The pirate and the parrot of the ticket picture (`pirate.webp`, `parrot.webp`), with clear backgrounds; `ticket.js` draws the clock and the calendar around them. The pictures of the route: the ship (`ship.svg`), an island (`island.svg`), the treasure chest (`treasure.svg`), the waves (`sea.svg`), the sky by day and by night (`sky-day.svg`, `sky-night.svg`) and the sun and moon (`sun.svg`, `moon.svg`). They have their own colours; the sea and sky behind them take theirs from the theme. |
+| `web/img/` | The tab icon (`favicon.svg`), PNG sizes for phones and older browsers, and `site.webmanifest`. The pirate and the parrot of the ticket picture (`pirate.webp`, `parrot.webp`), with clear backgrounds; `web/js/form/ticket/` draws the clock and the calendar around them. The pictures of the route: the ship (`ship.svg`), an island (`island.svg`), the treasure chest (`treasure.svg`), the waves (`sea.svg`), the sky by day and by night (`sky-day.svg`, `sky-night.svg`) and the sun and moon (`sun.svg`, `moon.svg`). They have their own colours; the sea and sky behind them take theirs from the theme. |
 | `web/js/config.js` | Source placeholder; `scripts/build/build-site.js` generates its published copy from the Actions `API_URL` variable, with the version of the site. |
 | `web/js/app/fresh.js` | Keeps an open page on the published version: compares the version in `config.js` with `version.json`, reloads an older page when nothing would be lost, and offers **Reload** otherwise. |
 | `web/js/app/api.js` | Sends requests to the backend as plain-text JSON (avoids browser CORS checks). |
-| `web/js/form.js`, `ticket.js` | The student page and the success ticket. |
+| `web/js/form/form.model.js` | The state of the student page and the helpers that read and write an answer; creates `App.formPage`, which the other parts add their functions to. Loaded first of the form parts. |
+| `web/js/form/steps.model.js` | The steps of a form and the step a question is on. |
+| `web/js/form/drafts.model.js` | Keeps a half-filled form in the tab's session storage, so a reload does not wipe it. |
+| `web/js/form/chrome.view.js` | The top bar and the head of the form. |
+| `web/js/form/route.view.js` | The route trail drawn as a sea of islands, the sheet and the banner. |
+| `web/js/form/fields.view.js` | A question with its label, description, control and error, and the folder naming rule. |
+| `web/js/form/text-input.view.js` | The text box of each field type and the filter of what it allows. |
+| `web/js/form/select.view.js` | Chips and dropdowns. |
+| `web/js/form/team-size.view.js` | The team size chips and the note of a size. |
+| `web/js/form/members.view.js` | The member cards and the list that follows the team size. |
+| `web/js/form/slots.view.js` | The days and times of a reservation. |
+| `web/js/form/review.view.js` | The review step and the ticket summary. |
+| `web/js/form/form.view.js` | The page of an open or closed form; with a key it opens on the summary. |
+| `web/js/form/team-key.page.js` | The first step of a key booking: the key and the team it opens. |
+| `web/js/form/navigation.page.js` | Moving between steps and showing their errors. |
+| `web/js/form/submit.page.js` | Sending the registration and showing its ticket. |
+| `web/js/form/submit-errors.page.js` | What the page does with each error the server gives back when a registration is sent. |
+| `web/js/form/key-entry.page.js` | Opening a registration with its key. |
+| `web/js/form/edit.page.js` | A registration opened with its key: read only, Close, cancel, start again. |
+| `web/js/form/success.view.js` | The page with the ticket after sending. |
+| `web/js/form/contacts.view.js` | The names and contacts of other teams in a request to move a member. |
+| `web/js/form/transfer.view.js` | The dialog of a request to move a member. |
+| `web/js/form/transfer.page.js` | The requests to move a member when a registration opens. |
+| `web/js/form/form.page.js` | Loads the form, draws the page for its state, and starts the page. Loaded last. |
+| `web/js/form/ticket/time.model.js` | The clock hands and the slice of the dial for the time of a booking. Loaded first of the ticket parts; creates `App.ticket`. |
+| `web/js/form/ticket/shapes.view.js` | The colours of the ticket picture and its small SVG shapes: a shadow, a brass knob. |
+| `web/js/form/ticket/calendar.view.js` | The desk calendar of the ticket picture. |
+| `web/js/form/ticket/clock-hands.view.js` | The hands of the ticket's clock, and the slot as a shaded slice of the dial with an arrow along it. |
+| `web/js/form/ticket/clock.view.js` | The ship's clock of the ticket picture: the wooden ring, the rim, the face and its numbers, the knobs. |
+| `web/js/form/ticket/when.view.js` | The time of a booking as a picture: the clock, the calendar, the pirate and the parrot, with the day and time as text over them. |
+| `web/js/form/ticket/save-image.page.js` | Saves the ticket as an image, with its torn edges. |
+| `web/js/form/ticket/ticket.view.js` | The success ticket: the reference, the picture, the key, and the buttons that save or print it. Loaded last. |
 | `web/js/i18n/en.js`, `ar.js` | The English and Arabic text of the student page, by key, in `App.strings`. |
 | `web/js/i18n/i18n.js` | `App.i18n`: the page language and its direction, the text of a key, `{en, ar}` labels, error sentences and dates. Loaded after `en.js` and `ar.js`. |
 | `web/js/teams/handover.view.js` | The question asked before the leader of a team moves to another team: who leads next, and their email. Used by the student page and the dashboard. |

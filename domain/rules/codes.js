@@ -11,6 +11,17 @@
   var CODE_LENGTH = 7;
 
   /**
+   * Gives the digits a student code question asks for.
+   *
+   * @param {?Object} field The question, with its optional `length`.
+   * @return {number} The digits.
+   */
+  function codeLength(field) {
+    var f = field || {};
+    return f.length || CODE_LENGTH;
+  }
+
+  /**
    * Checks a student code, with Arabic digits read as Latin ones and the
    * spaces taken out.
    *
@@ -20,7 +31,7 @@
    */
   function validateCode(raw, opts) {
     var o = opts || {};
-    var len = o.length || CODE_LENGTH;
+    var len = codeLength(o);
     var v = textRules.latinDigits(raw).replace(/\s+/g, '');
     if (!v) return { ok: false, error: 'required' };
     if (!/^\d+$/.test(v) || v.length !== len) {
@@ -29,7 +40,7 @@
     return { ok: true, value: v };
   }
 
-  var api = { validateCode: validateCode };
+  var api = { codeLength: codeLength, validateCode: validateCode };
   if (node) module.exports = api;
   root.RulesCodes = api;
 })(typeof globalThis !== 'undefined' ? globalThis : this);
