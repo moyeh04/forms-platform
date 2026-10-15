@@ -284,14 +284,6 @@
     "jsdoc": 9,
     "lines": 4
   },
-  "web/js/form/form.view.js": {
-    "biome/lint/complexity/noExcessiveCognitiveComplexity": 1,
-    "biome/lint/complexity/noExcessiveLinesPerFunction": 1,
-    "biome/lint/complexity/useOptionalChain": 3,
-    "biome/lint/style/noMagicNumbers": 2,
-    "jsdoc": 5,
-    "lines": 4
-  },
   "web/js/form/submit.page.js": {
     "biome/lint/complexity/noExcessiveCognitiveComplexity": 2,
     "biome/lint/complexity/noExcessiveLinesPerFunction": 1,
