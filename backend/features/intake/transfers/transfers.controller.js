@@ -3,8 +3,8 @@
 var API = API || {};
 
 API['transfer.decide'] = function (req) {
-  var form = requireForm(String(req.slug || ''));
-  var vform = validationForm(form);
+  var form = FormsRepository.requireForm(String(req.slug || ''));
+  var vform = FormsPublic.validationForm(form);
   var found = findByKey_(form, req.key);
   var out = Lock.withLock(function () {
     return decideTransfer_(
@@ -29,8 +29,8 @@ API['transfer.decide'] = function (req) {
 };
 
 API['transfer.cancel'] = function (req) {
-  var form = requireForm(String(req.slug || ''));
-  var vform = validationForm(form);
+  var form = FormsRepository.requireForm(String(req.slug || ''));
+  var vform = FormsPublic.validationForm(form);
   var found = findByKey_(form, req.key);
   Lock.withLock(function () {
     var t = readTransfers_(form).filter(function (x) {
@@ -70,8 +70,8 @@ function adminTransfers_(form) {
 }
 
 API['admin.transfer.decide'] = AuthService.admin(function (req) {
-  var form = requireForm(req.slug || req.id);
-  var vform = validationForm(form);
+  var form = FormsRepository.requireForm(req.slug || req.id);
+  var vform = FormsPublic.validationForm(form);
   var out = Lock.withLock(function () {
     return decideTransfer_(
       vform,

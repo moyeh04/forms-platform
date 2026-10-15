@@ -17,3 +17,11 @@ API['admin.clients.remove'] = AuthService.admin(ClientsController.remove);
 API['viewer.me'] = ViewerController.me;
 API['viewer.data'] = ViewerController.data;
 API['viewer.review'] = ViewerController.review;
+
+API['getForm'] = FormsController.getForm;
+API['admin.forms.list'] = AuthService.admin(FormsController.list);
+API['admin.forms.get'] = AuthService.admin(FormsController.get);
+API['admin.forms.create'] = AuthService.admin(FormsController.create);
+API['admin.forms.update'] = AuthService.admin(FormsController.update);
+API['admin.forms.duplicate'] = AuthService.admin(FormsController.duplicate);
+API['admin.forms.delete'] = AuthService.admin(FormsController.remove);

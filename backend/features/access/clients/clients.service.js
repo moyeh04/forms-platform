@@ -81,7 +81,7 @@ function cleanClientForms_(list) {
   list = Array.isArray(list) ? list : [];
   if (list.indexOf('*') !== -1) return ['*'];
   return list.map(function (s) {
-    var f = findForm(String(s));
+    var f = FormsRepository.findForm(String(s));
     if (!f) ApiError.fail('form_not_found', 'Form "' + s + '" does not exist.');
     return f.id;
   });

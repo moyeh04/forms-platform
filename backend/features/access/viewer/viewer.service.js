@@ -4,7 +4,7 @@
 
 var ViewerService = (function () {
 function requireClientForm_(client, slug) {
-  var form = requireForm(String(slug || ''));
+  var form = FormsRepository.requireForm(String(slug || ''));
   if (
     !ClientsAccess.clientAllows(client, form) ||
     form.status === 'draft' ||

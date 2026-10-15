@@ -63,7 +63,7 @@ function dlDownloadsFolder_() {
 }
 
 function dlJob_(req) {
-  var form = requireForm(req.slug || req.id);
+  var form = FormsRepository.requireForm(req.slug || req.id);
   var raw = CacheService.getScriptCache().get('dl_job:' + req.job);
   var job = raw ? Json.parseJson(raw, null) : null;
   if (!job || job.form !== form.id)

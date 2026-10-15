@@ -6,7 +6,7 @@ function menuPrintOptions(kind) {
     kind === 'reservations'
       ? ['reservation']
       : ['team_registration', 'task_submission'];
-  return readForms()
+  return FormsRepository.readForms()
     .filter(function (f) {
       return types.indexOf(f.type) !== -1;
     })

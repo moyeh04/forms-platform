@@ -51,7 +51,7 @@ function readClients_() {
   )
     return clients;
   var ids = {};
-  readForms().forEach(function (f) {
+  FormsRepository.readForms().forEach(function (f) {
     ids[f.slug] = f.id;
   });
   clients.forEach(function (c) {

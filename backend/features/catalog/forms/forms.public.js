@@ -1,5 +1,6 @@
 /** What the public may read of a form, with its list options filled in. */
 
+var FormsPublic = (function () {
 /**
  * The rules that limit a form to some values: rules.majors for the Majors list, and
  * rules.sections for whichever list of sections the section question reads.
@@ -92,3 +93,6 @@ function publicForm(form) {
 function validationForm(form) {
   return resolveOptions_(Json.clone(form), readLists());
 }
+
+return { validationForm, publicForm, LIMITED_LISTS: LIMITED_LISTS_ };
+})();

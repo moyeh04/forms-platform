@@ -107,7 +107,7 @@ function normalizeReservationMembers_(form) {
   members.max = Math.max(1, members.min, Math.min(19, isNaN(max) ? 5 : max));
   // The note for some numbers of teammates is cleaned like the team size note, and dropped when no number has it.
   var notice = members.notice
-    ? normalizeSizeNotice_(members.notice, members.min, members.max)
+    ? FormsRules.normalizeSizeNotice(members.notice, members.min, members.max)
     : null;
   if (notice && notice.sizes.length) members.notice = notice;
   else delete members.notice;

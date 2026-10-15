@@ -83,7 +83,7 @@ function menuPrintTeamList() {
 
 /** Called by the dialog. */
 function menuPrint(kind, slug, dayId, includeEmpty) {
-  var form = requireForm(slug);
+  var form = FormsRepository.requireForm(slug);
   var printed =
     kind === 'reservations'
       ? printReservations_(form, dayId, includeEmpty)
@@ -95,7 +95,7 @@ function menuRebuildViews() {
   var ui = SpreadsheetApp.getUi();
   var n = 0;
   SheetStyle.styleRegistryTabs();
-  readForms().forEach(function (f) {
+  FormsRepository.readForms().forEach(function (f) {
     if (rebuildViews(f)) n++;
   });
   ui.alert(

@@ -16,7 +16,7 @@ var API = API || {};
 
 /** Starts a download: a fresh work folder (the form's older ones go to the trash) and the list of teams. */
 API['admin.download.start'] = AuthService.admin(function (req) {
-  var form = requireForm(req.slug || req.id);
+  var form = FormsRepository.requireForm(req.slug || req.id);
   if (!isTeamForm_(form))
     ApiError.fail('wrong_type', 'Only team and task forms can be downloaded.');
   var teams = teamBlocks_(form);

@@ -1,5 +1,6 @@
 /** The questions and pages an admin adds to a form. */
 
+var FormsQuestions = (function () {
 /**
  * Questions an admin adds to a form. A built-in question comes from the template of
  * the form type; a custom one has `custom: true`, an id that starts with "q_", and one
@@ -130,3 +131,6 @@ function normalizeQuestions_(form) {
   });
   return form;
 }
+
+return { normalizeQuestions: normalizeQuestions_ };
+})();

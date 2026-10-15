@@ -4,7 +4,7 @@
 
 /** Forms a reservation may take keys from: any other form that gives its students a key. */
 function keyBookingSources_(form) {
-  return readForms().filter(function (f) {
+  return FormsRepository.readForms().filter(function (f) {
     return f.id !== form.id && issuesKeys_(f);
   });
 }
@@ -35,7 +35,7 @@ function keyBookingSource_(form) {
   var kb = form.keyBooking;
   if (form.type !== 'reservation' || !kb || !kb.enabled || !kb.source)
     return null;
-  var source = findForm(kb.source);
+  var source = FormsRepository.findForm(kb.source);
   return source && source.id !== form.id ? source : null;
 }
 
@@ -123,7 +123,7 @@ function issuesKeys_(f) {
 
 /** The reservations that are booked with the keys of this form, oldest first. */
 function bookingsOf_(source) {
-  return readForms()
+  return FormsRepository.readForms()
     .filter(function (f) {
       return (
         f.type === 'reservation' &&

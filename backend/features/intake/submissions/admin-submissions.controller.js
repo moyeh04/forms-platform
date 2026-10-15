@@ -14,7 +14,7 @@ function adminView_(r) {
 }
 
 API['admin.submissions'] = AuthService.admin(function (req) {
-  var form = requireForm(req.slug || req.id);
+  var form = FormsRepository.requireForm(req.slug || req.id);
   var rows = numberedResponses_(form, !!req.includeDeleted).map(function (r) {
     var view = adminView_(r);
     if (
@@ -30,8 +30,8 @@ API['admin.submissions'] = AuthService.admin(function (req) {
 });
 
 API['admin.submission.update'] = AuthService.admin(function (req) {
-  var form = requireForm(req.slug || req.id);
-  var vform = validationForm(form);
+  var form = FormsRepository.requireForm(req.slug || req.id);
+  var vform = FormsPublic.validationForm(form);
   var patch = req.patch || {};
   var changedData = false;
   Lock.withLock(function () {
@@ -75,7 +75,7 @@ API['admin.submission.update'] = AuthService.admin(function (req) {
 });
 
 API['admin.submission.delete'] = AuthService.admin(function (req) {
-  var form = requireForm(req.slug || req.id);
+  var form = FormsRepository.requireForm(req.slug || req.id);
   Lock.withLock(function () {
     if (!cancelResponse_(form, req.submissionId))
       ApiError.fail('submission_not_found', 'That submission does not exist.');
@@ -85,8 +85,8 @@ API['admin.submission.delete'] = AuthService.admin(function (req) {
 });
 
 API['admin.submission.resetKey'] = AuthService.admin(function (req) {
-  var form = requireForm(req.slug || req.id);
-  var vform = validationForm(form);
+  var form = FormsRepository.requireForm(req.slug || req.id);
+  var vform = FormsPublic.validationForm(form);
   return Lock.withLock(function () {
     var rows = readResponses(form);
     var r = rows.filter(function (x) {
@@ -104,7 +104,7 @@ API['admin.submission.resetKey'] = AuthService.admin(function (req) {
 
 /** The admin reads a student's current key, for example when the student lost it. */
 API['admin.submission.key'] = AuthService.admin(function (req) {
-  var form = requireForm(req.slug || req.id);
+  var form = FormsRepository.requireForm(req.slug || req.id);
   var r = readResponses(form).filter(function (x) {
     return x.id === req.submissionId;
   })[0];

@@ -5,7 +5,7 @@ function isTeamForm_(form) {
 }
 
 function teamBlocks_(form) {
-  var vform = validationForm(form);
+  var vform = FormsPublic.validationForm(form);
   return numberedResponses_(form)
     .sort(byTeamNumber_)
     .map(function (r) {

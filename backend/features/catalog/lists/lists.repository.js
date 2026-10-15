@@ -93,7 +93,7 @@ function formsUsingList_(key) {
       return f.list === key || uses(f.fields);
     });
   };
-  return readForms().filter(function (f) {
+  return FormsRepository.readForms().filter(function (f) {
     return uses(f.fields);
   });
 }

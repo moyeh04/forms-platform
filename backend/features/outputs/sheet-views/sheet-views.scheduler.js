@@ -19,7 +19,7 @@ function rebuildViews(form) {
   SheetStyle.styleFormTabs(ss);
   var build = VIEW_BUILDERS_[form.type];
   if (!build) return false;
-  build(validationForm(form), ss);
+  build(FormsPublic.validationForm(form), ss);
   return true;
 }
 
@@ -63,7 +63,7 @@ function processDirtyViews() {
   var store = PropertiesService.getScriptProperties();
   var marks = store.getProperties();
   var forms = {};
-  readForms().forEach(function (f) {
+  FormsRepository.readForms().forEach(function (f) {
     forms[f.id] = f;
   });
   var started = Date.now(),

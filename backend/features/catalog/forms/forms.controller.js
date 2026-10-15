@@ -1,9 +1,14 @@
 /** The form actions: the public form definition and the admin form actions. */
 
-var API = API || {};
-
-API.getForm = function (req) {
-  var form = requireForm(String(req.slug || ''));
+var FormsController = (function () {
+/**
+ * Answers the `getForm` action.
+ *
+ * @param {!Object} req The request body.
+ * @return {*} The answer, sent back as JSON.
+ */
+function getForm(req) {
+  var form = FormsRepository.requireForm(String(req.slug || ''));
   var state = Rules.formState(form);
   if (state === 'draft' || state === 'archived') {
     var draft = {
@@ -17,17 +22,28 @@ API.getForm = function (req) {
     Object.assign(draft, FormMetadata.public(form));
     return { state: state, form: draft };
   }
-  var out = { state: state, form: publicForm(form), serverTime: Time.nowIso() };
+  var out = { state: state, form: FormsPublic.publicForm(form), serverTime: Time.nowIso() };
   if (form.type === 'reservation') out.taken = slotAvailability_(form);
   return out;
-};
+}
 
-API['admin.forms.list'] = AuthService.admin(function () {
-  return { forms: readForms() };
-});
+/**
+ * Answers the `admin.forms.list` action.
+ *
+ * @return {*} The answer, sent back as JSON.
+ */
+function list() {
+  return { forms: FormsRepository.readForms() };
+}
 
-API['admin.forms.get'] = AuthService.admin(function (req) {
-  var form = requireForm(req.id);
+/**
+ * Answers the `admin.forms.get` action.
+ *
+ * @param {!Object} req The request body.
+ * @return {*} The answer, sent back as JSON.
+ */
+function get(req) {
+  var form = FormsRepository.requireForm(req.id);
   var out = { form: form, lists: readLists(), listInfo: readListInfo() };
   // The timetable editor marks slots that already have bookings.
   if (form.type === 'reservation') {
@@ -41,25 +57,51 @@ API['admin.forms.get'] = AuthService.admin(function (req) {
   if (form.type === 'reservation' && Rules.fieldByRole(form, 'members'))
     out.teammateCounts = teammateCounts_(form);
   return out;
-});
+}
 
-API['admin.forms.create'] = AuthService.admin(function (req) {
-  return { form: createForm(req) };
-});
+/**
+ * Answers the `admin.forms.create` action.
+ *
+ * @param {!Object} req The request body.
+ * @return {*} The answer, sent back as JSON.
+ */
+function create(req) {
+  return { form: FormsService.createForm(req) };
+}
 
-/** req: id, patch, and base (the `updatedAt` of the copy the page showed, so a newer save is not overwritten). */
-API['admin.forms.update'] = AuthService.admin(function (req) {
-  return { form: updateForm(req.id, req.patch || {}, req.base) };
-});
+/**
+ * req: id, patch, and base (the `updatedAt` of the copy the page showed, so a newer save is not overwritten).
+ *
+ * @param {!Object} req The request body.
+ * @return {*} The answer, sent back as JSON.
+ */
+function update(req) {
+  return { form: FormsService.updateForm(req.id, req.patch || {}, req.base) };
+}
 
-API['admin.forms.duplicate'] = AuthService.admin(function (req) {
-  return { form: duplicateForm(req.id, req) };
-});
+/**
+ * Answers the `admin.forms.duplicate` action.
+ *
+ * @param {!Object} req The request body.
+ * @return {*} The answer, sent back as JSON.
+ */
+function duplicate(req) {
+  return { form: FormsService.duplicateForm(req.id, req) };
+}
 
-API['admin.forms.delete'] = AuthService.admin(function (req) {
-  var form = requireForm(req.id);
+/**
+ * Answers the `admin.forms.delete` action.
+ *
+ * @param {!Object} req The request body.
+ * @return {*} The answer, sent back as JSON.
+ */
+function remove(req) {
+  var form = FormsRepository.requireForm(req.id);
   // The page sends the link name back as a deliberate second key, so a stray call cannot delete a form.
   if (String(req.confirm || '') !== form.slug)
     ApiError.fail('confirm_required', 'Confirm by sending the form link name.');
-  return deleteForm(form.id);
-});
+  return FormsService.deleteForm(form.id);
+}
+
+return { getForm, list, get, create, update, duplicate, remove };
+})();

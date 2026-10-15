@@ -43,7 +43,7 @@ function paintPrintHeader_(sh, title, headers) {
 
 /** One day of reservations, in timetable order, with a signature column. */
 function printReservations_(form, dayId, includeEmpty) {
-  var vform = validationForm(form);
+  var vform = FormsPublic.validationForm(form);
   var days = (vform.slots && vform.slots.days) || [];
   var day = days.filter(function (d) {
     return d.id === dayId;
@@ -134,7 +134,7 @@ function printReservations_(form, dayId, includeEmpty) {
 
 /** Everyone, team by team, with the team number and task merged. */
 function printTeamList_(form) {
-  var vform = validationForm(form);
+  var vform = FormsPublic.validationForm(form);
   var ss = SpreadsheetApp.openById(form.sheetId);
   var sh = freshView_(ss, 'Print - Team list');
   var headers = ['Team', 'Team member name', 'Code', teamThing_(form)];

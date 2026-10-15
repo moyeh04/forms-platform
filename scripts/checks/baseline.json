@@ -58,11 +58,12 @@
     "lines": 2
   },
   "backend/features/catalog/forms/forms.controller.js": {
+    "biome/format": 1,
     "biome/lint/correctness/noInnerDeclarations": 1,
-    "jsdoc": 1,
-    "lines": 3
+    "lines": 4
   },
   "backend/features/catalog/forms/forms.public.js": {
+    "biome/format": 1,
     "biome/lint/complexity/noExcessiveCognitiveComplexity": 1,
     "biome/lint/complexity/useOptionalChain": 3,
     "jsdoc": 12,
@@ -77,17 +78,19 @@
     "lines": 11
   },
   "backend/features/catalog/forms/forms.repository.js": {
+    "biome/format": 1,
     "biome/lint/correctness/noInnerDeclarations": 2,
     "jsdoc": 10,
-    "lines": 2
+    "lines": 3
   },
   "backend/features/catalog/forms/forms.rules.js": {
+    "biome/format": 1,
     "biome/lint/complexity/noExcessiveCognitiveComplexity": 1,
     "biome/lint/complexity/useOptionalChain": 3,
     "biome/lint/correctness/noInnerDeclarations": 4,
     "biome/lint/style/noMagicNumbers": 1,
     "jsdoc": 4,
-    "lines": 4
+    "lines": 5
   },
   "backend/features/catalog/forms/forms.service.js": {
     "biome/format": 1,
@@ -374,7 +377,7 @@
     "biome/format": 1,
     "biome/lint/style/noMagicNumbers": 1,
     "jsdoc": 6,
-    "lines": 11
+    "lines": 12
   },
   "backend/platform/sheets/table.js": {
     "biome/format": 1,
@@ -522,7 +525,8 @@
     "lines": 6
   },
   "tests/submissions.test.js": {
-    "lines": 10
+    "biome/format": 1,
+    "lines": 11
   },
   "tests/teamsize.test.js": {
     "lines": 14

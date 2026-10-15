@@ -12,7 +12,7 @@ function requireMatching_(form) {
 }
 
 API['admin.matching.import'] = AuthService.admin(function (req) {
-  var form = requireForm(req.slug || req.id);
+  var form = FormsRepository.requireForm(req.slug || req.id);
   requireMatching_(form);
   return Lock.withLock(function () {
     var sh = requestsSheet_(form);
@@ -61,7 +61,7 @@ API['admin.matching.import'] = AuthService.admin(function (req) {
 });
 
 API['admin.matching.list'] = AuthService.admin(function (req) {
-  var form = requireForm(req.slug || req.id);
+  var form = FormsRepository.requireForm(req.slug || req.id);
   requireMatching_(form);
   var subs = readResponses(form);
   var byPhone = {};
@@ -101,7 +101,7 @@ API['admin.matching.list'] = AuthService.admin(function (req) {
 });
 
 API['admin.matching.decide'] = AuthService.admin(function (req) {
-  var form = requireForm(req.slug || req.id);
+  var form = FormsRepository.requireForm(req.slug || req.id);
   requireMatching_(form);
   var decision = String(req.decision);
   if (REVIEW_STATUSES.indexOf(decision) === -1)
@@ -134,7 +134,7 @@ API['admin.matching.decide'] = AuthService.admin(function (req) {
 });
 
 API['admin.matching.remove'] = AuthService.admin(function (req) {
-  var form = requireForm(req.slug || req.id);
+  var form = FormsRepository.requireForm(req.slug || req.id);
   requireMatching_(form);
   var ids = {};
   (req.requestIds || []).forEach(function (i) {

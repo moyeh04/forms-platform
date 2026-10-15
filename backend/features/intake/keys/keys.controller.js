@@ -34,7 +34,7 @@ function extendedExpiry_(current, days, until) {
 }
 
 API['admin.keys.list'] = AuthService.admin(function (req) {
-  var form = requireForm(req.slug || req.id);
+  var form = FormsRepository.requireForm(req.slug || req.id);
   return { keys: keyedRows_(form).map(keyRow_) };
 });
 
@@ -43,7 +43,7 @@ API['admin.keys.list'] = AuthService.admin(function (req) {
  * (1 to 365) or until (an ISO time in the future).
  */
 API['admin.keys.extend'] = AuthService.admin(function (req) {
-  var form = requireForm(req.slug || req.id);
+  var form = FormsRepository.requireForm(req.slug || req.id);
   requireKeyEnabled_(form);
   var days = 0,
     until = '';

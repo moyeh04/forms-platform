@@ -3,10 +3,11 @@
  * allowed.
  */
 
+var FormsRules = (function () {
 /** Merges new rule settings over the old ones and checks the team size range and the warnings about small teams. */
 function normalizeRules_(current, next) {
   var merged = Object.assign({}, current || {}, next || {});
-  LIMITED_LISTS_.forEach(function (list) {
+  FormsPublic.LIMITED_LISTS.forEach(function (list) {
     if (merged[list] !== undefined)
       merged[list] = Array.isArray(merged[list])
         ? merged[list].map(String).filter(Boolean)
@@ -64,3 +65,6 @@ function normalizeSizeNotice_(n, min, max) {
     text: { en: String(text.en || '').trim(), ar: String(text.ar || '').trim() }
   };
 }
+
+return { normalizeRules: normalizeRules_, normalizeSizeNotice: normalizeSizeNotice_ };
+})();

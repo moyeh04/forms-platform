@@ -1,8 +1,9 @@
 /** Creating, changing, copying and deleting forms with their sheets. */
 
+var FormsService = (function () {
 function uniqueSlug_(wanted) {
   var taken = {};
-  readForms().forEach(function (f) {
+  FormsRepository.readForms().forEach(function (f) {
     taken[f.slug] = true;
   });
   var base = Text.slugify(wanted),
@@ -57,7 +58,7 @@ function addForm_(form, wantedSlug, adjust) {
       wantedSlug || form.title + ' ' + FormMetadata.slug(form)
     );
     if (adjust) adjust(form);
-    return saveForm(form);
+    return FormsRepository.saveForm(form);
   });
 }
 
@@ -101,7 +102,7 @@ var PATCHABLE_ = [
  */
 function updateForm(id, patch, base) {
   return Lock.withLock(function () {
-    return applyFormPatch_(requireForm(id), patch, base);
+    return applyFormPatch_(FormsRepository.requireForm(id), patch, base);
   });
 }
 
@@ -118,7 +119,7 @@ function applyFormPatch_(form, patch, base) {
     if (k === 'status' && Constants.FORM_STATUSES.indexOf(patch[k]) === -1)
       ApiError.fail('bad_status', 'Status must be draft, open, closed, or archived.');
     if (k === 'rules') {
-      form.rules = normalizeRules_(form.rules, patch.rules);
+      form.rules = FormsRules.normalizeRules(form.rules, patch.rules);
       return;
     }
     if (k === 'slots') {
@@ -131,7 +132,7 @@ function applyFormPatch_(form, patch, base) {
     }
     if (k === 'slug') {
       var wanted = Text.slugify(patch.slug);
-      var clash = findForm(wanted);
+      var clash = FormsRepository.findForm(wanted);
       if (clash && clash.id !== form.id)
         ApiError.fail('slug_taken', 'Another form already uses that link name.');
       if (wanted !== form.slug) ClientsRepository.keepClientForms();
@@ -141,12 +142,12 @@ function applyFormPatch_(form, patch, base) {
     form[k] = patch[k];
   });
   if (patch.fields !== undefined || patch.steps !== undefined)
-    normalizeQuestions_(form);
-  return saveForm(form);
+    FormsQuestions.normalizeQuestions(form);
+  return FormsRepository.saveForm(form);
 }
 
 function duplicateForm(id, o, adjust) {
-  var src = requireForm(id);
+  var src = FormsRepository.requireForm(id);
   var copy = Json.clone(src);
   copy.title = (o && o.title) || src.title;
   var metadata = FormMetadata.duplicate(src, o || {});
@@ -163,13 +164,13 @@ function duplicateForm(id, o, adjust) {
  */
 function deleteForm(id) {
   return Lock.withLock(function () {
-    return removeForm_(requireForm(id));
+    return removeForm_(FormsRepository.requireForm(id));
   });
 }
 
 function removeForm_(form) {
-  var sh = formsSheet();
-  sh.deleteRow(formRow_(sh, form.id));
+  var sh = FormsRepository.formsSheet();
+  sh.deleteRow(FormsRepository.formRow(sh, form.id));
   var trashed = false;
   if (form.sheetId) {
     try {
@@ -193,3 +194,6 @@ function removeForm_(form) {
   });
   return { deleted: true, sheetTrashed: trashed, title: form.title };
 }
+
+return { createForm, updateForm, duplicateForm, deleteForm };
+})();

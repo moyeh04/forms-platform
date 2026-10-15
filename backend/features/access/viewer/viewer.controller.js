@@ -29,7 +29,7 @@ function me(req) {
 function data(req) {
   var client = ClientsAccess.requireClient(req);
   var form = ViewerService.requireClientForm(client, req.slug);
-  var vform = validationForm(form);
+  var vform = FormsPublic.validationForm(form);
   var kind = ViewerRules.viewKind(form);
   var mode = req.mode === 'today' || req.mode === 'day' ? req.mode : 'all';
   var out = {

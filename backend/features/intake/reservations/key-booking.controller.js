@@ -5,7 +5,7 @@
 var API = API || {};
 
 API.bookingTeam = function (req) {
-  var form = requireForm(String(req.slug || ''));
+  var form = FormsRepository.requireForm(String(req.slug || ''));
   assertAcceptingSubmissions_(form);
   var source = requireKeyBookingSource_(form);
   var row = registrationByKey_(source, req.key);
@@ -32,7 +32,7 @@ API.bookingTeam = function (req) {
  * rules and hours, the days one week later, no bookings, and its own sheet. It is a draft.
  */
 API['admin.bookings.next'] = AuthService.admin(function (req) {
-  var source = requireForm(req.source);
+  var source = FormsRepository.requireForm(req.source);
   if (!issuesKeys_(source))
     ApiError.fail(
       'bad_key_booking',
@@ -43,7 +43,7 @@ API['admin.bookings.next'] = AuthService.admin(function (req) {
   var title = String(req.title || '').trim();
   var form;
   if (last) {
-    form = duplicateForm(
+    form = FormsService.duplicateForm(
       last.id,
       { title: title || nextTitle_(last.title) },
       function (copy) {
@@ -55,7 +55,7 @@ API['admin.bookings.next'] = AuthService.admin(function (req) {
     );
   } else {
     if (!title) ApiError.fail('title_required', 'Give the booking a title.');
-    form = createForm(
+    form = FormsService.createForm(
       Object.assign(
         { type: 'reservation', title: title },
         FormMetadata.read(source)

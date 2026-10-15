@@ -13,9 +13,9 @@ function publicSubmission_(r) {
 }
 
 API.submit = function (req) {
-  var form = requireForm(String(req.slug || ''));
+  var form = FormsRepository.requireForm(String(req.slug || ''));
   assertAcceptingSubmissions_(form);
-  var vform = validationForm(form);
+  var vform = FormsPublic.validationForm(form);
   var source = keyBookingSource_(form);
   var v,
     registration = null;
@@ -123,13 +123,13 @@ function editScope_(form) {
 }
 
 API.lookup = function (req) {
-  var form = requireForm(String(req.slug || ''));
+  var form = FormsRepository.requireForm(String(req.slug || ''));
   var r = findByKey_(form, req.key);
   var locked = taskLocked_(form);
   var scope = editScope_(form);
   return {
     submission: publicSubmission_(r),
-    transfers: teamTransfers_(validationForm(form), r),
+    transfers: teamTransfers_(FormsPublic.validationForm(form), r),
     keyExpires: r.keyExpires,
     canEdit: !!scope,
     slotOnly: scope === 'slot',
@@ -139,8 +139,8 @@ API.lookup = function (req) {
 };
 
 API.update = function (req) {
-  var form = requireForm(String(req.slug || ''));
-  var vform = validationForm(form);
+  var form = FormsRepository.requireForm(String(req.slug || ''));
+  var vform = FormsPublic.validationForm(form);
   var found = findByKey_(form, req.key);
   assertTaskOpen_(form);
   var scope = editScope_(form);
@@ -179,7 +179,7 @@ API.update = function (req) {
 };
 
 API.remove = function (req) {
-  var form = requireForm(String(req.slug || ''));
+  var form = FormsRepository.requireForm(String(req.slug || ''));
   var found = findByKey_(form, req.key);
   if (!form.editKey.allowDelete)
     ApiError.fail('delete_disabled', 'Deleting is turned off for this form.');

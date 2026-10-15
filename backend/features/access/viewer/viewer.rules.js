@@ -61,7 +61,7 @@ function visibleColumns_(client, form) {
 }
 
 function viewerForms_(client) {
-  return readForms().filter(function (f) {
+  return FormsRepository.readForms().filter(function (f) {
     return (
       f.status !== 'draft' &&
       f.status !== 'archived' &&

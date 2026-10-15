@@ -123,7 +123,7 @@ function styleFormTabs_(ss) {
 /** The three tabs of the registry. */
 function styleRegistryTabs_() {
   var ss = RegistryRepository.registry();
-  styleDataTab_(ss.getSheetByName(Constants.TABS.forms), FORM_COLS);
+  styleDataTab_(ss.getSheetByName(Constants.TABS.forms), FormsRepository.FORM_COLS);
   styleDataTab_(ss.getSheetByName(Constants.TABS.clients), ClientsRepository.CLIENT_COLS);
   styleDataTab_(ss.getSheetByName(Constants.TABS.lists), ['key', 'values']);
 }

@@ -1,5 +1,6 @@
 /** The Forms tab: reading, finding and saving form rows. */
 
+var FormsRepository = (function () {
 var FORM_COLS = [
   'id',
   'slug',
@@ -94,3 +95,6 @@ function saveForm(form) {
   else Table.appendPlain(sh, Table.rowValues(FORM_COLS, formToRow_(form)));
   return form;
 }
+
+return { FORM_COLS, readForms, findForm, requireForm, saveForm, formsSheet, formRow: formRow_ };
+})();
