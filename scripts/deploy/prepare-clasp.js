@@ -3,7 +3,7 @@
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
-const { apiUrl } = require('./build-site.js');
+const { apiUrl } = require('../build/build-site.js');
 
 function claspProject(scriptId) {
   return { scriptId, rootDir: './dist' };
@@ -26,7 +26,7 @@ function deploymentConfig(env) {
   return { project: claspProject(env.APPS_SCRIPT_ID), credentials };
 }
 
-function prepareClasp(env = process.env, root = path.resolve(__dirname, '..'), home = os.homedir()) {
+function prepareClasp(env = process.env, root = path.resolve(__dirname, '..', '..'), home = os.homedir()) {
   const config = deploymentConfig(env);
   fs.writeFileSync(path.join(root, '.clasp.json'), JSON.stringify(config.project, null, 2) + '\n');
   fs.writeFileSync(path.join(home, '.clasprc.json'), JSON.stringify(config.credentials) + '\n', { mode: 0o600 });

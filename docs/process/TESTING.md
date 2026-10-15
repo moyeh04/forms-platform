@@ -1,11 +1,11 @@
 # Testing
 
-348 automated tests run without a Google account, a browser, or a network.
+350 automated tests run without a Google account, a browser, or a network.
 They run the **real** backend and the **real** pages. This page explains how
 that works and what it can and cannot prove.
 
 ```
-npm test    # 348 tests
+npm test    # 350 tests
 ```
 
 ## The layers
@@ -163,6 +163,7 @@ says something else.
 | Instructor page | `viewer-ui.test.js` | 13 | Small teams listed by level and marked on their card, team numbers with a gap where a team cancelled, today, by day, hidden columns, review rights, invalid links, member values named for the phone layout, phone as a call link, the key screen and its theme switch |
 | Registry writes | `registry-writes.test.js` | 6 | Every change to forms, lists and links written inside the lock, a save that keeps its row while another form is deleted, a save over a newer copy refused, a busy lock, a link that keeps a renamed form, list names that stay unique |
 | Golden copies | `golden.test.js` | 5 | What the live system depends on, compared with saved copies in `tests/fixtures/golden/`: every function Apps Script calls by name, the salted hashes and seals for a fixed pepper, the error code of every action for five kinds of request, legacy flag cells read and written back, and every sheet, property, cache entry, mail and trigger after one scripted run. `GOLDEN_UPDATE=1` writes the copies again, only for a change meant to alter them |
+| Site map | `scripts/build/site-map.test.js` | 2 | Each published path, with or without a slash, query or fragment, finds its source under `web/` or `domain/`, and every page exists; a path outside the site or one that climbs out of it with `..` has none |
 | Check baseline | `scripts/checks/lib/baseline.test.js` | 3 | A legacy file keeps its count and never goes over it, a new file has no allowance, a lowered count must be written down and lowering never raises one, and a key ending in `/` is a folder that counts as there while it holds a file |
 | Check exceptions | `scripts/checks/lib/exceptions.test.js` | 1 | An exception removes the findings of its path and rule, needs a reason, and fails once it matches nothing |
 | Biome check | `scripts/checks/biome.test.js` | 2 | A formatted, clean file has no findings; a layout problem and a lint rule become findings with their rule and line, and files outside the configured folders are left out |
@@ -196,7 +197,7 @@ exercised on every run.
 ## Looking at the pages in a real browser
 
 jsdom does not draw anything, so `npm run dev` starts a local preview
-(`scripts/dev-server.js`). It serves the real pages and routes their API calls
+(`scripts/dev/dev-server.js`). It serves the real pages and routes their API calls
 into the same in-memory Google the tests use, seeded with a team form, a
 reservation form, a WhatsApp form, three teams, and a viewer link. The admin PIN
 is `4321`. Nothing is saved: stopping the server forgets everything.

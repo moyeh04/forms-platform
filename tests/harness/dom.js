@@ -6,6 +6,7 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const { JSDOM } = require('jsdom');
+const { sourceOf } = require('../../scripts/build/site-map.js');
 
 const root = path.resolve(__dirname, '..', '..');
 
@@ -14,7 +15,7 @@ function scriptsOf(html) {
 }
 
 async function openPage(file, world, { query = '', hash = '', lang } = {}) {
-  const html = fs.readFileSync(path.join(root, file), 'utf8');
+  const html = fs.readFileSync(path.join(root, sourceOf(file)), 'utf8');
   const dom = new JSDOM(html, {
     url: `http://localhost/${file}${query}${hash}`,
     runScripts: 'outside-only',
@@ -31,7 +32,7 @@ async function openPage(file, world, { query = '', hash = '', lang } = {}) {
   if (lang) window.localStorage.setItem('fp_lang', lang);
 
   for (const src of scriptsOf(html)) {
-    window.eval(fs.readFileSync(path.join(root, src), 'utf8'));
+    window.eval(fs.readFileSync(path.join(root, sourceOf(src)), 'utf8'));
   }
   window.APP_CONFIG.API_URL = 'http://api.test/exec';
   return dom;

@@ -14,9 +14,10 @@
 const http = require('node:http');
 const fs = require('node:fs');
 const path = require('node:path');
-const { createWorld } = require('../tests/harness/appsscript-mock.js');
+const { createWorld } = require('../../tests/harness/appsscript-mock.js');
+const { sourceOf } = require('../build/site-map.js');
 
-const ROOT = path.join(__dirname, '..');
+const ROOT = path.join(__dirname, '..', '..');
 const PIN = '4321';
 const TYPES = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.svg': 'image/svg+xml', '.png': 'image/png', '.ico': 'image/x-icon', '.webmanifest': 'application/manifest+json', '.json': 'application/json' };
 
@@ -111,11 +112,11 @@ function start(port, opts) {
       res.end("window.APP_CONFIG = { API_URL: location.origin + '/api' };\nwindow.App = window.App || {};\n");
       return;
     }
-    let file = path.normalize(path.join(ROOT, decodeURIComponent(url.pathname)));
-    const rel = path.relative(ROOT, file);
-    // Only files inside the project, and never dot-folders such as .git.
-    if (rel.startsWith('..') || path.isAbsolute(rel) || rel.split(path.sep).some((p) => p.startsWith('.'))) { res.writeHead(403); res.end(); return; }
-    if (fs.existsSync(file) && fs.statSync(file).isDirectory()) file = path.join(file, 'index.html');
+    // Only the files of the site, at the paths they are published at.
+    const pathname = decodeURIComponent(url.pathname);
+    const source = sourceOf(pathname === '/' ? 'index.html' : pathname);
+    if (!source) { res.writeHead(404); res.end('Not found'); return; }
+    const file = path.join(ROOT, source);
     fs.readFile(file, (err, buf) => {
       if (err) { res.writeHead(404); res.end('Not found'); return; }
       res.writeHead(200, { 'Content-Type': TYPES[path.extname(file)] || 'application/octet-stream', 'Cache-Control': 'no-store' });

@@ -11,7 +11,7 @@ const fs = require('node:fs');
 const { execFileSync } = require('node:child_process');
 
 /** The folders and files the bundle and its deployment are made from. */
-const BACKEND_PATHS = ['backend/', 'shared/', 'scripts/bundle-backend.js', 'scripts/prepare-clasp.js', '.github/workflows/pages.yml'];
+const BACKEND_PATHS = ['backend/', 'domain/', 'scripts/build/bundle-backend.js', 'scripts/deploy/prepare-clasp.js', '.github/workflows/pages.yml'];
 
 function touchesBackend(files) {
   return files.some((file) => BACKEND_PATHS.some((p) => (p.endsWith('/') ? file.startsWith(p) : file === p)));

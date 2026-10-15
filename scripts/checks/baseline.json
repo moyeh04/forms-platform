@@ -2,260 +2,6 @@
   ".github/workflows/pages.yml": {
     "lines": 9
   },
-  "admin.html": {
-    "lines": 5,
-    "structure/root": 1
-  },
-  "assets/": {
-    "structure/root": 1
-  },
-  "assets/css/admin.css": {
-    "biome/format": 1,
-    "biome/lint/complexity/noImportantStyles": 7,
-    "biome/lint/style/noDescendingSpecificity": 18,
-    "biome/lint/style/noExcessiveLinesPerFile": 1,
-    "lines": 228
-  },
-  "assets/css/app.css": {
-    "biome/format": 1,
-    "biome/lint/complexity/noImportantStyles": 5,
-    "biome/lint/style/noDescendingSpecificity": 12,
-    "biome/lint/style/noExcessiveLinesPerFile": 1,
-    "lines": 128
-  },
-  "assets/css/theme.css": {
-    "biome/format": 1,
-    "biome/lint/complexity/noImportantStyles": 3,
-    "lines": 11
-  },
-  "assets/js/": {
-    "structure/cap": 1
-  },
-  "assets/js/admin-data.js": {
-    "biome/format": 1,
-    "biome/lint/complexity/noExcessiveCognitiveComplexity": 8,
-    "biome/lint/complexity/noExcessiveLinesPerFunction": 3,
-    "biome/lint/complexity/useOptionalChain": 9,
-    "biome/lint/correctness/noInnerDeclarations": 9,
-    "biome/lint/correctness/noUnusedVariables": 1,
-    "biome/lint/style/noExcessiveLinesPerFile": 1,
-    "biome/lint/style/noMagicNumbers": 15,
-    "biome/lint/suspicious/noAssignInExpressions": 1,
-    "jsdoc": 37,
-    "lines": 155
-  },
-  "assets/js/admin-download.js": {
-    "biome/format": 1,
-    "biome/lint/complexity/noExcessiveCognitiveComplexity": 1,
-    "biome/lint/complexity/noExcessiveLinesPerFunction": 1,
-    "biome/lint/complexity/useOptionalChain": 1,
-    "biome/lint/correctness/noInnerDeclarations": 12,
-    "biome/lint/correctness/noUnusedVariables": 1,
-    "biome/lint/style/noMagicNumbers": 7,
-    "biome/lint/suspicious/noAssignInExpressions": 1,
-    "jsdoc": 9,
-    "lines": 33
-  },
-  "assets/js/admin-keys.js": {
-    "biome/format": 1,
-    "biome/lint/complexity/noExcessiveCognitiveComplexity": 2,
-    "biome/lint/complexity/noExcessiveLinesPerFunction": 1,
-    "biome/lint/complexity/useOptionalChain": 2,
-    "biome/lint/correctness/noUnusedVariables": 1,
-    "biome/lint/style/noMagicNumbers": 8,
-    "biome/lint/suspicious/noAssignInExpressions": 1,
-    "biome/lint/suspicious/noGlobalIsNan": 1,
-    "jsdoc": 30,
-    "lines": 56,
-    "numbers": 1
-  },
-  "assets/js/admin-lists.js": {
-    "biome/format": 1,
-    "biome/lint/complexity/noExcessiveCognitiveComplexity": 7,
-    "biome/lint/complexity/noExcessiveLinesPerFunction": 2,
-    "biome/lint/complexity/useMaxParams": 1,
-    "biome/lint/complexity/useOptionalChain": 15,
-    "biome/lint/correctness/noInnerDeclarations": 9,
-    "biome/lint/style/noExcessiveLinesPerFile": 1,
-    "biome/lint/style/noMagicNumbers": 16,
-    "biome/lint/suspicious/noAssignInExpressions": 4,
-    "biome/lint/suspicious/noGlobalIsNan": 2,
-    "biome/lint/suspicious/noPrototypeBuiltins": 1,
-    "jsdoc": 88,
-    "lines": 224
-  },
-  "assets/js/admin-people.js": {
-    "biome/format": 1,
-    "biome/lint/complexity/noExcessiveCognitiveComplexity": 3,
-    "biome/lint/complexity/noExcessiveLinesPerFunction": 1,
-    "biome/lint/correctness/noInnerDeclarations": 1,
-    "biome/lint/style/noMagicNumbers": 6,
-    "biome/lint/suspicious/noAssignInExpressions": 1,
-    "jsdoc": 13,
-    "lines": 68
-  },
-  "assets/js/admin-range.js": {
-    "biome/format": 1,
-    "biome/lint/complexity/noExcessiveCognitiveComplexity": 2,
-    "biome/lint/complexity/noExcessiveLinesPerFunction": 1,
-    "biome/lint/correctness/noInnerDeclarations": 1,
-    "biome/lint/style/noMagicNumbers": 1,
-    "biome/lint/suspicious/noAssignInExpressions": 1,
-    "jsdoc": 10,
-    "lines": 36
-  },
-  "assets/js/admin-settings.js": {
-    "biome/format": 1,
-    "biome/lint/complexity/noArguments": 1,
-    "biome/lint/complexity/noExcessiveCognitiveComplexity": 5,
-    "biome/lint/complexity/noExcessiveLinesPerFunction": 1,
-    "biome/lint/complexity/useMaxParams": 1,
-    "biome/lint/complexity/useOptionalChain": 16,
-    "biome/lint/correctness/noInnerDeclarations": 18,
-    "biome/lint/style/noExcessiveLinesPerFile": 1,
-    "biome/lint/style/noMagicNumbers": 13,
-    "biome/lint/suspicious/noAssignInExpressions": 3,
-    "biome/lint/suspicious/noGlobalIsNan": 2,
-    "jsdoc": 65,
-    "lines": 251,
-    "numbers": 4
-  },
-  "assets/js/admin-size-alerts.js": {
-    "biome/format": 1,
-    "biome/lint/suspicious/noAssignInExpressions": 1,
-    "jsdoc": 9,
-    "lines": 24
-  },
-  "assets/js/admin-timetable.js": {
-    "biome/format": 1,
-    "biome/lint/complexity/noExcessiveCognitiveComplexity": 3,
-    "biome/lint/complexity/noExcessiveLinesPerFunction": 1,
-    "biome/lint/complexity/useMaxParams": 1,
-    "biome/lint/complexity/useOptionalChain": 3,
-    "biome/lint/correctness/noInnerDeclarations": 3,
-    "biome/lint/style/noMagicNumbers": 9,
-    "biome/lint/suspicious/noAssignInExpressions": 2,
-    "biome/lint/suspicious/noGlobalIsNan": 1,
-    "jsdoc": 27,
-    "lines": 74,
-    "numbers": 2
-  },
-  "assets/js/admin.js": {
-    "biome/format": 1,
-    "biome/lint/complexity/noExcessiveCognitiveComplexity": 1,
-    "biome/lint/complexity/noExcessiveLinesPerFunction": 1,
-    "biome/lint/complexity/useMaxParams": 1,
-    "biome/lint/complexity/useOptionalChain": 5,
-    "biome/lint/correctness/noInnerDeclarations": 3,
-    "biome/lint/correctness/noUnusedVariables": 1,
-    "biome/lint/style/noExcessiveLinesPerFile": 1,
-    "biome/lint/style/noMagicNumbers": 12,
-    "biome/lint/suspicious/noAssignInExpressions": 2,
-    "biome/lint/suspicious/noGlobalIsNan": 1,
-    "jsdoc": 70,
-    "lines": 173
-  },
-  "assets/js/api.js": {
-    "biome/format": 1,
-    "biome/lint/complexity/useOptionalChain": 4,
-    "biome/lint/correctness/noInnerDeclarations": 1,
-    "biome/lint/correctness/noUnusedVariables": 2,
-    "biome/lint/suspicious/noAssignInExpressions": 1,
-    "jsdoc": 10,
-    "lines": 10
-  },
-  "assets/js/form.js": {
-    "biome/format": 1,
-    "biome/lint/complexity/noArguments": 1,
-    "biome/lint/complexity/noExcessiveCognitiveComplexity": 16,
-    "biome/lint/complexity/useMaxParams": 1,
-    "biome/lint/complexity/useOptionalChain": 28,
-    "biome/lint/correctness/noInnerDeclarations": 43,
-    "biome/lint/correctness/noUnusedFunctionParameters": 4,
-    "biome/lint/correctness/noUnusedVariables": 11,
-    "biome/lint/style/noExcessiveLinesPerFile": 1,
-    "biome/lint/style/noMagicNumbers": 25,
-    "biome/lint/suspicious/noAssignInExpressions": 2,
-    "biome/lint/suspicious/noGlobalIsNan": 1,
-    "jsdoc": 121,
-    "lines": 277
-  },
-  "assets/js/fresh.js": {
-    "biome/format": 1,
-    "biome/lint/complexity/useOptionalChain": 2,
-    "biome/lint/correctness/noInnerDeclarations": 1,
-    "biome/lint/correctness/noUnusedVariables": 1,
-    "biome/lint/style/noMagicNumbers": 4,
-    "biome/lint/suspicious/noAssignInExpressions": 2,
-    "jsdoc": 11,
-    "lines": 21
-  },
-  "assets/js/handover.js": {
-    "biome/format": 1,
-    "jsdoc": 5,
-    "lines": 11
-  },
-  "assets/js/i18n.js": {
-    "biome/format": 1,
-    "biome/lint/complexity/useOptionalChain": 2,
-    "biome/lint/correctness/noInnerDeclarations": 2,
-    "biome/lint/correctness/noUnusedVariables": 2,
-    "biome/lint/suspicious/noAssignInExpressions": 1,
-    "biome/lint/suspicious/noGlobalIsNan": 1,
-    "jsdoc": 12,
-    "lines": 133
-  },
-  "assets/js/size-alerts.js": {
-    "biome/format": 1,
-    "biome/lint/style/noMagicNumbers": 2,
-    "biome/lint/suspicious/noAssignInExpressions": 1,
-    "jsdoc": 4,
-    "lines": 11
-  },
-  "assets/js/theme.js": {
-    "biome/format": 1,
-    "biome/lint/complexity/useOptionalChain": 1,
-    "biome/lint/correctness/noUnusedVariables": 1,
-    "biome/lint/suspicious/noAssignInExpressions": 1,
-    "jsdoc": 6,
-    "lines": 4
-  },
-  "assets/js/ticket.js": {
-    "biome/format": 1,
-    "biome/lint/complexity/noExcessiveCognitiveComplexity": 1,
-    "biome/lint/complexity/useOptionalChain": 1,
-    "biome/lint/correctness/noInnerDeclarations": 6,
-    "biome/lint/correctness/noUnusedFunctionParameters": 1,
-    "biome/lint/correctness/noUnusedVariables": 2,
-    "biome/lint/style/noMagicNumbers": 105,
-    "biome/lint/suspicious/noAssignInExpressions": 1,
-    "jsdoc": 32,
-    "lines": 82,
-    "numbers": 39
-  },
-  "assets/js/ui.js": {
-    "biome/format": 1,
-    "biome/lint/complexity/noArguments": 2,
-    "biome/lint/complexity/noExcessiveCognitiveComplexity": 1,
-    "biome/lint/complexity/useOptionalChain": 1,
-    "biome/lint/correctness/noInnerDeclarations": 1,
-    "biome/lint/correctness/noUnusedVariables": 2,
-    "biome/lint/style/noMagicNumbers": 3,
-    "biome/lint/suspicious/noAssignInExpressions": 1,
-    "jsdoc": 15,
-    "lines": 35
-  },
-  "assets/js/viewer.js": {
-    "biome/format": 1,
-    "biome/lint/complexity/noExcessiveCognitiveComplexity": 4,
-    "biome/lint/complexity/useOptionalChain": 1,
-    "biome/lint/correctness/noInnerDeclarations": 4,
-    "biome/lint/correctness/noUnusedVariables": 2,
-    "biome/lint/style/noMagicNumbers": 5,
-    "biome/lint/suspicious/noAssignInExpressions": 2,
-    "jsdoc": 24,
-    "lines": 63
-  },
   "backend/": {
     "structure/cap": 1
   },
@@ -450,58 +196,7 @@
     "jsdoc": 11,
     "lines": 46
   },
-  "index.html": {
-    "lines": 4,
-    "structure/root": 1
-  },
-  "package.json": {
-    "lines": 1
-  },
-  "scripts/backend-changed.js": {
-    "biome/format": 1,
-    "jsdoc": 3,
-    "lines": 13
-  },
-  "scripts/build-site.js": {
-    "biome/format": 1,
-    "biome/lint/correctness/noUnusedFunctionParameters": 1,
-    "biome/lint/style/noMagicNumbers": 1,
-    "jsdoc": 10,
-    "lines": 24
-  },
-  "scripts/bundle-backend.js": {
-    "biome/format": 1,
-    "jsdoc": 4,
-    "lines": 5
-  },
-  "scripts/dev-server.js": {
-    "biome/format": 1,
-    "biome/lint/complexity/noCommaOperator": 1,
-    "biome/lint/style/noMagicNumbers": 10,
-    "biome/lint/suspicious/useIterableCallbackReturn": 2,
-    "jsdoc": 12,
-    "lines": 47,
-    "numbers": 4
-  },
-  "scripts/prepare-clasp.js": {
-    "biome/format": 1,
-    "jsdoc": 3,
-    "lines": 6,
-    "numbers": 1
-  },
-  "scripts/setup-deployment.js": {
-    "biome/format": 1,
-    "biome/lint/complexity/noExcessiveCognitiveComplexity": 1,
-    "biome/lint/complexity/noExcessiveLinesPerFunction": 1,
-    "biome/lint/style/noMagicNumbers": 3,
-    "jsdoc": 13,
-    "lines": 42
-  },
-  "shared/": {
-    "structure/name": 1,
-    "structure/root": 1
-  },
-  "shared/form-metadata.js": {
+  "domain/form-metadata.js": {
     "biome/format": 1,
     "biome/lint/complexity/useOptionalChain": 13,
     "biome/lint/correctness/noInnerDeclarations": 3,
@@ -511,7 +206,7 @@
     "jsdoc": 41,
     "lines": 27
   },
-  "shared/rules.js": {
+  "domain/rules.js": {
     "biome/format": 1,
     "biome/lint/complexity/noExcessiveCognitiveComplexity": 7,
     "biome/lint/complexity/noExcessiveLinesPerFunction": 1,
@@ -524,6 +219,49 @@
     "jsdoc": 69,
     "lines": 90,
     "numbers": 2
+  },
+  "package.json": {
+    "lines": 1
+  },
+  "scripts/build/build-site.js": {
+    "biome/format": 1,
+    "biome/lint/correctness/noUnusedFunctionParameters": 1,
+    "biome/lint/style/noMagicNumbers": 1,
+    "jsdoc": 10,
+    "lines": 24
+  },
+  "scripts/build/bundle-backend.js": {
+    "biome/format": 1,
+    "jsdoc": 4,
+    "lines": 5
+  },
+  "scripts/deploy/backend-changed.js": {
+    "biome/format": 1,
+    "jsdoc": 3,
+    "lines": 13
+  },
+  "scripts/deploy/prepare-clasp.js": {
+    "biome/format": 1,
+    "jsdoc": 3,
+    "lines": 6,
+    "numbers": 1
+  },
+  "scripts/deploy/setup-deployment.js": {
+    "biome/format": 1,
+    "biome/lint/complexity/noExcessiveCognitiveComplexity": 1,
+    "biome/lint/complexity/noExcessiveLinesPerFunction": 1,
+    "biome/lint/style/noMagicNumbers": 3,
+    "jsdoc": 13,
+    "lines": 42
+  },
+  "scripts/dev/dev-server.js": {
+    "biome/format": 1,
+    "biome/lint/complexity/noCommaOperator": 1,
+    "biome/lint/style/noMagicNumbers": 10,
+    "biome/lint/suspicious/useIterableCallbackReturn": 2,
+    "jsdoc": 12,
+    "lines": 44,
+    "numbers": 4
   },
   "tests/": {
     "structure/cap": 1
@@ -633,8 +371,260 @@
     "biome/format": 1,
     "lines": 71
   },
-  "viewer.html": {
-    "lines": 4,
-    "structure/root": 1
+  "web/admin.html": {
+    "lines": 5
+  },
+  "web/css/admin.css": {
+    "biome/format": 1,
+    "biome/lint/complexity/noImportantStyles": 7,
+    "biome/lint/style/noDescendingSpecificity": 18,
+    "biome/lint/style/noExcessiveLinesPerFile": 1,
+    "lines": 228
+  },
+  "web/css/app.css": {
+    "biome/format": 1,
+    "biome/lint/complexity/noImportantStyles": 5,
+    "biome/lint/style/noDescendingSpecificity": 12,
+    "biome/lint/style/noExcessiveLinesPerFile": 1,
+    "lines": 128
+  },
+  "web/css/theme.css": {
+    "biome/format": 1,
+    "biome/lint/complexity/noImportantStyles": 3,
+    "lines": 11
+  },
+  "web/index.html": {
+    "lines": 4
+  },
+  "web/js/": {
+    "structure/cap": 1
+  },
+  "web/js/admin-data.js": {
+    "biome/format": 1,
+    "biome/lint/complexity/noExcessiveCognitiveComplexity": 8,
+    "biome/lint/complexity/noExcessiveLinesPerFunction": 3,
+    "biome/lint/complexity/useOptionalChain": 9,
+    "biome/lint/correctness/noInnerDeclarations": 9,
+    "biome/lint/correctness/noUnusedVariables": 1,
+    "biome/lint/style/noExcessiveLinesPerFile": 1,
+    "biome/lint/style/noMagicNumbers": 15,
+    "biome/lint/suspicious/noAssignInExpressions": 1,
+    "jsdoc": 37,
+    "lines": 155
+  },
+  "web/js/admin-download.js": {
+    "biome/format": 1,
+    "biome/lint/complexity/noExcessiveCognitiveComplexity": 1,
+    "biome/lint/complexity/noExcessiveLinesPerFunction": 1,
+    "biome/lint/complexity/useOptionalChain": 1,
+    "biome/lint/correctness/noInnerDeclarations": 12,
+    "biome/lint/correctness/noUnusedVariables": 1,
+    "biome/lint/style/noMagicNumbers": 7,
+    "biome/lint/suspicious/noAssignInExpressions": 1,
+    "jsdoc": 9,
+    "lines": 33
+  },
+  "web/js/admin-keys.js": {
+    "biome/format": 1,
+    "biome/lint/complexity/noExcessiveCognitiveComplexity": 2,
+    "biome/lint/complexity/noExcessiveLinesPerFunction": 1,
+    "biome/lint/complexity/useOptionalChain": 2,
+    "biome/lint/correctness/noUnusedVariables": 1,
+    "biome/lint/style/noMagicNumbers": 8,
+    "biome/lint/suspicious/noAssignInExpressions": 1,
+    "biome/lint/suspicious/noGlobalIsNan": 1,
+    "jsdoc": 30,
+    "lines": 56,
+    "numbers": 1
+  },
+  "web/js/admin-lists.js": {
+    "biome/format": 1,
+    "biome/lint/complexity/noExcessiveCognitiveComplexity": 7,
+    "biome/lint/complexity/noExcessiveLinesPerFunction": 2,
+    "biome/lint/complexity/useMaxParams": 1,
+    "biome/lint/complexity/useOptionalChain": 15,
+    "biome/lint/correctness/noInnerDeclarations": 9,
+    "biome/lint/style/noExcessiveLinesPerFile": 1,
+    "biome/lint/style/noMagicNumbers": 16,
+    "biome/lint/suspicious/noAssignInExpressions": 4,
+    "biome/lint/suspicious/noGlobalIsNan": 2,
+    "biome/lint/suspicious/noPrototypeBuiltins": 1,
+    "jsdoc": 88,
+    "lines": 224
+  },
+  "web/js/admin-people.js": {
+    "biome/format": 1,
+    "biome/lint/complexity/noExcessiveCognitiveComplexity": 3,
+    "biome/lint/complexity/noExcessiveLinesPerFunction": 1,
+    "biome/lint/correctness/noInnerDeclarations": 1,
+    "biome/lint/style/noMagicNumbers": 6,
+    "biome/lint/suspicious/noAssignInExpressions": 1,
+    "jsdoc": 13,
+    "lines": 68
+  },
+  "web/js/admin-range.js": {
+    "biome/format": 1,
+    "biome/lint/complexity/noExcessiveCognitiveComplexity": 2,
+    "biome/lint/complexity/noExcessiveLinesPerFunction": 1,
+    "biome/lint/correctness/noInnerDeclarations": 1,
+    "biome/lint/style/noMagicNumbers": 1,
+    "biome/lint/suspicious/noAssignInExpressions": 1,
+    "jsdoc": 10,
+    "lines": 36
+  },
+  "web/js/admin-settings.js": {
+    "biome/format": 1,
+    "biome/lint/complexity/noArguments": 1,
+    "biome/lint/complexity/noExcessiveCognitiveComplexity": 5,
+    "biome/lint/complexity/noExcessiveLinesPerFunction": 1,
+    "biome/lint/complexity/useMaxParams": 1,
+    "biome/lint/complexity/useOptionalChain": 16,
+    "biome/lint/correctness/noInnerDeclarations": 18,
+    "biome/lint/style/noExcessiveLinesPerFile": 1,
+    "biome/lint/style/noMagicNumbers": 13,
+    "biome/lint/suspicious/noAssignInExpressions": 3,
+    "biome/lint/suspicious/noGlobalIsNan": 2,
+    "jsdoc": 65,
+    "lines": 251,
+    "numbers": 4
+  },
+  "web/js/admin-size-alerts.js": {
+    "biome/format": 1,
+    "biome/lint/suspicious/noAssignInExpressions": 1,
+    "jsdoc": 9,
+    "lines": 24
+  },
+  "web/js/admin-timetable.js": {
+    "biome/format": 1,
+    "biome/lint/complexity/noExcessiveCognitiveComplexity": 3,
+    "biome/lint/complexity/noExcessiveLinesPerFunction": 1,
+    "biome/lint/complexity/useMaxParams": 1,
+    "biome/lint/complexity/useOptionalChain": 3,
+    "biome/lint/correctness/noInnerDeclarations": 3,
+    "biome/lint/style/noMagicNumbers": 9,
+    "biome/lint/suspicious/noAssignInExpressions": 2,
+    "biome/lint/suspicious/noGlobalIsNan": 1,
+    "jsdoc": 27,
+    "lines": 74,
+    "numbers": 2
+  },
+  "web/js/admin.js": {
+    "biome/format": 1,
+    "biome/lint/complexity/noExcessiveCognitiveComplexity": 1,
+    "biome/lint/complexity/noExcessiveLinesPerFunction": 1,
+    "biome/lint/complexity/useMaxParams": 1,
+    "biome/lint/complexity/useOptionalChain": 5,
+    "biome/lint/correctness/noInnerDeclarations": 3,
+    "biome/lint/correctness/noUnusedVariables": 1,
+    "biome/lint/style/noExcessiveLinesPerFile": 1,
+    "biome/lint/style/noMagicNumbers": 12,
+    "biome/lint/suspicious/noAssignInExpressions": 2,
+    "biome/lint/suspicious/noGlobalIsNan": 1,
+    "jsdoc": 70,
+    "lines": 173
+  },
+  "web/js/api.js": {
+    "biome/format": 1,
+    "biome/lint/complexity/useOptionalChain": 4,
+    "biome/lint/correctness/noInnerDeclarations": 1,
+    "biome/lint/correctness/noUnusedVariables": 2,
+    "biome/lint/suspicious/noAssignInExpressions": 1,
+    "jsdoc": 10,
+    "lines": 10
+  },
+  "web/js/form.js": {
+    "biome/format": 1,
+    "biome/lint/complexity/noArguments": 1,
+    "biome/lint/complexity/noExcessiveCognitiveComplexity": 16,
+    "biome/lint/complexity/useMaxParams": 1,
+    "biome/lint/complexity/useOptionalChain": 28,
+    "biome/lint/correctness/noInnerDeclarations": 43,
+    "biome/lint/correctness/noUnusedFunctionParameters": 4,
+    "biome/lint/correctness/noUnusedVariables": 11,
+    "biome/lint/style/noExcessiveLinesPerFile": 1,
+    "biome/lint/style/noMagicNumbers": 25,
+    "biome/lint/suspicious/noAssignInExpressions": 2,
+    "biome/lint/suspicious/noGlobalIsNan": 1,
+    "jsdoc": 121,
+    "lines": 277
+  },
+  "web/js/fresh.js": {
+    "biome/format": 1,
+    "biome/lint/complexity/useOptionalChain": 2,
+    "biome/lint/correctness/noInnerDeclarations": 1,
+    "biome/lint/correctness/noUnusedVariables": 1,
+    "biome/lint/style/noMagicNumbers": 4,
+    "biome/lint/suspicious/noAssignInExpressions": 2,
+    "jsdoc": 11,
+    "lines": 21
+  },
+  "web/js/handover.js": {
+    "biome/format": 1,
+    "jsdoc": 5,
+    "lines": 11
+  },
+  "web/js/i18n.js": {
+    "biome/format": 1,
+    "biome/lint/complexity/useOptionalChain": 2,
+    "biome/lint/correctness/noInnerDeclarations": 2,
+    "biome/lint/correctness/noUnusedVariables": 2,
+    "biome/lint/suspicious/noAssignInExpressions": 1,
+    "biome/lint/suspicious/noGlobalIsNan": 1,
+    "jsdoc": 12,
+    "lines": 133
+  },
+  "web/js/size-alerts.js": {
+    "biome/format": 1,
+    "biome/lint/style/noMagicNumbers": 2,
+    "biome/lint/suspicious/noAssignInExpressions": 1,
+    "jsdoc": 4,
+    "lines": 11
+  },
+  "web/js/theme.js": {
+    "biome/format": 1,
+    "biome/lint/complexity/useOptionalChain": 1,
+    "biome/lint/correctness/noUnusedVariables": 1,
+    "biome/lint/suspicious/noAssignInExpressions": 1,
+    "jsdoc": 6,
+    "lines": 4
+  },
+  "web/js/ticket.js": {
+    "biome/format": 1,
+    "biome/lint/complexity/noExcessiveCognitiveComplexity": 1,
+    "biome/lint/complexity/useOptionalChain": 1,
+    "biome/lint/correctness/noInnerDeclarations": 6,
+    "biome/lint/correctness/noUnusedFunctionParameters": 1,
+    "biome/lint/correctness/noUnusedVariables": 2,
+    "biome/lint/style/noMagicNumbers": 105,
+    "biome/lint/suspicious/noAssignInExpressions": 1,
+    "jsdoc": 32,
+    "lines": 82,
+    "numbers": 39
+  },
+  "web/js/ui.js": {
+    "biome/format": 1,
+    "biome/lint/complexity/noArguments": 2,
+    "biome/lint/complexity/noExcessiveCognitiveComplexity": 1,
+    "biome/lint/complexity/useOptionalChain": 1,
+    "biome/lint/correctness/noInnerDeclarations": 1,
+    "biome/lint/correctness/noUnusedVariables": 2,
+    "biome/lint/style/noMagicNumbers": 3,
+    "biome/lint/suspicious/noAssignInExpressions": 1,
+    "jsdoc": 15,
+    "lines": 35
+  },
+  "web/js/viewer.js": {
+    "biome/format": 1,
+    "biome/lint/complexity/noExcessiveCognitiveComplexity": 4,
+    "biome/lint/complexity/useOptionalChain": 1,
+    "biome/lint/correctness/noInnerDeclarations": 4,
+    "biome/lint/correctness/noUnusedVariables": 2,
+    "biome/lint/style/noMagicNumbers": 5,
+    "biome/lint/suspicious/noAssignInExpressions": 2,
+    "jsdoc": 24,
+    "lines": 63
+  },
+  "web/viewer.html": {
+    "lines": 4
   }
 }

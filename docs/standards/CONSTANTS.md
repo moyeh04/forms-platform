@@ -12,7 +12,7 @@ change it.
   `_DAYS`, `_BYTES`, `_PX`.
 - **Declared at the top of the file that owns it**, under the imports, never
   inside a function. A value two files need belongs to the lower layer they
-  share: `backend/Config.js` for the backend, `shared/rules.js` for both
+  share: `backend/Config.js` for the backend, `domain/rules.js` for both
   sides.
 - **Built from smaller names** when it is a product: `40 * 1024 * 1024`
   stays readable, so write it out instead of `41943040`.
@@ -54,18 +54,18 @@ is silenced on its own line with the reason, and both checks honour it:
 | `backend/Clients.js` | `CLIENT_KEY_TRIES_` |
 | `backend/Download.js` | The size, time and file limits of a download job |
 | `backend/KeyExpiry.js`, `Questions.js`, `Views.js`, `Xlsx.js`, `SheetStyle.js` | The limits and sizes of their own feature |
-| `shared/rules.js` | The Arabic letter and digit tables, `SIZE_ALERT_LEVELS`, week day and month names |
-| `assets/js/*.js` | Each page module's own labels, choices and browser storage keys (`fp_*`) at the top of its wrapper |
-| `assets/js/config.js` | The backend URL, written by the deploy workflow |
+| `domain/rules.js` | The Arabic letter and digit tables, `SIZE_ALERT_LEVELS`, week day and month names |
+| `web/js/*.js` | Each page module's own labels, choices and browser storage keys (`fp_*`) at the top of its wrapper |
+| `web/js/config.js` | The backend URL, written by the deploy workflow |
 
 Known gaps, counted in the check baseline until they are fixed:
 
-- Month names are declared in both `shared/rules.js` and
-  `assets/js/admin-timetable.js`.
+- Month names are declared in both `domain/rules.js` and
+  `web/js/admin-timetable.js`.
 - Yes/no values are stored in the sheet as the strings `'1'` and `'0'`
   (`deleted` as `'1'` or empty). The row readers and writers of
   `backend/Clients.js` and `backend/Responses.js` convert them inline, each
   in its own way, instead of through one codec; `check-flags.js` counts
   them.
-- The ticket drawing in `assets/js/ticket.js` places its shapes with unnamed
+- The ticket drawing in `web/js/ticket.js` places its shapes with unnamed
   numbers.

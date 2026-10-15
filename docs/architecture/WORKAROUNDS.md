@@ -256,11 +256,11 @@ validation by hand into the website. The two copies drift apart.
   'sequence': {'mirrorActors': false, 'messageMargin': 34, 'boxMargin': 8}
 }}%%
 flowchart LR
-    r["shared/rules.js"] --> bundle
+    r["domain/rules.js"] --> bundle
     b1["backend/Auth.js"] --> bundle
     b2["backend/Registry.js"] --> bundle
     b3["... 21 more .js files"] --> bundle
-    bundle(("scripts/bundle-backend.js"))
+    bundle(("scripts/build/bundle-backend.js"))
     bundle --> out["dist/Code.gs<br/>one file to deploy"]
     manifest["backend/appsscript.json"] --> bundle
     bundle --> out2["dist/appsscript.json"]
@@ -356,7 +356,7 @@ that attaches itself correctly wherever it is loaded.
   'sequence': {'mirrorActors': false, 'messageMargin': 34, 'boxMargin': 8}
 }}%%
 flowchart TD
-    f["shared/rules.js<br/>pure functions, no DOM, no Google services"]
+    f["domain/rules.js<br/>pure functions, no DOM, no Google services"]
     f -->|"script tag"| b["Browser: window.Rules"]
     f -->|"bundler prepends it"| g["Apps Script: global Rules"]
     f -->|"require()"| t["Node tests: module.exports"]
@@ -412,7 +412,7 @@ Apps Script.
   'sequence': {'mirrorActors': false, 'messageMargin': 34, 'boxMargin': 8}
 }}%%
 flowchart LR
-    src["backend/*.js + shared/rules.js"] --> bundle["bundleSource()"]
+    src["backend/*.js + domain/rules.js"] --> bundle["bundleSource()"]
     bundle --> vm["Node vm context"]
     mocks["Fake SpreadsheetApp, DriveApp,<br/>LockService, CacheService,<br/>MailApp, UrlFetchApp, clock"] --> vm
     vm --> world["world.api({ action: ... })"]
@@ -867,7 +867,7 @@ minutes) and the project cannot change that header. After a publish a browser
 can hold a new page with an old script, or an old page altogether, and a tab
 left open for days never asks again. People were told to press Ctrl+F5.
 
-**What the platform does.** Two things, both made by `scripts/build-site.js`
+**What the platform does.** Two things, both made by `scripts/build/build-site.js`
 when the site is packaged:
 
 - **Every script and stylesheet is named by its content.** The address in the
@@ -876,7 +876,7 @@ when the site is packaged:
   that names it, and a file that did not change stays cached.
 - **The site carries its version.** A fingerprint of everything a visitor can
   load is written into `config.js` (`APP_CONFIG.VERSION`) and into
-  `version.json`. `assets/js/fresh.js`, loaded by the three pages, reads
+  `version.json`. `web/js/fresh.js`, loaded by the three pages, reads
   `version.json` under a new address each time (so no cache answers) when the
   page opens, when its tab is looked at again, and every five minutes. A page
   older than the site reloads itself; a reload always asks the server for the

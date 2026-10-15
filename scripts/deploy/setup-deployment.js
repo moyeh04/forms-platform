@@ -6,7 +6,7 @@ const path = require('node:path');
 const { spawnSync } = require('node:child_process');
 const { claspProject } = require('./prepare-clasp.js');
 
-const ROOT = path.resolve(__dirname, '..');
+const ROOT = path.resolve(__dirname, '..', '..');
 const CLASP = '@google/clasp@3.4.1'; // Same pinned version as .github/workflows/pages.yml.
 const PAGES = 'repos/{owner}/{repo}/pages';
 const SHEET = 'Forms Registry';
@@ -121,7 +121,9 @@ function setup(scriptId, options = {}) {
   const project = path.join(root, '.clasp.json');
   let id;
   try {
-    must('Backend build', process.execPath, ['scripts/bundle-backend.js']);
+    must('Backend build', process.execPath, [
+      'scripts/build/bundle-backend.js'
+    ]);
     fs.writeFileSync(project, JSON.stringify(claspProject(scriptId), null, 2) + '\n');
     clasp('Pushing the backend (is the Apps Script API enabled?)', ['push', '--force']);
 

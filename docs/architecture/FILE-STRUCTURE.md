@@ -29,10 +29,10 @@ Each folder goes somewhere different. Only one of them needs a build step.
 }}%%
 flowchart TD
     repo["Repository"]
-    repo --> web["Website<br/>index.html, admin.html, viewer.html<br/>assets/css, assets/js"]
-    repo --> shared["shared/rules.js<br/>validation rules"]
+    repo --> web["web/<br/>index.html, admin.html, viewer.html<br/>css, js, img"]
+    repo --> shared["domain/<br/>rules.js, form-metadata.js"]
     repo --> be["backend/<br/>23 .js files + appsscript.json"]
-    repo --> sc["scripts/<br/>bundle-backend.js, build-site.js,<br/>setup-deployment.js, dev-server.js"]
+    repo --> sc["scripts/<br/>build/, dev/, deploy/, checks/"]
     repo --> ts["tests/<br/>JavaScript"]
     repo --> dc["docs/"]
 
@@ -87,14 +87,14 @@ flowchart LR
         ui["ui.js"]
     end
     subgraph index["index.html: the student form"]
-        r1["shared/rules.js"]
+        r1["domain/rules.js"]
         i18n["i18n.js"]
         tk["ticket.js"]
         h1["handover.js"]
         fm["form.js"]
     end
     subgraph admin["admin.html: the dashboard"]
-        r2["shared/rules.js"]
+        r2["domain/rules.js"]
         a1["admin.js"]
         a2["admin-settings.js"]
         a5["admin-timetable.js"]
@@ -127,36 +127,40 @@ no validation.
 
 ## Website (static files, no build step)
 
+The site is published at the paths it has always had: the pages at the root,
+`web/js`, `web/css` and `web/img` under `assets/`, and `domain/` as
+`shared/`. `scripts/build/site-map.js` holds that mapping.
+
 | File | What it is |
 |---|---|
-| `index.html` | The page students use. Shows any form from its saved definition (`?f=name`). |
-| `admin.html` | The admin dashboard (PIN). |
-| `viewer.html` | The read-only instructor and client page (`?t=private-token`). |
-| `assets/css/theme.css` | Colors, fonts, and the type scale as variables. Change the look here; the contrast standard is in its header and enforced by `tests/contrast.test.js`. |
-| `assets/css/app.css` | Components of the student page. |
-| `assets/css/admin.css` | Dashboard and instructor layout, including the team cards (a coloured band per team, header strip, leader tag). |
-| `assets/img/` | The tab icon (`favicon.svg`), PNG sizes for phones and older browsers, and `site.webmanifest`. The pirate and the parrot of the ticket picture (`pirate.webp`, `parrot.webp`), with clear backgrounds; `ticket.js` draws the clock and the calendar around them. The pictures of the route: the ship (`ship.svg`), an island (`island.svg`), the treasure chest (`treasure.svg`), the waves (`sea.svg`), the sky by day and by night (`sky-day.svg`, `sky-night.svg`) and the sun and moon (`sun.svg`, `moon.svg`). They have their own colours; the sea and sky behind them take theirs from the theme. |
-| `assets/js/config.js` | Source placeholder; `scripts/build-site.js` generates its published copy from the Actions `API_URL` variable, with the version of the site. |
-| `assets/js/fresh.js` | Keeps an open page on the published version: compares the version in `config.js` with `version.json`, reloads an older page when nothing would be lost, and offers **Reload** otherwise. |
-| `assets/js/api.js` | Sends requests to the backend as plain-text JSON (avoids browser CORS checks). |
-| `assets/js/form.js`, `ticket.js`, `i18n.js` | The student page, the success ticket, English and Arabic text. |
-| `assets/js/handover.js` | The question asked before the leader of a team moves to another team: who leads next, and their email. Used by the student page and the dashboard. |
-| `assets/js/theme.js` | Light, dark, or follow the device; the choice is remembered on this device only. |
-| `assets/js/ui.js` | DOM building, inline icons, dialogs and the clipboard, used by every page. |
-| `assets/js/admin.js` | Dashboard core: login with the PIN, navigation, the widgets the dashboard modules share, and the forms list. |
-| `assets/js/admin-settings.js` | Form settings: everything an admin can change without touching code. |
-| `assets/js/admin-timetable.js` | The timetable of a reservation form: dates on a calendar, the hours, and the slots of each day. |
-| `assets/js/admin-range.js` | The range control of the team size and the teammates. |
-| `assets/js/admin-size-alerts.js` | The two warnings about small teams. |
-| `assets/js/admin-keys.js` | Key and link end dates. |
-| `assets/js/admin-data.js` | Responses, each team, day or registration in its own block as in the sheet, and WhatsApp matching. |
-| `assets/js/admin-download.js` | Download all. |
-| `assets/js/admin-people.js` | Instructor and client links. |
-| `assets/js/admin-lists.js` | The lists behind dropdown questions, each edited the way its kind needs. |
-| `assets/js/size-alerts.js` | The warnings about small teams as they are drawn: a line for each level and a mark on the card of a small team. Used by the dashboard and the instructor page. |
-| `assets/js/viewer.js` | The instructor page. |
-| `shared/form-metadata.js` | What each form type shows beside its title (term, subject code, batch year) and how it is read, saved and copied. Used by the pages and the backend. |
-| `shared/rules.js` | Validation and normalization rules (Arabic names, phones, codes, Drive links, team size, slots). Used by the browser, the backend, and the tests, so all three always agree. |
+| `web/index.html` | The page students use. Shows any form from its saved definition (`?f=name`). |
+| `web/admin.html` | The admin dashboard (PIN). |
+| `web/viewer.html` | The read-only instructor and client page (`?t=private-token`). |
+| `web/css/theme.css` | Colors, fonts, and the type scale as variables. Change the look here; the contrast standard is in its header and enforced by `tests/contrast.test.js`. |
+| `web/css/app.css` | Components of the student page. |
+| `web/css/admin.css` | Dashboard and instructor layout, including the team cards (a coloured band per team, header strip, leader tag). |
+| `web/img/` | The tab icon (`favicon.svg`), PNG sizes for phones and older browsers, and `site.webmanifest`. The pirate and the parrot of the ticket picture (`pirate.webp`, `parrot.webp`), with clear backgrounds; `ticket.js` draws the clock and the calendar around them. The pictures of the route: the ship (`ship.svg`), an island (`island.svg`), the treasure chest (`treasure.svg`), the waves (`sea.svg`), the sky by day and by night (`sky-day.svg`, `sky-night.svg`) and the sun and moon (`sun.svg`, `moon.svg`). They have their own colours; the sea and sky behind them take theirs from the theme. |
+| `web/js/config.js` | Source placeholder; `scripts/build/build-site.js` generates its published copy from the Actions `API_URL` variable, with the version of the site. |
+| `web/js/fresh.js` | Keeps an open page on the published version: compares the version in `config.js` with `version.json`, reloads an older page when nothing would be lost, and offers **Reload** otherwise. |
+| `web/js/api.js` | Sends requests to the backend as plain-text JSON (avoids browser CORS checks). |
+| `web/js/form.js`, `ticket.js`, `i18n.js` | The student page, the success ticket, English and Arabic text. |
+| `web/js/handover.js` | The question asked before the leader of a team moves to another team: who leads next, and their email. Used by the student page and the dashboard. |
+| `web/js/theme.js` | Light, dark, or follow the device; the choice is remembered on this device only. |
+| `web/js/ui.js` | DOM building, inline icons, dialogs and the clipboard, used by every page. |
+| `web/js/admin.js` | Dashboard core: login with the PIN, navigation, the widgets the dashboard modules share, and the forms list. |
+| `web/js/admin-settings.js` | Form settings: everything an admin can change without touching code. |
+| `web/js/admin-timetable.js` | The timetable of a reservation form: dates on a calendar, the hours, and the slots of each day. |
+| `web/js/admin-range.js` | The range control of the team size and the teammates. |
+| `web/js/admin-size-alerts.js` | The two warnings about small teams. |
+| `web/js/admin-keys.js` | Key and link end dates. |
+| `web/js/admin-data.js` | Responses, each team, day or registration in its own block as in the sheet, and WhatsApp matching. |
+| `web/js/admin-download.js` | Download all. |
+| `web/js/admin-people.js` | Instructor and client links. |
+| `web/js/admin-lists.js` | The lists behind dropdown questions, each edited the way its kind needs. |
+| `web/js/size-alerts.js` | The warnings about small teams as they are drawn: a line for each level and a mark on the card of a small team. Used by the dashboard and the instructor page. |
+| `web/js/viewer.js` | The instructor page. |
+| `domain/form-metadata.js` | What each form type shows beside its title (term, subject code, batch year) and how it is read, saved and copied. Used by the pages and the backend. |
+| `domain/rules.js` | Validation and normalization rules (Arabic names, phones, codes, Drive links, team size, slots). Used by the browser, the backend, and the tests, so all three always agree. |
 
 ## Backend (`backend/`, becomes one `Code.gs`)
 
@@ -185,13 +189,14 @@ no validation.
 | `Matching.js` | WhatsApp request matching. |
 | `Clients.js`, `Viewer.js` | Private instructor links, their access keys and end dates, and what they can see. |
 
-`npm run build` joins `shared/rules.js`, `shared/form-metadata.js` and every backend file into `dist/Code.gs`.
+`npm run build` joins `domain/rules.js`, `domain/form-metadata.js` and every backend file into `dist/Code.gs`.
 
 ## Tools and tests
 
 | Path | What it is |
 |---|---|
-| `scripts/bundle-backend.js` | The bundler. |
+| `scripts/build/bundle-backend.js` | The bundler. |
+| `scripts/build/site-map.js` | Where each published path of the site comes from: the pages from `web/`, `assets/js`, `assets/css` and `assets/img` from `web/js`, `web/css` and `web/img`, and `shared/` from `domain/`. The site packager, the preview server, the page tests and the structure check read it. |
 | `scripts/checks/run-checks.js`, `.githooks/pre-commit`, `.githooks/pre-push` | Runs every check, on the staged files before each commit (`--staged`) or on the whole tree before each push and in CI (`--all`, `npm run check`), and the git hooks that call it. `npm install` points git at `.githooks`. [CHECKS.md](../standards/CHECKS.md) lists the checks. |
 | `scripts/checks/config.json`, `baseline.json`, `exceptions.json` | What each check covers and its limits; the findings old files may still have, which may only go down; and the paths allowed to break a structure rule, each with its reason. |
 | `scripts/checks/lib/` | `files.js` (which files a run looks at), `parse.js` (acorn with comments), `jsdoc.js` (reads a JSDoc comment into its summary and tags), `baseline.js`, `exceptions.js`, `report.js`. |
@@ -202,10 +207,10 @@ no validation.
 | `scripts/checks/check-flags.js` | Yes/no values are compared and written as `'1'`/`'0'` only in a row codec. |
 | `scripts/checks/check-structure.js` | The structure rules above. |
 | `scripts/checks/check-docs.js` | [API.md](../backend/API.md) names exactly the actions the backend has, [TESTING.md](../process/TESTING.md) gives the real number of tests, and no Markdown link points at a file that is gone. |
-| `scripts/prepare-clasp.js` | Checks the deployment variables of the workflow and writes the clasp configuration git ignores. |
-| `scripts/backend-changed.js` | Tells the workflow whether a push changed a backend file, so a push of pages or documents alone does not deploy the backend. |
-| `scripts/setup-deployment.js` | First deployment from your computer (`npm run setup`): creates the sheet and its script, pushes the bundle, creates the web app, and stores the IDs, the credential and the Pages setting in GitHub. |
-| `scripts/dev-server.js` | `npm run dev`: serves the site and answers its API calls from the in-memory Google, with sample forms, so pages can be opened in a real browser. |
+| `scripts/deploy/prepare-clasp.js` | Checks the deployment variables of the workflow and writes the clasp configuration git ignores. |
+| `scripts/deploy/backend-changed.js` | Tells the workflow whether a push changed a backend file, so a push of pages or documents alone does not deploy the backend. |
+| `scripts/deploy/setup-deployment.js` | First deployment from your computer (`npm run setup`): creates the sheet and its script, pushes the bundle, creates the web app, and stores the IDs, the credential and the Pages setting in GitHub. |
+| `scripts/dev/dev-server.js` | `npm run dev`: serves the site and answers its API calls from the in-memory Google, with sample forms, so pages can be opened in a real browser. |
 | `tests/harness/appsscript-mock.js` | An in-memory Sheets, Drive, Mail, Cache, and clock, so the real backend code runs in tests. |
 | `tests/harness/dom.js` | Opens the real pages in jsdom wired to that backend. |
 | `tests/*.test.js`, `tests/scripts/` | The tests, one file per area, and the tests of the scripts under the same path; [TESTING.md](../process/TESTING.md) lists them. |
@@ -220,13 +225,13 @@ paths and limits are under `structure` in `scripts/checks/config.json`.
 | Root allow-list | The root holds `README.md`, `package.json`, `package-lock.json`, `biome.json`, `.gitignore`, `.git-blame-ignore-revs`, `.githooks/`, `.github/`, `backend/`, `web/`, `domain/`, `scripts/`, `tests/` and `docs/`. Pages, notes and requirements live in their folders. |
 | No catch-all names | No file or folder is named `utils`, `helpers`, `common`, `misc`, `manager`, `stuff` or `shared`. Code is named by what it does, so a reader finds it by its subject. |
 | Folder cap | At most 8 code files in one folder. A ninth means the folder holds more than one subject; sort its files into sub-folders by subject. |
-| Pages and assets | Every script and stylesheet a page loads exists, and every file under `assets/js/` and `assets/css/` is loaded by a page. |
+| Pages and assets | Every script and stylesheet a page loads exists, and every file under `web/js/` and `web/css/` is loaded by a page. |
 | Every file named here | Each source file has a row on this page, by its path or its name. A pattern such as `admin*.js` does not count. |
 | Tests mirror the source | The tests of `scripts/checks/lib/baseline.js` are in `tests/scripts/checks/lib/baseline.test.js`. This rule is not checked yet; the reviewer holds it. |
 
-The tree does not keep all of these today. The root still holds the pages,
-`assets/` and `shared/`, and `assets/js/`, `backend/` and `tests/` are over
-the cap. The check baseline counts each of these, so none can grow.
+The tree does not keep all of these today: `web/js/`, `backend/` and `tests/`
+are over the cap. The check baseline counts each of these, so none can
+grow.
 
 ## Data model in one paragraph
 

@@ -6,10 +6,10 @@
   "scripts": {
     "test": "node --test \"tests/**/*.test.js\"",
     "check": "node scripts/checks/run-checks.js --all",
-    "build": "node scripts/bundle-backend.js",
-    "build:site": "node scripts/build-site.js",
-    "setup": "node scripts/setup-deployment.js",
-    "dev": "node scripts/dev-server.js",
+    "build": "node scripts/build/bundle-backend.js",
+    "build:site": "node scripts/build/build-site.js",
+    "setup": "node scripts/deploy/setup-deployment.js",
+    "dev": "node scripts/dev/dev-server.js",
     "prepare": "git config core.hooksPath .githooks || exit 0"
   },
   "devDependencies": {

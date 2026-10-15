@@ -1,6 +1,6 @@
 /**
  * Colour contrast: every text and control colour pair the pages use must meet
- * WCAG 2.1 AA in both themes, read straight from assets/css/theme.css.
+ * WCAG 2.1 AA in both themes, read straight from web/css/theme.css.
  * Text needs 4.5:1; field outlines and the focus ring need 3:1.
  */
 const test = require('node:test');
@@ -8,7 +8,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 
-const css = fs.readFileSync(path.join(__dirname, '..', 'assets', 'css', 'theme.css'), 'utf8');
+const css = fs.readFileSync(path.join(__dirname, '..', 'web', 'css', 'theme.css'), 'utf8');
 
 function tokens(block) {
   const out = {};

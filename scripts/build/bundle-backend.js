@@ -13,7 +13,7 @@ const fs = require('fs');
 const path = require('path');
 const vm = require('vm');
 
-const root = path.resolve(__dirname, '..');
+const root = path.resolve(__dirname, '..', '..');
 const out = path.join(root, 'dist');
 
 function read(rel) {
@@ -32,8 +32,8 @@ function listBackend() {
 
 function bundleSource() {
   const files = [];
-  if (fs.existsSync(path.join(root, 'shared', 'rules.js'))) files.push('shared/rules.js');
-  if (fs.existsSync(path.join(root, 'shared', 'form-metadata.js'))) files.push('shared/form-metadata.js');
+  if (fs.existsSync(path.join(root, 'domain', 'rules.js'))) files.push('domain/rules.js');
+  if (fs.existsSync(path.join(root, 'domain', 'form-metadata.js'))) files.push('domain/form-metadata.js');
   files.push(...listBackend());
 
   const parts = files.map((rel) => `// ===== ${rel} =====\n${read(rel).trim()}\n`);

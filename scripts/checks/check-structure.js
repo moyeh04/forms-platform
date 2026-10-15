@@ -3,7 +3,9 @@
  * catch-all names such as `utils`, no folder with more code files than the
  * cap, every script and stylesheet a page loads exists and every one is
  * loaded, and FILE-STRUCTURE.md names every source file. A finding about a
- * folder names it with a trailing `/`.
+ * folder names it with a trailing `/`. When the site is published at other
+ * paths than its sources, the configured site map turns each `src` back into
+ * its source path.
  */
 const path = require('node:path');
 const { select, read } = require('./lib/files.js');
@@ -97,13 +99,19 @@ function capFindings(code, cap) {
  *
  * @param {string} page The page's path.
  * @param {string} html Its text.
- * @return {!Array<{file: string, line: number}>} Paths from the root.
+ * @param {?function(string): ?string} sourceOf Turns a published path into
+ *     its source path, or null when the site is served from its sources.
+ * @return {!Array<{src: string, file: ?string, line: number}>} Each `src`,
+ *     its source path from the root, and its line.
  */
-function pageAssets(page, html) {
+function pageAssets(page, html, sourceOf) {
   return [...html.matchAll(ASSET)]
     .filter((match) => !/^[a-z]+:|^\/\//.test(match[1]))
     .map((match) => ({
-      file: path.posix.join(path.posix.dirname(page), match[1]),
+      src: match[1],
+      file: sourceOf
+        ? sourceOf(match[1])
+        : path.posix.join(path.posix.dirname(page), match[1]),
       line: html.slice(0, match.index).split('\n').length
     }));
 }
@@ -117,13 +125,16 @@ function pageAssets(page, html) {
  * @return {!Array<!Object>} One finding for each.
  */
 function pageFindings(root, files, config) {
+  const sourceOf = config.siteMap
+    ? require(path.join(root, config.siteMap)).sourceOf
+    : null;
   const loaded = new Set();
   const out = [];
   for (const page of config.pages) {
-    for (const asset of pageAssets(page, read(root, page))) {
+    for (const asset of pageAssets(page, read(root, page), sourceOf)) {
       loaded.add(asset.file);
       if (files.includes(asset.file)) continue;
-      const message = `loads ${asset.file}, which does not exist`;
+      const message = `loads ${asset.src}, which does not exist`;
       out.push(finding(page, 'pages', message, asset.line));
     }
   }

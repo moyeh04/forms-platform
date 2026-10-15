@@ -8,8 +8,9 @@ const crypto = require('node:crypto');
 const fs = require('node:fs');
 const path = require('node:path');
 
-const ROOT = path.resolve(__dirname, '..');
-const PAGES = ['index.html', 'admin.html', 'viewer.html'];
+const { PAGES, FOLDERS, sourceOf } = require('./site-map.js');
+
+const ROOT = path.resolve(__dirname, '..', '..');
 const DIRS = ['assets', 'shared'];
 const CONFIG = 'assets/js/config.js';
 
@@ -70,10 +71,10 @@ function buildSite(env = process.env, output = path.join(ROOT, '_site')) {
   fs.rmSync(output, { recursive: true, force: true }); // Replace the generated output, including stale assets.
   fs.mkdirSync(output, { recursive: true });
   for (const file of PAGES) {
-    fs.copyFileSync(path.join(ROOT, file), path.join(output, file));
+    fs.copyFileSync(path.join(ROOT, sourceOf(file)), path.join(output, file));
   }
-  for (const dir of DIRS) {
-    fs.cpSync(path.join(ROOT, dir), path.join(output, dir), { recursive: true });
+  for (const { published, source } of FOLDERS) {
+    fs.cpSync(path.join(ROOT, source), path.join(output, published), { recursive: true });
   }
   // The version is taken from the files as they are in the repository, before anything is stamped.
   const version = siteVersion(output, url);

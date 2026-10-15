@@ -51,7 +51,7 @@ one link per form.
 | Layer | Technology | Why |
 |---|---|---|
 | Pages | HTML, CSS and plain JavaScript, no framework and no build step | Small and fast on a phone; the files are served as they are written |
-| Rules | `shared/rules.js`, loaded by the browser, the backend and the tests | One copy of every check, so the page and the server can never disagree |
+| Rules | `domain/rules.js`, loaded by the browser, the backend and the tests | One copy of every check, so the page and the server can never disagree |
 | Backend | Google Apps Script web app, bundled into one `Code.gs` by a Node script | Runs as the owner, free, with Sheets, Drive, Mail and a cache built in |
 | Data | Google Sheets (a registry plus one spreadsheet per form) and Google Drive | The owner can open, sort and print the data without the platform |
 | Excel | Office Open XML written by hand in `backend/Xlsx.js` | Real `.xlsx` files with merged cells, tints and links, with no library |
@@ -123,11 +123,10 @@ Script deployment and the configured website.
 
 | Path | Holds |
 |---|---|
-| `*.html` at the root | The student form, the dashboard and the instructor page |
-| `assets/js`, `assets/css` | Page scripts and styles, one file per screen or concern |
-| `shared/rules.js` | The validation rules shared by the pages, the backend and the tests |
+| `web/` | The website: the student form, the dashboard and the instructor page, with their scripts, styles and pictures |
+| `domain/` | The validation rules and form metadata shared by the pages, the backend and the tests |
 | `backend/` | The Apps Script modules, joined into `dist/Code.gs` by `npm run build` |
-| `scripts/` | The bundler, the site build, the first-deployment setup, and the local preview |
+| `scripts/` | The bundler and the site build (`build/`), the local preview (`dev/`), the first-deployment setup (`deploy/`), and the checks (`checks/`) |
 | `tests/` | The automated tests and the in-memory copy of Google's services |
 | `docs/` | Architecture, data model, security, testing and deployment |
 

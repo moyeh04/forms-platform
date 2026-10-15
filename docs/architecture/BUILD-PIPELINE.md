@@ -11,11 +11,11 @@ hidden.
 npm run build
 ```
 
-runs `scripts/bundle-backend.js`, which writes two files into `dist/`:
+runs `scripts/build/bundle-backend.js`, which writes two files into `dist/`:
 
 | Output | Made from | You do |
 |---|---|---|
-| `dist/Code.gs` | `shared/rules.js` + every `backend/*.js` | Actions pushes it with pinned clasp |
+| `dist/Code.gs` | `domain/rules.js` + every `backend/*.js` | Actions pushes it with pinned clasp |
 | `dist/appsscript.json` | `backend/appsscript.json` (copied as-is) | Actions pushes it with pinned clasp |
 
 `dist/` is listed in `.gitignore`, so it is **not committed**. It is regenerated
@@ -25,7 +25,7 @@ first deploy.
 
 ## What compiles `dist`
 
-Only one program: `scripts/bundle-backend.js`. Nothing else, not GitHub, not
+Only one program: `scripts/build/bundle-backend.js`. Nothing else, not GitHub, not
 Google, not a hidden service. It is about 50 lines of plain Node and uses only
 Node's built-in modules (`fs`, `path`, `vm`).
 
@@ -54,14 +54,14 @@ Node's built-in modules (`fs`, `path`, `vm`).
 }}%%
 flowchart TD
     subgraph sources["Source files you edit and commit"]
-        rules["shared/rules.js, shared/form-metadata.js<br/>rules and form metadata, also loaded by the pages"]
+        rules["domain/rules.js, domain/form-metadata.js<br/>rules and form metadata, also loaded by the pages"]
         gs["backend/*.js<br/>23 modules"]
         manifest["backend/appsscript.json<br/>time zone, scopes, web app mode"]
     end
 
     cmd["npm run build"] --> bundler
 
-    subgraph bundler["scripts/bundle-backend.js"]
+    subgraph bundler["scripts/build/bundle-backend.js"]
         s1["1. list files<br/>the two shared files first, then backend files A to Z, Code.js last"]
         s2["2. read each file, trim, add a header comment<br/>// ===== backend/Auth.js ====="]
         s3["3. join them into one string"]
@@ -86,7 +86,7 @@ flowchart TD
 
 ### Step by step
 
-1. **List the files.** `shared/rules.js` and `shared/form-metadata.js` go
+1. **List the files.** `domain/rules.js` and `domain/form-metadata.js` go
    first so the globals `Rules` and `FormMetadata` exist. The backend files follow in alphabetical order, with `Code.js`
    moved to the end (a one-line comparator in `listBackend`).
 2. **Read and label.** Each file is trimmed and prefixed with a comment such as
@@ -199,7 +199,7 @@ this exact order, so a mistake here would fail every test.
   'sequence': {'mirrorActors': false, 'messageMargin': 34, 'boxMargin': 8}
 }}%%
 flowchart TD
-    A["dist/Code.gs"] --> B["// ===== shared/rules.js =====<br/>creates the global Rules"]
+    A["dist/Code.gs"] --> B["// ===== domain/rules.js =====<br/>creates the global Rules"]
     A --> C["// ===== backend/Auth.js =====<br/>PIN and admin wrapper"]
     A --> D["// ===== backend/Clients.js ====="]
     A --> E["...  Config, Export, FormsApi, Matching, Menu,<br/>Print, Registry, Responses, Slots, Submissions,<br/>Templates, Viewer, Views"]
@@ -267,14 +267,14 @@ similar copy. The workflow pushes the same `backend-dist` artifact the tests ran
 
 | You changed | Rebuild? | Then |
 |---|---|---|
-| Anything in `backend/` or `shared/rules.js` | Yes, Actions does it | Push to `master`; clasp pushes the bundle and updates the existing deployment |
+| Anything in `backend/` or `domain/rules.js` | Yes, Actions does it | Push to `master`; clasp pushes the bundle and updates the existing deployment |
 | `backend/appsscript.json` (scopes, time zone) | Yes, Actions does it | The same push carries the manifest |
-| Only `index.html`, `admin.html`, `viewer.html`, `assets/` | No | Push to `master`; GitHub Pages updates |
+| Only files under `web/` | No | Push to `master`; GitHub Pages updates |
 
 Run `npm run build` yourself only to inspect the bundle or to run the tests
 locally; a routine update needs no local build.
 
-Note that `shared/rules.js` is used by **both sides**: the browser copy ships
+Note that `domain/rules.js` is used by **both sides**: the browser copy ships
 with the website and the server copy is inside the bundle. One push to `master`
 updates both, the server first, and Pages is published only after the backend
 deployment succeeds. The server is always the final judge.
@@ -288,11 +288,12 @@ and generates `_site/assets/js/config.js` from the required `API_URL` variable.
 Invalid configuration fails before the public artifact is uploaded.
 
 The package also knows its own version. `siteVersion` fingerprints the three
-pages, everything under `assets/` and `shared/`, and the API address; the
+pages, everything published under `assets/` and `shared/`, and the API
+address; the
 result goes into `config.js` as `VERSION` and into `_site/version.json`.
 `stampPage` then adds `?v=` and the fingerprint of the file to every local
 script and stylesheet address in the three pages. The pages in the repository
-stay as they are: only the published copies are stamped. `assets/js/fresh.js`
+stay as they are: only the published copies are stamped. `web/js/fresh.js`
 uses the two to bring an open page up to date
 ([WORKAROUNDS.md, 24](WORKAROUNDS.md#24-a-browser-keeps-showing-the-old-site-after-a-publish)).
 

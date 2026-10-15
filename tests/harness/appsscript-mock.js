@@ -9,7 +9,7 @@
 const vm = require('node:vm');
 const crypto = require('node:crypto');
 const zlib = require('node:zlib');
-const { bundleSource } = require('../../scripts/bundle-backend.js');
+const { bundleSource } = require('../../scripts/build/bundle-backend.js');
 
 /* ── Spreadsheet ─────────────────────────────────────────────── */
 
