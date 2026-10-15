@@ -1,7 +1,8 @@
 /**
  * The dialog that makes a private link or edits one: its name, the forms
- * it shows, the columns it hides, and whether it may review and sees the
- * warnings about small teams. A new link also chooses its key and its end.
+ * it shows, the columns it hides, whether it may review and sees the
+ * warnings about small teams, and what it may do with the progress of
+ * teams. A new link also chooses its key and its end.
  */
 (function (App) {
   'use strict';
@@ -40,6 +41,7 @@
         hidden: [],
         canReview: false,
         showSizeAlerts: true,
+        progress: ProgressAccess.SEE,
         withKey: true,
         end: { none: true }
       };
@@ -53,6 +55,7 @@
       hidden: client.hiddenColumns.slice(),
       canReview: client.canReview,
       showSizeAlerts: client.showSizeAlerts,
+      progress: client.progress || ProgressAccess.SEE,
       withKey: true,
       end: { none: true }
     };
@@ -204,6 +207,7 @@
         'Only on forms where you switched the warnings on, in the Small teams' +
           ' section of the form settings.'
       ),
+      A.progressField(st),
       client ? null : newLinkFields(st)
     );
   }
@@ -241,7 +245,8 @@
       forms: st.all ? ['*'] : st.forms,
       hiddenColumns: st.hidden,
       canReview: st.canReview,
-      showSizeAlerts: st.showSizeAlerts
+      showSizeAlerts: st.showSizeAlerts,
+      progress: st.progress
     };
     var r;
     if (client) {

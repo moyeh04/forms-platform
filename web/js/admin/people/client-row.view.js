@@ -289,6 +289,7 @@
       ),
       cell('Can review', c.canReview ? 'Yes' : 'No'),
       cell('Small teams', c.showSizeAlerts ? 'Shown' : 'Hidden'),
+      cell('Progress', A.progressWord(c.progress)),
       cell('Link', linkCell(c)),
       cell('Access key', keyCell(c)),
       h('td', null, actions(c, forms))

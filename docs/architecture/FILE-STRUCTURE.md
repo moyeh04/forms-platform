@@ -274,6 +274,7 @@ The site is published at the paths it has always had: the pages at the root,
 | `web/js/admin/responses/download.view.js` | The Download all dialog: what it saves, its progress, and Start again when it stops. |
 | `web/js/admin/people/access.view.js` | The dialog that shows a private link and its access key apart. |
 | `web/js/admin/people/link-end.view.js` | How long a private link works: the picker of its end and the dialog that moves it. |
+| `web/js/admin/people/link-progress.view.js` | What a private link may do with the progress of teams: the select of its dialog and the word in the table. |
 | `web/js/admin/people/client-row.view.js` | A private link in the Clients table, with its key and its actions. |
 | `web/js/admin/people/client-dialog.view.js` | The dialog that makes a private link or edits one. |
 | `web/js/admin/people/people.page.js` | The Clients page: its head and the table of links. |

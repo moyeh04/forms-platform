@@ -12,8 +12,10 @@
   /**
    * Everything the page knows: the link (`token`), the open form (`slug`),
    * who the link is (`me`), the data of the form, the view of a booking
-   * form (`mode`, `dayId`), the search, a reason the link cannot open, and
-   * the access key with whether to ask for it and why it was refused.
+   * form (`mode`, `dayId`), the search, Teams or Progress for each form
+   * (`views`) and the milestone a phone shows (`board`), a reason the link
+   * cannot open, and the access key with whether to ask for it and why it
+   * was refused.
    */
   V.state = {
     token: '',
@@ -23,6 +25,8 @@
     mode: 'auto',
     dayId: '',
     q: '',
+    views: {},
+    board: {},
     error: '',
     key: '',
     askKey: false,
@@ -121,6 +125,17 @@
     if (S.mode === 'today') {
       S.data = await V.call('viewer.data', { slug: S.slug, mode: 'today' });
     }
+  };
+
+  /**
+   * Says whether the open form shows its teams or their progress: the last
+   * choice for the form in this tab, or the teams.
+   *
+   * @return {string} 'teams' or 'progress'.
+   */
+  V.view = function () {
+    if (!S.views[S.slug]) S.views[S.slug] = App.progress.savedView(S.slug);
+    return S.views[S.slug];
   };
 
   /**

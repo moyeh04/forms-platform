@@ -438,6 +438,7 @@ test(
         'Hidden columns',
         'Can review',
         'Small teams',
+        'Progress',
         'Link',
         'Access key'
       ]
