@@ -7,7 +7,7 @@
   align-items: center;
   justify-content: center;
   padding: 16px;
-  background: rgba(20, 14, 8, 0.55);
+  background: var(--backdrop);
 }
 .dialog {
   width: min(440px, 100%);

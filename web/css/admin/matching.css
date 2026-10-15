@@ -98,7 +98,7 @@
   align-items: center;
   justify-content: center;
   padding: 16px;
-  background: rgba(20, 16, 11, 0.55);
+  background: var(--backdrop-dashboard);
   overflow: auto;
 }
 .dialog {

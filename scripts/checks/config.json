@@ -73,6 +73,11 @@
     "extensions": [".js"],
     "allowed": [0, 1, 2, 10, 24, 60]
   },
+  "colours": {
+    "include": ["web/css/"],
+    "extensions": [".css"],
+    "palette": "web/css/theme.css"
+  },
   "flags": {
     "include": ["web/js/", "backend/", "domain/"],
     "extensions": [".js"],

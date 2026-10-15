@@ -31,6 +31,14 @@ change it.
 - **No meaning-free names.** `FIVE = 5` names nothing; `MAX_TEAM_SIZE = 5`
   does.
 
+- **A colour is a name.** Every colour of the stylesheets is a custom
+  property of `web/css/theme.css`, named for what it paints (`--sea-frame`,
+  `--print-ink`), with its dark value beside the light one when the themes
+  differ. The other stylesheets write `var(--sea-frame)`, never `#2a1c12`,
+  `rgba(...)` or `white`. `transparent` and `currentColor` are no colours of
+  their own and need no name. `check-colours.js` refuses a colour written out
+  anywhere else.
+
 Numbers need no name when the meaning is the number itself: 0, 1, 2, 10
 (base ten), 24 and 60 (hours and minutes), and their negatives. Tests are
 exempt: an expected value is data.
@@ -41,6 +49,7 @@ exempt: an expected value is data.
 |---|---|
 | an argument, an operand, an array element, a comparison | Biome `style/noMagicNumbers` |
 | the initial value of a variable, a property or a default parameter, which Biome skips | `check-numbers.js`: it passes only under a CONSTANT_CASE variable, property, or constant object around it |
+| a colour in a stylesheet: a hex value, a colour function or a colour keyword | `check-colours.js`: it passes only as the value of a custom property in `web/css/theme.css` |
 
 A number that must stay as written, such as a length fixed by a standard,
 is silenced on its own line with the reason, and both checks honour it:
