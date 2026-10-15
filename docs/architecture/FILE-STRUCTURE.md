@@ -244,7 +244,8 @@ the file name says the role:
 | `backend/features/intake/transfers/transfers.mail.js` | The emails of a transfer request and of its answer. |
 | `backend/features/intake/transfers/transfers.controller.js` | The transfer actions of the team leader and of the admin. |
 | `backend/features/intake/reservations/slots.rules.js` | The slots of a reservation form: cleaned, labelled and counted. |
-| `backend/features/intake/reservations/key-booking.service.js` | Booking a slot with the key of a registration, and the next week of slots. |
+| `backend/features/intake/reservations/key-booking.service.js` | Booking a slot with the key of a registration. |
+| `backend/features/intake/reservations/key-booking.series.js` | The weekly series of bookings of a registration form: the bookings so far, and the title and timetable of the next one. |
 | `backend/features/intake/reservations/key-booking.controller.js` | The booking actions: the team behind a key, and the next week of bookings. |
 | `backend/features/intake/matching/matching.repository.js` | The WhatsApp requests tab of a form. |
 | `backend/features/intake/matching/matching.service.js` | WhatsApp matching: reads a form with matching on, imports pasted numbers, matches requests to submissions by phone, records decisions and deletes requests. |

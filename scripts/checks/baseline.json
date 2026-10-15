@@ -41,27 +41,8 @@
     "jsdoc": 14,
     "lines": 5
   },
-  "backend/features/intake/reservations/key-booking.controller.js": {
-    "biome/lint/complexity/useOptionalChain": 1,
-    "layers": 3,
-    "lines": 3
-  },
   "backend/features/intake/reservations/key-booking.service.js": {
-    "biome/lint/complexity/noExcessiveCognitiveComplexity": 1,
-    "biome/lint/complexity/useOptionalChain": 6,
-    "biome/lint/correctness/noInnerDeclarations": 1,
-    "biome/lint/correctness/noUnusedFunctionParameters": 1,
-    "biome/lint/style/noMagicNumbers": 1,
-    "jsdoc": 25,
-    "lines": 12
-  },
-  "backend/features/intake/reservations/slots.rules.js": {
-    "biome/lint/complexity/noExcessiveCognitiveComplexity": 1,
-    "biome/lint/complexity/useOptionalChain": 4,
-    "biome/lint/correctness/noUnusedFunctionParameters": 1,
-    "biome/lint/style/noMagicNumbers": 1,
-    "jsdoc": 6,
-    "lines": 1
+    "jsdoc": 1
   },
   "backend/features/intake/transfers/transfers.controller.js": {
     "jsdoc": 2,
