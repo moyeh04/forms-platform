@@ -1,17 +1,14 @@
 #!/usr/bin/env node
 /**
  * Runs every check of the project and fails when one finds something the
- * baseline and the exceptions do not allow.
+ * exceptions do not allow.
  *
  *   node scripts/checks/run-checks.js --staged   the staged files (pre-commit)
  *   node scripts/checks/run-checks.js --all      every tracked file (CI)
- *   ... --update-baseline                        lower the baseline to what
- *                                                is left; it never raises it
  */
 const fs = require('node:fs');
 const path = require('node:path');
 const { listFiles } = require('./lib/files.js');
-const baselines = require('./lib/baseline.js');
 const exceptions = require('./lib/exceptions.js');
 const { formatFinding, printBlock } = require('./lib/report.js');
 
@@ -65,26 +62,10 @@ function main(args) {
   const tracked = listFiles(ROOT, false);
   const files = staged ? listFiles(ROOT, true) : tracked;
   const allowed = readJson(CONFIG.exceptions);
-  const baseline = readJson(CONFIG.baseline);
   const { kept, unused } = exceptions.apply(runAll(files, tracked), allowed);
-  if (args.includes('--update-baseline')) {
-    const lowered = baselines.lower(baseline, kept, files);
-    const text = `${JSON.stringify(lowered, null, 2)}\n`;
-    fs.writeFileSync(path.join(__dirname, CONFIG.baseline), text);
-  }
-  const { failures, stale } = baselines.judge(kept, baseline, files);
-  let problems = printBlock('Not allowed:', failures.map(formatFinding));
-  problems += printBlock(
-    'Fixed, so lower the baseline (npm run check -- --update-baseline):',
-    args.includes('--update-baseline') ? [] : stale
-  );
+  let problems = printBlock('Not allowed:', kept.map(formatFinding));
   problems += printBlock('Exceptions:', exceptions.weakReasons(allowed));
-  if (!staged) {
-    problems += printBlock('Out of date:', [
-      ...unused,
-      ...baselines.goneFiles(baseline, tracked)
-    ]);
-  }
+  if (!staged) problems += printBlock('Out of date:', unused);
   return problems === 0;
 }
 

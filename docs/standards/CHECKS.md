@@ -7,7 +7,6 @@ which check enforces each one, what it refuses, and how to fix a refusal.
 ```
 npm run check                                  # every tracked file
 node scripts/checks/run-checks.js --staged     # the staged files
-npm run check -- --update-baseline             # write down what was fixed
 ```
 
 Three places run them:
@@ -28,13 +27,8 @@ machine; CI cannot.
 2. `exceptions.json` removes the findings it covers. An entry names a path, a
    rule and a reason of at least four words. A weak reason fails, and so does
    an entry that matches nothing in a full run.
-3. `baseline.json` gives the number of findings of each rule that an old file
-   may still have. More than that fails. A new file has no allowance, so new
-   code meets every rule from its first commit.
-4. A count that went down must be written down in the same commit
-   (`--update-baseline`), so the baseline only shrinks. `--update-baseline`
-   never raises a count; a higher count can only come from editing the file
-   by hand, which a reviewer sees.
+3. Any finding left fails. Every file meets every rule; no file keeps an
+   allowance of old findings.
 
 Every path a check covers and every limit a rule sets is in
 `scripts/checks/config.json`, not in the code.

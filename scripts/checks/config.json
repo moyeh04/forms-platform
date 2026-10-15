@@ -1,5 +1,4 @@
 {
-  "baseline": "baseline.json",
   "exceptions": "exceptions.json",
   "docs": {
     "api": "docs/backend/API.md",

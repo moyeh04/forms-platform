@@ -468,8 +468,8 @@ the file name says the role:
 | `scripts/build/bundle-backend.js` | The bundler. |
 | `scripts/build/site-map.js` | Where each published path of the site comes from: the pages from `web/`, `assets/js`, `assets/css` and `assets/img` from `web/js`, `web/css` and `web/img`, and `shared/` from `domain/`. The site packager, the preview server, the page tests and the structure check read it. |
 | `scripts/checks/run-checks.js`, `.githooks/pre-commit`, `.githooks/pre-push` | Runs every check, on the staged files before each commit (`--staged`) or on the whole tree before each push and in CI (`--all`, `npm run check`), and the git hooks that call it. `npm install` points git at `.githooks`. [CHECKS.md](../standards/CHECKS.md) lists the checks. |
-| `scripts/checks/config.json`, `baseline.json`, `exceptions.json` | What each check covers and its limits; the findings old files may still have, which may only go down; and the paths allowed to break a structure rule, each with its reason. |
-| `scripts/checks/lib/` | `files.js` (which files a run looks at), `parse.js` (acorn with comments), `jsdoc.js` (reads a JSDoc comment into its summary and tags), `baseline.js`, `exceptions.js`, `report.js`. |
+| `scripts/checks/config.json`, `exceptions.json` | What each check covers and its limits, and the paths allowed to break a structure rule, each with its reason. |
+| `scripts/checks/lib/` | `files.js` (which files a run looks at), `parse.js` (acorn with comments), `jsdoc.js` (reads a JSDoc comment into its summary and tags), `exceptions.js`, `report.js`. |
 | `scripts/checks/code/check-biome.js` | Runs Biome on the files of a run and turns what it reports into findings. |
 | `scripts/checks/code/check-lines.js` | No line wider than 80 columns, or 120 in CSS, URLs not counted. |
 | `scripts/checks/code/check-jsdoc.js` | Every named function has a Google-style JSDoc comment whose tags match its parameters and return, with no metadata tags. |
@@ -507,7 +507,7 @@ paths and limits are under `structure` in `scripts/checks/config.json`.
 | Pages and assets | Every script and stylesheet a page loads exists, and every file under `web/js/` and `web/css/` is loaded by a page. |
 | Every file named here | Each source file has a row on this page, by its path or its name. A pattern such as `admin*.js` does not count. |
 | Layers | Code under `backend/platform/` reads no feature, and a `*.controller.js` reads no `*.repository.js`: it asks the service, which reads the repository. `scripts/checks/code/check-layers.js` checks it. |
-| Tests mirror the source | Node's test runner sets no layout, so `tests/` mirrors the source: the tests of `scripts/checks/lib/baseline.js` are in `tests/scripts/checks/lib/baseline.test.js`. Only `tests/harness/` and `tests/fixtures/` exist in tests alone, and a test of the whole system sits at the root of `tests/`. `scripts/checks/tree/check-structure.js` checks that every other folder under `tests/` is a source folder. |
+| Tests mirror the source | Node's test runner sets no layout, so `tests/` mirrors the source: the tests of `scripts/checks/lib/exceptions.js` are in `tests/scripts/checks/lib/exceptions.test.js`. Only `tests/harness/` and `tests/fixtures/` exist in tests alone, and a test of the whole system sits at the root of `tests/`. `scripts/checks/tree/check-structure.js` checks that every other folder under `tests/` is a source folder. |
 
 ## Data model in one paragraph
 
