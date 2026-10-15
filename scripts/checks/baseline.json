@@ -101,10 +101,6 @@
   "tests/backend/features/intake/reservations/reservations.test.js": {
     "lines": 4
   },
-  "tests/domain/rules.test.js": {
-    "biome/lint/suspicious/useIterableCallbackReturn": 1,
-    "lines": 6
-  },
   "tests/backend/features/intake/submissions/submissions.test.js": {
     "lines": 4
   },

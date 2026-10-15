@@ -1,11 +1,11 @@
 # Testing
 
-365 automated tests run without a Google account, a browser, or a network.
+367 automated tests run without a Google account, a browser, or a network.
 They run the **real** backend and the **real** pages. This page explains how
 that works and what it can and cannot prove.
 
 ```
-npm test    # 365 tests
+npm test    # 367 tests
 ```
 
 ## The layers
@@ -39,7 +39,7 @@ flowchart TD
         dom["dom.js<br/>jsdom pages wired to the harness"]
     end
     subgraph units["Unit"]
-        rules["domain/rules.test.js<br/>pure validation"]
+        rules["domain/rules/*.test.js<br/>pure validation"]
         enums["domain/enums.test.js"]
     end
     subgraph backend["Backend through the in-memory world"]
@@ -146,7 +146,15 @@ says something else.
 | Area | File | Tests | Examples |
 |---|---|---:|---|
 | Shared enums | `domain/enums.test.js` | 2 | Each enum frozen, with distinct values and CONSTANT_CASE members, and the same in the backend bundle as in Node |
-| Shared rules | `domain/rules.test.js` | 20 | The two warnings about small teams (starting numbers, the level of a team, a wrong number or order), counting the people of a form with a code counted once, Arabic filtering, name parts, phones, codes, Drive links, folder names, slots and the room left in one, form state |
+| Rules loader | `domain/rules/index.test.js` | 2 | Rules holds every function of every part, and a page that loads the enums and the parts gets the same Rules |
+| Rules: text | `domain/rules/text.test.js` | 4 | Arabic filtering and name parts, live cleaning while typing, English-only titles |
+| Rules: phones | `domain/rules/phone.test.js` | 2 | Every Egyptian way of writing a mobile number, numbers found in pasted WhatsApp lines |
+| Rules: codes | `domain/rules/codes.test.js` | 1 | Seven digits by default |
+| Rules: Drive links | `domain/rules/drive-link.test.js` | 2 | Files, folders and slides, other hosts refused; folder names |
+| Rules: slots | `domain/rules/slots.test.js` | 2 | The generated times of a day, and the room left in a slot |
+| Rules: forms | `domain/rules/form.test.js` | 2 | Members list, role lookup and form state; counting the people of a form with a code counted once |
+| Rules: team size | `domain/rules/team-size.test.js` | 2 | The two warnings about small teams: starting numbers, the level of a team, a wrong number or order |
+| Rules: submission | `domain/rules/submission.test.js` | 5 | Cleaned data, field and member errors, the same code twice, too many members, slot choices, disabled fields |
 | Team size and audience | `backend/features/intake/teams/team-size.test.js` | 18 | Required question, range, exact member count, admin range, the warnings about small teams saved cleaned and refused when wrong, the sizes of the saved teams sent with the form, size notes, specialization limits, section limits |
 | Forms | `backend/features/catalog/forms/forms.test.js` | 8 | Every template created with its own spreadsheet, type and title checked, the public form of a draft and of an open form, open and close dates, unique link names, duplicate, delete, WhatsApp metadata kept on a copy |
 | Submissions | `backend/features/intake/submissions/submissions.test.js` | 13 | Submit, closed and draft forms, duplicates, a student in another team, capacity, Drive checks, folder names, the confirmation email on and off and without a key, WhatsApp registrations, the admin list, status, review, reset key and delete |
@@ -226,7 +234,7 @@ is `4321`. Nothing is saved: stopping the server forgets everything.
 ## Adding a test
 
 1. Pick the lowest layer that can see the behaviour: a rule goes in
-   `domain/rules.test.js`, a backend behaviour in the test folder of its
+   the test of its part under `domain/rules/`, a backend behaviour in the test folder of its
    feature, a screen behaviour in the test of its page. A test sits at the
    path of the code it checks under `tests/`, and a test of the whole system
    at the root of `tests/`.
