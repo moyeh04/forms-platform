@@ -95,7 +95,7 @@
 }
 .choice-head.with-ar,
 .with-ar > .choice {
-  grid-template-columns: 2rem minmax(0, 1.2fr) minmax(0, 1fr) minmax(0, 1fr) auto;
+  grid-template-columns: 2rem minmax(0, 1.2fr) repeat(2, minmax(0, 1fr)) auto;
 }
 .choice.bad {
   background: var(--tint-b);

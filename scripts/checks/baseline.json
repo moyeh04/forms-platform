@@ -1,7 +1,4 @@
 {
-  "web/css/admin/lists.css": {
-    "lines": 1
-  },
   "web/css/app.css": {
     "biome/lint/complexity/noImportantStyles": 5,
     "biome/lint/style/noDescendingSpecificity": 12,
