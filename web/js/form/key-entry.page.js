@@ -10,27 +10,98 @@
   var t = P.t;
   var S = P.S;
 
+  /** The digits of a registration key. */
+  var KEY_DIGITS = 5;
+
+  /** A whole registration key. */
+  var KEY_PATTERN = new RegExp('^\\d{' + KEY_DIGITS + '}$');
+
+  /**
+   * Says whether a text is a whole registration key.
+   *
+   * @param {string} key The text.
+   * @return {boolean} True for five digits.
+   */
+  function isKey(key) {
+    return KEY_PATTERN.test(key);
+  }
+
+  /**
+   * Makes the box a registration key is typed in. It keeps digits only,
+   * Arabic digits turned into Latin ones, and no more than a key has.
+   *
+   * @param {!Object} attrs Its id and other attributes.
+   * @param {function(string)=} onType Gets the key after each change.
+   * @return {!Element} The box.
+   */
+  function keyInput(attrs, onType) {
+    var input = h(
+      'input',
+      Object.assign(
+        {
+          class: 'input key-input',
+          type: 'text',
+          inputmode: 'numeric',
+          maxlength: String(KEY_DIGITS),
+          placeholder: '0'.repeat(KEY_DIGITS)
+        },
+        attrs
+      )
+    );
+    input.addEventListener('input', function () {
+      input.value = Rules.latinDigits(input.value)
+        .replace(/\D/g, '')
+        .slice(0, KEY_DIGITS);
+      if (onType) onType(input.value);
+    });
+    return input;
+  }
+
+  /**
+   * Makes the buttons under the key: back to the form, and open.
+   *
+   * @return {!Element} The buttons.
+   */
+  function keyButtons() {
+    return h(
+      'div',
+      { class: 'nav' },
+      h(
+        'button',
+        {
+          type: 'button',
+          class: 'btn btn-quiet',
+          onclick: function () {
+            S.view = S.state === 'open' ? 'form' : 'closed';
+            P.render();
+          }
+        },
+        t('backToForm')
+      ),
+      h(
+        'button',
+        { type: 'submit', class: 'btn btn-primary', disabled: S.busy },
+        t('editOpen')
+      )
+    );
+  }
+
+  /**
+   * Draws the page that asks for the key of a registration.
+   *
+   * @return {!Element} The sheet.
+   */
   function keyEntryView() {
-    var input = h('input', {
-      class: 'input key-input',
+    var input = keyInput({
       id: 'key-input',
-      type: 'text',
-      inputmode: 'numeric',
-      maxlength: '5',
       autocomplete: 'one-time-code',
-      'aria-label': t('keyLabel'),
-      placeholder: '00000'
+      'aria-label': t('keyLabel')
     });
     var error = h(
       'p',
       { class: 'error', role: 'alert', hidden: !S.keyError },
       S.keyError
     );
-    input.addEventListener('input', function () {
-      input.value = Rules.latinDigits(input.value)
-        .replace(/\D/g, '')
-        .slice(0, 5);
-    });
     var f = h(
       'form',
       {
@@ -49,79 +120,74 @@
         input,
         error
       ),
-      h(
-        'div',
-        { class: 'nav' },
-        h(
-          'button',
-          {
-            type: 'button',
-            class: 'btn btn-quiet',
-            onclick: function () {
-              S.view = S.state === 'open' ? 'form' : 'closed';
-              P.render();
-            }
-          },
-          t('backToForm')
-        ),
-        h(
-          'button',
-          { type: 'submit', class: 'btn btn-primary', disabled: S.busy },
-          t('editOpen')
-        )
-      )
+      keyButtons()
     );
     return P.sheet(P.head(), f);
   }
 
-  /** Opens a registration with its key, on its summary, or on its time when `toSlot` and the time can change. */
-  async function openByKey(key, toSlot) {
-    key = String(key || '').trim();
-    if (!/^\d{5}$/.test(key)) {
+  /**
+   * Takes in the registration a key opened.
+   *
+   * @param {string} key The key.
+   * @param {!Object} res The answer of lookup.
+   */
+  function takeRegistration(key, res) {
+    S.mode = 'edit';
+    S.key = key;
+    S.keyInfo = {
+      ref: res.submission.ref,
+      keyExpires: res.keyExpires,
+      canEdit: res.canEdit,
+      slotOnly: !!res.slotOnly,
+      canDelete: res.canDelete,
+      locked: !!res.locked
+    };
+    S.data = res.submission.data || {};
+    var sf = P.slotField();
+    var slot = sf && S.data[sf.id];
+    S.ownSlot = slot ? Rules.slotKey(slot.day, slot.time) : '';
+    S.errors = {};
+    S.banner = null;
+    S.original = JSON.stringify(S.data);
+    S.transfers = res.transfers || { incoming: [], outgoing: [] };
+    P.buildSteps();
+  }
+
+  /**
+   * Opens a registration with its key, on its summary, or on its time when
+   * `toSlot` and the time can change.
+   *
+   * @param {*} typed The key.
+   * @param {boolean=} toSlot True to open on the time.
+   * @return {!Promise<void>} Settles when the page is drawn.
+   */
+  async function openByKey(typed, toSlot) {
+    var key = String(typed || '').trim();
+    if (!isKey(key)) {
       S.keyError = t('errors.bad_key');
       return P.render();
     }
     S.busy = true;
+    var res;
     try {
-      var res = await App.api.call({
-        action: 'lookup',
-        slug: S.slug,
-        key: key
-      });
-      S.busy = false;
-      S.mode = 'edit';
-      S.key = key;
-      S.keyInfo = {
-        ref: res.submission.ref,
-        keyExpires: res.keyExpires,
-        canEdit: res.canEdit,
-        slotOnly: !!res.slotOnly,
-        canDelete: res.canDelete,
-        locked: !!res.locked
-      };
-      S.data = res.submission.data || {};
-      var sf = P.slotField();
-      S.ownSlot =
-        sf && S.data[sf.id]
-          ? Rules.slotKey(S.data[sf.id].day, S.data[sf.id].time)
-          : '';
-      S.errors = {};
-      S.banner = null;
-      S.original = JSON.stringify(S.data);
-      S.transfers = res.transfers || { incoming: [], outgoing: [] };
-      P.buildSteps();
-      S.stepIndex =
-        toSlot && res.canEdit && sf ? P.stepOfPath(sf.id) : S.steps.length - 1;
-      S.view = res.canEdit ? 'form' : 'readonly';
-      P.render();
-      P.askTransfers();
+      res = await App.api.call({ action: 'lookup', slug: S.slug, key: key });
     } catch (e) {
       S.busy = false;
       S.keyError = App.i18n.err({ error: e.code }) || e.message;
-      P.render();
+      return P.render();
     }
+    S.busy = false;
+    takeRegistration(key, res);
+    var sf = P.slotField();
+    var onSlot = toSlot && res.canEdit && sf;
+    S.stepIndex = onSlot ? P.stepOfPath(sf.id) : S.steps.length - 1;
+    S.view = res.canEdit ? 'form' : 'readonly';
+    P.render();
+    P.askTransfers();
   }
 
   P.keyEntryView = keyEntryView;
   P.openByKey = openByKey;
+  P.keyInput = keyInput;
+  P.isKey = isKey;
 })(window.App);

@@ -10,58 +10,69 @@
   var t = P.t;
   var S = P.S;
 
-  /** Step one of a key booking: the key, then the team it opens for the student to confirm. */
-  function teamBody() {
-    if (S.team) {
-      return [
-        h('p', { class: 'step-help' }, t('teamIs') + ' (' + S.team.ref + ')'),
-        P.teamSummary(),
-        // The key that found the team usually opens its booking too; when it does not, the key screen says so.
-        S.teamBooked
-          ? h(
-              'div',
-              { class: 'banner info', role: 'status', name: 'team-booked' },
-              S.teamSlot
-                ? t('teamBookedAt', {
-                    when: P.displayValue(P.slotField(), S.teamSlot)
-                  })
-                : t('teamBooked')
-            )
-          : null,
+  /**
+   * Draws the note that the team has a booking already. The key that found
+   * the team usually opens its booking too; when it does not, the key
+   * screen says so.
+   *
+   * @return {?Element} The note, or null when the team has none.
+   */
+  function bookedNote() {
+    if (!S.teamBooked) return null;
+    var text = S.teamSlot
+      ? t('teamBookedAt', { when: P.displayValue(P.slotField(), S.teamSlot) })
+      : t('teamBooked');
+    return h(
+      'div',
+      { class: 'banner info', role: 'status', name: 'team-booked' },
+      text
+    );
+  }
+
+  /**
+   * Draws the team a key found, for the student to confirm.
+   *
+   * @return {!Array<?Element>} The parts of the step.
+   */
+  function foundTeam() {
+    return [
+      h('p', { class: 'step-help' }, t('teamIs') + ' (' + S.team.ref + ')'),
+      P.teamSummary(),
+      bookedNote(),
+      h(
+        'p',
+        { class: 'foot' },
         h(
-          'p',
-          { class: 'foot' },
-          h(
-            'button',
-            {
-              type: 'button',
-              class: 'link-btn',
-              name: 'other-key',
-              onclick: function () {
-                forgetTeam();
-                P.render();
-              }
-            },
-            t('otherKey')
-          )
+          'button',
+          {
+            type: 'button',
+            class: 'link-btn',
+            name: 'other-key',
+            onclick: function () {
+              forgetTeam();
+              P.render();
+            }
+          },
+          t('otherKey')
         )
-      ];
-    }
-    var input = h('input', {
-      class: 'input key-input',
-      id: 'team-key',
-      type: 'text',
-      inputmode: 'numeric',
-      maxlength: '5',
-      autocomplete: 'off',
-      placeholder: '00000',
-      value: S.teamKey
-    });
-    input.addEventListener('input', function () {
-      input.value = S.teamKey = Rules.latinDigits(input.value)
-        .replace(/\D/g, '')
-        .slice(0, 5);
-    });
+      )
+    ];
+  }
+
+  /**
+   * Draws the first step of a key booking: the key, then the team it opens
+   * for the student to confirm.
+   *
+   * @return {!Array<?Element>} The parts of the step.
+   */
+  function teamBody() {
+    if (S.team) return foundTeam();
+    var input = P.keyInput(
+      { id: 'team-key', autocomplete: 'off', value: S.teamKey },
+      function (key) {
+        S.teamKey = key;
+      }
+    );
     return [
       h(
         'p',
@@ -82,6 +93,7 @@
     ];
   }
 
+  /** Forgets the team and its key. */
   function forgetTeam() {
     S.team = null;
     S.teamBooked = false;
@@ -92,8 +104,30 @@
     S.teamError = '';
   }
 
+  /**
+   * Takes in the team a key found and moves the focus to the step title.
+   *
+   * @param {!Object} res The answer of bookingTeam.
+   */
+  function takeTeam(res) {
+    S.team = res.team;
+    S.teamBooked = !!res.booked;
+    S.teamSlot = res.slot || null;
+    S.teamCanMove = !!res.canMove;
+    S.sourceKey = S.teamKey;
+    S.busy = false;
+    P.render();
+    var title = document.getElementById('step-title');
+    if (title?.focus) title.focus({ preventScroll: true });
+  }
+
+  /**
+   * Finds the team of the typed key.
+   *
+   * @return {!Promise<void>} Settles when the page is drawn.
+   */
   async function findTeam() {
-    if (!/^\d{5}$/.test(S.teamKey)) {
+    if (!P.isKey(S.teamKey)) {
       S.teamError = t('errors.bad_key');
       P.render();
       return P.focusFirstError();
@@ -101,27 +135,20 @@
     S.busy = true;
     S.teamError = '';
     P.render();
+    var res;
     try {
-      var res = await App.api.call({
+      res = await App.api.call({
         action: 'bookingTeam',
         slug: S.slug,
         key: S.teamKey
       });
-      S.team = res.team;
-      S.teamBooked = !!res.booked;
-      S.teamSlot = res.slot || null;
-      S.teamCanMove = !!res.canMove;
-      S.sourceKey = S.teamKey;
-      S.busy = false;
-      P.render();
-      var title = document.getElementById('step-title');
-      if (title && title.focus) title.focus({ preventScroll: true });
     } catch (e) {
       S.busy = false;
       S.teamError = App.i18n.err({ error: e.code }) || e.message;
       P.render();
-      P.focusFirstError();
+      return P.focusFirstError();
     }
+    takeTeam(res);
   }
 
   P.teamBody = teamBody;

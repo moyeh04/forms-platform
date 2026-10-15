@@ -313,14 +313,6 @@
     "jsdoc": 5,
     "lines": 4
   },
-  "web/js/form/team-key.page.js": {
-    "biome/lint/complexity/noExcessiveLinesPerFunction": 1,
-    "biome/lint/complexity/useOptionalChain": 1,
-    "biome/lint/correctness/noInnerDeclarations": 2,
-    "biome/lint/style/noMagicNumbers": 1,
-    "jsdoc": 3,
-    "lines": 2
-  },
   "web/js/form/navigation.page.js": {
     "biome/lint/complexity/useOptionalChain": 2,
     "biome/lint/correctness/noInnerDeclarations": 1,
@@ -336,18 +328,6 @@
     "biome/lint/correctness/noUnusedVariables": 1,
     "jsdoc": 2,
     "lines": 2
-  },
-  "web/js/form/key-entry.page.js": {
-    "biome/lint/complexity/noExcessiveCognitiveComplexity": 1,
-    "biome/lint/correctness/noInnerDeclarations": 2,
-    "biome/lint/style/noMagicNumbers": 1,
-    "jsdoc": 3,
-    "lines": 1
-  },
-  "web/js/form/edit.page.js": {
-    "biome/lint/style/noMagicNumbers": 1,
-    "jsdoc": 5,
-    "lines": 1
   },
   "web/js/form/contacts.view.js": {
     "biome/lint/style/noMagicNumbers": 2,
