@@ -130,7 +130,7 @@ Script deployment and the configured website.
 | `tests/` | The automated tests and the in-memory copy of Google's services |
 | `docs/` | Architecture, data model, security, testing and deployment |
 
-Every file is described in [docs/MODULES.md](docs/MODULES.md).
+Every file is described in [docs/architecture/FILE-STRUCTURE.md](docs/architecture/FILE-STRUCTURE.md).
 
 ## Documentation
 

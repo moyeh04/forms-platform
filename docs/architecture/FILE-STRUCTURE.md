@@ -1,4 +1,4 @@
-# How the project is organised
+# File structure
 
 ## The repository at a glance
 
@@ -181,13 +181,13 @@ no validation.
 | Path | What it is |
 |---|---|
 | `scripts/bundle-backend.js` | The bundler. |
-| `scripts/check-docs.js`, `.githooks/pre-commit` | The check that [API.md](backend/API.md) names exactly the actions the backend has and that [TESTING.md](process/TESTING.md) gives the real number of tests, and the git hook that runs it before every commit. `npm install` points git at `.githooks`. |
+| `scripts/check-docs.js`, `.githooks/pre-commit` | The check that [API.md](../backend/API.md) names exactly the actions the backend has and that [TESTING.md](../process/TESTING.md) gives the real number of tests, and the git hook that runs it before every commit. `npm install` points git at `.githooks`. |
 | `scripts/backend-changed.js` | Tells the workflow whether a push changed a backend file, so a push of pages or documents alone does not deploy the backend. |
 | `scripts/setup-deployment.js` | First deployment from your computer (`npm run setup`): creates the sheet and its script, pushes the bundle, creates the web app, and stores the IDs, the credential and the Pages setting in GitHub. |
 | `scripts/dev-server.js` | `npm run dev`: serves the site and answers its API calls from the in-memory Google, with sample forms, so pages can be opened in a real browser. |
 | `tests/harness/appsscript-mock.js` | An in-memory Sheets, Drive, Mail, Cache, and clock, so the real backend code runs in tests. |
 | `tests/harness/dom.js` | Opens the real pages in jsdom wired to that backend. |
-| `tests/*.test.js` | The tests, one file per area; [TESTING.md](process/TESTING.md) lists them. |
+| `tests/*.test.js` | The tests, one file per area; [TESTING.md](../process/TESTING.md) lists them. |
 
 ## Data model in one paragraph
 
@@ -242,11 +242,11 @@ flowchart LR
 
 | Question | Read |
 |---|---|
-| How does a request travel, and what runs where? | [ARCHITECTURE.md](architecture/ARCHITECTURE.md) |
-| Why was it built this way? | [WORKAROUNDS.md](architecture/WORKAROUNDS.md) |
-| What produces `dist/`? | [BUILD-PIPELINE.md](architecture/BUILD-PIPELINE.md) |
-| What do GitHub and Google each do? | [HOSTING.md](architecture/HOSTING.md) |
-| Every sheet and column | [DATA-MODEL.md](backend/DATA-MODEL.md) |
-| Secrets and weak spots | [SECURITY.md](backend/SECURITY.md) |
-| How the tests work | [TESTING.md](process/TESTING.md) |
-| Click-by-click setup | [DEPLOY.md](operations/DEPLOY.md) |
+| How does a request travel, and what runs where? | [ARCHITECTURE.md](ARCHITECTURE.md) |
+| Why was it built this way? | [WORKAROUNDS.md](WORKAROUNDS.md) |
+| What produces `dist/`? | [BUILD-PIPELINE.md](BUILD-PIPELINE.md) |
+| What do GitHub and Google each do? | [HOSTING.md](HOSTING.md) |
+| Every sheet and column | [DATA-MODEL.md](../backend/DATA-MODEL.md) |
+| Secrets and weak spots | [SECURITY.md](../backend/SECURITY.md) |
+| How the tests work | [TESTING.md](../process/TESTING.md) |
+| Click-by-click setup | [DEPLOY.md](../operations/DEPLOY.md) |

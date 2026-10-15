@@ -15,7 +15,7 @@ whichever page answers your question.
 | [TESTING.md](process/TESTING.md) | How the tests run without Google, and what they cannot prove |
 | [UI-UX.md](frontend/UI-UX.md) | The rules every page follows, with the place that shows each one |
 | [DEPLOY.md](operations/DEPLOY.md) | Click-by-click setup and the first-run checklist |
-| [MODULES.md](MODULES.md) | File-by-file reference |
+| [FILE-STRUCTURE.md](architecture/FILE-STRUCTURE.md) | Where every file lives and what it does |
 | [COMMIT_CONVENTION.md](process/COMMIT_CONVENTION.md) | How commits and branches are written |
 | [REQUIREMENTS.md](product/REQUIREMENTS.md) | Everything the platform was asked to do, and where each item stands |
 

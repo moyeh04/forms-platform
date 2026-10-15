@@ -1209,4 +1209,4 @@ labels of the current tables.
 | [SECURITY.md](../backend/SECURITY.md) | The secrets, who holds them, and what a leak would mean |
 | [TESTING.md](../process/TESTING.md) | How the tests run without Google |
 | [DEPLOY.md](../operations/DEPLOY.md) | Click-by-click setup |
-| [MODULES.md](../MODULES.md) | File-by-file reference |
+| [FILE-STRUCTURE.md](FILE-STRUCTURE.md) | Where every file lives and what it does |
