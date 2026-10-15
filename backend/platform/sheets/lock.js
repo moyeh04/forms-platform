@@ -1,5 +1,6 @@
 /** The script lock every write runs under, safe to nest. */
 
+var Lock = (function () {
 var LOCK_DEPTH_ = 0;
 
 /**
@@ -23,3 +24,6 @@ function withLock_(fn) {
     lock.releaseLock();
   }
 }
+
+return { withLock: withLock_ };
+})();

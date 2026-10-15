@@ -22,9 +22,10 @@
     "lines": 3
   },
   "backend/features/access/clients/clients.repository.js": {
+    "biome/format": 1,
     "flags": 6,
     "jsdoc": 9,
-    "lines": 4
+    "lines": 6
   },
   "backend/features/access/clients/clients.service.js": {
     "biome/lint/style/noMagicNumbers": 2,
@@ -96,10 +97,11 @@
     "lines": 3
   },
   "backend/features/catalog/lists/lists.repository.js": {
+    "biome/format": 1,
     "biome/lint/complexity/useOptionalChain": 1,
     "biome/lint/correctness/noInnerDeclarations": 1,
     "jsdoc": 11,
-    "lines": 3
+    "lines": 4
   },
   "backend/features/catalog/lists/lists.rules.js": {
     "biome/lint/correctness/noInnerDeclarations": 1,
@@ -187,9 +189,11 @@
     "lines": 2
   },
   "backend/features/intake/responses/responses.repository.js": {
+    "biome/format": 1,
     "biome/lint/style/noMagicNumbers": 1,
     "flags": 2,
-    "jsdoc": 8
+    "jsdoc": 8,
+    "lines": 2
   },
   "backend/features/intake/responses/responses.review.js": {
     "biome/format": 1,
@@ -339,19 +343,22 @@
     "jsdoc": 3
   },
   "backend/platform/sheets/lock.js": {
+    "biome/format": 1,
     "biome/lint/style/noMagicNumbers": 1,
     "jsdoc": 2,
     "lines": 2
   },
   "backend/platform/sheets/sheet-style.js": {
+    "biome/format": 1,
     "biome/lint/style/noMagicNumbers": 1,
     "jsdoc": 6,
-    "lines": 9
+    "lines": 10
   },
   "backend/platform/sheets/table.js": {
+    "biome/format": 1,
     "biome/lint/style/noMagicNumbers": 1,
     "jsdoc": 8,
-    "lines": 3
+    "lines": 4
   },
   "backend/platform/xlsx/workbook.js": {
     "biome/lint/complexity/noExcessiveCognitiveComplexity": 1,

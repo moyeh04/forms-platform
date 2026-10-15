@@ -30,7 +30,7 @@ var BUILTIN_LIST_NAMES_ = {
 
 function listRows_() {
   var sh = registry().getSheetByName(TABS.lists);
-  return sh ? readTable(sh, ['key', 'values']) : [];
+  return sh ? Table.readTable(sh, ['key', 'values']) : [];
 }
 
 function readLists() {
@@ -57,14 +57,14 @@ function listKind_(key, info) {
 
 function writeListRow_(key, json) {
   var sh = registry().getSheetByName(TABS.lists);
-  var rows = readTable(sh, ['key', 'values']);
+  var rows = Table.readTable(sh, ['key', 'values']);
   for (var i = 0; i < rows.length; i++) {
     if (rows[i].key === key) {
-      writeRow(sh, rows[i]._row, ['key', 'values'], { key: key, values: json });
+      Table.writeRow(sh, rows[i]._row, ['key', 'values'], { key: key, values: json });
       return;
     }
   }
-  appendPlain_(sh, [key, json]);
+  Table.appendPlain(sh, [key, json]);
 }
 
 function saveList(key, values) {
@@ -77,7 +77,7 @@ function saveListInfo_(info) {
 
 function deleteList_(key) {
   var sh = registry().getSheetByName(TABS.lists);
-  var row = readTable(sh, ['key', 'values']).filter(function (r) {
+  var row = Table.readTable(sh, ['key', 'values']).filter(function (r) {
     return r.key === key;
   })[0];
   if (row) sh.deleteRow(row._row);

@@ -28,14 +28,14 @@ function transfersOn_(form) {
 function transfersSheet_(form, create) {
   var ss = SpreadsheetApp.openById(form.sheetId);
   return create
-    ? ensureTab(ss, TRANSFER_TAB_, TRANSFER_COLS)
+    ? Table.ensureTab(ss, TRANSFER_TAB_, TRANSFER_COLS)
     : ss.getSheetByName(TRANSFER_TAB_);
 }
 
 function readTransfers_(form) {
   var sh = transfersSheet_(form, false);
   if (!sh) return [];
-  return readTable(sh, TRANSFER_COLS).map(function (r) {
+  return Table.readTable(sh, TRANSFER_COLS).map(function (r) {
     return {
       _row: r._row,
       id: String(r.id),
@@ -58,7 +58,7 @@ function saveTransfer_(form, t) {
   var sh = transfersSheet_(form, true);
   var o = clone(t);
   o.member = JSON.stringify(t.member || {});
-  if (t._row) writeRow(sh, t._row, TRANSFER_COLS, o);
-  else t._row = appendPlain_(sh, rowValues(TRANSFER_COLS, o));
+  if (t._row) Table.writeRow(sh, t._row, TRANSFER_COLS, o);
+  else t._row = Table.appendPlain(sh, Table.rowValues(TRANSFER_COLS, o));
   return t;
 }

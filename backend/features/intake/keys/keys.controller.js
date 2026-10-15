@@ -62,7 +62,7 @@ API['admin.keys.extend'] = admin(function (req) {
   if (which === 'chosen' && !ids.length)
     ApiError.fail('none_chosen', 'Choose at least one registration.');
 
-  var changed = withLock_(function () {
+  var changed = Lock.withLock(function () {
     var rows = keyedRows_(form);
     var picked = rows.filter(function (r) {
       if (which === 'all') return true;

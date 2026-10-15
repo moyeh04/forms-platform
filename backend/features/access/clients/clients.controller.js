@@ -27,7 +27,7 @@ API['admin.clients.create'] = admin(function (req) {
   };
   var key = req.withKey === false ? '' : newClientKey_();
   setClientKey_(c, key);
-  withLock_(function () {
+  Lock.withLock(function () {
     saveClient_(c);
   });
   return { client: publicClient_(c), token: token, accessKey: key };
@@ -84,7 +84,7 @@ API['admin.clients.showKey'] = admin(function (req) {
 });
 
 API['admin.clients.remove'] = admin(function (req) {
-  return withLock_(function () {
+  return Lock.withLock(function () {
     var c = readClients_().filter(function (x) {
       return x.id === req.id;
     })[0];

@@ -6,7 +6,7 @@ API['transfer.decide'] = function (req) {
   var form = requireForm(String(req.slug || ''));
   var vform = validationForm(form);
   var found = findByKey_(form, req.key);
-  var out = withLock_(function () {
+  var out = Lock.withLock(function () {
     return decideTransfer_(
       vform,
       req.id,
@@ -32,7 +32,7 @@ API['transfer.cancel'] = function (req) {
   var form = requireForm(String(req.slug || ''));
   var vform = validationForm(form);
   var found = findByKey_(form, req.key);
-  withLock_(function () {
+  Lock.withLock(function () {
     var t = readTransfers_(form).filter(function (x) {
       return (
         x.id === String(req.id) && x.status === 'pending' && x.toId === found.id
@@ -72,7 +72,7 @@ function adminTransfers_(form) {
 API['admin.transfer.decide'] = admin(function (req) {
   var form = requireForm(req.slug || req.id);
   var vform = validationForm(form);
-  var out = withLock_(function () {
+  var out = Lock.withLock(function () {
     return decideTransfer_(
       vform,
       req.transfer,

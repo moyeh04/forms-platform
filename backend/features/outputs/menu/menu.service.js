@@ -94,7 +94,7 @@ function menuPrint(kind, slug, dayId, includeEmpty) {
 function menuRebuildViews() {
   var ui = SpreadsheetApp.getUi();
   var n = 0;
-  styleRegistryTabs_();
+  SheetStyle.styleRegistryTabs();
   readForms().forEach(function (f) {
     if (rebuildViews(f)) n++;
   });

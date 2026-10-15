@@ -36,7 +36,7 @@ function freeListName_(name, lists, info, self) {
 /** A handler that changes the Lists tab: it reads and writes inside the lock, then returns every list. */
 function listChange_(change) {
   return admin(function (req) {
-    return withLock_(function () {
+    return Lock.withLock(function () {
       var extra = change(req) || {};
       return Object.assign(listsOut_(), extra);
     });

@@ -59,7 +59,7 @@ function formToRow_(form) {
 }
 
 function readForms() {
-  return readTable(formsSheet(), FORM_COLS).map(rowToForm_);
+  return Table.readTable(formsSheet(), FORM_COLS).map(rowToForm_);
 }
 
 function findForm(slugOrId) {
@@ -90,7 +90,7 @@ function saveForm(form) {
   form.updatedAt = nowIso();
   var sh = formsSheet();
   var at = formRow_(sh, form.id);
-  if (at) writeRow(sh, at, FORM_COLS, formToRow_(form));
-  else appendPlain_(sh, rowValues(FORM_COLS, formToRow_(form)));
+  if (at) Table.writeRow(sh, at, FORM_COLS, formToRow_(form));
+  else Table.appendPlain(sh, Table.rowValues(FORM_COLS, formToRow_(form)));
   return form;
 }

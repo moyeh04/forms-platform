@@ -14,7 +14,7 @@ function requireMatching_(form) {
 API['admin.matching.import'] = admin(function (req) {
   var form = requireForm(req.slug || req.id);
   requireMatching_(form);
-  return withLock_(function () {
+  return Lock.withLock(function () {
     var sh = requestsSheet_(form);
     var have = {};
     readRequests_(form).forEach(function (r) {
@@ -44,7 +44,7 @@ API['admin.matching.import'] = admin(function (req) {
             .join(' ')
             .replace(/[\s,;:|\-]+/g, ' ')
             .trim();
-          appendPlain_(sh, [
+          Table.appendPlain(sh, [
             uuid(),
             line,
             p.phone,
@@ -111,7 +111,7 @@ API['admin.matching.decide'] = admin(function (req) {
     return s.id === stepId;
   });
   var linked = null;
-  withLock_(function () {
+  Lock.withLock(function () {
     var q = readRequests_(form).filter(function (x) {
       return x.id === req.requestId;
     })[0];
@@ -127,7 +127,7 @@ API['admin.matching.decide'] = admin(function (req) {
     var sh = requestsSheet_(form);
     q.decision = decision;
     if (req.note !== undefined) q.note = String(req.note);
-    writeRow(sh, q._row, REQUEST_COLS_, q);
+    Table.writeRow(sh, q._row, REQUEST_COLS_, q);
   });
   if (linked) afterChange_(form);
   return { decided: true, submissionId: linked };
@@ -141,7 +141,7 @@ API['admin.matching.remove'] = admin(function (req) {
     ids[i] = true;
   });
   var removed = 0;
-  withLock_(function () {
+  Lock.withLock(function () {
     var sh = requestsSheet_(form);
     readRequests_(form)
       .filter(function (q) {

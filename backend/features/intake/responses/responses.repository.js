@@ -64,7 +64,7 @@ function rowToResponse_(r) {
 }
 
 function readResponses(form, includeDeleted) {
-  var rows = readTable(responsesSheet(form), RESPONSE_COLS).map(rowToResponse_);
+  var rows = Table.readTable(responsesSheet(form), RESPONSE_COLS).map(rowToResponse_);
   return includeDeleted
     ? rows
     : rows.filter(function (r) {
@@ -84,9 +84,9 @@ function responseToRow_(r) {
 function saveResponse_(form, r) {
   r.updated = nowIso();
   var sh = responsesSheet(form);
-  ensureHeaders_(sh, RESPONSE_COLS);
-  if (r._row) writeRow(sh, r._row, RESPONSE_COLS, responseToRow_(r));
-  else r._row = appendPlain_(sh, rowValues(RESPONSE_COLS, responseToRow_(r)));
+  Table.ensureHeaders(sh, RESPONSE_COLS);
+  if (r._row) Table.writeRow(sh, r._row, RESPONSE_COLS, responseToRow_(r));
+  else r._row = Table.appendPlain(sh, Table.rowValues(RESPONSE_COLS, responseToRow_(r)));
   return r;
 }
 

@@ -48,7 +48,7 @@ API['viewer.review'] = function (req) {
   var client = requireClient_(req);
   var form = requireClientForm_(client, req.slug);
   if (!client.canReview) ApiError.fail('forbidden', 'This link is read-only.');
-  withLock_(function () {
+  Lock.withLock(function () {
     var r = readResponses(form).filter(function (x) {
       return x.id === req.submissionId;
     })[0];

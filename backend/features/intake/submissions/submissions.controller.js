@@ -39,7 +39,7 @@ API.submit = function (req) {
     checkDriveFields_(vform, v.data);
   }
 
-  var result = withLock_(function () {
+  var result = Lock.withLock(function () {
     var rows = readResponses(form, true);
     var live = rows.filter(function (r) {
       return !r.deleted;
@@ -154,7 +154,7 @@ API.update = function (req) {
     checkDriveFields_(vform, v.data);
   }
 
-  var asked = withLock_(function () {
+  var asked = Lock.withLock(function () {
     var live = readResponses(form);
     var current = live.filter(function (r) {
       return r.id === found.id;
@@ -184,7 +184,7 @@ API.remove = function (req) {
   if (!form.editKey.allowDelete)
     ApiError.fail('delete_disabled', 'Deleting is turned off for this form.');
   assertTaskOpen_(form);
-  withLock_(function () {
+  Lock.withLock(function () {
     if (!cancelResponse_(form, found.id))
       ApiError.fail('bad_key', 'That key is not right.');
   });

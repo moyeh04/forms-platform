@@ -16,7 +16,7 @@ var VIEW_RUN_BUDGET_MS_ = 240000;
  */
 function rebuildViews(form) {
   var ss = SpreadsheetApp.openById(form.sheetId);
-  styleFormTabs_(ss);
+  SheetStyle.styleFormTabs(ss);
   var build = VIEW_BUILDERS_[form.type];
   if (!build) return false;
   build(validationForm(form), ss);
@@ -39,7 +39,7 @@ function viewRunBooked_() {
 function bookViewRun_() {
   var cache = CacheService.getScriptCache();
   if (cache.get('views_booked')) return;
-  withLock_(function () {
+  Lock.withLock(function () {
     if (!viewRunBooked_())
       ScriptApp.newTrigger('processDirtyViews')
         .timeBased()

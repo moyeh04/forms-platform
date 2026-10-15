@@ -38,7 +38,7 @@ function rowToClient_(r) {
 }
 
 function readClients_() {
-  var clients = readTable(clientsSheet_(), CLIENT_COLS_).map(rowToClient_);
+  var clients = Table.readTable(clientsSheet_(), CLIENT_COLS_).map(rowToClient_);
   // A form id holds an underscore and a link name never does, so the two cannot be confused.
   var named = function (s) {
     return s !== '*' && String(s).indexOf('_') === -1;
@@ -74,7 +74,7 @@ function keepClientForms_() {
 
 /** Changes one link inside the lock, on a fresh copy of its row, and saves it. Returns what `change` returns. */
 function changeClient_(id, change) {
-  return withLock_(function () {
+  return Lock.withLock(function () {
     var c = readClients_().filter(function (x) {
       return x.id === id;
     })[0];
@@ -105,8 +105,8 @@ function clientToRow_(c) {
 /** Writes a link to its row, or to a new row. Call it inside withLock_, with a row read there. */
 function saveClient_(c) {
   var sh = clientsSheet_();
-  ensureHeaders_(sh, CLIENT_COLS_);
-  if (c._row) writeRow(sh, c._row, CLIENT_COLS_, clientToRow_(c));
-  else c._row = appendPlain_(sh, rowValues(CLIENT_COLS_, clientToRow_(c)));
+  Table.ensureHeaders(sh, CLIENT_COLS_);
+  if (c._row) Table.writeRow(sh, c._row, CLIENT_COLS_, clientToRow_(c));
+  else c._row = Table.appendPlain(sh, Table.rowValues(CLIENT_COLS_, clientToRow_(c)));
   return c;
 }

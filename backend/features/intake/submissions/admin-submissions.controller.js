@@ -34,7 +34,7 @@ API['admin.submission.update'] = admin(function (req) {
   var vform = validationForm(form);
   var patch = req.patch || {};
   var changedData = false;
-  withLock_(function () {
+  Lock.withLock(function () {
     var live = readResponses(form);
     var r = live.filter(function (x) {
       return x.id === req.submissionId;
@@ -76,7 +76,7 @@ API['admin.submission.update'] = admin(function (req) {
 
 API['admin.submission.delete'] = admin(function (req) {
   var form = requireForm(req.slug || req.id);
-  withLock_(function () {
+  Lock.withLock(function () {
     if (!cancelResponse_(form, req.submissionId))
       ApiError.fail('submission_not_found', 'That submission does not exist.');
   });
@@ -87,7 +87,7 @@ API['admin.submission.delete'] = admin(function (req) {
 API['admin.submission.resetKey'] = admin(function (req) {
   var form = requireForm(req.slug || req.id);
   var vform = validationForm(form);
-  return withLock_(function () {
+  return Lock.withLock(function () {
     var rows = readResponses(form);
     var r = rows.filter(function (x) {
       return x.id === req.submissionId;

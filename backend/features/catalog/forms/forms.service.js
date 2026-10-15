@@ -28,7 +28,7 @@ function attachSheet_(form) {
     .getRange(1, 1, first.getMaxRows(), RESPONSE_COLS.length)
     .setNumberFormat('@');
   first.setFrozenRows(1);
-  styleDataTab_(first, RESPONSE_COLS);
+  SheetStyle.styleDataTab(first, RESPONSE_COLS);
   DriveApp.getFileById(ss.getId()).moveTo(rootFolder());
   form.sheetId = ss.getId();
   form.sheetUrl = ss.getUrl();
@@ -52,7 +52,7 @@ function addForm_(form, wantedSlug, adjust) {
   form.status = 'draft';
   form.createdAt = nowIso();
   attachSheet_(form);
-  return withLock_(function () {
+  return Lock.withLock(function () {
     form.slug = uniqueSlug_(
       wantedSlug || form.title + ' ' + FormMetadata.slug(form)
     );
@@ -100,7 +100,7 @@ var PATCHABLE_ = [
  * has been saved since, the change is refused instead of overwriting the newer one.
  */
 function updateForm(id, patch, base) {
-  return withLock_(function () {
+  return Lock.withLock(function () {
     return applyFormPatch_(requireForm(id), patch, base);
   });
 }
@@ -162,7 +162,7 @@ function duplicateForm(id, o, adjust) {
  * trash (restorable for 30 days), and private links stop listing it.
  */
 function deleteForm(id) {
-  return withLock_(function () {
+  return Lock.withLock(function () {
     return removeForm_(requireForm(id));
   });
 }

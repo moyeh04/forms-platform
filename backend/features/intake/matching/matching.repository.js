@@ -11,7 +11,7 @@ var REQUEST_COLS_ = [
 ];
 
 function requestsSheet_(form) {
-  return ensureTab(
+  return Table.ensureTab(
     SpreadsheetApp.openById(form.sheetId),
     'Requests',
     REQUEST_COLS_
@@ -19,7 +19,7 @@ function requestsSheet_(form) {
 }
 
 function readRequests_(form) {
-  return readTable(requestsSheet_(form), REQUEST_COLS_).map(function (r) {
+  return Table.readTable(requestsSheet_(form), REQUEST_COLS_).map(function (r) {
     return {
       _row: r._row,
       id: String(r.id),

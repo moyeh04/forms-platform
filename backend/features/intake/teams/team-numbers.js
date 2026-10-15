@@ -47,7 +47,7 @@ function keepTeamNumbers_(form, rows) {
   });
   if (!stored.length) return;
   var sh = responsesSheet(form);
-  ensureHeaders_(sh, RESPONSE_COLS);
+  Table.ensureHeaders(sh, RESPONSE_COLS);
   var column = sh.getRange(
     2,
     RESPONSE_COLS.indexOf('number') + 1,

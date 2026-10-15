@@ -1,5 +1,6 @@
 /** Reading and writing the rows of a sheet tab by its header names. */
 
+var Table = (function () {
 function readTable(sheet, cols) {
   var last = sheet.getLastRow();
   if (last < 2) return [];
@@ -61,3 +62,6 @@ function ensureTab(ss, name, headers) {
   sh.setFrozenRows(1);
   return sh;
 }
+
+return { readTable, ensureHeaders: ensureHeaders_, writeRow, appendPlain: appendPlain_, rowValues, ensureTab };
+})();

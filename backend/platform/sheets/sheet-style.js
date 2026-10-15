@@ -8,6 +8,7 @@
  * reads back is what it was.
  */
 
+var SheetStyle = (function () {
 /** Tints of the rows under the header, the lighter one first. */
 var DATA_TAB_ROWS_ = ['#FFFFFF', '#F8F1DE'];
 
@@ -126,3 +127,6 @@ function styleRegistryTabs_() {
   styleDataTab_(ss.getSheetByName(TABS.clients), CLIENT_COLS_);
   styleDataTab_(ss.getSheetByName(TABS.lists), ['key', 'values']);
 }
+
+return { styleDataTab: styleDataTab_, styleRegistryTabs: styleRegistryTabs_, styleFormTabs: styleFormTabs_ };
+})();
