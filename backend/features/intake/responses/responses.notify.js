@@ -3,6 +3,7 @@
  * views.
  */
 
+var ResponsesNotify = (function () {
 function siteLink_(form) {
   var base = Properties.getProp('SITE_URL');
   return base ? base.replace(/\/+$/, '') + '/?f=' + form.slug : '';
@@ -67,3 +68,6 @@ function afterChange_(form) {
     Logger.log('Views not marked: ' + e.message);
   }
 }
+
+return { afterChange: afterChange_, sendConfirmation: sendConfirmation_, siteLink: siteLink_ };
+})();

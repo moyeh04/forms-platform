@@ -5,7 +5,7 @@ function mailTransfer_(form, t, kind) {
   try {
     // The leaders see requests when they open the form with their key; email only when switched on.
     if ((form.rules || {}).transferEmails !== true) return;
-    var rows = readResponses(form);
+    var rows = ResponsesRepository.readResponses(form);
     var team = rows.filter(function (r) {
       return (
         r.id === (kind === 'asked' || kind === 'leads' ? t.fromId : t.toId)
@@ -14,7 +14,7 @@ function mailTransfer_(form, t, kind) {
     var to = team && Rules.valueByRole(form, team.data, 'email');
     if (!to) return;
     var who = (t.member.name || '') + ' (' + t.code + ')';
-    var link = siteLink_(form);
+    var link = ResponsesNotify.siteLink(form);
     var lines =
       kind === 'asked'
         ? [

@@ -63,7 +63,7 @@ API['admin.matching.import'] = AuthService.admin(function (req) {
 API['admin.matching.list'] = AuthService.admin(function (req) {
   var form = FormsRepository.requireForm(req.slug || req.id);
   requireMatching_(form);
-  var subs = readResponses(form);
+  var subs = ResponsesRepository.readResponses(form);
   var byPhone = {};
   subs.forEach(function (r) {
     var p = Rules.normalizePhone(r.phone);
@@ -104,7 +104,7 @@ API['admin.matching.decide'] = AuthService.admin(function (req) {
   var form = FormsRepository.requireForm(req.slug || req.id);
   requireMatching_(form);
   var decision = String(req.decision);
-  if (REVIEW_STATUSES.indexOf(decision) === -1)
+  if (ResponsesReview.REVIEW_STATUSES.indexOf(decision) === -1)
     ApiError.fail('bad_status', 'Decision must be pending, approved, or rejected.');
   var stepId = form.matching.step || 'group';
   var hasStep = ((form.review && form.review.steps) || []).some(function (s) {
@@ -116,12 +116,12 @@ API['admin.matching.decide'] = AuthService.admin(function (req) {
       return x.id === req.requestId;
     })[0];
     if (!q) ApiError.fail('request_not_found', 'That request does not exist.');
-    var subs = readResponses(form).filter(function (r) {
+    var subs = ResponsesRepository.readResponses(form).filter(function (r) {
       return Rules.normalizePhone(r.phone) === q.phone;
     });
     if (hasStep && subs.length === 1) {
-      setReviewStep_(form, subs[0], stepId, decision);
-      saveResponse_(form, subs[0]);
+      ResponsesReview.setReviewStep(form, subs[0], stepId, decision);
+      ResponsesRepository.saveResponse(form, subs[0]);
       linked = subs[0].id;
     }
     var sh = requestsSheet_(form);
@@ -129,7 +129,7 @@ API['admin.matching.decide'] = AuthService.admin(function (req) {
     if (req.note !== undefined) q.note = String(req.note);
     Table.writeRow(sh, q._row, REQUEST_COLS_, q);
   });
-  if (linked) afterChange_(form);
+  if (linked) ResponsesNotify.afterChange(form);
   return { decided: true, submissionId: linked };
 });
 

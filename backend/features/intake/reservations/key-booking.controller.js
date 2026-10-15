@@ -6,11 +6,11 @@ var API = API || {};
 
 API.bookingTeam = function (req) {
   var form = FormsRepository.requireForm(String(req.slug || ''));
-  assertAcceptingSubmissions_(form);
+  ResponsesRules.assertAcceptingSubmissions(form);
   var source = requireKeyBookingSource_(form);
   var row = registrationByKey_(source, req.key);
   var code = Rules.fieldByRole(form, 'code');
-  var booking = readResponses(form).filter(function (r) {
+  var booking = ResponsesRepository.readResponses(form).filter(function (r) {
     return (
       code &&
       String(r.data[code.id]) ===

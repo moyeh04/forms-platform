@@ -35,7 +35,7 @@ API['admin.submission.update'] = AuthService.admin(function (req) {
   var patch = req.patch || {};
   var changedData = false;
   Lock.withLock(function () {
-    var live = readResponses(form);
+    var live = ResponsesRepository.readResponses(form);
     var r = live.filter(function (x) {
       return x.id === req.submissionId;
     })[0];
@@ -52,25 +52,25 @@ API['admin.submission.update'] = AuthService.admin(function (req) {
       });
       steps.forEach(function (s) {
         if (patch.review[s.id] !== undefined)
-          setReviewStep_(form, r, s.id, patch.review[s.id]);
+          ResponsesReview.setReviewStep(form, r, s.id, patch.review[s.id]);
       });
     }
     if (patch.status !== undefined) {
-      if (SUBMISSION_STATUSES.indexOf(patch.status) === -1)
+      if (ResponsesRepository.SUBMISSION_STATUSES.indexOf(patch.status) === -1)
         ApiError.fail('bad_status', 'Unknown status.');
       r.status = patch.status;
     }
     if (patch.data) {
       var v = Rules.validateSubmission(vform, patch.data);
       if (!v.ok) ApiError.fail('invalid', 'Some answers need fixing.', v.errors);
-      checkLimits_(vform, v.data, live, r.id);
+      ResponsesRules.checkLimits(vform, v.data, live, r.id);
       r.data = v.data;
-      applyDerived_(vform, r);
+      ResponsesRepository.applyDerived(vform, r);
       changedData = true;
     }
-    saveResponse_(form, r);
+    ResponsesRepository.saveResponse(form, r);
   });
-  afterChange_(form);
+  ResponsesNotify.afterChange(form);
   return { updated: true, dataChanged: changedData };
 });
 
@@ -80,7 +80,7 @@ API['admin.submission.delete'] = AuthService.admin(function (req) {
     if (!cancelResponse_(form, req.submissionId))
       ApiError.fail('submission_not_found', 'That submission does not exist.');
   });
-  afterChange_(form);
+  ResponsesNotify.afterChange(form);
   return { deleted: true };
 });
 
@@ -88,7 +88,7 @@ API['admin.submission.resetKey'] = AuthService.admin(function (req) {
   var form = FormsRepository.requireForm(req.slug || req.id);
   var vform = FormsPublic.validationForm(form);
   return Lock.withLock(function () {
-    var rows = readResponses(form);
+    var rows = ResponsesRepository.readResponses(form);
     var r = rows.filter(function (x) {
       return x.id === req.submissionId;
     })[0];
@@ -97,7 +97,7 @@ API['admin.submission.resetKey'] = AuthService.admin(function (req) {
     r.keyHash = k.hash;
     r.keySeal = sealKey_(form, r.id, k.key);
     r.keyExpires = keyExpiry_(form);
-    saveResponse_(form, r);
+    ResponsesRepository.saveResponse(form, r);
     return { key: k.key, keyExpires: r.keyExpires, ref: r.ref };
   });
 });
@@ -105,7 +105,7 @@ API['admin.submission.resetKey'] = AuthService.admin(function (req) {
 /** The admin reads a student's current key, for example when the student lost it. */
 API['admin.submission.key'] = AuthService.admin(function (req) {
   var form = FormsRepository.requireForm(req.slug || req.id);
-  var r = readResponses(form).filter(function (x) {
+  var r = ResponsesRepository.readResponses(form).filter(function (x) {
     return x.id === req.submissionId;
   })[0];
   if (!r) ApiError.fail('submission_not_found', 'That submission does not exist.');

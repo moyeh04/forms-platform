@@ -66,14 +66,14 @@ function review(req) {
   var form = ViewerService.requireClientForm(client, req.slug);
   if (!client.canReview) ApiError.fail('forbidden', 'This link is read-only.');
   Lock.withLock(function () {
-    var r = readResponses(form).filter(function (x) {
+    var r = ResponsesRepository.readResponses(form).filter(function (x) {
       return x.id === req.submissionId;
     })[0];
     if (!r) ApiError.fail('submission_not_found', 'That submission does not exist.');
-    setReviewStep_(form, r, String(req.stepId), String(req.status));
-    saveResponse_(form, r);
+    ResponsesReview.setReviewStep(form, r, String(req.stepId), String(req.status));
+    ResponsesRepository.saveResponse(form, r);
   });
-  afterChange_(form);
+  ResponsesNotify.afterChange(form);
   return { updated: true };
 }
 

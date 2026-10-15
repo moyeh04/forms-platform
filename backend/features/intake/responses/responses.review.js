@@ -1,5 +1,6 @@
 /** The review steps of a submission and its review status. */
 
+var ResponsesReview = (function () {
 function defaultReview_(form) {
   var out = {};
   ((form.review && form.review.steps) || []).forEach(function (s) {
@@ -59,3 +60,6 @@ function setReviewStep_(form, r, stepId, status) {
   var derived = reviewStatus_(steps, r.review);
   if (derived) r.status = derived;
 }
+
+return { setReviewStep: setReviewStep_, REVIEW_STATUSES, defaultReview: defaultReview_ };
+})();

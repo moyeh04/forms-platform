@@ -115,7 +115,7 @@ function paintDataTab_(sh, cols) {
 
 /** The data tabs of one form's spreadsheet. Transfers and Requests exist only on forms that used them. */
 function styleFormTabs_(ss) {
-  styleDataTab_(ss.getSheetByName('Responses'), RESPONSE_COLS);
+  styleDataTab_(ss.getSheetByName('Responses'), ResponsesRepository.RESPONSE_COLS);
   styleDataTab_(ss.getSheetByName(TRANSFER_TAB_), TRANSFER_COLS);
   styleDataTab_(ss.getSheetByName('Requests'), REQUEST_COLS_);
 }

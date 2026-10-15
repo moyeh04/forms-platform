@@ -21,7 +21,7 @@ function keyRow_(r) {
 
 /** The live registrations of a form that hold a key. */
 function keyedRows_(form) {
-  return readResponses(form).filter(function (r) {
+  return ResponsesRepository.readResponses(form).filter(function (r) {
     return r.keyHash;
   });
 }
@@ -76,7 +76,7 @@ API['admin.keys.extend'] = AuthService.admin(function (req) {
       );
     picked.forEach(function (r) {
       r.keyExpires = extendedExpiry_(r.keyExpires, days, until);
-      saveResponse_(form, r);
+      ResponsesRepository.saveResponse(form, r);
     });
     return picked.length;
   });

@@ -44,7 +44,7 @@ function leaderContacts_(form) {
     rows = null;
   return function (teamId) {
     if (rules.transferPhones !== true) return {};
-    rows = rows || readResponses(form);
+    rows = rows || ResponsesRepository.readResponses(form);
     var team = rows.filter(function (r) {
       return r.id === teamId;
     })[0];
@@ -249,7 +249,7 @@ function decideTransfer_(form, id, approve, by, fromId, next) {
     t.decidedBy = by;
     return { transfer: saveTransfer_(form, t), underMin: false, handed: false };
   }
-  var rows = readResponses(form);
+  var rows = ResponsesRepository.readResponses(form);
   var mf = Rules.fieldByRole(form, 'members');
   var codeId = memberCodeId_(form);
   var range = Rules.teamSizeRange(form);
@@ -288,14 +288,14 @@ function decideTransfer_(form, id, approve, by, fromId, next) {
       });
     setTeamSize_(form, r.data);
     underMin = underMin || r.data[mf.id].length + 1 < range.min;
-    applyDerived_(form, r);
-    saveResponse_(form, r);
+    ResponsesRepository.applyDerived(form, r);
+    ResponsesRepository.saveResponse(form, r);
   });
   if (!has(toList)) {
     to.data[mf.id] = toList.concat([t.member]);
     setTeamSize_(form, to.data);
-    applyDerived_(form, to);
-    saveResponse_(form, to);
+    ResponsesRepository.applyDerived(form, to);
+    ResponsesRepository.saveResponse(form, to);
   }
   t.status = 'approved';
   t.decidedBy = by;

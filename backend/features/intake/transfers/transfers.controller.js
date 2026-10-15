@@ -16,9 +16,9 @@ API['transfer.decide'] = function (req) {
       req.handover
     );
   });
-  afterChange_(form);
+  ResponsesNotify.afterChange(form);
   mailDecision_(vform, out);
-  var fresh = readResponses(form).filter(function (r) {
+  var fresh = ResponsesRepository.readResponses(form).filter(function (r) {
     return r.id === found.id;
   })[0];
   return {
@@ -50,7 +50,7 @@ function adminTransfers_(form) {
   var waiting = readTransfers_(form).filter(function (t) {
     return t.status === 'pending';
   });
-  var rows = waiting.length ? readResponses(form) : [];
+  var rows = waiting.length ? ResponsesRepository.readResponses(form) : [];
   return waiting.map(function (t) {
     var from = rows.filter(function (r) {
       return r.id === t.fromId;
@@ -82,7 +82,7 @@ API['admin.transfer.decide'] = AuthService.admin(function (req) {
       req.handover
     );
   });
-  afterChange_(form);
+  ResponsesNotify.afterChange(form);
   mailDecision_(vform, out);
   return { transfers: adminTransfers_(form), underMin: out.underMin };
 });

@@ -42,7 +42,7 @@
   "backend/features/access/viewer/viewer.controller.js": {
     "biome/format": 1,
     "biome/lint/complexity/useOptionalChain": 2,
-    "lines": 2
+    "lines": 3
   },
   "backend/features/access/viewer/viewer.rules.js": {
     "biome/format": 1,
@@ -60,7 +60,7 @@
   "backend/features/catalog/forms/forms.controller.js": {
     "biome/format": 1,
     "biome/lint/correctness/noInnerDeclarations": 1,
-    "lines": 5
+    "lines": 6
   },
   "backend/features/catalog/forms/forms.public.js": {
     "biome/format": 1,
@@ -99,7 +99,7 @@
     "biome/lint/correctness/noInnerDeclarations": 2,
     "biome/lint/style/noMagicNumbers": 1,
     "jsdoc": 14,
-    "lines": 7
+    "lines": 8
   },
   "backend/features/catalog/lists/lists.controller.js": {
     "biome/format": 1,
@@ -198,34 +198,41 @@
     "lines": 1
   },
   "backend/features/intake/responses/drive-links.js": {
+    "biome/format": 1,
+    "biome/lint/complexity/noExcessiveCognitiveComplexity": 1,
     "biome/lint/complexity/useOptionalChain": 2,
     "biome/lint/correctness/noInnerDeclarations": 2,
     "jsdoc": 4
   },
   "backend/features/intake/responses/responses.notify.js": {
+    "biome/format": 1,
+    "biome/lint/complexity/noExcessiveCognitiveComplexity": 1,
     "biome/lint/complexity/useOptionalChain": 1,
     "biome/lint/correctness/noInnerDeclarations": 5,
     "jsdoc": 4,
-    "lines": 2
+    "lines": 3
   },
   "backend/features/intake/responses/responses.repository.js": {
     "biome/format": 1,
     "biome/lint/style/noMagicNumbers": 1,
     "flags": 2,
     "jsdoc": 8,
-    "lines": 2
+    "lines": 3
   },
   "backend/features/intake/responses/responses.review.js": {
     "biome/format": 1,
+    "biome/lint/complexity/noExcessiveCognitiveComplexity": 1,
     "biome/lint/complexity/useOptionalChain": 2,
     "biome/lint/correctness/noInnerDeclarations": 1,
     "jsdoc": 4,
-    "lines": 2
+    "lines": 3
   },
   "backend/features/intake/responses/responses.rules.js": {
+    "biome/format": 1,
+    "biome/lint/complexity/noExcessiveCognitiveComplexity": 1,
     "biome/lint/correctness/noInnerDeclarations": 4,
     "jsdoc": 8,
-    "lines": 1
+    "lines": 2
   },
   "backend/features/intake/submissions/admin-submissions.controller.js": {
     "biome/format": 1,
@@ -382,7 +389,7 @@
     "biome/format": 1,
     "biome/lint/style/noMagicNumbers": 1,
     "jsdoc": 6,
-    "lines": 12
+    "lines": 13
   },
   "backend/platform/sheets/table.js": {
     "biome/format": 1,

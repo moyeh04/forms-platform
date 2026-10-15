@@ -27,7 +27,7 @@ function numberTeams_(rows) {
 
 /** The responses of a form with their team numbers, whether or not the numbers are stored yet. */
 function numberedResponses_(form, includeDeleted) {
-  var rows = readResponses(form, true);
+  var rows = ResponsesRepository.readResponses(form, true);
   if (isTeamForm_(form)) numberTeams_(rows);
   return includeDeleted
     ? rows
@@ -46,11 +46,11 @@ function keepTeamNumbers_(form, rows) {
     return r._row;
   });
   if (!stored.length) return;
-  var sh = responsesSheet(form);
-  Table.ensureHeaders(sh, RESPONSE_COLS);
+  var sh = ResponsesRepository.responsesSheet(form);
+  Table.ensureHeaders(sh, ResponsesRepository.RESPONSE_COLS);
   var column = sh.getRange(
     2,
-    RESPONSE_COLS.indexOf('number') + 1,
+    ResponsesRepository.RESPONSE_COLS.indexOf('number') + 1,
     sh.getLastRow() - 1,
     1
   );

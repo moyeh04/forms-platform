@@ -1,5 +1,6 @@
 /** The Responses tab of a form: reading and saving submissions. */
 
+var ResponsesRepository = (function () {
 var RESPONSE_COLS = [
   'id',
   'ref',
@@ -126,3 +127,6 @@ function nextRef_(form) {
     ('000' + (count + 1)).slice(-4)
   );
 }
+
+return { RESPONSE_COLS, readResponses, saveResponse: saveResponse_, SUBMISSION_STATUSES, applyDerived: applyDerived_, nextRef: nextRef_, responsesSheet };
+})();

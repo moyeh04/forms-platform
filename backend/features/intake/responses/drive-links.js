@@ -3,6 +3,7 @@
  * asks.
  */
 
+var DriveLinks = (function () {
 function checkDriveLink_(link, naming) {
   var p = Rules.parseDriveLink(link);
   if (!p.ok) return { ok: false, error: 'invalid_link' };
@@ -58,3 +59,6 @@ function checkDriveFields_(form, data) {
   if (Object.keys(errors).length)
     ApiError.fail('invalid', 'Check the Google Drive links.', errors);
 }
+
+return { checkDriveFields: checkDriveFields_ };
+})();

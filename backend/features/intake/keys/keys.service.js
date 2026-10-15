@@ -70,7 +70,7 @@ function findByKey_(form, key, anyAge) {
   key = String(key || '').trim();
   var h = /^\d{5}$/.test(key) ? keyHash_(form, key) : '';
   var hit = null;
-  readResponses(form).forEach(function (r) {
+  ResponsesRepository.readResponses(form).forEach(function (r) {
     if (h && r.keyHash === h) hit = r;
   });
   if (!hit) {

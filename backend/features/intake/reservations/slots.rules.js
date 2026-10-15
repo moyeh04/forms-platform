@@ -49,7 +49,7 @@ function normalizeSlots_(slots) {
 /** How many bookings each slot has: { "day|time": count }. No personal data. */
 function slotAvailability_(form) {
   var taken = {};
-  readResponses(form).forEach(function (r) {
+  ResponsesRepository.readResponses(form).forEach(function (r) {
     if (r.slot) taken[r.slot] = (taken[r.slot] || 0) + 1;
   });
   return taken;

@@ -99,7 +99,7 @@ function buildBookings_(form, ss) {
     var ti = p.day ? p.day.times.indexOf(p.time) : 0;
     return (di < 0 ? 999 : di) * 1000 + (ti < 0 ? 999 : ti);
   }
-  var rows = readResponses(form)
+  var rows = ResponsesRepository.readResponses(form)
     .filter(function (r) {
       return r.slot;
     })
@@ -183,7 +183,7 @@ function buildRegistrations_(form, ss) {
     sh.setColumnWidth(i + 1, w);
   });
 
-  var rows = readResponses(form).sort(function (a, b) {
+  var rows = ResponsesRepository.readResponses(form).sort(function (a, b) {
     var ga = String(a.data.group),
       gb = String(b.data.group);
     if (ga !== gb) return ga < gb ? -1 : 1;

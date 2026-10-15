@@ -51,7 +51,7 @@ function printReservations_(form, dayId, includeEmpty) {
   if (!day) ApiError.fail('day_not_found', 'That day is not in the timetable.');
 
   var byTime = {};
-  readResponses(form).forEach(function (r) {
+  ResponsesRepository.readResponses(form).forEach(function (r) {
     var p = slotParts_(vform, r.slot);
     if (p.dayId !== dayId) return;
     (byTime[p.time] = byTime[p.time] || []).push(r);

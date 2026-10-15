@@ -1,5 +1,6 @@
 /** Whether a form takes submissions, and the limits on how many and how big. */
 
+var ResponsesRules = (function () {
 function assertAcceptingSubmissions_(form) {
   var state = Rules.formState(form);
   if (state !== 'open')
@@ -70,7 +71,7 @@ function checkLimits_(form, data, rows, selfId) {
 /** How many saved responses give each number: { "3": 2, "5": 7 }. numberOf reads it from one response. */
 function countResponses_(form, numberOf) {
   var counts = {};
-  readResponses(form).forEach(function (r) {
+  ResponsesRepository.readResponses(form).forEach(function (r) {
     var n = numberOf(r);
     counts[n] = (counts[n] || 0) + 1;
   });
@@ -93,3 +94,6 @@ function teammateCounts_(form) {
     return Array.isArray(list) ? list.length : 0;
   });
 }
+
+return { teamSizes: teamSizes_, teammateCounts: teammateCounts_, assertAcceptingSubmissions: assertAcceptingSubmissions_, checkLimits: checkLimits_ };
+})();

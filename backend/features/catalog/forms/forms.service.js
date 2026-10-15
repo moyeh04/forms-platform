@@ -22,14 +22,14 @@ function attachSheet_(form) {
   var first = ss.getSheets()[0];
   first.setName('Responses');
   first
-    .getRange(1, 1, 1, RESPONSE_COLS.length)
-    .setValues([RESPONSE_COLS])
+    .getRange(1, 1, 1, ResponsesRepository.RESPONSE_COLS.length)
+    .setValues([ResponsesRepository.RESPONSE_COLS])
     .setFontWeight('bold');
   first
-    .getRange(1, 1, first.getMaxRows(), RESPONSE_COLS.length)
+    .getRange(1, 1, first.getMaxRows(), ResponsesRepository.RESPONSE_COLS.length)
     .setNumberFormat('@');
   first.setFrozenRows(1);
-  SheetStyle.styleDataTab(first, RESPONSE_COLS);
+  SheetStyle.styleDataTab(first, ResponsesRepository.RESPONSE_COLS);
   DriveApp.getFileById(ss.getId()).moveTo(RegistryRepository.rootFolder());
   form.sheetId = ss.getId();
   form.sheetUrl = ss.getUrl();

@@ -19,7 +19,7 @@ function reservationRows_(form, client, mode, dayId) {
   var today = Time.todayIso();
   var membersField = Rules.fieldByRole(form, 'members');
   var includeMembers = !!(membersField && membersField.enabled !== false);
-  var rows = readResponses(form)
+  var rows = ResponsesRepository.readResponses(form)
     .filter(function (r) {
       return r.slot;
     })
@@ -118,7 +118,7 @@ function teamGroups_(form, client) {
 }
 
 function whatsappRows_(form, client) {
-  return readResponses(form)
+  return ResponsesRepository.readResponses(form)
     .sort(byCreated_)
     .map(function (r) {
       return ViewerRules.stripHidden(

@@ -53,9 +53,9 @@ function get(req) {
     });
   }
   // The team size and teammates panels count the saved answers that a new range would leave outside.
-  if (Rules.fieldByRole(form, 'team_size')) out.teamSizes = teamSizes_(form);
+  if (Rules.fieldByRole(form, 'team_size')) out.teamSizes = ResponsesRules.teamSizes(form);
   if (form.type === 'reservation' && Rules.fieldByRole(form, 'members'))
-    out.teammateCounts = teammateCounts_(form);
+    out.teammateCounts = ResponsesRules.teammateCounts(form);
   return out;
 }
 

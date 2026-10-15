@@ -14,7 +14,7 @@ function publicSubmission_(r) {
 
 API.submit = function (req) {
   var form = FormsRepository.requireForm(String(req.slug || ''));
-  assertAcceptingSubmissions_(form);
+  ResponsesRules.assertAcceptingSubmissions(form);
   var vform = FormsPublic.validationForm(form);
   var source = keyBookingSource_(form);
   var v,
@@ -36,11 +36,11 @@ API.submit = function (req) {
   } else {
     v = Rules.validateSubmission(vform, req.data || {});
     if (!v.ok) ApiError.fail('invalid', 'Some answers need fixing.', v.errors);
-    checkDriveFields_(vform, v.data);
+    DriveLinks.checkDriveFields(vform, v.data);
   }
 
   var result = Lock.withLock(function () {
-    var rows = readResponses(form, true);
+    var rows = ResponsesRepository.readResponses(form, true);
     var live = rows.filter(function (r) {
       return !r.deleted;
     });
@@ -49,7 +49,7 @@ API.submit = function (req) {
       ? []
       : takeOutTransfers_(vform, v.data, live, null, req.transfer);
     try {
-      checkLimits_(vform, v.data, live, null);
+      ResponsesRules.checkLimits(vform, v.data, live, null);
     } catch (e) {
       if (source && e.code === 'duplicate')
         ApiError.fail(
@@ -62,12 +62,12 @@ API.submit = function (req) {
       ? bookingKey_(vform, live, req.sourceKey)
       : issueKey_(vform, live);
     var id = Crypto.uuid();
-    var r = applyDerived_(vform, {
+    var r = ResponsesRepository.applyDerived(vform, {
       id: id,
-      ref: nextRef_(form),
+      ref: ResponsesRepository.nextRef(form),
       created: Time.nowIso(),
       status: 'new',
-      review: defaultReview_(form),
+      review: ResponsesReview.defaultReview(form),
       data: v.data,
       keyHash: k.hash,
       keyExpires: keyExpiry_(form),
@@ -76,7 +76,7 @@ API.submit = function (req) {
     });
     rows.push(r);
     keepTeamNumbers_(form, rows);
-    saveResponse_(form, r);
+    ResponsesRepository.saveResponse(form, r);
     var asked = recordTransfers_(form, r, wants);
     return {
       id: r.id,
@@ -87,8 +87,8 @@ API.submit = function (req) {
     };
   });
 
-  afterChange_(form);
-  result.emailed = sendConfirmation_(vform, result, v.data);
+  ResponsesNotify.afterChange(form);
+  result.emailed = ResponsesNotify.sendConfirmation(vform, result, v.data);
   return transferResult_(vform, result, v.data);
 };
 
@@ -151,11 +151,11 @@ API.update = function (req) {
   } else {
     v = Rules.validateSubmission(vform, req.data || {});
     if (!v.ok) ApiError.fail('invalid', 'Some answers need fixing.', v.errors);
-    checkDriveFields_(vform, v.data);
+    DriveLinks.checkDriveFields(vform, v.data);
   }
 
   var asked = Lock.withLock(function () {
-    var live = readResponses(form);
+    var live = ResponsesRepository.readResponses(form);
     var current = live.filter(function (r) {
       return r.id === found.id;
     })[0];
@@ -167,14 +167,14 @@ API.update = function (req) {
       current.id,
       req.transfer
     );
-    checkLimits_(vform, v.data, live, current.id);
+    ResponsesRules.checkLimits(vform, v.data, live, current.id);
     current.data = v.data;
-    applyDerived_(vform, current);
-    saveResponse_(form, current);
+    ResponsesRepository.applyDerived(vform, current);
+    ResponsesRepository.saveResponse(form, current);
     return recordTransfers_(form, current, wants);
   });
 
-  afterChange_(form);
+  ResponsesNotify.afterChange(form);
   return transferResult_(vform, { ref: found.ref, asked: asked }, v.data);
 };
 
@@ -188,7 +188,7 @@ API.remove = function (req) {
     if (!cancelResponse_(form, found.id))
       ApiError.fail('bad_key', 'That key is not right.');
   });
-  afterChange_(form);
+  ResponsesNotify.afterChange(form);
   return { removed: true, ref: found.ref };
 };
 
@@ -220,7 +220,7 @@ function transferResult_(form, result, data) {
  * the row, or null when there is no such live registration. Call it inside withLock_.
  */
 function cancelResponse_(form, id) {
-  var rows = readResponses(form, true);
+  var rows = ResponsesRepository.readResponses(form, true);
   var r = rows.filter(function (x) {
     return x.id === id && !x.deleted;
   })[0];
@@ -229,7 +229,7 @@ function cancelResponse_(form, id) {
   r.deleted = true;
   r.keyHash = '';
   r.keySeal = '';
-  saveResponse_(form, r);
+  ResponsesRepository.saveResponse(form, r);
   closeTransfersOf_(form, r.id);
   return r;
 }
