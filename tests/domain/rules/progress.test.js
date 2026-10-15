@@ -168,3 +168,11 @@ test('Progress: the copy of a form is compared with its list by id', () => {
   assert.equal(d.moved, true);
   assert.equal(d.same, false);
 });
+
+test('Progress: a change that takes off a milestone with marks says so', () => {
+  assert.deepEqual(
+    R.marksHidden(milestones, milestones.slice(1), { m_a: 3, m_c: 0 }),
+    [{ id: 'm_a', label: milestones[0].label, teams: 3 }]
+  );
+  assert.deepEqual(R.marksHidden(milestones, [], { m_c: 0 }), []);
+});

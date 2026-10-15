@@ -134,7 +134,15 @@
         App.sizeAlerts.tag(
           Rules.sizeAlertLevels(alerts),
           Rules.sizeAlertOf(alerts, members.length)
-        )
+        ),
+        Rules.progressOn(form)
+          ? h(
+              'span',
+              { class: 'progress-count' },
+              ' · ' +
+                App.progress.countText(Rules.milestonesOf(form), s.progress)
+            )
+          : null
       ),
       h(
         'div',

@@ -163,6 +163,7 @@ The site is published at the paths it has always had: the pages at the root,
 | `web/css/admin/phone.css` | The phone layout of team members, the page header and bookings. |
 | `web/css/admin/phone-tables.css` | The phone layout of wide tables: one card per row. |
 | `web/css/admin/keys.css` | Client links, the until picker of keys and links, and Download all. |
+| `web/css/admin/progress.css` | Team progress: the board, its phone view, the mark box and the Progress panel. |
 | `web/img/` | The tab icon (`favicon.svg`), PNG sizes for phones and older browsers, and `site.webmanifest`. The pirate and the parrot of the ticket picture (`pirate.webp`, `parrot.webp`), with clear backgrounds; `web/js/form/ticket/` draws the clock and the calendar around them. The pictures of the route: the ship (`ship.svg`), an island (`island.svg`), the treasure chest (`treasure.svg`), the waves (`sea.svg`), the sky by day and by night (`sky-day.svg`, `sky-night.svg`) the sun and moon (`sun.svg`, `moon.svg`) and the red flag of an explored island (`crew-flag.svg`). The arrow of a select (`select-arrow.svg`). They have their own colours; the sea and sky behind them take theirs from the theme. |
 | `web/js/config.js` | Source placeholder; `scripts/build/build-site.js` generates its published copy from the Actions `API_URL` variable, with the version of the site. |
 | `web/js/app/fresh.js` | Keeps an open page on the published version: compares the version in `config.js` with `version.json`, reloads an older page when nothing would be lost, and offers **Reload** otherwise. |
@@ -232,6 +233,7 @@ The site is published at the paths it has always had: the pages at the root,
 | `web/js/admin/settings/limits.view.js` | The Limits and checks panel: most submissions, Drive check, one team per student with transfer requests, folder names. |
 | `web/js/admin/settings/emails.view.js` | The Emails panel: the confirmation to students and the note to the admin. |
 | `web/js/admin/settings/review.view.js` | The Review steps panel, and matching to pasted WhatsApp requests. |
+| `web/js/admin/settings/progress.view.js` | The Progress panel: the milestones list a team registration copies, Update from list, and whether teams see their progress. |
 | `web/js/admin/settings/settings.model.js` | What the settings page saves, and the first thing that stops a save with its panel. |
 | `web/js/admin/settings/savebar.view.js` | The save bar: shown while something changed, sends only what changed, shows why a save was refused. |
 | `web/js/admin/questions/questions.model.js` | The questions and pages of a form as the Questions tab changes them: kinds, moves, adding and removing, choices, what stops a save. |
@@ -294,6 +296,8 @@ The site is published at the paths it has always had: the pages at the root,
 | `web/js/admin/lists/list-head.view.js` | The head of the open list: name, Rename, Delete, what it is for and the forms that ask it. |
 | `web/js/admin/lists/lists.page.js` | The Lists page: its page object, opening a list, and drawing the pane and the editor of each kind. |
 | `web/js/teams/size-alerts.view.js` | The warnings about small teams as they are drawn: a line for each level and a mark on the card of a small team. Used by the dashboard and the instructor page. |
+| `web/js/teams/progress-mark.view.js` | The mark of one team on one milestone: the box with the three states and two notes, and the queue that saves the changes of a cell in order. Used by the dashboard and the instructor page. |
+| `web/js/teams/progress-board.view.js` | The progress board: a table of teams and milestones, one milestone at a time on a phone, and the Teams or Progress switch. Used by the dashboard and the instructor page. |
 | `web/js/viewer/viewer.model.js` | The state of the instructor page and its calls: the link and form in the address, the access key kept for the tab, loading the open form and matching the search. Loaded first of the instructor page parts; creates `App.viewer`. |
 | `web/js/viewer/login.view.js` | The screens before a link opens: the access key it asks for, and why a link cannot be opened. |
 | `web/js/viewer/toolbar.view.js` | The toolbar: the form picker, the views of a booking form, the search, Refresh and Print. |

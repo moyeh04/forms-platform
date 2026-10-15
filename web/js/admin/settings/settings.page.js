@@ -136,11 +136,14 @@
     if (s.hasSize) s.size = A.teamSizePanels(s);
     var size = s.size || {};
     var editKey = A.editKeyPanel(s);
+    s.editKeyPanel = editKey;
     var limits = A.limitsPanel(s);
     var emails = A.emailsPanel(s);
     s.questionsPanel = A.questionsPanel(s);
     if (s.isReservation) reservationPanels(s);
     var review = A.reviewPanel(s);
+    var progress =
+      s.f.type === FormType.TEAM_REGISTRATION ? A.progressPanel(s) : null;
     var questions = [s.questionsPanel, size.sizePanel, s.teammates?.panel];
     var setup = [general, who, editKey, emails, limits, size.alertsPanel];
     return [
@@ -156,7 +159,7 @@
       {
         id: 'settings',
         label: 'Setup',
-        panels: setup.concat([review, dangerPanel(s.f)])
+        panels: setup.concat([review, progress, dangerPanel(s.f)])
       }
     ].filter(Boolean);
   }

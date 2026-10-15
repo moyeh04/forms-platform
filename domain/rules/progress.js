@@ -176,13 +176,35 @@
     return out;
   }
 
+  /**
+   * Lists the milestones a change takes off a form while teams have marks
+   * on them: the marks stay in the sheet but are no longer shown.
+   *
+   * @param {!Array<!Object>} before The milestones as saved.
+   * @param {!Array<!Object>} after The milestones after the change.
+   * @param {!Object<string, number>} counts The teams with marks, by id.
+   * @return {!Array<{id: string, label: !Object, teams: number}>} Each
+   *     milestone taken off that has marks, with how many teams have them.
+   */
+  function marksHidden(before, after, counts) {
+    var kept = idsOf(after);
+    return before
+      .filter(function (m) {
+        return kept.indexOf(m.id) === -1 && counts[m.id] > 0;
+      })
+      .map(function (m) {
+        return { id: m.id, label: m.label, teams: counts[m.id] };
+      });
+  }
+
   var api = {
     milestonesOf: milestonesOf,
     progressOn: progressOn,
     progressForStudents: progressForStudents,
     milestonesFromList: milestonesFromList,
     cleanProgress: cleanProgress,
-    milestonesDiff: milestonesDiff
+    milestonesDiff: milestonesDiff,
+    marksHidden: marksHidden
   };
   if (node) module.exports = api;
   root.RulesProgress = api;

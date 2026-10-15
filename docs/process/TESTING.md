@@ -1,11 +1,11 @@
 # Testing
 
-387 automated tests run without a Google account, a browser, or a network.
+391 automated tests run without a Google account, a browser, or a network.
 They run the **real** backend and the **real** pages. This page explains how
 that works and what it can and cannot prove.
 
 ```
-npm test    # 387 tests
+npm test    # 391 tests
 ```
 
 ## The layers
@@ -153,7 +153,7 @@ says something else.
 | Rules: Drive links | `domain/rules/drive-link.test.js` | 2 | Files, folders and slides, other hosts refused; folder names |
 | Rules: slots | `domain/rules/slots.test.js` | 2 | The generated times of a day, and the room left in a slot |
 | Rules: forms | `domain/rules/form.test.js` | 2 | Members list, role lookup and form state; counting the people of a form with a code counted once |
-| Rules: progress | `domain/rules/progress.test.js` | 6 | The milestones of a team registration copied from a list and cleaned, a mark whose time changes only with its state, a refused milestone, state or note, counts per team and per milestone, what a team and a link see, and a copy compared with its list by id |
+| Rules: progress | `domain/rules/progress.test.js` | 7 | The milestones of a team registration copied from a list and cleaned, a mark whose time changes only with its state, a refused milestone, state or note, counts per team and per milestone, what a team and a link see, a copy compared with its list by id, and the marks a change of milestones would hide |
 | Rules: team size | `domain/rules/team-size.test.js` | 4 | The two warnings about small teams: the levels and their order, starting numbers, the level of a team, a wrong number or order, the numbers a level can ask for |
 | Form metadata: terms | `domain/form-metadata/read.test.js` | 2 | A season term read into its season and the academic year that starts in its year, a term in another shape kept as written, and the batch year of an older WhatsApp form read the same way |
 | Rules: submission | `domain/rules/submission.test.js` | 5 | Cleaned data, field and member errors, the same code twice, too many members, slot choices, disabled fields |
@@ -181,6 +181,7 @@ says something else.
 | Admin page: responses | `web/admin.responses.test.js` | 12 | Team cards with their stored numbers, small teams listed by level, the people count, search and status, details with a key reset or shown, matching, column names on list rows for the phone layout, the day sheet group, one registration's key extended, Download all with what was not downloaded and the saved zip |
 | Admin page: clients | `web/admin.people.test.js` | 3 | A link shown once with the key apart, a lost key shown again, and a link end picked and moved |
 | Admin page: lists | `web/admin.lists.test.js` | 9 | Lists as chips or rows, the reason for a refused save, a year group added from its own card, a section kind added or removed, number runs with steppers, a new list picked for a question, lists the server refuses, a new department letter kept as a chip, and milestones as named rows whose hidden ids survive a rename or a move |
+| Admin page: progress | `web/admin.progress.test.js` | 3 | A team registration that copies a milestones list and keeps its copy until Update from list, no student switch while keys are off, and a team marked on the board with its note and the count on its card |
 | Instructor page | `web/viewer.test.js` | 13 | Small teams listed by level and marked on their card, team numbers with a gap where a team cancelled, today, by day, hidden columns, review rights, invalid links, member values named for the phone layout, phone as a call link, the key screen and its theme switch |
 | Registry writes | `backend/features/catalog/registry/registry-writes.test.js` | 6 | Every change to forms, lists and links written inside the lock, a save that keeps its row while another form is deleted, a save over a newer copy refused, a busy lock, a link that keeps a renamed form, list names that stay unique |
 | Flag cells | `backend/platform/sheets/cell.test.js` | 2 | A stored flag read as yes, no or its column's default (empty, missing and legacy text), and written as `1` or the column's own cell for no |
