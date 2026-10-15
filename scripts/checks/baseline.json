@@ -457,24 +457,38 @@
   "package.json": {
     "lines": 1
   },
-  "scripts/backend-changed.js": {
-    "biome/format": 1,
-    "jsdoc": 3,
-    "lines": 13
-  },
-  "scripts/build-site.js": {
+  "scripts/build/build-site.js": {
     "biome/format": 1,
     "biome/lint/correctness/noUnusedFunctionParameters": 1,
     "biome/lint/style/noMagicNumbers": 1,
     "jsdoc": 10,
     "lines": 24
   },
-  "scripts/bundle-backend.js": {
+  "scripts/build/bundle-backend.js": {
     "biome/format": 1,
     "jsdoc": 4,
     "lines": 5
   },
-  "scripts/dev-server.js": {
+  "scripts/deploy/backend-changed.js": {
+    "biome/format": 1,
+    "jsdoc": 3,
+    "lines": 13
+  },
+  "scripts/deploy/prepare-clasp.js": {
+    "biome/format": 1,
+    "jsdoc": 3,
+    "lines": 6,
+    "numbers": 1
+  },
+  "scripts/deploy/setup-deployment.js": {
+    "biome/format": 1,
+    "biome/lint/complexity/noExcessiveCognitiveComplexity": 1,
+    "biome/lint/complexity/noExcessiveLinesPerFunction": 1,
+    "biome/lint/style/noMagicNumbers": 3,
+    "jsdoc": 13,
+    "lines": 42
+  },
+  "scripts/dev/dev-server.js": {
     "biome/format": 1,
     "biome/lint/complexity/noCommaOperator": 1,
     "biome/lint/style/noMagicNumbers": 10,
@@ -482,20 +496,6 @@
     "jsdoc": 12,
     "lines": 47,
     "numbers": 4
-  },
-  "scripts/prepare-clasp.js": {
-    "biome/format": 1,
-    "jsdoc": 3,
-    "lines": 6,
-    "numbers": 1
-  },
-  "scripts/setup-deployment.js": {
-    "biome/format": 1,
-    "biome/lint/complexity/noExcessiveCognitiveComplexity": 1,
-    "biome/lint/complexity/noExcessiveLinesPerFunction": 1,
-    "biome/lint/style/noMagicNumbers": 3,
-    "jsdoc": 13,
-    "lines": 42
   },
   "shared/": {
     "structure/name": 1,

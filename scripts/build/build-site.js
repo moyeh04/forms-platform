@@ -8,7 +8,7 @@ const crypto = require('node:crypto');
 const fs = require('node:fs');
 const path = require('node:path');
 
-const ROOT = path.resolve(__dirname, '..');
+const ROOT = path.resolve(__dirname, '..', '..');
 const PAGES = ['index.html', 'admin.html', 'viewer.html'];
 const DIRS = ['assets', 'shared'];
 const CONFIG = 'assets/js/config.js';

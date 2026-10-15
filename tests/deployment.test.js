@@ -6,9 +6,9 @@ const path = require('node:path');
 const vm = require('node:vm');
 const { spawnSync } = require('node:child_process');
 const crypto = require('node:crypto');
-const { apiUrl, buildSite } = require('../scripts/build-site.js');
-const { deploymentConfig, prepareClasp } = require('../scripts/prepare-clasp.js');
-const { CLASP, createdProject, deploymentId, setup } = require('../scripts/setup-deployment.js');
+const { apiUrl, buildSite } = require('../scripts/build/build-site.js');
+const { deploymentConfig, prepareClasp } = require('../scripts/deploy/prepare-clasp.js');
+const { CLASP, createdProject, deploymentId, setup } = require('../scripts/deploy/setup-deployment.js');
 
 const root = path.resolve(__dirname, '..');
 const env = {
@@ -126,7 +126,7 @@ test('Deployment: clasp targets dist and writes private credentials separately',
 });
 
 test('Deployment: command line returns failure when API_URL is missing', () => {
-  const result = spawnSync(process.execPath, ['scripts/build-site.js'], {
+  const result = spawnSync(process.execPath, ['scripts/build/build-site.js'], {
     cwd: root, env: { ...process.env, API_URL: '' }, encoding: 'utf8'
   });
   assert.equal(result.status, 1);
@@ -258,12 +258,12 @@ test('Setup: the workstation and the workflow pin the same clasp version', () =>
 });
 
 test('Workflow: a push that changes no backend file skips the Apps Script deployment', () => {
-  const { backendChanged, touchesBackend } = require('../scripts/backend-changed.js');
+  const { backendChanged, touchesBackend } = require('../scripts/deploy/backend-changed.js');
   assert.equal(touchesBackend(['README.md', 'docs/operations/DEPLOY.md', 'assets/js/admin.js', 'index.html', 'tests/core.test.js']), false);
-  for (const file of ['backend/Views.js', 'backend/appsscript.json', 'shared/rules.js', 'scripts/bundle-backend.js', '.github/workflows/pages.yml']) {
+  for (const file of ['backend/Views.js', 'backend/appsscript.json', 'shared/rules.js', 'scripts/build/bundle-backend.js', '.github/workflows/pages.yml']) {
     assert.equal(touchesBackend(['README.md', file]), true, file);
   }
-  assert.equal(touchesBackend(['docs/backend/notes.md', 'scripts/bundle-backend.js.bak']), false, 'only the real paths count');
+  assert.equal(touchesBackend(['docs/backend/notes.md', 'scripts/build/bundle-backend.js.bak']), false, 'only the real paths count');
 
   const before = 'a'.repeat(40);
   const git = (files) => (cmd, args) => (args[0] === 'diff' ? files.join('\n') + '\n' : '');

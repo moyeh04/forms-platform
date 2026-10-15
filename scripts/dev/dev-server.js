@@ -14,9 +14,9 @@
 const http = require('node:http');
 const fs = require('node:fs');
 const path = require('node:path');
-const { createWorld } = require('../tests/harness/appsscript-mock.js');
+const { createWorld } = require('../../tests/harness/appsscript-mock.js');
 
-const ROOT = path.join(__dirname, '..');
+const ROOT = path.join(__dirname, '..', '..');
 const PIN = '4321';
 const TYPES = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.svg': 'image/svg+xml', '.png': 'image/png', '.ico': 'image/x-icon', '.webmanifest': 'application/manifest+json', '.json': 'application/json' };
 

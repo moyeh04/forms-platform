@@ -260,7 +260,7 @@ flowchart LR
     b1["backend/Auth.js"] --> bundle
     b2["backend/Registry.js"] --> bundle
     b3["... 21 more .js files"] --> bundle
-    bundle(("scripts/bundle-backend.js"))
+    bundle(("scripts/build/bundle-backend.js"))
     bundle --> out["dist/Code.gs<br/>one file to deploy"]
     manifest["backend/appsscript.json"] --> bundle
     bundle --> out2["dist/appsscript.json"]
@@ -867,7 +867,7 @@ minutes) and the project cannot change that header. After a publish a browser
 can hold a new page with an old script, or an old page altogether, and a tab
 left open for days never asks again. People were told to press Ctrl+F5.
 
-**What the platform does.** Two things, both made by `scripts/build-site.js`
+**What the platform does.** Two things, both made by `scripts/build/build-site.js`
 when the site is packaged:
 
 - **Every script and stylesheet is named by its content.** The address in the

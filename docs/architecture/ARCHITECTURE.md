@@ -1195,7 +1195,7 @@ labels of the current tables.
 | Change the downloaded Excel list | `dlWorkbook_` in `backend/Download.js` (the file format is in `backend/Xlsx.js`) |
 | Change the Drive folder name rule | `Rules.checkFolderName` in `shared/rules.js` |
 | Change the tab icon | `assets/img/favicon.svg`, then regenerate the PNGs in `assets/img/` |
-| See a change in a real browser before deploying | `npm run dev` (`scripts/dev-server.js`) |
+| See a change in a real browser before deploying | `npm run dev` (`scripts/dev/dev-server.js`) |
 | Change what CI runs or publishes | `.github/workflows/pages.yml` |
 
 ## Documents

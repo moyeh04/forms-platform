@@ -40,7 +40,7 @@ jobs:
         id: backend
         env:
           BEFORE: ${{ github.event.before }}
-        run: node scripts/backend-changed.js
+        run: node scripts/deploy/backend-changed.js
       - uses: actions/upload-artifact@v4
         with:
           name: backend-dist
@@ -79,7 +79,7 @@ jobs:
       - name: Prepare validated clasp configuration
         env:
           CLASPRC_JSON: ${{ secrets.CLASPRC_JSON }}
-        run: node scripts/prepare-clasp.js
+        run: node scripts/deploy/prepare-clasp.js
       - uses: actions/download-artifact@v4
         with:
           name: backend-dist

@@ -11,7 +11,7 @@ hidden.
 npm run build
 ```
 
-runs `scripts/bundle-backend.js`, which writes two files into `dist/`:
+runs `scripts/build/bundle-backend.js`, which writes two files into `dist/`:
 
 | Output | Made from | You do |
 |---|---|---|
@@ -25,7 +25,7 @@ first deploy.
 
 ## What compiles `dist`
 
-Only one program: `scripts/bundle-backend.js`. Nothing else, not GitHub, not
+Only one program: `scripts/build/bundle-backend.js`. Nothing else, not GitHub, not
 Google, not a hidden service. It is about 50 lines of plain Node and uses only
 Node's built-in modules (`fs`, `path`, `vm`).
 
@@ -61,7 +61,7 @@ flowchart TD
 
     cmd["npm run build"] --> bundler
 
-    subgraph bundler["scripts/bundle-backend.js"]
+    subgraph bundler["scripts/build/bundle-backend.js"]
         s1["1. list files<br/>the two shared files first, then backend files A to Z, Code.js last"]
         s2["2. read each file, trim, add a header comment<br/>// ===== backend/Auth.js ====="]
         s3["3. join them into one string"]

@@ -196,7 +196,7 @@ exercised on every run.
 ## Looking at the pages in a real browser
 
 jsdom does not draw anything, so `npm run dev` starts a local preview
-(`scripts/dev-server.js`). It serves the real pages and routes their API calls
+(`scripts/dev/dev-server.js`). It serves the real pages and routes their API calls
 into the same in-memory Google the tests use, seeded with a team form, a
 reservation form, a WhatsApp form, three teams, and a viewer link. The admin PIN
 is `4321`. Nothing is saved: stopping the server forgets everything.
