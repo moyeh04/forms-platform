@@ -210,7 +210,8 @@ the file name says the role:
 | `backend/features/catalog/registry/registry.repository.js` | The registry spreadsheet and the Drive folder that holds every form. |
 | `backend/features/catalog/registry/registry.setup.js` | Creating the registry tabs and folder the first time, and the look of the registry tabs. |
 | `backend/features/catalog/forms/forms.repository.js` | The Forms tab: reading, finding and saving form rows. |
-| `backend/features/catalog/forms/forms.service.js` | Creating, changing, copying and deleting forms with their sheets. |
+| `backend/features/catalog/forms/forms.service.js` | Creating, reading, copying and deleting forms with their sheets, and the form the admin editor opens. |
+| `backend/features/catalog/forms/forms.patch.js` | Changing a form: the settings a patch may change, how each is cleaned, and refusing a change made on an old copy. |
 | `backend/features/catalog/forms/forms.rules.js` | The submission rules and the small-team notice of a form, cleaned to what is allowed. |
 | `backend/features/catalog/forms/forms.public.js` | What the public may read of a form, with its list options filled in. |
 | `backend/features/catalog/forms/forms.questions.js` | The questions and pages an admin adds to a form. |
