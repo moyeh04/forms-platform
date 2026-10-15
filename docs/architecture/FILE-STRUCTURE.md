@@ -322,15 +322,11 @@ paths and limits are under `structure` in `scripts/checks/config.json`.
 |---|---|
 | Root allow-list | The root holds `README.md`, `package.json`, `package-lock.json`, `biome.json`, `.gitignore`, `.git-blame-ignore-revs`, `.githooks/`, `.github/`, `backend/`, `web/`, `domain/`, `scripts/`, `tests/` and `docs/`. Pages, notes and requirements live in their folders. |
 | No catch-all names | No file or folder is named `utils`, `helpers`, `common`, `misc`, `manager`, `stuff` or `shared`. Code is named by what it does, so a reader finds it by its subject. |
-| Folder cap | At most 8 code files in one folder. A ninth means the folder holds more than one subject; sort its files into sub-folders by subject. |
+| One subject per folder | A folder holds the files of one subject, so its name says what is inside. No number decides when a folder is too full; the reviewer splits a folder when it holds two subjects. No published JavaScript standard sets a file count, so none is checked. |
 | Pages and assets | Every script and stylesheet a page loads exists, and every file under `web/js/` and `web/css/` is loaded by a page. |
 | Every file named here | Each source file has a row on this page, by its path or its name. A pattern such as `admin*.js` does not count. |
 | Layers | Code under `backend/platform/` reads no feature, and a `*.controller.js` reads no `*.repository.js`: it asks the service, which reads the repository. `scripts/checks/code/check-layers.js` checks it. |
 | Tests mirror the source | The tests of `scripts/checks/lib/baseline.js` are in `tests/scripts/checks/lib/baseline.test.js`. This rule is not checked yet; the reviewer holds it. |
-
-The tree does not keep all of these today: `web/js/`, `backend/` and `tests/`
-are over the cap. The check baseline counts each of these, so none can
-grow.
 
 ## Data model in one paragraph
 

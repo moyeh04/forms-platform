@@ -129,12 +129,6 @@
       "stuff",
       "shared"
     ],
-    "cap": 8,
-    "code": {
-      "include": [""],
-      "extensions": [".js", ".css", ".html", ".sh"],
-      "exclude": ["tests/fixtures/", "docs/"]
-    },
     "pages": ["web/index.html", "web/admin.html", "web/viewer.html"],
     "loaded": {
       "include": ["web/js/", "web/css/"],

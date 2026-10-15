@@ -425,9 +425,6 @@
     "lines": 12,
     "numbers": 4
   },
-  "tests/": {
-    "structure/cap": 1
-  },
   "tests/admin-ui.test.js": {
     "lines": 65
   },
@@ -529,9 +526,6 @@
   },
   "web/index.html": {
     "lines": 4
-  },
-  "web/js/": {
-    "structure/cap": 1
   },
   "web/js/admin-data.js": {
     "biome/lint/complexity/noExcessiveCognitiveComplexity": 8,
