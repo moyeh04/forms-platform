@@ -136,7 +136,7 @@ Every file is described in [docs/MODULES.md](docs/MODULES.md).
 
 | Read | To learn |
 |---|---|
-| [REQUIREMENTS.md](REQUIREMENTS.md) | Everything the platform was asked to do, and where each item stands |
+| [REQUIREMENTS.md](docs/product/REQUIREMENTS.md) | Everything the platform was asked to do, and where each item stands |
 | [docs/README.md](docs/README.md) | The index of the documentation and how to read its diagrams |
 | [ARCHITECTURE.md](docs/architecture/ARCHITECTURE.md) | What runs where, how requests travel, every module |
 | [WORKAROUNDS.md](docs/architecture/WORKAROUNDS.md) | The 24 solutions that make free hosting enough, and their trade-offs |

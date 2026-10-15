@@ -1,8 +1,8 @@
 # Requirements
 
 Everything the platform was asked to do, and where each item stands. For what
-the project is and how it fits together, see the [README](README.md) and
-[docs/README.md](docs/README.md).
+the project is and how it fits together, see the [README](../../README.md) and
+[docs/README.md](../README.md).
 
 Status: **Done** means built and covered by automated tests. **Done, check live**
 means built and tested against a faithful in-memory copy of Google, but the last

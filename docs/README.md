@@ -17,7 +17,7 @@ whichever page answers your question.
 | [DEPLOY.md](DEPLOY.md) | Click-by-click setup and the first-run checklist |
 | [MODULES.md](MODULES.md) | File-by-file reference |
 | [COMMIT_CONVENTION.md](COMMIT_CONVENTION.md) | How commits and branches are written |
-| [REQUIREMENTS.md](../REQUIREMENTS.md) | Everything the platform was asked to do, and where each item stands |
+| [REQUIREMENTS.md](product/REQUIREMENTS.md) | Everything the platform was asked to do, and where each item stands |
 
 ## How to read the diagrams
 
