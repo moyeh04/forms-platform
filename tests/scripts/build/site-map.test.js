@@ -30,18 +30,18 @@ test('Site map: a split script loads its parts in one order', () => {
   const { bundleSource } = require('../../../scripts/build/bundle-backend.js');
   const bundled = bundleSource().files;
   for (const { published, sources } of JOINED) {
-    const folder = sources[0].replace(/[^/]+$/, '');
+    const inParts = (file) => sources.includes(file);
+    const last = sources[sources.length - 1];
     for (const page of PAGES) {
       const html = fs.readFileSync(path.join(root, sourceOf(page)), 'utf8');
       const loaded = [...html.matchAll(/<script src="([^"]+)"/g)]
         .map((m) => sourceOf(m[1]))
-        .filter((file) => file?.startsWith(folder));
-      if (loaded.length) assert.deepEqual(loaded, sources, page);
+        .filter(inParts);
+      if (loaded.includes(last)) assert.deepEqual(loaded, sources, page);
     }
-    assert.deepEqual(
-      bundled.filter((file) => file.startsWith(folder)),
-      sources,
-      published + ' in the bundle'
-    );
+    const inBundle = bundled.filter(inParts);
+    if (inBundle.includes(last)) {
+      assert.deepEqual(inBundle, sources, published);
+    }
   }
 });

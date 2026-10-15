@@ -195,6 +195,35 @@ test('Deployment: the built site carries its version, and a script or stylesheet
   );
 });
 
+test('Deployment: a page kept from the last release still runs', (t) => {
+  const output = buildSite(env, path.join(temp(t), 'site'));
+  const lastRelease = require('../../fixtures/last-release.json');
+  for (const [page, files] of Object.entries(lastRelease)) {
+    for (const file of files) {
+      assert.ok(fs.existsSync(path.join(output, file)), page + ': ' + file);
+    }
+    const context = vm.createContext({});
+    for (const file of files.filter((f) => f.startsWith('shared/'))) {
+      vm.runInContext(
+        fs.readFileSync(path.join(output, file), 'utf8'),
+        context
+      );
+    }
+    assert.equal(
+      vm.runInContext("FormMetadata.caption({ term: 'Fall 2027' })", context),
+      'Fall 2027',
+      page
+    );
+    if (files.includes('shared/rules.js')) {
+      assert.equal(
+        vm.runInContext("Rules.formState({ status: 'draft' })", context),
+        'draft',
+        page + ': the old rules read the enums'
+      );
+    }
+  }
+});
+
 test('Deployment: command line returns failure when API_URL is missing', () => {
   const result = spawnSync(process.execPath, ['scripts/build/build-site.js'], {
     cwd: root,

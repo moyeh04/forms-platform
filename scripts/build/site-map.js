@@ -24,12 +24,14 @@ const FOLDERS = [
 /**
  * The published scripts made by joining several sources in order. A page a
  * browser kept from before a script was split still asks for the old
- * address, so it stays for one release, made of the new parts.
+ * address, so it stays for one release, made of the new parts. The old
+ * rules come with the enums they read, which those pages never loaded.
  */
 const JOINED = [
   {
     published: 'shared/rules.js',
     sources: [
+      'domain/enums.js',
       'domain/rules/text.js',
       'domain/rules/phone.js',
       'domain/rules/codes.js',

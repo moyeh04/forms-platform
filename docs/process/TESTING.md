@@ -1,11 +1,11 @@
 # Testing
 
-367 automated tests run without a Google account, a browser, or a network.
+368 automated tests run without a Google account, a browser, or a network.
 They run the **real** backend and the **real** pages. This page explains how
 that works and what it can and cannot prove.
 
 ```
-npm test    # 367 tests
+npm test    # 368 tests
 ```
 
 ## The layers
@@ -199,7 +199,7 @@ says something else.
 | Sheet rows | `backend/platform/sheets/table.test.js` | 1 | A new row is written as plain text, also past the rows the sheet was made with |
 | Data tab look | `backend/platform/sheets/sheet-style.test.js` | 3 | The registry and a new form get the header, widths and row tints, an older sheet gets them on the next repaint with no value changed, a tab that refuses the look is still repainted |
 | Sheet menu | `backend/features/outputs/menu/menu.test.js` | 2 | Print dialogs list the right forms and days with escaped titles, and the menu call creates the tab |
-| Site build | `scripts/build/build-site.test.js` | 5 | `API_URL` validation, the URL and the deployment ID agree, built pages use the variable URL, the built site carries its version and names every script and stylesheet by its content, the command line fails without `API_URL` |
+| Site build | `scripts/build/build-site.test.js` | 6 | `API_URL` validation, the URL and the deployment ID agree, built pages use the variable URL, the built site carries its version and names every script and stylesheet by its content, a page kept from the last release finds every file and its old rules read the enums, the command line fails without `API_URL` |
 | Clasp configuration | `scripts/deploy/prepare-clasp.test.js` | 2 | Missing IDs or credentials fail without showing a token, and clasp targets `dist/` with the credentials written apart |
 | First deployment | `scripts/deploy/setup-deployment.test.js` | 8 | A first run creates the web app and stores its address, the credential reaches GitHub on standard input only, a stored deployment updated in place, a branch-built Pages site switched to Actions, a failed step stops early, a bound sheet created once, the choice on a terminal, the same clasp version as the workflow |
 | Backend change | `scripts/deploy/backend-changed.test.js` | 1 | A push without a backend change skips the Apps Script job, and one that cannot be compared deploys |
