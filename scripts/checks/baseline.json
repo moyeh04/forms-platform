@@ -245,109 +245,84 @@
     "structure/cap": 1
   },
   "tests/admin-ui.test.js": {
-    "biome/format": 1,
-    "lines": 435
+    "lines": 65
   },
   "tests/contrast.test.js": {
-    "biome/format": 1,
-    "lines": 10
-  },
-  "tests/core.test.js": {
-    "biome/format": 1,
-    "lines": 50
-  },
-  "tests/deployment.test.js": {
-    "biome/format": 1,
-    "biome/lint/correctness/noUnusedFunctionParameters": 1,
-    "lines": 91
-  },
-  "tests/download.test.js": {
-    "biome/format": 1,
-    "biome/lint/suspicious/noAssignInExpressions": 1,
-    "lines": 64
-  },
-  "tests/form-ui.test.js": {
-    "biome/format": 1,
-    "lines": 175
-  },
-  "tests/fresh.test.js": {
-    "biome/format": 1,
-    "lines": 19
-  },
-  "tests/golden.test.js": {
-    "biome/format": 1,
-    "biome/lint/suspicious/useIterableCallbackReturn": 1,
-    "lines": 41
-  },
-  "tests/harness.test.js": {
-    "biome/format": 1,
     "lines": 3
   },
+  "tests/core.test.js": {
+    "lines": 7
+  },
+  "tests/deployment.test.js": {
+    "biome/lint/correctness/noUnusedFunctionParameters": 1,
+    "lines": 15
+  },
+  "tests/download.test.js": {
+    "biome/lint/suspicious/noAssignInExpressions": 1,
+    "lines": 7
+  },
+  "tests/form-ui.test.js": {
+    "lines": 40
+  },
+  "tests/fresh.test.js": {
+    "lines": 6
+  },
+  "tests/golden.test.js": {
+    "biome/lint/suspicious/useIterableCallbackReturn": 1,
+    "lines": 7
+  },
+  "tests/harness.test.js": {
+    "lines": 1
+  },
   "tests/harness/appsscript-mock.js": {
-    "biome/format": 1,
     "biome/lint/complexity/useOptionalChain": 4,
     "biome/lint/correctness/noUnusedFunctionParameters": 4,
     "biome/lint/suspicious/useIterableCallbackReturn": 3,
-    "lines": 89
-  },
-  "tests/harness/dom.js": {
-    "biome/format": 1,
-    "biome/lint/correctness/noUnusedFunctionParameters": 1,
     "lines": 9
   },
+  "tests/harness/dom.js": {
+    "biome/lint/correctness/noUnusedFunctionParameters": 1
+  },
   "tests/key-expiry.test.js": {
-    "biome/format": 1,
-    "lines": 22
+    "lines": 3
   },
   "tests/keybooking.test.js": {
-    "biome/format": 1,
-    "lines": 99
+    "lines": 17
   },
   "tests/matching.test.js": {
-    "biome/format": 1,
-    "lines": 25
+    "lines": 7
   },
   "tests/print.test.js": {
-    "biome/format": 1,
-    "lines": 35
+    "lines": 4
   },
   "tests/registry-writes.test.js": {
-    "biome/format": 1,
-    "lines": 31
+    "lines": 4
   },
   "tests/reservations.test.js": {
-    "biome/format": 1,
-    "lines": 34
+    "lines": 4
   },
   "tests/rules.test.js": {
-    "biome/format": 1,
     "biome/lint/suspicious/useIterableCallbackReturn": 1,
-    "lines": 59
+    "lines": 6
   },
   "tests/submissions.test.js": {
-    "biome/format": 1,
-    "lines": 96
+    "lines": 10
   },
   "tests/teamsize.test.js": {
-    "biome/format": 1,
-    "lines": 97
+    "lines": 14
   },
   "tests/transfers.test.js": {
-    "biome/format": 1,
     "biome/lint/style/useConst": 1,
-    "lines": 120
+    "lines": 15
   },
   "tests/viewer-ui.test.js": {
-    "biome/format": 1,
-    "lines": 71
+    "lines": 13
   },
   "tests/viewer.test.js": {
-    "biome/format": 1,
-    "lines": 67
+    "lines": 6
   },
   "tests/views.test.js": {
-    "biome/format": 1,
-    "lines": 71
+    "lines": 13
   },
   "web/admin.html": {
     "lines": 5

@@ -8,11 +8,15 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 
-const css = fs.readFileSync(path.join(__dirname, '..', 'web', 'css', 'theme.css'), 'utf8');
+const css = fs.readFileSync(
+  path.join(__dirname, '..', 'web', 'css', 'theme.css'),
+  'utf8'
+);
 
 function tokens(block) {
   const out = {};
-  for (const m of block.matchAll(/--([\w-]+):\s*(#[0-9A-Fa-f]{6})/g)) out[m[1]] = m[2];
+  for (const m of block.matchAll(/--([\w-]+):\s*(#[0-9A-Fa-f]{6})/g))
+    out[m[1]] = m[2];
   return out;
 }
 
@@ -23,11 +27,18 @@ function blockAfter(marker) {
 }
 
 const light = tokens(blockAfter(':root {'));
-const darkToggle = { ...light, ...tokens(blockAfter(':root[data-theme="dark"]')) };
-const darkDevice = { ...light, ...tokens(blockAfter(':root:not([data-theme="light"])')) };
+const darkToggle = {
+  ...light,
+  ...tokens(blockAfter(':root[data-theme="dark"]'))
+};
+const darkDevice = {
+  ...light,
+  ...tokens(blockAfter(':root:not([data-theme="light"])'))
+};
 
 function luminance(hex) {
-  const [r, g, b] = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255)
+  const [r, g, b] = [1, 3, 5]
+    .map((i) => parseInt(hex.slice(i, i + 2), 16) / 255)
     .map((c) => (c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4));
   return 0.2126 * r + 0.7152 * g + 0.0722 * b;
 }
@@ -62,10 +73,18 @@ const PAIRS = [
   ['focus', 'sheet', 3, 'focus ring']
 ];
 
-for (const [name, theme] of [['light', light], ['dark (toggle)', darkToggle], ['dark (device)', darkDevice]]) {
+for (const [name, theme] of [
+  ['light', light],
+  ['dark (toggle)', darkToggle],
+  ['dark (device)', darkDevice]
+]) {
   test(`Contrast: ${name} theme meets WCAG AA for every pair the pages use`, () => {
-    const failures = PAIRS.filter(([fg, bg, min]) => ratio(theme[fg], theme[bg]) < min)
-      .map(([fg, bg, min, use]) => `${fg} on ${bg} (${use}): ${ratio(theme[fg], theme[bg]).toFixed(2)} < ${min}`);
+    const failures = PAIRS.filter(
+      ([fg, bg, min]) => ratio(theme[fg], theme[bg]) < min
+    ).map(
+      ([fg, bg, min, use]) =>
+        `${fg} on ${bg} (${use}): ${ratio(theme[fg], theme[bg]).toFixed(2)} < ${min}`
+    );
     assert.deepEqual(failures, []);
   });
 }

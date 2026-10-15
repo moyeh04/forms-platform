@@ -16,13 +16,19 @@ test('Harness: sheets store, append, delete rows and read back', () => {
   sh.getRange(3, 1, 1, 2).setValues([['c', 3]]);
   assert.equal(sh.getLastRow(), 3);
   sh.deleteRow(2);
-  assert.deepEqual(sh.getDataRange().getValues(), [['a', 1], ['c', 3]]);
+  assert.deepEqual(sh.getDataRange().getValues(), [
+    ['a', 1],
+    ['c', 3]
+  ]);
   sh.getRange(1, 1).setBackground('#fff').setFontWeight('bold');
 });
 
 test('Harness: digest matches Apps Script signed-byte output', () => {
   const w = createWorld();
-  const d = w.ctx.Utilities.computeDigest(w.ctx.Utilities.DigestAlgorithm.SHA_256, 'abc');
+  const d = w.ctx.Utilities.computeDigest(
+    w.ctx.Utilities.DigestAlgorithm.SHA_256,
+    'abc'
+  );
   assert.equal(d.length, 32);
   assert.ok(d.every((b) => b >= -128 && b <= 127));
 });
@@ -41,7 +47,11 @@ test('Harness: a seeded world gives the same ids and random numbers every time',
   const run = (seed) => {
     const w = createWorld({ seed });
     w.call('setup');
-    return [w.props.get('REGISTRY_ID'), w.props.get('PEPPER'), w.ctx.Math.random()];
+    return [
+      w.props.get('REGISTRY_ID'),
+      w.props.get('PEPPER'),
+      w.ctx.Math.random()
+    ];
   };
   assert.deepEqual(run(7), run(7));
   assert.notDeepEqual(run(7), run(8));
