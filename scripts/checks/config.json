@@ -63,6 +63,10 @@
       "fileoverview"
     ]
   },
+  "comments": {
+    "include": [".githooks/", ".github/", "scripts/"],
+    "extensions": [".sh", ".yml", ".yaml", ""]
+  },
   "numbers": {
     "include": ["web/js/", "backend/", "domain/", "scripts/"],
     "extensions": [".js"],

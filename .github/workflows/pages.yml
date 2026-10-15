@@ -1,4 +1,8 @@
-# Pages Source must be GitHub Actions so the generated configuration is served.
+# Tests every push and pull request to master. A push to master then deploys:
+# the Apps Script backend when a backend file changed, and the website to
+# GitHub Pages. Pages Source must be GitHub Actions, because the site is built
+# here with the API address filled in; a branch-built site would serve the
+# placeholder. docs/operations/DEPLOY.md explains each variable and secret.
 name: Test and deploy site
 
 on:
@@ -11,11 +15,16 @@ on:
 permissions:
   contents: read
 
+# Deploys of one branch run one at a time and none is cancelled, so a newer
+# push never stops a backend deploy halfway.
 concurrency:
   group: pages-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
+  # Runs for every push and pull request: the checks, the tests and both
+  # builds. It hands the backend bundle and the configured site to the deploy
+  # jobs as artifacts, so they deploy exactly what was tested.
   test:
     name: Tests and deployment artifacts
     runs-on: ubuntu-latest
@@ -23,6 +32,8 @@ jobs:
       backend: ${{ steps.backend.outputs.backend }}
     steps:
       - uses: actions/checkout@v4
+      # actionlint catches a wrong expression or key in this file before it
+      # can skip a deploy without saying so.
       - uses: actions/setup-go@v5
         with:
           go-version: '1.23.x'
@@ -36,6 +47,8 @@ jobs:
       - run: npm run check
       - run: npm test
       - run: npm run build
+      # A push that touches only the website skips the Apps Script deploy,
+      # so a live backend is never redeployed for nothing.
       - name: Check whether the backend changed
         id: backend
         env:
@@ -46,6 +59,8 @@ jobs:
           name: backend-dist
           path: dist/
           retention-days: 30
+      # Only master builds the site with the live API address; a pull
+      # request never sees the repository variables of the deployment.
       - name: Build configured website
         if: github.event_name != 'pull_request' && github.ref == 'refs/heads/master'
         env:
@@ -60,6 +75,9 @@ jobs:
           include-hidden-files: true
           retention-days: 7
 
+  # Pushes the tested bundle to the existing Apps Script deployment, only on
+  # master and only when a backend file changed. Updating the deployment in
+  # place keeps the API address that the site and the clients already hold.
   apps-script:
     name: Deploy Google Apps Script
     needs: test
@@ -84,21 +102,28 @@ jobs:
         with:
           name: backend-dist
           path: dist/
+      # clasp is pinned to the version setup-deployment.js uses, so the
+      # workstation and CI deploy the same way. The step summary names the new
+      # backend version and how to go back to the one before it.
       - name: Update the existing web deployment
         run: |
           npx --yes @google/clasp@3.4.1 push --force
           npx --yes @google/clasp@3.4.1 deploy -i "$APPS_SCRIPT_DEPLOYMENT_ID" --description "Commit $GITHUB_SHA" | tee deploy.log
           version=$(grep -o '@[0-9][0-9]*' deploy.log | tail -n 1)
           echo "Backend version ${version:-unknown} now serves commit $GITHUB_SHA. To go back, point the deployment at the version before it (docs/operations/DEPLOY.md, Going back to an earlier backend)." >> "$GITHUB_STEP_SUMMARY"
+      # Runs even when the deploy failed, so the clasp credentials never stay
+      # on the runner.
       - name: Remove temporary credentials
         if: always()
         run: |
           node -e "const fs = require('node:fs'); for (const p of [process.env.HOME + '/.clasprc.json', '.clasp.json']) fs.rmSync(p, { force: true });"
 
+  # Publishes the configured site to GitHub Pages after the backend is live,
+  # so the pages never call an action the backend does not have yet. It also
+  # runs when the backend job was skipped because no backend file changed.
   deploy:
     name: Publish to GitHub Pages
     needs: [test, apps-script]
-    # The backend job is skipped when no backend file changed; the site is still published.
     if: always() && needs.test.result == 'success' && (needs.apps-script.result == 'success' || needs.apps-script.result == 'skipped') && github.event_name != 'pull_request' && github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
     permissions:
@@ -109,6 +134,8 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
+      # A Pages site built from a branch would ignore this upload and keep
+      # serving the old pages, so the job stops with the setting to change.
       - name: Verify Pages uses GitHub Actions
         env:
           GH_TOKEN: ${{ github.token }}

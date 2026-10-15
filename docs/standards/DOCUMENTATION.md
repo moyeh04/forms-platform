@@ -55,3 +55,22 @@ without a tag.
 A `//` comment inside a function says why, when the code cannot: a rule from
 the product, a limit of Apps Script, a browser quirk. It does not repeat what
 the next line does.
+
+## Shell scripts, git hooks and workflows
+
+The files that are not JavaScript carry `#` comments under the same rules:
+they say what and why, never who or when.
+
+- A shell script or git hook has a comment block right under its `#!` line
+  that says what it does and when it runs: on `npm install`, before each
+  commit, before each push.
+- A CI workflow starts with a comment block that says what it runs, on which
+  events, and what it deploys.
+- Every job has a comment line above it that says why the job exists and why
+  it runs when it does: the condition of its `if:`, what it waits for.
+- A step whose reason is not in its name gets a comment above it: a pinned
+  version, a step that runs `always()`, a check that stops the deploy.
+
+`scripts/checks/code/check-comments.js` checks the header of each script and
+workflow and the comment above each job; whether a step needs one is for the
+reviewer.

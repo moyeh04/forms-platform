@@ -21,6 +21,7 @@ const CHECKS = [
   require('./code/check-biome.js'),
   require('./code/check-lines.js'),
   require('./code/check-jsdoc.js'),
+  require('./code/check-comments.js'),
   require('./code/check-numbers.js'),
   require('./code/check-flags.js'),
   require('./code/check-enums.js'),

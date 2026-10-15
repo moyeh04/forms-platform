@@ -1,6 +1,6 @@
 {
   ".github/workflows/pages.yml": {
-    "lines": 9
+    "lines": 8
   },
   "backend/features/access/auth/auth.service.js": {
     "biome/lint/complexity/useOptionalChain": 1,
