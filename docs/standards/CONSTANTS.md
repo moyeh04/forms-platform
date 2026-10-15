@@ -12,7 +12,7 @@ change it.
   `_DAYS`, `_BYTES`, `_PX`.
 - **Declared at the top of the file that owns it**, under the imports, never
   inside a function. A value two files need belongs to the lower layer they
-  share: `backend/Config.gs` for the backend, `shared/rules.js` for both
+  share: `backend/Config.js` for the backend, `shared/rules.js` for both
   sides.
 - **Built from smaller names** when it is a product: `40 * 1024 * 1024`
   stays readable, so write it out instead of `41943040`.
@@ -47,13 +47,13 @@ is silenced on its own line with the reason, and both checks honour it:
 
 | Owner | Holds |
 |---|---|
-| `backend/Config.gs` | Sheet tab names, the column lists of the Forms, Responses and Clients tabs, `FORM_TYPES`, `FORM_STATUSES` |
-| `backend/Responses.gs` | `SUBMISSION_STATUSES`, `REVIEW_STATUSES`, the reference prefix of each form type |
-| `backend/Registry.gs` | The list kinds, the built-in lists, the form fields a patch may change and the ones the public may read |
-| `backend/Auth.gs` | `ADMIN_MAX_FAILS`, `ADMIN_LOCK_SECONDS` |
-| `backend/Clients.gs` | `CLIENT_KEY_TRIES_` |
-| `backend/Download.gs` | The size, time and file limits of a download job |
-| `backend/KeyExpiry.gs`, `Questions.gs`, `Views.gs`, `Xlsx.gs`, `SheetStyle.gs` | The limits and sizes of their own feature |
+| `backend/Config.js` | Sheet tab names, the column lists of the Forms, Responses and Clients tabs, `FORM_TYPES`, `FORM_STATUSES` |
+| `backend/Responses.js` | `SUBMISSION_STATUSES`, `REVIEW_STATUSES`, the reference prefix of each form type |
+| `backend/Registry.js` | The list kinds, the built-in lists, the form fields a patch may change and the ones the public may read |
+| `backend/Auth.js` | `ADMIN_MAX_FAILS`, `ADMIN_LOCK_SECONDS` |
+| `backend/Clients.js` | `CLIENT_KEY_TRIES_` |
+| `backend/Download.js` | The size, time and file limits of a download job |
+| `backend/KeyExpiry.js`, `Questions.js`, `Views.js`, `Xlsx.js`, `SheetStyle.js` | The limits and sizes of their own feature |
 | `shared/rules.js` | The Arabic letter and digit tables, `SIZE_ALERT_LEVELS`, week day and month names |
 | `assets/js/*.js` | Each page module's own labels, choices and browser storage keys (`fp_*`) at the top of its wrapper |
 | `assets/js/config.js` | The backend URL, written by the deploy workflow |
@@ -64,7 +64,7 @@ Known gaps, counted in the check baseline until they are fixed:
   `assets/js/admin-timetable.js`.
 - Yes/no values are stored in the sheet as the strings `'1'` and `'0'`
   (`deleted` as `'1'` or empty). The row readers and writers of
-  `backend/Clients.gs` and `backend/Responses.gs` convert them inline, each
+  `backend/Clients.js` and `backend/Responses.js` convert them inline, each
   in its own way, instead of through one codec; `check-flags.js` counts
   them.
 - The ticket drawing in `assets/js/ticket.js` places its shapes with unnamed

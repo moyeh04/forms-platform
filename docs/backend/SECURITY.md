@@ -164,7 +164,7 @@ flowchart LR
 - **Rendering.** The pages build elements with `textContent` and text nodes, not
   by pasting student text into HTML. The only `innerHTML` use in the pages is for the
   app's own fixed icon shapes. A student cannot inject script through a name or
-  title. The print dialog of the sheet menu (`Menu.gs`) is the one exception: it
+  title. The print dialog of the sheet menu (`Menu.js`) is the one exception: it
   builds its list of days as HTML from the day names the admin typed, in a
   dialog only the sheet owner opens.
 - **Admin PIN in the browser.** Kept in `sessionStorage` for the current tab only

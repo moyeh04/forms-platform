@@ -7,7 +7,7 @@
   var started = false;
 
   // What each kind of form is: `text` says what it is for, `pages` are the pages students go
-  // through (the same as the template in Templates.gs), `next` is what to set up after creating it.
+  // through (the same as the template in Templates.js), `next` is what to set up after creating it.
   A.TYPES = {
     team_registration: { label: 'Team registration', icon: 'team', text: 'Teams sign up once: a leader, the members and a project title.',
       pages: ['About you', 'Study details', 'Team members', 'Project'], next: ['Set the smallest and the largest team.', 'Choose who can register.'] },

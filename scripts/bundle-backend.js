@@ -3,7 +3,7 @@
  * Bundles the Apps Script backend into one paste-ready file.
  *
  * Output (git-ignored):
- *   dist/Code.gs          shared rules + every backend/*.gs module
+ *   dist/Code.gs          shared rules + every backend/*.js module
  *   dist/appsscript.json  the manifest (time zone, scopes, web app settings)
  *
  * Module load order does not matter: every module only declares functions
@@ -25,8 +25,8 @@ function listBackend() {
   if (!fs.existsSync(dir)) return [];
   return fs
     .readdirSync(dir)
-    .filter((f) => f.endsWith('.gs'))
-    .sort((a, b) => (a === 'Code.gs') - (b === 'Code.gs') || a.localeCompare(b))
+    .filter((f) => f.endsWith('.js'))
+    .sort((a, b) => (a === 'Code.js') - (b === 'Code.js') || a.localeCompare(b))
     .map((f) => path.posix.join('backend', f));
 }
 

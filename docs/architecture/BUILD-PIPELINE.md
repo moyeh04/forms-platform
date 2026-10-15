@@ -15,7 +15,7 @@ runs `scripts/bundle-backend.js`, which writes two files into `dist/`:
 
 | Output | Made from | You do |
 |---|---|---|
-| `dist/Code.gs` | `shared/rules.js` + every `backend/*.gs` | Actions pushes it with pinned clasp |
+| `dist/Code.gs` | `shared/rules.js` + every `backend/*.js` | Actions pushes it with pinned clasp |
 | `dist/appsscript.json` | `backend/appsscript.json` (copied as-is) | Actions pushes it with pinned clasp |
 
 `dist/` is listed in `.gitignore`, so it is **not committed**. It is regenerated
@@ -55,15 +55,15 @@ Node's built-in modules (`fs`, `path`, `vm`).
 flowchart TD
     subgraph sources["Source files you edit and commit"]
         rules["shared/rules.js, shared/form-metadata.js<br/>rules and form metadata, also loaded by the pages"]
-        gs["backend/*.gs<br/>23 modules"]
+        gs["backend/*.js<br/>23 modules"]
         manifest["backend/appsscript.json<br/>time zone, scopes, web app mode"]
     end
 
     cmd["npm run build"] --> bundler
 
     subgraph bundler["scripts/bundle-backend.js"]
-        s1["1. list files<br/>the two shared files first, then backend files A to Z, Code.gs last"]
-        s2["2. read each file, trim, add a header comment<br/>// ===== backend/Auth.gs ====="]
+        s1["1. list files<br/>the two shared files first, then backend files A to Z, Code.js last"]
+        s2["2. read each file, trim, add a header comment<br/>// ===== backend/Auth.js ====="]
         s3["3. join them into one string"]
         s4["4. compile the string with Node's vm.Script<br/>fail loudly on a syntax error"]
         s5["5. write dist/Code.gs"]
@@ -87,10 +87,10 @@ flowchart TD
 ### Step by step
 
 1. **List the files.** `shared/rules.js` and `shared/form-metadata.js` go
-   first so the globals `Rules` and `FormMetadata` exist. The backend files follow in alphabetical order, with `Code.gs`
+   first so the globals `Rules` and `FormMetadata` exist. The backend files follow in alphabetical order, with `Code.js`
    moved to the end (a one-line comparator in `listBackend`).
 2. **Read and label.** Each file is trimmed and prefixed with a comment such as
-   `// ===== backend/Auth.gs =====`, so when you read the deployed code in the
+   `// ===== backend/Auth.js =====`, so when you read the deployed code in the
    Apps Script editor you can still see where every part came from.
 3. **Join.** All parts become one string.
 4. **Check it compiles.** `new vm.Script(code, { filename: 'Code.gs' })` makes
@@ -163,13 +163,13 @@ flowchart LR
 
 One detail deserves a sentence. A registration such as
 `API['admin.clients.list'] = admin(function () { ... })` *does* run while the
-file loads, and it calls `admin(...)`, which is defined in `Auth.gs`. That works
+file loads, and it calls `admin(...)`, which is defined in `Auth.js`. That works
 whatever the order because `admin` is a **function declaration**, and the whole
 bundle is one script, so declarations are hoisted to the top before any line
 runs. The wrapper only stores the handler; the PIN check happens later, when a
 request arrives.
 
-`Code.gs` goes last only by tradition (it is the entry point and reads best at
+`Code.js` goes last only by tradition (it is the entry point and reads best at
 the end). Moving it would not break anything. The test suite loads the bundle in
 this exact order, so a mistake here would fail every test.
 
@@ -200,10 +200,10 @@ this exact order, so a mistake here would fail every test.
 }}%%
 flowchart TD
     A["dist/Code.gs"] --> B["// ===== shared/rules.js =====<br/>creates the global Rules"]
-    A --> C["// ===== backend/Auth.gs =====<br/>PIN and admin wrapper"]
-    A --> D["// ===== backend/Clients.gs ====="]
+    A --> C["// ===== backend/Auth.js =====<br/>PIN and admin wrapper"]
+    A --> D["// ===== backend/Clients.js ====="]
     A --> E["...  Config, Export, FormsApi, Matching, Menu,<br/>Print, Registry, Responses, Slots, Submissions,<br/>Templates, Viewer, Views"]
-    A --> F["// ===== backend/Code.gs =====<br/>doGet and doPost, the entry point"]
+    A --> F["// ===== backend/Code.js =====<br/>doGet and doPost, the entry point"]
     classDef cDb fill:#F3E2B3,stroke:#B8892D,stroke-width:1.5px,color:#2F2418
     classDef cActor fill:#F4D9D3,stroke:#9A3328,stroke-width:1.5px,color:#2F2418
     classDef cDec fill:#FBEFC9,stroke:#C9A24A,stroke-width:1.5px,color:#2F2418
@@ -216,9 +216,9 @@ Google calls three kinds of function by name:
 
 | Function | Called when | Defined in |
 |---|---|---|
-| `doPost(e)` / `doGet()` | A request reaches the web app address | `Code.gs` |
-| `onOpen()` | The registry sheet opens (draws the **Forms Platform** menu) | `Menu.gs` |
-| `processDirtyViews()` | Once, a minute after a change (a time trigger it books and removes itself) | `Views.gs` |
+| `doPost(e)` / `doGet()` | A request reaches the web app address | `Code.js` |
+| `onOpen()` | The registry sheet opens (draws the **Forms Platform** menu) | `Menu.js` |
+| `processDirtyViews()` | Once, a minute after a change (a time trigger it books and removes itself) | `Views.js` |
 
 ## The same bundle is what the tests run
 

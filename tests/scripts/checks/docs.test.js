@@ -10,7 +10,7 @@ const CONFIG = {
     api: 'docs/API.md',
     testing: 'docs/TESTING.md',
     tests: 'tests',
-    backend: { include: ['backend/'], extensions: ['.gs', '.js'] }
+    backend: { include: ['backend/'], extensions: ['.js'] }
   }
 };
 
@@ -32,7 +32,7 @@ const TWO_TESTS = [
 ].join('\n');
 
 const good = () => ({
-  'backend/Forms.gs':
+  'backend/Forms.js':
     "API['admin.forms.list'] = function () {};\nAPI.submit = function () {};\n",
   'docs/API.md':
     '| `admin.forms.list` | yes |\n| `submit` | no |\n[Testing](TESTING.md)\n',
@@ -48,7 +48,7 @@ test('Docs check: a matching API page, test page and links pass', () => {
 
 test('Docs check: a missing action, wrong count and dead link fail', () => {
   const files = good();
-  files['backend/Forms.gs'] += "API['admin.forms.delete'] = function () {};\n";
+  files['backend/Forms.js'] += "API['admin.forms.delete'] = function () {};\n";
   files['tests/sub/more.test.js'] = TWO_TESTS;
   files['docs/API.md'] += '[Gone](OLD.md)\n';
   const { root, files: list } = repo(files);
