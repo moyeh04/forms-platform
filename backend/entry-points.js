@@ -38,3 +38,84 @@ function setup() {
 function processDirtyViews() {
   SheetViewsScheduler.processDirtyViews();
 }
+
+/**
+ * Draws the Forms Platform menu when the registry sheet opens.
+ */
+function onOpen() {
+  MenuService.onOpen();
+}
+
+/**
+ * Menu item: first-time setup.
+ *
+ * @return {!Object} What setup returned.
+ */
+function menuSetup() {
+  return MenuService.menuSetup();
+}
+
+/**
+ * Menu item: asks for a new admin PIN and stores it.
+ */
+function menuSetPin() {
+  MenuService.menuSetPin();
+}
+
+/**
+ * Menu item: unlocks the admin page after wrong PINs.
+ */
+function menuUnlockAdmin() {
+  MenuService.menuUnlockAdmin();
+}
+
+/**
+ * Menu item: asks for the website address used in emails.
+ */
+function menuSetSiteUrl() {
+  MenuService.menuSetSiteUrl();
+}
+
+/**
+ * Menu item: opens the dialog that prints the bookings of a day.
+ */
+function menuPrintReservations() {
+  MenuService.menuPrintReservations();
+}
+
+/**
+ * Menu item: opens the dialog that prints a team list.
+ */
+function menuPrintTeamList() {
+  MenuService.menuPrintTeamList();
+}
+
+/**
+ * Called by the print dialog: prints one form.
+ *
+ * @param {string} kind What to print: reservations or teams.
+ * @param {string} slug The link name of the form.
+ * @param {string} dayId The day to print, for reservations.
+ * @param {boolean} includeEmpty True to print empty slots too.
+ * @return {!Object} The printed sheet and its PDF.
+ */
+function menuPrint(kind, slug, dayId, includeEmpty) {
+  return MenuService.menuPrint(kind, slug, dayId, includeEmpty);
+}
+
+/**
+ * Menu item: rebuilds the sheet views of every form.
+ */
+function menuRebuildViews() {
+  MenuService.menuRebuildViews();
+}
+
+/**
+ * The forms, with their days, a print dialog can offer.
+ *
+ * @param {string} kind What to print: reservations or teams.
+ * @return {!Array<!Object>} One entry for each form.
+ */
+function menuPrintOptions(kind) {
+  return PrintDialog.menuPrintOptions(kind);
+}

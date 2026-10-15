@@ -1,5 +1,6 @@
 /** The dialog the print menu items open in the sheet. */
 
+var PrintDialog = (function () {
 /** The forms (and their days) a print dialog can offer. */
 function menuPrintOptions(kind) {
   var types =
@@ -62,3 +63,6 @@ function showPrintDialog_(kind, title) {
     .setHeight(300);
   SpreadsheetApp.getUi().showModalDialog(html, title);
 }
+
+return { showPrintDialog: showPrintDialog_, printDialogHtml: printDialogHtml_, menuPrintOptions };
+})();

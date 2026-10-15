@@ -4,6 +4,7 @@
  * the admin PIN, one-click printing, and unlocking the admin page.
  */
 
+var MenuService = (function () {
 function onOpen() {
   SpreadsheetApp.getUi()
     .createMenu('Forms Platform')
@@ -74,11 +75,11 @@ function menuSetSiteUrl() {
 }
 
 function menuPrintReservations() {
-  showPrintDialog_('reservations', 'Print reservations for a day');
+  PrintDialog.showPrintDialog('reservations', 'Print reservations for a day');
 }
 
 function menuPrintTeamList() {
-  showPrintDialog_('teams', 'Print team list');
+  PrintDialog.showPrintDialog('teams', 'Print team list');
 }
 
 /** Called by the dialog. */
@@ -105,3 +106,6 @@ function menuRebuildViews() {
     ui.ButtonSet.OK
   );
 }
+
+return { onOpen, menuSetup, menuSetPin, menuSetSiteUrl, menuUnlockAdmin, menuPrintReservations, menuPrintTeamList, menuRebuildViews, menuPrint };
+})();

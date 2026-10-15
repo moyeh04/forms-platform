@@ -288,7 +288,7 @@ test('Menu: print dialogs list the right forms and days and escape titles', () =
   ]);
   const teams = w.call('menuPrintOptions', 'teams');
   assert.equal(teams.length, 1);
-  const html = w.call('printDialogHtml_', 'teams');
+  const html = w.call('PrintDialog.printDialogHtml', 'teams');
   assert.ok(html.includes('A &lt;b&gt;team&lt;/b&gt; form'));
   assert.equal(html.includes('<b>team</b>'), false);
 });

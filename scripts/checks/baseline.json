@@ -323,14 +323,16 @@
     "lines": 1
   },
   "backend/features/outputs/menu/menu.service.js": {
+    "biome/format": 1,
     "jsdoc": 10,
-    "lines": 4
+    "lines": 5
   },
   "backend/features/outputs/menu/print-dialog.js": {
+    "biome/format": 1,
     "biome/lint/complexity/useOptionalChain": 1,
     "biome/lint/style/noMagicNumbers": 2,
     "jsdoc": 4,
-    "lines": 7
+    "lines": 8
   },
   "backend/features/outputs/print/print.controller.js": {
     "biome/format": 1,
