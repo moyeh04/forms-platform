@@ -512,7 +512,7 @@ person under it).
 | The levels, their starting numbers, the level of a team, and why a setting cannot be saved, the numbers a level can ask for | `Rules.sizeAlerts`, `Rules.sizeAlertLevels`, `Rules.sizeAlertOf`, `Rules.sizeAlertsProblem`, `Rules.sizeAlertBounds` in `domain/rules/team-size.js` |
 | Checking and cleaning the setting on a save | `normalizeRules_` in `forms.rules.js`, with the same `Rules` functions (`bad_size_alerts`) |
 | The control in the Small teams panel of Setup | `A.sizeAlerts` in `admin/settings/size-alerts.view.js`; it returns `{ node, refresh(), problem(), summary() }` like the range control |
-| Whether an instructor sees them | `showSizeAlerts` of each link in `clients.repository.js`, set in the link dialog (`admin/people/people.page.js`) |
+| Whether an instructor sees them | `showSizeAlerts` of each link in `clients.repository.js`, set in the link dialog (`admin/people/client-dialog.view.js`) |
 | The lines above the teams and the mark on a card | `App.sizeAlerts` in `size-alerts.js`, used by the dashboard and the instructor page |
 
 The dashboard loads `domain/rules/` and asks it for the level of each team.
@@ -738,7 +738,7 @@ flowchart LR
         h2["handover.js<br/>who leads a team next"]
         s2["size-alerts.js<br/>small teams, drawn"]
         a3["admin/responses/responses.page.js<br/>blocks, matching, print"]
-        a4["admin/people/people.page.js<br/>clients"]
+        a4["admin/people/<br/>clients"]
         a5["admin/keys/<br/>key and link end dates"]
         a6["admin/responses/download.view.js<br/>Download all"]
     end

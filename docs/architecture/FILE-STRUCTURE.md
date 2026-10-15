@@ -107,7 +107,7 @@ flowchart LR
         h2["handover.js"]
         s2["size-alerts.js"]
         a3["admin/responses/responses.page.js"]
-        a4["admin/people/people.page.js"]
+        a4["admin/people/"]
         a6["admin/lists/lists.page.js"]
     end
     subgraph viewer["viewer.html: instructor page"]
@@ -233,7 +233,11 @@ The site is published at the paths it has always had: the pages at the root,
 | `web/js/admin/keys/keys-summary.view.js` | The keys line of a form's Setup, with the Extend keys button. |
 | `web/js/admin/responses/responses.page.js` | Responses, each team, day or registration in its own block as in the sheet, and WhatsApp matching. |
 | `web/js/admin/responses/download.view.js` | Download all. |
-| `web/js/admin/people/people.page.js` | Instructor and client links. |
+| `web/js/admin/people/access.view.js` | The dialog that shows a private link and its access key apart. |
+| `web/js/admin/people/link-end.view.js` | How long a private link works: the picker of its end and the dialog that moves it. |
+| `web/js/admin/people/client-row.view.js` | A private link in the Clients table, with its key and its actions. |
+| `web/js/admin/people/client-dialog.view.js` | The dialog that makes a private link or edits one. |
+| `web/js/admin/people/people.page.js` | The Clients page: its head and the table of links. |
 | `web/js/admin/lists/lists.page.js` | The lists behind dropdown questions, each edited the way its kind needs. |
 | `web/js/teams/size-alerts.view.js` | The warnings about small teams as they are drawn: a line for each level and a mark on the card of a small team. Used by the dashboard and the instructor page. |
 | `web/js/viewer.js` | The instructor page. |

@@ -172,16 +172,6 @@
     "jsdoc": 88,
     "lines": 44
   },
-  "web/js/admin/people/people.page.js": {
-    "biome/lint/complexity/noExcessiveCognitiveComplexity": 3,
-    "biome/lint/complexity/noExcessiveLinesPerFunction": 3,
-    "biome/lint/correctness/noInnerDeclarations": 1,
-    "biome/lint/style/noExcessiveLinesPerFile": 1,
-    "biome/lint/style/noMagicNumbers": 3,
-    "biome/lint/suspicious/noAssignInExpressions": 1,
-    "jsdoc": 13,
-    "lines": 10
-  },
   "web/js/viewer.js": {
     "biome/lint/complexity/noExcessiveCognitiveComplexity": 4,
     "biome/lint/complexity/noExcessiveLinesPerFunction": 5,
