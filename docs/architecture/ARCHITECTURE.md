@@ -822,8 +822,9 @@ up while a timer ran every five minutes loses that timer on the first run.
 
 The same repaint looks after the data tabs. Responses, Transfers and Requests
 get a dark header, a frozen first row, column widths and two row tints
-(`sheet-style.js`); the registry's Forms, Clients and Lists get them at
-**First-time setup** and from **Rebuild all views** in the sheet menu. A tab
+(`SheetStyle.styleDataTab`, called by `SheetViewsLayout.styleFormTabs`); the
+registry's Forms, Clients and Lists get them at **First-time setup** and from
+**Rebuild all views** in the sheet menu (`RegistrySetup.styleRegistryTabs`). A tab
 that has the look costs three reads and is left alone. Only the look is set, so
 no value and no number format changes, and a tab that refuses a format is logged
 and does not stop the repaint.
@@ -1198,7 +1199,7 @@ labels of the current tables.
 | Add a new form type | A new function in `templates.service.js`, a label in `web/js/admin.js` |
 | Change a validation rule | `domain/rules.js` (browser, server, and tests all follow) |
 | Add a backend action | A named function in the feature's `*.controller.js`, returned by its namespace; a row in `backend/routes.js` with its `Access`; a row in the section of that access in [API.md](../backend/API.md) |
-| Change sheet colours | `sheet-views.layout.js` |
+| Change sheet colours | `PALETTE` in `sheet-style.js` |
 | Change the downloaded Excel list | `dlWorkbook_` in `downloads.workbook.js` (the file format is in `backend/platform/xlsx/`) |
 | Change the Drive folder name rule | `Rules.checkFolderName` in `domain/rules.js` |
 | Change the tab icon | `web/img/favicon.svg`, then regenerate the PNGs in `web/img/` |

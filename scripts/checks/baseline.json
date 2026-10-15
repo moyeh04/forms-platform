@@ -348,12 +348,6 @@
     "jsdoc": 2,
     "lines": 2
   },
-  "backend/platform/sheets/sheet-style.js": {
-    "biome/lint/style/noMagicNumbers": 1,
-    "jsdoc": 6,
-    "layers": 13,
-    "lines": 9
-  },
   "backend/platform/sheets/table.js": {
     "biome/lint/style/noMagicNumbers": 1,
     "jsdoc": 8,

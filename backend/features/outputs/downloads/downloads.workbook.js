@@ -6,13 +6,13 @@ var DownloadsWorkbook = (function () {
     var thing = TeamsService.teamThing(form);
     var styles = [
       {
-        fill: SheetViewsLayout.VIEW_STYLE.ink,
-        color: SheetViewsLayout.VIEW_STYLE.onInk,
+        fill: SheetStyle.PALETTE.ink,
+        color: SheetStyle.PALETTE.onInk,
         bold: true,
         align: 'center'
       }
     ];
-    SheetViewsLayout.VIEW_STYLE.groups.forEach(function (g) {
+    SheetStyle.PALETTE.groups.forEach(function (g) {
       styles.push(
         { fill: g.shades[0], bold: true, align: 'right', rtl: true },
         { fill: g.shades[1], bold: true, align: 'right', rtl: true },
@@ -31,10 +31,10 @@ var DownloadsWorkbook = (function () {
     styles.push({ wrap: true });
     var ST = {
       head: 1,
-      wrap: 2 + SheetViewsLayout.VIEW_STYLE.groups.length * 5
+      wrap: 2 + SheetStyle.PALETTE.groups.length * 5
     };
     var group = function (g, k) {
-      return 2 + (g % SheetViewsLayout.VIEW_STYLE.groups.length) * 5 + k;
+      return 2 + (g % SheetStyle.PALETTE.groups.length) * 5 + k;
     };
     var paths = Object.keys(saved);
     var localLink = function (base) {

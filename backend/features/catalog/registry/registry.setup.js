@@ -1,4 +1,4 @@
-/** Creating the registry tabs and folder the first time. */
+/** Creating the registry tabs and folder the first time, and their look. */
 
 var RegistrySetup = (function () {
   /** First-time setup. Safe to run again. */
@@ -22,7 +22,7 @@ var RegistrySetup = (function () {
     var blank = ss.getSheetByName('Sheet1');
     if (blank && blank.getLastRow() === 0 && ss.getSheets().length > 1)
       ss.deleteSheet(blank);
-    SheetStyle.styleRegistryTabs();
+    styleRegistryTabs();
     RegistryRepository.rootFolder();
     return {
       registryUrl: ss.getUrl(),
@@ -30,5 +30,22 @@ var RegistrySetup = (function () {
     };
   }
 
-  return { setup };
+  /** Gives the three tabs of the registry their look. */
+  function styleRegistryTabs() {
+    var ss = RegistryRepository.registry();
+    SheetStyle.styleDataTab(
+      ss.getSheetByName(Constants.TABS.forms),
+      FormsRepository.FORM_COLS
+    );
+    SheetStyle.styleDataTab(
+      ss.getSheetByName(Constants.TABS.clients),
+      ClientsRepository.CLIENT_COLS
+    );
+    SheetStyle.styleDataTab(ss.getSheetByName(Constants.TABS.lists), [
+      'key',
+      'values'
+    ]);
+  }
+
+  return { setup, styleRegistryTabs };
 })();

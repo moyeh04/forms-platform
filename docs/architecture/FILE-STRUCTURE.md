@@ -190,7 +190,7 @@ the file name says the role:
 | `backend/platform/sheets/table.js` | Reading and writing the rows of a sheet tab by its header names. |
 | `backend/platform/sheets/lock.js` | The script lock every write runs under, safe to nest. |
 | `backend/platform/sheets/cell.js` | Yes/no values as the sheets store them: `readFlag` and `writeFlag`, the only code that reads or writes the stored `'1'` and `'0'`. |
-| `backend/platform/sheets/sheet-style.js` | The look of the data tabs and the registry tabs: row colours, widths and frozen headers. |
+| `backend/platform/sheets/sheet-style.js` | The palette every painted tab shares, and the look of a data tab: row colours, widths and a frozen header. |
 | `backend/platform/security/crypto.js` | Ids, random digits, SHA-256 and the sealing of short digit strings. |
 | `backend/platform/security/properties.js` | Script properties, including the secret pepper of every hash. |
 | `backend/platform/format/text.js` | Turning text into link names and into safe HTML. |
@@ -206,7 +206,7 @@ the file name says the role:
 | File | What it does |
 |---|---|
 | `backend/features/catalog/registry/registry.repository.js` | The registry spreadsheet and the Drive folder that holds every form. |
-| `backend/features/catalog/registry/registry.setup.js` | Creating the registry tabs and folder the first time. |
+| `backend/features/catalog/registry/registry.setup.js` | Creating the registry tabs and folder the first time, and the look of the registry tabs. |
 | `backend/features/catalog/forms/forms.repository.js` | The Forms tab: reading, finding and saving form rows. |
 | `backend/features/catalog/forms/forms.service.js` | Creating, changing, copying and deleting forms with their sheets. |
 | `backend/features/catalog/forms/forms.rules.js` | The submission rules and the small-team notice of a form, cleaned to what is allowed. |
@@ -262,7 +262,7 @@ the file name says the role:
 
 | File | What it does |
 |---|---|
-| `backend/features/outputs/sheet-views/sheet-views.layout.js` | The look of the sheet views: headers, frames, merged labels and links. |
+| `backend/features/outputs/sheet-views/sheet-views.layout.js` | The look of the sheet views: headers, frames, merged labels and links; and the look of a form's data tabs. |
 | `backend/features/outputs/sheet-views/sheet-views.builder.js` | Styled views inside each form's own spreadsheet: the team list, the bookings and the registrations. Every team (or day, or registration) is a block with its own tint and a heavy border around it, so the eye can match a name to its task, code or slot at a glance. |
 | `backend/features/outputs/sheet-views/sheet-views.scheduler.js` | When the sheet views are rebuilt. A change only marks the form's views as out of date and books one run a minute later. The run repaints every marked form and removes itself, so students never wait for formatting and nothing runs while nothing changes. |
 | `backend/features/outputs/sheet-views/sheet-views.controller.js` | The admin action that rebuilds the sheet views. |

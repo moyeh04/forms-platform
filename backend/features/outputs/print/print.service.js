@@ -25,7 +25,7 @@ var PrintService = (function () {
     sh.getRange(1, 1, 1, cols)
       .merge()
       .setValue(title)
-      .setFontFamily(SheetViewsLayout.VIEW_STYLE.font)
+      .setFontFamily(SheetStyle.PALETTE.font)
       .setFontSize(16)
       .setFontWeight('bold')
       .setHorizontalAlignment('center')
@@ -33,7 +33,7 @@ var PrintService = (function () {
     sh.setRowHeight(1, 44);
     sh.getRange(3, 1, 1, cols)
       .setValues([headers])
-      .setFontFamily(SheetViewsLayout.VIEW_STYLE.font)
+      .setFontFamily(SheetStyle.PALETTE.font)
       .setFontSize(12)
       .setFontWeight('bold')
       .setBackground('#E9DFC4')
@@ -107,7 +107,7 @@ var PrintService = (function () {
     if (values.length) {
       sh.getRange(4, 1, values.length, headers.length)
         .setValues(values)
-        .setFontFamily(SheetViewsLayout.VIEW_STYLE.font)
+        .setFontFamily(SheetStyle.PALETTE.font)
         .setFontSize(12)
         .setVerticalAlignment('middle');
       sh.getRange(4, 1, values.length, 2).setHorizontalAlignment('center');
@@ -162,7 +162,7 @@ var PrintService = (function () {
       shades = [],
       blocks = [];
     TeamsService.teamBlocks(form).forEach(function (t, g) {
-      var style = SheetViewsLayout.VIEW_STYLE.groups[g % 2];
+      var style = SheetStyle.PALETTE.groups[g % 2];
       var start = values.length + 4;
       t.members.forEach(function (m, i) {
         values.push([
@@ -200,7 +200,7 @@ var PrintService = (function () {
     sh.getRange(4, 1, values.length, 4)
       .setValues(values)
       .setBackgrounds(shades)
-      .setFontFamily(SheetViewsLayout.VIEW_STYLE.font)
+      .setFontFamily(SheetStyle.PALETTE.font)
       .setFontSize(12)
       .setVerticalAlignment('middle');
     sh.getRange(4, 2, values.length, 1).setFontWeight('bold');
@@ -239,7 +239,7 @@ var PrintService = (function () {
       true,
       true,
       true,
-      SheetViewsLayout.VIEW_STYLE.ink,
+      SheetStyle.PALETTE.ink,
       SpreadsheetApp.BorderStyle.SOLID
     );
     return {
