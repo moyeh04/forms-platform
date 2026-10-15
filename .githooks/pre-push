@@ -1,0 +1,5 @@
+#!/bin/sh
+# Runs before every push: every check on the whole tree, and the tests of the
+# checks. CI runs the same checks and then the full test suite.
+node scripts/checks/run-checks.js --all &&
+  node --test "tests/scripts/checks/**/*.test.js"

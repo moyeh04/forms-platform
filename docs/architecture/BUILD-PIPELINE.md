@@ -282,7 +282,7 @@ deployment succeeds. The server is always the final judge.
 ## What GitHub builds and deploys
 
 `.github/workflows/pages.yml` validates its own syntax with pinned actionlint,
-runs the tests, and creates the `backend-dist` artifact.
+runs the checks and the tests, and creates the `backend-dist` artifact.
 For pushes to `master`, `npm run build:site` packages public files into `_site/`
 and generates `_site/assets/js/config.js` from the required `API_URL` variable.
 Invalid configuration fails before the public artifact is uploaded.

@@ -107,8 +107,9 @@ flowchart LR
 ## Quick start
 
 ```
-npm install          # once, installs the browser test library and the git hook
+npm install          # once, installs the browser test library, Biome and the git hooks
 npm run dev          # local preview on http://localhost:8080 (PIN 4321), in memory, no Google needed
+npm run check        # Biome, line width, JSDoc, constants and structure checks
 npm test             # rules, backend, form page, dashboard, instructor page, deployment
 npm run build        # writes dist/Code.gs and dist/appsscript.json for clasp
 npm run setup        # first deployment: creates the sheet, pushes the backend, creates the web app, configures GitHub

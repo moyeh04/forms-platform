@@ -1,0 +1,125 @@
+{
+  "baseline": "baseline.json",
+  "exceptions": "exceptions.json",
+  "docs": {
+    "api": "docs/backend/API.md",
+    "testing": "docs/process/TESTING.md",
+    "tests": "tests",
+    "backend": {
+      "include": ["backend/"],
+      "extensions": [".gs", ".js"]
+    }
+  },
+  "biome": {
+    "include": [
+      "assets/js/",
+      "assets/css/",
+      "backend/",
+      "shared/",
+      "scripts/",
+      "tests/",
+      "package.json",
+      "biome.json"
+    ],
+    "extensions": [".js", ".css", ".json"],
+    "exclude": ["tests/fixtures/"]
+  },
+  "lines": {
+    "limit": 80,
+    "include": [
+      "assets/",
+      "backend/",
+      "shared/",
+      "scripts/",
+      "tests/",
+      ".githooks/",
+      ".github/",
+      "index.html",
+      "admin.html",
+      "viewer.html",
+      "biome.json",
+      "package.json"
+    ],
+    "extensions": [".js", ".gs", ".css", ".html", ".sh", ".yml", ".json", ""],
+    "exclude": ["tests/fixtures/", "package-lock.json"]
+  },
+  "jsdoc": {
+    "include": ["assets/js/", "backend/", "shared/", "scripts/"],
+    "extensions": [".js", ".gs"],
+    "exclude": ["assets/js/config.js"],
+    "forbiddenTags": [
+      "author",
+      "date",
+      "since",
+      "version",
+      "copyright",
+      "license",
+      "created",
+      "modified",
+      "file",
+      "fileoverview"
+    ]
+  },
+  "numbers": {
+    "include": ["assets/js/", "backend/", "shared/", "scripts/"],
+    "extensions": [".js", ".gs"],
+    "allowed": [0, 1, 2, 10, 24, 60]
+  },
+  "flags": {
+    "include": ["assets/js/", "backend/", "shared/"],
+    "extensions": [".js", ".gs"],
+    "exclude": []
+  },
+  "structure": {
+    "root": [
+      "README.md",
+      "package.json",
+      "package-lock.json",
+      "biome.json",
+      ".gitignore",
+      ".git-blame-ignore-revs",
+      ".githooks",
+      ".github",
+      "backend",
+      "web",
+      "domain",
+      "scripts",
+      "tests",
+      "docs"
+    ],
+    "catchAllNames": [
+      "utils",
+      "util",
+      "helpers",
+      "helper",
+      "common",
+      "misc",
+      "manager",
+      "stuff",
+      "shared"
+    ],
+    "cap": 8,
+    "code": {
+      "include": [""],
+      "extensions": [".js", ".gs", ".css", ".html", ".sh"],
+      "exclude": ["tests/fixtures/", "docs/"]
+    },
+    "pages": ["index.html", "admin.html", "viewer.html"],
+    "loaded": {
+      "include": ["assets/js/", "assets/css/"],
+      "extensions": [".js", ".css"]
+    },
+    "fileStructure": "docs/architecture/FILE-STRUCTURE.md",
+    "documented": {
+      "include": [
+        "assets/js/",
+        "assets/css/",
+        "backend/",
+        "shared/",
+        "scripts/",
+        ".githooks/"
+      ],
+      "extensions": [".js", ".gs", ".css", ".sh", ""]
+    }
+  }
+}
