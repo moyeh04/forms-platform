@@ -22,7 +22,7 @@
       "biome.json"
     ],
     "extensions": [".js", ".css", ".json"],
-    "exclude": ["tests/fixtures/", "backend/"]
+    "exclude": ["tests/fixtures/"]
   },
   "lines": {
     "limit": 80,

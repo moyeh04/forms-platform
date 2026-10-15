@@ -45,6 +45,15 @@ Rules turned off, each for a reason:
 | `complexity/useArrowFunction` | the browser files are classic scripts wrapped in `(function (App) { … })(window.App)`, and the backend is Apps Script globals; both are written with `function` |
 | `suspicious/noRedundantUseStrict` | the browser files are classic scripts, not modules, so `'use strict'` inside their wrapper is not redundant |
 
+Two rules are off for `backend/` only. The bundler joins every backend file
+into one Apps Script file, so they share one global scope that Biome, which
+reads one file at a time, cannot see:
+
+| Rule | Why it is off in `backend/` |
+|---|---|
+| `correctness/noUnusedVariables` | a top-level function is called by Apps Script (`doGet`, `doPost`, menu items, triggers) or by another backend file, so Biome reports it as unused |
+| `correctness/noInvalidUseBeforeDeclaration` | each file joins the shared handler table with `var API = API \|\| {}`, which reads `API` before the declaration in the same file |
+
 Tests are exempt from the size rules and from `noMagicNumbers`: an expected
 value in an assertion is data.
 
