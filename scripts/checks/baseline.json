@@ -2,12 +2,6 @@
   ".github/workflows/pages.yml": {
     "lines": 8
   },
-  "backend/features/access/auth/auth.service.js": {
-    "biome/lint/complexity/useOptionalChain": 1,
-    "biome/lint/style/noMagicNumbers": 1,
-    "jsdoc": 5,
-    "lines": 2
-  },
   "backend/features/access/clients/clients.access.js": {
     "biome/lint/complexity/noExcessiveCognitiveComplexity": 1,
     "biome/lint/complexity/useOptionalChain": 2,
@@ -102,12 +96,6 @@
     "biome/lint/correctness/noInnerDeclarations": 1,
     "biome/lint/style/noMagicNumbers": 1,
     "jsdoc": 2
-  },
-  "backend/features/catalog/registry/registry.repository.js": {
-    "jsdoc": 2
-  },
-  "backend/features/catalog/registry/registry.setup.js": {
-    "jsdoc": 1
   },
   "backend/features/catalog/templates/template-fields.js": {
     "biome/lint/complexity/noExcessiveCognitiveComplexity": 1,

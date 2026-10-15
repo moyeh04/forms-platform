@@ -1,7 +1,13 @@
 /** Creating the registry tabs and folder the first time, and their look. */
 
 var RegistrySetup = (function () {
-  /** First-time setup. Safe to run again. */
+  /**
+   * Sets up the registry the first time: its tabs, the default lists, the
+   * pepper and the folder. Safe to run again.
+   *
+   * @return {{registryUrl: string, folderId: ?string}} The registry's
+   *     address and the id of the Drive folder.
+   */
   function setup() {
     var ss = RegistryRepository.registry();
     Properties.setProp(Constants.PROPS.REGISTRY_ID, ss.getId());
