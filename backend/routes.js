@@ -43,3 +43,23 @@ API['admin.transfer.decide'] = AuthService.admin(
 
 API['bookingTeam'] = KeyBookingController.bookingTeam;
 API['admin.bookings.next'] = AuthService.admin(KeyBookingController.next);
+
+API['admin.submissions'] = AuthService.admin(
+  AdminSubmissionsController.submissions
+);
+API['admin.submission.update'] = AuthService.admin(
+  AdminSubmissionsController.update
+);
+API['admin.submission.delete'] = AuthService.admin(
+  AdminSubmissionsController.remove
+);
+API['admin.submission.resetKey'] = AuthService.admin(
+  AdminSubmissionsController.resetKey
+);
+API['admin.submission.key'] = AuthService.admin(
+  AdminSubmissionsController.submissionKey
+);
+API['submit'] = SubmissionsController.submit;
+API['lookup'] = SubmissionsController.lookup;
+API['update'] = SubmissionsController.update;
+API['remove'] = SubmissionsController.remove;

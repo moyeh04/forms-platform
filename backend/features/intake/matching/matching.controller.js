@@ -95,7 +95,7 @@ API['admin.matching.list'] = AuthService.admin(function (req) {
     });
   return {
     requests: out,
-    submissions: subs.map(adminView_),
+    submissions: subs.map(AdminSubmissionsController.adminView),
     notRequested: notRequested
   };
 });

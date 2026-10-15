@@ -1,7 +1,6 @@
 /** The student actions: submit, look up, update and cancel a submission. */
 
-var API = API || {};
-
+var SubmissionsController = (function () {
 function publicSubmission_(r) {
   return {
     ref: r.ref,
@@ -12,7 +11,13 @@ function publicSubmission_(r) {
   };
 }
 
-API.submit = function (req) {
+/**
+ * Answers the `submit` action.
+ *
+ * @param {!Object} req The request body.
+ * @return {*} The answer, sent back as JSON.
+ */
+function submit(req) {
   var form = FormsRepository.requireForm(String(req.slug || ''));
   ResponsesRules.assertAcceptingSubmissions(form);
   var vform = FormsPublic.validationForm(form);
@@ -90,7 +95,7 @@ API.submit = function (req) {
   ResponsesNotify.afterChange(form);
   result.emailed = ResponsesNotify.sendConfirmation(vform, result, v.data);
   return transferResult_(vform, result, v.data);
-};
+}
 
 /**
  * A task is handed in by its deadline: once the form stops taking answers, a key still opens
@@ -122,7 +127,13 @@ function editScope_(form) {
   return edit ? 'all' : form.editKey.allowDelete ? 'slot' : '';
 }
 
-API.lookup = function (req) {
+/**
+ * Answers the `lookup` action.
+ *
+ * @param {!Object} req The request body.
+ * @return {*} The answer, sent back as JSON.
+ */
+function lookup(req) {
   var form = FormsRepository.requireForm(String(req.slug || ''));
   var r = KeysService.findByKey(form, req.key);
   var locked = taskLocked_(form);
@@ -136,9 +147,15 @@ API.lookup = function (req) {
     canDelete: !!form.editKey.allowDelete && !locked,
     locked: locked
   };
-};
+}
 
-API.update = function (req) {
+/**
+ * Answers the `update` action.
+ *
+ * @param {!Object} req The request body.
+ * @return {*} The answer, sent back as JSON.
+ */
+function update(req) {
   var form = FormsRepository.requireForm(String(req.slug || ''));
   var vform = FormsPublic.validationForm(form);
   var found = KeysService.findByKey(form, req.key);
@@ -176,9 +193,15 @@ API.update = function (req) {
 
   ResponsesNotify.afterChange(form);
   return transferResult_(vform, { ref: found.ref, asked: asked }, v.data);
-};
+}
 
-API.remove = function (req) {
+/**
+ * Answers the `remove` action.
+ *
+ * @param {!Object} req The request body.
+ * @return {*} The answer, sent back as JSON.
+ */
+function remove(req) {
   var form = FormsRepository.requireForm(String(req.slug || ''));
   var found = KeysService.findByKey(form, req.key);
   if (!form.editKey.allowDelete)
@@ -190,7 +213,7 @@ API.remove = function (req) {
   });
   ResponsesNotify.afterChange(form);
   return { removed: true, ref: found.ref };
-};
+}
 
 /**
  * Finishes a save that asked for members of other teams: emails their leaders, and returns the
@@ -233,3 +256,6 @@ function cancelResponse_(form, id) {
   TransfersService.closeTransfersOf(form, r.id);
   return r;
 }
+
+return { editScope: editScope_, cancelResponse: cancelResponse_, publicSubmission: publicSubmission_, submit, lookup, update, remove };
+})();

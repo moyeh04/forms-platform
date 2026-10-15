@@ -27,7 +27,7 @@ function transferDecide(req) {
     return r.id === found.id;
   })[0];
   return {
-    submission: publicSubmission_(fresh),
+    submission: SubmissionsController.publicSubmission(fresh),
     transfers: TransfersService.teamTransfers(vform, fresh),
     underMin: out.underMin
   };

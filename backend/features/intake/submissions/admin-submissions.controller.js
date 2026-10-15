@@ -2,8 +2,7 @@
  * The admin actions on submissions: list, edit, delete and reset or show a key.
  */
 
-var API = API || {};
-
+var AdminSubmissionsController = (function () {
 function adminView_(r) {
   var o = Json.clone(r);
   o.keyKnown = !!(r.keyHash && r.keySeal);
@@ -13,7 +12,13 @@ function adminView_(r) {
   return o;
 }
 
-API['admin.submissions'] = AuthService.admin(function (req) {
+/**
+ * Answers the `admin.submissions` action.
+ *
+ * @param {!Object} req The request body.
+ * @return {*} The answer, sent back as JSON.
+ */
+function submissions(req) {
   var form = FormsRepository.requireForm(req.slug || req.id);
   var rows = TeamNumbers.numberedResponses(form, !!req.includeDeleted).map(function (r) {
     var view = adminView_(r);
@@ -27,9 +32,15 @@ API['admin.submissions'] = AuthService.admin(function (req) {
     return view;
   });
   return { submissions: rows, transfers: TransfersController.adminTransfers(form) };
-});
+}
 
-API['admin.submission.update'] = AuthService.admin(function (req) {
+/**
+ * Answers the `admin.submission.update` action.
+ *
+ * @param {!Object} req The request body.
+ * @return {*} The answer, sent back as JSON.
+ */
+function update(req) {
   var form = FormsRepository.requireForm(req.slug || req.id);
   var vform = FormsPublic.validationForm(form);
   var patch = req.patch || {};
@@ -72,19 +83,31 @@ API['admin.submission.update'] = AuthService.admin(function (req) {
   });
   ResponsesNotify.afterChange(form);
   return { updated: true, dataChanged: changedData };
-});
+}
 
-API['admin.submission.delete'] = AuthService.admin(function (req) {
+/**
+ * Answers the `admin.submission.delete` action.
+ *
+ * @param {!Object} req The request body.
+ * @return {*} The answer, sent back as JSON.
+ */
+function remove(req) {
   var form = FormsRepository.requireForm(req.slug || req.id);
   Lock.withLock(function () {
-    if (!cancelResponse_(form, req.submissionId))
+    if (!SubmissionsController.cancelResponse(form, req.submissionId))
       ApiError.fail('submission_not_found', 'That submission does not exist.');
   });
   ResponsesNotify.afterChange(form);
   return { deleted: true };
-});
+}
 
-API['admin.submission.resetKey'] = AuthService.admin(function (req) {
+/**
+ * Answers the `admin.submission.resetKey` action.
+ *
+ * @param {!Object} req The request body.
+ * @return {*} The answer, sent back as JSON.
+ */
+function resetKey(req) {
   var form = FormsRepository.requireForm(req.slug || req.id);
   var vform = FormsPublic.validationForm(form);
   return Lock.withLock(function () {
@@ -100,10 +123,15 @@ API['admin.submission.resetKey'] = AuthService.admin(function (req) {
     ResponsesRepository.saveResponse(form, r);
     return { key: k.key, keyExpires: r.keyExpires, ref: r.ref };
   });
-});
+}
 
-/** The admin reads a student's current key, for example when the student lost it. */
-API['admin.submission.key'] = AuthService.admin(function (req) {
+/**
+ * The admin reads a student's current key, for example when the student lost it.
+ *
+ * @param {!Object} req The request body.
+ * @return {*} The answer, sent back as JSON.
+ */
+function submissionKey(req) {
   var form = FormsRepository.requireForm(req.slug || req.id);
   var r = ResponsesRepository.readResponses(form).filter(function (x) {
     return x.id === req.submissionId;
@@ -121,4 +149,7 @@ API['admin.submission.key'] = AuthService.admin(function (req) {
     ref: r.ref,
     expired: !!(r.keyExpires && Date.parse(r.keyExpires) < Date.now())
   };
-});
+}
+
+return { adminView: adminView_, submissions, update, remove, resetKey, submissionKey };
+})();
