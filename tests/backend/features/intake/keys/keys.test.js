@@ -53,28 +53,31 @@ const team = (o = {}) =>
     ...o
   });
 
-test('Key: lookup returns the registration and wrong keys are throttled', () => {
-  const w = boot();
-  const r = w.submit(team());
-  const hit = w.api({ action: 'lookup', slug: w.form.slug, key: r.key });
-  assert.equal(hit.submission.data.leader_code, '4230999');
-  assert.equal(hit.canEdit, true);
-  const wrong = r.key === '00000' ? '11111' : '00000';
-  for (let i = 0; i < 10; i++)
+test(
+  'Key: lookup returns the registration ' + 'and wrong keys are throttled',
+  () => {
+    const w = boot();
+    const r = w.submit(team());
+    const hit = w.api({ action: 'lookup', slug: w.form.slug, key: r.key });
+    assert.equal(hit.submission.data.leader_code, '4230999');
+    assert.equal(hit.canEdit, true);
+    const wrong = r.key === '00000' ? '11111' : '00000';
+    for (let i = 0; i < 10; i++)
+      assert.equal(
+        w.api({ action: 'lookup', slug: w.form.slug, key: wrong }).error.code,
+        'bad_key'
+      );
     assert.equal(
-      w.api({ action: 'lookup', slug: w.form.slug, key: wrong }).error.code,
-      'bad_key'
+      w.api({ action: 'lookup', slug: w.form.slug, key: r.key }).error.code,
+      'too_many_attempts'
     );
-  assert.equal(
-    w.api({ action: 'lookup', slug: w.form.slug, key: r.key }).error.code,
-    'too_many_attempts'
-  );
-  w.setNow(w.nowMs + 61000);
-  assert.equal(
-    w.api({ action: 'lookup', slug: w.form.slug, key: r.key }).ok,
-    true
-  );
-});
+    w.setNow(w.nowMs + 61000);
+    assert.equal(
+      w.api({ action: 'lookup', slug: w.form.slug, key: r.key }).ok,
+      true
+    );
+  }
+);
 
 test('Key: expires after the configured number of days', () => {
   const w = boot();
@@ -174,67 +177,78 @@ test('Key: keys are unique across a form', () => {
   }
 });
 
-test('Keys: the admin can read a student key back; the sheet only holds a sealed copy', () => {
-  const w = boot();
-  const r = w.submit(team());
-  const subs = w.admin({
-    action: 'admin.submissions',
-    slug: w.form.slug
-  }).submissions;
-  assert.equal(subs[0].keySeal, undefined, 'the seal never leaves the server');
-  assert.equal(subs[0].keyKnown, true);
-  const got = w.admin({
-    action: 'admin.submission.key',
-    slug: w.form.slug,
-    submissionId: subs[0].id
-  });
-  assert.equal(got.key, r.key);
-  const raw = w.sheet(w.form.sheetId, 'Responses').getDataRange().getValues();
-  assert.ok(
-    !JSON.stringify(raw).includes('"' + r.key + '"'),
-    'the plain key is not in the sheet'
-  );
-  assert.ok(raw[0].includes('keySeal'));
-  assert.equal(
-    w.api({
+test(
+  'Keys: the admin can read a student key back; the sheet only holds a ' +
+    'sealed copy',
+  () => {
+    const w = boot();
+    const r = w.submit(team());
+    const subs = w.admin({
+      action: 'admin.submissions',
+      slug: w.form.slug
+    }).submissions;
+    assert.equal(
+      subs[0].keySeal,
+      undefined,
+      'the seal never leaves the server'
+    );
+    assert.equal(subs[0].keyKnown, true);
+    const got = w.admin({
       action: 'admin.submission.key',
       slug: w.form.slug,
       submissionId: subs[0].id
-    }).error.code,
-    'bad_pin',
-    'needs the PIN'
-  );
-  const fresh = w.admin({
-    action: 'admin.submission.resetKey',
-    slug: w.form.slug,
-    submissionId: subs[0].id
-  });
-  assert.equal(
-    w.admin({
-      action: 'admin.submission.key',
+    });
+    assert.equal(got.key, r.key);
+    const raw = w.sheet(w.form.sheetId, 'Responses').getDataRange().getValues();
+    assert.ok(
+      !JSON.stringify(raw).includes('"' + r.key + '"'),
+      'the plain key is not in the sheet'
+    );
+    assert.ok(raw[0].includes('keySeal'));
+    assert.equal(
+      w.api({
+        action: 'admin.submission.key',
+        slug: w.form.slug,
+        submissionId: subs[0].id
+      }).error.code,
+      'bad_pin',
+      'needs the PIN'
+    );
+    const fresh = w.admin({
+      action: 'admin.submission.resetKey',
       slug: w.form.slug,
       submissionId: subs[0].id
-    }).key,
-    fresh.key,
-    'a reset key can be shown too'
-  );
-});
+    });
+    assert.equal(
+      w.admin({
+        action: 'admin.submission.key',
+        slug: w.form.slug,
+        submissionId: subs[0].id
+      }).key,
+      fresh.key,
+      'a reset key can be shown too'
+    );
+  }
+);
 
-test('Keys: registrations made before sealing say so and point to Reset key', () => {
-  const w = boot();
-  w.submit(team());
-  const sh = w.sheet(w.form.sheetId, 'Responses');
-  const vals = sh.getDataRange().getValues();
-  sh.getRange(2, vals[0].indexOf('keySeal') + 1).setValue('');
-  const sub = w.admin({ action: 'admin.submissions', slug: w.form.slug })
-    .submissions[0];
-  assert.equal(sub.keyKnown, false);
-  assert.equal(
-    w.admin({
-      action: 'admin.submission.key',
-      slug: w.form.slug,
-      submissionId: sub.id
-    }).error.code,
-    'key_unknown'
-  );
-});
+test(
+  'Keys: registrations made before sealing say so and point to Reset ' + 'key',
+  () => {
+    const w = boot();
+    w.submit(team());
+    const sh = w.sheet(w.form.sheetId, 'Responses');
+    const vals = sh.getDataRange().getValues();
+    sh.getRange(2, vals[0].indexOf('keySeal') + 1).setValue('');
+    const sub = w.admin({ action: 'admin.submissions', slug: w.form.slug })
+      .submissions[0];
+    assert.equal(sub.keyKnown, false);
+    assert.equal(
+      w.admin({
+        action: 'admin.submission.key',
+        slug: w.form.slug,
+        submissionId: sub.id
+      }).error.code,
+      'key_unknown'
+    );
+  }
+);

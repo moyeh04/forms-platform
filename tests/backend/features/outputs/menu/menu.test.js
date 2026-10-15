@@ -51,25 +51,28 @@ const slots = {
   capacity: 1
 };
 
-test('Menu: print dialogs list the right forms and days and escape titles', () => {
-  const w = boot('reservation', { slots });
-  w.admin({
-    action: 'admin.forms.create',
-    type: 'team_registration',
-    title: 'A <b>team</b> form',
-    term: ''
-  });
-  const opts = w.call('menuPrintOptions', 'reservations');
-  assert.equal(opts.length, 1);
-  assert.deepEqual(JSON.parse(JSON.stringify(opts[0].days)), [
-    { id: 'week-11-sunday', label: 'Week 11 - Sunday' }
-  ]);
-  const teams = w.call('menuPrintOptions', 'teams');
-  assert.equal(teams.length, 1);
-  const html = w.call('PrintDialog.printDialogHtml', 'teams');
-  assert.ok(html.includes('A &lt;b&gt;team&lt;/b&gt; form'));
-  assert.equal(html.includes('<b>team</b>'), false);
-});
+test(
+  'Menu: print dialogs list the right ' + 'forms and days and escape titles',
+  () => {
+    const w = boot('reservation', { slots });
+    w.admin({
+      action: 'admin.forms.create',
+      type: 'team_registration',
+      title: 'A <b>team</b> form',
+      term: ''
+    });
+    const opts = w.call('menuPrintOptions', 'reservations');
+    assert.equal(opts.length, 1);
+    assert.deepEqual(JSON.parse(JSON.stringify(opts[0].days)), [
+      { id: 'week-11-sunday', label: 'Week 11 - Sunday' }
+    ]);
+    const teams = w.call('menuPrintOptions', 'teams');
+    assert.equal(teams.length, 1);
+    const html = w.call('PrintDialog.printDialogHtml', 'teams');
+    assert.ok(html.includes('A &lt;b&gt;team&lt;/b&gt; form'));
+    assert.equal(html.includes('<b>team</b>'), false);
+  }
+);
 
 test('Menu: menuPrint creates the tab from the dialog call', () => {
   const w = boot('reservation', { slots });

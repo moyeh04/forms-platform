@@ -99,7 +99,7 @@
    * @return {!Element} The editor.
    */
   A.METADATA_EDITORS['term-subject'] = function (o, onchange) {
-    var st = A.parseTerm(o.term);
+    var st = FormMetadata.termParts(o.term);
     var subject = o.subject || '';
     if (!st.year) st.year = yearOptions()[0];
 

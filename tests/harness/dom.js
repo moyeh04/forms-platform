@@ -35,7 +35,7 @@ async function openPage(file, world, { query = '', hash = '', lang } = {}) {
       addEventListener() {},
       removeEventListener() {}
     }));
-  window.fetch = async (url, opts) => ({
+  window.fetch = async (_url, opts) => ({
     json: async () => world.api(JSON.parse(opts.body))
   });
   window.print = () => {

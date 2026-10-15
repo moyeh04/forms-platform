@@ -11,7 +11,6 @@
   var fieldOf = read.fieldOf;
   var academicYears = read.academicYears;
   var academicYear = read.academicYear;
-  var legacyAcademicYear = read.legacyAcademicYear;
 
   /**
    * Reads the batch year of a form, or of its older term.
@@ -22,7 +21,7 @@
   function batchYear(form) {
     return (
       academicYear(fieldOf(form, 'batchYear')) ||
-      legacyAcademicYear(fieldOf(form, 'term'))
+      academicYear(fieldOf(form, 'term'))
     );
   }
 
@@ -54,8 +53,7 @@
   function batchCreate(values) {
     return {
       term: '',
-      batchYear:
-        academicYear(values.batchYear) || legacyAcademicYear(values.term)
+      batchYear: academicYear(values.batchYear) || academicYear(values.term)
     };
   }
 
@@ -83,7 +81,7 @@
     if (own(patch, 'batchYear')) {
       form.batchYear = academicYear(patch.batchYear);
     } else if (own(patch, 'term')) {
-      form.batchYear = legacyAcademicYear(patch.term);
+      form.batchYear = academicYear(patch.term);
     }
   }
 

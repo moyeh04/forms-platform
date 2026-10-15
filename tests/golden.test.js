@@ -49,60 +49,66 @@ function ok(reply) {
   return reply;
 }
 
-test('Golden: every function Apps Script calls by name exists in the bundle', () => {
-  const w = createWorld();
-  const names = [
-    'doGet',
-    'doPost',
-    'onOpen',
-    'setup',
-    'setAdminPin',
-    'unlockAdmin',
-    'menuSetup',
-    'menuSetPin',
-    'menuSetSiteUrl',
-    'menuUnlockAdmin',
-    'menuPrintReservations',
-    'menuPrintTeamList',
-    'menuRebuildViews',
-    'menuPrint',
-    'menuPrintOptions',
-    'processDirtyViews'
-  ];
-  for (const name of names) {
-    assert.equal(typeof w.ctx[name], 'function', name);
+test(
+  'Golden: every function Apps Script calls by name exists in the ' + 'bundle',
+  () => {
+    const w = createWorld();
+    const names = [
+      'doGet',
+      'doPost',
+      'onOpen',
+      'setup',
+      'setAdminPin',
+      'unlockAdmin',
+      'menuSetup',
+      'menuSetPin',
+      'menuSetSiteUrl',
+      'menuUnlockAdmin',
+      'menuPrintReservations',
+      'menuPrintTeamList',
+      'menuRebuildViews',
+      'menuPrint',
+      'menuPrintOptions',
+      'processDirtyViews'
+    ];
+    for (const name of names) {
+      assert.equal(typeof w.ctx[name], 'function', name);
+    }
+    const menu = bundleSource().code;
+    const named = [...menu.matchAll(/addItem\('[^']*', '(\w+)'\)/g)].map(
+      (m) => m[1]
+    );
+    assert.ok(named.length > 0);
+    for (const name of named)
+      assert.ok(names.includes(name), `menu item ${name} is pinned`);
   }
-  const menu = bundleSource().code;
-  const named = [...menu.matchAll(/addItem\('[^']*', '(\w+)'\)/g)].map(
-    (m) => m[1]
-  );
-  assert.ok(named.length > 0);
-  for (const name of named)
-    assert.ok(names.includes(name), `menu item ${name} is pinned`);
-});
+);
 
-test('Golden: the salted hashes and seals are the same for the same pepper', () => {
-  const w = createWorld();
-  w.props.set('PEPPER', 'pepper-for-golden-tests');
-  const form = { id: 'form-1' };
-  const client = { id: 'client-1' };
-  const hashes = {
-    pin: w.call('AuthService.pinHash', '1234'),
-    clientToken: w.call('ClientsService.clientToken', 'token-1'),
-    clientKey: w.call('ClientsService.clientKeyHash', client, '12345'),
-    clientPad: w.call('ClientsService.clientKeyPad', client),
-    key: w.call('KeysService.keyHash', form, '12345'),
-    keyPad: w.call('KeysService.keyPad', form, 'response-1'),
-    seal: w.call('KeysService.sealKey', form, 'response-1', '12345'),
-    unseal: w.call(
-      'KeysService.unsealKey',
-      form,
-      'response-1',
-      w.call('KeysService.sealKey', form, 'response-1', '12345')
-    )
-  };
-  matchesFixture('hashes.json', hashes);
-});
+test(
+  'Golden: the salted hashes and seals ' + 'are the same for the same pepper',
+  () => {
+    const w = createWorld();
+    w.props.set('PEPPER', 'pepper-for-golden-tests');
+    const form = { id: 'form-1' };
+    const client = { id: 'client-1' };
+    const hashes = {
+      pin: w.call('AuthService.pinHash', '1234'),
+      clientToken: w.call('ClientsService.clientToken', 'token-1'),
+      clientKey: w.call('ClientsService.clientKeyHash', client, '12345'),
+      clientPad: w.call('ClientsService.clientKeyPad', client),
+      key: w.call('KeysService.keyHash', form, '12345'),
+      keyPad: w.call('KeysService.keyPad', form, 'response-1'),
+      seal: w.call('KeysService.sealKey', form, 'response-1', '12345'),
+      unseal: w.call(
+        'KeysService.unsealKey',
+        form,
+        'response-1',
+        w.call('KeysService.sealKey', form, 'response-1', '12345')
+      )
+    };
+    matchesFixture('hashes.json', hashes);
+  }
+);
 
 // Names every object inherits; none of them is an action.
 const PROTOTYPE_NAMES = [
@@ -112,72 +118,79 @@ const PROTOTYPE_NAMES = [
   'hasOwnProperty'
 ];
 
-test('Golden: every action answers an empty, wrong-PIN, wrong-key, bare admin and real-form request the same way', () => {
-  const w = boot();
-  const form = openForm(w, 'team_registration', 'Team Form 1');
-  const actions = w.ctx.Routes.actions().sort();
-  const codeOf = (reply) => (reply.error ? reply.error.code : 'ok');
-  const table = {};
-  for (const action of actions) {
-    w.cache.clear();
-    table[action] = [
-      codeOf(w.api({ action })),
-      codeOf(w.api({ action, admin: { pin: '0000' } })),
-      codeOf(
-        w.api({ action, token: 'wrong-token', key: '00000', slug: 'nothing' })
-      ),
-      codeOf(w.admin({ action })),
-      codeOf(w.api({ action, slug: form.slug, key: '00000', id: 'nothing' }))
-    ];
+test(
+  'Golden: every action answers an empty, wrong-PIN, wrong-key, bare ' +
+    'admin and real-form request the same way',
+  () => {
+    const w = boot();
+    const form = openForm(w, 'team_registration', 'Team Form 1');
+    const actions = w.ctx.Routes.actions().sort();
+    const codeOf = (reply) => (reply.error ? reply.error.code : 'ok');
+    const table = {};
+    for (const action of actions) {
+      w.cache.clear();
+      table[action] = [
+        codeOf(w.api({ action })),
+        codeOf(w.api({ action, admin: { pin: '0000' } })),
+        codeOf(
+          w.api({ action, token: 'wrong-token', key: '00000', slug: 'nothing' })
+        ),
+        codeOf(w.admin({ action })),
+        codeOf(w.api({ action, slug: form.slug, key: '00000', id: 'nothing' }))
+      ];
+    }
+    table['(unknown)'] = [codeOf(w.api({ action: 'nope' }))];
+    table['(no action)'] = [codeOf(w.api({}))];
+    table['(prototype names)'] = PROTOTYPE_NAMES.map((action) =>
+      codeOf(w.api({ action }))
+    );
+    matchesFixture('actions.json', table);
   }
-  table['(unknown)'] = [codeOf(w.api({ action: 'nope' }))];
-  table['(no action)'] = [codeOf(w.api({}))];
-  table['(prototype names)'] = PROTOTYPE_NAMES.map((action) =>
-    codeOf(w.api({ action }))
-  );
-  matchesFixture('actions.json', table);
-});
+);
 
-test('Golden: legacy flag cells read the same and are written back the same', () => {
-  const w = boot();
-  const sheet = w.sheet(w.props.get('REGISTRY_ID'), 'Clients');
-  const header = sheet.rows()[0];
-  const row = (values) => header.map((h) => (h in values ? values[h] : ''));
-  sheet.appendRow(
-    row({
-      id: 'c1',
-      name: 'Client 1',
-      canReview: 1,
-      active: 0,
-      showSizeAlerts: 'TRUE'
-    })
-  );
-  sheet.appendRow(
-    row({
-      id: 'c2',
-      name: 'Client 2',
-      canReview: '0',
-      active: '',
-      showSizeAlerts: '0'
-    })
-  );
-  sheet.appendRow(
-    row({
-      id: 'c3',
-      name: 'Client 3',
-      canReview: 'TRUE',
-      active: '1',
-      showSizeAlerts: ''
-    })
-  );
-  const read = w
-    .call('ClientsRepository.readClients')
-    .map((c) => [c.id, c.canReview, c.active, c.showSizeAlerts]);
-  w.call('ClientsRepository.readClients').forEach((c) =>
-    w.call('ClientsRepository.saveClient', c)
-  );
-  matchesFixture('legacy-cells.json', { read, written: sheet.rows() });
-});
+test(
+  'Golden: legacy flag cells read the same and are written back the ' + 'same',
+  () => {
+    const w = boot();
+    const sheet = w.sheet(w.props.get('REGISTRY_ID'), 'Clients');
+    const header = sheet.rows()[0];
+    const row = (values) => header.map((h) => (h in values ? values[h] : ''));
+    sheet.appendRow(
+      row({
+        id: 'c1',
+        name: 'Client 1',
+        canReview: 1,
+        active: 0,
+        showSizeAlerts: 'TRUE'
+      })
+    );
+    sheet.appendRow(
+      row({
+        id: 'c2',
+        name: 'Client 2',
+        canReview: '0',
+        active: '',
+        showSizeAlerts: '0'
+      })
+    );
+    sheet.appendRow(
+      row({
+        id: 'c3',
+        name: 'Client 3',
+        canReview: 'TRUE',
+        active: '1',
+        showSizeAlerts: ''
+      })
+    );
+    const read = w
+      .call('ClientsRepository.readClients')
+      .map((c) => [c.id, c.canReview, c.active, c.showSizeAlerts]);
+    w.call('ClientsRepository.readClients').forEach((c) => {
+      w.call('ClientsRepository.saveClient', c);
+    });
+    matchesFixture('legacy-cells.json', { read, written: sheet.rows() });
+  }
+);
 
 const ARABIC = [
   'طالب أول اسم تجريبي',
@@ -227,7 +240,10 @@ function openForm(w, type, title, patch = {}) {
   return form;
 }
 
-/** One run through every kind of form and most actions, so every sheet and tab exists. */
+/**
+ * One run through every kind of form and most actions, so every sheet and tab
+ * exists.
+ */
 function scenario(w) {
   ok(w.admin({ action: 'admin.lists.create', name: 'Labs', kind: 'plain' }));
   const teams = openForm(w, 'team_registration', 'Team Form 1', {
@@ -353,7 +369,9 @@ function scenario(w) {
   w.runTriggers();
 }
 
-/** Everything the run left behind: sheets, properties, cache, mail and triggers. */
+/**
+ * Everything the run left behind: sheets, properties, cache, mail and triggers.
+ */
 function stored(w) {
   const sheets = [...w.spreadsheets.values()].map((ss) => ({
     name: ss.name,
@@ -370,8 +388,12 @@ function stored(w) {
   };
 }
 
-test('Golden: one scripted run leaves the same sheets, properties, cache and mail', () => {
-  const w = boot();
-  scenario(w);
-  matchesFixture('world.json', stored(w));
-});
+test(
+  'Golden: one scripted run leaves the same sheets, properties, cache ' +
+    'and mail',
+  () => {
+    const w = boot();
+    scenario(w);
+    matchesFixture('world.json', stored(w));
+  }
+);

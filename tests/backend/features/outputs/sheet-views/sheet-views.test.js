@@ -21,7 +21,8 @@ function boot(type, patch = {}) {
     patch: { status: 'open', ...patch }
   });
   w.form = form;
-  // The views are painted by the run a change books, so reading one lets that run happen first.
+  // The views are painted by the run a change books, so reading one lets that
+  // run happen first.
   w.view = (name) => {
     w.runTriggers();
     return w.sheet(form.sheetId, name);
@@ -54,59 +55,67 @@ const person = (o) =>
     ...o
   });
 
-test('Team list: every team is a block with its members, star on the leader, merged linked task', () => {
-  const w = boot('task_submission');
-  const link = (c) => `https://docs.google.com/presentation/d/${ID(c)}/edit`;
-  w.api({
-    action: 'submit',
-    slug: w.form.slug,
-    data: person({
-      title: 'Normalization',
-      link: link('a'),
-      members: [member('سارة خالد حسن علي', '4230002')]
-    })
-  });
-  w.api({
-    action: 'submit',
-    slug: w.form.slug,
-    data: person({
-      leader_code: '4230010',
-      leader_name: 'عمر يوسف إبراهيم سعيد',
-      title: 'ER Diagram',
-      link: link('b'),
-      members: [
-        member('منى أشرف كمال فؤاد', '4230011'),
-        member('كريم هشام عادل نصر', '4230012')
-      ]
-    })
-  });
+test(
+  'Team list: every team is a block with its members, star on the ' +
+    'leader, merged linked task',
+  () => {
+    const w = boot('task_submission');
+    const link = (c) => `https://docs.google.com/presentation/d/${ID(c)}/edit`;
+    w.api({
+      action: 'submit',
+      slug: w.form.slug,
+      data: person({
+        title: 'Normalization',
+        link: link('a'),
+        members: [member('سارة خالد حسن علي', '4230002')]
+      })
+    });
+    w.api({
+      action: 'submit',
+      slug: w.form.slug,
+      data: person({
+        leader_code: '4230010',
+        leader_name: 'عمر يوسف إبراهيم سعيد',
+        title: 'ER Diagram',
+        link: link('b'),
+        members: [
+          member('منى أشرف كمال فؤاد', '4230011'),
+          member('كريم هشام عادل نصر', '4230012')
+        ]
+      })
+    });
 
-  const rows = w.view('Team Members List').rows();
-  assert.deepEqual(rows[0], ['Team member name', 'Section', 'Code', 'Task']);
-  assert.equal(rows.length, 6);
-  assert.equal(rows[1][0], '1.  أحمد محمد محمود أحمد  \u2605');
-  assert.equal(rows[1][1], '4C-TH1');
-  assert.equal(rows[2][0], '2.  سارة خالد حسن علي');
-  assert.equal(rows[2][1], '4C-TH1');
-  assert.equal(rows[2][2], '4230002');
-  assert.equal(rows[3][0], '1.  عمر يوسف إبراهيم سعيد  \u2605');
-  assert.equal(rows[5][0], '3.  كريم هشام عادل نصر');
-  assert.equal(rows[1][3], `=HYPERLINK("${link('a')}","Normalization")`);
-  assert.equal(rows[2][3], '', 'merged cell body stays empty');
-  assert.equal(rows[3][3], `=HYPERLINK("${link('b')}","ER Diagram")`);
-});
+    const rows = w.view('Team Members List').rows();
+    assert.deepEqual(rows[0], ['Team member name', 'Section', 'Code', 'Task']);
+    assert.equal(rows.length, 6);
+    assert.equal(rows[1][0], '1.  أحمد محمد محمود أحمد  \u2605');
+    assert.equal(rows[1][1], '4C-TH1');
+    assert.equal(rows[2][0], '2.  سارة خالد حسن علي');
+    assert.equal(rows[2][1], '4C-TH1');
+    assert.equal(rows[2][2], '4230002');
+    assert.equal(rows[3][0], '1.  عمر يوسف إبراهيم سعيد  \u2605');
+    assert.equal(rows[5][0], '3.  كريم هشام عادل نصر');
+    assert.equal(rows[1][3], `=HYPERLINK("${link('a')}","Normalization")`);
+    assert.equal(rows[2][3], '', 'merged cell body stays empty');
+    assert.equal(rows[3][3], `=HYPERLINK("${link('b')}","ER Diagram")`);
+  }
+);
 
-test('Team list: projects without a link show plain text and the header says Project', () => {
-  const w = boot('team_registration');
-  w.api({
-    action: 'submit',
-    slug: w.form.slug,
-    data: person({ title: 'Library System', members: [] })
-  });
-  const rows = w.view('Team Members List').rows();
-  assert.equal(rows[0][3], 'Project');
-  assert.equal(rows[1][3], 'Library System');
-});
+test(
+  'Team list: projects without a link show plain text and the header ' +
+    'says Project',
+  () => {
+    const w = boot('team_registration');
+    w.api({
+      action: 'submit',
+      slug: w.form.slug,
+      data: person({ title: 'Library System', members: [] })
+    });
+    const rows = w.view('Team Members List').rows();
+    assert.equal(rows[0][3], 'Project');
+    assert.equal(rows[1][3], 'Library System');
+  }
+);
 
 test('Team list: deleted teams disappear and an empty form says so', () => {
   const w = boot('team_registration');
@@ -122,285 +131,323 @@ test('Team list: deleted teams disappear and an empty form says so', () => {
   );
 });
 
-test('Bookings: grouped by day, ordered by timetable, day label on the first row of each block', () => {
-  const w = boot('reservation', {
-    slots: {
-      days: [
-        { label: 'Week 11 - Sunday', times: ['12:30 - 12:50', '12:55 - 1:15'] },
-        { label: 'Week 11 - Tuesday', times: ['12:30 - 12:50'] }
-      ],
-      capacity: 1
-    }
-  });
-  const book = (code, day, time, title) =>
-    w.api({
-      action: 'submit',
-      slug: w.form.slug,
-      data: person({ leader_code: code, title, slot: { day, time } })
-    });
-  book('4230003', 'week-11-tuesday', '12:30 - 12:50', 'Third');
-  book('4230002', 'week-11-sunday', '12:55 - 1:15', 'Second');
-  book('4230001', 'week-11-sunday', '12:30 - 12:50', 'First');
-  const rows = w.view('Bookings').rows();
-  assert.deepEqual(rows[0], [
-    'Day',
-    'Time',
-    'Team leader',
-    'Code',
-    'Phone',
-    'Project'
-  ]);
-  assert.deepEqual(
-    rows.slice(1).map((r) => r[5]),
-    ['First', 'Second', 'Third']
-  );
-  assert.equal(rows[1][0], 'Week 11 - Sunday');
-  assert.equal(rows[2][0], '');
-  assert.equal(rows[3][0], 'Week 11 - Tuesday');
-});
-
-test('Bookings: teammate names appear in the sheet view only when collection is enabled', () => {
-  const w = boot('reservation', {
-    slots: {
-      days: [{ label: 'Sunday', times: ['12:30 - 12:50'] }],
-      capacity: 2
-    }
-  });
-  const form = w.admin({ action: 'admin.forms.get', id: w.form.id }).form;
-  w.admin({
-    action: 'admin.forms.update',
-    id: w.form.id,
-    patch: {
-      fields: form.fields.map((field) =>
-        field.role === 'members' ? { ...field, enabled: true } : field
-      ),
-      steps: form.steps.map((step) =>
-        step.id === 'project'
-          ? { ...step, fields: step.fields.concat('members') }
-          : step
-      )
-    }
-  });
-  const name = 'سارة خالد حسن علي';
-  const result = w.api({
-    action: 'submit',
-    slug: w.form.slug,
-    data: person({
-      title: 'Seminar project',
-      slot: { day: 'sunday', time: '12:30 - 12:50' },
-      members: [member(name, '4230002')]
-    })
-  });
-  assert.equal(result.ok, true);
-  const rows = w.view('Bookings').rows();
-  assert.deepEqual(rows[0], [
-    'Day',
-    'Time',
-    'Team leader',
-    'Code',
-    'Phone',
-    'Project',
-    'Teammates'
-  ]);
-  assert.equal(rows[1][6], name);
-});
-
-test('Bookings: legacy reservations gain disabled teammate metadata before views and printing', () => {
-  const w = boot('reservation', {
-    slots: {
-      days: [{ id: 'sunday', label: 'Sunday', times: ['12:30 - 12:50'] }],
-      capacity: 1
-    }
-  });
-  w.api({
-    action: 'submit',
-    slug: w.form.slug,
-    data: person({
-      title: 'Solo project',
-      slot: { day: 'sunday', time: '12:30 - 12:50' }
-    })
-  });
-
-  const forms = w.registry.getSheetByName('Forms');
-  const config = JSON.parse(forms.rows()[1][10]);
-  config.fields = config.fields.filter((field) => field.role !== 'members');
-  config.steps = config.steps.map((step) => ({
-    ...step,
-    fields: step.fields.filter((id) => id !== 'members')
-  }));
-  forms.getRange(2, 11).setValue(JSON.stringify(config));
-
-  const legacy = w.admin({ action: 'admin.forms.get', id: w.form.id }).form;
-  const members = legacy.fields.find((field) => field.role === 'members');
-  assert.ok(
-    members,
-    'legacy reservation receives the teammate field definition'
-  );
-  assert.equal(members.enabled, false, 'legacy reservations remain solo-only');
-  assert.ok(
-    legacy.steps
-      .find((step) => step.id === 'project')
-      .fields.includes(members.id)
-  );
-
-  w.admin({ action: 'admin.views.rebuild', slug: w.form.slug });
-  assert.deepEqual(w.view('Bookings').rows()[0], [
-    'Day',
-    'Time',
-    'Team leader',
-    'Code',
-    'Phone',
-    'Project'
-  ]);
-  const printed = w.admin({
-    action: 'admin.print.reservations',
-    slug: w.form.slug,
-    dayId: 'sunday'
-  });
-  assert.deepEqual(w.view(printed.sheetName).rows()[2], [
-    'No.',
-    'Time',
-    'Team leader',
-    'Code',
-    'Project',
-    'Signature'
-  ]);
-});
-
-test('Registrations: WhatsApp rows sorted by group and section with review text and link', () => {
-  const w = boot('whatsapp_registration');
-  const reg = (code, group, section, phone) =>
-    w.api({
-      action: 'submit',
-      slug: w.form.slug,
-      data: {
-        email: 'a@b.com',
-        name: 'أحمد محمد محمود أحمد',
-        phone,
-        code,
-        level: 'صفر / الأولى',
-        major: 'حاسبات',
-        group,
-        section,
-        schedule: `https://drive.google.com/file/d/${ID('s')}/view`
+test(
+  'Bookings: grouped by day, ordered by timetable, day label on the ' +
+    'first row of each block',
+  () => {
+    const w = boot('reservation', {
+      slots: {
+        days: [
+          {
+            label: 'Week 11 - Sunday',
+            times: ['12:30 - 12:50', '12:55 - 1:15']
+          },
+          { label: 'Week 11 - Tuesday', times: ['12:30 - 12:50'] }
+        ],
+        capacity: 1
       }
     });
-  reg('4230001', 'B', '3', '01012345671');
-  reg('4230002', 'A', '21', '01012345672');
-  reg('4230003', 'A', '4', '01012345673');
-  const rows = w.view('Registrations').rows();
-  assert.deepEqual(
-    rows.slice(1).map((r) => r[2]),
-    ['4230003', '4230002', '4230001']
-  );
-  assert.equal(rows[1][7], 'Timetable check: pending  |  Group match: pending');
-  assert.ok(rows[1][6].startsWith('=HYPERLINK('));
-});
+    const book = (code, day, time, title) =>
+      w.api({
+        action: 'submit',
+        slug: w.form.slug,
+        data: person({ leader_code: code, title, slot: { day, time } })
+      });
+    book('4230003', 'week-11-tuesday', '12:30 - 12:50', 'Third');
+    book('4230002', 'week-11-sunday', '12:55 - 1:15', 'Second');
+    book('4230001', 'week-11-sunday', '12:30 - 12:50', 'First');
+    const rows = w.view('Bookings').rows();
+    assert.deepEqual(rows[0], [
+      'Day',
+      'Time',
+      'Team leader',
+      'Code',
+      'Phone',
+      'Project'
+    ]);
+    assert.deepEqual(
+      rows.slice(1).map((r) => r[5]),
+      ['First', 'Second', 'Third']
+    );
+    assert.equal(rows[1][0], 'Week 11 - Sunday');
+    assert.equal(rows[2][0], '');
+    assert.equal(rows[3][0], 'Week 11 - Tuesday');
+  }
+);
+
+test(
+  'Bookings: teammate names appear in the sheet view only when ' +
+    'collection is enabled',
+  () => {
+    const w = boot('reservation', {
+      slots: {
+        days: [{ label: 'Sunday', times: ['12:30 - 12:50'] }],
+        capacity: 2
+      }
+    });
+    const form = w.admin({ action: 'admin.forms.get', id: w.form.id }).form;
+    w.admin({
+      action: 'admin.forms.update',
+      id: w.form.id,
+      patch: {
+        fields: form.fields.map((field) =>
+          field.role === 'members' ? { ...field, enabled: true } : field
+        ),
+        steps: form.steps.map((step) =>
+          step.id === 'project'
+            ? { ...step, fields: step.fields.concat('members') }
+            : step
+        )
+      }
+    });
+    const name = 'سارة خالد حسن علي';
+    const result = w.api({
+      action: 'submit',
+      slug: w.form.slug,
+      data: person({
+        title: 'Seminar project',
+        slot: { day: 'sunday', time: '12:30 - 12:50' },
+        members: [member(name, '4230002')]
+      })
+    });
+    assert.equal(result.ok, true);
+    const rows = w.view('Bookings').rows();
+    assert.deepEqual(rows[0], [
+      'Day',
+      'Time',
+      'Team leader',
+      'Code',
+      'Phone',
+      'Project',
+      'Teammates'
+    ]);
+    assert.equal(rows[1][6], name);
+  }
+);
+
+test(
+  'Bookings: legacy reservations gain disabled teammate metadata ' +
+    'before views and printing',
+  () => {
+    const w = boot('reservation', {
+      slots: {
+        days: [{ id: 'sunday', label: 'Sunday', times: ['12:30 - 12:50'] }],
+        capacity: 1
+      }
+    });
+    w.api({
+      action: 'submit',
+      slug: w.form.slug,
+      data: person({
+        title: 'Solo project',
+        slot: { day: 'sunday', time: '12:30 - 12:50' }
+      })
+    });
+
+    const forms = w.registry.getSheetByName('Forms');
+    const config = JSON.parse(forms.rows()[1][10]);
+    config.fields = config.fields.filter((field) => field.role !== 'members');
+    config.steps = config.steps.map((step) => ({
+      ...step,
+      fields: step.fields.filter((id) => id !== 'members')
+    }));
+    forms.getRange(2, 11).setValue(JSON.stringify(config));
+
+    const legacy = w.admin({ action: 'admin.forms.get', id: w.form.id }).form;
+    const members = legacy.fields.find((field) => field.role === 'members');
+    assert.ok(
+      members,
+      'legacy reservation receives the teammate field definition'
+    );
+    assert.equal(
+      members.enabled,
+      false,
+      'legacy reservations remain solo-only'
+    );
+    assert.ok(
+      legacy.steps
+        .find((step) => step.id === 'project')
+        .fields.includes(members.id)
+    );
+
+    w.admin({ action: 'admin.views.rebuild', slug: w.form.slug });
+    assert.deepEqual(w.view('Bookings').rows()[0], [
+      'Day',
+      'Time',
+      'Team leader',
+      'Code',
+      'Phone',
+      'Project'
+    ]);
+    const printed = w.admin({
+      action: 'admin.print.reservations',
+      slug: w.form.slug,
+      dayId: 'sunday'
+    });
+    assert.deepEqual(w.view(printed.sheetName).rows()[2], [
+      'No.',
+      'Time',
+      'Team leader',
+      'Code',
+      'Project',
+      'Signature'
+    ]);
+  }
+);
+
+test(
+  'Registrations: WhatsApp rows sorted by group and section with ' +
+    'review text and link',
+  () => {
+    const w = boot('whatsapp_registration');
+    const reg = (code, group, section, phone) =>
+      w.api({
+        action: 'submit',
+        slug: w.form.slug,
+        data: {
+          email: 'a@b.com',
+          name: 'أحمد محمد محمود أحمد',
+          phone,
+          code,
+          level: 'صفر / الأولى',
+          major: 'حاسبات',
+          group,
+          section,
+          schedule: `https://drive.google.com/file/d/${ID('s')}/view`
+        }
+      });
+    reg('4230001', 'B', '3', '01012345671');
+    reg('4230002', 'A', '21', '01012345672');
+    reg('4230003', 'A', '4', '01012345673');
+    const rows = w.view('Registrations').rows();
+    assert.deepEqual(
+      rows.slice(1).map((r) => r[2]),
+      ['4230003', '4230002', '4230001']
+    );
+    assert.equal(
+      rows[1][7],
+      'Timetable check: pending  |  Group match: pending'
+    );
+    assert.ok(rows[1][6].startsWith('=HYPERLINK('));
+  }
+);
 
 const marked = (w) => [...w.props.keys()].filter((k) => k.startsWith('dirty:'));
 
-test('Views: changes book one run a minute later, which paints the view and removes itself', () => {
-  const w = boot('team_registration');
-  assert.deepEqual(w.triggers, [], 'nothing is booked while nothing changed');
-  w.api({
-    action: 'submit',
-    slug: w.form.slug,
-    data: person({ title: 'One', members: [] })
-  });
-  w.api({
-    action: 'submit',
-    slug: w.form.slug,
-    data: person({ leader_code: '4230099', title: 'Two', members: [] })
-  });
-  assert.deepEqual(
-    w.triggers.map((t) => [t.fn, t.kind, t.arg]),
-    [['processDirtyViews', 'after', 60000]],
-    'two changes, one run'
-  );
-  assert.equal(
-    w.sheet(w.form.sheetId, 'Team Members List'),
-    null,
-    'the submission did not wait for the view'
-  );
-  assert.equal(marked(w).length, 1);
-  assert.equal(w.runTriggers(), 1);
-  assert.equal(w.sheet(w.form.sheetId, 'Team Members List').rows().length, 3);
-  assert.deepEqual(
-    [w.triggers.length, marked(w).length],
-    [0, 0],
-    'the run left nothing behind'
-  );
-  assert.equal(
-    w.runTriggers(),
-    0,
-    'and nothing runs again until the next change'
-  );
-});
-
-test('Views: a repaint that fails keeps its mark, and the timer of an older version is removed', () => {
-  const w = boot('team_registration');
-  // A deployment made before this version left a run every five minutes.
-  w.triggers.push({
-    fn: 'processDirtyViews',
-    id: 'old',
-    kind: 'everyMinutes',
-    arg: 5
-  });
-  w.api({
-    action: 'submit',
-    slug: w.form.slug,
-    data: person({ title: 'One', members: [] })
-  });
-  assert.equal(w.triggers.length, 1, 'a booked run is not booked twice');
-  const sheet = w.spreadsheets.get(w.form.sheetId);
-  w.spreadsheets.delete(w.form.sheetId);
-  w.runTriggers();
-  assert.deepEqual(
-    [w.triggers.length, marked(w).length],
-    [0, 1],
-    'the old timer is gone and the form is still marked'
-  );
-  w.spreadsheets.set(w.form.sheetId, sheet);
-  w.api({
-    action: 'submit',
-    slug: w.form.slug,
-    data: person({ leader_code: '4230099', title: 'Two', members: [] })
-  });
-  w.runTriggers();
-  assert.equal(w.sheet(w.form.sheetId, 'Team Members List').rows().length, 3);
-  assert.equal(marked(w).length, 0);
-});
-
-test('Views: a change that arrives while a form is painted books one more run', () => {
-  const w = boot('team_registration');
-  w.api({
-    action: 'submit',
-    slug: w.form.slug,
-    data: person({ title: 'One', members: [] })
-  });
-  // The second team registers after the run read its marks and before it
-  // finished: while it styles the tabs, the first step of every repaint.
-  const layout = w.ctx.SheetViewsLayout;
-  const real = layout.styleFormTabs;
-  layout.styleFormTabs = (ss) => {
-    layout.styleFormTabs = real;
-    w.advanceDays(0.001);
+test(
+  'Views: changes book one run a minute later, which paints the view ' +
+    'and removes itself',
+  () => {
+    const w = boot('team_registration');
+    assert.deepEqual(w.triggers, [], 'nothing is booked while nothing changed');
+    w.api({
+      action: 'submit',
+      slug: w.form.slug,
+      data: person({ title: 'One', members: [] })
+    });
     w.api({
       action: 'submit',
       slug: w.form.slug,
       data: person({ leader_code: '4230099', title: 'Two', members: [] })
     });
-    return real(ss);
-  };
-  w.runTriggers();
-  assert.deepEqual(
-    [w.triggers.length, marked(w).length],
-    [1, 1],
-    'the newer mark is kept and a run is booked for it'
-  );
-  w.runTriggers();
-  assert.deepEqual([w.triggers.length, marked(w).length], [0, 0]);
-});
+    assert.deepEqual(
+      w.triggers.map((t) => [t.fn, t.kind, t.arg]),
+      [['processDirtyViews', 'after', 60000]],
+      'two changes, one run'
+    );
+    assert.equal(
+      w.sheet(w.form.sheetId, 'Team Members List'),
+      null,
+      'the submission did not wait for the view'
+    );
+    assert.equal(marked(w).length, 1);
+    assert.equal(w.runTriggers(), 1);
+    assert.equal(w.sheet(w.form.sheetId, 'Team Members List').rows().length, 3);
+    assert.deepEqual(
+      [w.triggers.length, marked(w).length],
+      [0, 0],
+      'the run left nothing behind'
+    );
+    assert.equal(
+      w.runTriggers(),
+      0,
+      'and nothing runs again until the next change'
+    );
+  }
+);
+
+test(
+  'Views: a repaint that fails keeps its mark, and the timer of an ' +
+    'older version is removed',
+  () => {
+    const w = boot('team_registration');
+    // A deployment made before this version left a run every five minutes.
+    w.triggers.push({
+      fn: 'processDirtyViews',
+      id: 'old',
+      kind: 'everyMinutes',
+      arg: 5
+    });
+    w.api({
+      action: 'submit',
+      slug: w.form.slug,
+      data: person({ title: 'One', members: [] })
+    });
+    assert.equal(w.triggers.length, 1, 'a booked run is not booked twice');
+    const sheet = w.spreadsheets.get(w.form.sheetId);
+    w.spreadsheets.delete(w.form.sheetId);
+    w.runTriggers();
+    assert.deepEqual(
+      [w.triggers.length, marked(w).length],
+      [0, 1],
+      'the old timer is gone and the form is still marked'
+    );
+    w.spreadsheets.set(w.form.sheetId, sheet);
+    w.api({
+      action: 'submit',
+      slug: w.form.slug,
+      data: person({ leader_code: '4230099', title: 'Two', members: [] })
+    });
+    w.runTriggers();
+    assert.equal(w.sheet(w.form.sheetId, 'Team Members List').rows().length, 3);
+    assert.equal(marked(w).length, 0);
+  }
+);
+
+test(
+  'Views: a change that arrives while a form is painted books one more ' +
+    'run',
+  () => {
+    const w = boot('team_registration');
+    w.api({
+      action: 'submit',
+      slug: w.form.slug,
+      data: person({ title: 'One', members: [] })
+    });
+    // The second team registers after the run read its marks and before it
+    // finished: while it styles the tabs, the first step of every repaint.
+    const layout = w.ctx.SheetViewsLayout;
+    const real = layout.styleFormTabs;
+    layout.styleFormTabs = (ss) => {
+      layout.styleFormTabs = real;
+      w.advanceDays(0.001);
+      w.api({
+        action: 'submit',
+        slug: w.form.slug,
+        data: person({ leader_code: '4230099', title: 'Two', members: [] })
+      });
+      return real(ss);
+    };
+    w.runTriggers();
+    assert.deepEqual(
+      [w.triggers.length, marked(w).length],
+      [1, 1],
+      'the newer mark is kept and a run is booked for it'
+    );
+    w.runTriggers();
+    assert.deepEqual([w.triggers.length, marked(w).length], [0, 0]);
+  }
+);
 
 test('Admin: rebuild on demand returns the sheet link', () => {
   const w = boot('team_registration');

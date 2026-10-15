@@ -24,7 +24,7 @@
 
 var ClientsService = (function () {
   /** How many digits an access key has. */
-  var KEY_DIGITS = 6;
+  var KEY_DIGITS = Rules.accessKeyDigits();
 
   /** How many hex digits of a fresh id an access key is made from. */
   var KEY_SOURCE_HEX_ = 10;

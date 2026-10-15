@@ -10,39 +10,42 @@ function boot() {
   return w;
 }
 
-test('Forms: every template can be created and gets its own spreadsheet', () => {
-  const w = boot();
-  const types = [
-    'team_registration',
-    'task_submission',
-    'reservation',
-    'whatsapp_registration'
-  ];
-  const sheets = new Set();
-  types.forEach((type) => {
-    const r = w.admin({
-      action: 'admin.forms.create',
-      type,
-      title: 'Database Team Project',
-      term: 'Fall 2027'
+test(
+  'Forms: every template can be ' + 'created and gets its own spreadsheet',
+  () => {
+    const w = boot();
+    const types = [
+      'team_registration',
+      'task_submission',
+      'reservation',
+      'whatsapp_registration'
+    ];
+    const sheets = new Set();
+    types.forEach((type) => {
+      const r = w.admin({
+        action: 'admin.forms.create',
+        type,
+        title: 'Database Team Project',
+        term: 'Fall 2027'
+      });
+      assert.equal(r.ok, true, type);
+      assert.equal(r.form.status, 'draft');
+      assert.ok(r.form.fields.length >= 6);
+      sheets.add(r.form.sheetId);
+      const header = w
+        .sheet(r.form.sheetId, 'Responses')
+        .getRange(1, 1, 1, 3)
+        .getValues()[0];
+      assert.deepEqual(header, ['id', 'ref', 'created']);
     });
-    assert.equal(r.ok, true, type);
-    assert.equal(r.form.status, 'draft');
-    assert.ok(r.form.fields.length >= 6);
-    sheets.add(r.form.sheetId);
-    const header = w
-      .sheet(r.form.sheetId, 'Responses')
-      .getRange(1, 1, 1, 3)
-      .getValues()[0];
-    assert.deepEqual(header, ['id', 'ref', 'created']);
-  });
-  assert.equal(sheets.size, 4);
-  const slugs = w
-    .admin({ action: 'admin.forms.list' })
-    .forms.map((f) => f.slug);
-  assert.equal(new Set(slugs).size, 4);
-  assert.equal(slugs[0], 'database-team-project-fall-2027');
-});
+    assert.equal(sheets.size, 4);
+    const slugs = w
+      .admin({ action: 'admin.forms.list' })
+      .forms.map((f) => f.slug);
+    assert.equal(new Set(slugs).size, 4);
+    assert.equal(slugs[0], 'database-team-project-fall-2027');
+  }
+);
 
 test('Forms: creation validates type and title', () => {
   const w = boot();
@@ -58,35 +61,39 @@ test('Forms: creation validates type and title', () => {
   );
 });
 
-test('Public form: draft hides fields, open form hides internals and resolves lists', () => {
-  const w = boot();
-  const f = w.admin({
-    action: 'admin.forms.create',
-    type: 'team_registration',
-    title: 'Team',
-    term: 'Fall 2027'
-  }).form;
-  const draft = w.api({ action: 'getForm', slug: f.slug });
-  assert.equal(draft.state, 'draft');
-  assert.equal(draft.form.fields, undefined);
+test(
+  'Public form: draft hides fields, open form hides internals and ' +
+    'resolves lists',
+  () => {
+    const w = boot();
+    const f = w.admin({
+      action: 'admin.forms.create',
+      type: 'team_registration',
+      title: 'Team',
+      term: 'Fall 2027'
+    }).form;
+    const draft = w.api({ action: 'getForm', slug: f.slug });
+    assert.equal(draft.state, 'draft');
+    assert.equal(draft.form.fields, undefined);
 
-  w.admin({
-    action: 'admin.forms.update',
-    id: f.id,
-    patch: { status: 'open' }
-  });
-  const open = w.api({ action: 'getForm', slug: f.slug });
-  assert.equal(open.state, 'open');
-  const level = open.form.fields.find((x) => x.id === 'level');
-  assert.equal(level.options.length, 5);
-  const memberLevel = open.form.fields
-    .find((x) => x.id === 'members')
-    .fields.find((x) => x.id === 'level');
-  assert.equal(memberLevel.options.length, 5);
-  assert.equal(JSON.stringify(open).includes(f.sheetId), false);
-  assert.equal(open.form.sheetId, undefined);
-  assert.equal(open.form.notifications, undefined);
-});
+    w.admin({
+      action: 'admin.forms.update',
+      id: f.id,
+      patch: { status: 'open' }
+    });
+    const open = w.api({ action: 'getForm', slug: f.slug });
+    assert.equal(open.state, 'open');
+    const level = open.form.fields.find((x) => x.id === 'level');
+    assert.equal(level.options.length, 5);
+    const memberLevel = open.form.fields
+      .find((x) => x.id === 'members')
+      .fields.find((x) => x.id === 'level');
+    assert.equal(memberLevel.options.length, 5);
+    assert.equal(JSON.stringify(open).includes(f.sheetId), false);
+    assert.equal(open.form.sheetId, undefined);
+    assert.equal(open.form.notifications, undefined);
+  }
+);
 
 test('Public form: respects open and close dates', () => {
   const w = boot();
@@ -149,118 +156,131 @@ test('Forms: updates validate status and keep link names unique', () => {
   );
 });
 
-test('Forms: duplicating gives a draft copy with a fresh sheet and settings kept', () => {
-  const w = boot();
-  const a = w.admin({
-    action: 'admin.forms.create',
-    type: 'task_submission',
-    title: 'Projects',
-    term: 'Round 1'
-  }).form;
-  w.admin({
-    action: 'admin.forms.update',
-    id: a.id,
-    patch: {
-      status: 'open',
-      editKey: { enabled: true, days: 3, allowEdit: true, allowDelete: false }
-    }
-  });
-  const copy = w.admin({
-    action: 'admin.forms.duplicate',
-    id: a.id,
-    term: 'Round 2'
-  }).form;
-  assert.equal(copy.status, 'draft');
-  assert.equal(copy.term, 'Round 2');
-  assert.notEqual(copy.sheetId, a.sheetId);
-  assert.notEqual(copy.slug, a.slug);
-  assert.equal(copy.editKey.days, 3);
-});
+test(
+  'Forms: duplicating gives a draft copy with a fresh sheet and ' +
+    'settings kept',
+  () => {
+    const w = boot();
+    const a = w.admin({
+      action: 'admin.forms.create',
+      type: 'task_submission',
+      title: 'Projects',
+      term: 'Round 1'
+    }).form;
+    w.admin({
+      action: 'admin.forms.update',
+      id: a.id,
+      patch: {
+        status: 'open',
+        editKey: { enabled: true, days: 3, allowEdit: true, allowDelete: false }
+      }
+    });
+    const copy = w.admin({
+      action: 'admin.forms.duplicate',
+      id: a.id,
+      term: 'Round 2'
+    }).form;
+    assert.equal(copy.status, 'draft');
+    assert.equal(copy.term, 'Round 2');
+    assert.notEqual(copy.sheetId, a.sheetId);
+    assert.notEqual(copy.slug, a.slug);
+    assert.equal(copy.editKey.days, 3);
+  }
+);
 
-test('WhatsApp metadata: duplicating a legacy record keeps only batch-year metadata', () => {
-  const w = boot();
-  const source = w.admin({
-    action: 'admin.forms.create',
-    type: 'whatsapp_registration',
-    title: 'Groups',
-    term: 'Spring 2027',
-    subject: 'CMPn123'
-  }).form;
-  const sheet = w.registry.getSheetByName('Forms');
-  const config = JSON.parse(sheet.rows()[1][10]);
-  delete config.batchYear;
-  config.subject = 'CMPn123';
-  sheet.getRange(2, 11).setValue(JSON.stringify(config));
-  sheet.getRange(2, 5).setValue('Spring 2027');
+test(
+  'WhatsApp metadata: duplicating a legacy record keeps only ' +
+    'batch-year metadata',
+  () => {
+    const w = boot();
+    const source = w.admin({
+      action: 'admin.forms.create',
+      type: 'whatsapp_registration',
+      title: 'Groups',
+      term: 'Spring 2027',
+      subject: 'CMPn123'
+    }).form;
+    const sheet = w.registry.getSheetByName('Forms');
+    const config = JSON.parse(sheet.rows()[1][10]);
+    delete config.batchYear;
+    config.subject = 'CMPn123';
+    sheet.getRange(2, 11).setValue(JSON.stringify(config));
+    sheet.getRange(2, 5).setValue('Spring 2027');
 
-  const copy = w.admin({
-    action: 'admin.forms.duplicate',
-    id: source.id,
-    title: 'Groups 2028',
-    batchYear: '2028/2029'
-  }).form;
-  assert.equal(copy.batchYear, '2028/2029');
-  assert.equal(copy.term, '');
-  assert.equal(copy.subject, undefined);
-  const persisted = JSON.parse(sheet.rows()[2][10]);
-  assert.equal(persisted.batchYear, '2028/2029');
-  assert.equal(persisted.term, undefined);
-  assert.equal(persisted.subject, undefined);
-});
+    const copy = w.admin({
+      action: 'admin.forms.duplicate',
+      id: source.id,
+      title: 'Groups 2028',
+      batchYear: '2028/2029'
+    }).form;
+    assert.equal(copy.batchYear, '2028/2029');
+    assert.equal(copy.term, '');
+    assert.equal(copy.subject, undefined);
+    const persisted = JSON.parse(sheet.rows()[2][10]);
+    assert.equal(persisted.batchYear, '2028/2029');
+    assert.equal(persisted.term, undefined);
+    assert.equal(persisted.subject, undefined);
+  }
+);
 
-test('Forms: deleting needs the link name, removes the form, trashes its sheet, and unlists it from links', () => {
-  const w = boot();
-  const a = w.admin({
-    action: 'admin.forms.create',
-    type: 'team_registration',
-    title: 'Keep me',
-    term: 'Fall 2027'
-  }).form;
-  const b = w.admin({
-    action: 'admin.forms.create',
-    type: 'reservation',
-    title: 'Delete me',
-    term: 'Fall 2027'
-  }).form;
-  w.admin({
-    action: 'admin.clients.create',
-    name: 'Dr. X',
-    forms: [a.slug, b.slug],
-    hiddenColumns: [],
-    canReview: false,
-    withKey: false
-  });
-  assert.equal(
-    w.admin({ action: 'admin.forms.delete', id: b.id }).error.code,
-    'confirm_required'
-  );
-  assert.equal(
-    w.api({ action: 'admin.forms.delete', id: b.id, confirm: b.slug }).ok,
-    false,
-    'needs the PIN'
-  );
-  const r = w.admin({
-    action: 'admin.forms.delete',
-    id: b.id,
-    confirm: b.slug
-  });
-  assert.equal(r.deleted, true);
-  assert.equal(r.sheetTrashed, true);
-  assert.ok(
-    w.drive.trashed.has(b.sheetId),
-    'the sheet is in the Drive trash, not destroyed'
-  );
-  assert.deepEqual(
-    w.admin({ action: 'admin.forms.list' }).forms.map((f) => f.slug),
-    [a.slug],
-    'the other form is untouched'
-  );
-  assert.equal(
-    w.api({ action: 'getForm', slug: b.slug }).error.code,
-    'form_not_found',
-    'the link stops working'
-  );
-  assert.deepEqual(w.admin({ action: 'admin.clients.list' }).clients[0].forms, [
-    a.id
-  ]);
-});
+test(
+  'Forms: deleting needs the link name, removes the form, trashes its ' +
+    'sheet, and unlists it from links',
+  () => {
+    const w = boot();
+    const a = w.admin({
+      action: 'admin.forms.create',
+      type: 'team_registration',
+      title: 'Keep me',
+      term: 'Fall 2027'
+    }).form;
+    const b = w.admin({
+      action: 'admin.forms.create',
+      type: 'reservation',
+      title: 'Delete me',
+      term: 'Fall 2027'
+    }).form;
+    w.admin({
+      action: 'admin.clients.create',
+      name: 'Dr. X',
+      forms: [a.slug, b.slug],
+      hiddenColumns: [],
+      canReview: false,
+      withKey: false
+    });
+    assert.equal(
+      w.admin({ action: 'admin.forms.delete', id: b.id }).error.code,
+      'confirm_required'
+    );
+    assert.equal(
+      w.api({ action: 'admin.forms.delete', id: b.id, confirm: b.slug }).ok,
+      false,
+      'needs the PIN'
+    );
+    const r = w.admin({
+      action: 'admin.forms.delete',
+      id: b.id,
+      confirm: b.slug
+    });
+    assert.equal(r.deleted, true);
+    assert.equal(r.sheetTrashed, true);
+    assert.ok(
+      w.drive.trashed.has(b.sheetId),
+      'the sheet is in the Drive trash, not destroyed'
+    );
+    assert.deepEqual(
+      w.admin({ action: 'admin.forms.list' }).forms.map((f) => f.slug),
+      [a.slug],
+      'the other form is untouched'
+    );
+    assert.equal(
+      w.api({ action: 'getForm', slug: b.slug }).error.code,
+      'form_not_found',
+      'the link stops working'
+    );
+    assert.deepEqual(
+      w.admin({ action: 'admin.clients.list' }).clients[0].forms,
+      [a.id]
+    );
+  }
+);

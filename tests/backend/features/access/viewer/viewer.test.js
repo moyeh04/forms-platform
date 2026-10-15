@@ -175,78 +175,81 @@ test('Viewer: a link cannot open a form it was not given', () => {
   assert.equal(w.data(c.token, w.team.slug).error.code, 'forbidden');
 });
 
-test('Reservations: teammate names appear only when collecting teammates', () => {
-  const w = boot();
-  const client = w.client();
-  const hidden = w.data(client.token, w.res.slug, { mode: 'all' });
-  assert.equal(
-    hidden.columns.some((column) => column.id === 'members'),
-    false
-  );
+test(
+  'Reservations: teammate names appear ' + 'only when collecting teammates',
+  () => {
+    const w = boot();
+    const client = w.client();
+    const hidden = w.data(client.token, w.res.slug, { mode: 'all' });
+    assert.equal(
+      hidden.columns.some((column) => column.id === 'members'),
+      false
+    );
 
-  const form = w.admin({ action: 'admin.forms.get', id: w.res.id }).form;
-  form.slots.capacity = 2;
-  w.admin({
-    action: 'admin.forms.update',
-    id: w.res.id,
-    patch: {
-      slots: form.slots,
-      fields: form.fields.map((field) =>
-        field.role === 'members'
-          ? { ...field, enabled: true, required: true }
-          : field
-      )
-    }
-  });
-  w.api({
-    action: 'submit',
-    slug: w.res.slug,
-    data: {
-      email: 'a@b.com',
-      leader_name: 'أحمد محمد محمود أحمد',
-      leader_code: '4230010',
-      phone: '01012345678',
-      major: 'حاسبات',
-      level: 'صفر / الأولى',
-      section: '4C-TH1',
-      curriculum: '2020',
-      title: 'Team project',
-      slot: { day: 'week-11-sunday', time: '12:30 - 12:50' },
-      members: [
-        {
-          name: 'سارة خالد حسن علي',
-          phone: '01112345678',
-          code: '4230011',
-          level: 'صفر / الأولى',
-          curriculum: '2020',
-          section: '4C-TH1'
-        }
-      ]
-    }
-  });
-  const visible = w.data(client.token, w.res.slug, { mode: 'all' });
-  assert.equal(
-    visible.columns.some((column) => column.id === 'members'),
-    true
-  );
-  assert.ok(visible.rows.some((row) => row.members === 'سارة خالد حسن علي'));
+    const form = w.admin({ action: 'admin.forms.get', id: w.res.id }).form;
+    form.slots.capacity = 2;
+    w.admin({
+      action: 'admin.forms.update',
+      id: w.res.id,
+      patch: {
+        slots: form.slots,
+        fields: form.fields.map((field) =>
+          field.role === 'members'
+            ? { ...field, enabled: true, required: true }
+            : field
+        )
+      }
+    });
+    w.api({
+      action: 'submit',
+      slug: w.res.slug,
+      data: {
+        email: 'a@b.com',
+        leader_name: 'أحمد محمد محمود أحمد',
+        leader_code: '4230010',
+        phone: '01012345678',
+        major: 'حاسبات',
+        level: 'صفر / الأولى',
+        section: '4C-TH1',
+        curriculum: '2020',
+        title: 'Team project',
+        slot: { day: 'week-11-sunday', time: '12:30 - 12:50' },
+        members: [
+          {
+            name: 'سارة خالد حسن علي',
+            phone: '01112345678',
+            code: '4230011',
+            level: 'صفر / الأولى',
+            curriculum: '2020',
+            section: '4C-TH1'
+          }
+        ]
+      }
+    });
+    const visible = w.data(client.token, w.res.slug, { mode: 'all' });
+    assert.equal(
+      visible.columns.some((column) => column.id === 'members'),
+      true
+    );
+    assert.ok(visible.rows.some((row) => row.members === 'سارة خالد حسن علي'));
 
-  w.admin({
-    action: 'admin.forms.update',
-    id: w.res.id,
-    patch: {
-      fields: form.fields.map((field) =>
-        field.role === 'members' ? { ...field, enabled: false } : field
-      )
-    }
-  });
-  const disabled = w.data(client.token, w.res.slug, { mode: 'all' });
-  assert.equal(
-    disabled.columns.some((column) => column.id === 'members'),
-    false
-  );
-  assert.equal(JSON.stringify(disabled).includes('سارة خالد حسن علي'), false);
-});
+    w.admin({
+      action: 'admin.forms.update',
+      id: w.res.id,
+      patch: {
+        fields: form.fields.map((field) =>
+          field.role === 'members' ? { ...field, enabled: false } : field
+        )
+      }
+    });
+    const disabled = w.data(client.token, w.res.slug, { mode: 'all' });
+    assert.equal(
+      disabled.columns.some((column) => column.id === 'members'),
+      false
+    );
+    assert.equal(JSON.stringify(disabled).includes('سارة خالد حسن علي'), false);
+  }
+);
 
 test('Reservations: today, by day, and all, in timetable order', () => {
   const w = boot();
@@ -338,182 +341,204 @@ test('Viewer: repeated bad tokens are throttled', () => {
   );
 });
 
-test('Viewer key: wrong keys lock the link for a while, and a link made before keys opens as before', () => {
-  const w = boot();
-  const made = w.client({ withKey: true });
-  assert.match(made.accessKey, /^\d{6}$/);
-  assert.equal(
-    w.admin({ action: 'admin.clients.list' }).clients[0].hasKey,
-    true
-  );
-  for (let i = 0; i < 5; i++)
+test(
+  'Viewer key: wrong keys lock the link for a while, and a link made ' +
+    'before keys opens as before',
+  () => {
+    const w = boot();
+    const made = w.client({ withKey: true });
+    assert.match(made.accessKey, /^\d{6}$/);
+    assert.equal(
+      w.admin({ action: 'admin.clients.list' }).clients[0].hasKey,
+      true
+    );
+    for (let i = 0; i < 5; i++)
+      assert.equal(
+        w.api({
+          action: 'viewer.me',
+          token: made.token,
+          accessKey: '000000' === made.accessKey ? '111111' : '000000'
+        }).error.code,
+        'bad_access_key'
+      );
     assert.equal(
       w.api({
         action: 'viewer.me',
         token: made.token,
-        accessKey: '000000' === made.accessKey ? '111111' : '000000'
+        accessKey: made.accessKey
       }).error.code,
-      'bad_access_key'
+      'key_locked',
+      'even the right key waits after five wrong ones'
     );
-  assert.equal(
-    w.api({ action: 'viewer.me', token: made.token, accessKey: made.accessKey })
-      .error.code,
-    'key_locked',
-    'even the right key waits after five wrong ones'
-  );
-  const again = w.admin({
-    action: 'admin.clients.key',
-    id: made.client.id,
-    on: true
-  });
-  assert.equal(
-    w.api({
-      action: 'viewer.me',
-      token: made.token,
-      accessKey: again.accessKey
-    }).ok,
-    true,
-    'a new key also lifts the lock'
-  );
-  const rows = w.registry.getSheetByName('Clients').rows();
-  assert.equal(rows[0][8], 'keyHash', 'the column gets its header');
-  assert.equal(
-    rows.flat().join('|').includes(again.accessKey),
-    false,
-    'the key itself is never stored'
-  );
-  const old = w.client({ withKey: false });
-  assert.equal(old.accessKey, '');
-  assert.equal(w.api({ action: 'viewer.me', token: old.token }).ok, true);
-});
+    const again = w.admin({
+      action: 'admin.clients.key',
+      id: made.client.id,
+      on: true
+    });
+    assert.equal(
+      w.api({
+        action: 'viewer.me',
+        token: made.token,
+        accessKey: again.accessKey
+      }).ok,
+      true,
+      'a new key also lifts the lock'
+    );
+    const rows = w.registry.getSheetByName('Clients').rows();
+    assert.equal(rows[0][8], 'keyHash', 'the column gets its header');
+    assert.equal(
+      rows.flat().join('|').includes(again.accessKey),
+      false,
+      'the key itself is never stored'
+    );
+    const old = w.client({ withKey: false });
+    assert.equal(old.accessKey, '');
+    assert.equal(w.api({ action: 'viewer.me', token: old.token }).ok, true);
+  }
+);
 
-test('Viewer key: the admin can read a lost key again, and a link made before sealed keys says to make a new one', () => {
-  const w = boot();
-  const made = w.client({ withKey: true });
-  const listed = w.admin({ action: 'admin.clients.list' }).clients[0];
-  assert.equal(listed.keyKnown, true);
-  assert.equal(
-    w.admin({ action: 'admin.clients.showKey', id: made.client.id }).accessKey,
-    made.accessKey
-  );
-  const fresh = w.admin({
-    action: 'admin.clients.key',
-    id: made.client.id,
-    on: true
-  });
-  assert.equal(
-    w.admin({ action: 'admin.clients.showKey', id: made.client.id }).accessKey,
-    fresh.accessKey,
-    'a new key replaces the one shown'
-  );
-  const sheet = w.registry.getSheetByName('Clients');
-  assert.equal(sheet.rows()[0][9], 'keySeal');
-  sheet.getRange(2, 10).setValue(''); // a key given before keys were sealed
-  assert.equal(
-    w.admin({ action: 'admin.clients.list' }).clients[0].keyKnown,
-    false
-  );
-  assert.equal(
-    w.admin({ action: 'admin.clients.showKey', id: made.client.id }).error.code,
-    'key_unknown'
-  );
-  const plain = w.client();
-  assert.equal(
-    w.admin({ action: 'admin.clients.showKey', id: plain.client.id }).error
-      .code,
-    'no_key'
-  );
-});
+test(
+  'Viewer key: the admin can read a lost key again, and a link made ' +
+    'before sealed keys says to make a new one',
+  () => {
+    const w = boot();
+    const made = w.client({ withKey: true });
+    const listed = w.admin({ action: 'admin.clients.list' }).clients[0];
+    assert.equal(listed.keyKnown, true);
+    assert.equal(
+      w.admin({ action: 'admin.clients.showKey', id: made.client.id })
+        .accessKey,
+      made.accessKey
+    );
+    const fresh = w.admin({
+      action: 'admin.clients.key',
+      id: made.client.id,
+      on: true
+    });
+    assert.equal(
+      w.admin({ action: 'admin.clients.showKey', id: made.client.id })
+        .accessKey,
+      fresh.accessKey,
+      'a new key replaces the one shown'
+    );
+    const sheet = w.registry.getSheetByName('Clients');
+    assert.equal(sheet.rows()[0][9], 'keySeal');
+    sheet.getRange(2, 10).setValue(''); // a key given before keys were sealed
+    assert.equal(
+      w.admin({ action: 'admin.clients.list' }).clients[0].keyKnown,
+      false
+    );
+    assert.equal(
+      w.admin({ action: 'admin.clients.showKey', id: made.client.id }).error
+        .code,
+      'key_unknown'
+    );
+    const plain = w.client();
+    assert.equal(
+      w.admin({ action: 'admin.clients.showKey', id: plain.client.id }).error
+        .code,
+      'no_key'
+    );
+  }
+);
 
-test('Viewer link end: a link stops on its end date and opens again when the admin moves it', () => {
-  const w = boot();
-  const made = w.client({ expires: '2027-11-20T21:59:00Z' });
-  assert.equal(made.client.expires, '2027-11-20T21:59:00.000Z');
-  assert.equal(w.api({ action: 'viewer.me', token: made.token }).ok, true);
-  w.setNow('2027-11-21T08:00:00Z');
-  const shut = w.api({ action: 'viewer.me', token: made.token });
-  assert.equal(shut.error.code, 'link_expired');
-  assert.match(shut.error.message, /2027-11-20/);
-  assert.equal(
-    w.admin({ action: 'admin.clients.list' }).clients[0].expired,
-    true
-  );
-  w.admin({
-    action: 'admin.clients.update',
-    id: made.client.id,
-    patch: { expires: '2027-12-31T21:59:00Z' }
-  });
-  assert.equal(w.api({ action: 'viewer.me', token: made.token }).ok, true);
-  w.admin({
-    action: 'admin.clients.update',
-    id: made.client.id,
-    patch: { expires: '' }
-  });
-  w.setNow('2030-01-01T00:00:00Z');
-  assert.equal(
-    w.api({ action: 'viewer.me', token: made.token }).ok,
-    true,
-    'no end date means it never ends'
-  );
-  assert.equal(
+test(
+  'Viewer link end: a link stops on its end date and opens again when ' +
+    'the admin moves it',
+  () => {
+    const w = boot();
+    const made = w.client({ expires: '2027-11-20T21:59:00Z' });
+    assert.equal(made.client.expires, '2027-11-20T21:59:00.000Z');
+    assert.equal(w.api({ action: 'viewer.me', token: made.token }).ok, true);
+    w.setNow('2027-11-21T08:00:00Z');
+    const shut = w.api({ action: 'viewer.me', token: made.token });
+    assert.equal(shut.error.code, 'link_expired');
+    assert.match(shut.error.message, /2027-11-20/);
+    assert.equal(
+      w.admin({ action: 'admin.clients.list' }).clients[0].expired,
+      true
+    );
     w.admin({
       action: 'admin.clients.update',
       id: made.client.id,
-      patch: { expires: 'soon' }
-    }).error.code,
-    'bad_date'
-  );
-});
-
-test('Teams: a small team carries its level for the instructor, unless the link does not show the warnings', () => {
-  const w = boot();
-  const c = w.client({ forms: [w.team.slug] });
-  const plain = w.data(c.token, w.team.slug);
-  assert.deepEqual(plain.sizeAlerts, []);
-  assert.equal('alert' in plain.groups[0], false);
-  const set = (sizeAlerts) =>
-    w.admin({
-      action: 'admin.forms.update',
-      id: w.team.id,
-      patch: { rules: { sizeAlerts } }
+      patch: { expires: '2027-12-31T21:59:00Z' }
     });
-  set({ critical: { on: true, below: 2 }, warning: { on: true, below: 4 } });
-  const r = w.data(c.token, w.team.slug);
-  assert.deepEqual(r.sizeAlerts, [
-    { level: 'critical', below: 2 },
-    { level: 'warning', below: 4 }
-  ]);
-  assert.equal(r.groups[0].members.length, 2);
-  assert.equal(r.groups[0].alert, 'warning');
-  const hidden = w.data(
-    w.client({
-      forms: [w.team.slug],
-      hiddenColumns: ['name', 'section', 'code', 'phone']
-    }).token,
-    w.team.slug
-  );
-  assert.equal(
-    hidden.groups[0].alert,
-    'warning',
-    'hidden columns do not change the count'
-  );
-  assert.equal(
-    c.client.showSizeAlerts,
-    true,
-    'a link shows the warnings unless told otherwise'
-  );
-  w.admin({
-    action: 'admin.clients.update',
-    id: c.client.id,
-    patch: { showSizeAlerts: false }
-  });
-  assert.equal(
-    w
-      .admin({ action: 'admin.clients.list' })
-      .clients.find((x) => x.id === c.client.id).showSizeAlerts,
-    false
-  );
-  const kept = w.data(c.token, w.team.slug);
-  assert.deepEqual(kept.sizeAlerts, []);
-  assert.equal('alert' in kept.groups[0], false);
-});
+    assert.equal(w.api({ action: 'viewer.me', token: made.token }).ok, true);
+    w.admin({
+      action: 'admin.clients.update',
+      id: made.client.id,
+      patch: { expires: '' }
+    });
+    w.setNow('2030-01-01T00:00:00Z');
+    assert.equal(
+      w.api({ action: 'viewer.me', token: made.token }).ok,
+      true,
+      'no end date means it never ends'
+    );
+    assert.equal(
+      w.admin({
+        action: 'admin.clients.update',
+        id: made.client.id,
+        patch: { expires: 'soon' }
+      }).error.code,
+      'bad_date'
+    );
+  }
+);
+
+test(
+  'Teams: a small team carries its level for the instructor, unless ' +
+    'the link does not show the warnings',
+  () => {
+    const w = boot();
+    const c = w.client({ forms: [w.team.slug] });
+    const plain = w.data(c.token, w.team.slug);
+    assert.deepEqual(plain.sizeAlerts, []);
+    assert.equal('alert' in plain.groups[0], false);
+    const set = (sizeAlerts) =>
+      w.admin({
+        action: 'admin.forms.update',
+        id: w.team.id,
+        patch: { rules: { sizeAlerts } }
+      });
+    set({ critical: { on: true, below: 2 }, warning: { on: true, below: 4 } });
+    const r = w.data(c.token, w.team.slug);
+    assert.deepEqual(r.sizeAlerts, [
+      { level: 'critical', below: 2 },
+      { level: 'warning', below: 4 }
+    ]);
+    assert.equal(r.groups[0].members.length, 2);
+    assert.equal(r.groups[0].alert, 'warning');
+    const hidden = w.data(
+      w.client({
+        forms: [w.team.slug],
+        hiddenColumns: ['name', 'section', 'code', 'phone']
+      }).token,
+      w.team.slug
+    );
+    assert.equal(
+      hidden.groups[0].alert,
+      'warning',
+      'hidden columns do not change the count'
+    );
+    assert.equal(
+      c.client.showSizeAlerts,
+      true,
+      'a link shows the warnings unless told otherwise'
+    );
+    w.admin({
+      action: 'admin.clients.update',
+      id: c.client.id,
+      patch: { showSizeAlerts: false }
+    });
+    assert.equal(
+      w
+        .admin({ action: 'admin.clients.list' })
+        .clients.find((x) => x.id === c.client.id).showSizeAlerts,
+      false
+    );
+    const kept = w.data(c.token, w.team.slug);
+    assert.deepEqual(kept.sizeAlerts, []);
+    assert.equal('alert' in kept.groups[0], false);
+  }
+);

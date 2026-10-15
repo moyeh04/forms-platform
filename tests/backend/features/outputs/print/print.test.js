@@ -51,99 +51,107 @@ const slots = {
   capacity: 1
 };
 
-test('Print reservations: one tab per day, in timetable order, with a signature column', () => {
-  const w = boot('reservation', { slots });
-  const book = (code, time, title) =>
+test(
+  'Print reservations: one tab per day, in timetable order, with a ' +
+    'signature column',
+  () => {
+    const w = boot('reservation', { slots });
+    const book = (code, time, title) =>
+      w.api({
+        action: 'submit',
+        slug: w.form.slug,
+        data: person({
+          leader_code: code,
+          title,
+          slot: { day: 'week-11-sunday', time }
+        })
+      });
+    book('4230002', '1:20 - 1:40', 'Second');
+    book('4230001', '12:30 - 12:50', 'First');
+    const r = w.admin({
+      action: 'admin.print.reservations',
+      slug: w.form.slug,
+      dayId: 'week-11-sunday'
+    });
+    assert.equal(r.count, 2);
+    assert.equal(r.sheetName, 'Print - Week 11 - Sunday');
+    assert.ok(r.sheetUrl.includes('#gid='));
+    const rows = w.view(r.sheetName).rows();
+    assert.equal(
+      rows[0][0],
+      'Seminar Booking  -  Week 11 - Sunday  (2027-11-14)'
+    );
+    assert.deepEqual(rows[2], [
+      'No.',
+      'Time',
+      'Team leader',
+      'Code',
+      'Project',
+      'Signature'
+    ]);
+    assert.deepEqual(
+      rows.slice(3).map((x) => [x[0], x[1], x[4]]),
+      [
+        [1, '12:30 - 12:50', 'First'],
+        [2, '1:20 - 1:40', 'Second']
+      ]
+    );
+  }
+);
+
+test(
+  'Print reservations: teammate names are printed when collection is ' +
+    'enabled',
+  () => {
+    const w = boot('reservation', { slots });
+    const form = w.admin({ action: 'admin.forms.get', id: w.form.id }).form;
+    form.slots.capacity = 2;
+    w.admin({
+      action: 'admin.forms.update',
+      id: w.form.id,
+      patch: {
+        slots: form.slots,
+        fields: form.fields.map((field) =>
+          field.role === 'members' ? { ...field, enabled: true } : field
+        )
+      }
+    });
     w.api({
       action: 'submit',
       slug: w.form.slug,
       data: person({
-        leader_code: code,
-        title,
-        slot: { day: 'week-11-sunday', time }
+        title: 'First',
+        slot: { day: 'week-11-sunday', time: '12:30 - 12:50' },
+        members: [
+          {
+            name: 'سارة خالد حسن علي',
+            phone: '01112345678',
+            code: '4230002',
+            level: 'صفر / الأولى',
+            curriculum: '2020',
+            section: '4C-TH1'
+          }
+        ]
       })
     });
-  book('4230002', '1:20 - 1:40', 'Second');
-  book('4230001', '12:30 - 12:50', 'First');
-  const r = w.admin({
-    action: 'admin.print.reservations',
-    slug: w.form.slug,
-    dayId: 'week-11-sunday'
-  });
-  assert.equal(r.count, 2);
-  assert.equal(r.sheetName, 'Print - Week 11 - Sunday');
-  assert.ok(r.sheetUrl.includes('#gid='));
-  const rows = w.view(r.sheetName).rows();
-  assert.equal(
-    rows[0][0],
-    'Seminar Booking  -  Week 11 - Sunday  (2027-11-14)'
-  );
-  assert.deepEqual(rows[2], [
-    'No.',
-    'Time',
-    'Team leader',
-    'Code',
-    'Project',
-    'Signature'
-  ]);
-  assert.deepEqual(
-    rows.slice(3).map((x) => [x[0], x[1], x[4]]),
-    [
-      [1, '12:30 - 12:50', 'First'],
-      [2, '1:20 - 1:40', 'Second']
-    ]
-  );
-});
-
-test('Print reservations: teammate names are printed when collection is enabled', () => {
-  const w = boot('reservation', { slots });
-  const form = w.admin({ action: 'admin.forms.get', id: w.form.id }).form;
-  form.slots.capacity = 2;
-  w.admin({
-    action: 'admin.forms.update',
-    id: w.form.id,
-    patch: {
-      slots: form.slots,
-      fields: form.fields.map((field) =>
-        field.role === 'members' ? { ...field, enabled: true } : field
-      )
-    }
-  });
-  w.api({
-    action: 'submit',
-    slug: w.form.slug,
-    data: person({
-      title: 'First',
-      slot: { day: 'week-11-sunday', time: '12:30 - 12:50' },
-      members: [
-        {
-          name: 'سارة خالد حسن علي',
-          phone: '01112345678',
-          code: '4230002',
-          level: 'صفر / الأولى',
-          curriculum: '2020',
-          section: '4C-TH1'
-        }
-      ]
-    })
-  });
-  const printed = w.admin({
-    action: 'admin.print.reservations',
-    slug: w.form.slug,
-    dayId: 'week-11-sunday'
-  });
-  const rows = w.view(printed.sheetName).rows();
-  assert.deepEqual(rows[2], [
-    'No.',
-    'Time',
-    'Team leader',
-    'Code',
-    'Project',
-    'Teammates',
-    'Signature'
-  ]);
-  assert.equal(rows[3][5], 'سارة خالد حسن علي');
-});
+    const printed = w.admin({
+      action: 'admin.print.reservations',
+      slug: w.form.slug,
+      dayId: 'week-11-sunday'
+    });
+    const rows = w.view(printed.sheetName).rows();
+    assert.deepEqual(rows[2], [
+      'No.',
+      'Time',
+      'Team leader',
+      'Code',
+      'Project',
+      'Teammates',
+      'Signature'
+    ]);
+    assert.equal(rows[3][5], 'سارة خالد حسن علي');
+  }
+);
 
 test('Print reservations: can include the empty slots', () => {
   const w = boot('reservation', { slots });
@@ -223,52 +231,56 @@ test('Print team list: numbered teams, members, and a merged project', () => {
   assert.equal(rows[5][3], 'Beta');
 });
 
-test('PDF export: returns a Drive link when Google answers, null when it refuses', () => {
-  const w = boot('reservation', { slots });
-  w.api({
-    action: 'submit',
-    slug: w.form.slug,
-    data: person({
-      title: 'First',
-      slot: { day: 'week-11-sunday', time: '12:30 - 12:50' }
-    })
-  });
-  let url = '';
-  w.fetch = (u, opts) => {
-    url = u;
-    assert.equal(opts.headers.Authorization, 'Bearer test-token');
-    return {
-      getResponseCode: () => 200,
-      getBlob: () => ({
-        setName(n) {
-          this.name = n;
-          return this;
-        }
+test(
+  'PDF export: returns a Drive link when Google answers, null when it ' +
+    'refuses',
+  () => {
+    const w = boot('reservation', { slots });
+    w.api({
+      action: 'submit',
+      slug: w.form.slug,
+      data: person({
+        title: 'First',
+        slot: { day: 'week-11-sunday', time: '12:30 - 12:50' }
       })
+    });
+    let url = '';
+    w.fetch = (u, opts) => {
+      url = u;
+      assert.equal(opts.headers.Authorization, 'Bearer test-token');
+      return {
+        getResponseCode: () => 200,
+        getBlob: () => ({
+          setName(n) {
+            this.name = n;
+            return this;
+          }
+        })
+      };
     };
-  };
-  const ok = w.admin({
-    action: 'admin.print.reservations',
-    slug: w.form.slug,
-    dayId: 'week-11-sunday'
-  });
-  assert.ok(ok.pdfUrl.startsWith('https://drive.google.com/file/d/'));
-  assert.ok(url.includes('format=pdf') && url.includes('fitw=true'));
-  w.fetch = () => ({ getResponseCode: () => 403, getBlob: () => null });
-  assert.equal(
-    w.admin({
+    const ok = w.admin({
       action: 'admin.print.reservations',
       slug: w.form.slug,
       dayId: 'week-11-sunday'
-    }).pdfUrl,
-    null
-  );
-  w.fetch = null;
-  const none = w.admin({
-    action: 'admin.print.reservations',
-    slug: w.form.slug,
-    dayId: 'week-11-sunday'
-  });
-  assert.equal(none.pdfUrl, null);
-  assert.equal(none.count, 1);
-});
+    });
+    assert.ok(ok.pdfUrl.startsWith('https://drive.google.com/file/d/'));
+    assert.ok(url.includes('format=pdf') && url.includes('fitw=true'));
+    w.fetch = () => ({ getResponseCode: () => 403, getBlob: () => null });
+    assert.equal(
+      w.admin({
+        action: 'admin.print.reservations',
+        slug: w.form.slug,
+        dayId: 'week-11-sunday'
+      }).pdfUrl,
+      null
+    );
+    w.fetch = null;
+    const none = w.admin({
+      action: 'admin.print.reservations',
+      slug: w.form.slug,
+      dayId: 'week-11-sunday'
+    });
+    assert.equal(none.pdfUrl, null);
+    assert.equal(none.count, 1);
+  }
+);

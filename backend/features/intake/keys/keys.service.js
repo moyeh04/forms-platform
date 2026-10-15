@@ -7,7 +7,7 @@
 
 var KeysService = (function () {
   /** How many digits an edit key has. */
-  var KEY_DIGITS_ = 5;
+  var KEY_DIGITS_ = Rules.editKeyDigits();
 
   /** How many random keys to try before a form counts as full. */
   var ISSUE_TRIES_ = 60;
@@ -20,9 +20,6 @@ var KeysService = (function () {
 
   /** How long the count of wrong keys lasts, in seconds. */
   var BAD_KEY_WINDOW_S_ = 60;
-
-  /** What a typed key must look like. */
-  var KEY_PATTERN_ = new RegExp('^\\d{' + KEY_DIGITS_ + '}$');
 
   /**
    * Hashes a key of a form.
@@ -167,7 +164,7 @@ var KeysService = (function () {
         'Too many wrong keys. Wait a minute and try again.'
       );
     key = String(key || '').trim();
-    var h = KEY_PATTERN_.test(key) ? keyHash_(form, key) : '';
+    var h = Rules.isEditKey(key) ? keyHash_(form, key) : '';
     var hit = null;
     ResponsesRepository.readResponses(form).forEach(function (r) {
       if (h && r.keyHash === h) hit = r;
