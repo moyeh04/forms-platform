@@ -8,6 +8,7 @@ const docs = require('../../../scripts/checks/check-docs.js');
 const CONFIG = {
   docs: {
     api: 'docs/API.md',
+    accessSections: { Anyone: 'PUBLIC', Admin: 'ADMIN' },
     testing: 'docs/TESTING.md',
     tests: 'tests',
     backend: { include: ['backend/'], extensions: ['.js'] }
@@ -36,7 +37,8 @@ const good = () => ({
     "[\n  { action: 'admin.forms.list', access: Access.ADMIN },\n" +
     "  { action: 'submit', access: Access.PUBLIC }\n];\n",
   'docs/API.md':
-    '| `admin.forms.list` | yes |\n| `submit` | no |\n[Testing](TESTING.md)\n',
+    '## Anyone\n\n| `submit` | no |\n\n' +
+    '## Admin\n\n| `admin.forms.list` | yes |\n[Testing](TESTING.md)\n',
   'docs/TESTING.md':
     '2 automated tests\n\n| Forms | `forms.test.js` | 2 | Lists |\n',
   'tests/forms.test.js': TWO_TESTS
@@ -47,9 +49,25 @@ test('Docs check: a matching API page, test page and links pass', () => {
   assert.deepEqual(docs.check(root, files, CONFIG), []);
 });
 
+test('Docs check: an action in the section of another access fails', () => {
+  const files = good();
+  files['backend/routes.js'] = files['backend/routes.js'].replace(
+    'Access.PUBLIC',
+    'Access.ADMIN'
+  );
+  const { root, files: list } = repo(files);
+  const found = docs
+    .check(root, list, CONFIG)
+    .map((f) => `${f.file}: ${f.message}`);
+  assert.deepEqual(found, [
+    'docs/API.md: submit is in the section of another access than Access.ADMIN'
+  ]);
+});
+
 test('Docs check: a missing action, wrong count and dead link fail', () => {
   const files = good();
-  files['backend/routes.js'] += "  { action: 'admin.forms.delete' }\n";
+  files['backend/routes.js'] +=
+    "  { action: 'admin.forms.delete', access: Access.ADMIN }\n";
   files['tests/sub/more.test.js'] = TWO_TESTS;
   files['docs/API.md'] += '[Gone](OLD.md)\n';
   const { root, files: list } = repo(files);
