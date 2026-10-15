@@ -253,19 +253,52 @@
     "jsdoc": 70,
     "lines": 31
   },
-  "web/js/form/ticket/ticket.js": {
-    "biome/lint/complexity/noExcessiveCognitiveComplexity": 1,
+  "web/js/form/ticket/calendar.view.js": {
     "biome/lint/complexity/noExcessiveLinesPerFunction": 1,
+    "biome/lint/style/noMagicNumbers": 7,
+    "jsdoc": 2,
+    "lines": 3,
+    "numbers": 11
+  },
+  "web/js/form/ticket/clock.view.js": {
+    "biome/lint/complexity/noExcessiveLinesPerFunction": 1,
+    "biome/lint/correctness/noInnerDeclarations": 5,
+    "biome/lint/style/noMagicNumbers": 73,
+    "jsdoc": 4,
+    "lines": 5,
+    "numbers": 22
+  },
+  "web/js/form/ticket/save-image.page.js": {
+    "biome/lint/correctness/noInnerDeclarations": 1,
+    "biome/lint/style/noMagicNumbers": 2,
+    "jsdoc": 3,
+    "lines": 3
+  },
+  "web/js/form/ticket/shapes.view.js": {
+    "biome/lint/style/noMagicNumbers": 10,
+    "jsdoc": 6,
+    "lines": 5,
+    "numbers": 2
+  },
+  "web/js/form/ticket/ticket.view.js": {
+    "biome/lint/complexity/noExcessiveCognitiveComplexity": 1,
     "biome/lint/complexity/useOptionalChain": 1,
-    "biome/lint/correctness/noInnerDeclarations": 6,
     "biome/lint/correctness/noUnusedFunctionParameters": 1,
-    "biome/lint/correctness/noUnusedVariables": 2,
-    "biome/lint/style/noExcessiveLinesPerFile": 1,
-    "biome/lint/style/noMagicNumbers": 105,
-    "biome/lint/suspicious/noAssignInExpressions": 1,
-    "jsdoc": 32,
-    "lines": 27,
-    "numbers": 39
+    "biome/lint/correctness/noUnusedVariables": 1,
+    "biome/lint/style/noMagicNumbers": 3,
+    "jsdoc": 6,
+    "lines": 3
+  },
+  "web/js/form/ticket/time.model.js": {
+    "biome/lint/style/noMagicNumbers": 10,
+    "jsdoc": 5,
+    "lines": 3
+  },
+  "web/js/form/ticket/when.view.js": {
+    "biome/lint/correctness/noUnusedVariables": 1,
+    "jsdoc": 6,
+    "lines": 4,
+    "numbers": 4
   },
   "web/js/viewer.js": {
     "biome/lint/complexity/noExcessiveCognitiveComplexity": 4,

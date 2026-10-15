@@ -139,7 +139,7 @@ The site is published at the paths it has always had: the pages at the root,
 | `web/css/theme.css` | Colors, fonts, and the type scale as variables. Change the look here; the contrast standard is in its header and enforced by `tests/web/css/theme.test.js`. |
 | `web/css/app.css` | Components of the student page. |
 | `web/css/admin.css` | Dashboard and instructor layout, including the team cards (a coloured band per team, header strip, leader tag). |
-| `web/img/` | The tab icon (`favicon.svg`), PNG sizes for phones and older browsers, and `site.webmanifest`. The pirate and the parrot of the ticket picture (`pirate.webp`, `parrot.webp`), with clear backgrounds; `ticket.js` draws the clock and the calendar around them. The pictures of the route: the ship (`ship.svg`), an island (`island.svg`), the treasure chest (`treasure.svg`), the waves (`sea.svg`), the sky by day and by night (`sky-day.svg`, `sky-night.svg`) and the sun and moon (`sun.svg`, `moon.svg`). They have their own colours; the sea and sky behind them take theirs from the theme. |
+| `web/img/` | The tab icon (`favicon.svg`), PNG sizes for phones and older browsers, and `site.webmanifest`. The pirate and the parrot of the ticket picture (`pirate.webp`, `parrot.webp`), with clear backgrounds; `web/js/form/ticket/` draws the clock and the calendar around them. The pictures of the route: the ship (`ship.svg`), an island (`island.svg`), the treasure chest (`treasure.svg`), the waves (`sea.svg`), the sky by day and by night (`sky-day.svg`, `sky-night.svg`) and the sun and moon (`sun.svg`, `moon.svg`). They have their own colours; the sea and sky behind them take theirs from the theme. |
 | `web/js/config.js` | Source placeholder; `scripts/build/build-site.js` generates its published copy from the Actions `API_URL` variable, with the version of the site. |
 | `web/js/app/fresh.js` | Keeps an open page on the published version: compares the version in `config.js` with `version.json`, reloads an older page when nothing would be lost, and offers **Reload** otherwise. |
 | `web/js/app/api.js` | Sends requests to the backend as plain-text JSON (avoids browser CORS checks). |
@@ -167,7 +167,13 @@ The site is published at the paths it has always had: the pages at the root,
 | `web/js/form/transfer.view.js` | The dialog of a request to move a member. |
 | `web/js/form/transfer.page.js` | The requests to move a member when a registration opens. |
 | `web/js/form/form.page.js` | Loads the form, draws the page for its state, and starts the page. Loaded last. |
-| `web/js/form/ticket/ticket.js` | The success ticket: its picture, the image and the PDF. |
+| `web/js/form/ticket/time.model.js` | The clock hands and the slice of the dial for the time of a booking. Loaded first of the ticket parts; creates `App.ticket`. |
+| `web/js/form/ticket/shapes.view.js` | The colours of the ticket picture and its small SVG shapes: a shadow, a brass knob. |
+| `web/js/form/ticket/calendar.view.js` | The desk calendar of the ticket picture. |
+| `web/js/form/ticket/clock.view.js` | The ship's clock of the ticket picture. |
+| `web/js/form/ticket/when.view.js` | The time of a booking as a picture: the clock, the calendar, the pirate and the parrot, with the day and time as text over them. |
+| `web/js/form/ticket/save-image.page.js` | Saves the ticket as an image, with its torn edges. |
+| `web/js/form/ticket/ticket.view.js` | The success ticket: the reference, the picture, the key, and the buttons that save or print it. Loaded last. |
 | `web/js/i18n/en.js`, `ar.js` | The English and Arabic text of the student page, by key, in `App.strings`. |
 | `web/js/i18n/i18n.js` | `App.i18n`: the page language and its direction, the text of a key, `{en, ar}` labels, error sentences and dates. Loaded after `en.js` and `ar.js`. |
 | `web/js/teams/handover.view.js` | The question asked before the leader of a team moves to another team: who leads next, and their email. Used by the student page and the dashboard. |

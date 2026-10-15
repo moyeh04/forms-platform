@@ -81,7 +81,15 @@ const JOINED = [
   },
   {
     published: 'assets/js/ticket.js',
-    sources: ['web/js/form/ticket/ticket.js']
+    sources: [
+      'web/js/form/ticket/time.model.js',
+      'web/js/form/ticket/shapes.view.js',
+      'web/js/form/ticket/calendar.view.js',
+      'web/js/form/ticket/clock.view.js',
+      'web/js/form/ticket/when.view.js',
+      'web/js/form/ticket/save-image.page.js',
+      'web/js/form/ticket/ticket.view.js'
+    ]
   },
   {
     published: 'assets/js/size-alerts.js',
