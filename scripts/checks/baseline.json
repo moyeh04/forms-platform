@@ -5,13 +5,6 @@
   "package.json": {
     "lines": 1
   },
-  "scripts/deploy/setup-deployment.js": {
-    "biome/lint/complexity/noExcessiveCognitiveComplexity": 1,
-    "biome/lint/complexity/noExcessiveLinesPerFunction": 1,
-    "biome/lint/style/noMagicNumbers": 3,
-    "jsdoc": 9,
-    "lines": 15
-  },
   "scripts/dev/dev-server.js": {
     "biome/lint/complexity/noCommaOperator": 1,
     "biome/lint/complexity/noExcessiveLinesPerFunction": 1,
