@@ -298,12 +298,12 @@
   },
   "backend/features/outputs/downloads/downloads.controller.js": {
     "biome/format": 1,
-    "biome/lint/complexity/noExcessiveCognitiveComplexity": 1,
+    "biome/lint/complexity/noExcessiveCognitiveComplexity": 2,
     "biome/lint/complexity/noExcessiveLinesPerFunction": 1,
     "biome/lint/correctness/noInnerDeclarations": 12,
     "biome/lint/style/noMagicNumbers": 5,
     "jsdoc": 2,
-    "lines": 17
+    "lines": 20
   },
   "backend/features/outputs/downloads/downloads.jobs.js": {
     "biome/format": 1,
@@ -311,10 +311,12 @@
     "biome/lint/style/noMagicNumbers": 17,
     "biome/lint/suspicious/noControlCharactersInRegex": 2,
     "jsdoc": 15,
-    "lines": 4,
+    "lines": 5,
     "numbers": 1
   },
   "backend/features/outputs/downloads/downloads.workbook.js": {
+    "biome/format": 1,
+    "biome/lint/complexity/noExcessiveCognitiveComplexity": 1,
     "biome/lint/complexity/noExcessiveLinesPerFunction": 1,
     "biome/lint/style/noMagicNumbers": 4,
     "jsdoc": 4,

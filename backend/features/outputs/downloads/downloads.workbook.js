@@ -1,5 +1,6 @@
 /** The Excel workbook a Download all job puts beside the files. */
 
+var DownloadsWorkbook = (function () {
 /** The workbook: every team with its members, and its task or project linked to the saved copy. */
 function dlWorkbook_(form, job, saved) {
   var thing = TeamsService.teamThing(form);
@@ -56,7 +57,7 @@ function dlWorkbook_(form, job, saved) {
   var merges = [];
   TeamsService.teamBlocks(form).forEach(function (t, g) {
     var start = rows.length + 1;
-    var link = localLink(dlBase_(form, t)) || t.link || '';
+    var link = localLink(DownloadsJobs.dlBase(form, t)) || t.link || '';
     t.members.forEach(function (m, i) {
       rows.push([
         i === 0
@@ -109,3 +110,6 @@ function dlWorkbook_(form, job, saved) {
   }
   return Workbook.xlsxBlob('Teams.xlsx', sheets, styles);
 }
+
+return { dlWorkbook: dlWorkbook_ };
+})();

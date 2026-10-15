@@ -1,5 +1,6 @@
 /** A Download all job: its folder, its saved parts, retries and file names. */
 
+var DownloadsJobs = (function () {
 var DL_PART_BYTES_ = 40 * 1024 * 1024;
 
 var DL_FILE_MAX_ = 45 * 1024 * 1024;
@@ -158,3 +159,6 @@ function dlFileName_(name, ext) {
   var n = dlName_(name);
   return ext && !new RegExp('\\.' + ext + '$', 'i').test(n) ? n + '.' + ext : n;
 }
+
+return { dlDownloadsFolder: dlDownloadsFolder_, dlSave: dlSave_, dlJob: dlJob_, dlBase: dlBase_, dlSaved: dlSaved_, DL_FILES_PER_CALL: DL_FILES_PER_CALL_, DL_BUDGET_MS: DL_BUDGET_MS_, dlBlob: dlBlob_, DL_EXPORTS: DL_EXPORTS_, dlFileName: dlFileName_, dlName: dlName_, DL_PART_BYTES: DL_PART_BYTES_, DL_CHUNK_BYTES: DL_CHUNK_BYTES_, dlRetry: dlRetry_ };
+})();

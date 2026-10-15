@@ -72,3 +72,11 @@ API['admin.matching.decide'] = AuthService.admin(MatchingController.decide);
 API['admin.matching.remove'] = AuthService.admin(MatchingController.remove);
 
 API['admin.views.rebuild'] = AuthService.admin(SheetViewsController.rebuild);
+
+API['admin.download.start'] = AuthService.admin(DownloadsController.start);
+API['admin.download.team'] = AuthService.admin(
+  DownloadsController.downloadTeam
+);
+API['admin.download.finish'] = AuthService.admin(DownloadsController.finish);
+API['admin.download.pack'] = AuthService.admin(DownloadsController.pack);
+API['admin.download.chunk'] = AuthService.admin(DownloadsController.chunk);
