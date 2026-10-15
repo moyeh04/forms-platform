@@ -32,7 +32,10 @@ const JOINED = [
   { published: 'assets/js/fresh.js', sources: ['web/js/app/fresh.js'] },
   { published: 'assets/js/api.js', sources: ['web/js/app/api.js'] },
   { published: 'assets/js/theme.js', sources: ['web/js/app/theme.js'] },
-  { published: 'assets/js/i18n.js', sources: ['web/js/i18n/i18n.js'] },
+  {
+    published: 'assets/js/i18n.js',
+    sources: ['web/js/i18n/en.js', 'web/js/i18n/ar.js', 'web/js/i18n/i18n.js']
+  },
   {
     published: 'assets/js/ui.js',
     sources: [

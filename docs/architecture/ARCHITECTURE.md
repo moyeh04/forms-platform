@@ -170,7 +170,7 @@ sequenceDiagram
 
 The response envelope is always `{ ok: true, ...fields }` or
 `{ ok: false, error: { code, message, details } }`. The browser turns the
-`code` into a friendly sentence in English or Arabic (`web/js/i18n.js`).
+`code` into a friendly sentence in English or Arabic (`web/js/i18n/`).
 
 ## A student submits a registration
 
@@ -724,7 +724,7 @@ flowchart LR
         ui["ui/<br/>h(), icons, dialogs, toast"]
     end
     subgraph student["index.html"]
-        i18n["i18n.js<br/>English and Arabic"]
+        i18n["i18n/<br/>English and Arabic"]
         tk["ticket.js<br/>key, image, PDF"]
         h1["handover.js<br/>who leads a team next"]
         fm["form.js<br/>steps, members, slots, review"]
@@ -1194,7 +1194,7 @@ labels of the current tables.
 | I want to... | Edit |
 |---|---|
 | Change a colour, font, or size | `web/css/theme.css` (variables only); `npm test` checks the contrast |
-| Reword a message or translate | `web/js/i18n.js` |
+| Reword a message or translate | `web/js/i18n/en.js` and `ar.js` |
 | Add a question to a form | Admin dashboard, or `template-fields.js` for new forms by default |
 | Add a new form type | A new function in `templates.service.js`, a label in `web/js/admin.js` |
 | Change a validation rule | its part in `domain/rules/` (browser, server, and tests all follow) |

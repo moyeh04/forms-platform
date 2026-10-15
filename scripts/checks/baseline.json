@@ -291,16 +291,6 @@
     "jsdoc": 5,
     "lines": 5
   },
-  "web/js/i18n/i18n.js": {
-    "biome/lint/complexity/useOptionalChain": 2,
-    "biome/lint/correctness/noInnerDeclarations": 2,
-    "biome/lint/correctness/noUnusedVariables": 2,
-    "biome/lint/style/noExcessiveLinesPerFile": 1,
-    "biome/lint/suspicious/noAssignInExpressions": 1,
-    "biome/lint/suspicious/noGlobalIsNan": 1,
-    "jsdoc": 12,
-    "lines": 30
-  },
   "web/js/teams/size-alerts.view.js": {
     "biome/lint/style/noMagicNumbers": 2,
     "biome/lint/suspicious/noAssignInExpressions": 1,
