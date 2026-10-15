@@ -23,6 +23,7 @@ const CHECKS = [
   require('./code/check-jsdoc.js'),
   require('./code/check-comments.js'),
   require('./code/check-numbers.js'),
+  require('./code/check-colours.js'),
   require('./code/check-flags.js'),
   require('./code/check-enums.js'),
   require('./code/check-layers.js'),

@@ -137,7 +137,7 @@ The site is published at the paths it has always had: the pages at the root,
 | `web/index.html` | The page students use. Shows any form from its saved definition (`?f=name`). |
 | `web/admin.html` | The admin dashboard (PIN). |
 | `web/viewer.html` | The read-only instructor and client page (`?t=private-token`). |
-| `web/css/theme.css` | Colors, fonts, and the type scale as variables. Change the look here; the contrast standard is in its header and enforced by `tests/web/css/theme.test.js`. |
+| `web/css/theme.css` | Every colour of the stylesheets, the fonts and the type scale, as named variables. Change the look here; the contrast standard is in its header and enforced by `tests/web/css/theme.test.js`. |
 | `web/css/app/page.css` | The page, its top bar and icon buttons, and the sheet. Every page loads the `app/` files in the order of these rows, so the cascade is the one the single file had. |
 | `web/css/app/route.css` | The route of the steps: the sea, the islands, the treasure island and the ship. |
 | `web/css/app/fields.css` | The title of a step, the fields, the chips of small lists and the team members. |
@@ -475,6 +475,7 @@ the file name says the role:
 | `scripts/checks/code/check-jsdoc.js` | Every named function has a Google-style JSDoc comment whose tags match its parameters and return, with no metadata tags. |
 | `scripts/checks/code/check-comments.js` | Every shell script, git hook and CI workflow says in a comment what it does and when it runs, and every workflow job says why it runs. |
 | `scripts/checks/code/check-numbers.js` | Every number that initialises something, which Biome skips, is held by a CONSTANT_CASE name. |
+| `scripts/checks/code/check-colours.js` | Every colour of the stylesheets is a named custom property of `web/css/theme.css`. |
 | `scripts/checks/code/check-enums.js` | The values of a shared enum are written as its members where they are compared with the property the enum names. |
 | `scripts/checks/code/check-layers.js` | Backend code reads only the layers it may: the platform reads no feature, and a controller reads no repository. |
 | `scripts/checks/code/check-flags.js` | Yes/no values are compared and written as `'1'`/`'0'` only in `backend/platform/sheets/cell.js`. |
