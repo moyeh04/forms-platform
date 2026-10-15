@@ -184,7 +184,9 @@ the file name says the role:
 
 | File | What it does |
 |---|---|
+| `backend/platform/http/access.js` | Who may call an action: the admin, a private link, the holder of a registration key, or anyone. |
 | `backend/platform/http/api-error.js` | The error every handler throws and the JSON reply the web app sends. |
+| `backend/platform/http/router.js` | Finds the handler of each request in the routes table, runs the admin or link check its access asks for, and turns what it returns or throws into the reply. |
 | `backend/platform/sheets/table.js` | Reading and writing the rows of a sheet tab by its header names. |
 | `backend/platform/sheets/lock.js` | The script lock every write runs under, safe to nest. |
 | `backend/platform/sheets/sheet-style.js` | The look of the data tabs and the registry tabs: row colours, widths and frozen headers. |
@@ -274,9 +276,9 @@ the file name says the role:
 
 | File | What it does |
 |---|---|
-| `backend/routes.js` | Every action name and the handler that answers it, wrapped in `AuthService.admin` when it needs the admin. |
+| `backend/routes.js` | Every action: who may call it and the handler that answers it. A row without a valid access stops the script while it loads. |
 | `backend/entry-points.js` | The functions Apps Script calls by name (the sheet menu, its print dialog, setup, the PIN commands and the view trigger), each handing the call to its namespace. |
-| `backend/main.js` | The web app: every request arrives here and goes to its handler. |
+| `backend/main.js` | The web app: every request arrives here, is read as JSON, and goes to the router. |
 
 `npm run build` joins `domain/rules.js`, `domain/form-metadata.js` and every
 backend file into `dist/Code.gs`: `platform/` first, then `features/`, then

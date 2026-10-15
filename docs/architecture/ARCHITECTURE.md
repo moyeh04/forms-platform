@@ -142,7 +142,7 @@ sequenceDiagram
     autonumber
     participant B as Browser page
     participant G as Apps Script doPost
-    participant T as API table
+    participant T as Router
     participant H as Handler
 
     B->>G: POST text/plain with JSON body (action, slug, data...)
@@ -150,21 +150,21 @@ sequenceDiagram
     alt body is not JSON
         G-->>B: ok false, bad_json
     end
-    G->>T: look up API[action]
+    G->>T: Routes.reply(req)
     alt unknown action
-        G-->>B: ok false, unknown_action
+        T-->>B: ok false, unknown_action
     end
+    Note over T: The route's access decides the check:<br/>ADMIN checks the PIN, CLIENT checks the link<br/>and hands it to the handler.
     T->>H: run handler(req)
-    Note over H: Admin handlers are wrapped by admin(fn).<br/>The wrapper checks the PIN first.
     alt handler calls fail(code, message)
-        H-->>G: throws ApiError
-        G-->>B: ok false, error code and message
+        H-->>T: throws ApiError
+        T-->>B: ok false, error code and message
     else unexpected error
-        G->>G: Logger.log the stack trace
-        G-->>B: ok false, server_error
+        T->>T: Logger.log the stack trace
+        T-->>B: ok false, server_error
     else success
-        H-->>G: result object
-        G-->>B: ok true plus result fields
+        H-->>T: result object
+        T-->>B: ok true plus result fields
     end
 ```
 
@@ -621,7 +621,7 @@ name. The diagram shows the features;
 }}%%
 flowchart TD
     subgraph entry["Entry"]
-        Main["main.js<br/>doGet, doPost, routing"]
+        Main["main.js, routes.js<br/>doGet, doPost, the routes table"]
         Menu["outputs/menu<br/>onOpen sheet menu, print dialog"]
     end
     subgraph catalog["features/catalog"]
@@ -1197,7 +1197,7 @@ labels of the current tables.
 | Add a question to a form | Admin dashboard, or `template-fields.js` for new forms by default |
 | Add a new form type | A new function in `templates.service.js`, a label in `web/js/admin.js` |
 | Change a validation rule | `domain/rules.js` (browser, server, and tests all follow) |
-| Add a backend action | A named function in the feature's `*.controller.js`, returned by its namespace, and a line in `backend/routes.js` (wrap it in `AuthService.admin(...)` if private) |
+| Add a backend action | A named function in the feature's `*.controller.js`, returned by its namespace; a row in `backend/routes.js` with its `Access`; a row in the section of that access in [API.md](../backend/API.md) |
 | Change sheet colours | `sheet-views.layout.js` |
 | Change the downloaded Excel list | `dlWorkbook_` in `downloads.workbook.js` (the file format is in `backend/platform/xlsx/`) |
 | Change the Drive folder name rule | `Rules.checkFolderName` in `domain/rules.js` |

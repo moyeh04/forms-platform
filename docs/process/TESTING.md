@@ -1,11 +1,11 @@
 # Testing
 
-351 automated tests run without a Google account, a browser, or a network.
+354 automated tests run without a Google account, a browser, or a network.
 They run the **real** backend and the **real** pages. This page explains how
 that works and what it can and cannot prove.
 
 ```
-npm test    # 351 tests
+npm test    # 354 tests
 ```
 
 ## The layers
@@ -147,7 +147,7 @@ says something else.
 |---|---|---:|---|
 | Shared rules | `rules.test.js` | 20 | The two warnings about small teams (starting numbers, the level of a team, a wrong number or order), counting the people of a form with a code counted once, Arabic filtering, name parts, phones, codes, Drive links, folder names, slots and the room left in one, form state |
 | Team size and audience | `teamsize.test.js` | 18 | Required question, range, exact member count, admin range, the warnings about small teams saved cleaned and refused when wrong, the sizes of the saved teams sent with the form, size notes, specialization limits, section limits |
-| Core and forms | `core.test.js` | 14 | Setup, PIN lockout and unlocking it from the sheet menu, forms CRUD, duplicate, delete, templates |
+| Core and forms | `core.test.js` | 16 | Setup, PIN lockout and unlocking it from the sheet menu, the routes the router refuses and the checks it runs, forms CRUD, duplicate, delete, templates |
 | Submissions | `submissions.test.js` | 26 | Submit, edit keys, sealed keys, expiry, throttling, duplicates, Drive checks, folder names, limits, emails on and off and without a key, rows written as text past the rows a sheet starts with, team numbers that stay when a team cancels and that older rows keep |
 | Reservations | `reservations.test.js` | 12 | Slots, capacity, one booking per leader, a key that moves a booking and changes nothing else, a booking on a removed slot still counted |
 | Sheet views | `views.test.js` | 14 | Tinted blocks, leader star, merged task cell, bookings by day, one booked repaint for many changes that removes its trigger, a change during the repaint booking another, a failed repaint keeping its mark, the header, widths and row tints of every data tab with no value changed, a tab that refuses the look still repainted |
@@ -172,7 +172,7 @@ says something else.
 | Number check | `scripts/checks/numbers.test.js` | 3 | A number held by a constant variable, property, member or object passes, so do 0, 1, -1 and an ignored line; an unnamed variable, property, nested property or default parameter is found; arguments, operands and array elements are left to Biome |
 | Flag check | `scripts/checks/flags.test.js` | 2 | A field compared with `'1'` or `'0'` either way round, and a choice that writes them, are found; a menu choice in a variable, a digit test, zero padding, other labels and a boolean compare pass |
 | Structure check | `scripts/checks/structure.test.js` | 2 | A tree that keeps every rule passes; an entry outside the root allow-list, catch-all names for a file and a folder, a crowded folder, a missing page script, scripts no page loads and a file the structure page does not name are each found at their place |
-| Document check | `scripts/checks/docs.test.js` | 2 | API.md, TESTING.md (sub-folders counted) and Markdown links that match pass; a missing action, a wrong count and a broken link are each found |
+| Document check | `scripts/checks/docs.test.js` | 3 | API.md, TESTING.md (sub-folders counted) and Markdown links that match pass; a missing action, an action in the section of another access, a wrong count and a broken link are each found |
 | Harness | `harness.test.js` | 5 | The fake itself, and a seeded world that repeats its ids |
 | Colour contrast | `contrast.test.js` | 4 | Every text and outline pair meets WCAG AA in light, dark, and device-dark themes |
 | A page older than the site | `fresh.test.js` | 4 | An untouched page reloads once for a newer site and never in a loop, a page with typed text or an open dialog offers Reload instead, the bar in the language of the form, nothing in a preview or when the version cannot be read |

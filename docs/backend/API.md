@@ -10,8 +10,15 @@ as plain text, with the action in `action`. Every answer is JSON with `ok`:
 { "ok": false, "error": { "code": "bad_key", "message": "That key is not right." } }
 ```
 
-An unknown action answers `unknown_action`. An error the code did not expect
-answers `server_error` and is written to the Apps Script log.
+An unknown action answers `unknown_action`; so does a name every object
+inherits, such as `constructor`. An error the code did not expect answers
+`server_error` and is written to the Apps Script log.
+
+Each action is a row of `backend/routes.js` with its access: `ADMIN`,
+`CLIENT`, `KEY` or `PUBLIC`. The router checks the PIN of an `ADMIN` action and
+the link of a `CLIENT` action before the handler runs; the service checks the
+key of a `KEY` action itself, inside the lock. The sections below follow the
+access, and the docs check refuses an action filed under another one.
 
 This page lists every action: who may call it, whether it takes the script
 lock, and what it writes. A git hook (`.githooks/pre-commit`) refuses a commit
@@ -31,8 +38,8 @@ Who may call an action is decided by the secret the request carries:
 |---|---|---|---|
 | None | | | |
 | Edit key (5 digits) | `key` | `findByKey_` | 10 a minute for each form |
-| Private link | `token`, and `accessKey` when the link has one | `requireClient_` | 30 wrong tokens a minute; 5 wrong access keys lock that link for 10 minutes |
-| Admin PIN | `admin.pin` | `requireAdmin` | 8 wrong PINs lock the dashboard for 10 minutes |
+| Private link | `token`, and `accessKey` when the link has one | the router, with `requireClient_` | 30 wrong tokens a minute; 5 wrong access keys lock that link for 10 minutes |
+| Admin PIN | `admin.pin` | the router, with `requireAdmin` | 8 wrong PINs lock the dashboard for 10 minutes |
 
 ## Anyone (no secret)
 

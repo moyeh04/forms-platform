@@ -3,6 +3,12 @@
   "exceptions": "exceptions.json",
   "docs": {
     "api": "docs/backend/API.md",
+    "accessSections": {
+      "Anyone": "PUBLIC",
+      "Edit key": "KEY",
+      "Private link": "CLIENT",
+      "Admin": "ADMIN"
+    },
     "testing": "docs/process/TESTING.md",
     "tests": "tests",
     "backend": {

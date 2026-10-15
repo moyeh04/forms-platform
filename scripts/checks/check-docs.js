@@ -1,14 +1,16 @@
 /**
  * Checks the documents against the code: API.md names exactly the actions
- * the backend has, TESTING.md gives the right number of tests in total and
- * for each test file, and no Markdown link points at a file that is gone.
+ * the backend has, each under the section of its access, TESTING.md gives
+ * the right number of tests in total and for each test file, and no Markdown
+ * link points at a file that is gone.
  */
 const fs = require('node:fs');
 const path = require('node:path');
 const Module = require('node:module');
 const { select, read } = require('./lib/files.js');
 
-const ACTION = /^API(?:\['([A-Za-z.]+)'\]|\.([A-Za-z]+)) = /gm;
+const ROUTE = /\baction: '([A-Za-z.]+)',\s*access: Access\.([A-Z]+)/g;
+const SECTION = /^## (.*)$/;
 const API_ROW = /^\| `([A-Za-z.]+)` \| (?:yes|no) \|/gm;
 const TEST_ROW = /^\|[^|]+\| `([a-z0-9/._-]+\.test\.js)` \| (\d+) \|/gm;
 const TOTAL = /(\d+) automated tests|# (\d+) tests/g;
@@ -27,22 +29,51 @@ function finding(file, message) {
 }
 
 /**
- * Lists the actions the backend defines and the ones API.md names.
+ * Reads the rows of API.md, each with the access of the section it is in.
+ * A section whose heading starts with a key of `sections` holds the actions
+ * of that access.
+ *
+ * @param {string} text The text of API.md.
+ * @param {!Object<string, string>} sections Heading starts and the access
+ *     each one stands for.
+ * @return {!Map<string, ?string>} Each action and the access of its section,
+ *     or null when its section names none.
+ */
+function pageRows(text, sections) {
+  const rows = new Map();
+  let access = null;
+  for (const line of text.split('\n')) {
+    const heading = SECTION.exec(line);
+    if (heading) {
+      const start = Object.keys(sections).find((s) => heading[1].startsWith(s));
+      access = start ? sections[start] : null;
+    }
+    for (const match of line.matchAll(API_ROW)) rows.set(match[1], access);
+  }
+  return rows;
+}
+
+/**
+ * Lists the actions of the backend's routes table and the ones API.md names.
  *
  * @param {string} root The repository root.
  * @param {!Array<string>} files Every tracked file.
  * @param {!Object} config The `docs` part of the checks configuration.
- * @return {{code: !Array<string>, page: !Array<string>}} Both lists, sorted.
+ * @return {{code: !Map<string, string>, page: !Array<string>,
+ *     sections: !Map<string, ?string>}} The access of each route, the
+ *     actions API.md names, sorted, and the access of the section of each.
  */
 function actions(root, files, config) {
-  const code = [];
+  const code = new Map();
   for (const file of select(files, config.backend)) {
-    for (const match of read(root, file).matchAll(ACTION)) {
-      code.push(match[1] || match[2]);
+    for (const match of read(root, file).matchAll(ROUTE)) {
+      code.set(match[1], match[2]);
     }
   }
-  const page = [...read(root, config.api).matchAll(API_ROW)].map((m) => m[1]);
-  return { code: code.sort(), page: page.sort() };
+  const text = read(root, config.api);
+  const page = [...text.matchAll(API_ROW)].map((m) => m[1]);
+  const sections = pageRows(text, config.accessSections || {});
+  return { code, page: page.sort(), sections };
 }
 
 /**
@@ -54,14 +85,22 @@ function actions(root, files, config) {
  * @return {!Array<!Object>} One finding for each difference.
  */
 function apiFindings(root, files, config) {
-  const { code, page } = actions(root, files, config);
-  const missing = code.filter((name) => !page.includes(name));
-  const extra = page.filter((name) => !code.includes(name));
+  const { code, page, sections } = actions(root, files, config);
+  const names = [...code.keys()].sort();
+  const missing = names.filter((name) => !page.includes(name));
+  const extra = page.filter((name) => !code.has(name));
   const twice = page.filter((name, i) => page.indexOf(name) !== i);
+  const misplaced = names.filter(
+    (name) => sections.has(name) && sections.get(name) !== code.get(name)
+  );
   const out = [];
   if (missing.length) out.push(`no row for ${missing.join(', ')}`);
   if (extra.length) out.push(`a row for a missing action: ${extra.join(', ')}`);
   if (twice.length) out.push(`listed twice: ${twice.join(', ')}`);
+  for (const name of misplaced) {
+    const access = `Access.${code.get(name)}`;
+    out.push(`${name} is in the section of another access than ${access}`);
+  }
   return out.map((message) => finding(config.api, message));
 }
 
