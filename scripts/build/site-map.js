@@ -69,6 +69,7 @@ const JOINED = [
       'web/js/form/team-key.page.js',
       'web/js/form/navigation.page.js',
       'web/js/form/submit.page.js',
+      'web/js/form/submit-errors.page.js',
       'web/js/form/key-entry.page.js',
       'web/js/form/edit.page.js',
       'web/js/form/success.view.js',

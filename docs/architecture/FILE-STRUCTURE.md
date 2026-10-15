@@ -158,7 +158,8 @@ The site is published at the paths it has always had: the pages at the root,
 | `web/js/form/form.view.js` | The page of an open or closed form; with a key it opens on the summary. |
 | `web/js/form/team-key.page.js` | The first step of a key booking: the key and the team it opens. |
 | `web/js/form/navigation.page.js` | Moving between steps and showing their errors. |
-| `web/js/form/submit.page.js` | Sending the registration and handling the server's errors. |
+| `web/js/form/submit.page.js` | Sending the registration and showing its ticket. |
+| `web/js/form/submit-errors.page.js` | What the page does with each error the server gives back when a registration is sent. |
 | `web/js/form/key-entry.page.js` | Opening a registration with its key. |
 | `web/js/form/edit.page.js` | A registration opened with its key: read only, Close, cancel, start again. |
 | `web/js/form/success.view.js` | The page with the ticket after sending. |
