@@ -188,6 +188,7 @@ the file name says the role:
 | `backend/platform/http/router.js` | Finds the handler of each request in the routes table, runs the admin or link check its access asks for, and turns what it returns or throws into the reply. |
 | `backend/platform/sheets/table.js` | Reading and writing the rows of a sheet tab by its header names. |
 | `backend/platform/sheets/lock.js` | The script lock every write runs under, safe to nest. |
+| `backend/platform/sheets/cell.js` | Yes/no values as the sheets store them: `readFlag` and `writeFlag`, the only code that reads or writes the stored `'1'` and `'0'`. |
 | `backend/platform/sheets/sheet-style.js` | The look of the data tabs and the registry tabs: row colours, widths and frozen headers. |
 | `backend/platform/security/crypto.js` | Ids, random digits, SHA-256 and the sealing of short digit strings. |
 | `backend/platform/security/properties.js` | Script properties, including the secret pepper of every hash. |

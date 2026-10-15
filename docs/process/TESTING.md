@@ -1,11 +1,11 @@
 # Testing
 
-354 automated tests run without a Google account, a browser, or a network.
+356 automated tests run without a Google account, a browser, or a network.
 They run the **real** backend and the **real** pages. This page explains how
 that works and what it can and cannot prove.
 
 ```
-npm test    # 354 tests
+npm test    # 356 tests
 ```
 
 ## The layers
@@ -162,6 +162,7 @@ says something else.
 | Admin page | `admin-ui.test.js` | 60 | The two warnings about small teams switched on in Setup with their numbers and a wrong order kept with its reason, small teams listed by level and marked on their card, login, a refused PIN kept in its field, a lock that leaves an open window signed in, create with term chips, team size and notes, descriptions, who can register, locked fields, team cards with their stored numbers, the people count, show key, teammates of a booking (how many, title, details asked), timetable calendar, hours, a day with its own hours and booked slots, delete, matching, clients with the link shown once and the key apart and whether the link shows small teams, a lost key shown again, a link end picked and moved, Extend keys for expired keys and chosen teams, one registration's key extended from its details, Download all with what was not downloaded and the saved zip, lists as chips or rows with the reason for a refused save, sections built from groups and counts, number runs with steppers, new lists picked for a question, column names on list rows for the phone layout, the day sheet group, form tabs that keep edits, section summaries, save bar only while there is a change, sections by one or by year group, a year group added from its own card with the counts set there, a section kind added by name or removed with its own button, added questions and pages, new form preview and title reason, the same header on every tab with a status saved at once, the forms list grouped by status, the count of teams outside a new size range, a new department letter kept as a chip |
 | Instructor page | `viewer-ui.test.js` | 13 | Small teams listed by level and marked on their card, team numbers with a gap where a team cancelled, today, by day, hidden columns, review rights, invalid links, member values named for the phone layout, phone as a call link, the key screen and its theme switch |
 | Registry writes | `registry-writes.test.js` | 6 | Every change to forms, lists and links written inside the lock, a save that keeps its row while another form is deleted, a save over a newer copy refused, a busy lock, a link that keeps a renamed form, list names that stay unique |
+| Flag cells | `cell.test.js` | 2 | A stored flag read as yes, no or its column's default (empty, missing and legacy text), and written as `1` or the column's own cell for no |
 | Golden copies | `golden.test.js` | 5 | What the live system depends on, compared with saved copies in `tests/fixtures/golden/`: every function Apps Script calls by name, the salted hashes and seals for a fixed pepper, the error code of every action for five kinds of request, legacy flag cells read and written back, and every sheet, property, cache entry, mail and trigger after one scripted run. `GOLDEN_UPDATE=1` writes the copies again, only for a change meant to alter them |
 | Site map | `scripts/build/site-map.test.js` | 2 | Each published path, with or without a slash, query or fragment, finds its source under `web/` or `domain/`, and every page exists; a path outside the site or one that climbs out of it with `..` has none |
 | Check baseline | `scripts/checks/lib/baseline.test.js` | 3 | A legacy file keeps its count and never goes over it, a new file has no allowance, a lowered count must be written down and lowering never raises one, and a key ending in `/` is a folder that counts as there while it holds a file |
