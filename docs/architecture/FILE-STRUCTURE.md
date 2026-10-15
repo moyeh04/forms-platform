@@ -230,7 +230,7 @@ the file name says the role:
 | `backend/features/intake/responses/responses.rules.js` | Whether a form takes submissions, and the limits on how many and how big. |
 | `backend/features/intake/responses/drive-links.js` | Checking the Drive links a submission names: shared, and named as the form asks. |
 | `backend/features/intake/responses/responses.notify.js` | What follows a saved submission: the emails and the repaint of the sheet views. |
-| `backend/features/intake/keys/keys.service.js` | Edit keys: issuing, sealing, expiring and finding a submission by its key. |
+| `backend/features/intake/keys/keys.service.js` | Edit keys: issuing, sealing, expiring and finding a submission by its key, and listing and extending the keys of a form. |
 | `backend/features/intake/keys/keys.controller.js` | The key actions of the admin: list keys and extend their end dates. |
 | `backend/features/intake/submissions/submissions.controller.js` | The student actions: submit, look up, update and cancel a submission. |
 | `backend/features/intake/submissions/admin-submissions.controller.js` | The admin actions on submissions: list, edit, delete and reset or show a key. |

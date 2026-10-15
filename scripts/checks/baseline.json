@@ -83,22 +83,6 @@
     "biome/lint/style/noMagicNumbers": 1,
     "jsdoc": 2
   },
-  "backend/features/intake/keys/keys.controller.js": {
-    "biome/lint/complexity/noExcessiveCognitiveComplexity": 1,
-    "biome/lint/correctness/noInnerDeclarations": 1,
-    "biome/lint/style/noMagicNumbers": 1,
-    "biome/lint/suspicious/noGlobalIsNan": 1,
-    "jsdoc": 5,
-    "layers": 4,
-    "lines": 4
-  },
-  "backend/features/intake/keys/keys.service.js": {
-    "biome/lint/complexity/useOptionalChain": 2,
-    "biome/lint/correctness/noInnerDeclarations": 3,
-    "biome/lint/style/noMagicNumbers": 4,
-    "jsdoc": 12,
-    "lines": 3
-  },
   "backend/features/intake/reservations/key-booking.controller.js": {
     "biome/lint/complexity/useOptionalChain": 1,
     "layers": 3,
