@@ -299,12 +299,6 @@
     "jsdoc": 9,
     "lines": 4
   },
-  "web/js/form/review.view.js": {
-    "biome/lint/complexity/noExcessiveCognitiveComplexity": 1,
-    "biome/lint/complexity/useOptionalChain": 1,
-    "biome/lint/correctness/noInnerDeclarations": 5,
-    "jsdoc": 7
-  },
   "web/js/form/form.view.js": {
     "biome/lint/complexity/noExcessiveCognitiveComplexity": 1,
     "biome/lint/complexity/noExcessiveLinesPerFunction": 1,
@@ -312,13 +306,6 @@
     "biome/lint/style/noMagicNumbers": 2,
     "jsdoc": 5,
     "lines": 4
-  },
-  "web/js/form/navigation.page.js": {
-    "biome/lint/complexity/useOptionalChain": 2,
-    "biome/lint/correctness/noInnerDeclarations": 1,
-    "biome/lint/correctness/noUnusedVariables": 2,
-    "jsdoc": 6,
-    "lines": 1
   },
   "web/js/form/submit.page.js": {
     "biome/lint/complexity/noExcessiveCognitiveComplexity": 2,
@@ -328,12 +315,6 @@
     "biome/lint/correctness/noUnusedVariables": 1,
     "jsdoc": 2,
     "lines": 2
-  },
-  "web/js/form/contacts.view.js": {
-    "biome/lint/style/noMagicNumbers": 2,
-    "biome/lint/suspicious/noAssignInExpressions": 1,
-    "jsdoc": 8,
-    "lines": 4
   },
   "web/js/form/transfer.view.js": {
     "biome/lint/complexity/noExcessiveCognitiveComplexity": 1,
