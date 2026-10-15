@@ -103,10 +103,9 @@ flowchart LR
         a11["admin/settings/range-note.view.js"]
         a10["admin/settings/size-alerts.view.js"]
         a7["admin/keys/"]
-        a8["admin/responses/download.view.js"]
         h2["handover.js"]
         s2["size-alerts.js"]
-        a3["admin/responses/responses.page.js"]
+        a3["admin/responses/"]
         a4["admin/people/"]
         a6["admin/lists/lists.page.js"]
     end
@@ -231,7 +230,20 @@ The site is published at the paths it has always had: the pages at the root,
 | `web/js/admin/keys/key-teams.view.js` | The keys the Extend keys dialog acts on: the groups to pick from, and the teams to choose with their search. |
 | `web/js/admin/keys/extend-keys.view.js` | The Extend keys dialog. |
 | `web/js/admin/keys/keys-summary.view.js` | The keys line of a form's Setup, with the Extend keys button. |
-| `web/js/admin/responses/responses.page.js` | Responses, each team, day or registration in its own block as in the sheet, and WhatsApp matching. |
+| `web/js/admin/responses/responses.model.js` | The rules of Responses that draw nothing: the search, the teams under the minimum size, bookings by day, the order of WhatsApp registrations and the CSV rows. |
+| `web/js/admin/responses/row-controls.view.js` | What every list of responses shares: Arabic names, labelled cells, the status and review selects and the Details button. |
+| `web/js/admin/responses/details-key.view.js` | The edit key rows of the Details dialog: the key shown on request and the date it works until. |
+| `web/js/admin/responses/details.view.js` | The Details dialog of a submission: every answer, the review steps, Reset key and Delete. |
+| `web/js/admin/responses/teams.view.js` | Teams and tasks, each team in its own block with its members. |
+| `web/js/admin/responses/bookings.view.js` | Reservations, each day in its own block with its bookings in timetable order. |
+| `web/js/admin/responses/registrations.view.js` | WhatsApp registrations in one table, with a column for each review step. |
+| `web/js/admin/responses/transfers.view.js` | The students another team asked for, with Reject and Approve and move, and the new leader when a leader moves. |
+| `web/js/admin/responses/matching.view.js` | WhatsApp matching: its shared state, loading, filtering and deciding. |
+| `web/js/admin/responses/matching-list.view.js` | The left side of matching: the pasted requests, the filters and the list. |
+| `web/js/admin/responses/matching-detail.view.js` | The right side of matching: the registrations of a phone number, the note and the decision buttons. |
+| `web/js/admin/responses/print.view.js` | The print tabs made in the Google Sheet, and the CSV file. |
+| `web/js/admin/responses/toolbar.view.js` | The toolbar of Responses: search, status filter, Refresh, Download CSV and the print and download buttons of each form type. |
+| `web/js/admin/responses/responses.page.js` | The Responses page: its stats, what needs the admin, the matching tabs and the list. |
 | `web/js/admin/responses/download.view.js` | Download all. |
 | `web/js/admin/people/access.view.js` | The dialog that shows a private link and its access key apart. |
 | `web/js/admin/people/link-end.view.js` | How long a private link works: the picker of its end and the dialog that moves it. |

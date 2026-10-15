@@ -737,7 +737,7 @@ flowchart LR
         a7["admin/settings/size-alerts.view.js<br/>warnings about small teams"]
         h2["handover.js<br/>who leads a team next"]
         s2["size-alerts.js<br/>small teams, drawn"]
-        a3["admin/responses/responses.page.js<br/>blocks, matching, print"]
+        a3["admin/responses/<br/>blocks, matching, print"]
         a4["admin/people/<br/>clients"]
         a5["admin/keys/<br/>key and link end dates"]
         a6["admin/responses/download.view.js<br/>Download all"]
@@ -991,7 +991,7 @@ used by both the responses page and the settings page:
 
 | Tab | Address | What it holds |
 |---|---|---|
-| Responses | `#/f/<slug>` | The answers (`admin/responses/responses.page.js`) |
+| Responses | `#/f/<slug>` | The answers (`admin/responses/`) |
 | Questions | `#/f/<slug>/questions` | The questions under the page of the form that shows them, then team size and teammates |
 | Timetable | `#/f/<slug>/timetable` | Reservations only: the calendar of days, the hours and bookings per slot, the slots of each day, booking with a key |
 | Setup | `#/f/<slug>/settings` | Name and dates, who can register, edit key, emails, limits, review steps, delete |
