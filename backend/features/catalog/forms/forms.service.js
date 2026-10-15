@@ -121,7 +121,7 @@ var FormsService = (function () {
     FormMetadata.update(form, patch);
     PATCHABLE_.forEach(function (k) {
       if (patch[k] === undefined) return;
-      if (k === 'status' && Constants.FORM_STATUSES.indexOf(patch[k]) === -1)
+      if (k === 'status' && Object.values(FormStatus).indexOf(patch[k]) === -1)
         ApiError.fail(
           'bad_status',
           'Status must be draft, open, closed, or archived.'

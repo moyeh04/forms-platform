@@ -7,8 +7,8 @@ var ViewerService = (function () {
     var form = FormsRepository.requireForm(String(slug || ''));
     if (
       !ClientsAccess.clientAllows(client, form) ||
-      form.status === 'draft' ||
-      form.status === 'archived'
+      form.status === FormStatus.DRAFT ||
+      form.status === FormStatus.ARCHIVED
     )
       ApiError.fail('forbidden', 'You do not have access to this form.');
     return form;

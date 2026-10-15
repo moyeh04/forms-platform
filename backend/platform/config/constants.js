@@ -1,5 +1,5 @@
 /**
- * The name of the app, the registry tab names, and the form statuses.
+ * The name of the app and the registry tab names.
  */
 
 var Constants = (function () {
@@ -7,7 +7,5 @@ var Constants = (function () {
 
   var TABS = { forms: 'Forms', clients: 'Clients', lists: 'Lists' };
 
-  var FORM_STATUSES = ['draft', 'open', 'closed', 'archived'];
-
-  return { APP, TABS, FORM_STATUSES };
+  return { APP, TABS };
 })();

@@ -196,7 +196,7 @@ the file name says the role:
 | `backend/platform/format/text.js` | Turning text into link names and into safe HTML. |
 | `backend/platform/format/time.js` | The current time and date as ISO text. |
 | `backend/platform/format/json.js` | Copying values and reading JSON text safely. |
-| `backend/platform/config/constants.js` | The name of the app, the registry tab names, and the form statuses. |
+| `backend/platform/config/constants.js` | The name of the app and the registry tab names. |
 | `backend/platform/config/access.js` | Who may call an action: the admin, a private link, the holder of a registration key, or anyone. |
 | `backend/platform/xlsx/xml.js` | The XML pieces of an Excel file: escaped text, column letters and colours. |
 | `backend/platform/xlsx/workbook.js` | An Excel workbook built by hand: styles, column widths, sheets and the zipped file. |

@@ -131,7 +131,7 @@
           return x.list === key || uses(x.fields);
         });
       };
-      return f.status !== 'archived' && uses(f.fields);
+      return f.status !== FormStatus.ARCHIVED && uses(f.fields);
     });
   }
 

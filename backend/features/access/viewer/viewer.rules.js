@@ -63,8 +63,8 @@ var ViewerRules = (function () {
   function viewerForms_(client) {
     return FormsRepository.readForms().filter(function (f) {
       return (
-        f.status !== 'draft' &&
-        f.status !== 'archived' &&
+        f.status !== FormStatus.DRAFT &&
+        f.status !== FormStatus.ARCHIVED &&
         ClientsAccess.clientAllows(client, f)
       );
     });

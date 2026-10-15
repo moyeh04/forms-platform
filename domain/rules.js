@@ -3,14 +3,18 @@
  *
  * One source of truth used by the browser form, the dashboards, the Node
  * tests, and the Apps Script backend (the bundler prepends this file).
- * Everything here is pure: no DOM, no Apps Script services.
+ * Everything here is pure: no DOM, no Apps Script services. It reads the
+ * enums of enums.js, which the pages and the bundle load first.
  */
 (function (root, factory) {
-  var api = factory();
-  if (typeof module === 'object' && module.exports) module.exports = api;
+  var node = typeof module === 'object' && module.exports;
+  var api = factory(node ? require('./enums.js') : root);
+  if (node) module.exports = api;
   root.Rules = api;
-})(typeof globalThis !== 'undefined' ? globalThis : this, function () {
+})(typeof globalThis !== 'undefined' ? globalThis : this, function (enums) {
   'use strict';
+
+  var FormStatus = enums.FormStatus;
 
   var DIACRITICS = /[\u064B-\u065F\u0670\u0640]/g;
   var NOT_ARABIC_LETTER_OR_SPACE = /[^\u0621-\u063A\u0641-\u064A\u0671\s]/g;
@@ -382,9 +386,9 @@
   function formState(form, nowMs) {
     var now = nowMs == null ? Date.now() : nowMs;
     if (!form) return 'closed';
-    if (form.status === 'draft') return 'draft';
-    if (form.status === 'archived') return 'archived';
-    if (form.status === 'closed') return 'closed';
+    if (form.status === FormStatus.DRAFT) return 'draft';
+    if (form.status === FormStatus.ARCHIVED) return 'archived';
+    if (form.status === FormStatus.CLOSED) return 'closed';
     var o = form.opensAt ? Date.parse(form.opensAt) : NaN;
     var c = form.closesAt ? Date.parse(form.closesAt) : NaN;
     if (!isNaN(o) && now < o) return 'not_yet';
