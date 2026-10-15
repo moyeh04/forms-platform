@@ -1201,7 +1201,7 @@ query is for a thing that changes what it is on a phone (a table that becomes
 cards), not for a thing that only needs fewer columns.
 
 A new list table must set `data-label` on its cells and use one of these
-classes; `tests/web/admin.test.js` and `tests/web/viewer.test.js` check the
+classes; `tests/web/admin.responses.test.js` and `tests/web/viewer.test.js` check the
 labels of the current tables.
 
 ## Where to change what

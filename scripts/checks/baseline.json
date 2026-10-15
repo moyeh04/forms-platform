@@ -40,8 +40,26 @@
     "lines": 12,
     "numbers": 4
   },
-  "tests/web/admin.test.js": {
-    "lines": 65
+  "tests/web/admin.lists.test.js": {
+    "lines": 8
+  },
+  "tests/web/admin.people.test.js": {
+    "lines": 3
+  },
+  "tests/web/admin.questions.test.js": {
+    "lines": 3
+  },
+  "tests/web/admin.responses.test.js": {
+    "lines": 12
+  },
+  "tests/web/admin.settings.test.js": {
+    "lines": 18
+  },
+  "tests/web/admin.shell.test.js": {
+    "lines": 15
+  },
+  "tests/web/admin.timetable.test.js": {
+    "lines": 6
   },
   "tests/web/css/theme.test.js": {
     "lines": 3
@@ -53,8 +71,20 @@
     "biome/lint/suspicious/noAssignInExpressions": 1,
     "lines": 7
   },
-  "tests/web/index.test.js": {
-    "lines": 40
+  "tests/web/index.edit.test.js": {
+    "lines": 3
+  },
+  "tests/web/index.form.test.js": {
+    "lines": 17
+  },
+  "tests/web/index.reservation.test.js": {
+    "lines": 3
+  },
+  "tests/web/index.team-size.test.js": {
+    "lines": 6
+  },
+  "tests/web/index.transfer.test.js": {
+    "lines": 11
   },
   "tests/web/js/fresh.test.js": {
     "lines": 6
