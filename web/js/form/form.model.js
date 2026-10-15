@@ -7,22 +7,26 @@
 (function (App) {
   'use strict';
 
-  var h = App.ui.h;
-
-  var icon = App.ui.icon;
-
-  var t = function (k, p) {
+  /**
+   * Gives the page text of a key in the page language.
+   *
+   * @param {string} k The key.
+   * @param {?Object=} p The values to put in.
+   * @return {string} The text.
+   */
+  function t(k, p) {
     return App.i18n.t(k, p);
-  };
+  }
 
-  // The bar about a newer version of the page speaks the language of the form.
-  App.fresh.words = function () {
-    return { text: t('freshReady'), action: t('freshReload') };
-  };
-
-  var L = function (o) {
+  /**
+   * Picks the text of a `{en, ar}` label in the page language.
+   *
+   * @param {*} o The label.
+   * @return {string} The text.
+   */
+  function L(o) {
     return App.i18n.L(o);
-  };
+  }
 
   var root = document.getElementById('app');
 
@@ -54,59 +58,85 @@
     teamError: ''
   };
 
+  /**
+   * Reads an answer by its path, such as 'members.0.name'.
+   *
+   * @param {string} path The path.
+   * @return {*} The answer, or undefined.
+   */
   function getVal(path) {
-    var cur = S.data;
-    var parts = path.split('.');
-    for (var i = 0; i < parts.length && cur != null; i++) cur = cur[parts[i]];
-    return cur;
+    return path.split('.').reduce(function (cur, part) {
+      return cur == null ? cur : cur[part];
+    }, S.data);
   }
 
+  /**
+   * Writes an answer by its path, making the lists and objects on the way.
+   *
+   * @param {string} path The path.
+   * @param {*} v The answer.
+   */
   function setVal(path, v) {
     var parts = path.split('.');
-    var cur = S.data;
-    for (var i = 0; i < parts.length - 1; i++) {
-      if (cur[parts[i]] == null)
-        cur[parts[i]] = /^\d+$/.test(parts[i + 1]) ? [] : {};
-      cur = cur[parts[i]];
-    }
-    cur[parts[parts.length - 1]] = v;
+    var last = parts.pop();
+    var cur = parts.reduce(function (obj, part, i) {
+      var below = i + 1 < parts.length ? parts[i + 1] : last;
+      if (obj[part] == null) obj[part] = /^\d+$/.test(below) ? [] : {};
+      return obj[part];
+    }, S.data);
+    cur[last] = v;
   }
 
+  /**
+   * Lists the questions of the form that are switched on.
+   *
+   * @return {!Array<!Object>} The fields.
+   */
   function activeFields() {
     return (S.form.fields || []).filter(function (f) {
       return f.enabled !== false;
     });
   }
 
-  function fieldById(id) {
-    return activeFields().filter(function (f) {
-      return f.id === id;
-    })[0];
-  }
-
+  /**
+   * Finds the slot question of the form.
+   *
+   * @return {?Object} The field, or null.
+   */
   function slotField() {
     return Rules.fieldByRole(S.form, 'slot');
   }
 
-  /** True while a new booking is made with a registration key instead of typed answers. */
+  /**
+   * Says whether a new booking is made with a registration key instead of
+   * typed answers.
+   *
+   * @return {boolean} True in that case.
+   */
   function keyMode() {
-    return !!(S.form && S.form.keyBooking) && S.mode === 'new';
+    return !!S.form?.keyBooking && S.mode === 'new';
   }
 
-  /** True for a booking opened with its key that may move to another time and change nothing else. */
+  /**
+   * Says whether a booking opened with its key may move to another time
+   * and change nothing else.
+   *
+   * @return {boolean} True in that case.
+   */
   function slotOnly() {
-    return (
-      S.mode === 'edit' && !!(S.keyInfo && S.keyInfo.slotOnly) && !!slotField()
-    );
+    return S.mode === 'edit' && !!S.keyInfo?.slotOnly && !!slotField();
   }
 
-  var P = { h: h, icon: icon, t: t, L: L, root: root, S: S };
-  App.formPage = P;
-
-  P.keyMode = keyMode;
-  P.slotField = slotField;
-  P.activeFields = activeFields;
-  P.slotOnly = slotOnly;
-  P.getVal = getVal;
-  P.setVal = setVal;
+  App.formPage = {
+    t: t,
+    L: L,
+    root: root,
+    S: S,
+    keyMode: keyMode,
+    slotField: slotField,
+    activeFields: activeFields,
+    slotOnly: slotOnly,
+    getVal: getVal,
+    setVal: setVal
+  };
 })(window.App);

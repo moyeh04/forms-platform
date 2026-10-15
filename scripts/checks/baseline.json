@@ -253,25 +253,6 @@
     "jsdoc": 70,
     "lines": 31
   },
-  "web/js/form/form.model.js": {
-    "biome/lint/complexity/useOptionalChain": 2,
-    "biome/lint/correctness/noInnerDeclarations": 2,
-    "biome/lint/correctness/noUnusedVariables": 1,
-    "jsdoc": 10,
-    "lines": 2
-  },
-  "web/js/form/steps.model.js": {
-    "biome/lint/complexity/useOptionalChain": 1,
-    "biome/lint/correctness/noInnerDeclarations": 4,
-    "jsdoc": 3
-  },
-  "web/js/form/drafts.model.js": {
-    "biome/lint/complexity/useOptionalChain": 1,
-    "biome/lint/correctness/noInnerDeclarations": 1,
-    "biome/lint/correctness/noUnusedVariables": 2,
-    "jsdoc": 5,
-    "lines": 1
-  },
   "web/js/form/chrome.view.js": {
     "biome/lint/complexity/useOptionalChain": 3,
     "biome/lint/style/noMagicNumbers": 2,
@@ -410,13 +391,6 @@
     "biome/lint/correctness/noUnusedVariables": 1,
     "jsdoc": 4,
     "lines": 5
-  },
-  "web/js/form/form.page.js": {
-    "biome/lint/complexity/noExcessiveCognitiveComplexity": 2,
-    "biome/lint/correctness/noInnerDeclarations": 5,
-    "biome/lint/correctness/noUnusedVariables": 1,
-    "biome/lint/style/noMagicNumbers": 1,
-    "jsdoc": 4
   },
   "web/js/form/ticket/ticket.js": {
     "biome/lint/complexity/noExcessiveCognitiveComplexity": 1,
