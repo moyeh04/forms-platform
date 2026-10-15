@@ -13,3 +13,7 @@ API['admin.clients.regenerate'] = AuthService.admin(
 API['admin.clients.key'] = AuthService.admin(ClientsController.setKey);
 API['admin.clients.showKey'] = AuthService.admin(ClientsController.showKey);
 API['admin.clients.remove'] = AuthService.admin(ClientsController.remove);
+
+API['viewer.me'] = ViewerController.me;
+API['viewer.data'] = ViewerController.data;
+API['viewer.review'] = ViewerController.review;

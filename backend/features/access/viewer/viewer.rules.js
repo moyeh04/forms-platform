@@ -1,5 +1,6 @@
 /** What a private link may see: the forms, the kind of view and the columns. */
 
+var ViewerRules = (function () {
 var VIEW_COLUMNS_ = {
   reservation: [
     ['time', 'Time'],
@@ -75,3 +76,6 @@ function stripHidden_(obj, hidden) {
   });
   return obj;
 }
+
+return { viewerForms: viewerForms_, viewFormMetadata: viewFormMetadata_, viewKind: viewKind_, visibleColumns: visibleColumns_, stripHidden: stripHidden_ };
+})();

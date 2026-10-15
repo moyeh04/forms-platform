@@ -3,28 +3,39 @@
  * reviews.
  */
 
-var API = API || {};
-
-API['viewer.me'] = function (req) {
+var ViewerController = (function () {
+/**
+ * Answers the `viewer.me` action.
+ *
+ * @param {!Object} req The request body.
+ * @return {*} The answer, sent back as JSON.
+ */
+function me(req) {
   var client = ClientsAccess.requireClient(req);
   return {
     client: { name: client.name, canReview: client.canReview },
-    forms: viewerForms_(client).map(function (f) {
-      return Object.assign(viewFormMetadata_(f), { icon: f.icon });
+    forms: ViewerRules.viewerForms(client).map(function (f) {
+      return Object.assign(ViewerRules.viewFormMetadata(f), { icon: f.icon });
     })
   };
-};
+}
 
-API['viewer.data'] = function (req) {
+/**
+ * Answers the `viewer.data` action.
+ *
+ * @param {!Object} req The request body.
+ * @return {*} The answer, sent back as JSON.
+ */
+function data(req) {
   var client = ClientsAccess.requireClient(req);
-  var form = requireClientForm_(client, req.slug);
+  var form = ViewerService.requireClientForm(client, req.slug);
   var vform = validationForm(form);
-  var kind = viewKind_(form);
+  var kind = ViewerRules.viewKind(form);
   var mode = req.mode === 'today' || req.mode === 'day' ? req.mode : 'all';
   var out = {
-    form: viewFormMetadata_(form),
+    form: ViewerRules.viewFormMetadata(form),
     kind: kind,
-    columns: visibleColumns_(client, form),
+    columns: ViewerRules.visibleColumns(client, form),
     canReview: client.canReview,
     steps: (form.review && form.review.steps) || [],
     generatedAt: Time.nowIso()
@@ -34,19 +45,25 @@ API['viewer.data'] = function (req) {
     out.days = ((form.slots && form.slots.days) || []).map(function (d) {
       return { id: d.id, label: d.label, date: d.date };
     });
-    out.rows = reservationRows_(vform, client, mode, String(req.dayId || ''));
+    out.rows = ViewerService.reservationRows(vform, client, mode, String(req.dayId || ''));
   } else if (kind === 'team') {
-    out.groups = teamGroups_(vform, client);
-    out.sizeAlerts = viewerSizeAlerts_(form, client);
+    out.groups = ViewerService.teamGroups(vform, client);
+    out.sizeAlerts = ViewerService.viewerSizeAlerts(form, client);
   } else {
-    out.rows = whatsappRows_(vform, client);
+    out.rows = ViewerService.whatsappRows(vform, client);
   }
   return out;
-};
+}
 
-API['viewer.review'] = function (req) {
+/**
+ * Answers the `viewer.review` action.
+ *
+ * @param {!Object} req The request body.
+ * @return {*} The answer, sent back as JSON.
+ */
+function review(req) {
   var client = ClientsAccess.requireClient(req);
-  var form = requireClientForm_(client, req.slug);
+  var form = ViewerService.requireClientForm(client, req.slug);
   if (!client.canReview) ApiError.fail('forbidden', 'This link is read-only.');
   Lock.withLock(function () {
     var r = readResponses(form).filter(function (x) {
@@ -58,4 +75,7 @@ API['viewer.review'] = function (req) {
   });
   afterChange_(form);
   return { updated: true };
-};
+}
+
+return { me, data, review };
+})();

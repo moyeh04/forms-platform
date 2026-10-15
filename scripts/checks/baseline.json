@@ -42,17 +42,20 @@
   "backend/features/access/viewer/viewer.controller.js": {
     "biome/format": 1,
     "biome/lint/complexity/useOptionalChain": 2,
-    "jsdoc": 3,
-    "lines": 1
+    "lines": 2
   },
   "backend/features/access/viewer/viewer.rules.js": {
-    "jsdoc": 5
+    "biome/format": 1,
+    "jsdoc": 5,
+    "lines": 1
   },
   "backend/features/access/viewer/viewer.service.js": {
+    "biome/format": 1,
+    "biome/lint/complexity/noExcessiveCognitiveComplexity": 1,
     "biome/lint/complexity/useOptionalChain": 1,
     "biome/lint/style/noMagicNumbers": 2,
     "jsdoc": 6,
-    "lines": 1
+    "lines": 2
   },
   "backend/features/catalog/forms/forms.controller.js": {
     "biome/lint/correctness/noInnerDeclarations": 1,

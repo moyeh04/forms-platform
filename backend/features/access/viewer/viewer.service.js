@@ -2,6 +2,7 @@
  * The rows a private link reads: bookings, teams and WhatsApp registrations.
  */
 
+var ViewerService = (function () {
 function requireClientForm_(client, slug) {
   var form = requireForm(String(slug || ''));
   if (
@@ -66,7 +67,7 @@ function reservationRows_(form, client, mode, dayId) {
   });
   return rows.map(function (r) {
     delete r._order;
-    return stripHidden_(r, client.hiddenColumns);
+    return ViewerRules.stripHidden(r, client.hiddenColumns);
   });
 }
 
@@ -99,7 +100,7 @@ function teamGroups_(form, client) {
       if (hidden.indexOf('title') !== -1) delete g.title;
       if (hidden.indexOf('link') !== -1) delete g.link;
       g.members = g.members.map(function (m) {
-        return stripHidden_(
+        return ViewerRules.stripHidden(
           {
             name: m.name,
             section: m.section,
@@ -120,7 +121,7 @@ function whatsappRows_(form, client) {
   return readResponses(form)
     .sort(byCreated_)
     .map(function (r) {
-      return stripHidden_(
+      return ViewerRules.stripHidden(
         {
           id: r.id,
           name: r.name,
@@ -137,3 +138,6 @@ function whatsappRows_(form, client) {
       );
     });
 }
+
+return { requireClientForm: requireClientForm_, reservationRows: reservationRows_, teamGroups: teamGroups_, viewerSizeAlerts: viewerSizeAlerts_, whatsappRows: whatsappRows_ };
+})();
