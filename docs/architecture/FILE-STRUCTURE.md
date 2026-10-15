@@ -99,6 +99,7 @@ flowchart LR
         a2["admin/settings/settings.page.js"]
         a5["admin/settings/timetable.view.js"]
         a9["admin/settings/range.view.js"]
+        a11["admin/settings/range-note.view.js"]
         a10["admin/settings/size-alerts.view.js"]
         a7["admin/keys/"]
         a8["admin/responses/download.view.js"]
@@ -199,7 +200,8 @@ The site is published at the paths it has always had: the pages at the root,
 | `web/js/admin/shell/router.page.js` | Reads the address, draws the bar and the page it names, and guards unsaved changes. Loaded last of the shell parts. |
 | `web/js/admin/settings/settings.page.js` | Form settings: everything an admin can change without touching code. |
 | `web/js/admin/settings/timetable.view.js` | The timetable of a reservation form: dates on a calendar, the hours, and the slots of each day. |
-| `web/js/admin/settings/range.view.js` | The range control of the team size and the teammates. |
+| `web/js/admin/settings/range.view.js` | The range control of the team size and the teammates: the bounds, the numbers students see and the saved answers left outside. |
+| `web/js/admin/settings/range-note.view.js` | The note of the range control: the numbers that show it, its text and its preview. |
 | `web/js/admin/settings/size-alerts.view.js` | The two warnings about small teams. |
 | `web/js/admin/keys/until.model.js` | The dates keys and links work until: how a date is written, the end of a picked day, and where a key ends once given more time. |
 | `web/js/admin/keys/until-picker.view.js` | The line that says until when a key or a link works, and the one picker for how long, shared by Clients, a registration and Extend keys. |

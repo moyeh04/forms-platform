@@ -489,10 +489,11 @@ range (`min - 1` to `max - 1`), so older form definitions keep working.
 The teammates of a booking are the same kind of range, counted without the
 leader: the `min` and `max` of the members question, from 0 (a leader books
 alone) to 19, and its own `notice`. The admin sets both ranges with one
-control, `A.sizeRange` in `admin/settings/range.view.js`: the lowest and the highest, the
-numbers students will see, the saved answers outside a new range (`teamSizes`
-or `teammateCounts` from `admin.forms.get`, both counted by `countResponses_`),
-and the note with its preview. `Rules.sizeNotice` fills in both notes, and the
+control, `A.sizeRange` in `admin/settings/range.view.js`: the lowest and the
+highest, the numbers students will see, the saved answers outside a new range
+(`teamSizes` or `teammateCounts` from `admin.forms.get`, both counted by
+`countResponses_`), and the note with its preview, drawn by
+`admin/settings/range-note.view.js`. `Rules.sizeNotice` fills in both notes, and the
 backend cleans both with `normalizeSizeNotice_`. A booking shows the note under
 the teammates when the leader has added one of its numbers.
 

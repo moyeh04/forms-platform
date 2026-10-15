@@ -182,15 +182,6 @@
     "jsdoc": 13,
     "lines": 10
   },
-  "web/js/admin/settings/range.view.js": {
-    "biome/lint/complexity/noExcessiveCognitiveComplexity": 2,
-    "biome/lint/complexity/noExcessiveLinesPerFunction": 2,
-    "biome/lint/correctness/noInnerDeclarations": 1,
-    "biome/lint/style/noMagicNumbers": 1,
-    "biome/lint/suspicious/noAssignInExpressions": 1,
-    "jsdoc": 10,
-    "lines": 9
-  },
   "web/js/admin/settings/settings.page.js": {
     "biome/lint/complexity/noArguments": 1,
     "biome/lint/complexity/noExcessiveCognitiveComplexity": 5,
@@ -205,12 +196,6 @@
     "jsdoc": 65,
     "lines": 70,
     "numbers": 4
-  },
-  "web/js/admin/settings/size-alerts.view.js": {
-    "biome/lint/complexity/noExcessiveLinesPerFunction": 1,
-    "biome/lint/suspicious/noAssignInExpressions": 1,
-    "jsdoc": 9,
-    "lines": 8
   },
   "web/js/admin/settings/timetable.view.js": {
     "biome/lint/complexity/noExcessiveCognitiveComplexity": 3,
