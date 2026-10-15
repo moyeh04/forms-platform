@@ -143,7 +143,8 @@ The site is published at the paths it has always had: the pages at the root,
 | `web/js/config.js` | Source placeholder; `scripts/build/build-site.js` generates its published copy from the Actions `API_URL` variable, with the version of the site. |
 | `web/js/app/fresh.js` | Keeps an open page on the published version: compares the version in `config.js` with `version.json`, reloads an older page when nothing would be lost, and offers **Reload** otherwise. |
 | `web/js/app/api.js` | Sends requests to the backend as plain-text JSON (avoids browser CORS checks). |
-| `web/js/form.js`, `ticket.js` | The student page and the success ticket. |
+| `web/js/form/form.page.js` | The student page. |
+| `web/js/form/ticket/ticket.js` | The success ticket: its picture, the image and the PDF. |
 | `web/js/i18n/en.js`, `ar.js` | The English and Arabic text of the student page, by key, in `App.strings`. |
 | `web/js/i18n/i18n.js` | `App.i18n`: the page language and its direction, the text of a key, `{en, ar}` labels, error sentences and dates. Loaded after `en.js` and `ar.js`. |
 | `web/js/teams/handover.view.js` | The question asked before the leader of a team moves to another team: who leads next, and their email. Used by the student page and the dashboard. |

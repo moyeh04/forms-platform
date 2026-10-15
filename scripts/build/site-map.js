@@ -50,6 +50,11 @@ const JOINED = [
     published: 'assets/js/handover.js',
     sources: ['web/js/teams/handover.view.js']
   },
+  { published: 'assets/js/form.js', sources: ['web/js/form/form.page.js'] },
+  {
+    published: 'assets/js/ticket.js',
+    sources: ['web/js/form/ticket/ticket.js']
+  },
   {
     published: 'assets/js/size-alerts.js',
     sources: ['web/js/teams/size-alerts.view.js']

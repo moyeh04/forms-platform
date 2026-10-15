@@ -80,5 +80,5 @@ Known gaps, counted in the check baseline until they are fixed:
 
 - Month names are declared in both `domain/rules/slots.js` and
   `web/js/admin-timetable.js`.
-- The ticket drawing in `web/js/ticket.js` places its shapes with unnamed
+- The ticket drawing in `web/js/form/ticket/ticket.js` places its shapes with unnamed
   numbers.

@@ -253,7 +253,7 @@ A new registration is a path: one page after another, then a review. A
 registration opened with a key is not. It opens on a summary of every answer
 ("Your registration"), each page is reached with **Change** and returns to the
 summary with **Done**, and **Save changes** exists only while an answer differs
-from the saved one (`hub()` and `changed()` in `form.js`). The route trail and
+from the saved one (`hub()` and `changed()` in `web/js/form/form.page.js`). The route trail and
 the Back button belong to the path, so they are not shown here.
 
 A task is handed in by its deadline. Once a task form stops taking answers
@@ -273,7 +273,7 @@ period; a date sets the same end for every key picked. The dialog says the new
 end before anything is saved. Private links use the same picker for their end
 date, with **No end date** as the default.
 
-Team members are resized in place by `memberList` in `form.js`: each member
+Team members are resized in place by `memberList` in `web/js/form/form.page.js`: each member
 form has **Remove**, the list has **Add a team member**, and both move the team
 size choice with them, inside the range of the form. Remove takes out the
 member that was chosen and offers **Undo**, because its form may be filled in.
@@ -1109,7 +1109,7 @@ Rules of the move:
   only to a team that registered and asked, and it goes away with the answer.
   With `rules.transferWhatsapp` the request also carries `whatsapp: true` and
   the page links the number with `Rules.whatsappLink`. The page draws the number
-  in one place, `leaderContact` in `form.js`, always with a Copy button.
+  in one place, `leaderContact` in `web/js/form/form.page.js`, always with a Copy button.
 - Nothing of a member who moves is asked: the two leaders, or the admin,
   decide. A leader who is asked for answers for themselves.
 - A leader learns about a request by opening the form with the key. Emails to

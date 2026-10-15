@@ -253,7 +253,7 @@
     "jsdoc": 70,
     "lines": 31
   },
-  "web/js/form.js": {
+  "web/js/form/form.page.js": {
     "biome/lint/complexity/noArguments": 1,
     "biome/lint/complexity/noExcessiveCognitiveComplexity": 16,
     "biome/lint/complexity/noExcessiveLinesPerFunction": 11,
@@ -269,7 +269,7 @@
     "jsdoc": 121,
     "lines": 46
   },
-  "web/js/ticket.js": {
+  "web/js/form/ticket/ticket.js": {
     "biome/lint/complexity/noExcessiveCognitiveComplexity": 1,
     "biome/lint/complexity/noExcessiveLinesPerFunction": 1,
     "biome/lint/complexity/useOptionalChain": 1,
