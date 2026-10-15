@@ -16,8 +16,13 @@ change it.
   sides.
 - **Built from smaller names** when it is a product: `40 * 1024 * 1024`
   stays readable, so write it out instead of `41943040`.
-- **A set of allowed values is one list**, declared once, and every check
-  reads it: `FORM_STATUSES`, not `'draft'` compared by hand in five files.
+- **A vocabulary is one enum.** The words the pages and the backend share
+  (`FormType`, `FormStatus`, `ReviewStatus`, `ListKind`) are frozen enums in
+  `domain/enums.js`. Code compares with the member, `FormStatus.DRAFT`, never
+  with `'draft'`, and checks a value against `Object.values(FormStatus)`.
+  `check-enums.js` refuses a word of a mapped enum written by hand. A
+  vocabulary only the backend uses is a frozen object in
+  `backend/platform/config/`, such as `Access`.
 - **Yes/no is a boolean in code.** Only `backend/platform/sheets/cell.js`
   reads or writes the stored strings `'1'` and `'0'`: a row mapper calls
   `Cell.readFlag(cell, whenAbsent)` and `Cell.writeFlag(value, falseCell)`.
@@ -48,10 +53,12 @@ is silenced on its own line with the reason, and both checks honour it:
 
 | Owner | Holds |
 |---|---|
+| `domain/enums.js` | `FormType`, `FormStatus`, `ReviewStatus`, `ListKind` |
 | `backend/platform/config/constants.js` | The app name, the registry tab names, the script property names (`PROPS`) and the cache keys (`CACHE`) |
+| `backend/platform/config/access.js` | `Access`, who may call an action |
 | each `*.repository.js` | The column list of its tab (`FORM_COLS`, `RESPONSE_COLS`, `CLIENT_COLS_`, `TRANSFER_COLS`, `REQUEST_COLS_`) |
-| `responses.repository.js`, `responses.review.js` | `SUBMISSION_STATUSES`, the reference prefix of each form type, `REVIEW_STATUSES` |
-| `lists.repository.js`, `forms.service.js`, `forms.public.js` | The list kinds and built-in lists, the form fields a patch may change, the ones the public may read |
+| `responses.repository.js` | `SUBMISSION_STATUSES`, the reference prefix of each form type |
+| `lists.repository.js`, `forms.service.js`, `forms.public.js` | The kind and name of each built-in list, the form fields a patch may change, the ones the public may read |
 | `auth.service.js` | `ADMIN_MAX_FAILS`, `ADMIN_LOCK_SECONDS` |
 | `clients.access.js` | `CLIENT_KEY_TRIES_` |
 | `downloads.jobs.js` | The size, time and file limits of a download job |
