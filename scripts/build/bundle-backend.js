@@ -46,7 +46,7 @@ const DOMAIN_FIRST = [
   'domain/rules/team-size.js',
   'domain/rules/submission.js',
   'domain/rules/index.js',
-  'domain/form-metadata.js'
+  'domain/form-metadata/index.js'
 ];
 
 /**

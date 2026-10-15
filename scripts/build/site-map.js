@@ -40,6 +40,10 @@ const JOINED = [
       'domain/rules/submission.js',
       'domain/rules/index.js'
     ]
+  },
+  {
+    published: 'shared/form-metadata.js',
+    sources: ['domain/form-metadata/index.js']
   }
 ];
 

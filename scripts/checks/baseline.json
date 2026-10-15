@@ -2,7 +2,7 @@
   ".github/workflows/pages.yml": {
     "lines": 8
   },
-  "domain/form-metadata.js": {
+  "domain/form-metadata/index.js": {
     "biome/lint/complexity/useOptionalChain": 13,
     "biome/lint/correctness/noInnerDeclarations": 3,
     "biome/lint/correctness/noUnusedVariables": 1,
