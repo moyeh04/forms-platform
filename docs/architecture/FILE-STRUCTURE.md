@@ -184,7 +184,9 @@ the file name says the role:
 
 | File | What it does |
 |---|---|
+| `backend/platform/http/access.js` | Who may call an action: the admin, a private link, the holder of a registration key, or anyone. |
 | `backend/platform/http/api-error.js` | The error every handler throws and the JSON reply the web app sends. |
+| `backend/platform/http/router.js` | Finds the handler of each request in the routes table, runs the admin or link check its access asks for, and turns what it returns or throws into the reply. |
 | `backend/platform/sheets/table.js` | Reading and writing the rows of a sheet tab by its header names. |
 | `backend/platform/sheets/lock.js` | The script lock every write runs under, safe to nest. |
 | `backend/platform/sheets/sheet-style.js` | The look of the data tabs and the registry tabs: row colours, widths and frozen headers. |
