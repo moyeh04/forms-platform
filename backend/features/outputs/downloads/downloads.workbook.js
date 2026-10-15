@@ -5,13 +5,13 @@ function dlWorkbook_(form, job, saved) {
   var thing = TeamsService.teamThing(form);
   var styles = [
     {
-      fill: VIEW_STYLE_.ink,
-      color: VIEW_STYLE_.onInk,
+      fill: SheetViewsLayout.VIEW_STYLE.ink,
+      color: SheetViewsLayout.VIEW_STYLE.onInk,
       bold: true,
       align: 'center'
     }
   ];
-  VIEW_STYLE_.groups.forEach(function (g) {
+  SheetViewsLayout.VIEW_STYLE.groups.forEach(function (g) {
     styles.push(
       { fill: g.shades[0], bold: true, align: 'right', rtl: true },
       { fill: g.shades[1], bold: true, align: 'right', rtl: true },
@@ -28,9 +28,9 @@ function dlWorkbook_(form, job, saved) {
     );
   });
   styles.push({ wrap: true });
-  var ST = { head: 1, wrap: 2 + VIEW_STYLE_.groups.length * 5 };
+  var ST = { head: 1, wrap: 2 + SheetViewsLayout.VIEW_STYLE.groups.length * 5 };
   var group = function (g, k) {
-    return 2 + (g % VIEW_STYLE_.groups.length) * 5 + k;
+    return 2 + (g % SheetViewsLayout.VIEW_STYLE.groups.length) * 5 + k;
   };
   var paths = Object.keys(saved);
   var localLink = function (base) {

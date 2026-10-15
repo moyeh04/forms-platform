@@ -63,7 +63,7 @@ function sendConfirmation_(form, result, data) {
 /** After a saved change: the form's sheet views are marked for a repaint. A failure here never fails the save. */
 function afterChange_(form) {
   try {
-    refreshViews(form);
+    SheetViewsScheduler.refreshViews(form);
   } catch (e) {
     Logger.log('Views not marked: ' + e.message);
   }

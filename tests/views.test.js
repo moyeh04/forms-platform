@@ -378,17 +378,19 @@ test('Views: a change that arrives while a form is painted books one more run', 
     slug: w.form.slug,
     data: person({ title: 'One', members: [] })
   });
-  // The second team registers after the run read its marks and before it finished.
-  const real = w.ctx.rebuildViews;
-  w.ctx.rebuildViews = (form) => {
-    w.ctx.rebuildViews = real;
+  // The second team registers after the run read its marks and before it
+  // finished: while it styles the tabs, the first step of every repaint.
+  const style = w.ctx.SheetStyle;
+  const real = style.styleFormTabs;
+  style.styleFormTabs = (ss) => {
+    style.styleFormTabs = real;
     w.advanceDays(0.001);
     w.api({
       action: 'submit',
       slug: w.form.slug,
       data: person({ leader_code: '4230099', title: 'Two', members: [] })
     });
-    return real(form);
+    return real(ss);
   };
   w.runTriggers();
   assert.deepEqual(

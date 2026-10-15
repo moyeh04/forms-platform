@@ -58,7 +58,7 @@ var DATA_TAB_WIDTHS_ = {
 /** True when the tab already has the look for exactly these columns and all of its rows. */
 function dataTabStyled_(sh, cols) {
   var last = String(sh.getRange(1, cols.length).getBackground()).toLowerCase();
-  if (last !== VIEW_STYLE_.ink.toLowerCase()) return false;
+  if (last !== SheetViewsLayout.VIEW_STYLE.ink.toLowerCase()) return false;
   return sh.getBandings().some(function (b) {
     return (
       b.getRange().getNumRows() === sh.getMaxRows() &&
@@ -87,10 +87,10 @@ function paintDataTab_(sh, cols) {
   var rows = sh.getMaxRows(),
     n = cols.length;
   sh.getRange(1, 1, 1, n)
-    .setBackground(VIEW_STYLE_.ink)
-    .setFontColor(VIEW_STYLE_.onInk)
+    .setBackground(SheetViewsLayout.VIEW_STYLE.ink)
+    .setFontColor(SheetViewsLayout.VIEW_STYLE.onInk)
     .setFontWeight('bold')
-    .setFontFamily(VIEW_STYLE_.font)
+    .setFontFamily(SheetViewsLayout.VIEW_STYLE.font)
     .setVerticalAlignment('middle');
   sh.setRowHeight(1, 32);
   sh.setFrozenRows(1);
@@ -99,7 +99,7 @@ function paintDataTab_(sh, cols) {
   });
   if (rows > 1) {
     sh.getRange(2, 1, rows - 1, n)
-      .setFontFamily(VIEW_STYLE_.font)
+      .setFontFamily(SheetViewsLayout.VIEW_STYLE.font)
       .setVerticalAlignment('middle')
       .setWrapStrategy(SpreadsheetApp.WrapStrategy.CLIP);
   }
@@ -108,7 +108,7 @@ function paintDataTab_(sh, cols) {
   });
   sh.getRange(1, 1, rows, n)
     .applyRowBanding(SpreadsheetApp.BandingTheme.LIGHT_GREY, true, false)
-    .setHeaderRowColor(VIEW_STYLE_.ink)
+    .setHeaderRowColor(SheetViewsLayout.VIEW_STYLE.ink)
     .setFirstRowColor(DATA_TAB_ROWS_[0])
     .setSecondRowColor(DATA_TAB_ROWS_[1]);
 }

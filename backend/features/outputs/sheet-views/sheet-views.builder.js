@@ -5,26 +5,27 @@
  * task, code or slot at a glance.
  */
 
+var SheetViewsBuilder = (function () {
 function byCreated_(a, b) {
   return a.created < b.created ? -1 : a.created > b.created ? 1 : 0;
 }
 
 function buildTeamList_(form, ss) {
-  var sh = freshView_(ss, 'Team Members List');
-  paintHeader_(sh, ['Team member name', 'Section', 'Code', TeamsService.teamThing(form)]);
+  var sh = SheetViewsLayout.freshView(ss, 'Team Members List');
+  SheetViewsLayout.paintHeader(sh, ['Team member name', 'Section', 'Code', TeamsService.teamThing(form)]);
   sh.setColumnWidth(1, 300);
   sh.setColumnWidth(2, 100);
   sh.setColumnWidth(3, 110);
   sh.setColumnWidth(4, 280);
 
   var teams = TeamsService.teamBlocks(form);
-  if (!teams.length) return emptyView_(sh, 4, 'No registrations yet.');
+  if (!teams.length) return SheetViewsLayout.emptyView(sh, 4, 'No registrations yet.');
 
   var values = [],
     shades = [],
     blocks = [];
   teams.forEach(function (t, g) {
-    var style = VIEW_STYLE_.groups[g % 2];
+    var style = SheetViewsLayout.VIEW_STYLE.groups[g % 2];
     var start = values.length + 2;
     t.members.forEach(function (m, i) {
       values.push([
@@ -53,7 +54,7 @@ function buildTeamList_(form, ss) {
   sh.getRange(first, 1, values.length, 4)
     .setValues(values)
     .setBackgrounds(shades)
-    .setFontFamily(VIEW_STYLE_.font)
+    .setFontFamily(SheetViewsLayout.VIEW_STYLE.font)
     .setFontSize(11)
     .setVerticalAlignment('middle');
   sh.getRange(first, 1, values.length, 1)
@@ -66,26 +67,26 @@ function buildTeamList_(form, ss) {
 
   blocks.forEach(function (b) {
     var title = b.response.title || '\u2014';
-    mergedLabel_(
+    SheetViewsLayout.mergedLabel(
       sh,
       b.start,
       4,
       b.length,
       title,
-      b.response.link ? hyperlink_(b.response.link, title) : '',
+      b.response.link ? SheetViewsLayout.hyperlink(b.response.link, title) : '',
       b.style.solid
     );
   });
-  frameBlocks_(sh, 4, first, last, blocks);
+  SheetViewsLayout.frameBlocks(sh, 4, first, last, blocks);
 }
 
 function buildBookings_(form, ss) {
-  var sh = freshView_(ss, 'Bookings');
+  var sh = SheetViewsLayout.freshView(ss, 'Bookings');
   var membersField = Rules.fieldByRole(form, 'members');
   var includeMembers = !!(membersField && membersField.enabled !== false);
   var headers = ['Day', 'Time', 'Team leader', 'Code', 'Phone', 'Project'];
   if (includeMembers) headers.push('Teammates');
-  paintHeader_(sh, headers);
+  SheetViewsLayout.paintHeader(sh, headers);
   [190, 140, 300, 110, 130, 280]
     .concat(includeMembers ? [240] : [])
     .forEach(function (w, i) {
@@ -106,7 +107,7 @@ function buildBookings_(form, ss) {
     .sort(function (a, b) {
       return order(a) - order(b);
     });
-  if (!rows.length) return emptyView_(sh, 6, 'No bookings yet.');
+  if (!rows.length) return SheetViewsLayout.emptyView(sh, 6, 'No bookings yet.');
 
   var values = [],
     shades = [],
@@ -121,7 +122,7 @@ function buildBookings_(form, ss) {
         label: p.day ? p.day.label : p.dayId,
         start: values.length + 2,
         length: 0,
-        style: VIEW_STYLE_.groups[g % 2]
+        style: SheetViewsLayout.VIEW_STYLE.groups[g % 2]
       };
       blocks.push(current);
     }
@@ -146,7 +147,7 @@ function buildBookings_(form, ss) {
   sh.getRange(2, 1, values.length, headers.length)
     .setValues(values)
     .setBackgrounds(shades)
-    .setFontFamily(VIEW_STYLE_.font)
+    .setFontFamily(SheetViewsLayout.VIEW_STYLE.font)
     .setFontSize(11)
     .setVerticalAlignment('middle');
   sh.getRange(2, 3, values.length, 1).setFontWeight('bold');
@@ -154,9 +155,9 @@ function buildBookings_(form, ss) {
   sh.getRange(2, 4, values.length, 2).setHorizontalAlignment('center');
   sh.setRowHeights(2, values.length, 32);
   blocks.forEach(function (b) {
-    mergedLabel_(sh, b.start, 1, b.length, b.label, '', b.style.solid);
+    SheetViewsLayout.mergedLabel(sh, b.start, 1, b.length, b.label, '', b.style.solid);
   });
-  frameBlocks_(sh, 6, 2, values.length + 1, blocks);
+  SheetViewsLayout.frameBlocks(sh, 6, 2, values.length + 1, blocks);
 }
 
 function reviewText_(form, r) {
@@ -168,8 +169,8 @@ function reviewText_(form, r) {
 }
 
 function buildRegistrations_(form, ss) {
-  var sh = freshView_(ss, 'Registrations');
-  paintHeader_(sh, [
+  var sh = SheetViewsLayout.freshView(ss, 'Registrations');
+  SheetViewsLayout.paintHeader(sh, [
     'No.',
     'Name',
     'Code',
@@ -192,7 +193,7 @@ function buildRegistrations_(form, ss) {
         (parseInt(b.data.section, 10) || 0) || byCreated_(a, b)
     );
   });
-  if (!rows.length) return emptyView_(sh, 8, 'No registrations yet.');
+  if (!rows.length) return SheetViewsLayout.emptyView(sh, 8, 'No registrations yet.');
 
   var values = [],
     shades = [];
@@ -207,21 +208,21 @@ function buildRegistrations_(form, ss) {
       '',
       reviewText_(form, r)
     ]);
-    var s = VIEW_STYLE_.groups[i % 2].shades[0];
+    var s = SheetViewsLayout.VIEW_STYLE.groups[i % 2].shades[0];
     shades.push([s, s, s, s, s, s, s, s]);
   });
   sh.getRange(2, 1, values.length, 8)
     .setValues(values)
     .setBackgrounds(shades)
-    .setFontFamily(VIEW_STYLE_.font)
+    .setFontFamily(SheetViewsLayout.VIEW_STYLE.font)
     .setFontSize(11)
     .setVerticalAlignment('middle');
   rows.forEach(function (r, i) {
-    if (r.link) sh.getRange(i + 2, 7).setFormula(hyperlink_(r.link, 'Open'));
+    if (r.link) sh.getRange(i + 2, 7).setFormula(SheetViewsLayout.hyperlink(r.link, 'Open'));
   });
   sh.getRange(2, 2, values.length, 1).setFontWeight('bold');
   sh.setRowHeights(2, values.length, 30);
-  frameBlocks_(sh, 8, 2, values.length + 1, []);
+  SheetViewsLayout.frameBlocks(sh, 8, 2, values.length + 1, []);
 }
 
 var VIEW_BUILDERS_ = {
@@ -230,3 +231,6 @@ var VIEW_BUILDERS_ = {
   reservation: buildBookings_,
   whatsapp_registration: buildRegistrations_
 };
+
+return { byCreated: byCreated_, VIEW_BUILDERS: VIEW_BUILDERS_ };
+})();

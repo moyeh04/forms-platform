@@ -70,3 +70,5 @@ API['admin.matching.import'] = AuthService.admin(
 API['admin.matching.list'] = AuthService.admin(MatchingController.list);
 API['admin.matching.decide'] = AuthService.admin(MatchingController.decide);
 API['admin.matching.remove'] = AuthService.admin(MatchingController.remove);
+
+API['admin.views.rebuild'] = AuthService.admin(SheetViewsController.rebuild);

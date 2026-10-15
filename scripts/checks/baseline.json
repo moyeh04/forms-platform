@@ -338,7 +338,7 @@
     "biome/lint/style/noMagicNumbers": 46,
     "biome/lint/suspicious/noAssignInExpressions": 1,
     "jsdoc": 11,
-    "lines": 3
+    "lines": 4
   },
   "backend/features/outputs/sheet-views/sheet-views.builder.js": {
     "biome/format": 1,
@@ -347,14 +347,21 @@
     "biome/lint/correctness/noInnerDeclarations": 1,
     "biome/lint/style/noMagicNumbers": 41,
     "jsdoc": 6,
-    "lines": 1
+    "lines": 6
+  },
+  "backend/features/outputs/sheet-views/sheet-views.controller.js": {
+    "biome/format": 1
   },
   "backend/features/outputs/sheet-views/sheet-views.layout.js": {
+    "biome/format": 1,
     "biome/lint/complexity/useMaxParams": 2,
     "biome/lint/style/noMagicNumbers": 3,
-    "jsdoc": 6
+    "jsdoc": 6,
+    "lines": 1
   },
   "backend/features/outputs/sheet-views/sheet-views.scheduler.js": {
+    "biome/format": 1,
+    "biome/lint/complexity/noExcessiveCognitiveComplexity": 1,
     "biome/lint/style/noMagicNumbers": 2,
     "jsdoc": 4,
     "lines": 8
@@ -570,7 +577,7 @@
     "lines": 6
   },
   "tests/views.test.js": {
-    "lines": 13
+    "lines": 12
   },
   "web/admin.html": {
     "lines": 5

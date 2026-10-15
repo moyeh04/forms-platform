@@ -119,7 +119,7 @@ function teamGroups_(form, client) {
 
 function whatsappRows_(form, client) {
   return ResponsesRepository.readResponses(form)
-    .sort(byCreated_)
+    .sort(SheetViewsBuilder.byCreated)
     .map(function (r) {
       return ViewerRules.stripHidden(
         {

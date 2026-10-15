@@ -31,3 +31,10 @@ function unlockAdmin() {
 function setup() {
   return RegistrySetup.setup();
 }
+
+/**
+ * Time trigger: repaints the sheet views marked as out of date.
+ */
+function processDirtyViews() {
+  SheetViewsScheduler.processDirtyViews();
+}

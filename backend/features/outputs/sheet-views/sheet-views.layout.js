@@ -1,5 +1,6 @@
 /** The look of the sheet views: headers, frames, merged labels and links. */
 
+var SheetViewsLayout = (function () {
 var VIEW_STYLE_ = {
   ink: '#3A2A1A',
   onInk: '#F3E6C4',
@@ -92,3 +93,6 @@ function hyperlink_(url, text) {
     '")'
   );
 }
+
+return { VIEW_STYLE: VIEW_STYLE_, freshView: freshView_, mergedLabel: mergedLabel_, hyperlink: hyperlink_, frameBlocks: frameBlocks_, paintHeader: paintHeader_, emptyView: emptyView_ };
+})();

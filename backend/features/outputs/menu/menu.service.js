@@ -96,7 +96,7 @@ function menuRebuildViews() {
   var n = 0;
   SheetStyle.styleRegistryTabs();
   FormsRepository.readForms().forEach(function (f) {
-    if (rebuildViews(f)) n++;
+    if (SheetViewsScheduler.rebuildViews(f)) n++;
   });
   ui.alert(
     'Views rebuilt',

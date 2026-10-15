@@ -19,7 +19,7 @@ function numberTeams_(rows) {
     .filter(function (r) {
       return !r.deleted && !r.number;
     })
-    .sort(byCreated_)
+    .sort(SheetViewsBuilder.byCreated)
     .map(function (r) {
       r.number = ++top;
       return r;

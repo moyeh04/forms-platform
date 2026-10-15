@@ -5,6 +5,7 @@
  * while nothing changes.
  */
 
+var SheetViewsScheduler = (function () {
 var VIEW_DELAY_MS_ = 60000;
 
 /** A run stops starting new forms after this long, well inside Google's six minutes, and books another. */
@@ -17,7 +18,7 @@ var VIEW_RUN_BUDGET_MS_ = 240000;
 function rebuildViews(form) {
   var ss = SpreadsheetApp.openById(form.sheetId);
   SheetStyle.styleFormTabs(ss);
-  var build = VIEW_BUILDERS_[form.type];
+  var build = SheetViewsBuilder.VIEW_BUILDERS[form.type];
   if (!build) return false;
   build(FormsPublic.validationForm(form), ss);
   return true;
@@ -90,3 +91,6 @@ function processDirtyViews() {
   });
   if (again) bookViewRun_();
 }
+
+return { refreshViews, rebuildViews, processDirtyViews };
+})();

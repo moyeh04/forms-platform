@@ -24,7 +24,7 @@ function paintPrintHeader_(sh, title, headers) {
   sh.getRange(1, 1, 1, cols)
     .merge()
     .setValue(title)
-    .setFontFamily(VIEW_STYLE_.font)
+    .setFontFamily(SheetViewsLayout.VIEW_STYLE.font)
     .setFontSize(16)
     .setFontWeight('bold')
     .setHorizontalAlignment('center')
@@ -32,7 +32,7 @@ function paintPrintHeader_(sh, title, headers) {
   sh.setRowHeight(1, 44);
   sh.getRange(3, 1, 1, cols)
     .setValues([headers])
-    .setFontFamily(VIEW_STYLE_.font)
+    .setFontFamily(SheetViewsLayout.VIEW_STYLE.font)
     .setFontSize(12)
     .setFontWeight('bold')
     .setBackground('#E9DFC4')
@@ -85,7 +85,7 @@ function printReservations_(form, dayId, includeEmpty) {
   });
 
   var ss = SpreadsheetApp.openById(form.sheetId);
-  var sh = freshView_(ss, printSheetName_(day.label));
+  var sh = SheetViewsLayout.freshView(ss, printSheetName_(day.label));
   var headers = ['No.', 'Time', 'Team leader', 'Code', 'Project'];
   if (includeMembers) headers.push('Teammates');
   headers.push('Signature');
@@ -102,7 +102,7 @@ function printReservations_(form, dayId, includeEmpty) {
   if (values.length) {
     sh.getRange(4, 1, values.length, headers.length)
       .setValues(values)
-      .setFontFamily(VIEW_STYLE_.font)
+      .setFontFamily(SheetViewsLayout.VIEW_STYLE.font)
       .setFontSize(12)
       .setVerticalAlignment('middle');
     sh.getRange(4, 1, values.length, 2).setHorizontalAlignment('center');
@@ -136,7 +136,7 @@ function printReservations_(form, dayId, includeEmpty) {
 function printTeamList_(form) {
   var vform = FormsPublic.validationForm(form);
   var ss = SpreadsheetApp.openById(form.sheetId);
-  var sh = freshView_(ss, 'Print - Team list');
+  var sh = SheetViewsLayout.freshView(ss, 'Print - Team list');
   var headers = ['Team', 'Team member name', 'Code', TeamsService.teamThing(form)];
   var metadata = FormMetadata.caption(vform);
   paintPrintHeader_(
@@ -152,7 +152,7 @@ function printTeamList_(form) {
     shades = [],
     blocks = [];
   TeamsService.teamBlocks(form).forEach(function (t, g) {
-    var style = VIEW_STYLE_.groups[g % 2];
+    var style = SheetViewsLayout.VIEW_STYLE.groups[g % 2];
     var start = values.length + 4;
     t.members.forEach(function (m, i) {
       values.push([
@@ -190,7 +190,7 @@ function printTeamList_(form) {
   sh.getRange(4, 1, values.length, 4)
     .setValues(values)
     .setBackgrounds(shades)
-    .setFontFamily(VIEW_STYLE_.font)
+    .setFontFamily(SheetViewsLayout.VIEW_STYLE.font)
     .setFontSize(12)
     .setVerticalAlignment('middle');
   sh.getRange(4, 2, values.length, 1).setFontWeight('bold');
@@ -198,20 +198,20 @@ function printTeamList_(form) {
   sh.setRowHeights(4, values.length, 30);
   blocks.forEach(function (b) {
     var title = b.response.title || '\u2014';
-    mergedLabel_(sh, b.start, 1, b.length, b.number, '', '#E9DFC4');
+    SheetViewsLayout.mergedLabel(sh, b.start, 1, b.length, b.number, '', '#E9DFC4');
     sh.getRange(b.start, 1).setFontColor('#000000');
-    mergedLabel_(
+    SheetViewsLayout.mergedLabel(
       sh,
       b.start,
       4,
       b.length,
       title,
-      b.response.link ? hyperlink_(b.response.link, title) : '',
+      b.response.link ? SheetViewsLayout.hyperlink(b.response.link, title) : '',
       '#E9DFC4'
     );
     sh.getRange(b.start, 4).setFontColor('#000000');
   });
-  frameBlocks_(sh, 4, 4, values.length + 3, blocks);
+  SheetViewsLayout.frameBlocks(sh, 4, 4, values.length + 3, blocks);
   sh.getRange(3, 1, 1, 4).setBorder(
     true,
     true,
@@ -219,7 +219,7 @@ function printTeamList_(form) {
     true,
     true,
     true,
-    VIEW_STYLE_.ink,
+    SheetViewsLayout.VIEW_STYLE.ink,
     SpreadsheetApp.BorderStyle.SOLID
   );
   return {
