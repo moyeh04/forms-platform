@@ -37,12 +37,12 @@ var ViewerController = (function () {
       kind: kind,
       columns: ViewerRules.visibleColumns(client, form),
       canReview: client.canReview,
-      steps: (form.review && form.review.steps) || [],
+      steps: form.review?.steps || [],
       generatedAt: Time.nowIso()
     };
     if (kind === 'reservation') {
       out.today = Time.todayIso();
-      out.days = ((form.slots && form.slots.days) || []).map(function (d) {
+      out.days = (form.slots?.days || []).map(function (d) {
         return { id: d.id, label: d.label, date: d.date };
       });
       out.rows = ViewerService.reservationRows(
@@ -71,23 +71,12 @@ var ViewerController = (function () {
     var form = ViewerService.requireClientForm(client, req.slug);
     if (!client.canReview)
       ApiError.fail('forbidden', 'This link is read-only.');
-    Lock.withLock(function () {
-      var r = ResponsesRepository.readResponses(form).filter(function (x) {
-        return x.id === req.submissionId;
-      })[0];
-      if (!r)
-        ApiError.fail(
-          'submission_not_found',
-          'That submission does not exist.'
-        );
-      ResponsesReview.setReviewStep(
-        form,
-        r,
-        String(req.stepId),
-        String(req.status)
-      );
-      ResponsesRepository.saveResponse(form, r);
-    });
+    ViewerService.reviewSubmission(
+      form,
+      req.submissionId,
+      String(req.stepId),
+      String(req.status)
+    );
     ResponsesNotify.afterChange(form);
     return { updated: true };
   }

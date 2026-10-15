@@ -1,15 +1,23 @@
 /**
- * The teams of a team or task form, numbered, each with its members (leader first). The sheet
- * view, the printed list, the dashboard, the instructor page and the download all read the
- * numbers from here, so they always agree.
+ * The teams of a team or task form, numbered, each with its members (leader
+ * first). The sheet view, the printed list, the dashboard, the instructor
+ * page and the download all read the numbers from here, so they always
+ * agree.
  *
- * A team keeps its number for good: it is stored in the `number` column of its row, also after
- * the team is cancelled, so the teams after it do not move up. Teams registered before the
- * column existed get the numbers they had, in the order they registered.
+ * A team keeps its number for good: it is stored in the `number` column of
+ * its row, also after the team is cancelled, so the teams after it do not
+ * move up. Teams registered before the column existed get the numbers they
+ * had, in the order they registered.
  */
 
 var TeamNumbers = (function () {
-  /** Gives each live row without a number the next one, in the order they registered. Returns the rows it numbered. */
+  /**
+   * Gives each live row without a number the next one, in the order they
+   * registered.
+   *
+   * @param {!Array<!Object>} rows The responses of the form.
+   * @return {!Array<!Object>} The rows it numbered.
+   */
   function numberTeams_(rows) {
     var top = 0;
     rows.forEach(function (r) {
@@ -26,7 +34,14 @@ var TeamNumbers = (function () {
       });
   }
 
-  /** The responses of a form with their team numbers, whether or not the numbers are stored yet. */
+  /**
+   * Reads the responses of a form with their team numbers, whether or not
+   * the numbers are stored yet.
+   *
+   * @param {!Object} form The form.
+   * @param {boolean=} includeDeleted True to keep cancelled teams.
+   * @return {!Array<!Object>} The responses.
+   */
   function numberedResponses_(form, includeDeleted) {
     var rows = ResponsesRepository.readResponses(form, true);
     if (TeamsService.isTeamForm(form)) numberTeams_(rows);
@@ -38,8 +53,12 @@ var TeamNumbers = (function () {
   }
 
   /**
-   * Numbers the rows that have none and stores the numbers of those already in the sheet, in one
-   * write of the column. Call it inside withLock_ before a team is added or cancelled.
+   * Numbers the rows that have none and stores the numbers of those already
+   * in the sheet, in one write of the column. Call it inside Lock.withLock
+   * before a team is added or cancelled.
+   *
+   * @param {!Object} form The form.
+   * @param {!Array<!Object>} rows Its responses, as read from the sheet.
    */
   function keepTeamNumbers_(form, rows) {
     if (!TeamsService.isTeamForm(form)) return;
@@ -62,6 +81,13 @@ var TeamNumbers = (function () {
     column.setNumberFormat('@').setValues(values);
   }
 
+  /**
+   * Orders two teams by their number.
+   *
+   * @param {!Object} a A team.
+   * @param {!Object} b Another team.
+   * @return {number} Below zero when `a` comes first.
+   */
   function byTeamNumber_(a, b) {
     return a.number - b.number;
   }

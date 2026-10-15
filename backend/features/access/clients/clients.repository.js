@@ -1,6 +1,7 @@
 /** The Clients tab: the private links of instructors and clients. */
 
 var ClientsRepository = (function () {
+  /** The columns of the Clients tab, in sheet order. */
   var CLIENT_COLS_ = [
     'id',
     'name',
@@ -16,10 +17,21 @@ var ClientsRepository = (function () {
     'showSizeAlerts'
   ];
 
+  /**
+   * Opens the Clients tab of the registry.
+   *
+   * @return {!SpreadsheetApp.Sheet} The tab.
+   */
   function clientsSheet_() {
     return RegistryRepository.registry().getSheetByName(Constants.TABS.clients);
   }
 
+  /**
+   * Turns a row of the tab into a link.
+   *
+   * @param {!Object} r The row, by column name.
+   * @return {!Object} The link, with its `_row`.
+   */
   function rowToClient_(r) {
     return {
       _row: r._row,
@@ -38,14 +50,27 @@ var ClientsRepository = (function () {
     };
   }
 
+  /**
+   * Says whether a link names a form by its link name. A form id holds an
+   * underscore and a link name never does, so the two cannot be confused.
+   *
+   * @param {*} s A form of the link.
+   * @return {boolean} True for a link name.
+   */
+  function named(s) {
+    return s !== '*' && String(s).indexOf('_') === -1;
+  }
+
+  /**
+   * Reads every link. Forms named by link name are read as ids, and the link
+   * is marked `byName` so its next save stores the ids.
+   *
+   * @return {!Array<!Object>} The links.
+   */
   function readClients_() {
     var clients = Table.readTable(clientsSheet_(), CLIENT_COLS_).map(
       rowToClient_
     );
-    // A form id holds an underscore and a link name never does, so the two cannot be confused.
-    var named = function (s) {
-      return s !== '*' && String(s).indexOf('_') === -1;
-    };
     if (
       !clients.some(function (c) {
         return c.forms.some(named);
@@ -68,14 +93,25 @@ var ClientsRepository = (function () {
     return clients;
   }
 
-  /** Stores ids in every link that still names its forms by link name. Run before a link name changes. */
+  /**
+   * Stores ids in every link that still names its forms by link name. Run
+   * it before a link name changes.
+   */
   function keepClientForms_() {
     readClients_().forEach(function (c) {
       if (c.byName) saveClient_(c);
     });
   }
 
-  /** Changes one link inside the lock, on a fresh copy of its row, and saves it. Returns what `change` returns. */
+  /**
+   * Changes one link inside the lock, on a fresh copy of its row, and saves
+   * it.
+   *
+   * @param {string} id The id of the link.
+   * @param {function(!Object): *} change Changes the link in place.
+   * @return {*} What `change` returns.
+   * @throws {ApiError} `client_not_found` when there is no such link.
+   */
   function changeClient_(id, change) {
     return Lock.withLock(function () {
       var c = readClients_().filter(function (x) {
@@ -88,6 +124,12 @@ var ClientsRepository = (function () {
     });
   }
 
+  /**
+   * Turns a link into the values of its row.
+   *
+   * @param {!Object} c The link.
+   * @return {!Object} The row, by column name.
+   */
   function clientToRow_(c) {
     return {
       id: c.id,
@@ -105,7 +147,13 @@ var ClientsRepository = (function () {
     };
   }
 
-  /** Writes a link to its row, or to a new row. Call it inside withLock_, with a row read there. */
+  /**
+   * Writes a link to its row, or to a new row. Call it inside Lock.withLock,
+   * with a row read there.
+   *
+   * @param {!Object} c The link; a new one gets its `_row`.
+   * @return {!Object} The same link.
+   */
   function saveClient_(c) {
     var sh = clientsSheet_();
     Table.ensureHeaders(sh, CLIENT_COLS_);
@@ -118,12 +166,22 @@ var ClientsRepository = (function () {
     return c;
   }
 
+  /**
+   * Deletes the row of a link. Call it inside Lock.withLock, with a row read
+   * there.
+   *
+   * @param {!Object} c The link.
+   */
+  function deleteClient_(c) {
+    clientsSheet_().deleteRow(c._row);
+  }
+
   return {
     CLIENT_COLS: CLIENT_COLS_,
+    deleteClient: deleteClient_,
     readClients: readClients_,
     saveClient: saveClient_,
     changeClient: changeClient_,
-    clientsSheet: clientsSheet_,
     keepClientForms: keepClientForms_
   };
 })();

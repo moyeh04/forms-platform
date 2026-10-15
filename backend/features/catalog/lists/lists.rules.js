@@ -1,6 +1,10 @@
 /** The lists a new registry starts with, and how list values are cleaned. */
 
 var ListsRules = (function () {
+  /** The most WhatsApp section numbers a new registry lists. */
+  var WA_SECTION_COUNT_ = 33;
+
+  /** The lists a new registry starts with. */
   var DEFAULT_LISTS = {
     levels: [
       ['صفر / الأولى', 'Level 0 / Year 1'],
@@ -34,14 +38,17 @@ var ListsRules = (function () {
       '4C-O3'
     ],
     groups: ['A', 'B'],
-    wa_sections: (function () {
-      var a = [];
-      for (var i = 1; i <= 33; i++) a.push(String(i));
-      return a;
-    })()
+    wa_sections: Array.from({ length: WA_SECTION_COUNT_ }, function (_, i) {
+      return String(i + 1);
+    })
   };
 
-  /** Turns ['ar', 'en'] pairs or plain strings into option objects. */
+  /**
+   * Turns ['ar', 'en'] pairs or plain strings into option objects.
+   *
+   * @param {?Array<*>} values The choices as typed or stored.
+   * @return {!Array<{value: string, label: !Object}>} The options.
+   */
   function normalizeListValues(values) {
     return (values || []).map(function (v) {
       if (Array.isArray(v))
