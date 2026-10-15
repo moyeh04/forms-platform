@@ -1,4 +1,7 @@
-/* Phones: a team member is a name line and labelled lines under it, all starting at the same edge. */
+/*
+ * Phones: a team member is a name line and labelled lines under it, all
+ * starting at the same edge.
+ */
 @media (max-width: 600px) {
   .team-card .scroll-x {
     overflow: visible;
@@ -84,7 +87,10 @@
     white-space: normal;
   }
 
-  /* Search fills the row; filters and actions share two equal columns instead of wrapping at random widths. */
+  /*
+   * Search fills the row; filters and actions share two equal columns instead
+   * of wrapping at random widths.
+   */
   .toolbar {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -143,7 +149,10 @@
   }
 }
 
-/* Phones: one header row with the actions, the section links underneath; menus and the save bar stay on screen. */
+/*
+ * Phones: one header row with the actions, the section links underneath; menus
+ * and the save bar stay on screen.
+ */
 @media (max-width: 600px) {
   .admin-bar {
     gap: 10px;
@@ -216,7 +225,10 @@
   }
 }
 
-/* Phones: each booking becomes a small card of labelled lines instead of a squeezed table. */
+/*
+ * Phones: each booking becomes a small card of labelled lines instead of a
+ * squeezed table.
+ */
 @media (max-width: 600px) {
   .block.single .scroll-x {
     overflow: visible;

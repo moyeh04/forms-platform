@@ -1,4 +1,7 @@
-/* Client links: the access key column and the dialog that shows a new link and key once. */
+/*
+ * Client links: the access key column and the dialog that shows a new link and
+ * key once.
+ */
 .client-key {
   display: flex;
   flex-wrap: wrap;
@@ -24,7 +27,10 @@
   margin: 4px 0 6px;
 }
 
-/* How long a key or link works: period chips, a date field, and a line saying the result. */
+/*
+ * How long a key or link works: period chips, a date field, and a line saying
+ * the result.
+ */
 .until-picker .toggle-chips {
   margin: 2px 0 0;
 }
@@ -112,7 +118,10 @@
   }
 }
 
-/* Download all: a progress bar, the line saying where it is, and a button per zip part. */
+/*
+ * Download all: a progress bar, the line saying where it is, and a button per
+ * zip part.
+ */
 .download {
   --l-gap: 12px;
 }

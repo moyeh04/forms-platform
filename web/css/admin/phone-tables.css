@@ -1,4 +1,7 @@
-/* Phones: a wide list table becomes one card per row, each value under its column name. */
+/*
+ * Phones: a wide list table becomes one card per row, each value under its
+ * column name.
+ */
 @media (max-width: 600px) {
   .data-table.cards,
   .data-table.cards tbody {

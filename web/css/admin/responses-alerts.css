@@ -37,7 +37,10 @@
   padding: 0;
   border: 0;
 }
-/* Warnings about small teams: a line for each level, and a mark on the card of each small team. */
+/*
+ * Warnings about small teams: a line for each level, and a mark on the card of
+ * each small team.
+ */
 .size-alerts {
   display: grid;
   gap: 8px;

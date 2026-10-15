@@ -180,10 +180,12 @@
   color: var(--mute);
 }
 /*
- * Layout pieces. Each one changes shape from the width it is given, so a page built from
- * them works on a phone with no media query of its own.
- *   .l-split  a main part (.l-main) and a narrower side (.l-side); the side goes under the main part when both do not fit
- *   .l-grid   equal columns, as many as fit; --l-min is the narrowest a column may be
+ * Layout pieces. Each one changes shape from the width it is given, so a page
+ * built from them works on a phone with no media query of its own.
+ *   .l-split  a main part (.l-main) and a narrower side (.l-side); the side
+ *             goes under the main part when both do not fit
+ *   .l-grid   equal columns, as many as fit; --l-min is the narrowest a
+ *             column may be
  *   .l-stack  children under each other with one gap (--l-gap)
  */
 .l-split {

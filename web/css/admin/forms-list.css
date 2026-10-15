@@ -1,4 +1,7 @@
-/* The header of a form: its More menu opens under its own right edge, and a refused status has a line of its own. */
+/*
+ * The header of a form: its More menu opens under its own right edge, and a
+ * refused status has a line of its own.
+ */
 .page-head .more-menu {
   inset-inline-start: auto;
   inset-inline-end: 0;
@@ -67,7 +70,10 @@
   color: var(--ink);
 }
 
-/* The forms list is grouped by status; a group is its name, how many forms it has, and their cards. */
+/*
+ * The forms list is grouped by status; a group is its name, how many forms it
+ * has, and their cards.
+ */
 .form-group + .form-group {
   margin-top: 26px;
 }

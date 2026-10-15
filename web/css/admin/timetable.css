@@ -1,6 +1,7 @@
 /*
- * Timetable: the days and the hours at the side, the result in the main part (.l-split).
- * A day is a row of slot chips that wrap, so the page never needs sideways scrolling.
+ * Timetable: the days and the hours at the side, the result in the main
+ * part (.l-split). A day is a row of slot chips that wrap, so the page never
+ * needs sideways scrolling.
  */
 .tt-setup {
   max-width: 400px;

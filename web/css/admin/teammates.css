@@ -14,8 +14,9 @@
 }
 
 /*
- * Lists: the lists at the side, the choices of the picked one in the main part (.l-split).
- * Below 940px there is room for one of the two: the lists, or the picked list with a way back.
+ * Lists: the lists at the side, the choices of the picked one in the main
+ * part (.l-split). Below 940px there is room for one of the two: the lists,
+ * or the picked list with a way back.
  */
 .lists {
   margin-top: 12px;

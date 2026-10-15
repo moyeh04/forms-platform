@@ -1,4 +1,7 @@
-/* Responses: every team, day and registration is a block with its own tint and a heavy border. */
+/*
+ * Responses: every team, day and registration is a block with its own tint and
+ * a heavy border.
+ */
 .toolbar {
   display: flex;
   flex-wrap: wrap;
@@ -48,7 +51,10 @@
   margin-inline-end: 6px;
 }
 
-/* Team cards: neutral paper, a coloured band on the leading edge, and a header strip. */
+/*
+ * Team cards: neutral paper, a coloured band on the leading edge, and a header
+ * strip.
+ */
 .team-list {
   display: flex;
   flex-direction: column;

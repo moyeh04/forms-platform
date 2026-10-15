@@ -1,4 +1,7 @@
-/* A list of sections: one card for each year group, a stepper for each kind of section. */
+/*
+ * A list of sections: one card for each year group, a stepper for each kind of
+ * section.
+ */
 .sec-editor {
   --l-gap: 12px;
 }

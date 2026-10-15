@@ -1,4 +1,6 @@
-/* New form: steps in the main part, a preview that stays in view at the side. */
+/*
+ * New form: steps in the main part, a preview that stays in view at the side.
+ */
 .new-side {
   position: sticky;
   top: 16px;

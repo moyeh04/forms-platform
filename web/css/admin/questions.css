@@ -1,4 +1,7 @@
-/* Questions: one row per question under the page that shows it. Nothing here needs sideways scrolling. */
+/*
+ * Questions: one row per question under the page that shows it. Nothing here
+ * needs sideways scrolling.
+ */
 .q-page {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;

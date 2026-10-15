@@ -1,4 +1,7 @@
-/* Dashboard layout. Same paper palette and type scale as the public form, tuned for dense data. */
+/*
+ * Dashboard layout. Same paper palette and type scale as the public form, tuned
+ * for dense data.
+ */
 
 body.admin {
   font-size: 1rem;
@@ -69,7 +72,10 @@ body.admin {
   font-size: 1.5rem;
 }
 
-/* The tabs of one form: the same bar on the responses page and on every settings tab. */
+/*
+ * The tabs of one form: the same bar on the responses page and on every
+ * settings tab.
+ */
 .form-tabs {
   display: flex;
   gap: 4px;
@@ -120,7 +126,10 @@ body.admin {
   font-size: 1rem;
 }
 
-/* A settings section: one line (name and current value) that opens to its controls. */
+/*
+ * A settings section: one line (name and current value) that opens to its
+ * controls.
+ */
 .panel {
   background: var(--sheet);
   border: 1.5px solid var(--line);
