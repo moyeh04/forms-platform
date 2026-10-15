@@ -1,5 +1,6 @@
 /** The lists a new registry starts with, and how list values are cleaned. */
 
+var ListsRules = (function () {
 var DEFAULT_LISTS = {
   levels: [
     ['صفر / الأولى', 'Level 0 / Year 1'],
@@ -53,3 +54,6 @@ function normalizeListValues(values) {
     return { value: String(v), label: { en: String(v), ar: String(v) } };
   });
 }
+
+return { normalizeListValues, DEFAULT_LISTS };
+})();

@@ -10,7 +10,7 @@ var LIMITED_LISTS_ = ['majors', 'sections'];
 /** The rule that limits the choices of a list, or '' when none does. */
 function limitRuleOf_(list, info) {
   if (list === 'majors') return 'majors';
-  return listKind_(list, info) === 'sections' ? 'sections' : '';
+  return ListsRepository.listKind(list, info) === 'sections' ? 'sections' : '';
 }
 
 /** The values of a list that a form is limited to; empty means every value. */
@@ -26,7 +26,7 @@ function allowedMajors_(form) {
 
 /** Lists are merged into select fields so the browser gets plain options. */
 function resolveOptions_(form, lists, info) {
-  info = info || readListInfo();
+  info = info || ListsRepository.readListInfo();
   function fix(fields) {
     (fields || []).forEach(function (f) {
       if (f.list) f.options = lists[f.list] || [];
@@ -62,7 +62,7 @@ var PUBLIC_KEYS_ = [
 ];
 
 function publicForm(form) {
-  var full = resolveOptions_(Json.clone(form), readLists());
+  var full = resolveOptions_(Json.clone(form), ListsRepository.readLists());
   var out = {};
   PUBLIC_KEYS_.forEach(function (k) {
     if (full[k] !== undefined) out[k] = full[k];
@@ -91,7 +91,7 @@ function publicForm(form) {
 
 /** The form with options resolved, for server-side validation. */
 function validationForm(form) {
-  return resolveOptions_(Json.clone(form), readLists());
+  return resolveOptions_(Json.clone(form), ListsRepository.readLists());
 }
 
 return { validationForm, publicForm, LIMITED_LISTS: LIMITED_LISTS_ };

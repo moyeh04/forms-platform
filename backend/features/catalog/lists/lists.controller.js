@@ -1,14 +1,13 @@
 /** The list actions of the admin: read, fill, make, rename and delete lists. */
 
-var API = API || {};
-
+var ListsController = (function () {
 function listsOut_() {
-  return { lists: readLists(), info: readListInfo() };
+  return { lists: ListsRepository.readLists(), info: ListsRepository.readListInfo() };
 }
 
 function requireList_(key) {
   key = String(key || '');
-  if (!key || key.charAt(0) === '_' || !readLists().hasOwnProperty(key))
+  if (!key || key.charAt(0) === '_' || !ListsRepository.readLists().hasOwnProperty(key))
     ApiError.fail('list_not_found', 'There is no such list.');
   return key;
 }
@@ -24,7 +23,7 @@ function freeListName_(name, lists, info, self) {
       k !== self &&
       (
         (info[k] && info[k].name) ||
-        BUILTIN_LIST_NAMES_[k] ||
+        ListsRepository.BUILTIN_LIST_NAMES[k] ||
         ''
       ).toLowerCase() === name.toLowerCase()
     );
@@ -35,28 +34,43 @@ function freeListName_(name, lists, info, self) {
 
 /** A handler that changes the Lists tab: it reads and writes inside the lock, then returns every list. */
 function listChange_(change) {
-  return AuthService.admin(function (req) {
+  return function (req) {
     return Lock.withLock(function () {
       var extra = change(req) || {};
       return Object.assign(listsOut_(), extra);
     });
-  });
+  };
 }
 
-API['admin.lists.get'] = AuthService.admin(function () {
+/**
+ * Answers the `admin.lists.get` action.
+ *
+ * @return {*} The answer, sent back as JSON.
+ */
+function get() {
   return listsOut_();
-});
+}
 
-API['admin.lists.set'] = listChange_(function (req) {
-  saveList(requireList_(req.key), req.values || []);
-});
+/**
+ * Answers the `admin.lists.set` action.
+ *
+ * @param {!Object} req The request body.
+ */
+function set(req) {
+  ListsRepository.saveList(requireList_(req.key), req.values || []);
+}
 
-/** A new list: a name, a kind, and the choices to start with (empty, or a copy of another list). */
-API['admin.lists.create'] = listChange_(function (req) {
-  var lists = readLists();
-  var info = readListInfo();
+/**
+ * A new list: a name, a kind, and the choices to start with (empty, or a copy of another list).
+ *
+ * @param {!Object} req The request body.
+ * @return {*} The answer, sent back as JSON.
+ */
+function create(req) {
+  var lists = ListsRepository.readLists();
+  var info = ListsRepository.readListInfo();
   var name = freeListName_(req.name, lists, info);
-  var kind = LIST_KINDS_.indexOf(req.kind) === -1 ? 'plain' : req.kind;
+  var kind = ListsRepository.LIST_KINDS.indexOf(req.kind) === -1 ? 'plain' : req.kind;
   var base =
     name
       .toLowerCase()
@@ -65,35 +79,44 @@ API['admin.lists.create'] = listChange_(function (req) {
       .slice(0, 30) || 'list';
   var key = base,
     n = 2;
-  while (lists.hasOwnProperty(key) || BUILTIN_LIST_KINDS_.hasOwnProperty(key))
+  while (lists.hasOwnProperty(key) || ListsRepository.BUILTIN_LIST_KINDS.hasOwnProperty(key))
     key = base + '_' + n++;
-  saveList(key, req.copyOf ? lists[requireList_(req.copyOf)] : []);
+  ListsRepository.saveList(key, req.copyOf ? lists[requireList_(req.copyOf)] : []);
   info[key] = { name: name, kind: kind };
-  saveListInfo_(info);
+  ListsRepository.saveListInfo(info);
   return { key: key };
-});
+}
 
-API['admin.lists.rename'] = listChange_(function (req) {
+/**
+ * Answers the `admin.lists.rename` action.
+ *
+ * @param {!Object} req The request body.
+ */
+function rename(req) {
   var key = requireList_(req.key);
-  var info = readListInfo();
+  var info = ListsRepository.readListInfo();
   if (!info[key])
     ApiError.fail(
       'list_builtin',
       'The lists that came with the platform keep their names.'
     );
-  info[key].name = freeListName_(req.name, readLists(), info, key);
-  saveListInfo_(info);
-});
+  info[key].name = freeListName_(req.name, ListsRepository.readLists(), info, key);
+  ListsRepository.saveListInfo(info);
+}
 
-/** Only a list an admin made, and only while no form asks it. */
-API['admin.lists.delete'] = listChange_(function (req) {
+/**
+ * Only a list an admin made, and only while no form asks it.
+ *
+ * @param {!Object} req The request body.
+ */
+function remove(req) {
   var key = requireList_(req.key);
-  if (!readListInfo()[key])
+  if (!ListsRepository.readListInfo()[key])
     ApiError.fail(
       'list_builtin',
       'The lists that came with the platform cannot be deleted.'
     );
-  var users = formsUsingList_(key);
+  var users = ListsRepository.formsUsingList(key);
   if (users.length)
     ApiError.fail(
       'list_in_use',
@@ -105,5 +128,14 @@ API['admin.lists.delete'] = listChange_(function (req) {
           .join(', ') +
         '.'
     );
-  deleteList_(key);
-});
+  ListsRepository.deleteList(key);
+}
+
+return {
+  get,
+  set: listChange_(set),
+  create: listChange_(create),
+  rename: listChange_(rename),
+  remove: listChange_(remove)
+};
+})();

@@ -1,5 +1,6 @@
 /** The Lists tab: the values of each list and what kind of list it is. */
 
+var ListsRepository = (function () {
 /*
  * A row of the Lists tab is one list: its key and its choices as JSON. The row with the key
  * `_info` holds the name and the kind of each list an admin made, so the tab keeps its two
@@ -68,7 +69,7 @@ function writeListRow_(key, json) {
 }
 
 function saveList(key, values) {
-  writeListRow_(key, JSON.stringify(normalizeListValues(values)));
+  writeListRow_(key, JSON.stringify(ListsRules.normalizeListValues(values)));
 }
 
 function saveListInfo_(info) {
@@ -97,3 +98,6 @@ function formsUsingList_(key) {
     return uses(f.fields);
   });
 }
+
+return { readLists, readListInfo, listKind: listKind_, BUILTIN_LIST_NAMES: BUILTIN_LIST_NAMES_, saveList, LIST_KINDS: LIST_KINDS_, BUILTIN_LIST_KINDS: BUILTIN_LIST_KINDS_, saveListInfo: saveListInfo_, formsUsingList: formsUsingList_, deleteList: deleteList_ };
+})();

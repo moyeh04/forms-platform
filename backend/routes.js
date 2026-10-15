@@ -25,3 +25,9 @@ API['admin.forms.create'] = AuthService.admin(FormsController.create);
 API['admin.forms.update'] = AuthService.admin(FormsController.update);
 API['admin.forms.duplicate'] = AuthService.admin(FormsController.duplicate);
 API['admin.forms.delete'] = AuthService.admin(FormsController.remove);
+
+API['admin.lists.get'] = AuthService.admin(ListsController.get);
+API['admin.lists.set'] = AuthService.admin(ListsController.set);
+API['admin.lists.create'] = AuthService.admin(ListsController.create);
+API['admin.lists.rename'] = AuthService.admin(ListsController.rename);
+API['admin.lists.delete'] = AuthService.admin(ListsController.remove);

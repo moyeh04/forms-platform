@@ -44,7 +44,7 @@ function list() {
  */
 function get(req) {
   var form = FormsRepository.requireForm(req.id);
-  var out = { form: form, lists: readLists(), listInfo: readListInfo() };
+  var out = { form: form, lists: ListsRepository.readLists(), listInfo: ListsRepository.readListInfo() };
   // The timetable editor marks slots that already have bookings.
   if (form.type === 'reservation') {
     out.taken = slotAvailability_(form);

@@ -95,7 +95,7 @@ function normalizeQuestions_(form) {
     return clean;
   });
   // A question that reads a list may read any list that exists; the admin picks it in the Questions tab.
-  var lists = readLists();
+  var lists = ListsRepository.readLists();
   var known = function (fields) {
     (fields || []).forEach(function (f) {
       if (f.list && !lists.hasOwnProperty(f.list))

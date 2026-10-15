@@ -10,10 +10,10 @@ function setup() {
   Table.ensureTab(ss, Constants.TABS.clients, ClientsRepository.CLIENT_COLS);
   var lists = Table.ensureTab(ss, Constants.TABS.lists, ['key', 'values']);
   if (lists.getLastRow() < 2) {
-    Object.keys(DEFAULT_LISTS).forEach(function (k) {
+    Object.keys(ListsRules.DEFAULT_LISTS).forEach(function (k) {
       Table.appendPlain(lists, [
         k,
-        JSON.stringify(normalizeListValues(DEFAULT_LISTS[k]))
+        JSON.stringify(ListsRules.normalizeListValues(ListsRules.DEFAULT_LISTS[k]))
       ]);
     });
   }
