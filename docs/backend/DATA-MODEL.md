@@ -154,7 +154,10 @@ The `config` cell is the reason new forms need no code:
 The row with the key `_info` is not a list. Its `values` is a JSON object with
 the name and the kind of each list an admin made:
 `{ "third_year": { "name": "Third year", "kind": "sections" } }`. The kinds are
-`sections`, `numbers`, `named` and `plain`; a built-in list has its kind by key.
+`sections`, `numbers`, `named`, `plain` and `milestones`; a built-in list has
+its kind by key. The value of a milestone is a random id (`m_` and eight
+letters or digits), never shown and never reused, because the marks of every
+team are kept by it; a missing Arabic name repeats the English one.
 
 A form's dropdown stores only the list **key** (`field.list`), and the admin
 picks it in the Questions tab. The options are filled in when the form is read,

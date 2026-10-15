@@ -1150,7 +1150,10 @@ are in the `*.model.js` files, so each editor only draws.
   cannot give back exactly (a gap, a leading zero) is kept under Other
   sections. A list of `numbers` is two steppers. A `named`
   list is rows; a `plain` list is chips, with one link to the rows because
-  chips cannot rename or reorder. Typing is needed only for names.
+  chips cannot rename or reorder. A `milestones` list is the rows of a named
+  list without the value column: a milestone is added by its name and gets a
+  random id (`L.newMilestoneId`), which stays when it is renamed or moved.
+  Typing is needed only for names.
 - **Lists are made, not only edited.** New list asks for a name, a kind and a
   copy to start from (`admin.lists.create`). An admin's own list can be renamed,
   and deleted while no form asks it; Delete is shown only then. A question

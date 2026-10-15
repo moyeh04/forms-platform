@@ -1,7 +1,8 @@
 /**
  * The editor of named and short choices: rows with a value, an English
  * name and, when the list has one, an Arabic name, or chips for plain
- * values.
+ * values. A list of milestones has the same rows without the value, which
+ * is a hidden id, and always with the Arabic name.
  */
 (function (App) {
   'use strict';
@@ -85,7 +86,7 @@
           type: 'button',
           class: 'icon-btn sm danger',
           name: 'remove-' + i,
-          'aria-label': 'Remove ' + (r.value || 'this choice'),
+          'aria-label': 'Remove ' + (r.en || r.value || 'this choice'),
           onclick: function () {
             p.removeRow(i);
           }
@@ -105,20 +106,23 @@
    * @return {!Element} The row.
    */
   function rowEl(p, r, i) {
+    var what = p.milestones ? 'milestone ' : 'choice ';
     return h(
       'li',
       { class: 'choice', dataset: { i: String(i) } },
       h('span', { class: 'choice-n' }, String(i + 1)),
-      A.text(r.value, edit(p, r, 'value'), {
-        class: 'input',
-        name: 'value-' + i,
-        'aria-label': 'Choice ' + (i + 1),
-        dir: 'auto'
-      }),
+      p.milestones
+        ? null
+        : A.text(r.value, edit(p, r, 'value'), {
+            class: 'input',
+            name: 'value-' + i,
+            'aria-label': 'Choice ' + (i + 1),
+            dir: 'auto'
+          }),
       A.text(r.en, edit(p, r, 'en'), {
         class: 'input choice-en',
         name: 'en-' + i,
-        'aria-label': 'English name of choice ' + (i + 1),
+        'aria-label': 'English name of ' + what + (i + 1),
         placeholder: 'English name',
         dir: 'ltr'
       }),
@@ -126,7 +130,7 @@
         ? A.text(r.ar, edit(p, r, 'ar'), {
             class: 'input choice-ar',
             name: 'ar-' + i,
-            'aria-label': 'Arabic name of choice ' + (i + 1),
+            'aria-label': 'Arabic name of ' + what + (i + 1),
             placeholder: 'الاسم بالعربية',
             dir: 'rtl',
             lang: 'ar'
@@ -171,13 +175,14 @@
    * @return {!Array<!Element>} The heads and the rows.
    */
   function rowList(p) {
-    var ar = p.withAr ? ' with-ar' : '';
+    var ar = p.withAr && !p.milestones ? ' with-ar' : '';
+    if (p.milestones) ar = ' milestones';
     return [
       h(
         'div',
         { class: 'choice-head' + ar, 'aria-hidden': 'true' },
         h('span'),
-        h('span', null, 'Choice'),
+        p.milestones ? null : h('span', null, 'Choice'),
         h('span', null, 'English name'),
         p.withAr ? h('span', null, 'Arabic name') : null,
         h('span')
@@ -220,16 +225,23 @@
    */
   L.choicesEditor = function (p) {
     var box = h('div');
-    p.withAr = p.rows.some(function (r) {
-      return r.ar;
-    });
+    p.milestones = L.kindOf(p) === ListKind.MILESTONES;
+    p.withAr =
+      p.milestones ||
+      p.rows.some(function (r) {
+        return r.ar;
+      });
     var rows = L.asRows(p);
     var shown;
     if (!p.rows.length) {
       shown = h(
         'div',
         { class: 'empty' },
-        h('strong', null, 'No choices yet.'),
+        h(
+          'strong',
+          null,
+          p.milestones ? 'No milestones yet.' : 'No choices yet.'
+        ),
         ' Add the first one below.'
       );
     } else if (!rows) {
@@ -245,7 +257,7 @@
       box.appendChild(node);
     });
     box.appendChild(L.adder(p, rows));
-    if (p.rows.length && L.kindOf(p) !== ListKind.NAMED && !L.named(p)) {
+    if (p.rows.length && !L.asRowsAlways(p) && !L.named(p)) {
       box.appendChild(viewSwitch(p, rows));
     }
     box.appendChild(L.many(p));

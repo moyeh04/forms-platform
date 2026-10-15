@@ -10,6 +10,8 @@
  *   numbers   a run from one number to another
  *   named     choices with an English name (majors, levels), as rows
  *   plain     short choices (groups, bylaws), as chips
+ *   milestones the steps of a project, by name only; each keeps a random
+ *             id, because the marks of every team are kept by it
  */
 (function (App) {
   'use strict';
@@ -25,6 +27,9 @@
     'whatsapp_registration'
   ];
   var FORM_TYPES = ['team_registration', 'task_submission', 'reservation'];
+
+  /** How a milestone id is made: base 36, which letters of it are kept. */
+  var ID = { RADIX: 36, FROM: 2, TO: 10 };
 
   /**
    * The lists that came with the platform: their names, what they are
@@ -96,7 +101,29 @@
       label: 'Short choices',
       example: 'A, B, 2020',
       about: 'Short values shown as chips.'
+    },
+    milestones: {
+      label: 'Milestones',
+      example: 'Task 1, Task 2, Task 3',
+      about:
+        'Milestones of a project. A form copies these milestones when it' +
+        ' picks the list.'
     }
+  };
+
+  /**
+   * Makes the id of a new milestone. It is random, so the id of a removed
+   * milestone never comes back with other marks.
+   *
+   * @param {!Array<string>} taken The ids in use.
+   * @return {string} The id.
+   */
+  L.newMilestoneId = function (taken) {
+    var id;
+    do {
+      id = 'm_' + Math.random().toString(ID.RADIX).slice(ID.FROM, ID.TO);
+    } while (taken.indexOf(id) !== -1);
+    return id;
   };
 
   /**
@@ -167,19 +194,36 @@
   };
 
   /**
+   * Gives the name a missing Arabic name repeats: the value, or for a
+   * milestone, whose value is an id, its English name.
+   *
+   * @param {string} value The value.
+   * @param {string} en The English name.
+   * @param {string=} kind The kind of the list.
+   * @return {string} The name.
+   */
+  function arFallback(value, en, kind) {
+    return kind === ListKind.MILESTONES ? en : value;
+  }
+
+  /**
    * Gives a saved list as the editor holds it: a name that only repeats
    * the value is left empty.
    *
    * @param {?Array<!Object>} values The saved choices.
+   * @param {string=} kind The kind of the list.
    * @return {!Array<!Object>} The rows: value, en and ar.
    */
-  L.toRows = function (values) {
+  L.toRows = function (values, kind) {
     return (values || []).map(function (o) {
       var label = o.label || {};
+      var v = String(o.value);
+      var en = label.en && label.en !== v ? label.en : '';
+      var same = arFallback(v, en, kind);
       return {
-        value: String(o.value),
-        en: label.en && label.en !== String(o.value) ? label.en : '',
-        ar: label.ar && label.ar !== String(o.value) ? label.ar : ''
+        value: v,
+        en: en,
+        ar: label.ar && label.ar !== same ? label.ar : ''
       };
     });
   };
@@ -189,18 +233,20 @@
    * missing name repeats the value.
    *
    * @param {!Array<!Object>} rows The rows.
+   * @param {string=} kind The kind of the list.
    * @return {!Array<!Object>} The choices.
    */
-  L.fromRows = function (rows) {
+  L.fromRows = function (rows, kind) {
     return rows
       .filter(function (r) {
         return r.value.trim();
       })
       .map(function (r) {
         var v = r.value.trim();
+        var en = r.en.trim() || v;
         return {
           value: v,
-          label: { en: r.en.trim() || v, ar: r.ar.trim() || v }
+          label: { en: en, ar: r.ar.trim() || arFallback(v, en, kind) }
         };
       });
   };

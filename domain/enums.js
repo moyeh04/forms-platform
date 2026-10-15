@@ -44,7 +44,8 @@
     SECTIONS: 'sections',
     NUMBERS: 'numbers',
     NAMED: 'named',
-    PLAIN: 'plain'
+    PLAIN: 'plain',
+    MILESTONES: 'milestones'
   });
 
   return {

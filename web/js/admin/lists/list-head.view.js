@@ -186,7 +186,7 @@
       { class: 'list-head' },
       p.renaming ? renameRow(p) : titleRow(p, custom, users.length),
       h('p', { class: 'help' }, about),
-      usedBy(users)
+      L.kindOf(p) === ListKind.MILESTONES ? null : usedBy(users)
     );
   };
 })(window.App);

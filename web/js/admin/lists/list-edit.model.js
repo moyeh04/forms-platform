@@ -49,7 +49,7 @@
    */
   L.load = function (p, key) {
     p.key = key;
-    p.rows = L.toRows(p.lists[key]);
+    p.rows = L.toRows(p.lists[key], L.kindOf(p));
     p.order = false;
     p.renaming = false;
     p.draft = null;
@@ -77,10 +77,11 @@
    * @return {boolean} True when a save is needed.
    */
   L.dirty = function (p) {
+    var k = L.kindOf(p);
     return (
       !p.creating &&
-      (JSON.stringify(L.fromRows(p.rows)) !==
-        JSON.stringify(L.fromRows(L.toRows(p.lists[p.key]))) ||
+      (JSON.stringify(L.fromRows(p.rows, k)) !==
+        JSON.stringify(L.fromRows(L.toRows(p.lists[p.key], k), k)) ||
         p.rows.some(function (r) {
           return !r.value.trim() && (r.en.trim() || r.ar.trim());
         }))
@@ -107,20 +108,41 @@
    * @return {boolean} True for rows.
    */
   L.asRows = function (p) {
-    return L.kindOf(p) === ListKind.NAMED || p.order || L.named(p);
+    return L.asRowsAlways(p) || p.order || L.named(p);
   };
 
   /**
-   * Says what is wrong with a row: a name with no value, or a value seen
-   * before.
+   * Whether the kind of the open list is always drawn as rows: named
+   * choices and milestones have names, so they have no short view.
+   *
+   * @param {!Object} p The page.
+   * @return {boolean} True for rows only.
+   */
+  L.asRowsAlways = function (p) {
+    var k = L.kindOf(p);
+    return k === ListKind.NAMED || k === ListKind.MILESTONES;
+  };
+
+  /**
+   * Says what is wrong with a row: a name with no value, a value seen
+   * before, or a milestone with no English name (its value is a hidden id,
+   * so the name is all the admin sees).
    *
    * @param {!Object} r The row.
    * @param {number} i Where it is, from 0.
    * @param {!Object<string, boolean>} seen The values seen so far.
+   * @param {boolean} milestones True for a list of milestones.
    * @return {string} The reason, or ''.
    */
-  function rowProblem(r, i, seen) {
+  function rowProblem(r, i, seen, milestones) {
     var v = r.value.trim();
+    if (milestones && !r.en.trim()) {
+      return (
+        'Milestone ' +
+        (i + 1) +
+        ' has no English name. Write one or remove the row.'
+      );
+    }
     if (!v && (r.en.trim() || r.ar.trim())) {
       return (
         'Choice ' +
@@ -143,14 +165,17 @@
   L.problem = function (p) {
     var seen = {};
     var out = { text: '', at: -1 };
+    var milestones = L.kindOf(p) === ListKind.MILESTONES;
     p.rows.some(function (r, i) {
-      var text = rowProblem(r, i, seen);
+      var text = rowProblem(r, i, seen, milestones);
       if (text) out = { text: text, at: i };
       seen[r.value.trim()] = true;
       return text;
     });
     if (!out.text && !L.fromRows(p.rows).length) {
-      out.text = 'A list needs at least one choice.';
+      out.text = milestones
+        ? 'A list needs at least one milestone.'
+        : 'A list needs at least one choice.';
     }
     return out;
   };
@@ -186,7 +211,7 @@
     var before = (p.lists[p.key] || []).map(function (o) {
       return String(o.value);
     });
-    var now = L.fromRows(p.rows).map(function (o) {
+    var now = L.fromRows(p.rows, L.kindOf(p)).map(function (o) {
       return o.value;
     });
     var added = now.filter(function (v) {

@@ -1,11 +1,11 @@
 # Testing
 
-375 automated tests run without a Google account, a browser, or a network.
+376 automated tests run without a Google account, a browser, or a network.
 They run the **real** backend and the **real** pages. This page explains how
 that works and what it can and cannot prove.
 
 ```
-npm test    # 375 tests
+npm test    # 376 tests
 ```
 
 ## The layers
@@ -179,7 +179,7 @@ says something else.
 | Admin page: questions | `web/admin.questions.test.js` | 3 | Descriptions, added questions moved between pages, and pages added, renamed and reordered |
 | Admin page: responses | `web/admin.responses.test.js` | 12 | Team cards with their stored numbers, small teams listed by level, the people count, search and status, details with a key reset or shown, matching, column names on list rows for the phone layout, the day sheet group, one registration's key extended, Download all with what was not downloaded and the saved zip |
 | Admin page: clients | `web/admin.people.test.js` | 3 | A link shown once with the key apart, a lost key shown again, and a link end picked and moved |
-| Admin page: lists | `web/admin.lists.test.js` | 8 | Lists as chips or rows, the reason for a refused save, a year group added from its own card, a section kind added or removed, number runs with steppers, a new list picked for a question, lists the server refuses, and a new department letter kept as a chip |
+| Admin page: lists | `web/admin.lists.test.js` | 9 | Lists as chips or rows, the reason for a refused save, a year group added from its own card, a section kind added or removed, number runs with steppers, a new list picked for a question, lists the server refuses, a new department letter kept as a chip, and milestones as named rows whose hidden ids survive a rename or a move |
 | Instructor page | `web/viewer.test.js` | 13 | Small teams listed by level and marked on their card, team numbers with a gap where a team cancelled, today, by day, hidden columns, review rights, invalid links, member values named for the phone layout, phone as a call link, the key screen and its theme switch |
 | Registry writes | `backend/features/catalog/registry/registry-writes.test.js` | 6 | Every change to forms, lists and links written inside the lock, a save that keeps its row while another form is deleted, a save over a newer copy refused, a busy lock, a link that keeps a renamed form, list names that stay unique |
 | Flag cells | `backend/platform/sheets/cell.test.js` | 2 | A stored flag read as yes, no or its column's default (empty, missing and legacy text), and written as `1` or the column's own cell for no |
