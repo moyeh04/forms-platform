@@ -23,6 +23,7 @@ const CHECKS = [
   require('./check-jsdoc.js'),
   require('./check-numbers.js'),
   require('./check-flags.js'),
+  require('./check-structure.js'),
   require('./check-docs.js')
 ];
 
@@ -64,7 +65,7 @@ function main(args) {
   const { kept, unused } = exceptions.apply(runAll(files, tracked), allowed);
   if (args.includes('--update-baseline')) {
     const lowered = baselines.lower(baseline, kept, files);
-    const text = `${JSON.stringify(lowered, null, 1)}\n`;
+    const text = `${JSON.stringify(lowered, null, 2)}\n`;
     fs.writeFileSync(path.join(__dirname, CONFIG.baseline), text);
   }
   const { failures, stale } = baselines.judge(kept, baseline, files);

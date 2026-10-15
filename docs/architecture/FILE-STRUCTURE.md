@@ -141,7 +141,18 @@ no validation.
 | `assets/js/api.js` | Sends requests to the backend as plain-text JSON (avoids browser CORS checks). |
 | `assets/js/form.js`, `ticket.js`, `i18n.js` | The student page, the success ticket, English and Arabic text. |
 | `assets/js/handover.js` | The question asked before the leader of a team moves to another team: who leads next, and their email. Used by the student page and the dashboard. |
-| `assets/js/admin*.js` | Dashboard: core and forms list, settings, the timetable editor, the range control of the team size and the teammates (`admin-range.js`), the two warnings about small teams (`admin-size-alerts.js`), key and link end dates (`admin-keys.js`), responses and matching, Download all (`admin-download.js`), clients, lists. |
+| `assets/js/theme.js` | Light, dark, or follow the device; the choice is remembered on this device only. |
+| `assets/js/ui.js` | DOM building, inline icons, dialogs and the clipboard, used by every page. |
+| `assets/js/admin.js` | Dashboard core: login with the PIN, navigation, the widgets the dashboard modules share, and the forms list. |
+| `assets/js/admin-settings.js` | Form settings: everything an admin can change without touching code. |
+| `assets/js/admin-timetable.js` | The timetable of a reservation form: dates on a calendar, the hours, and the slots of each day. |
+| `assets/js/admin-range.js` | The range control of the team size and the teammates. |
+| `assets/js/admin-size-alerts.js` | The two warnings about small teams. |
+| `assets/js/admin-keys.js` | Key and link end dates. |
+| `assets/js/admin-data.js` | Responses, each team, day or registration in its own block as in the sheet, and WhatsApp matching. |
+| `assets/js/admin-download.js` | Download all. |
+| `assets/js/admin-people.js` | Instructor and client links. |
+| `assets/js/admin-lists.js` | The lists behind dropdown questions, each edited the way its kind needs. |
 | `assets/js/size-alerts.js` | The warnings about small teams as they are drawn: a line for each level and a mark on the card of a small team. Used by the dashboard and the instructor page. |
 | `assets/js/viewer.js` | The instructor page. |
 | `shared/form-metadata.js` | What each form type shows beside its title (term, subject code, batch year) and how it is read, saved and copied. Used by the pages and the backend. |
@@ -189,13 +200,33 @@ no validation.
 | `scripts/checks/check-jsdoc.js` | Every named function has a Google-style JSDoc comment whose tags match its parameters and return, with no metadata tags. |
 | `scripts/checks/check-numbers.js` | Every number that initialises something, which Biome skips, is held by a CONSTANT_CASE name. |
 | `scripts/checks/check-flags.js` | Yes/no values are compared and written as `'1'`/`'0'` only in a row codec. |
+| `scripts/checks/check-structure.js` | The structure rules above. |
 | `scripts/checks/check-docs.js` | [API.md](../backend/API.md) names exactly the actions the backend has, [TESTING.md](../process/TESTING.md) gives the real number of tests, and no Markdown link points at a file that is gone. |
+| `scripts/prepare-clasp.js` | Checks the deployment variables of the workflow and writes the clasp configuration git ignores. |
 | `scripts/backend-changed.js` | Tells the workflow whether a push changed a backend file, so a push of pages or documents alone does not deploy the backend. |
 | `scripts/setup-deployment.js` | First deployment from your computer (`npm run setup`): creates the sheet and its script, pushes the bundle, creates the web app, and stores the IDs, the credential and the Pages setting in GitHub. |
 | `scripts/dev-server.js` | `npm run dev`: serves the site and answers its API calls from the in-memory Google, with sample forms, so pages can be opened in a real browser. |
 | `tests/harness/appsscript-mock.js` | An in-memory Sheets, Drive, Mail, Cache, and clock, so the real backend code runs in tests. |
 | `tests/harness/dom.js` | Opens the real pages in jsdom wired to that backend. |
 | `tests/*.test.js`, `tests/scripts/` | The tests, one file per area, and the tests of the scripts under the same path; [TESTING.md](../process/TESTING.md) lists them. |
+
+## Structure rules
+
+`scripts/checks/check-structure.js` checks these on the whole tree; the
+paths and limits are under `structure` in `scripts/checks/config.json`.
+
+| Rule | What it means |
+|---|---|
+| Root allow-list | The root holds `README.md`, `package.json`, `package-lock.json`, `biome.json`, `.gitignore`, `.git-blame-ignore-revs`, `.githooks/`, `.github/`, `backend/`, `web/`, `domain/`, `scripts/`, `tests/` and `docs/`. Pages, notes and requirements live in their folders. |
+| No catch-all names | No file or folder is named `utils`, `helpers`, `common`, `misc`, `manager`, `stuff` or `shared`. Code is named by what it does, so a reader finds it by its subject. |
+| Folder cap | At most 8 code files in one folder. A ninth means the folder holds more than one subject; sort its files into sub-folders by subject. |
+| Pages and assets | Every script and stylesheet a page loads exists, and every file under `assets/js/` and `assets/css/` is loaded by a page. |
+| Every file named here | Each source file has a row on this page, by its path or its name. A pattern such as `admin*.js` does not count. |
+| Tests mirror the source | The tests of `scripts/checks/lib/baseline.js` are in `tests/scripts/checks/lib/baseline.test.js`. This rule is not checked yet; the reviewer holds it. |
+
+The tree does not keep all of these today. The root still holds the pages,
+`assets/` and `shared/`, and `assets/js/`, `backend/` and `tests/` are over
+the cap. The check baseline counts each of these, so none can grow.
 
 ## Data model in one paragraph
 

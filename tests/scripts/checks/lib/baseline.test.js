@@ -45,3 +45,18 @@ test('Baseline: a lower count is written down, never raised', () => {
     'b.js: in the baseline but no longer tracked'
   ]);
 });
+
+test('Baseline: a key ending in / is a folder, kept while it has files', () => {
+  const baseline = { 'web/': { 'structure/cap': 1 } };
+  const findings = [at('web/', 'structure/cap')];
+  assert.deepEqual(baselines.judge(findings, baseline, ['web/a.js']), {
+    failures: [],
+    stale: []
+  });
+  assert.deepEqual(baselines.judge([], baseline, ['web/a.js']).stale, [
+    'web/: structure/cap is down to 0 from 1'
+  ]);
+  assert.deepEqual(baselines.lower(baseline, [], ['web/a.js']), {});
+  assert.deepEqual(baselines.goneFiles(baseline, ['web/a.js']), []);
+  assert.equal(baselines.goneFiles(baseline, ['src/a.js']).length, 1);
+});

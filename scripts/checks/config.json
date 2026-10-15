@@ -69,5 +69,57 @@
     "include": ["assets/js/", "backend/", "shared/"],
     "extensions": [".js", ".gs"],
     "exclude": []
+  },
+  "structure": {
+    "root": [
+      "README.md",
+      "package.json",
+      "package-lock.json",
+      "biome.json",
+      ".gitignore",
+      ".git-blame-ignore-revs",
+      ".githooks",
+      ".github",
+      "backend",
+      "web",
+      "domain",
+      "scripts",
+      "tests",
+      "docs"
+    ],
+    "catchAllNames": [
+      "utils",
+      "util",
+      "helpers",
+      "helper",
+      "common",
+      "misc",
+      "manager",
+      "stuff",
+      "shared"
+    ],
+    "cap": 8,
+    "code": {
+      "include": [""],
+      "extensions": [".js", ".gs", ".css", ".html", ".sh"],
+      "exclude": ["tests/fixtures/", "docs/"]
+    },
+    "pages": ["index.html", "admin.html", "viewer.html"],
+    "loaded": {
+      "include": ["assets/js/", "assets/css/"],
+      "extensions": [".js", ".css"]
+    },
+    "fileStructure": "docs/architecture/FILE-STRUCTURE.md",
+    "documented": {
+      "include": [
+        "assets/js/",
+        "assets/css/",
+        "backend/",
+        "shared/",
+        "scripts/",
+        ".githooks/"
+      ],
+      "extensions": [".js", ".gs", ".css", ".sh", ""]
+    }
   }
 }

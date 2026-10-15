@@ -1,1 +1,27 @@
-{}
+{
+  "admin.html": {
+    "structure/root": 1
+  },
+  "assets/": {
+    "structure/root": 1
+  },
+  "assets/js/": {
+    "structure/cap": 1
+  },
+  "backend/": {
+    "structure/cap": 1
+  },
+  "index.html": {
+    "structure/root": 1
+  },
+  "shared/": {
+    "structure/root": 1,
+    "structure/name": 1
+  },
+  "tests/": {
+    "structure/cap": 1
+  },
+  "viewer.html": {
+    "structure/root": 1
+  }
+}

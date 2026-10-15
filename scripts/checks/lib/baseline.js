@@ -12,6 +12,19 @@
  */
 
 /**
+ * Says whether a baseline key is among some paths. A key ending in `/` is a
+ * folder, there while any of the paths sits under it.
+ *
+ * @param {string} key A file or a folder.
+ * @param {!Array<string>} paths Paths of files.
+ * @return {boolean} True when the key is among them.
+ */
+function among(key, paths) {
+  if (!key.endsWith('/')) return paths.includes(key);
+  return paths.some((file) => file.startsWith(key));
+}
+
+/**
  * Counts findings by file and rule.
  *
  * @param {!Array<!Finding>} findings What the checks found.
@@ -44,8 +57,8 @@ function judge(findings, baseline, checked) {
     return counts[finding.file][finding.rule] > allowed;
   });
   const stale = [];
-  for (const file of checked) {
-    for (const [rule, allowed] of Object.entries(baseline[file] || {})) {
+  for (const file of Object.keys(baseline).filter((k) => among(k, checked))) {
+    for (const [rule, allowed] of Object.entries(baseline[file])) {
       const left = counts[file]?.[rule] || 0;
       if (left < allowed) {
         stale.push(`${file}: ${rule} is down to ${left} from ${allowed}`);
@@ -64,7 +77,7 @@ function judge(findings, baseline, checked) {
  */
 function goneFiles(baseline, files) {
   return Object.keys(baseline)
-    .filter((file) => !files.includes(file))
+    .filter((file) => !among(file, files))
     .map((file) => `${file}: in the baseline but no longer tracked`);
 }
 
@@ -81,7 +94,7 @@ function lower(baseline, findings, checked) {
   const out = {};
   for (const [file, rules] of Object.entries(baseline)) {
     for (const [rule, allowed] of Object.entries(rules)) {
-      const left = checked.includes(file)
+      const left = among(file, checked)
         ? Math.min(allowed, counts[file]?.[rule] || 0)
         : allowed;
       if (left === 0) continue;
