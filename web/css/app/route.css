@@ -151,7 +151,7 @@
   color: var(--ink);
   font-weight: 700;
 }
-/* The treasure island is the largest: the chest on the sand, a painted X beside it, and its name under it.
+/* The treasure island is the largest: the chest on the sand and its name under it.
    It is in front of the ship, so the chest still shows when the ship arrives on a narrow screen. */
 .trail-x .isle {
   z-index: 3;
@@ -170,16 +170,6 @@
   left: calc(50% - 38px);
   width: 52px;
   height: 42px;
-}
-.trail-x .isle .icon {
-  position: absolute;
-  bottom: 12px;
-  left: calc(50% + 8px);
-  color: var(--treasure-x);
-  filter: drop-shadow(0 1px 0 var(--treasure-x-shadow));
-}
-.trail-x .isle .icon svg {
-  stroke-width: 3.4;
 }
 .trail-x .trail-label {
   font-family: var(--font-title);
@@ -228,14 +218,6 @@
     height: 30px;
     left: calc(50% - 28px);
     bottom: 18px;
-  }
-  .trail-x .isle .icon {
-    left: calc(50% + 5px);
-    bottom: 9px;
-  }
-  .trail-x .isle .icon svg {
-    width: 20px;
-    height: 20px;
   }
   .trail-x .trail-label {
     display: block;

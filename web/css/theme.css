@@ -45,8 +45,6 @@
   --backdrop-dashboard: rgba(20, 16, 11, 0.55);
   --horizon-foam: rgba(255, 255, 255, 0.7);
   --course-line: rgba(255, 255, 255, 0.85);
-  --treasure-x: #c62828;
-  --treasure-x-shadow: rgba(42, 28, 18, 0.45);
   /* The booking scene keeps its own ink in both themes, as the saved image does. */
   --scene-ink: #2f2418;
   --scene-mute: #4a3a2a;
