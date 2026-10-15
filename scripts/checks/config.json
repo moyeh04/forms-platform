@@ -1,0 +1,10 @@
+{
+  "baseline": "baseline.json",
+  "exceptions": "exceptions.json",
+  "docs": {
+    "api": "docs/backend/API.md",
+    "testing": "docs/process/TESTING.md",
+    "tests": "tests",
+    "backend": { "include": ["backend/"], "extensions": [".gs", ".js"] }
+  }
+}

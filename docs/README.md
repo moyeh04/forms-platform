@@ -18,6 +18,7 @@ whichever page answers your question.
 | [FILE-STRUCTURE.md](architecture/FILE-STRUCTURE.md) | Where every file lives and what it does |
 | [COMMIT_CONVENTION.md](process/COMMIT_CONVENTION.md) | How commits and branches are written |
 | [CODING_STYLE.md](standards/CODING_STYLE.md) | The style the code follows and the Biome settings that check it |
+| [CHECKS.md](standards/CHECKS.md) | Every check the hook and CI run, what each refuses and how to fix it |
 | [REQUIREMENTS.md](product/REQUIREMENTS.md) | Everything the platform was asked to do, and where each item stands |
 
 ## How to read the diagrams

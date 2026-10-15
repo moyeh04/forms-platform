@@ -181,13 +181,16 @@ no validation.
 | Path | What it is |
 |---|---|
 | `scripts/bundle-backend.js` | The bundler. |
-| `scripts/check-docs.js`, `.githooks/pre-commit` | The check that [API.md](../backend/API.md) names exactly the actions the backend has and that [TESTING.md](../process/TESTING.md) gives the real number of tests, and the git hook that runs it before every commit. `npm install` points git at `.githooks`. |
+| `scripts/checks/run-checks.js`, `.githooks/pre-commit` | Runs every check, on the staged files before each commit (`--staged`) or on the whole tree (`--all`, `npm run check`), and the git hook that calls it. `npm install` points git at `.githooks`. [CHECKS.md](../standards/CHECKS.md) lists the checks. |
+| `scripts/checks/config.json`, `baseline.json`, `exceptions.json` | What each check covers and its limits; the findings old files may still have, which may only go down; and the paths allowed to break a structure rule, each with its reason. |
+| `scripts/checks/lib/` | `files.js` (which files a run looks at), `parse.js` (acorn with comments), `baseline.js`, `exceptions.js`, `report.js`. |
+| `scripts/checks/check-docs.js` | [API.md](../backend/API.md) names exactly the actions the backend has, [TESTING.md](../process/TESTING.md) gives the real number of tests, and no Markdown link points at a file that is gone. |
 | `scripts/backend-changed.js` | Tells the workflow whether a push changed a backend file, so a push of pages or documents alone does not deploy the backend. |
 | `scripts/setup-deployment.js` | First deployment from your computer (`npm run setup`): creates the sheet and its script, pushes the bundle, creates the web app, and stores the IDs, the credential and the Pages setting in GitHub. |
 | `scripts/dev-server.js` | `npm run dev`: serves the site and answers its API calls from the in-memory Google, with sample forms, so pages can be opened in a real browser. |
 | `tests/harness/appsscript-mock.js` | An in-memory Sheets, Drive, Mail, Cache, and clock, so the real backend code runs in tests. |
 | `tests/harness/dom.js` | Opens the real pages in jsdom wired to that backend. |
-| `tests/*.test.js` | The tests, one file per area; [TESTING.md](../process/TESTING.md) lists them. |
+| `tests/*.test.js`, `tests/scripts/` | The tests, one file per area, and the tests of the scripts under the same path; [TESTING.md](../process/TESTING.md) lists them. |
 
 ## Data model in one paragraph
 

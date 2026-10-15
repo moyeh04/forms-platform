@@ -1,11 +1,11 @@
 # Testing
 
-328 automated tests run without a Google account, a browser, or a network.
+333 automated tests run without a Google account, a browser, or a network.
 They run the **real** backend and the **real** pages. This page explains how
 that works and what it can and cannot prove.
 
 ```
-npm test    # 328 tests
+npm test    # 333 tests
 ```
 
 ## The layers
@@ -138,9 +138,10 @@ function that calls `world.api`. Helpers `type`, `pick`, `click`,
 
 ## What is covered
 
-The numbers on this page are checked: `scripts/check-docs.js` counts the tests
-each file defines, and the git hook in `.githooks/pre-commit` refuses a commit
-while the total above or a row below says something else.
+The numbers on this page are checked: `scripts/checks/check-docs.js` counts the
+tests each file defines, in `tests/` and its sub-folders, and the git hook in
+`.githooks/pre-commit` refuses a commit while the total above or a row below
+says something else.
 
 | Area | File | Tests | Examples |
 |---|---|---:|---|
@@ -162,6 +163,8 @@ while the total above or a row below says something else.
 | Instructor page | `viewer-ui.test.js` | 13 | Small teams listed by level and marked on their card, team numbers with a gap where a team cancelled, today, by day, hidden columns, review rights, invalid links, member values named for the phone layout, phone as a call link, the key screen and its theme switch |
 | Registry writes | `registry-writes.test.js` | 6 | Every change to forms, lists and links written inside the lock, a save that keeps its row while another form is deleted, a save over a newer copy refused, a busy lock, a link that keeps a renamed form, list names that stay unique |
 | Golden copies | `golden.test.js` | 5 | What the live system depends on, compared with saved copies in `tests/fixtures/golden/`: every function Apps Script calls by name, the salted hashes and seals for a fixed pepper, the error code of every action for five kinds of request, legacy flag cells read and written back, and every sheet, property, cache entry, mail and trigger after one scripted run. `GOLDEN_UPDATE=1` writes the copies again, only for a change meant to alter them |
+| Check baseline and exceptions | `scripts/checks/baseline.test.js` | 3 | A legacy file keeps its count and never goes over it, a new file has no allowance, a lowered count must be written down and lowering never raises one, an exception needs a reason and fails once it matches nothing |
+| Document check | `scripts/checks/docs.test.js` | 2 | API.md, TESTING.md (sub-folders counted) and Markdown links that match pass; a missing action, a wrong count and a broken link are each found |
 | Harness | `harness.test.js` | 5 | The fake itself, and a seeded world that repeats its ids |
 | Colour contrast | `contrast.test.js` | 4 | Every text and outline pair meets WCAG AA in light, dark, and device-dark themes |
 | A page older than the site | `fresh.test.js` | 4 | An untouched page reloads once for a newer site and never in a loop, a page with typed text or an open dialog offers Reload instead, the bar in the language of the form, nothing in a preview or when the version cannot be read |
