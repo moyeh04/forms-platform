@@ -5,7 +5,7 @@
   "backend/features/access/auth/auth.service.js": {
     "biome/lint/complexity/useOptionalChain": 1,
     "biome/lint/style/noMagicNumbers": 1,
-    "jsdoc": 7,
+    "jsdoc": 5,
     "lines": 2
   },
   "backend/features/access/clients/clients.access.js": {
@@ -305,7 +305,6 @@
     "lines": 8
   },
   "backend/main.js": {
-    "biome/lint/complexity/useOptionalChain": 2,
     "jsdoc": 2
   },
   "backend/platform/format/json.js": {

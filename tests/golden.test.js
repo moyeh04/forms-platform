@@ -115,7 +115,7 @@ const PROTOTYPE_NAMES = [
 test('Golden: every action answers an empty, wrong-PIN, wrong-key, bare admin and real-form request the same way', () => {
   const w = boot();
   const form = openForm(w, 'team_registration', 'Team Form 1');
-  const actions = Object.keys(w.ctx.API).sort();
+  const actions = w.ctx.Routes.actions().sort();
   const codeOf = (reply) => (reply.error ? reply.error.code : 'ok');
   const table = {};
   for (const action of actions) {

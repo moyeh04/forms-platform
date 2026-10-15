@@ -53,13 +53,5 @@ var AuthService = (function () {
     return true;
   }
 
-  /** Wraps a handler so it only runs for a verified admin. */
-  function admin(fn) {
-    return function (req) {
-      requireAdmin(req);
-      return fn(req);
-    };
-  }
-
-  return { admin, setAdminPin, unlockAdmin, pinHash: pinHash_ };
+  return { requireAdmin, setAdminPin, unlockAdmin, pinHash: pinHash_ };
 })();

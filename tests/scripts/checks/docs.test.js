@@ -32,8 +32,9 @@ const TWO_TESTS = [
 ].join('\n');
 
 const good = () => ({
-  'backend/Forms.js':
-    "API['admin.forms.list'] = function () {};\nAPI.submit = function () {};\n",
+  'backend/routes.js':
+    "[\n  { action: 'admin.forms.list', access: Access.ADMIN },\n" +
+    "  { action: 'submit', access: Access.PUBLIC }\n];\n",
   'docs/API.md':
     '| `admin.forms.list` | yes |\n| `submit` | no |\n[Testing](TESTING.md)\n',
   'docs/TESTING.md':
@@ -48,7 +49,7 @@ test('Docs check: a matching API page, test page and links pass', () => {
 
 test('Docs check: a missing action, wrong count and dead link fail', () => {
   const files = good();
-  files['backend/Forms.js'] += "API['admin.forms.delete'] = function () {};\n";
+  files['backend/routes.js'] += "  { action: 'admin.forms.delete' }\n";
   files['tests/sub/more.test.js'] = TWO_TESTS;
   files['docs/API.md'] += '[Gone](OLD.md)\n';
   const { root, files: list } = repo(files);

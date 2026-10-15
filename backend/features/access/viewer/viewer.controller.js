@@ -7,11 +7,11 @@ var ViewerController = (function () {
   /**
    * Answers the `viewer.me` action.
    *
-   * @param {!Object} req The request body.
+   * @param {!Object} _req The request body, which holds nothing else.
+   * @param {!Object} client The private link, checked by the router.
    * @return {*} The answer, sent back as JSON.
    */
-  function me(req) {
-    var client = ClientsAccess.requireClient(req);
+  function me(_req, client) {
     return {
       client: { name: client.name, canReview: client.canReview },
       forms: ViewerRules.viewerForms(client).map(function (f) {
@@ -24,10 +24,10 @@ var ViewerController = (function () {
    * Answers the `viewer.data` action.
    *
    * @param {!Object} req The request body.
+   * @param {!Object} client The private link, checked by the router.
    * @return {*} The answer, sent back as JSON.
    */
-  function data(req) {
-    var client = ClientsAccess.requireClient(req);
+  function data(req, client) {
     var form = ViewerService.requireClientForm(client, req.slug);
     var vform = FormsPublic.validationForm(form);
     var kind = ViewerRules.viewKind(form);
@@ -64,10 +64,10 @@ var ViewerController = (function () {
    * Answers the `viewer.review` action.
    *
    * @param {!Object} req The request body.
+   * @param {!Object} client The private link, checked by the router.
    * @return {*} The answer, sent back as JSON.
    */
-  function review(req) {
-    var client = ClientsAccess.requireClient(req);
+  function review(req, client) {
     var form = ViewerService.requireClientForm(client, req.slug);
     if (!client.canReview)
       ApiError.fail('forbidden', 'This link is read-only.');

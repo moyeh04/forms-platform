@@ -8,7 +8,7 @@ const path = require('node:path');
 const Module = require('node:module');
 const { select, read } = require('./lib/files.js');
 
-const ACTION = /^API(?:\['([A-Za-z.]+)'\]|\.([A-Za-z]+)) = /gm;
+const ACTION = /^\s*(?:\{\s*)?action: '([A-Za-z.]+)'/gm;
 const API_ROW = /^\| `([A-Za-z.]+)` \| (?:yes|no) \|/gm;
 const TEST_ROW = /^\|[^|]+\| `([a-z0-9/._-]+\.test\.js)` \| (\d+) \|/gm;
 const TOTAL = /(\d+) automated tests|# (\d+) tests/g;
@@ -27,7 +27,7 @@ function finding(file, message) {
 }
 
 /**
- * Lists the actions the backend defines and the ones API.md names.
+ * Lists the actions of the backend's routes table and the ones API.md names.
  *
  * @param {string} root The repository root.
  * @param {!Array<string>} files Every tracked file.
@@ -38,7 +38,7 @@ function actions(root, files, config) {
   const code = [];
   for (const file of select(files, config.backend)) {
     for (const match of read(root, file).matchAll(ACTION)) {
-      code.push(match[1] || match[2]);
+      code.push(match[1]);
     }
   }
   const page = [...read(root, config.api).matchAll(API_ROW)].map((m) => m[1]);
