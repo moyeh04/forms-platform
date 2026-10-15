@@ -1,11 +1,11 @@
 # Testing
 
-358 automated tests run without a Google account, a browser, or a network.
+360 automated tests run without a Google account, a browser, or a network.
 They run the **real** backend and the **real** pages. This page explains how
 that works and what it can and cannot prove.
 
 ```
-npm test    # 358 tests
+npm test    # 360 tests
 ```
 
 ## The layers
@@ -172,6 +172,7 @@ says something else.
 | Line check | `scripts/checks/code/lines.test.js` | 2 | A line over the limit is found with its width and one at the limit passes, a hook file without an extension is checked, Arabic counts by character, a URL does not count, and other folders are left out |
 | JSDoc check | `scripts/checks/code/jsdoc.test.js` | 4 | A full Google-style doc passes on a declaration, an arrow in a constant and an object property; a missing doc, a wrong or untyped `@param`, a missing or needless `@return`, `@returns` and `@author` are each found; a file header above a blank line does not count as the doc of the function below it, and callbacks, wrappers and handlers passed to a call need no doc |
 | Number check | `scripts/checks/code/numbers.test.js` | 3 | A number held by a constant variable, property, member or object passes, so do 0, 1, -1 and an ignored line; an unnamed variable, property, nested property or default parameter is found; arguments, operands and array elements are left to Biome |
+| Enum check | `scripts/checks/code/enums.test.js` | 2 | A value of a mapped enum compared with its property, either way round, through a computed read or as a `case`, is found; members, other words of the same property, unmapped properties and local variables pass |
 | Flag check | `scripts/checks/code/flags.test.js` | 2 | A field compared with `'1'` or `'0'` either way round, and a choice that writes them, are found; a menu choice in a variable, a digit test, zero padding, other labels and a boolean compare pass |
 | Structure check | `scripts/checks/tree/structure.test.js` | 2 | A tree that keeps every rule passes; an entry outside the root allow-list, catch-all names for a file and a folder, a crowded folder, a missing page script, scripts no page loads and a file the structure page does not name are each found at their place |
 | Document check | `scripts/checks/tree/docs.test.js` | 3 | API.md, TESTING.md (sub-folders counted) and Markdown links that match pass; a missing action, an action in the section of another access, a wrong count and a broken link are each found |

@@ -73,6 +73,13 @@
     "extensions": [".js"],
     "exclude": ["backend/platform/sheets/cell.js"]
   },
+  "enums": {
+    "include": ["web/js/", "backend/", "domain/"],
+    "extensions": [".js"],
+    "exclude": ["domain/enums.js"],
+    "source": "domain/enums.js",
+    "properties": {}
+  },
   "structure": {
     "root": [
       "README.md",

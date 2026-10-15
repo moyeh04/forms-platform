@@ -299,6 +299,7 @@ the file name says the role:
 | `scripts/checks/code/check-lines.js` | No line wider than 80 columns, URLs not counted. |
 | `scripts/checks/code/check-jsdoc.js` | Every named function has a Google-style JSDoc comment whose tags match its parameters and return, with no metadata tags. |
 | `scripts/checks/code/check-numbers.js` | Every number that initialises something, which Biome skips, is held by a CONSTANT_CASE name. |
+| `scripts/checks/code/check-enums.js` | The values of a shared enum are written as its members where they are compared with the property the enum names. |
 | `scripts/checks/code/check-flags.js` | Yes/no values are compared and written as `'1'`/`'0'` only in `backend/platform/sheets/cell.js`. |
 | `scripts/checks/tree/check-structure.js` | The structure rules above. |
 | `scripts/checks/tree/check-docs.js` | [API.md](../backend/API.md) names exactly the actions the backend has, [TESTING.md](../process/TESTING.md) gives the real number of tests, and no Markdown link points at a file that is gone. |
