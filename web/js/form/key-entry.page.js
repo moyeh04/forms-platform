@@ -11,10 +11,7 @@
   var S = P.S;
 
   /** The digits of a registration key. */
-  var KEY_DIGITS = 5;
-
-  /** A whole registration key. */
-  var KEY_PATTERN = new RegExp('^\\d{' + KEY_DIGITS + '}$');
+  var KEY_DIGITS = Rules.editKeyDigits();
 
   /**
    * Says whether a text is a whole registration key.
@@ -23,7 +20,7 @@
    * @return {boolean} True for five digits.
    */
   function isKey(key) {
-    return KEY_PATTERN.test(key);
+    return Rules.isEditKey(key);
   }
 
   /**

@@ -1,5 +1,6 @@
 /**
- * The rule of student codes: digits only, of the length the field asks.
+ * The rules of codes and keys: a student code is digits only, of the length
+ * the field asks; a registration key has five digits.
  */
 (function (root) {
   'use strict';
@@ -9,6 +10,12 @@
 
   /** The digits of a student code when the field does not say. */
   var CODE_LENGTH = 7;
+
+  /** The digits of the key a student opens a registration with. */
+  var EDIT_KEY_DIGITS = 5;
+
+  /** A whole registration key. */
+  var EDIT_KEY = new RegExp('^\\d{' + EDIT_KEY_DIGITS + '}$');
 
   /**
    * Gives the digits a student code question asks for.
@@ -40,7 +47,32 @@
     return { ok: true, value: v };
   }
 
-  var api = { codeLength: codeLength, validateCode: validateCode };
+  /**
+   * Gives the digits of a registration key, so the page that asks for it
+   * and the backend that makes it agree.
+   *
+   * @return {number} The digits.
+   */
+  function editKeyDigits() {
+    return EDIT_KEY_DIGITS;
+  }
+
+  /**
+   * Says whether a text is a whole registration key.
+   *
+   * @param {*} key The text.
+   * @return {boolean} True for five digits.
+   */
+  function isEditKey(key) {
+    return EDIT_KEY.test(key);
+  }
+
+  var api = {
+    codeLength: codeLength,
+    validateCode: validateCode,
+    editKeyDigits: editKeyDigits,
+    isEditKey: isEditKey
+  };
   if (node) module.exports = api;
   root.RulesCodes = api;
 })(typeof globalThis !== 'undefined' ? globalThis : this);

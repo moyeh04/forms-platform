@@ -64,7 +64,7 @@ is silenced on its own line with the reason, and both checks honour it:
 | `downloads.jobs.js` | The size, time and file limits of a download job |
 | `keys.controller.js`, `forms.questions.js`, `sheet-views.*.js`, `workbook.js`, `sheet-style.js` | The limits and sizes of their own feature |
 | `domain/rules/text.js` | The Arabic letter and digit tables, the lengths of a name, an English title and an email address |
-| `domain/rules/phone.js`, `codes.js`, `drive-link.js` | The Egyptian country code and number lengths, the digits of a student code, the Drive hosts and link kinds, the parts of a folder name |
+| `domain/rules/phone.js`, `codes.js`, `drive-link.js` | The Egyptian country code and number lengths, the digits of a student code and of a registration key, the Drive hosts and link kinds, the parts of a folder name |
 | `domain/rules/slots.js` | Week day and month names, the minutes of an hour and the hours of a clock face |
 | `domain/rules/team-size.js` | `SIZE_ALERT_LEVELS`, the biggest team when a form does not say, the smallest number a warning can ask for |
 | `domain/rules/submission.js` | The longest answer of a short and of a long text field |
