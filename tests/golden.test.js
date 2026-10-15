@@ -104,6 +104,14 @@ test('Golden: the salted hashes and seals are the same for the same pepper', () 
   matchesFixture('hashes.json', hashes);
 });
 
+// Names every object inherits; none of them is an action.
+const PROTOTYPE_NAMES = [
+  'constructor',
+  '__proto__',
+  'toString',
+  'hasOwnProperty'
+];
+
 test('Golden: every action answers an empty, wrong-PIN, wrong-key, bare admin and real-form request the same way', () => {
   const w = boot();
   const form = openForm(w, 'team_registration', 'Team Form 1');
@@ -124,6 +132,9 @@ test('Golden: every action answers an empty, wrong-PIN, wrong-key, bare admin an
   }
   table['(unknown)'] = [codeOf(w.api({ action: 'nope' }))];
   table['(no action)'] = [codeOf(w.api({}))];
+  table['(prototype names)'] = PROTOTYPE_NAMES.map((action) =>
+    codeOf(w.api({ action }))
+  );
   matchesFixture('actions.json', table);
 });
 

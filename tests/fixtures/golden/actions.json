@@ -361,5 +361,11 @@
  ],
  "(no action)": [
   "unknown_action"
+ ],
+ "(prototype names)": [
+  "ok",
+  "server_error",
+  "ok",
+  "server_error"
  ]
 }
