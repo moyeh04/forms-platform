@@ -139,11 +139,9 @@ Why it suits this project:
 - **Two folders are the site.** The workflow copies the pages and files of
   `web/` and the rules in `domain/` into the published artifact, at the paths
   `scripts/build/site-map.js` gives them: the pages at the root, `web/js`,
-  `web/css` and `web/img` under `assets/`, and `domain/` as `shared/`. Those
-  paths never change, so a page a browser kept still finds its files. When
-  a file is split into a folder of parts, its old path stays published for
-  one release as the parts joined in order (`JOINED` in the site map):
-  `shared/rules.js` and `shared/form-metadata.js`. Backend code, tests,
+  `web/css` and `web/img` under `assets/`, and `domain/` as `shared/`. A file
+  that moves is published only at its new path: a page a browser kept from
+  before asks for the old one and needs a reload. Backend code, tests,
   scripts, and docs never go online.
 - **Tested before it is public.** Pages' source is *GitHub Actions*, so a push
   that breaks a test is never published.
