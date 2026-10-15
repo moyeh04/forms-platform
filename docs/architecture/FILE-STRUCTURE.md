@@ -89,9 +89,9 @@ flowchart LR
     subgraph index["index.html: the student form"]
         r1["domain/rules/"]
         i18n["i18n/: en, ar, i18n"]
-        tk["ticket.js"]
+        tk["form/ticket/"]
         h1["handover.js"]
-        fm["form.js"]
+        fm["form/: model, views, pages"]
     end
     subgraph admin["admin.html: the dashboard"]
         r2["domain/rules/"]
@@ -143,7 +143,29 @@ The site is published at the paths it has always had: the pages at the root,
 | `web/js/config.js` | Source placeholder; `scripts/build/build-site.js` generates its published copy from the Actions `API_URL` variable, with the version of the site. |
 | `web/js/app/fresh.js` | Keeps an open page on the published version: compares the version in `config.js` with `version.json`, reloads an older page when nothing would be lost, and offers **Reload** otherwise. |
 | `web/js/app/api.js` | Sends requests to the backend as plain-text JSON (avoids browser CORS checks). |
-| `web/js/form/form.page.js` | The student page. |
+| `web/js/form/form.model.js` | The state of the student page and the helpers that read and write an answer; creates `App.formPage`, which the other parts add their functions to. Loaded first of the form parts. |
+| `web/js/form/steps.model.js` | The steps of a form and the step a question is on. |
+| `web/js/form/drafts.model.js` | Keeps a half-filled form in the tab's session storage, so a reload does not wipe it. |
+| `web/js/form/chrome.view.js` | The top bar and the head of the form. |
+| `web/js/form/route.view.js` | The route trail drawn as a sea of islands, the sheet and the banner. |
+| `web/js/form/fields.view.js` | A question with its label, description, control and error, and the folder naming rule. |
+| `web/js/form/text-input.view.js` | The text box of each field type and the filter of what it allows. |
+| `web/js/form/select.view.js` | Chips and dropdowns. |
+| `web/js/form/team-size.view.js` | The team size chips and the note of a size. |
+| `web/js/form/members.view.js` | The member cards and the list that follows the team size. |
+| `web/js/form/slots.view.js` | The days and times of a reservation. |
+| `web/js/form/review.view.js` | The review step and the ticket summary. |
+| `web/js/form/form.view.js` | The page of an open or closed form; with a key it opens on the summary. |
+| `web/js/form/team-key.page.js` | The first step of a key booking: the key and the team it opens. |
+| `web/js/form/navigation.page.js` | Moving between steps and showing their errors. |
+| `web/js/form/submit.page.js` | Sending the registration and handling the server's errors. |
+| `web/js/form/key-entry.page.js` | Opening a registration with its key. |
+| `web/js/form/edit.page.js` | A registration opened with its key: read only, Close, cancel, start again. |
+| `web/js/form/success.view.js` | The page with the ticket after sending. |
+| `web/js/form/contacts.view.js` | The names and contacts of other teams in a request to move a member. |
+| `web/js/form/transfer.view.js` | The dialog of a request to move a member. |
+| `web/js/form/transfer.page.js` | The requests to move a member when a registration opens. |
+| `web/js/form/form.page.js` | Loads the form, draws the page for its state, and starts the page. Loaded last. |
 | `web/js/form/ticket/ticket.js` | The success ticket: its picture, the image and the PDF. |
 | `web/js/i18n/en.js`, `ar.js` | The English and Arabic text of the student page, by key, in `App.strings`. |
 | `web/js/i18n/i18n.js` | `App.i18n`: the page language and its direction, the text of a key, `{en, ar}` labels, error sentences and dates. Loaded after `en.js` and `ar.js`. |
