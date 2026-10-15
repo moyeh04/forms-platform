@@ -442,7 +442,7 @@ test(
       ),
       'the treasure waits on the last island'
     );
-    assert.ok(p.$('.trail-x .isle .icon-x'), 'beside the X');
+    assert.equal(p.$('.trail-x .icon-x'), null, 'with no X beside it');
     assert.equal(p.$$('.trail-ship').length, 1);
     assert.ok(p.$('.trail-ship img[src="assets/img/ship.svg"]'));
     assert.deepEqual(

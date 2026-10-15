@@ -8,12 +8,8 @@
 
   var P = App.formPage;
   var h = App.ui.h;
-  var icon = App.ui.icon;
   var t = P.t;
   var S = P.S;
-
-  /** The size of the X on the treasure island, in pixels. */
-  var X_SIZE = 26;
 
   /** The middle of a stop, as a part of its width. */
   var MIDDLE = 0.5;
@@ -77,7 +73,7 @@
   }
 
   /**
-   * Makes the treasure island, with the X at the end of the route.
+   * Makes the treasure island, with the chest at the end of the route.
    *
    * @return {!Element} The island.
    */
@@ -89,8 +85,7 @@
         'span',
         { class: 'isle' },
         art('island'),
-        art('treasure', 'trail-treasure'),
-        icon('x', X_SIZE)
+        art('treasure', 'trail-treasure')
       ),
       h('span', { class: 'trail-label' }, t('treasure'))
     );
