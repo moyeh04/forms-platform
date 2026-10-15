@@ -1200,7 +1200,7 @@ labels of the current tables.
 | Change a validation rule | `domain/rules.js` (browser, server, and tests all follow) |
 | Add a backend action | A named function in the feature's `*.controller.js`, returned by its namespace; a row in `backend/routes.js` with its `Access`; a row in the section of that access in [API.md](../backend/API.md) |
 | Change sheet colours | `PALETTE` in `sheet-style.js` |
-| Change the downloaded Excel list | `dlWorkbook_` in `downloads.workbook.js` (the file format is in `backend/platform/xlsx/`) |
+| Change the downloaded Excel list | `dlWorkbook` in `downloads.workbook.js` (the file format is in `backend/platform/xlsx/`) |
 | Change the Drive folder name rule | `Rules.checkFolderName` in `domain/rules.js` |
 | Change the tab icon | `web/img/favicon.svg`, then regenerate the PNGs in `web/img/` |
 | See a change in a real browser before deploying | `npm run dev` (`scripts/dev/dev-server.js`) |

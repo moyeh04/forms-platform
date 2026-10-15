@@ -319,19 +319,6 @@
     "jsdoc": 4,
     "lines": 8
   },
-  "backend/platform/xlsx/workbook.js": {
-    "biome/lint/complexity/noExcessiveCognitiveComplexity": 2,
-    "biome/lint/complexity/noExcessiveLinesPerFunction": 3,
-    "biome/lint/correctness/noUnusedFunctionParameters": 2,
-    "biome/lint/style/noMagicNumbers": 3,
-    "jsdoc": 6,
-    "lines": 20
-  },
-  "backend/platform/xlsx/xml.js": {
-    "biome/lint/style/noMagicNumbers": 3,
-    "biome/lint/suspicious/noControlCharactersInRegex": 6,
-    "jsdoc": 4
-  },
   "domain/form-metadata.js": {
     "biome/lint/complexity/useOptionalChain": 13,
     "biome/lint/correctness/noInnerDeclarations": 3,

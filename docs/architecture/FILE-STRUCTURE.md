@@ -198,8 +198,10 @@ the file name says the role:
 | `backend/platform/format/json.js` | Copying values and reading JSON text safely. |
 | `backend/platform/config/constants.js` | The name of the app, the registry tab names, and the names of the script properties and cache keys. |
 | `backend/platform/config/access.js` | Who may call an action: the admin, a private link, the holder of a registration key, or anyone. |
-| `backend/platform/xlsx/xml.js` | The XML pieces of an Excel file: escaped text, column letters and colours. |
-| `backend/platform/xlsx/workbook.js` | An Excel workbook built by hand: styles, column widths, sheets and the zipped file. |
+| `backend/platform/xlsx/xml.js` | The XML pieces of an Excel file: elements, namespaces, links between parts, escaped text, column letters and colours. |
+| `backend/platform/xlsx/style-sheet.js` | The style sheet of an Excel file: fonts, fills, the grid border and one cell format for each style. |
+| `backend/platform/xlsx/worksheet.js` | One sheet of an Excel file: its cells, column widths fitted to the text, merged ranges, links, frozen header and print setup. |
+| `backend/platform/xlsx/workbook.js` | The Excel file itself: the list of parts, the workbook, its links, and the zip. |
 
 ### Catalog: what the admin sets up
 
