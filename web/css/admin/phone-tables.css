@@ -74,11 +74,11 @@
   .block {
     break-inside: avoid;
     box-shadow: none;
-    border-color: #999;
+    border-color: var(--print-line);
   }
   .block-head,
   .day-head {
-    background: #f2f2f2;
+    background: var(--print-band);
   }
   .block-actions {
     display: none;

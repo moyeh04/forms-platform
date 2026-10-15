@@ -1,8 +1,8 @@
 /* Print: only the ticket, on plain paper. */
 @media print {
   body {
-    background: #fff;
-    color: #000;
+    background: var(--print-paper);
+    color: var(--print-ink);
   }
   .page > *:not(.sheet),
   .topbar,
@@ -16,20 +16,20 @@
   .sheet {
     clip-path: none;
     filter: none;
-    background: #fff;
+    background: var(--print-paper);
     padding: 0;
   }
   .sheet::after {
     display: none;
   }
   .ticket {
-    color: #000;
+    color: var(--print-ink);
   }
   .key-block {
-    border-color: #000;
+    border-color: var(--print-ink);
   }
   .key-note,
   .callout-arrow {
-    color: #000;
+    color: var(--print-ink);
   }
 }

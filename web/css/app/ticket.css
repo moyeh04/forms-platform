@@ -5,11 +5,15 @@
   background: var(--sheet-2);
   padding: 30px 18px 28px;
   -webkit-mask:
-    conic-gradient(from 135deg at top, #0000, #000 1deg 89deg, #0000 90deg) top / 18px 51% repeat-x,
-    conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) bottom / 18px 51% repeat-x;
+    conic-gradient(from 135deg at top, var(--mask-clear), var(--mask-solid) 1deg 89deg, var(--mask-clear) 90deg) top /
+    18px 51% repeat-x,
+    conic-gradient(from -45deg at bottom, var(--mask-clear), var(--mask-solid) 1deg 89deg, var(--mask-clear) 90deg)
+    bottom / 18px 51% repeat-x;
   mask:
-    conic-gradient(from 135deg at top, #0000, #000 1deg 89deg, #0000 90deg) top / 18px 51% repeat-x,
-    conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) bottom / 18px 51% repeat-x;
+    conic-gradient(from 135deg at top, var(--mask-clear), var(--mask-solid) 1deg 89deg, var(--mask-clear) 90deg) top /
+    18px 51% repeat-x,
+    conic-gradient(from -45deg at bottom, var(--mask-clear), var(--mask-solid) 1deg 89deg, var(--mask-clear) 90deg)
+    bottom / 18px 51% repeat-x;
 }
 .ticket-title {
   font-size: var(--fs-title);
@@ -88,21 +92,12 @@
    the saved image; only the card is a little darker at night. The words and the two figures sit over the
    drawing, placed in hundredths of its 440 by 220 box, each centred on what it labels. */
 .when {
-  --scene-card: #f0e2c5;
   position: relative;
   max-width: 440px;
   margin: 4px auto 18px;
   container-type: inline-size;
-  color: #2f2418;
+  color: var(--scene-ink);
   direction: ltr;
-}
-:root[data-theme="dark"] .when {
-  --scene-card: #d8c69c;
-}
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) .when {
-    --scene-card: #d8c69c;
-  }
 }
 .when-card {
   fill: var(--scene-card);
@@ -169,7 +164,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #fbf3df;
+  color: var(--scene-band-ink);
   font-family: var(--font-body);
   font-size: 3.9cqw;
   font-weight: 700;
@@ -200,12 +195,12 @@
   margin-top: 0.6cqw;
   font-size: 3.6cqw;
   font-weight: 700;
-  color: #4a3a2a;
+  color: var(--scene-mute);
 }
 .when-sub.only {
   padding: 0 4%;
   font-size: 3.8cqw;
-  color: #2f2418;
+  color: var(--scene-ink);
 }
 /* The time is centred under the clock (x 118). */
 .when-time {

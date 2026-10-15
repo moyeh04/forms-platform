@@ -4,6 +4,9 @@
  * toggle.
  * No orange, no pure white, no logo.
  *
+ * Every colour of the stylesheets is named here; the other files use the
+ * names (docs/standards/CONSTANTS.md).
+ *
  * Contrast standard: WCAG 2.1 AA in both themes. Text needs 4.5:1 against
  * its background; outlines that show where a field is (--field-line) and the
  * focus ring need 3:1. --line is for decorative dividers only.
@@ -32,6 +35,30 @@
   --err: #a12b1f;
   --focus: #3f6b66;
   --shadow: rgba(47, 36, 24, 0.16);
+  --sea-frame: #2a1c12;
+  --scene-card: #f0e2c5;
+
+  /* The same in both themes. */
+  --stain-red: rgba(154, 51, 40, 0.05);
+  --stain-sea: rgba(63, 107, 102, 0.06);
+  --backdrop: rgba(20, 14, 8, 0.55);
+  --backdrop-dashboard: rgba(20, 16, 11, 0.55);
+  --horizon-foam: rgba(255, 255, 255, 0.7);
+  --course-line: rgba(255, 255, 255, 0.85);
+  --treasure-x: #c62828;
+  --treasure-x-shadow: rgba(42, 28, 18, 0.45);
+  /* The booking scene keeps its own ink in both themes, as the saved image does. */
+  --scene-ink: #2f2418;
+  --scene-mute: #4a3a2a;
+  --scene-band-ink: #fbf3df;
+  /* A mask reads only the alpha: clear cuts away, solid keeps. */
+  --mask-clear: #0000;
+  --mask-solid: #000;
+  /* Print is plain paper. */
+  --print-paper: #fff;
+  --print-ink: #000;
+  --print-line: #999;
+  --print-band: #f2f2f2;
 
   /* Type scale. Latin and Arabic share it; Arabic gets a little more size
      and air. */
@@ -75,6 +102,8 @@
     --err: #f08a7c;
     --focus: #86b8ad;
     --shadow: rgba(0, 0, 0, 0.5);
+    --sea-frame: #5a4a38;
+    --scene-card: #d8c69c;
     color-scheme: dark;
   }
 }
@@ -100,6 +129,8 @@
   --err: #f08a7c;
   --focus: #86b8ad;
   --shadow: rgba(0, 0, 0, 0.5);
+  --sea-frame: #5a4a38;
+  --scene-card: #d8c69c;
   color-scheme: dark;
 }
 

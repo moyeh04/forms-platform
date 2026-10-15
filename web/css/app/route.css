@@ -7,7 +7,6 @@
   --dock: 22px;
   --sky-art: url(../../img/sky-day.svg);
   --sky-light: url(../../img/sun.svg);
-  --frame: #2a1c12;
   position: relative;
   margin: 8px 0 26px;
 }
@@ -15,13 +14,11 @@
   :root:not([data-theme="light"]) .trail-sea {
     --sky-art: url(../../img/sky-night.svg);
     --sky-light: url(../../img/moon.svg);
-    --frame: #5a4a38;
   }
 }
 :root[data-theme="dark"] .trail-sea {
   --sky-art: url(../../img/sky-night.svg);
   --sky-light: url(../../img/moon.svg);
-  --frame: #5a4a38;
 }
 .trail-sea::before {
   content: "";
@@ -29,7 +26,7 @@
   inset: 0 0 auto;
   height: var(--sea-h);
   border-radius: 18px;
-  border: 2px solid var(--frame);
+  border: 2px solid var(--sea-frame);
   background:
     var(--sky-light) right 6% top 2px / calc(var(--horizon) - 4px) auto no-repeat,
     var(--sky-art) 0 0 / auto var(--horizon) repeat-x,
@@ -38,7 +35,7 @@
       180deg,
       var(--sky) 0,
       var(--sky-2) var(--horizon),
-      rgba(255, 255, 255, 0.7) var(--horizon),
+      var(--horizon-foam) var(--horizon),
       var(--sea-1) calc(var(--horizon) + 2px),
       var(--sea-2) 100%
     );
@@ -112,7 +109,7 @@
   top: var(--course);
   inset-inline-end: 50%;
   width: 100%;
-  border-top: 2px dashed rgba(255, 255, 255, 0.85);
+  border-top: 2px dashed var(--course-line);
 }
 .trail .is-done + li::before,
 .trail .is-current::before {
@@ -178,8 +175,8 @@
   position: absolute;
   bottom: 12px;
   left: calc(50% + 8px);
-  color: #c62828;
-  filter: drop-shadow(0 1px 0 rgba(42, 28, 18, 0.45));
+  color: var(--treasure-x);
+  filter: drop-shadow(0 1px 0 var(--treasure-x-shadow));
 }
 .trail-x .isle .icon svg {
   stroke-width: 3.4;
