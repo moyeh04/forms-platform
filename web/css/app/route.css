@@ -54,6 +54,41 @@
       0 0;
   }
 }
+/* The ship waits beside the island of the current step, and sails there from the island it was at. */
+.trail-ship {
+  position: absolute;
+  z-index: 2;
+  top: 40px;
+  inset-inline-start: calc(var(--at) + var(--dock));
+  line-height: 0;
+  animation: sail-on 1.4s ease-in-out both;
+  pointer-events: none;
+}
+.trail-ship img {
+  display: block;
+  width: 68px;
+  height: 53px;
+  max-width: none;
+  animation: bob 2.8s ease-in-out infinite;
+}
+/* It faces the treasure, so it is turned round when the page reads right to left. */
+[dir="rtl"] .trail-ship img {
+  scale: -1 1;
+}
+@keyframes sail-on {
+  from {
+    inset-inline-start: calc(var(--from) + var(--dock));
+  }
+}
+@keyframes bob {
+  0%,
+  100% {
+    transform: rotate(-2deg);
+  }
+  50% {
+    transform: translateY(-3px) rotate(3deg);
+  }
+}
 .trail {
   position: relative;
   list-style: none;
@@ -98,10 +133,7 @@
   height: 48px;
   max-width: none;
 }
-/* An island ahead is not explored yet; an island left behind flies the red flag of the crew. */
-.trail li:not(.is-done):not(.is-current):not(.trail-x) .isle img {
-  filter: saturate(0.6) opacity(0.8);
-}
+/* An island left behind flies the red flag of the crew. */
 .trail .is-done .isle::after {
   content: "";
   position: absolute;
@@ -131,6 +163,10 @@
   width: 88px;
   height: 66px;
 }
+/* An island ahead is not explored yet. */
+.trail li:not(.is-done):not(.is-current):not(.trail-x) .isle img {
+  filter: saturate(0.6) opacity(0.8);
+}
 .trail-x .isle .trail-treasure {
   position: absolute;
   bottom: 24px;
@@ -155,41 +191,6 @@
   color: var(--accent);
   white-space: nowrap;
 }
-/* The ship waits beside the island of the current step, and sails there from the island it was at. */
-.trail-ship {
-  position: absolute;
-  z-index: 2;
-  top: 40px;
-  inset-inline-start: calc(var(--at) + var(--dock));
-  line-height: 0;
-  animation: sail-on 1.4s ease-in-out both;
-  pointer-events: none;
-}
-.trail-ship img {
-  display: block;
-  width: 68px;
-  height: 53px;
-  max-width: none;
-  animation: bob 2.8s ease-in-out infinite;
-}
-/* It faces the treasure, so it is turned round when the page reads right to left. */
-[dir="rtl"] .trail-ship img {
-  scale: -1 1;
-}
-@keyframes sail-on {
-  from {
-    inset-inline-start: calc(var(--from) + var(--dock));
-  }
-}
-@keyframes bob {
-  0%,
-  100% {
-    transform: rotate(-2deg);
-  }
-  50% {
-    transform: translateY(-3px) rotate(3deg);
-  }
-}
 @media (max-width: 560px) {
   .trail-label {
     display: none;
@@ -200,6 +201,13 @@
     --horizon: 32px;
     --course: calc(var(--sea-h) - 20px);
     --dock: 10px;
+  }
+  .trail-ship {
+    top: 34px;
+  }
+  .trail-ship img {
+    width: 48px;
+    height: 37px;
   }
   .trail .isle {
     padding-bottom: 8px;
@@ -235,13 +243,6 @@
   .trail-x .trail-label {
     display: block;
     font-size: 1rem;
-  }
-  .trail-ship {
-    top: 34px;
-  }
-  .trail-ship img {
-    width: 48px;
-    height: 37px;
   }
 }
 .step-count {

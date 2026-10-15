@@ -92,13 +92,13 @@
   );
   opacity: 0.55;
 }
-.slot-chip.is-full .slot-left {
-  color: var(--err);
-  font-weight: 700;
-}
 .slot-chip .slot-left {
   font-family: var(--font-body);
   letter-spacing: 0;
+}
+.slot-chip.is-full .slot-left {
+  color: var(--err);
+  font-weight: 700;
 }
 .slot-move {
   display: flex;

@@ -154,6 +154,14 @@
     background 0.12s,
     border-color 0.12s;
 }
+/* The team size chips hold one number each, large and centred. */
+.size-chips .chip span {
+  min-width: 3.25rem;
+  justify-content: center;
+  text-align: center;
+  font-weight: 700;
+  font-size: 1.25rem;
+}
 .chip input:checked + span {
   background: var(--sea);
   border-color: var(--sea);
@@ -206,13 +214,6 @@
 .team-size {
   color: var(--mute);
   font-size: var(--fs-help);
-}
-.size-chips .chip span {
-  min-width: 3.25rem;
-  justify-content: center;
-  text-align: center;
-  font-weight: 700;
-  font-size: 1.25rem;
 }
 .pick-size,
 .solo-team {
