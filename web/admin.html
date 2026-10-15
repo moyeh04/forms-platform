@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Forms dashboard</title>
+  <meta name="color-scheme" content="light dark">
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="assets/img/favicon-32.png" sizes="32x32"
+        type="image/png">
+  <link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
+  <link rel="manifest" href="assets/img/site.webmanifest">
+  <meta name="theme-color" content="#E9DFC6"
+        media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#14100B"
+        media="(prefers-color-scheme: dark)">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Aref+Ruqaa:wght@400;700&family=IM+Fell+English:ital@0;1&family=Special+Elite&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/theme.css">
+  <link rel="stylesheet" href="assets/css/app/page.css">
+  <link rel="stylesheet" href="assets/css/app/route.css">
+  <link rel="stylesheet" href="assets/css/app/fields.css">
+  <link rel="stylesheet" href="assets/css/app/slots.css">
+  <link rel="stylesheet" href="assets/css/app/buttons.css">
+  <link rel="stylesheet" href="assets/css/app/ticket.css">
+  <link rel="stylesheet" href="assets/css/app/dialogs.css">
+  <link rel="stylesheet" href="assets/css/app/print.css">
+  <link rel="stylesheet" href="assets/css/app/notes.css">
+  <link rel="stylesheet" href="assets/css/admin/layout.css">
+  <link rel="stylesheet" href="assets/css/admin/questions.css">
+  <link rel="stylesheet" href="assets/css/admin/forms-list.css">
+  <link rel="stylesheet" href="assets/css/admin/bookings.css">
+  <link rel="stylesheet" href="assets/css/admin/new-form.css">
+  <link rel="stylesheet" href="assets/css/admin/fields.css">
+  <link rel="stylesheet" href="assets/css/admin/timetable.css">
+  <link rel="stylesheet" href="assets/css/admin/responses-alerts.css">
+  <link rel="stylesheet" href="assets/css/admin/teammates.css">
+  <link rel="stylesheet" href="assets/css/admin/sections.css">
+  <link rel="stylesheet" href="assets/css/admin/lists.css">
+  <link rel="stylesheet" href="assets/css/admin/responses.css">
+  <link rel="stylesheet" href="assets/css/admin/matching.css">
+  <link rel="stylesheet" href="assets/css/admin/phone.css">
+  <link rel="stylesheet" href="assets/css/admin/phone-tables.css">
+  <link rel="stylesheet" href="assets/css/admin/keys.css">
+</head>
+<body class="admin">
+  <div id="app" aria-live="polite">
+    <div class="loading">Opening the dashboard...</div>
+  </div>
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/app/fresh.js"></script>
+  <script src="shared/enums.js"></script>
+  <script src="shared/rules/text.js"></script>
+  <script src="shared/rules/phone.js"></script>
+  <script src="shared/rules/codes.js"></script>
+  <script src="shared/rules/drive-link.js"></script>
+  <script src="shared/rules/slots.js"></script>
+  <script src="shared/rules/form.js"></script>
+  <script src="shared/rules/team-size.js"></script>
+  <script src="shared/rules/submission.js"></script>
+  <script src="shared/rules/index.js"></script>
+  <script src="shared/form-metadata/read.js"></script>
+  <script src="shared/form-metadata/subject.js"></script>
+  <script src="shared/form-metadata/batch.js"></script>
+  <script src="shared/form-metadata/index.js"></script>
+  <script src="assets/js/app/theme.js"></script>
+  <script src="assets/js/app/api.js"></script>
+  <script src="assets/js/ui/dom.js"></script>
+  <script src="assets/js/ui/icons.js"></script>
+  <script src="assets/js/ui/dialogs.js"></script>
+  <script src="assets/js/ui/clipboard.js"></script>
+  <script src="assets/js/ui/theme-button.js"></script>
+  <script src="assets/js/admin/shell/admin.model.js"></script>
+  <script src="assets/js/admin/shell/calls.page.js"></script>
+  <script src="assets/js/admin/shell/widgets.view.js"></script>
+  <script src="assets/js/admin/shell/dialogs.view.js"></script>
+  <script src="assets/js/admin/shell/metadata.view.js"></script>
+  <script src="assets/js/admin/shell/form-head.view.js"></script>
+  <script src="assets/js/admin/shell/form-actions.page.js"></script>
+  <script src="assets/js/admin/shell/forms.model.js"></script>
+  <script src="assets/js/admin/shell/series.view.js"></script>
+  <script src="assets/js/admin/shell/forms-list.view.js"></script>
+  <script src="assets/js/admin/shell/create.view.js"></script>
+  <script src="assets/js/admin/shell/login.view.js"></script>
+  <script src="assets/js/admin/shell/router.page.js"></script>
+  <script src="assets/js/admin/settings/timetable.model.js"></script>
+  <script src="assets/js/admin/settings/timetable-calendar.view.js"></script>
+  <script src="assets/js/admin/settings/timetable-hours.view.js"></script>
+  <script src="assets/js/admin/settings/timetable-day.view.js"></script>
+  <script src="assets/js/admin/settings/timetable.view.js"></script>
+  <script src="assets/js/admin/keys/until.model.js"></script>
+  <script src="assets/js/admin/keys/until-picker.view.js"></script>
+  <script src="assets/js/admin/keys/key-teams.view.js"></script>
+  <script src="assets/js/admin/keys/extend-keys.view.js"></script>
+  <script src="assets/js/admin/keys/keys-summary.view.js"></script>
+  <script src="assets/js/admin/settings/range.view.js"></script>
+  <script src="assets/js/admin/settings/range-note.view.js"></script>
+  <script src="assets/js/admin/settings/size-alerts.view.js"></script>
+  <script src="assets/js/admin/settings/panel.view.js"></script>
+  <script src="assets/js/admin/settings/allow-picker.view.js"></script>
+  <script src="assets/js/admin/questions/questions.model.js"></script>
+  <script src="assets/js/admin/questions/page-head.view.js"></script>
+  <script src="assets/js/admin/questions/question-tools.view.js"></script>
+  <script src="assets/js/admin/questions/question-row.view.js"></script>
+  <script src="assets/js/admin/questions/questions.view.js"></script>
+  <script src="assets/js/admin/questions/teammates.view.js"></script>
+  <script src="assets/js/admin/settings/general.view.js"></script>
+  <script src="assets/js/admin/settings/who.view.js"></script>
+  <script src="assets/js/admin/settings/key-booking.view.js"></script>
+  <script src="assets/js/admin/settings/team-size.view.js"></script>
+  <script src="assets/js/admin/settings/edit-key.view.js"></script>
+  <script src="assets/js/admin/settings/limits.view.js"></script>
+  <script src="assets/js/admin/settings/emails.view.js"></script>
+  <script src="assets/js/admin/settings/review.view.js"></script>
+  <script src="assets/js/admin/settings/settings.model.js"></script>
+  <script src="assets/js/admin/settings/savebar.view.js"></script>
+  <script src="assets/js/admin/settings/settings.page.js"></script>
+  <script src="assets/js/teams/handover.view.js"></script>
+  <script src="assets/js/teams/size-alerts.view.js"></script>
+  <script src="assets/js/admin/responses/responses.model.js"></script>
+  <script src="assets/js/admin/responses/row-controls.view.js"></script>
+  <script src="assets/js/admin/responses/details-key.view.js"></script>
+  <script src="assets/js/admin/responses/details.view.js"></script>
+  <script src="assets/js/admin/responses/teams.view.js"></script>
+  <script src="assets/js/admin/responses/bookings.view.js"></script>
+  <script src="assets/js/admin/responses/registrations.view.js"></script>
+  <script src="assets/js/admin/responses/transfers.view.js"></script>
+  <script src="assets/js/admin/responses/matching.view.js"></script>
+  <script src="assets/js/admin/responses/matching-list.view.js"></script>
+  <script src="assets/js/admin/responses/matching-detail.view.js"></script>
+  <script src="assets/js/admin/responses/print.view.js"></script>
+  <script src="assets/js/admin/responses/toolbar.view.js"></script>
+  <script src="assets/js/admin/responses/responses.page.js"></script>
+  <script src="assets/js/admin/responses/download.model.js"></script>
+  <script src="assets/js/admin/responses/download-result.view.js"></script>
+  <script src="assets/js/admin/responses/download.view.js"></script>
+  <script src="assets/js/admin/people/access.view.js"></script>
+  <script src="assets/js/admin/people/link-end.view.js"></script>
+  <script src="assets/js/admin/people/client-row.view.js"></script>
+  <script src="assets/js/admin/people/client-dialog.view.js"></script>
+  <script src="assets/js/admin/people/people.page.js"></script>
+  <script src="assets/js/admin/lists/lists.model.js"></script>
+  <script src="assets/js/admin/lists/list-edit.model.js"></script>
+  <script src="assets/js/admin/lists/sections.model.js"></script>
+  <script src="assets/js/admin/lists/stepper.view.js"></script>
+  <script src="assets/js/admin/lists/new-kind.view.js"></script>
+  <script src="assets/js/admin/lists/section-extras.view.js"></script>
+  <script src="assets/js/admin/lists/sections.view.js"></script>
+  <script src="assets/js/admin/lists/group-draft.model.js"></script>
+  <script src="assets/js/admin/lists/group-draft-pick.view.js"></script>
+  <script src="assets/js/admin/lists/group-draft.view.js"></script>
+  <script src="assets/js/admin/lists/numbers.view.js"></script>
+  <script src="assets/js/admin/lists/choices.view.js"></script>
+  <script src="assets/js/admin/lists/choice-add.view.js"></script>
+  <script src="assets/js/admin/lists/list-index.view.js"></script>
+  <script src="assets/js/admin/lists/list-savebar.view.js"></script>
+  <script src="assets/js/admin/lists/create-pane.view.js"></script>
+  <script src="assets/js/admin/lists/list-head.view.js"></script>
+  <script src="assets/js/admin/lists/lists.page.js"></script>
+  <script>if (!window.__PAGE_NO_AUTOSTART__) window.App.admin.start();</script>
+</body>
+</html>

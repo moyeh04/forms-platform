@@ -147,7 +147,7 @@ flowchart TD
 ```
 
 **Cost.** The platform, not Google, is now responsible for access control. That
-is why [SECURITY.md](../reference/SECURITY.md) exists and why secrets are hashed.
+is why [SECURITY.md](../backend/SECURITY.md) exists and why secrets are hashed.
 
 ---
 
@@ -210,7 +210,7 @@ sequenceDiagram
 ```
 
 The backend reads `e.postData.contents` and parses it itself (`doPost` in
-`Code.gs`). `redirect: 'follow'` matters because Apps Script answers through a
+`main.js`). `redirect: 'follow'` matters because Apps Script answers through a
 redirect.
 
 **Cost.** None visible to users. The one caveat is that this behaviour belongs
@@ -256,11 +256,11 @@ validation by hand into the website. The two copies drift apart.
   'sequence': {'mirrorActors': false, 'messageMargin': 34, 'boxMargin': 8}
 }}%%
 flowchart LR
-    r["shared/rules.js"] --> bundle
-    b1["backend/Auth.gs"] --> bundle
-    b2["backend/Registry.gs"] --> bundle
-    b3["... 16 more .gs files"] --> bundle
-    bundle(("scripts/bundle-backend.js"))
+    r["domain/rules/"] --> bundle
+    b1["backend/platform/..."] --> bundle
+    b2["backend/features/..."] --> bundle
+    b3["... 66 backend files in all"] --> bundle
+    bundle(("scripts/build/bundle-backend.js"))
     bundle --> out["dist/Code.gs<br/>one file to deploy"]
     manifest["backend/appsscript.json"] --> bundle
     bundle --> out2["dist/appsscript.json"]
@@ -290,24 +290,32 @@ is ever pasted into the Apps Script editor.
 **Problem.** When files are glued together, order usually matters: a file that
 uses `API` before it exists breaks.
 
-**What the platform does.** Makes order irrelevant by convention. Every file is
-one of two things:
-
-1. Plain function declarations. JavaScript hoists these, so in one concatenated
-   script they exist everywhere before any line runs.
-2. Handler registrations that start with the same safe line:
+**What the platform does.** Keeps order down to one rule. Every feature or
+platform file defines one namespace named after it:
 
 ```js
-var API = API || {};
-API['admin.clients.list'] = admin(function () { /* ... */ });
+var ClientsRepository = (function () {
+  function readClients_() { /* calls Table.readTable(...) when it runs */ }
+  return { readClients: readClients_ };
+})();
 ```
 
-`var API = API || {}` means "use the table if it exists, otherwise create it",
-so whichever file loads first creates it and the rest reuse it. The call to
-`admin(...)` works from any file because `admin` is a hoisted declaration, and
-it only wraps the handler; the PIN check runs later, per request. The bundler
-therefore only needs a stable order (rules first, `Code.gs` last), not a clever
-one.
+The function runs while the file loads, but it only declares functions and
+constants; it calls another namespace only from inside them, when a request
+runs. So the namespaces load in any order. One file, `routes.js`, joins every
+action to its handler:
+
+```js
+var Routes = Router.create([
+  { action: 'admin.clients.list', access: Access.ADMIN, handler: ClientsController.list },
+  // ...
+], { requireAdmin: AuthService.requireAdmin, requireClient: ClientsAccess.requireClient });
+```
+
+It reads the namespaces while it loads, so the bundler puts it after them.
+`Router.create` only checks and stores the rows; the PIN check runs later, per
+request. The bundler therefore only needs a stable order (rules first, then the
+namespaces, then `routes.js`), not a clever one.
 
 **Cost.** A convention to follow when adding a file (the guide in
 [ARCHITECTURE.md](ARCHITECTURE.md#where-to-change-what) shows how).
@@ -356,7 +364,7 @@ that attaches itself correctly wherever it is loaded.
   'sequence': {'mirrorActors': false, 'messageMargin': 34, 'boxMargin': 8}
 }}%%
 flowchart TD
-    f["shared/rules.js<br/>pure functions, no DOM, no Google services"]
+    f["domain/rules/<br/>pure functions, no DOM, no Google services"]
     f -->|"script tag"| b["Browser: window.Rules"]
     f -->|"bundler prepends it"| g["Apps Script: global Rules"]
     f -->|"require()"| t["Node tests: module.exports"]
@@ -412,7 +420,7 @@ Apps Script.
   'sequence': {'mirrorActors': false, 'messageMargin': 34, 'boxMargin': 8}
 }}%%
 flowchart LR
-    src["backend/*.gs + shared/rules.js"] --> bundle["bundleSource()"]
+    src["backend/*.js + domain/rules/"] --> bundle["bundleSource()"]
     bundle --> vm["Node vm context"]
     mocks["Fake SpreadsheetApp, DriveApp,<br/>LockService, CacheService,<br/>MailApp, UrlFetchApp, clock"] --> vm
     vm --> world["world.api({ action: ... })"]
@@ -427,7 +435,7 @@ flowchart LR
 
 The page tests go one step further: they open the real HTML pages and route
 `fetch` straight into the same world, so browser and backend are tested
-together. More in [TESTING.md](../reference/TESTING.md).
+together. More in [TESTING.md](../process/TESTING.md).
 
 **Cost.** The copy can only be as faithful as it is written. That is why real
 Drive sharing checks, PDF export, and email are on the first-run checklist.
@@ -486,7 +494,7 @@ held only while the tab is read and the row is written.
 
 The registry is guarded the same way. Every change to a form, a list or a
 private link reads its row and writes it inside the lock (`withLock_` in
-`Config.gs`), and a form's row is found by its id at the moment of writing,
+`lock.js`), and a form's row is found by its id at the moment of writing,
 because rows move up when a form above is deleted. The Setup page sends only
 what changed, with the `updatedAt` of the copy it shows; a save over a newer
 copy is refused with `stale` and stays on the page with the reason.
@@ -507,7 +515,7 @@ registration. To make a short number safe:
 |---|---|
 | Stored as `sha256(pepper + form id + key)` | A leaked sheet reveals no keys, and the same key in two forms hashes differently |
 | Unique within a form | Two registrations never share a key, so the key identifies exactly one |
-| 10 wrong tries a minute per form | Guessing is slowed to a few hundred tries an hour. It is not stopped: [SECURITY.md](../reference/SECURITY.md#honest-weak-spots) says what is left |
+| 10 wrong tries a minute per form | Guessing is slowed to a few hundred tries an hour. It is not stopped: [SECURITY.md](../backend/SECURITY.md#honest-weak-spots) says what is left |
 | Expires after a number of days you set | A stolen old key stops working |
 | Shown once, optionally emailed | A lost key can be read back by the admin from a sealed copy, or replaced |
 
@@ -688,7 +696,7 @@ Rules.valueByRole(form, data, 'code');   // the leader code, whatever the field 
 Rules.fieldByRole(form, 'team_size');    // the team size question, if the form has one
 ```
 
-The four form types are just four template functions in `Templates.gs`. The
+The four form types are just four template functions in `templates.service.js`. The
 engine contains no question text.
 
 **Cost.** A little indirection when reading the code; a lot of freedom when
@@ -703,7 +711,7 @@ their values into every form would make updates a chore and a risk.
 
 **What the platform does.** A form stores only the **name** of a list. The real
 options are resolved when the form is read (`resolveOptions_` in
-`Registry.gs`), both for students and for server-side validation. Edit the list
+`forms.public.js`), both for students and for server-side validation. Edit the list
 once in the dashboard and every form updates immediately. The Lists page shows,
 for each list, which forms read it, and can be filtered to the lists one kind of
 form uses, so WhatsApp-only lists stay out of the way when editing team forms.
@@ -714,7 +722,7 @@ and accepts only Computers, in the browser and on the server, from one setting.
 `rules.sections` does the same for the Sections list, for the leader and for
 each member, so one Sections list can hold the sections of every year (4C-TH1,
 3L-A, ...) and each form offers only its own. The lists that can be narrowed
-are named once, in `LIMITED_LISTS_` in `Registry.gs`.
+are named once, in `LIMITED_LISTS_` in `forms.public.js`.
 
 **Cost.** Changing a list also changes what old forms accept. Existing stored
 answers are not rewritten.
@@ -787,7 +795,7 @@ the owner (`DriveApp`, and the export address with the owner's token for Google
 files), which is not public-link traffic. The page asks for one team at a time,
 a big folder is fetched over several requests, files are split into zip parts
 of up to 40 MB, and each zip reaches the browser in pieces through the API, so
-nothing is shared. `Xlsx.gs` writes `Teams.xlsx` itself, with **relative**
+nothing is shared. `backend/platform/xlsx/` writes `Teams.xlsx` itself, with **relative**
 links (`Tasks/03 - Task 3.pptx`), so the unzipped folder can be moved and
 still work. Anything that cannot be saved is listed on a **Not downloaded**
 sheet with the reason and its Drive link. See
@@ -815,7 +823,7 @@ The website needs no edit when the backend changes, and the backend needs none
 when the website changes. They only agree on the JSON actions.
 
 **Cost.** Three repository variables and one credential secret, written once
-by `npm run setup` ([DEPLOY.md](../DEPLOY.md#updating-later)). If Google rejects the saved clasp
+by `npm run setup` ([DEPLOY.md](../operations/DEPLOY.md#updating-later)). If Google rejects the saved clasp
 login, the secret has to be replaced before the next deploy can run.
 
 ---
@@ -867,7 +875,7 @@ minutes) and the project cannot change that header. After a publish a browser
 can hold a new page with an old script, or an old page altogether, and a tab
 left open for days never asks again. People were told to press Ctrl+F5.
 
-**What the platform does.** Two things, both made by `scripts/build-site.js`
+**What the platform does.** Two things, both made by `scripts/build/build-site.js`
 when the site is packaged:
 
 - **Every script and stylesheet is named by its content.** The address in the
@@ -876,7 +884,7 @@ when the site is packaged:
   that names it, and a file that did not change stays cached.
 - **The site carries its version.** A fingerprint of everything a visitor can
   load is written into `config.js` (`APP_CONFIG.VERSION`) and into
-  `version.json`. `assets/js/fresh.js`, loaded by the three pages, reads
+  `version.json`. `web/js/fresh.js`, loaded by the three pages, reads
   `version.json` under a new address each time (so no cache answers) when the
   page opens, when its tab is looked at again, and every five minutes. A page
   older than the site reloads itself; a reload always asks the server for the

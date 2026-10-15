@@ -1,0 +1,83 @@
+const test = require('node:test');
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const os = require('node:os');
+const path = require('node:path');
+const docs = require('../../../../scripts/checks/tree/check-docs.js');
+
+const CONFIG = {
+  docs: {
+    api: 'docs/API.md',
+    accessSections: { Anyone: 'PUBLIC', Admin: 'ADMIN' },
+    testing: 'docs/TESTING.md',
+    tests: 'tests',
+    backend: { include: ['backend/'], extensions: ['.js'] }
+  }
+};
+
+/** Writes a small repository and returns its root and file list. */
+function repo(files) {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'check-docs-'));
+  for (const [file, text] of Object.entries(files)) {
+    fs.mkdirSync(path.dirname(path.join(root, file)), { recursive: true });
+    fs.writeFileSync(path.join(root, file), text);
+  }
+  return { root, files: Object.keys(files) };
+}
+
+const TWO_TESTS = [
+  "const test = require('node:test');",
+  "test('a', () => {});",
+  "test('b', () => {});",
+  ''
+].join('\n');
+
+const good = () => ({
+  'backend/routes.js':
+    "[\n  { action: 'admin.forms.list', access: Access.ADMIN },\n" +
+    "  { action: 'submit', access: Access.PUBLIC }\n];\n",
+  'docs/API.md':
+    '## Anyone\n\n| `submit` | no |\n\n' +
+    '## Admin\n\n| `admin.forms.list` | yes |\n[Testing](TESTING.md)\n',
+  'docs/TESTING.md':
+    '2 automated tests\n\n| Forms | `forms.test.js` | 2 | Lists |\n',
+  'tests/forms.test.js': TWO_TESTS
+});
+
+test('Docs check: a matching API page, test page and links pass', () => {
+  const { root, files } = repo(good());
+  assert.deepEqual(docs.check(root, files, CONFIG), []);
+});
+
+test('Docs check: an action in the section of another access fails', () => {
+  const files = good();
+  files['backend/routes.js'] = files['backend/routes.js'].replace(
+    'Access.PUBLIC',
+    'Access.ADMIN'
+  );
+  const { root, files: list } = repo(files);
+  const found = docs
+    .check(root, list, CONFIG)
+    .map((f) => `${f.file}: ${f.message}`);
+  assert.deepEqual(found, [
+    'docs/API.md: submit is in the section of another access than Access.ADMIN'
+  ]);
+});
+
+test('Docs check: a missing action, wrong count and dead link fail', () => {
+  const files = good();
+  files['backend/routes.js'] +=
+    "  { action: 'admin.forms.delete', access: Access.ADMIN }\n";
+  files['tests/sub/more.test.js'] = TWO_TESTS;
+  files['docs/API.md'] += '[Gone](OLD.md)\n';
+  const { root, files: list } = repo(files);
+  const found = docs
+    .check(root, list, CONFIG)
+    .map((f) => `${f.file}: ${f.message}`);
+  assert.deepEqual(found, [
+    'docs/API.md: no row for admin.forms.delete',
+    'docs/TESTING.md: gives 2 tests in total; there are 4',
+    'docs/TESTING.md: no row for sub/more.test.js (2 tests)',
+    'docs/API.md: links to OLD.md, which does not exist'
+  ]);
+});

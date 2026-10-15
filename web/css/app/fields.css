@@ -1,0 +1,225 @@
+/* The title of a step takes the focus when the step changes, for a screen reader. It is not a control, so it has no
+   ring. */
+.step-title:focus {
+  outline: none;
+}
+.step-help {
+  color: var(--mute);
+  margin-bottom: 18px;
+}
+
+/* Fields: ruled lines, like writing on a map. */
+.field {
+  margin: 0 0 22px;
+}
+.label {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 2px;
+  font-size: var(--fs-label);
+  font-weight: 700;
+}
+.label .opt {
+  font-weight: 400;
+  color: var(--mute);
+}
+.input,
+.select,
+.textarea {
+  display: block;
+  width: 100%;
+  min-height: 46px;
+  padding: 8px 2px 6px;
+  background: transparent;
+  border: 0;
+  border-bottom: 1.5px solid var(--field-line);
+  border-radius: 0;
+  font-size: var(--fs-input);
+  color: var(--ink);
+}
+.textarea {
+  min-height: 96px;
+  resize: vertical;
+  border: 1.5px solid var(--field-line);
+  padding: 8px 10px;
+}
+.input::placeholder {
+  color: var(--mute);
+  opacity: 0.7;
+}
+.input:focus,
+.select:focus,
+.textarea:focus {
+  outline: none;
+  border-color: var(--focus);
+  box-shadow: 0 2px 0 0 var(--focus);
+}
+.input[lang="ar"] {
+  text-align: right;
+  direction: rtl;
+}
+.input.is-latin,
+.input[dir="ltr"] {
+  direction: ltr;
+}
+.select {
+  appearance: none;
+  padding-inline-end: 28px;
+  background-image: url(../../img/select-arrow.svg);
+  background-repeat: no-repeat;
+  background-position: right 4px center;
+}
+:lang(ar) .select,
+[dir="rtl"] .select {
+  background-position: left 4px center;
+}
+.select option {
+  background: var(--sheet);
+  color: var(--ink);
+}
+.field.has-error .input,
+.field.has-error .select,
+.field.has-error .textarea {
+  border-color: var(--err);
+}
+.help {
+  margin: 4px 0 0;
+  font-size: var(--fs-help);
+  font-style: italic;
+  color: var(--mute);
+  line-height: 1.45;
+}
+.field-desc {
+  margin: 0 0 4px;
+  white-space: pre-line;
+}
+:lang(ar) .help,
+:lang(ar) em {
+  font-style: normal;
+}
+.error {
+  margin: 5px 0 0;
+  font-size: var(--fs-error);
+  font-weight: 700;
+  color: var(--err);
+}
+.hint {
+  margin: 4px 0 0;
+  font-size: var(--fs-help);
+  font-weight: 700;
+  color: var(--accent);
+  animation: hint-in 0.2s ease-out;
+}
+@keyframes hint-in {
+  from {
+    opacity: 0;
+    transform: translateY(-3px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Small lists become chips. */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+.chip {
+  position: relative;
+}
+.chip input {
+  position: absolute;
+  opacity: 0;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  cursor: pointer;
+}
+.chip span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 4px 18px;
+  border: 1.5px solid var(--field-line);
+  border-radius: 999px;
+  background: transparent;
+  font-size: var(--fs-input);
+  transition:
+    background 0.12s,
+    border-color 0.12s;
+}
+/* The team size chips hold one number each, large and centred. */
+.size-chips .chip span {
+  min-width: 3.25rem;
+  justify-content: center;
+  text-align: center;
+  font-weight: 700;
+  font-size: 1.25rem;
+}
+.chip input:checked + span {
+  background: var(--sea);
+  border-color: var(--sea);
+  color: var(--on-sea);
+  font-weight: 700;
+}
+.chip input:focus-visible + span {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+.chip input:disabled + span {
+  opacity: 0.45;
+  text-decoration: line-through;
+  cursor: not-allowed;
+}
+.field.has-error .chip span {
+  border-color: var(--err);
+}
+
+/* Team members. */
+.members {
+  display: grid;
+  gap: 16px;
+}
+.member {
+  position: relative;
+  padding: 16px 16px 4px;
+  border: 1.5px solid var(--line);
+  border-radius: 4px;
+  background: var(--sheet-2);
+}
+.member-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.member-title {
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 1.15rem;
+  margin: 0;
+}
+.member .btn {
+  min-height: 40px;
+  padding: 2px 14px;
+  font-size: 0.95rem;
+}
+.team-size {
+  color: var(--mute);
+  font-size: var(--fs-help);
+}
+.pick-size,
+.solo-team {
+  margin: 0;
+  padding: 12px 14px;
+  border: 1.5px dashed var(--line);
+  border-radius: 4px;
+  font-style: normal;
+}

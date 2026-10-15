@@ -9,15 +9,19 @@ whichever page answers your question.
 | [WORKAROUNDS.md](architecture/WORKAROUNDS.md) | The 24 clever solutions that make free hosting enough, and their trade-offs |
 | [BUILD-PIPELINE.md](architecture/BUILD-PIPELINE.md) | Exactly what produces `dist/`, why files can be joined safely, when to rebuild |
 | [HOSTING.md](architecture/HOSTING.md) | What GitHub does, what Google does, how they fit, how updates flow |
-| [DATA-MODEL.md](reference/DATA-MODEL.md) | Every sheet, column, stored property, and browser key |
-| [API.md](reference/API.md) | Every backend action: who may call it, whether it takes the lock, what it writes |
-| [SECURITY.md](reference/SECURITY.md) | The secrets, what protects them, and the honest weak spots |
-| [TESTING.md](reference/TESTING.md) | How the tests run without Google, and what they cannot prove |
-| [UI-UX.md](reference/UI-UX.md) | The rules every page follows, with the place that shows each one |
-| [DEPLOY.md](DEPLOY.md) | Click-by-click setup and the first-run checklist |
-| [MODULES.md](MODULES.md) | File-by-file reference |
-| [COMMIT_CONVENTION.md](COMMIT_CONVENTION.md) | How commits and branches are written |
-| [REQUIREMENTS.md](../REQUIREMENTS.md) | Everything the platform was asked to do, and where each item stands |
+| [DATA-MODEL.md](backend/DATA-MODEL.md) | Every sheet, column, stored property, and browser key |
+| [API.md](backend/API.md) | Every backend action: who may call it, whether it takes the lock, what it writes |
+| [SECURITY.md](backend/SECURITY.md) | The secrets, what protects them, and the honest weak spots |
+| [TESTING.md](process/TESTING.md) | How the tests run without Google, and what they cannot prove |
+| [UI-UX.md](frontend/UI-UX.md) | The rules every page follows, with the place that shows each one |
+| [DEPLOY.md](operations/DEPLOY.md) | Click-by-click setup and the first-run checklist |
+| [FILE-STRUCTURE.md](architecture/FILE-STRUCTURE.md) | Where every file lives and what it does |
+| [COMMIT_CONVENTION.md](process/COMMIT_CONVENTION.md) | How commits and branches are written |
+| [CODING_STYLE.md](standards/CODING_STYLE.md) | The style the code follows and the Biome settings that check it |
+| [DOCUMENTATION.md](standards/DOCUMENTATION.md) | How a function is documented: Google-style JSDoc, without metadata tags |
+| [CONSTANTS.md](standards/CONSTANTS.md) | How values are named, which numbers need no name, and which file owns each constant today |
+| [CHECKS.md](standards/CHECKS.md) | Every check the hook and CI run, what each refuses and how to fix it |
+| [REQUIREMENTS.md](product/REQUIREMENTS.md) | Everything the platform was asked to do, and where each item stands |
 
 ## How to read the diagrams
 

@@ -9,92 +9,217 @@
 const vm = require('node:vm');
 const crypto = require('node:crypto');
 const zlib = require('node:zlib');
-const { bundleSource } = require('../../scripts/bundle-backend.js');
+const { bundleSource } = require('../../scripts/build/bundle-backend.js');
 
 /* ── Spreadsheet ─────────────────────────────────────────────── */
 
 class MockRange {
   constructor(sheet, r, c, nr, nc) {
-    this.sheet = sheet; this.r = r; this.c = c; this.nr = nr; this.nc = nc;
+    this.sheet = sheet;
+    this.r = r;
+    this.c = c;
+    this.nr = nr;
+    this.nc = nc;
     this.proxy = new Proxy(this, {
-      get: (t, p) => (p in t ? (typeof t[p] === 'function' ? t[p].bind(t) : t[p]) : (...a) => t.proxy)
+      get: (t, p) =>
+        p in t
+          ? typeof t[p] === 'function'
+            ? t[p].bind(t)
+            : t[p]
+          : (..._a) => t.proxy
     });
   }
   getValues() {
     const out = [];
     for (let i = 0; i < this.nr; i++) {
       const row = [];
-      for (let j = 0; j < this.nc; j++) row.push(this.sheet.get(this.r + i, this.c + j));
+      for (let j = 0; j < this.nc; j++)
+        row.push(this.sheet.get(this.r + i, this.c + j));
       out.push(row);
     }
     return out;
   }
-  getDisplayValues() { return this.getValues(); }
-  getValue() { return this.getValues()[0][0]; }
+  getDisplayValues() {
+    return this.getValues();
+  }
+  getValue() {
+    return this.getValues()[0][0];
+  }
   setValues(vals) {
-    for (let i = 0; i < vals.length; i++) for (let j = 0; j < vals[i].length; j++) this.sheet.set(this.r + i, this.c + j, vals[i][j]);
+    for (let i = 0; i < vals.length; i++)
+      for (let j = 0; j < vals[i].length; j++)
+        this.sheet.set(this.r + i, this.c + j, vals[i][j]);
     return this.proxy;
   }
   setValue(v) {
-    for (let i = 0; i < this.nr; i++) for (let j = 0; j < this.nc; j++) this.sheet.set(this.r + i, this.c + j, v);
+    for (let i = 0; i < this.nr; i++)
+      for (let j = 0; j < this.nc; j++)
+        this.sheet.set(this.r + i, this.c + j, v);
     return this.proxy;
   }
-  setFormula(f) { return this.setValue(f); }
+  setFormula(f) {
+    return this.setValue(f);
+  }
   setBackground(color) {
-    for (let i = 0; i < this.nr; i++) for (let j = 0; j < this.nc; j++) this.sheet.backgrounds.set(`${this.r + i},${this.c + j}`, color);
+    for (let i = 0; i < this.nr; i++)
+      for (let j = 0; j < this.nc; j++)
+        this.sheet.backgrounds.set(`${this.r + i},${this.c + j}`, color);
     return this.proxy;
   }
-  getBackground() { return this.sheet.backgrounds.get(`${this.r},${this.c}`) || '#ffffff'; }
-  /** Alternating colours over this range. The colours are kept so a test can read them. */
+  getBackground() {
+    return this.sheet.backgrounds.get(`${this.r},${this.c}`) || '#ffffff';
+  }
+  /**
+   * Alternating colours over this range. The colours are kept so a test can
+   * read them.
+   */
   applyRowBanding() {
-    const sheet = this.sheet, range = this.proxy;
-    const band = { getRange: () => range, remove: () => { sheet.bandings = sheet.bandings.filter((b) => b !== band); } };
-    for (const part of ['HeaderRow', 'FirstRow', 'SecondRow']) band['set' + part + 'Color'] = (color) => { band[part] = color; return band; };
+    const sheet = this.sheet,
+      range = this.proxy;
+    const band = {
+      getRange: () => range,
+      remove: () => {
+        sheet.bandings = sheet.bandings.filter((b) => b !== band);
+      }
+    };
+    for (const part of ['HeaderRow', 'FirstRow', 'SecondRow'])
+      band['set' + part + 'Color'] = (color) => {
+        band[part] = color;
+        return band;
+      };
     sheet.bandings.push(band);
     return band;
   }
   setNumberFormat(f) {
-    for (let i = 0; i < this.nr; i++) for (let j = 0; j < this.nc; j++) this.sheet.formats.set(`${this.r + i},${this.c + j}`, f);
+    for (let i = 0; i < this.nr; i++)
+      for (let j = 0; j < this.nc; j++)
+        this.sheet.formats.set(`${this.r + i},${this.c + j}`, f);
     return this.proxy;
   }
-  clear() { return this.clearContent(); }
+  clear() {
+    return this.clearContent();
+  }
   clearContent() {
-    for (let i = 0; i < this.nr; i++) for (let j = 0; j < this.nc; j++) this.sheet.cells.delete(`${this.r + i},${this.c + j}`);
+    for (let i = 0; i < this.nr; i++)
+      for (let j = 0; j < this.nc; j++)
+        this.sheet.cells.delete(`${this.r + i},${this.c + j}`);
     return this.proxy;
   }
-  getRow() { return this.r; }
-  getColumn() { return this.c; }
-  getNumRows() { return this.nr; }
-  getNumColumns() { return this.nc; }
-  getSheet() { return this.sheet.proxy; }
+  getRow() {
+    return this.r;
+  }
+  getColumn() {
+    return this.c;
+  }
+  getNumRows() {
+    return this.nr;
+  }
+  getNumColumns() {
+    return this.nc;
+  }
+  getSheet() {
+    return this.sheet.proxy;
+  }
 }
 
 class MockSheet {
   constructor(ss, name, id) {
-    this.ss = ss; this.name = name; this.id = id; this.cells = new Map(); this.formats = new Map(); this.hidden = false;
-    this.backgrounds = new Map(); this.widths = new Map(); this.bandings = []; this.frozenRows = 0;
+    this.ss = ss;
+    this.name = name;
+    this.id = id;
+    this.cells = new Map();
+    this.formats = new Map();
+    this.hidden = false;
+    this.backgrounds = new Map();
+    this.widths = new Map();
+    this.bandings = [];
+    this.frozenRows = 0;
     this.proxy = new Proxy(this, {
-      get: (t, p) => (p in t ? (typeof t[p] === 'function' ? t[p].bind(t) : t[p]) : (...a) => t.proxy)
+      get: (t, p) =>
+        p in t
+          ? typeof t[p] === 'function'
+            ? t[p].bind(t)
+            : t[p]
+          : (..._a) => t.proxy
     });
   }
-  get(r, c) { const v = this.cells.get(`${r},${c}`); return v === undefined ? '' : v; }
-  set(r, c, v) { this.noteWrite(); if (v === '' || v === null || v === undefined) this.cells.delete(`${r},${c}`); else this.cells.set(`${r},${c}`, v); }
-  /** A write to the registry while no request holds the lock is recorded, so a test can require there are none. */
-  noteWrite() { const w = this.ss.world; if (w.watchLocks && this.ss === w.registry && !w.lock.held) w.unlockedWrites.push(this.name); }
-  getBandings() { return this.bandings.slice(); }
-  setColumnWidth(c, w) { this.widths.set(c, w); return this.proxy; }
-  setFrozenRows(n) { this.frozenRows = n; return this.proxy; }
-  getName() { return this.name; }
-  setName(n) { this.name = n; return this.proxy; }
-  getSheetId() { return this.id; }
-  getParent() { return this.ss.proxy; }
-  getLastRow() { let m = 0; for (const k of this.cells.keys()) m = Math.max(m, +k.split(',')[0]); return m; }
-  getLastColumn() { let m = 0; for (const k of this.cells.keys()) m = Math.max(m, +k.split(',')[1]); return m; }
-  getMaxRows() { return Math.max(1000, this.getLastRow()); }
-  getMaxColumns() { return Math.max(26, this.getLastColumn()); }
-  getRange(r, c, nr, nc) { return new MockRange(this, r, c, nr || 1, nc || 1).proxy; }
-  getDataRange() { return this.getRange(1, 1, Math.max(1, this.getLastRow()), Math.max(1, this.getLastColumn())); }
-  appendRow(arr) { const r = this.getLastRow() + 1; arr.forEach((v, j) => this.set(r, j + 1, v)); return this.proxy; }
+  get(r, c) {
+    const v = this.cells.get(`${r},${c}`);
+    return v === undefined ? '' : v;
+  }
+  set(r, c, v) {
+    this.noteWrite();
+    if (v === '' || v === null || v === undefined)
+      this.cells.delete(`${r},${c}`);
+    else this.cells.set(`${r},${c}`, v);
+  }
+  /**
+   * A write to the registry while no request holds the lock is recorded, so a
+   * test can require there are none.
+   */
+  noteWrite() {
+    const w = this.ss.world;
+    if (w.watchLocks && this.ss === w.registry && !w.lock.held)
+      w.unlockedWrites.push(this.name);
+  }
+  getBandings() {
+    return this.bandings.slice();
+  }
+  setColumnWidth(c, w) {
+    this.widths.set(c, w);
+    return this.proxy;
+  }
+  setFrozenRows(n) {
+    this.frozenRows = n;
+    return this.proxy;
+  }
+  getName() {
+    return this.name;
+  }
+  setName(n) {
+    this.name = n;
+    return this.proxy;
+  }
+  getSheetId() {
+    return this.id;
+  }
+  getParent() {
+    return this.ss.proxy;
+  }
+  getLastRow() {
+    let m = 0;
+    for (const k of this.cells.keys()) m = Math.max(m, +k.split(',')[0]);
+    return m;
+  }
+  getLastColumn() {
+    let m = 0;
+    for (const k of this.cells.keys()) m = Math.max(m, +k.split(',')[1]);
+    return m;
+  }
+  getMaxRows() {
+    return Math.max(1000, this.getLastRow());
+  }
+  getMaxColumns() {
+    return Math.max(26, this.getLastColumn());
+  }
+  getRange(r, c, nr, nc) {
+    return new MockRange(this, r, c, nr || 1, nc || 1).proxy;
+  }
+  getDataRange() {
+    return this.getRange(
+      1,
+      1,
+      Math.max(1, this.getLastRow()),
+      Math.max(1, this.getLastColumn())
+    );
+  }
+  appendRow(arr) {
+    const r = this.getLastRow() + 1;
+    arr.forEach((v, j) => {
+      this.set(r, j + 1, v);
+    });
+    return this.proxy;
+  }
   deleteRow(n) {
     this.noteWrite();
     const next = new Map();
@@ -106,34 +231,91 @@ class MockSheet {
     this.cells = next;
     return this.proxy;
   }
-  clear() { this.cells.clear(); return this.proxy; }
-  clearContents() { this.cells.clear(); return this.proxy; }
-  hideSheet() { this.hidden = true; return this.proxy; }
-  rows() { const out = []; for (let r = 1; r <= this.getLastRow(); r++) out.push(this.getRange(r, 1, 1, this.getLastColumn()).getValues()[0]); return out; }
+  clear() {
+    this.cells.clear();
+    return this.proxy;
+  }
+  clearContents() {
+    this.cells.clear();
+    return this.proxy;
+  }
+  hideSheet() {
+    this.hidden = true;
+    return this.proxy;
+  }
+  rows() {
+    const out = [];
+    for (let r = 1; r <= this.getLastRow(); r++)
+      out.push(this.getRange(r, 1, 1, this.getLastColumn()).getValues()[0]);
+    return out;
+  }
 }
 
 class MockSpreadsheet {
   constructor(world, id, name) {
-    this.world = world; this.id = id; this.name = name; this.sheets = []; this.nextSheetId = 1;
-    this.proxy = new Proxy(this, { get: (t, p) => (p in t ? (typeof t[p] === 'function' ? t[p].bind(t) : t[p]) : (...a) => t.proxy) });
+    this.world = world;
+    this.id = id;
+    this.name = name;
+    this.sheets = [];
+    this.nextSheetId = 1;
+    this.proxy = new Proxy(this, {
+      get: (t, p) =>
+        p in t
+          ? typeof t[p] === 'function'
+            ? t[p].bind(t)
+            : t[p]
+          : (..._a) => t.proxy
+    });
     this.insertSheet('Sheet1');
   }
-  getId() { return this.id; }
-  getName() { return this.name; }
-  getUrl() { return `https://docs.google.com/spreadsheets/d/${this.id}/edit`; }
-  getSheets() { return this.sheets.map((s) => s.proxy); }
-  getSheetByName(n) { const s = this.sheets.find((x) => x.name === n); return s ? s.proxy : null; }
+  getId() {
+    return this.id;
+  }
+  getName() {
+    return this.name;
+  }
+  getUrl() {
+    return `https://docs.google.com/spreadsheets/d/${this.id}/edit`;
+  }
+  getSheets() {
+    return this.sheets.map((s) => s.proxy);
+  }
+  getSheetByName(n) {
+    const s = this.sheets.find((x) => x.name === n);
+    return s ? s.proxy : null;
+  }
   insertSheet(name) {
-    if (this.sheets.some((s) => s.name === name)) throw new Error(`A sheet with the name "${name}" already exists.`);
+    if (this.sheets.some((s) => s.name === name))
+      throw new Error(`A sheet with the name "${name}" already exists.`);
     const s = new MockSheet(this, name, this.nextSheetId++);
     this.sheets.push(s);
     return s.proxy;
   }
-  deleteSheet(sheet) { this.sheets = this.sheets.filter((s) => s.proxy !== sheet && s !== sheet); return this.proxy; }
-  rename(n) { this.name = n; }
+  deleteSheet(sheet) {
+    this.sheets = this.sheets.filter((s) => s.proxy !== sheet && s !== sheet);
+    return this.proxy;
+  }
+  rename(n) {
+    this.name = n;
+  }
 }
 
 /* ── World ───────────────────────────────────────────────────── */
+
+/**
+ * A small repeatable random source (mulberry32): the same seed gives the same
+ * numbers.
+ */
+function seededRandom(seed) {
+  let a = seed >>> 0;
+  return () => {
+    a = (a + 0x6d2b79f5) >>> 0;
+    let t = a;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
 
 function createWorld(options = {}) {
   const world = {
@@ -143,106 +325,275 @@ function createWorld(options = {}) {
     cache: new Map(),
     mail: [],
     triggers: [],
-    // The script lock: `busy` makes the next wait time out, `beforeLock` runs once just before a lock is taken.
-    lock: { held: false, busy: false }, unlockedWrites: [], watchLocks: false, beforeLock: null,
-    drive: { access: new Map(), missing: new Set(), folders: new Map(), files: new Map(), trashed: new Set() },
+    // The script lock: `busy` makes the next wait time out, `beforeLock` runs
+    // once just before a lock is taken.
+    lock: { held: false, busy: false },
+    unlockedWrites: [],
+    watchLocks: false,
+    beforeLock: null,
+    drive: {
+      access: new Map(),
+      missing: new Set(),
+      folders: new Map(),
+      files: new Map(),
+      trashed: new Set()
+    },
     logs: []
   };
-  const uid = () => crypto.randomBytes(16).toString('hex');
+  // With `options.seed`, ids, uuids and Math.random repeat from run to run, so
+  // stored data can be compared whole.
+  const seeded = options.seed === undefined ? null : seededRandom(options.seed);
+  const randomBytes = (n) =>
+    seeded
+      ? Buffer.from(Array.from({ length: n }, () => Math.floor(seeded() * 256)))
+      : crypto.randomBytes(n);
+  if (seeded) world.random = seeded;
+  const uid = () => randomBytes(16).toString('hex');
+  const uuidOf = () => {
+    if (!seeded) return crypto.randomUUID();
+    const hex = randomBytes(16).toString('hex');
+    return [
+      hex.slice(0, 8),
+      hex.slice(8, 12),
+      hex.slice(12, 16),
+      hex.slice(16, 20),
+      hex.slice(20)
+    ].join('-');
+  };
 
-  const createSs = (name) => { const ss = new MockSpreadsheet(world, uid(), name); world.spreadsheets.set(ss.id, ss); world.drive.files.set(ss.id, { name, isSheet: true }); return ss; };
+  const createSs = (name) => {
+    const ss = new MockSpreadsheet(world, uid(), name);
+    world.spreadsheets.set(ss.id, ss);
+    world.drive.files.set(ss.id, { name, isSheet: true });
+    return ss;
+  };
   world.registry = createSs('Forms Registry');
 
-  // Blobs hold real bytes, so a zip or a workbook the backend builds can be opened in a test.
+  // Blobs hold real bytes, so a zip or a workbook the backend builds can be
+  // opened in a test.
   class MockBlob {
-    constructor(bytes, type, name) { this.buf = Buffer.from(bytes == null ? '' : bytes); this.type = type || ''; this.name = name || ''; this.data = bytes; }
-    getBytes() { return Array.from(this.buf, (b) => (b > 127 ? b - 256 : b)); }
-    getName() { return this.name; }
-    setName(n) { this.name = n; return this; }
-    getContentType() { return this.type; }
-    setContentType(t) { this.type = t; return this; }
-    getDataAsString() { return this.buf.toString('utf8'); }
-    copyBlob() { return new MockBlob(this.buf, this.type, this.name); }
+    constructor(bytes, type, name) {
+      this.buf = Buffer.from(bytes == null ? '' : bytes);
+      this.type = type || '';
+      this.name = name || '';
+      this.data = bytes;
+    }
+    getBytes() {
+      return Array.from(this.buf, (b) => (b > 127 ? b - 256 : b));
+    }
+    getName() {
+      return this.name;
+    }
+    setName(n) {
+      this.name = n;
+      return this;
+    }
+    getContentType() {
+      return this.type;
+    }
+    setContentType(t) {
+      this.type = t;
+      return this;
+    }
+    getDataAsString() {
+      return this.buf.toString('utf8');
+    }
+    copyBlob() {
+      return new MockBlob(this.buf, this.type, this.name);
+    }
   }
-  const toBuf = (v) => (Buffer.isBuffer(v) ? v : Array.isArray(v) ? Buffer.from(v.map((b) => (b + 256) % 256)) : Buffer.from(String(v == null ? '' : v), 'utf8'));
+  const toBuf = (v) =>
+    Buffer.isBuffer(v)
+      ? v
+      : Array.isArray(v)
+        ? Buffer.from(v.map((b) => (b + 256) % 256))
+        : Buffer.from(String(v == null ? '' : v), 'utf8');
   /** A plain zip (stored, not compressed) with UTF-8 names. */
   function zipOf(blobs, name) {
-    const parts = [], central = [];
+    const parts = [],
+      central = [];
     let offset = 0;
     blobs.forEach((b) => {
-      const data = b.buf, fname = Buffer.from(b.name, 'utf8'), crc = zlib.crc32(data);
+      const data = b.buf,
+        fname = Buffer.from(b.name, 'utf8'),
+        crc = zlib.crc32(data);
       const head = Buffer.alloc(30);
-      head.writeUInt32LE(0x04034b50, 0); head.writeUInt16LE(20, 4); head.writeUInt16LE(0x0800, 6); head.writeUInt16LE(0, 8);
-      head.writeUInt32LE(crc >>> 0, 14); head.writeUInt32LE(data.length, 18); head.writeUInt32LE(data.length, 22); head.writeUInt16LE(fname.length, 26);
+      head.writeUInt32LE(0x04034b50, 0);
+      head.writeUInt16LE(20, 4);
+      head.writeUInt16LE(0x0800, 6);
+      head.writeUInt16LE(0, 8);
+      head.writeUInt32LE(crc >>> 0, 14);
+      head.writeUInt32LE(data.length, 18);
+      head.writeUInt32LE(data.length, 22);
+      head.writeUInt16LE(fname.length, 26);
       const dir = Buffer.alloc(46);
-      dir.writeUInt32LE(0x02014b50, 0); dir.writeUInt16LE(20, 4); dir.writeUInt16LE(20, 6); dir.writeUInt16LE(0x0800, 8);
-      dir.writeUInt32LE(crc >>> 0, 16); dir.writeUInt32LE(data.length, 20); dir.writeUInt32LE(data.length, 24); dir.writeUInt16LE(fname.length, 28); dir.writeUInt32LE(offset, 42);
-      parts.push(head, fname, data); central.push(dir, fname);
+      dir.writeUInt32LE(0x02014b50, 0);
+      dir.writeUInt16LE(20, 4);
+      dir.writeUInt16LE(20, 6);
+      dir.writeUInt16LE(0x0800, 8);
+      dir.writeUInt32LE(crc >>> 0, 16);
+      dir.writeUInt32LE(data.length, 20);
+      dir.writeUInt32LE(data.length, 24);
+      dir.writeUInt16LE(fname.length, 28);
+      dir.writeUInt32LE(offset, 42);
+      parts.push(head, fname, data);
+      central.push(dir, fname);
       offset += 30 + fname.length + data.length;
     });
-    const cd = Buffer.concat(central), end = Buffer.alloc(22);
-    end.writeUInt32LE(0x06054b50, 0); end.writeUInt16LE(blobs.length, 8); end.writeUInt16LE(blobs.length, 10); end.writeUInt32LE(cd.length, 12); end.writeUInt32LE(offset, 16);
-    return new MockBlob(Buffer.concat(parts.concat([cd, end])), 'application/zip', name || 'archive.zip');
+    const cd = Buffer.concat(central),
+      end = Buffer.alloc(22);
+    end.writeUInt32LE(0x06054b50, 0);
+    end.writeUInt16LE(blobs.length, 8);
+    end.writeUInt16LE(blobs.length, 10);
+    end.writeUInt32LE(cd.length, 12);
+    end.writeUInt32LE(offset, 16);
+    return new MockBlob(
+      Buffer.concat(parts.concat([cd, end])),
+      'application/zip',
+      name || 'archive.zip'
+    );
   }
   world.MockBlob = MockBlob;
-  /** Puts a file in pretend Drive: { name, mime, bytes, parent }. Returns its id. */
-  world.drive.addFile = (o) => { const id = o.id || uid(); world.drive.files.set(id, { name: o.name, mime: o.mime || 'application/octet-stream', buf: toBuf(o.bytes || ''), parent: o.parent }); return id; };
-  world.drive.addFolder = (o) => { const id = o.id || uid(); world.drive.folders.set(id, { name: o.name, parent: o.parent }); return id; };
-  const iter = (list) => { let i = 0; return { hasNext: () => i < list.length, next: () => list[i++] }; };
+  /**
+   * Puts a file in pretend Drive: { name, mime, bytes, parent }. Returns its
+   * id.
+   */
+  world.drive.addFile = (o) => {
+    const id = o.id || uid();
+    world.drive.files.set(id, {
+      name: o.name,
+      mime: o.mime || 'application/octet-stream',
+      buf: toBuf(o.bytes || ''),
+      parent: o.parent
+    });
+    return id;
+  };
+  world.drive.addFolder = (o) => {
+    const id = o.id || uid();
+    world.drive.folders.set(id, { name: o.name, parent: o.parent });
+    return id;
+  };
+  const iter = (list) => {
+    let i = 0;
+    return { hasNext: () => i < list.length, next: () => list[i++] };
+  };
 
   const fileObj = (id) => ({
     getId: () => id,
-    getName: () => (world.drive.files.get(id) || {}).name || id,
-    getMimeType: () => (world.drive.files.get(id) || {}).mime || 'application/octet-stream',
-    getSize: () => ((world.drive.files.get(id) || {}).buf || Buffer.alloc(0)).length,
+    getName: () => world.drive.files.get(id)?.name || id,
+    getMimeType: () =>
+      world.drive.files.get(id)?.mime || 'application/octet-stream',
+    getSize: () => (world.drive.files.get(id)?.buf || Buffer.alloc(0)).length,
     getUrl: () => `https://drive.google.com/file/d/${id}/view`,
     getSharingAccess: () => world.drive.access.get(id) || 'ANYONE_WITH_LINK',
     moveTo: () => fileObj(id),
-    setTrashed: (v) => { if (v) world.drive.trashed.add(id); else world.drive.trashed.delete(id); return fileObj(id); },
+    setTrashed: (v) => {
+      if (v) world.drive.trashed.add(id);
+      else world.drive.trashed.delete(id);
+      return fileObj(id);
+    },
     isTrashed: () => world.drive.trashed.has(id),
-    getBlob: () => { const f = world.drive.files.get(id) || {}; return new MockBlob(f.buf || Buffer.alloc(0), f.mime, f.name || id); }
+    getBlob: () => {
+      const f = world.drive.files.get(id) || {};
+      return new MockBlob(f.buf || Buffer.alloc(0), f.mime, f.name || id);
+    }
   });
   const folderObj = (id) => ({
     getId: () => id,
     getName: () => world.drive.folders.get(id).name,
     getSharingAccess: () => world.drive.access.get(id) || 'ANYONE_WITH_LINK',
     getUrl: () => `https://drive.google.com/drive/folders/${id}`,
-    setTrashed: (v) => { if (v) world.drive.trashed.add(id); else world.drive.trashed.delete(id); return folderObj(id); },
-    createFolder: (name) => { const nid = uid(); world.drive.folders.set(nid, { name, parent: id }); return folderObj(nid); },
-    getFoldersByName: (name) => iter([...world.drive.folders].filter(([fid, f]) => f.name === name && (f.parent === undefined || f.parent === id) && !world.drive.trashed.has(fid)).map(([fid]) => folderObj(fid))),
-    getFolders: () => iter([...world.drive.folders].filter(([fid, f]) => f.parent === id && !world.drive.trashed.has(fid)).map(([fid]) => folderObj(fid))),
-    getFiles: () => iter([...world.drive.files].filter(([fid, f]) => f.parent === id && !world.drive.trashed.has(fid)).map(([fid]) => fileObj(fid))),
+    setTrashed: (v) => {
+      if (v) world.drive.trashed.add(id);
+      else world.drive.trashed.delete(id);
+      return folderObj(id);
+    },
+    createFolder: (name) => {
+      const nid = uid();
+      world.drive.folders.set(nid, { name, parent: id });
+      return folderObj(nid);
+    },
+    getFoldersByName: (name) =>
+      iter(
+        [...world.drive.folders]
+          .filter(
+            ([fid, f]) =>
+              f.name === name &&
+              (f.parent === undefined || f.parent === id) &&
+              !world.drive.trashed.has(fid)
+          )
+          .map(([fid]) => folderObj(fid))
+      ),
+    getFolders: () =>
+      iter(
+        [...world.drive.folders]
+          .filter(
+            ([fid, f]) => f.parent === id && !world.drive.trashed.has(fid)
+          )
+          .map(([fid]) => folderObj(fid))
+      ),
+    getFiles: () =>
+      iter(
+        [...world.drive.files]
+          .filter(
+            ([fid, f]) => f.parent === id && !world.drive.trashed.has(fid)
+          )
+          .map(([fid]) => fileObj(fid))
+      ),
     createFile: (blobOrName) => {
       const nid = uid();
       const blob = blobOrName instanceof MockBlob ? blobOrName : null;
-      world.drive.files.set(nid, { name: (blobOrName && blobOrName.name) || String(blobOrName), mime: blob ? blob.type : '', buf: blob ? blob.buf : Buffer.alloc(0), parent: id });
+      world.drive.files.set(nid, {
+        name: blobOrName?.name || String(blobOrName),
+        mime: blob ? blob.type : '',
+        buf: blob ? blob.buf : Buffer.alloc(0),
+        parent: id
+      });
       return fileObj(nid);
     }
   });
 
   const sandbox = {
-    console, Logger: { log: (m) => world.logs.push(String(m)) },
+    console,
+    Logger: { log: (m) => world.logs.push(String(m)) },
     SpreadsheetApp: {
       getActive: () => world.registry.proxy,
       getActiveSpreadsheet: () => world.registry.proxy,
-      openById: (id) => { const s = world.spreadsheets.get(id); if (!s) throw new Error('No spreadsheet ' + id); return s.proxy; },
+      openById: (id) => {
+        const s = world.spreadsheets.get(id);
+        if (!s) throw new Error('No spreadsheet ' + id);
+        return s.proxy;
+      },
       create: (name) => createSs(name).proxy,
-      BorderStyle: { SOLID: 'SOLID', SOLID_MEDIUM: 'SOLID_MEDIUM', SOLID_THICK: 'SOLID_THICK' },
+      BorderStyle: {
+        SOLID: 'SOLID',
+        SOLID_MEDIUM: 'SOLID_MEDIUM',
+        SOLID_THICK: 'SOLID_THICK'
+      },
       BandingTheme: { LIGHT_GREY: 'LIGHT_GREY' },
       WrapStrategy: { CLIP: 'CLIP', WRAP: 'WRAP', OVERFLOW: 'OVERFLOW' },
-      getUi: () => { throw new Error('UI not available in tests'); }
+      getUi: () => {
+        throw new Error('UI not available in tests');
+      }
     },
     DriveApp: {
       getRootFolder: () => folderObj('root'),
-      createFolder: (name) => { const id = uid(); world.drive.folders.set(id, { name }); return folderObj(id); },
+      createFolder: (name) => {
+        const id = uid();
+        world.drive.folders.set(id, { name });
+        return folderObj(id);
+      },
       getFoldersByName: (name) => folderObj('root').getFoldersByName(name),
       getFolderById: (id) => {
-        if (world.drive.missing.has(id)) throw new Error('No item with the given ID could be found');
-        if (!world.drive.folders.has(id)) world.drive.folders.set(id, { name: id });
+        if (world.drive.missing.has(id))
+          throw new Error('No item with the given ID could be found');
+        if (!world.drive.folders.has(id))
+          world.drive.folders.set(id, { name: id });
         return folderObj(id);
       },
       getFileById: (id) => {
-        if (world.drive.missing.has(id)) throw new Error('No item with the given ID could be found');
+        if (world.drive.missing.has(id))
+          throw new Error('No item with the given ID could be found');
         if (!world.drive.files.has(id)) world.drive.files.set(id, { name: id });
         return fileObj(id);
       }
@@ -250,45 +601,106 @@ function createWorld(options = {}) {
     PropertiesService: {
       getScriptProperties: () => ({
         getProperty: (k) => (world.props.has(k) ? world.props.get(k) : null),
-        setProperty(k, v) { world.props.set(k, String(v)); return this; },
-        setProperties(o) { Object.keys(o).forEach((k) => world.props.set(k, String(o[k]))); return this; },
-        deleteProperty(k) { world.props.delete(k); return this; },
+        setProperty(k, v) {
+          world.props.set(k, String(v));
+          return this;
+        },
+        setProperties(o) {
+          Object.keys(o).forEach((k) => {
+            world.props.set(k, String(o[k]));
+          });
+          return this;
+        },
+        deleteProperty(k) {
+          world.props.delete(k);
+          return this;
+        },
         getProperties: () => Object.fromEntries(world.props)
       })
     },
     CacheService: {
       getScriptCache: () => ({
-        get: (k) => { const e = world.cache.get(k); return e && e.until > world.nowMs ? e.v : null; },
-        put: (k, v, ttl) => world.cache.set(k, { v: String(v), until: world.nowMs + (ttl || 600) * 1000 }),
+        get: (k) => {
+          const e = world.cache.get(k);
+          return e && e.until > world.nowMs ? e.v : null;
+        },
+        put: (k, v, ttl) =>
+          world.cache.set(k, {
+            v: String(v),
+            until: world.nowMs + (ttl || 600) * 1000
+          }),
         remove: (k) => world.cache.delete(k)
       })
     },
     LockService: {
       getScriptLock: () => ({
         waitLock: () => {
-          if (world.beforeLock) { const between = world.beforeLock; world.beforeLock = null; between(); }
-          if (world.lock.busy) throw new Error('Lock timeout: another process was holding the lock for too long.');
+          if (world.beforeLock) {
+            const between = world.beforeLock;
+            world.beforeLock = null;
+            between();
+          }
+          if (world.lock.busy)
+            throw new Error(
+              'Lock timeout: another process was holding the lock for too long.'
+            );
           world.lock.held = true;
         },
-        tryLock: () => { if (world.lock.busy) return false; world.lock.held = true; return true; },
-        releaseLock: () => { world.lock.held = false; },
+        tryLock: () => {
+          if (world.lock.busy) return false;
+          world.lock.held = true;
+          return true;
+        },
+        releaseLock: () => {
+          world.lock.held = false;
+        },
         hasLock: () => world.lock.held
       })
     },
-    MailApp: { sendEmail: (a, b, c) => world.mail.push(typeof a === 'object' ? a : { to: a, subject: b, body: c }) },
+    MailApp: {
+      sendEmail: (a, b, c) =>
+        world.mail.push(
+          typeof a === 'object' ? a : { to: a, subject: b, body: c }
+        )
+    },
     Session: {
       getScriptTimeZone: () => 'Africa/Cairo',
       getEffectiveUser: () => ({ getEmail: () => 'owner@example.com' }),
       getActiveUser: () => ({ getEmail: () => 'owner@example.com' })
     },
     ScriptApp: {
-      getProjectTriggers: () => world.triggers.map((t) => ({ getHandlerFunction: () => t.fn, getUniqueId: () => t.id })),
-      deleteTrigger: (trigger) => { world.triggers = world.triggers.filter((t) => t.id !== trigger.getUniqueId()); },
+      getProjectTriggers: () =>
+        world.triggers.map((t) => ({
+          getHandlerFunction: () => t.fn,
+          getUniqueId: () => t.id
+        })),
+      deleteTrigger: (trigger) => {
+        world.triggers = world.triggers.filter(
+          (t) => t.id !== trigger.getUniqueId()
+        );
+      },
       getOAuthToken: () => 'test-token',
       newTrigger: (fn) => {
-        // { fn, id, kind: 'after' or 'everyMinutes', arg: the delay or the interval }
+        // { fn, id, kind: 'after' or 'everyMinutes', arg: the delay or the
+        // interval }
         const made = { fn, id: uid() };
-        const chain = new Proxy({}, { get: (t, p) => (p === 'create' ? () => { world.triggers.push(made); } : (...a) => { if (p !== 'timeBased') { made.kind = p; made.arg = a[0]; } return chain; }) });
+        const chain = new Proxy(
+          {},
+          {
+            get: (_t, p) =>
+              p === 'create'
+                ? () => {
+                    world.triggers.push(made);
+                  }
+                : (...a) => {
+                    if (p !== 'timeBased') {
+                      made.kind = p;
+                      made.arg = a[0];
+                    }
+                    return chain;
+                  }
+          }
+        );
         return chain;
       }
     },
@@ -300,17 +712,47 @@ function createWorld(options = {}) {
     },
     ContentService: {
       MimeType: { JSON: 'JSON' },
-      createTextOutput: (text) => ({ getContent: () => text, setMimeType() { return this; } })
+      createTextOutput: (text) => ({
+        getContent: () => text,
+        setMimeType() {
+          return this;
+        }
+      })
     },
-    HtmlService: { createHtmlOutput: (h) => ({ html: h, setWidth() { return this; }, setHeight() { return this; } }) },
+    HtmlService: {
+      createHtmlOutput: (h) => ({
+        html: h,
+        setWidth() {
+          return this;
+        },
+        setHeight() {
+          return this;
+        }
+      })
+    },
     Utilities: {
       DigestAlgorithm: { SHA_256: 'sha256', MD5: 'md5' },
-      getUuid: () => crypto.randomUUID(),
-      computeDigest: (algo, value) => Array.from(crypto.createHash(algo).update(String(value), 'utf8').digest()).map((b) => (b > 127 ? b - 256 : b)),
+      getUuid: uuidOf,
+      computeDigest: (algo, value) =>
+        Array.from(
+          crypto.createHash(algo).update(String(value), 'utf8').digest()
+        ).map((b) => (b > 127 ? b - 256 : b)),
       base64Encode: (v) => toBuf(v).toString('base64'),
       formatDate: (date, tz, pattern) => {
-        const p = Object.fromEntries(new Intl.DateTimeFormat('en-CA', { timeZone: tz, year: 'numeric', month: '2-digit', day: '2-digit' }).formatToParts(date).map((x) => [x.type, x.value]));
-        return pattern.replace('yyyy', p.year).replace('MM', p.month).replace('dd', p.day);
+        const p = Object.fromEntries(
+          new Intl.DateTimeFormat('en-CA', {
+            timeZone: tz,
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit'
+          })
+            .formatToParts(date)
+            .map((x) => [x.type, x.value])
+        );
+        return pattern
+          .replace('yyyy', p.year)
+          .replace('MM', p.month)
+          .replace('dd', p.day);
       },
       newBlob: (data, type, name) => new MockBlob(toBuf(data), type, name),
       zip: (blobs, name) => zipOf(blobs, name),
@@ -321,8 +763,13 @@ function createWorld(options = {}) {
   // A controllable clock for everything inside the backend.
   const RealDate = Date;
   class FakeDate extends RealDate {
-    constructor(...a) { if (a.length) super(...a); else super(world.nowMs); }
-    static now() { return world.nowMs; }
+    constructor(...a) {
+      if (a.length) super(...a);
+      else super(world.nowMs);
+    }
+    static now() {
+      return world.nowMs;
+    }
   }
   sandbox.Date = FakeDate;
   sandbox.Math = Object.create(Math);
@@ -333,20 +780,40 @@ function createWorld(options = {}) {
   vm.runInContext(code, ctx, { filename: 'Code.gs' });
 
   world.ctx = ctx;
-  world.setNow = (ms) => { world.nowMs = typeof ms === 'string' ? Date.parse(ms) : ms; };
-  world.advanceDays = (d) => { world.nowMs += d * 86400000; };
+  world.setNow = (ms) => {
+    world.nowMs = typeof ms === 'string' ? Date.parse(ms) : ms;
+  };
+  world.advanceDays = (d) => {
+    world.nowMs += d * 86400000;
+  };
 
   /** Calls the web app entry point exactly like the browser does. */
   world.api = (body) => {
-    const out = vm.runInContext('doPost', ctx)({ postData: { contents: JSON.stringify(body), type: 'text/plain' } });
+    const out = vm.runInContext(
+      'doPost',
+      ctx
+    )({ postData: { contents: JSON.stringify(body), type: 'text/plain' } });
     return JSON.parse(out.getContent());
   };
   world.call = (name, ...args) => vm.runInContext(name, ctx)(...args);
-  /** Fires every trigger that is booked now, as Google would when its time comes. Returns how many ran. */
-  world.runTriggers = () => { const due = world.triggers.slice(); due.forEach((t) => world.call(t.fn)); return due.length; };
-  world.sheet = (ssId, name) => { const s = world.spreadsheets.get(ssId).getSheetByName(name); return s; };
+  /**
+   * Fires every trigger that is booked now, as Google would when its time
+   * comes. Returns how many ran.
+   */
+  world.runTriggers = () => {
+    const due = world.triggers.slice();
+    due.forEach((t) => {
+      world.call(t.fn);
+    });
+    return due.length;
+  };
+  world.sheet = (ssId, name) => {
+    const s = world.spreadsheets.get(ssId).getSheetByName(name);
+    return s;
+  };
   world.drive.setAccess = (id, a) => world.drive.access.set(id, a);
-  world.drive.setFolderName = (id, name) => world.drive.folders.set(id, { name });
+  world.drive.setFolderName = (id, name) =>
+    world.drive.folders.set(id, { name });
   return world;
 }
 

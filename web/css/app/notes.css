@@ -1,0 +1,147 @@
+/* Lists inside summaries and review groups. */
+ul.plain {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+ul.plain li {
+  padding: 1px 0;
+}
+.person {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 12px;
+}
+[dir="rtl"] .icon-arrow {
+  transform: scaleX(-1);
+}
+.review-group {
+  margin-bottom: 18px;
+}
+.review-group .member-head {
+  margin-bottom: 0;
+}
+
+@media (max-width: 560px) {
+  .form-title {
+    font-size: 1.7rem;
+  }
+  :lang(ar) .form-title {
+    font-size: 1.9rem;
+  }
+  .ticket-title {
+    font-size: 1.7rem;
+  }
+  .key-digit {
+    width: 44px;
+    height: 58px;
+    font-size: 2rem;
+  }
+}
+
+/* A note tied to a chosen team size: a soft callout that slides in under the size chips. */
+.size-notice {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  margin: 12px 0 0;
+  padding: 10px 14px;
+  border: 1.5px solid var(--sea);
+  border-inline-start-width: 5px;
+  border-radius: 4px;
+  background: var(--tint-a);
+  color: var(--ink);
+  font-size: var(--fs-label);
+  font-weight: 700;
+  line-height: 1.5;
+  animation: hint-in 0.2s ease-out;
+}
+.size-notice .icon {
+  color: var(--sea);
+  margin-top: 1px;
+}
+.size-notice-inline {
+  display: block;
+  margin-top: 4px;
+  font-size: var(--fs-help);
+  color: var(--sea);
+  font-weight: 700;
+}
+.audience {
+  display: inline-flex;
+  align-self: flex-start;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: var(--tint-a);
+  color: var(--ink);
+  font-size: var(--fs-label);
+  font-weight: 700;
+}
+.audience .icon {
+  color: var(--sea);
+}
+.folder-rule {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  margin: 6px 0 0;
+  font-size: var(--fs-help);
+  color: var(--ink);
+  line-height: 1.5;
+}
+.folder-rule .icon {
+  color: var(--sea);
+  margin-top: 2px;
+}
+.folder-rule-text {
+  overflow-wrap: anywhere;
+}
+
+/* Requests to move a member between teams: one line each above the registration. */
+.transfer-notes {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.transfer-notes .banner {
+  margin: 0;
+}
+.transfer-actions {
+  flex-wrap: wrap;
+}
+.leader-contact {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 12px;
+  margin: 6px 0 0;
+}
+.leader-contact a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: inherit;
+  font-weight: 700;
+}
+.leader-contact .link-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 40px;
+}
+.handover {
+  margin-top: 14px;
+}
+.handover .field:last-child {
+  margin-bottom: 0;
+}
+@media (max-width: 480px) {
+  .transfer-actions .btn {
+    flex: 1 1 auto;
+  }
+}

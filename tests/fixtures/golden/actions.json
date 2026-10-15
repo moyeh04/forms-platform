@@ -1,0 +1,371 @@
+{
+ "admin.bookings.next": [
+  "bad_pin",
+  "bad_pin",
+  "bad_pin",
+  "form_not_found",
+  "bad_pin"
+ ],
+ "admin.clients.create": [
+  "bad_pin",
+  "bad_pin",
+  "bad_pin",
+  "name_required",
+  "bad_pin"
+ ],
+ "admin.clients.key": [
+  "bad_pin",
+  "bad_pin",
+  "bad_pin",
+  "client_not_found",
+  "bad_pin"
+ ],
+ "admin.clients.list": [
+  "bad_pin",
+  "bad_pin",
+  "bad_pin",
+  "ok",
+  "bad_pin"
+ ],
+ "admin.clients.regenerate": [
+  "bad_pin",
+  "bad_pin",
+  "bad_pin",
+  "client_not_found",
+  "bad_pin"
+ ],
+ "admin.clients.remove": [
+  "bad_pin",
+  "bad_pin",
+  "bad_pin",
+  "client_not_found",
+  "bad_pin"
+ ],
+ "admin.clients.showKey": [
+  "bad_pin",
+  "bad_pin",
+  "bad_pin",
+  "client_not_found",
+  "bad_pin"
+ ],
+ "admin.clients.update": [
+  "bad_pin",
+  "bad_pin",
+  "bad_pin",
+  "client_not_found",
+  "bad_pin"
+ ],
+ "admin.download.chunk": [
+  "bad_pin",
+  "bad_pin",
+  "bad_pin",
+  "form_not_found",
+  "bad_pin"
+ ],
+ "admin.download.finish": [
+  "bad_pin",
+  "bad_pin",
+  "bad_pin",
+  "form_not_found",
+  "bad_pin"
+ ],
+ "admin.download.pack": [
+  "bad_pin",
+  "bad_pin",
+  "bad_pin",
+  "form_not_found",
+  "bad_pin"
+ ],
+ "admin.download.start": [
+  "bad_pin",
+  "bad_pin",
+  "bad_pin",
+  "form_not_found",
+  "bad_pin"
+ ],
+ "admin.download.team": [
+  "bad_pin",
+  "bad_pin",
+  "bad_pin",
+  "form_not_found",
+  "bad_pin"
+ ],
+ "admin.forms.create": [
+  "bad_pin",
+  "bad_pin",
+  "bad_pin",
+  "unknown_type",
+  "bad_pin"
+ ],
+ "admin.forms.delete": [
+  "bad_pin",
+  "bad_pin",
+  "bad_pin",
+  "form_not_found",
+  "bad_pin"
+ ],
+ "admin.forms.duplicate": [
+  "bad_pin",
+  "bad_pin",
+  "bad_pin",
+  "form_not_found",
+  "bad_pin"
+ ],
+ "admin.forms.get": [
+  "bad_pin",
+  "bad_pin",
+  "bad_pin",
+  "form_not_found",
+  "bad_pin"
+ ],
+ "admin.forms.list": [
+  "bad_pin",
+  "bad_pin",
+  "bad_pin",
+  "ok",
+  "bad_pin"
+ ],
+ "admin.forms.update": [
+  "bad_pin",
+  "bad_pin",
+  "bad_pin",
+  "form_not_found",
+  "bad_pin"
+ ],
+ "admin.keys.extend": [
+  "bad_pin",
+  "bad_pin",
+  "bad_pin",
+  "form_not_found",
+  "bad_pin"
+ ],
+ "admin.keys.list": [
+  "bad_pin",
+  "bad_pin",
+  "bad_pin",
+  "form_not_found",
+  "bad_pin"
+ ],
+ "admin.lists.create": [
+  "bad_pin",
+  "bad_pin",
+  "bad_pin",
+  "list_name",
+  "bad_pin"
+ ],
+ "admin.lists.delete": [
+  "bad_pin",
+  "bad_pin",
+  "bad_pin",
+  "list_not_found",
+  "bad_pin"
+ ],
+ "admin.lists.get": [
+  "bad_pin",
+  "bad_pin",
+  "bad_pin",
+  "ok",
+  "bad_pin"
+ ],
+ "admin.lists.rename": [
+  "bad_pin",
+  "bad_pin",
+  "bad_pin",
+  "list_not_found",
+  "bad_pin"
+ ],
+ "admin.lists.set": [
+  "bad_pin",
+  "bad_pin",
+  "bad_pin",
+  "list_not_found",
+  "bad_pin"
+ ],
+ "admin.login": [
+  "bad_pin",
+  "bad_pin",
+  "bad_pin",
+  "ok",
+  "bad_pin"
+ ],
+ "admin.matching.decide": [
+  "bad_pin",
+  "bad_pin",
+  "bad_pin",
+  "form_not_found",
+  "bad_pin"
+ ],
+ "admin.matching.import": [
+  "bad_pin",
+  "bad_pin",
+  "bad_pin",
+  "form_not_found",
+  "bad_pin"
+ ],
+ "admin.matching.list": [
+  "bad_pin",
+  "bad_pin",
+  "bad_pin",
+  "form_not_found",
+  "bad_pin"
+ ],
+ "admin.matching.remove": [
+  "bad_pin",
+  "bad_pin",
+  "bad_pin",
+  "form_not_found",
+  "bad_pin"
+ ],
+ "admin.print.reservations": [
+  "bad_pin",
+  "bad_pin",
+  "bad_pin",
+  "form_not_found",
+  "bad_pin"
+ ],
+ "admin.print.teamList": [
+  "bad_pin",
+  "bad_pin",
+  "bad_pin",
+  "form_not_found",
+  "bad_pin"
+ ],
+ "admin.submission.delete": [
+  "bad_pin",
+  "bad_pin",
+  "bad_pin",
+  "form_not_found",
+  "bad_pin"
+ ],
+ "admin.submission.key": [
+  "bad_pin",
+  "bad_pin",
+  "bad_pin",
+  "form_not_found",
+  "bad_pin"
+ ],
+ "admin.submission.resetKey": [
+  "bad_pin",
+  "bad_pin",
+  "bad_pin",
+  "form_not_found",
+  "bad_pin"
+ ],
+ "admin.submission.update": [
+  "bad_pin",
+  "bad_pin",
+  "bad_pin",
+  "form_not_found",
+  "bad_pin"
+ ],
+ "admin.submissions": [
+  "bad_pin",
+  "bad_pin",
+  "bad_pin",
+  "form_not_found",
+  "bad_pin"
+ ],
+ "admin.transfer.decide": [
+  "bad_pin",
+  "bad_pin",
+  "bad_pin",
+  "form_not_found",
+  "bad_pin"
+ ],
+ "admin.views.rebuild": [
+  "bad_pin",
+  "bad_pin",
+  "bad_pin",
+  "form_not_found",
+  "bad_pin"
+ ],
+ "bookingTeam": [
+  "form_not_found",
+  "form_not_found",
+  "form_not_found",
+  "form_not_found",
+  "key_booking_off"
+ ],
+ "getForm": [
+  "form_not_found",
+  "form_not_found",
+  "form_not_found",
+  "form_not_found",
+  "ok"
+ ],
+ "lookup": [
+  "form_not_found",
+  "form_not_found",
+  "form_not_found",
+  "form_not_found",
+  "bad_key"
+ ],
+ "remove": [
+  "form_not_found",
+  "form_not_found",
+  "form_not_found",
+  "form_not_found",
+  "bad_key"
+ ],
+ "submit": [
+  "form_not_found",
+  "form_not_found",
+  "form_not_found",
+  "form_not_found",
+  "invalid"
+ ],
+ "transfer.cancel": [
+  "form_not_found",
+  "form_not_found",
+  "form_not_found",
+  "form_not_found",
+  "bad_key"
+ ],
+ "transfer.decide": [
+  "form_not_found",
+  "form_not_found",
+  "form_not_found",
+  "form_not_found",
+  "bad_key"
+ ],
+ "update": [
+  "form_not_found",
+  "form_not_found",
+  "form_not_found",
+  "form_not_found",
+  "bad_key"
+ ],
+ "viewer.data": [
+  "bad_token",
+  "bad_token",
+  "bad_token",
+  "bad_token",
+  "bad_token"
+ ],
+ "viewer.me": [
+  "bad_token",
+  "bad_token",
+  "bad_token",
+  "bad_token",
+  "bad_token"
+ ],
+ "viewer.review": [
+  "bad_token",
+  "bad_token",
+  "bad_token",
+  "bad_token",
+  "bad_token"
+ ],
+ "(unknown)": [
+  "unknown_action"
+ ],
+ "(no action)": [
+  "unknown_action"
+ ],
+ "(prototype names)": [
+  "unknown_action",
+  "unknown_action",
+  "unknown_action",
+  "unknown_action"
+ ]
+}

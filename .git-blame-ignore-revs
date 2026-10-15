@@ -1,0 +1,20 @@
+# Commits that only change layout. git blame skips them when
+# blame.ignoreRevsFile points here, which npm install sets.
+
+# style(domain): Format with Biome
+62be895e970c39f596ba9a47d3135473bec267c1
+
+# style(backend): Format with Biome
+e5be497e4ba2dcb23b05a6e7f376df51a0faf427
+
+# style(web): Format with Biome
+0de822ab14c2076ef7a678adf420fb751dbb08af
+
+# style(scripts): Format with Biome
+415e37823ce9fff7df7f092b199ec20076ec262a
+
+# style(tests): Format with Biome
+a6ba6299ae5743d440aedae6383d4b8fc820330d
+
+# style(backend): Indent the namespace bodies
+28b1f3fca079189ffa0de393eaff2e91d0213202

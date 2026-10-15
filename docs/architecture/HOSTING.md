@@ -78,7 +78,7 @@ Script deployment. Google continues to run the backend and store the data.
 
 Because GitHub only serves files, **nothing secret ever belongs in the
 repository**. Nothing is secret there by design: the one value the website
-needs, the web app address in `assets/js/config.js`, has to be public anyway,
+needs, the web app address in `web/js/config.js`, has to be public anyway,
 since every visitor's browser calls it.
 
 ## How GitHub Pages serves this project
@@ -116,8 +116,8 @@ sequenceDiagram
 
     Dev->>Git: git push
     Git->>CI: Test and deploy site
-    CI->>CI: npm test
-    alt a test fails
+    CI->>CI: npm run check, npm test
+    alt a check or a test fails
         CI-->>Dev: red cross, the old site stays online
     else all pass
         CI->>Pages: publish index, admin, viewer, assets, shared
@@ -125,7 +125,7 @@ sequenceDiagram
     Note over Pages: No build. Files are served as committed, except config.js, generated from API_URL.
     Stu->>CDN: GET /forms/index.html?f=slug
     CDN-->>Stu: static HTML (cached, over HTTPS)
-    Stu->>CDN: GET assets/css, assets/js, shared/rules.js
+    Stu->>CDN: GET assets/css, assets/js, shared/rules/*.js
     CDN-->>Stu: static files
     Note over Stu: From here the page talks to Google, not GitHub.
 ```
@@ -136,9 +136,13 @@ Why it suits this project:
   Actions generates the public `config.js` from `API_URL`; other website files
   are copied directly from source. Deployment IDs are required Variables and
   clasp credentials are kept only in the `CLASPRC_JSON` Secret.
-- **The root folder is the site.** The HTML files sit at the top of the
-  repository, and the workflow copies just them, `assets/`, and `shared/` into
-  the published artifact. Backend code, tests, scripts, and docs never go online.
+- **Two folders are the site.** The workflow copies the pages and files of
+  `web/` and the rules in `domain/` into the published artifact, at the paths
+  `scripts/build/site-map.js` gives them: the pages at the root, `web/js`,
+  `web/css` and `web/img` under `assets/`, and `domain/` as `shared/`. A file
+  that moves is published only at its new path: a page a browser kept from
+  before asks for the old one and needs a reload. Backend code, tests,
+  scripts, and docs never go online.
 - **Tested before it is public.** Pages' source is *GitHub Actions*, so a push
   that breaks a test is never published.
 - **No special folders.** Nothing starts with an underscore, so GitHub's
@@ -265,8 +269,8 @@ read, filter, and print.
 flowchart TD
     q{"What did you change?"}
     q -- "pages, styles, scripts in assets" --> a1["push master<br/>Actions tests, skips the backend,<br/>Pages republishes"]
-    q -- "backend or shared/rules.js" --> a2["push master<br/>Actions tests and builds<br/>clasp updates existing deployment"]
-    q -- "a rule in shared/rules.js" --> a3["push master once<br/>Actions updates the server copy,<br/>then publishes the browser copy"]
+    q -- "backend or domain/rules/" --> a2["push master<br/>Actions tests and builds<br/>clasp updates existing deployment"]
+    q -- "a rule in domain/rules/" --> a3["push master once<br/>Actions updates the server copy,<br/>then publishes the browser copy"]
     q -- "a form's questions or team sizes" --> a4["Nothing to deploy.<br/>Change it in the dashboard."]
     classDef cDb fill:#F3E2B3,stroke:#B8892D,stroke-width:1.5px,color:#2F2418
     classDef cActor fill:#F4D9D3,stroke:#9A3328,stroke-width:1.5px,color:#2F2418

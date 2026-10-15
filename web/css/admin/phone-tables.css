@@ -1,0 +1,94 @@
+/*
+ * Phones: a wide list table becomes one card per row, each value under its
+ * column name.
+ */
+@media (max-width: 600px) {
+  .data-table.cards,
+  .data-table.cards tbody {
+    display: block;
+  }
+  .data-table.cards thead {
+    display: none;
+  }
+  .data-table.cards tr {
+    display: block;
+    margin-bottom: 10px;
+    padding: 10px 14px;
+    background: var(--sheet);
+    border: 1.5px solid var(--line);
+    border-radius: 4px;
+  }
+  .data-table.cards td {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    padding: 3px 0;
+    border: 0;
+  }
+  .data-table.cards td.num {
+    display: none;
+  }
+  .data-table.cards td.nm {
+    font-size: 1.1rem;
+    margin-bottom: 4px;
+  }
+  .data-table.cards td[data-label]::before {
+    content: attr(data-label);
+    flex: none;
+    width: 7.5rem;
+    color: var(--mute);
+    font-family: var(--font-body);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .data-table.cards td:empty {
+    display: none;
+  }
+  .data-table.cards td:last-child {
+    margin-top: 6px;
+  }
+  .dialog-actions {
+    flex-wrap: wrap;
+  }
+  .dialog-actions .btn {
+    flex: 1 1 auto;
+    white-space: nowrap;
+    justify-content: center;
+  }
+  .data-table.cards .actions .btn {
+    flex: 1 1 auto;
+    justify-content: center;
+  }
+}
+
+@media print {
+  .admin-bar,
+  .toolbar,
+  .savebar,
+  .block-side .actions,
+  .no-print {
+    display: none;
+  }
+  .block {
+    break-inside: avoid;
+    box-shadow: none;
+    border-color: var(--print-line);
+  }
+  .block-head,
+  .day-head {
+    background: var(--print-band);
+  }
+  .block-actions {
+    display: none;
+  }
+}
+
+.plain-list {
+  margin: 6px 0 0;
+  padding-inline-start: 18px;
+}
+.plain-list li {
+  margin: 2px 0;
+}

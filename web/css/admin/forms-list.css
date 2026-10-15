@@ -1,0 +1,198 @@
+/*
+ * The header of a form: its More menu opens under its own right edge, and a
+ * refused status has a line of its own.
+ */
+.more {
+  position: relative;
+}
+.more > summary {
+  list-style: none;
+  cursor: pointer;
+}
+.more > summary::-webkit-details-marker {
+  display: none;
+}
+.more-menu {
+  position: absolute;
+  z-index: 20;
+  inset-inline-start: 0;
+  top: calc(100% + 6px);
+  min-width: 230px;
+  padding: 6px;
+  background: var(--sheet);
+  border: 1.5px solid var(--ink);
+  border-radius: 6px;
+  box-shadow: 0 8px 22px var(--shadow);
+  display: flex;
+  flex-direction: column;
+}
+.more-menu a,
+.more-menu button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  border: 0;
+  border-radius: 4px;
+  background: none;
+  color: var(--ink);
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 0.95rem;
+  text-align: start;
+  cursor: pointer;
+}
+.more-menu a:hover,
+.more-menu button:hover {
+  background: var(--sheet-2);
+}
+.more-menu .danger {
+  color: var(--err);
+  border-top: 1px solid var(--line);
+  border-radius: 0 0 4px 4px;
+  margin-top: 4px;
+}
+.page-head .more-menu {
+  inset-inline-start: auto;
+  inset-inline-end: 0;
+}
+.page-head .head-note {
+  flex-basis: 100%;
+  margin: 0;
+  text-align: end;
+}
+.size-preview + .banner {
+  margin: 12px 0 0;
+}
+.status-pick .select[data-status="open"] {
+  border-color: var(--sea);
+}
+.status-pick .select[data-status="closed"] {
+  border-color: var(--err);
+}
+.btn.sm {
+  min-height: 38px;
+  padding: 2px 14px;
+  font-size: 0.95rem;
+}
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.badge {
+  display: inline-block;
+  padding: 1px 10px;
+  border-radius: 999px;
+  font-size: var(--fs-help);
+  font-weight: 700;
+  border: 1.5px solid var(--line);
+  background: var(--sheet-2);
+  color: var(--ink);
+  white-space: nowrap;
+}
+.badge.open,
+.badge.approved,
+.badge.matched {
+  background: var(--sea);
+  border-color: var(--sea);
+  color: var(--on-sea);
+}
+.badge.closed,
+.badge.rejected,
+.badge.none {
+  background: transparent;
+  border-color: var(--err);
+  color: var(--err);
+}
+.badge.draft,
+.badge.pending,
+.badge.new {
+  background: transparent;
+  color: var(--mute);
+}
+.badge.duplicate,
+.badge.in_review {
+  background: var(--tint-b);
+  border-color: var(--accent);
+  color: var(--ink);
+}
+
+/*
+ * The forms list is grouped by status; a group is its name, how many forms it
+ * has, and their cards.
+ */
+.form-group + .form-group {
+  margin-top: 26px;
+}
+.group-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+  font-size: 1.25rem;
+  color: var(--mute);
+}
+.group-count {
+  padding: 0 9px;
+  border-radius: 999px;
+  background: var(--sheet-2);
+  font-family: var(--font-body);
+  font-size: var(--fs-help);
+  font-weight: 700;
+}
+a.badge {
+  text-decoration: none;
+}
+a.badge:hover {
+  text-decoration: underline;
+}
+.cards:not(table) {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 16px;
+  align-items: start;
+}
+.card {
+  background: var(--sheet);
+  border: 1.5px solid var(--line);
+  border-radius: 4px;
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.card h4 {
+  font-size: 1.25rem;
+  line-height: 1.3;
+}
+.card-top {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+.card-top .icon {
+  color: var(--accent);
+}
+.card-icon {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--accent) 10%, var(--sheet));
+}
+.card-tags {
+  margin-top: 2px;
+}
+.card {
+  box-shadow: 0 1px 2px var(--shadow);
+  border-radius: 6px;
+}
+.card-actions {
+  margin-top: auto;
+}

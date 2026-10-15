@@ -1,0 +1,241 @@
+/* The route is a sea under the sky: an island for each step, joined by a dashed course, and the treasure island at the
+   end. */
+.trail-sea {
+  --sea-h: 112px;
+  --horizon: 40px;
+  --course: calc(var(--sea-h) - 26px);
+  --dock: 22px;
+  --sky-art: url(../../img/sky-day.svg);
+  --sky-light: url(../../img/sun.svg);
+  position: relative;
+  margin: 8px 0 26px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .trail-sea {
+    --sky-art: url(../../img/sky-night.svg);
+    --sky-light: url(../../img/moon.svg);
+  }
+}
+:root[data-theme="dark"] .trail-sea {
+  --sky-art: url(../../img/sky-night.svg);
+  --sky-light: url(../../img/moon.svg);
+}
+.trail-sea::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: var(--sea-h);
+  border-radius: 18px;
+  border: 2px solid var(--sea-frame);
+  background:
+    var(--sky-light) right 6% top 2px / calc(var(--horizon) - 4px) auto no-repeat,
+    var(--sky-art) 0 0 / auto var(--horizon) repeat-x,
+    url(../../img/sea.svg) 0 calc(var(--horizon) + 4px) / 160px 72px repeat-x,
+    linear-gradient(
+      180deg,
+      var(--sky) 0,
+      var(--sky-2) var(--horizon),
+      var(--horizon-foam) var(--horizon),
+      var(--sea-1) calc(var(--horizon) + 2px),
+      var(--sea-2) 100%
+    );
+  animation: swell 14s linear infinite;
+}
+/* The waves roll on, slowly. */
+@keyframes swell {
+  to {
+    background-position:
+      right 6% top 2px,
+      0 0,
+      -160px calc(var(--horizon) + 4px),
+      0 0;
+  }
+}
+/* The ship waits beside the island of the current step, and sails there from the island it was at. */
+.trail-ship {
+  position: absolute;
+  z-index: 2;
+  top: 40px;
+  inset-inline-start: calc(var(--at) + var(--dock));
+  line-height: 0;
+  animation: sail-on 1.4s ease-in-out both;
+  pointer-events: none;
+}
+.trail-ship img {
+  display: block;
+  width: 68px;
+  height: 53px;
+  max-width: none;
+  animation: bob 2.8s ease-in-out infinite;
+}
+/* It faces the treasure, so it is turned round when the page reads right to left. */
+[dir="rtl"] .trail-ship img {
+  scale: -1 1;
+}
+@keyframes sail-on {
+  from {
+    inset-inline-start: calc(var(--from) + var(--dock));
+  }
+}
+@keyframes bob {
+  0%,
+  100% {
+    transform: rotate(-2deg);
+  }
+  50% {
+    transform: translateY(-3px) rotate(3deg);
+  }
+}
+.trail {
+  position: relative;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  align-items: flex-start;
+}
+.trail li {
+  position: relative;
+  flex: 1 1 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+.trail li + li::before {
+  content: "";
+  position: absolute;
+  top: var(--course);
+  inset-inline-end: 50%;
+  width: 100%;
+  border-top: 2px dashed var(--course-line);
+}
+.trail .is-done + li::before,
+.trail .is-current::before {
+  border-top-color: var(--accent);
+}
+.trail .isle {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  height: var(--sea-h);
+  padding-bottom: 10px;
+}
+.trail .isle img {
+  display: block;
+  width: 64px;
+  height: 48px;
+  max-width: none;
+}
+/* An island left behind flies the red flag of the crew. */
+.trail .is-done .isle::after {
+  content: "";
+  position: absolute;
+  bottom: 30px;
+  left: calc(50% - 23px);
+  width: 14px;
+  height: 18px;
+  background: url(../../img/crew-flag.svg) no-repeat;
+}
+.trail-label {
+  font-size: var(--fs-help);
+  color: var(--mute);
+  text-align: center;
+  line-height: 1.25;
+  padding-inline: 2px;
+}
+.is-current .trail-label {
+  color: var(--ink);
+  font-weight: 700;
+}
+/* The treasure island is the largest: the chest on the sand and its name under it.
+   It is in front of the ship, so the chest still shows when the ship arrives on a narrow screen. */
+.trail-x .isle {
+  z-index: 3;
+}
+.trail-x .isle img {
+  width: 88px;
+  height: 66px;
+}
+/* An island ahead is not explored yet. */
+.trail li:not(.is-done):not(.is-current):not(.trail-x) .isle img {
+  filter: saturate(0.6) opacity(0.8);
+}
+.trail-x .isle .trail-treasure {
+  position: absolute;
+  bottom: 24px;
+  left: calc(50% - 38px);
+  width: 52px;
+  height: 42px;
+}
+.trail-x .trail-label {
+  font-family: var(--font-title);
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--accent);
+  white-space: nowrap;
+}
+@media (max-width: 560px) {
+  .trail-label {
+    display: none;
+  }
+  /* Steps are narrow on a phone, so the scene is smaller; the treasure keeps its name. */
+  .trail-sea {
+    --sea-h: 92px;
+    --horizon: 32px;
+    --course: calc(var(--sea-h) - 20px);
+    --dock: 10px;
+  }
+  .trail-ship {
+    top: 34px;
+  }
+  .trail-ship img {
+    width: 48px;
+    height: 37px;
+  }
+  .trail .isle {
+    padding-bottom: 8px;
+  }
+  .trail .isle img {
+    width: 48px;
+    height: 36px;
+  }
+  .trail .is-done .isle::after {
+    bottom: 23px;
+    left: calc(50% - 18px);
+    width: 11px;
+    height: 14px;
+  }
+  .trail-x .isle img {
+    width: 64px;
+    height: 48px;
+  }
+  .trail-x .isle .trail-treasure {
+    width: 38px;
+    height: 30px;
+    left: calc(50% - 28px);
+    bottom: 18px;
+  }
+  .trail-x .trail-label {
+    display: block;
+    font-size: 1rem;
+  }
+}
+.step-count {
+  margin: -14px 0 18px;
+  color: var(--mute);
+  font-size: var(--fs-help);
+}
+@media (min-width: 561px) {
+  .step-count {
+    display: none;
+  }
+}
+
+.step-title {
+  font-size: var(--fs-step);
+  margin-bottom: 4px;
+}

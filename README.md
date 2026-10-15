@@ -51,10 +51,10 @@ one link per form.
 | Layer | Technology | Why |
 |---|---|---|
 | Pages | HTML, CSS and plain JavaScript, no framework and no build step | Small and fast on a phone; the files are served as they are written |
-| Rules | `shared/rules.js`, loaded by the browser, the backend and the tests | One copy of every check, so the page and the server can never disagree |
+| Rules | `domain/rules/`, loaded by the browser, the backend and the tests | One copy of every check, so the page and the server can never disagree |
 | Backend | Google Apps Script web app, bundled into one `Code.gs` by a Node script | Runs as the owner, free, with Sheets, Drive, Mail and a cache built in |
 | Data | Google Sheets (a registry plus one spreadsheet per form) and Google Drive | The owner can open, sort and print the data without the platform |
-| Excel | Office Open XML written by hand in `backend/Xlsx.gs` | Real `.xlsx` files with merged cells, tints and links, with no library |
+| Excel | Office Open XML written by hand in `backend/platform/xlsx/` | Real `.xlsx` files with merged cells, tints and links, with no library |
 | Hosting | GitHub Pages, deployed by GitHub Actions; the backend is pushed with `clasp` | A push to `master` tests and deploys both halves |
 | Tests | `node:test`, jsdom and an in-memory copy of the Apps Script services; `actionlint` | The tests run the real backend and pages with no Google account |
 | Look | IM Fell English, Amiri and Special Elite, a paper palette in light and dark | Readable in both languages, meeting WCAG 2.1 AA contrast |
@@ -107,14 +107,15 @@ flowchart LR
 ## Quick start
 
 ```
-npm install          # once, installs the browser test library and the git hook
+npm install          # once, installs the browser test library, Biome and the git hooks
 npm run dev          # local preview on http://localhost:8080 (PIN 4321), in memory, no Google needed
+npm run check        # Biome, line width, JSDoc, constants and structure checks
 npm test             # rules, backend, form page, dashboard, instructor page, deployment
 npm run build        # writes dist/Code.gs and dist/appsscript.json for clasp
 npm run setup        # first deployment: creates the sheet, pushes the backend, creates the web app, configures GitHub
 ```
 
-To put it online, follow [docs/DEPLOY.md](docs/DEPLOY.md). After that, a push to `master`
+To put it online, follow [docs/operations/DEPLOY.md](docs/operations/DEPLOY.md). After that, a push to `master`
 runs [`.github/workflows/pages.yml`](.github/workflows/pages.yml): the tests, then the Apps
 Script deployment and the configured website.
 
@@ -122,25 +123,24 @@ Script deployment and the configured website.
 
 | Path | Holds |
 |---|---|
-| `*.html` at the root | The student form, the dashboard and the instructor page |
-| `assets/js`, `assets/css` | Page scripts and styles, one file per screen or concern |
-| `shared/rules.js` | The validation rules shared by the pages, the backend and the tests |
+| `web/` | The website: the student form, the dashboard and the instructor page, with their scripts, styles and pictures |
+| `domain/` | The validation rules and form metadata shared by the pages, the backend and the tests |
 | `backend/` | The Apps Script modules, joined into `dist/Code.gs` by `npm run build` |
-| `scripts/` | The bundler, the site build, the first-deployment setup, and the local preview |
+| `scripts/` | The bundler and the site build (`build/`), the local preview (`dev/`), the first-deployment setup (`deploy/`), and the checks (`checks/`) |
 | `tests/` | The automated tests and the in-memory copy of Google's services |
 | `docs/` | Architecture, data model, security, testing and deployment |
 
-Every file is described in [docs/MODULES.md](docs/MODULES.md).
+Every file is described in [docs/architecture/FILE-STRUCTURE.md](docs/architecture/FILE-STRUCTURE.md).
 
 ## Documentation
 
 | Read | To learn |
 |---|---|
-| [REQUIREMENTS.md](REQUIREMENTS.md) | Everything the platform was asked to do, and where each item stands |
+| [REQUIREMENTS.md](docs/product/REQUIREMENTS.md) | Everything the platform was asked to do, and where each item stands |
 | [docs/README.md](docs/README.md) | The index of the documentation and how to read its diagrams |
 | [ARCHITECTURE.md](docs/architecture/ARCHITECTURE.md) | What runs where, how requests travel, every module |
 | [WORKAROUNDS.md](docs/architecture/WORKAROUNDS.md) | The 24 solutions that make free hosting enough, and their trade-offs |
-| [DEPLOY.md](docs/DEPLOY.md) | Click-by-click setup and the first-run checklist |
-| [COMMIT_CONVENTION.md](docs/COMMIT_CONVENTION.md) | How commits and branches are written |
+| [DEPLOY.md](docs/operations/DEPLOY.md) | Click-by-click setup and the first-run checklist |
+| [COMMIT_CONVENTION.md](docs/process/COMMIT_CONVENTION.md) | How commits and branches are written |
 
 Generated files (`dist/`, `_site/`, `node_modules/`) are not committed.

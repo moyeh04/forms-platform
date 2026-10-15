@@ -1,0 +1,161 @@
+{
+  "exceptions": "exceptions.json",
+  "docs": {
+    "api": "docs/backend/API.md",
+    "accessSections": {
+      "Anyone": "PUBLIC",
+      "Edit key": "KEY",
+      "Private link": "CLIENT",
+      "Admin": "ADMIN"
+    },
+    "testing": "docs/process/TESTING.md",
+    "tests": "tests",
+    "backend": {
+      "include": ["backend/"],
+      "extensions": [".js"]
+    }
+  },
+  "biome": {
+    "include": [
+      "web/js/",
+      "web/css/",
+      "backend/",
+      "domain/",
+      "scripts/",
+      "tests/",
+      "package.json",
+      "biome.json"
+    ],
+    "extensions": [".js", ".css", ".json"],
+    "exclude": ["tests/fixtures/"]
+  },
+  "lines": {
+    "limit": 80,
+    "byExtension": { ".css": 120 },
+    "include": [
+      "web/",
+      "backend/",
+      "domain/",
+      "scripts/",
+      "tests/",
+      ".githooks/",
+      ".github/",
+      "biome.json",
+      "package.json"
+    ],
+    "extensions": [".js", ".css", ".html", ".sh", ".yml", ".json", ""],
+    "exclude": ["tests/fixtures/", "package-lock.json"]
+  },
+  "jsdoc": {
+    "include": ["web/js/", "backend/", "domain/", "scripts/"],
+    "extensions": [".js"],
+    "exclude": ["web/js/config.js"],
+    "forbiddenTags": [
+      "author",
+      "date",
+      "since",
+      "version",
+      "copyright",
+      "license",
+      "created",
+      "modified",
+      "file",
+      "fileoverview"
+    ]
+  },
+  "comments": {
+    "include": [".githooks/", ".github/", "scripts/"],
+    "extensions": [".sh", ".yml", ".yaml", ""]
+  },
+  "numbers": {
+    "include": ["web/js/", "backend/", "domain/", "scripts/"],
+    "extensions": [".js"],
+    "allowed": [0, 1, 2, 10, 24, 60]
+  },
+  "colours": {
+    "include": ["web/css/"],
+    "extensions": [".css"],
+    "palette": "web/css/theme.css"
+  },
+  "flags": {
+    "include": ["web/js/", "backend/", "domain/"],
+    "extensions": [".js"],
+    "exclude": ["backend/platform/sheets/cell.js"]
+  },
+  "enums": {
+    "include": ["web/js/", "backend/", "domain/"],
+    "extensions": [".js"],
+    "exclude": ["domain/enums.js"],
+    "source": "domain/enums.js",
+    "properties": {
+      "type": "FormType",
+      "status": "FormStatus",
+      "review": "ReviewStatus",
+      "kind": "ListKind"
+    }
+  },
+  "layers": {
+    "include": ["backend/"],
+    "extensions": [".js"],
+    "rules": [
+      {
+        "files": "^backend/platform/",
+        "mayNotUse": "^backend/features/",
+        "why": "platform code serves every feature and reads none"
+      },
+      {
+        "files": "\\.controller\\.js$",
+        "mayNotUse": "\\.repository\\.js$",
+        "why": "a controller asks a service, which reads the repository"
+      }
+    ]
+  },
+  "structure": {
+    "root": [
+      "README.md",
+      "package.json",
+      "package-lock.json",
+      "biome.json",
+      ".gitignore",
+      ".git-blame-ignore-revs",
+      ".githooks",
+      ".github",
+      "backend",
+      "web",
+      "domain",
+      "scripts",
+      "tests",
+      "docs"
+    ],
+    "catchAllNames": [
+      "utils",
+      "util",
+      "helpers",
+      "helper",
+      "common",
+      "misc",
+      "manager",
+      "stuff",
+      "shared"
+    ],
+    "pages": ["web/index.html", "web/admin.html", "web/viewer.html"],
+    "loaded": {
+      "include": ["web/js/", "web/css/"],
+      "extensions": [".js", ".css"]
+    },
+    "fileStructure": "docs/architecture/FILE-STRUCTURE.md",
+    "documented": {
+      "include": [
+        "web/js/",
+        "web/css/",
+        "backend/",
+        "domain/",
+        "scripts/",
+        ".githooks/"
+      ],
+      "extensions": [".js", ".css", ".sh", ""]
+    },
+    "siteMap": "scripts/build/site-map.js",
+    "tests": { "root": "tests/", "own": ["harness/", "fixtures/"] }
+  }
+}

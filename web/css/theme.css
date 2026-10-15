@@ -1,0 +1,222 @@
+/*
+ * Theme tokens: aged map paper, kept light for contrast and easy reading.
+ * Light is the default; dark ("candlelit cabin") follows the device or the
+ * toggle.
+ * No orange, no pure white, no logo.
+ *
+ * Every colour of the stylesheets is named here; the other files use the
+ * names (docs/standards/CONSTANTS.md).
+ *
+ * Contrast standard: WCAG 2.1 AA in both themes. Text needs 4.5:1 against
+ * its background; outlines that show where a field is (--field-line) and the
+ * focus ring need 3:1. --line is for decorative dividers only.
+ * tests/web/css/theme.test.js checks every pair the pages use, so CI refuses a
+ * colour change that breaks this.
+ */
+:root {
+  --desk: #e9dfc6;
+  --sheet: #f8f1dd;
+  --sheet-2: #f1e7cb;
+  --ink: #2f2418;
+  --mute: #6a5a44;
+  --line: #cdbb94;
+  --field-line: #8f7c5a;
+  --accent: #9a3328;
+  --on-accent: #fbf3df;
+  --sea: #3f6b66;
+  --on-sea: #f4f1e2;
+  --tint-a: #dce9e2;
+  --tint-b: #f0e4c8;
+  --gold: #7e5e1b;
+  --sky: #fbefd2;
+  --sky-2: #d3ecef;
+  --sea-1: #9ad4dc;
+  --sea-2: #4e9db3;
+  --err: #a12b1f;
+  --focus: #3f6b66;
+  --shadow: rgba(47, 36, 24, 0.16);
+  --sea-frame: #2a1c12;
+  --scene-card: #f0e2c5;
+
+  /* The same in both themes. */
+  --stain-red: rgba(154, 51, 40, 0.05);
+  --stain-sea: rgba(63, 107, 102, 0.06);
+  --backdrop: rgba(20, 14, 8, 0.55);
+  --backdrop-dashboard: rgba(20, 16, 11, 0.55);
+  --horizon-foam: rgba(255, 255, 255, 0.7);
+  --course-line: rgba(255, 255, 255, 0.85);
+  /* The booking scene keeps its own ink in both themes, as the saved image does. */
+  --scene-ink: #2f2418;
+  --scene-mute: #4a3a2a;
+  --scene-band-ink: #fbf3df;
+  /* A mask reads only the alpha: clear cuts away, solid keeps. */
+  --mask-clear: #0000;
+  --mask-solid: #000;
+  /* Print is plain paper. */
+  --print-paper: #fff;
+  --print-ink: #000;
+  --print-line: #999;
+  --print-band: #f2f2f2;
+
+  /* Type scale. Latin and Arabic share it; Arabic gets a little more size
+     and air. */
+  /* Latin from IM Fell, Arabic falls through to Aref Ruqaa. */
+  --font-title: "IM Fell English", "Aref Ruqaa", Georgia, serif;
+  --font-body: "Amiri", "IM Fell English", Georgia, serif;
+  --font-code: "Special Elite", "Courier New", monospace;
+  --fs-title: 2.125rem;
+  --fs-step: 1.5rem;
+  --fs-tag: 1.125rem;
+  --fs-body: 1.0625rem;
+  --fs-input: 1.125rem;
+  --fs-label: 0.875rem;
+  --fs-help: 0.8125rem;
+  --fs-error: 0.8125rem;
+  --fs-btn: 1.0625rem;
+  --lh-body: 1.6;
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --desk: #14100b;
+    --sheet: #231c13;
+    --sheet-2: #2e251a;
+    --ink: #ebddba;
+    --mute: #b3a07c;
+    --line: #43352a;
+    --field-line: #857459;
+    --accent: #e06a5c;
+    --on-accent: #1b130c;
+    --sea: #86b8ad;
+    --on-sea: #14100b;
+    --tint-a: #1f2f2b;
+    --tint-b: #33291b;
+    --gold: #d9b25c;
+    --sky: #141a2b;
+    --sky-2: #27324e;
+    --sea-1: #2b5f6b;
+    --sea-2: #0f2c35;
+    --err: #f08a7c;
+    --focus: #86b8ad;
+    --shadow: rgba(0, 0, 0, 0.5);
+    --sea-frame: #5a4a38;
+    --scene-card: #d8c69c;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --desk: #14100b;
+  --sheet: #231c13;
+  --sheet-2: #2e251a;
+  --ink: #ebddba;
+  --mute: #b3a07c;
+  --line: #43352a;
+  --field-line: #857459;
+  --accent: #e06a5c;
+  --on-accent: #1b130c;
+  --sea: #86b8ad;
+  --on-sea: #14100b;
+  --tint-a: #1f2f2b;
+  --tint-b: #33291b;
+  --gold: #d9b25c;
+  --sky: #141a2b;
+  --sky-2: #27324e;
+  --sea-1: #2b5f6b;
+  --sea-2: #0f2c35;
+  --err: #f08a7c;
+  --focus: #86b8ad;
+  --shadow: rgba(0, 0, 0, 0.5);
+  --sea-frame: #5a4a38;
+  --scene-card: #d8c69c;
+  color-scheme: dark;
+}
+
+:lang(ar) {
+  --fs-title: 2.375rem;
+  --fs-step: 1.625rem;
+  --fs-body: 1.1875rem;
+  --fs-input: 1.25rem;
+  --fs-label: 0.9375rem;
+  --fs-help: 0.875rem;
+  --fs-error: 0.875rem;
+  --fs-btn: 1.1875rem;
+  --lh-body: 1.85;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+html {
+  -webkit-text-size-adjust: 100%;
+}
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--desk);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  font-weight: 400;
+}
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-title);
+  font-weight: 400;
+  margin: 0;
+  line-height: 1.2;
+}
+:lang(ar) h1,
+:lang(ar) h2,
+:lang(ar) h3 {
+  line-height: 1.5;
+}
+p {
+  margin: 0 0 0.75em;
+}
+a {
+  color: var(--sea);
+  text-underline-offset: 3px;
+}
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+.code {
+  font-family: var(--font-code);
+  letter-spacing: 0.08em;
+}
+:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+  border-radius: 3px;
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    /* biome-ignore-start lint/complexity/noImportantStyles: a reduced-motion
+       setting must beat the motion of every component, whatever its
+       specificity. */
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+    /* biome-ignore-end lint/complexity/noImportantStyles: see above. */
+  }
+}

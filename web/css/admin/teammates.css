@@ -1,0 +1,108 @@
+/* Teammates of a booking: the settings exist only while teammates are asked. */
+.tm-body {
+  --l-gap: 0;
+}
+.tm-body[hidden] {
+  display: none;
+}
+.tm-line {
+  margin: 10px 0 0;
+  font-weight: 700;
+}
+.tm-questions .q-row.sub {
+  margin-inline-start: 0;
+}
+
+/*
+ * Lists: the lists at the side, the choices of the picked one in the main
+ * part (.l-split). Below 940px there is room for one of the two: the lists,
+ * or the picked list with a way back.
+ */
+.lists {
+  margin-top: 12px;
+}
+.lists-index {
+  --l-gap: 6px;
+  position: sticky;
+  top: 12px;
+}
+.list-card {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  text-align: start;
+  padding: 10px 14px;
+  border: 1.5px solid var(--line);
+  border-radius: 4px;
+  background: var(--sheet);
+  color: var(--ink);
+  cursor: pointer;
+}
+.list-card:hover {
+  border-color: var(--ink);
+}
+.list-card[aria-current="true"] {
+  border-color: var(--sea);
+  box-shadow: inset 4px 0 0 var(--sea);
+  background: var(--sheet-2);
+}
+[dir="rtl"] .list-card[aria-current="true"] {
+  box-shadow: inset -4px 0 0 var(--sea);
+}
+.list-card-name {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-weight: 700;
+}
+.list-card-peek {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.list-card-meta {
+  font-size: var(--fs-help);
+  color: var(--mute);
+}
+.lists-back {
+  display: none;
+}
+.list-new {
+  justify-content: center;
+  border-style: dashed;
+}
+.list-new[aria-current="true"] {
+  border-color: var(--sea);
+  color: var(--sea);
+}
+.list-card-kind {
+  flex: none;
+  font-size: var(--fs-help);
+  font-weight: 400;
+  font-style: italic;
+  color: var(--mute);
+}
+.list-title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 14px;
+}
+.list-title .link-btn {
+  padding: 0;
+  font-size: var(--fs-help);
+}
+.link-btn.danger-link {
+  color: var(--err);
+}
+.list-rename {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+.list-rename .input {
+  flex: 1 1 14rem;
+}
