@@ -107,7 +107,7 @@ flowchart LR
         s2["size-alerts.js"]
         a3["admin/responses/"]
         a4["admin/people/"]
-        a6["admin/lists/lists.page.js"]
+        a6["admin/lists/"]
     end
     subgraph viewer["viewer.html: instructor page"]
         v1["viewer.js"]
@@ -252,7 +252,24 @@ The site is published at the paths it has always had: the pages at the root,
 | `web/js/admin/people/client-row.view.js` | A private link in the Clients table, with its key and its actions. |
 | `web/js/admin/people/client-dialog.view.js` | The dialog that makes a private link or edits one. |
 | `web/js/admin/people/people.page.js` | The Clients page: its head and the table of links. |
-| `web/js/admin/lists/lists.page.js` | The lists behind dropdown questions, each edited the way its kind needs. |
+| `web/js/admin/lists/lists.model.js` | The lists that came with the platform, the kinds a list can be, and how a saved list turns into rows and back. Also the kind, name and swap rule the Questions tab reads. |
+| `web/js/admin/lists/list-edit.model.js` | The open list as it is edited: loading it, whether it differs from its saved copy, what stops a save and what a save would change. |
+| `web/js/admin/lists/sections.model.js` | A section list as year groups, kinds and counts: reading and writing the values, where a new group goes, and the kinds, letters and years in use. |
+| `web/js/admin/lists/stepper.view.js` | A number with − and + buttons around its field. |
+| `web/js/admin/lists/new-kind.view.js` | The "+ New kind" chip that turns into a field. |
+| `web/js/admin/lists/section-extras.view.js` | The sections kept as written because they follow no pattern. |
+| `web/js/admin/lists/sections.view.js` | The editor of a section list: a card for each year group with a stepper for each kind. |
+| `web/js/admin/lists/group-draft.model.js` | The rules of a new year group: its name, its sections and what stops it being added. |
+| `web/js/admin/lists/group-draft-pick.view.js` | The year and department letter chips of a new year group. |
+| `web/js/admin/lists/group-draft.view.js` | The card of a new year group: its counts, its footer and Add. |
+| `web/js/admin/lists/numbers.view.js` | The editor of a number list: a run from one number to another. |
+| `web/js/admin/lists/choices.view.js` | The editor of named and short choices, as rows or chips. |
+| `web/js/admin/lists/choice-add.view.js` | Adding choices one at a time or many at once from pasted lines. |
+| `web/js/admin/lists/list-index.view.js` | The index of the Lists page: New list and a card for each list. |
+| `web/js/admin/lists/list-savebar.view.js` | The save bar of the open list and what follows the rows as they are typed. |
+| `web/js/admin/lists/create-pane.view.js` | The New list pane: name, kind and what it starts with. |
+| `web/js/admin/lists/list-head.view.js` | The head of the open list: name, Rename, Delete, what it is for and the forms that ask it. |
+| `web/js/admin/lists/lists.page.js` | The Lists page: its page object, opening a list, and drawing the pane and the editor of each kind. |
 | `web/js/teams/size-alerts.view.js` | The warnings about small teams as they are drawn: a line for each level and a mark on the card of a small team. Used by the dashboard and the instructor page. |
 | `web/js/viewer.js` | The instructor page. |
 | `domain/enums.js` | The words the pages and the backend share, as frozen enums of stored values: `FormType`, `FormStatus`, `ReviewStatus` and `ListKind`. Loaded before the other domain files. |

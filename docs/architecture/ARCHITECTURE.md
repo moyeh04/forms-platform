@@ -1130,8 +1130,12 @@ Rules of the move:
 
 ## The Lists page
 
-`admin/lists/lists.page.js` draws `#/lists` and `#/lists/<key>`: the lists at the side
+`admin/lists/` draws `#/lists` and `#/lists/<key>`: the lists at the side
 (`.l-side`) and the choices of the picked one in the main part (`.l-main`).
+`lists.page.js` builds one page object, `p`, that every part reads and
+draws into: the lists and their names, the open list as it is edited, and
+`paint`, `paintRows`, `changed` and `setRows`. The rules that draw nothing
+are in the `*.model.js` files, so each editor only draws.
 
 - **The kind picks the editor.** A list of `sections` is built from year group
   cards with a stepper for each kind; a count runs from 1 to 99, and a kind
