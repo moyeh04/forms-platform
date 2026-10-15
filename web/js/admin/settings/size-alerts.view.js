@@ -10,9 +10,6 @@
     h = ui.h,
     A = App.admin;
 
-  /** The lowest number a warning can be for: teams of fewer than two. */
-  var LOWEST_BELOW = 2;
-
   var LEVELS = [
     {
       id: 'critical',
@@ -86,7 +83,6 @@
       },
       {
         name: l.id + 'Below',
-        min: String(LOWEST_BELOW),
         'aria-describedby': 'size-alert-' + l.id + '-err'
       }
     );
@@ -144,8 +140,8 @@
   }
 
   /**
-   * Draws the rows and the preview again: which rows are open, the highest
-   * number allowed, and the reason a number is refused.
+   * Draws the rows and the preview again: which rows are open, the numbers
+   * allowed, and the reason a number is refused.
    *
    * @param {!Object} form The form.
    * @param {!Array<!Object>} rows The rows, from alertRow.
@@ -154,12 +150,11 @@
   function paintAlerts(form, rows, preview) {
     var alerts = form.rules.sizeAlerts;
     var stop = Rules.sizeAlertsProblem(form);
-    var max = stop
-      ? stop.max
-      : Math.max(Rules.teamSizeRange(form).max, LOWEST_BELOW);
+    var bounds = Rules.sizeAlertBounds(form);
     rows.forEach(function (r) {
       r.sub.hidden = !alerts[r.id].on;
-      r.input.max = String(max);
+      r.input.min = String(bounds.min);
+      r.input.max = String(bounds.max);
       r.error.textContent = stop && stop.level === r.id ? reason(stop) : '';
     });
     preview.textContent = words(form, alerts);

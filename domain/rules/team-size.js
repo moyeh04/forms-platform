@@ -103,6 +103,17 @@
   }
 
   /**
+   * Gives the numbers a warning level can ask for, so the dashboard bounds
+   * its inputs by the same rule as the save.
+   *
+   * @param {?Object} form The form.
+   * @return {{min: number, max: number}} The lowest and the highest.
+   */
+  function sizeAlertBounds(form) {
+    return { min: MIN_ALERT_SIZE, max: sizeAlertCeiling(form) };
+  }
+
+  /**
    * Gives the warnings about small teams of a form. A level is `{on,
    * below}` and marks the teams with fewer people than `below`. A level
    * that was never set starts from the biggest team size: about half of it,
@@ -219,6 +230,7 @@
     teammateNotice: teammateNotice,
     sizeAlerts: sizeAlerts,
     sizeAlertsProblem: sizeAlertsProblem,
+    sizeAlertBounds: sizeAlertBounds,
     sizeAlertLevels: sizeAlertLevels,
     sizeAlertOf: sizeAlertOf,
     validateTeamSize: validateTeamSize

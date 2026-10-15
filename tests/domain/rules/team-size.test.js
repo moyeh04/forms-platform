@@ -90,3 +90,13 @@ test('Small teams: the stronger level wins; wrong numbers are named', () => {
     'a level that is off is not checked'
   );
 });
+
+test('Small teams: a level asks for 2 up to the biggest team size', () => {
+  const sized = (max) => ({ rules: { teamSize: { min: 1, max } } });
+  assert.deepEqual(R.sizeAlertBounds(sized(6)), { min: 2, max: 6 });
+  assert.deepEqual(
+    R.sizeAlertBounds(sized(1)),
+    { min: 2, max: 2 },
+    'a form of single students still has a number to pick'
+  );
+});

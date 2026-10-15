@@ -1,11 +1,11 @@
 # Testing
 
-367 automated tests run without a Google account, a browser, or a network.
+368 automated tests run without a Google account, a browser, or a network.
 They run the **real** backend and the **real** pages. This page explains how
 that works and what it can and cannot prove.
 
 ```
-npm test    # 367 tests
+npm test    # 368 tests
 ```
 
 ## The layers
@@ -153,7 +153,7 @@ says something else.
 | Rules: Drive links | `domain/rules/drive-link.test.js` | 2 | Files, folders and slides, other hosts refused; folder names |
 | Rules: slots | `domain/rules/slots.test.js` | 2 | The generated times of a day, and the room left in a slot |
 | Rules: forms | `domain/rules/form.test.js` | 2 | Members list, role lookup and form state; counting the people of a form with a code counted once |
-| Rules: team size | `domain/rules/team-size.test.js` | 2 | The two warnings about small teams: starting numbers, the level of a team, a wrong number or order |
+| Rules: team size | `domain/rules/team-size.test.js` | 3 | The two warnings about small teams: starting numbers, the level of a team, a wrong number or order, the numbers a level can ask for |
 | Rules: submission | `domain/rules/submission.test.js` | 5 | Cleaned data, field and member errors, the same code twice, too many members, slot choices, disabled fields |
 | Team size and audience | `backend/features/intake/teams/team-size.test.js` | 18 | Required question, range, exact member count, admin range, the warnings about small teams saved cleaned and refused when wrong, the sizes of the saved teams sent with the form, size notes, specialization limits, section limits |
 | Forms | `backend/features/catalog/forms/forms.test.js` | 8 | Every template created with its own spreadsheet, type and title checked, the public form of a draft and of an open form, open and close dates, unique link names, duplicate, delete, WhatsApp metadata kept on a copy |
