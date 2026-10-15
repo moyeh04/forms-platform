@@ -29,10 +29,18 @@ function clientsSheet_() {
 
 function rowToClient_(r) {
   return {
-    _row: r._row, id: String(r.id), name: String(r.name), tokenHash: String(r.tokenHash),
-    forms: parseJson(r.forms, []), hiddenColumns: parseJson(r.hiddenColumns, []),
-    canReview: String(r.canReview) === '1', active: String(r.active) !== '0', createdAt: String(r.createdAt),
-    keyHash: String(r.keyHash || ''), keySeal: String(r.keySeal || ''), expires: String(r.expires || ''),
+    _row: r._row,
+    id: String(r.id),
+    name: String(r.name),
+    tokenHash: String(r.tokenHash),
+    forms: parseJson(r.forms, []),
+    hiddenColumns: parseJson(r.hiddenColumns, []),
+    canReview: String(r.canReview) === '1',
+    active: String(r.active) !== '0',
+    createdAt: String(r.createdAt),
+    keyHash: String(r.keyHash || ''),
+    keySeal: String(r.keySeal || ''),
+    expires: String(r.expires || ''),
     showSizeAlerts: String(r.showSizeAlerts) !== '0'
   };
 }
@@ -40,27 +48,44 @@ function rowToClient_(r) {
 function readClients_() {
   var clients = readTable(clientsSheet_(), CLIENT_COLS_).map(rowToClient_);
   // A form id holds an underscore and a link name never does, so the two cannot be confused.
-  var named = function (s) { return s !== '*' && String(s).indexOf('_') === -1; };
-  if (!clients.some(function (c) { return c.forms.some(named); })) return clients;
+  var named = function (s) {
+    return s !== '*' && String(s).indexOf('_') === -1;
+  };
+  if (
+    !clients.some(function (c) {
+      return c.forms.some(named);
+    })
+  )
+    return clients;
   var ids = {};
-  readForms().forEach(function (f) { ids[f.slug] = f.id; });
+  readForms().forEach(function (f) {
+    ids[f.slug] = f.id;
+  });
   clients.forEach(function (c) {
     if (!c.forms.some(named)) return;
     c.byName = true;
-    c.forms = c.forms.map(function (s) { return named(s) ? ids[s] : s; }).filter(Boolean);
+    c.forms = c.forms
+      .map(function (s) {
+        return named(s) ? ids[s] : s;
+      })
+      .filter(Boolean);
   });
   return clients;
 }
 
 /** Stores ids in every link that still names its forms by link name. Run before a link name changes. */
 function keepClientForms_() {
-  readClients_().forEach(function (c) { if (c.byName) saveClient_(c); });
+  readClients_().forEach(function (c) {
+    if (c.byName) saveClient_(c);
+  });
 }
 
 /** Changes one link inside the lock, on a fresh copy of its row, and saves it. Returns what `change` returns. */
 function changeClient_(id, change) {
   return withLock_(function () {
-    var c = readClients_().filter(function (x) { return x.id === id; })[0];
+    var c = readClients_().filter(function (x) {
+      return x.id === id;
+    })[0];
     if (!c) fail('client_not_found', 'That client does not exist.');
     var out = change(c);
     saveClient_(c);
@@ -70,9 +95,18 @@ function changeClient_(id, change) {
 
 function clientToRow_(c) {
   return {
-    id: c.id, name: c.name, tokenHash: c.tokenHash, forms: JSON.stringify(c.forms), hiddenColumns: JSON.stringify(c.hiddenColumns),
-    canReview: c.canReview ? '1' : '0', active: c.active ? '1' : '0', createdAt: c.createdAt, keyHash: c.keyHash || '',
-    keySeal: c.keySeal || '', expires: c.expires || '', showSizeAlerts: c.showSizeAlerts === false ? '0' : '1'
+    id: c.id,
+    name: c.name,
+    tokenHash: c.tokenHash,
+    forms: JSON.stringify(c.forms),
+    hiddenColumns: JSON.stringify(c.hiddenColumns),
+    canReview: c.canReview ? '1' : '0',
+    active: c.active ? '1' : '0',
+    createdAt: c.createdAt,
+    keyHash: c.keyHash || '',
+    keySeal: c.keySeal || '',
+    expires: c.expires || '',
+    showSizeAlerts: c.showSizeAlerts === false ? '0' : '1'
   };
 }
 
@@ -126,8 +160,20 @@ function newToken_() {
 }
 
 function publicClient_(c) {
-  return { id: c.id, name: c.name, forms: c.forms, hiddenColumns: c.hiddenColumns, canReview: c.canReview, showSizeAlerts: c.showSizeAlerts !== false,
-    active: c.active, createdAt: c.createdAt, hasKey: !!c.keyHash, keyKnown: !!(c.keyHash && c.keySeal), expires: c.expires, expired: clientExpired_(c) };
+  return {
+    id: c.id,
+    name: c.name,
+    forms: c.forms,
+    hiddenColumns: c.hiddenColumns,
+    canReview: c.canReview,
+    showSizeAlerts: c.showSizeAlerts !== false,
+    active: c.active,
+    createdAt: c.createdAt,
+    hasKey: !!c.keyHash,
+    keyKnown: !!(c.keyHash && c.keySeal),
+    expires: c.expires,
+    expired: clientExpired_(c)
+  };
 }
 
 function cleanClientForms_(list) {
@@ -144,21 +190,37 @@ function cleanClientForms_(list) {
 function requireClient_(req) {
   var cache = CacheService.getScriptCache();
   var fails = parseInt(cache.get('bad_tokens') || '0', 10);
-  if (fails >= 30) fail('too_many_attempts', 'Too many tries. Wait a minute and open the link again.');
+  if (fails >= 30)
+    fail(
+      'too_many_attempts',
+      'Too many tries. Wait a minute and open the link again.'
+    );
   var token = String((req && req.token) || '');
   var h = token ? clientToken_(token) : '';
   var hit = null;
-  readClients_().forEach(function (c) { if (h && c.tokenHash === h) hit = c; });
+  readClients_().forEach(function (c) {
+    if (h && c.tokenHash === h) hit = c;
+  });
   if (!hit) {
     cache.put('bad_tokens', String(fails + 1), 60);
     fail('bad_token', 'This link is not valid.');
   }
   if (!hit.active) fail('revoked', 'This link was turned off.');
-  if (clientExpired_(hit)) fail('link_expired', 'This link ended on ' + hit.expires.slice(0, 10) + '. Ask whoever sent it to extend it.');
+  if (clientExpired_(hit))
+    fail(
+      'link_expired',
+      'This link ended on ' +
+        hit.expires.slice(0, 10) +
+        '. Ask whoever sent it to extend it.'
+    );
   if (hit.keyHash) {
     var tag = 'client_key:' + hit.id;
     var wrong = parseInt(cache.get(tag) || '0', 10);
-    if (wrong >= CLIENT_KEY_TRIES_) fail('key_locked', 'Too many wrong keys. Wait ten minutes and try again.');
+    if (wrong >= CLIENT_KEY_TRIES_)
+      fail(
+        'key_locked',
+        'Too many wrong keys. Wait ten minutes and try again.'
+      );
     var key = String((req && req.accessKey) || '').replace(/\D/g, '');
     if (!key) fail('key_needed', 'This link needs its access key.');
     if (clientKeyHash_(hit, key) !== hit.keyHash) {
@@ -170,7 +232,9 @@ function requireClient_(req) {
 }
 
 function clientAllows_(client, form) {
-  return client.forms.indexOf('*') !== -1 || client.forms.indexOf(form.id) !== -1;
+  return (
+    client.forms.indexOf('*') !== -1 || client.forms.indexOf(form.id) !== -1
+  );
 }
 
 API['admin.clients.list'] = admin(function () {
@@ -182,13 +246,22 @@ API['admin.clients.create'] = admin(function (req) {
   if (!name) fail('name_required', 'Give this person or group a name.');
   var token = newToken_();
   var c = {
-    id: shortId('c_'), name: name, tokenHash: clientToken_(token), forms: cleanClientForms_(req.forms),
-    hiddenColumns: Array.isArray(req.hiddenColumns) ? req.hiddenColumns : [], canReview: !!req.canReview, showSizeAlerts: req.showSizeAlerts !== false,
-    active: true, createdAt: nowIso(), expires: cleanExpiry_(req.expires)
+    id: shortId('c_'),
+    name: name,
+    tokenHash: clientToken_(token),
+    forms: cleanClientForms_(req.forms),
+    hiddenColumns: Array.isArray(req.hiddenColumns) ? req.hiddenColumns : [],
+    canReview: !!req.canReview,
+    showSizeAlerts: req.showSizeAlerts !== false,
+    active: true,
+    createdAt: nowIso(),
+    expires: cleanExpiry_(req.expires)
   };
   var key = req.withKey === false ? '' : newClientKey_();
   setClientKey_(c, key);
-  withLock_(function () { saveClient_(c); });
+  withLock_(function () {
+    saveClient_(c);
+  });
   return { client: publicClient_(c), token: token, accessKey: key };
 });
 
@@ -197,7 +270,8 @@ API['admin.clients.update'] = admin(function (req) {
   return changeClient_(req.id, function (c) {
     if (p.name !== undefined) c.name = String(p.name).trim() || c.name;
     if (p.forms !== undefined) c.forms = cleanClientForms_(p.forms);
-    if (p.hiddenColumns !== undefined) c.hiddenColumns = Array.isArray(p.hiddenColumns) ? p.hiddenColumns : [];
+    if (p.hiddenColumns !== undefined)
+      c.hiddenColumns = Array.isArray(p.hiddenColumns) ? p.hiddenColumns : [];
     if (p.canReview !== undefined) c.canReview = !!p.canReview;
     if (p.showSizeAlerts !== undefined) c.showSizeAlerts = !!p.showSizeAlerts;
     if (p.active !== undefined) c.active = !!p.active;
@@ -227,17 +301,25 @@ API['admin.clients.key'] = admin(function (req) {
 
 /** The admin reads a link's current key, for example when the client lost it. */
 API['admin.clients.showKey'] = admin(function (req) {
-  var c = readClients_().filter(function (x) { return x.id === req.id; })[0];
+  var c = readClients_().filter(function (x) {
+    return x.id === req.id;
+  })[0];
   if (!c) fail('client_not_found', 'That client does not exist.');
   if (!c.keyHash) fail('no_key', 'This link does not ask for a key.');
   var key = unsealDigits_(clientKeyPad_(c), c.keySeal, 6);
-  if (!key || clientKeyHash_(c, key) !== c.keyHash) fail('key_unknown', 'This key was made before keys could be shown. Make a new key to see it.');
+  if (!key || clientKeyHash_(c, key) !== c.keyHash)
+    fail(
+      'key_unknown',
+      'This key was made before keys could be shown. Make a new key to see it.'
+    );
   return { accessKey: key };
 });
 
 API['admin.clients.remove'] = admin(function (req) {
   return withLock_(function () {
-    var c = readClients_().filter(function (x) { return x.id === req.id; })[0];
+    var c = readClients_().filter(function (x) {
+      return x.id === req.id;
+    })[0];
     if (!c) fail('client_not_found', 'That client does not exist.');
     clientsSheet_().deleteRow(c._row);
     return { removed: true };

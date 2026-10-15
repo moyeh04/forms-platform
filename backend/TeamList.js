@@ -15,18 +15,29 @@ function isTeamForm_(form) {
 /** Gives each live row without a number the next one, in the order they registered. Returns the rows it numbered. */
 function numberTeams_(rows) {
   var top = 0;
-  rows.forEach(function (r) { top = Math.max(top, r.number || 0); });
-  return rows.filter(function (r) { return !r.deleted && !r.number; }).sort(byCreated_).map(function (r) {
-    r.number = ++top;
-    return r;
+  rows.forEach(function (r) {
+    top = Math.max(top, r.number || 0);
   });
+  return rows
+    .filter(function (r) {
+      return !r.deleted && !r.number;
+    })
+    .sort(byCreated_)
+    .map(function (r) {
+      r.number = ++top;
+      return r;
+    });
 }
 
 /** The responses of a form with their team numbers, whether or not the numbers are stored yet. */
 function numberedResponses_(form, includeDeleted) {
   var rows = readResponses(form, true);
   if (isTeamForm_(form)) numberTeams_(rows);
-  return includeDeleted ? rows : rows.filter(function (r) { return !r.deleted; });
+  return includeDeleted
+    ? rows
+    : rows.filter(function (r) {
+        return !r.deleted;
+      });
 }
 
 /**
@@ -35,26 +46,44 @@ function numberedResponses_(form, includeDeleted) {
  */
 function keepTeamNumbers_(form, rows) {
   if (!isTeamForm_(form)) return;
-  var stored = numberTeams_(rows).filter(function (r) { return r._row; });
+  var stored = numberTeams_(rows).filter(function (r) {
+    return r._row;
+  });
   if (!stored.length) return;
   var sh = responsesSheet(form);
   ensureHeaders_(sh, RESPONSE_COLS);
-  var column = sh.getRange(2, RESPONSE_COLS.indexOf('number') + 1, sh.getLastRow() - 1, 1);
+  var column = sh.getRange(
+    2,
+    RESPONSE_COLS.indexOf('number') + 1,
+    sh.getLastRow() - 1,
+    1
+  );
   var values = column.getValues();
-  stored.forEach(function (r) { values[r._row - 2][0] = String(r.number); });
+  stored.forEach(function (r) {
+    values[r._row - 2][0] = String(r.number);
+  });
   column.setNumberFormat('@').setValues(values);
 }
 
-function byTeamNumber_(a, b) { return a.number - b.number; }
+function byTeamNumber_(a, b) {
+  return a.number - b.number;
+}
 
 function teamBlocks_(form) {
   var vform = validationForm(form);
-  return numberedResponses_(form).sort(byTeamNumber_).map(function (r) {
-    return {
-      number: r.number, ref: r.ref, title: r.title, link: r.link, created: r.created, response: r,
-      members: Rules.membersOf(vform, r.data)
-    };
-  });
+  return numberedResponses_(form)
+    .sort(byTeamNumber_)
+    .map(function (r) {
+      return {
+        number: r.number,
+        ref: r.ref,
+        title: r.title,
+        link: r.link,
+        created: r.created,
+        response: r,
+        members: Rules.membersOf(vform, r.data)
+      };
+    });
 }
 
 /** "Task" or "Project": what the fourth column of a team list holds. */

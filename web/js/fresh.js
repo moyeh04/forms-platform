@@ -11,28 +11,56 @@
   'use strict';
 
   var mine = '';
-  var EVERY = 5 * 60 * 1000, GAP = 30 * 1000, TRIED = 'fp_fresh_tried';
-  var touched = false, checking = false, last = 0, bar = null, published = '';
+  var EVERY = 5 * 60 * 1000,
+    GAP = 30 * 1000,
+    TRIED = 'fp_fresh_tried';
+  var touched = false,
+    checking = false,
+    last = 0,
+    bar = null,
+    published = '';
 
-  function store() { try { return window.sessionStorage; } catch (e) { return null; } }
+  function store() {
+    try {
+      return window.sessionStorage;
+    } catch (e) {
+      return null;
+    }
+  }
 
-  var F = App.fresh = {
+  var F = (App.fresh = {
     /** The version that is published now, or '' when it cannot be read. The address is new every time, so no cache answers. */
     read: function () {
-      return window.fetch('version.json?t=' + Date.now(), { cache: 'no-store' })
-        .then(function (r) { return r.ok ? r.json() : {}; })
-        .then(function (j) { return String((j && j.version) || ''); })
-        .catch(function () { return ''; });
+      return window
+        .fetch('version.json?t=' + Date.now(), { cache: 'no-store' })
+        .then(function (r) {
+          return r.ok ? r.json() : {};
+        })
+        .then(function (j) {
+          return String((j && j.version) || '');
+        })
+        .catch(function () {
+          return '';
+        });
     },
-    reload: function () { window.location.reload(); },
+    reload: function () {
+      window.location.reload();
+    },
     /** The words of the bar. A page in another language gives its own. */
-    words: function () { return { text: 'A newer version of this page is ready.', action: 'Reload' }; },
+    words: function () {
+      return {
+        text: 'A newer version of this page is ready.',
+        action: 'Reload'
+      };
+    },
     check: check,
     start: start
-  };
+  });
 
   /** Reloading now would lose something: the visitor typed or chose something, or a dialog is open. */
-  function inUse() { return touched || !!document.querySelector('.overlay'); }
+  function inUse() {
+    return touched || !!document.querySelector('.overlay');
+  }
 
   function show() {
     if (!bar) {
@@ -68,7 +96,8 @@
 
   /** Compares this page with the published site. `now` skips the wait between two checks. */
   function check(now) {
-    if (!mine || checking || (!now && Date.now() - last < GAP)) return Promise.resolve();
+    if (!mine || checking || (!now && Date.now() - last < GAP))
+      return Promise.resolve();
     checking = true;
     last = Date.now();
     return F.read().then(function (version) {
@@ -87,19 +116,40 @@
   function start(version) {
     if (mine || !version) return Promise.resolve();
     mine = String(version);
-    ['input', 'change'].forEach(function (type) { document.addEventListener(type, function () { touched = true; }, true); });
-    document.addEventListener('visibilitychange', function () { if (!document.hidden) check(); });
+    ['input', 'change'].forEach(function (type) {
+      document.addEventListener(
+        type,
+        function () {
+          touched = true;
+        },
+        true
+      );
+    });
+    document.addEventListener('visibilitychange', function () {
+      if (!document.hidden) check();
+    });
     // A page brought back by the Back button is shown as it was left, without loading anything.
-    window.addEventListener('pageshow', function (e) { if (e.persisted) check(true); });
-    window.setInterval(function () { if (!document.hidden) check(); }, EVERY);
+    window.addEventListener('pageshow', function (e) {
+      if (e.persisted) check(true);
+    });
+    window.setInterval(function () {
+      if (!document.hidden) check();
+    }, EVERY);
     // A page that learns its language after it opened says the bar again in that language.
-    new window.MutationObserver(function () { if (bar) show(); }).observe(document.documentElement, { attributes: true, attributeFilter: ['lang'] });
+    new window.MutationObserver(function () {
+      if (bar) show();
+    }).observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['lang']
+    });
     // The first check waits for the scripts of the page, so the bar has the words of the page.
     if (document.readyState !== 'loading') return check(true);
     return new Promise(function (done) {
-      document.addEventListener('DOMContentLoaded', function () { check(true).then(done); });
+      document.addEventListener('DOMContentLoaded', function () {
+        check(true).then(done);
+      });
     });
   }
 
   start((window.APP_CONFIG || {}).VERSION);
-})(window.App = window.App || {});
+})((window.App = window.App || {}));

@@ -5,14 +5,23 @@ const R = require('../domain/rules.js');
 test('Arabic names: accepts four Arabic parts and strips diacritics', () => {
   const ok = R.validateArabicName('أحمد محمد محمود أحمد');
   assert.equal(ok.ok, true);
-  assert.equal(R.validateArabicName('أَحْمَد  مُحَمَّد مَحمود أحمد').value, 'أحمد محمد محمود أحمد');
+  assert.equal(
+    R.validateArabicName('أَحْمَد  مُحَمَّد مَحمود أحمد').value,
+    'أحمد محمد محمود أحمد'
+  );
 });
 
 test('Arabic names: rejects English letters, digits and short names', () => {
-  assert.equal(R.validateArabicName('Ahmed Mohamed Mahmoud Ahmed').error, 'arabic_only');
+  assert.equal(
+    R.validateArabicName('Ahmed Mohamed Mahmoud Ahmed').error,
+    'arabic_only'
+  );
   assert.equal(R.validateArabicName('أحمد محمد 123 أحمد').error, 'arabic_only');
   assert.equal(R.validateArabicName('أحمد محمد محمود').error, 'arabic_parts');
-  assert.equal(R.validateArabicName('أحمد محمد محمود', { minParts: 3 }).ok, true);
+  assert.equal(
+    R.validateArabicName('أحمد محمد محمود', { minParts: 3 }).ok,
+    true
+  );
   assert.equal(R.validateArabicName('   ').error, 'required');
 });
 
@@ -30,12 +39,27 @@ test('English text: rejects Arabic letters', () => {
 });
 
 test('Phones: every Egyptian format maps to 01XXXXXXXXX', () => {
-  ['01012345678', '+201012345678', '00201012345678', '201012345678', '1012345678', '+20 10 1234 5678', '٠١٠١٢٣٤٥٦٧٨']
-    .forEach((p) => assert.equal(R.normalizePhone(p), '01012345678', p));
+  [
+    '01012345678',
+    '+201012345678',
+    '00201012345678',
+    '201012345678',
+    '1012345678',
+    '+20 10 1234 5678',
+    '٠١٠١٢٣٤٥٦٧٨'
+  ].forEach((p) => assert.equal(R.normalizePhone(p), '01012345678', p));
   assert.equal(R.normalizePhone('01312345678'), '');
   assert.equal(R.normalizePhone('12345'), '');
-  assert.equal(R.whatsappLink('+20 101 234 5678'), 'https://wa.me/201012345678', 'WhatsApp takes the number with the country code');
-  assert.equal(R.whatsappLink('12345'), '', 'and there is no link for a number that is not a mobile');
+  assert.equal(
+    R.whatsappLink('+20 101 234 5678'),
+    'https://wa.me/201012345678',
+    'WhatsApp takes the number with the country code'
+  );
+  assert.equal(
+    R.whatsappLink('12345'),
+    '',
+    'and there is no link for a number that is not a mobile'
+  );
 });
 
 test('Phones: extracts numbers from pasted WhatsApp lines', () => {
@@ -55,22 +79,46 @@ test('Codes: seven digits by default', () => {
 test('Drive links: recognises files, folders, slides and rejects other hosts', () => {
   const id = 'a'.repeat(33);
   assert.deepEqual(
-    [R.parseDriveLink(`https://drive.google.com/file/d/${id}/view?usp=sharing`).kind,
+    [
+      R.parseDriveLink(`https://drive.google.com/file/d/${id}/view?usp=sharing`)
+        .kind,
       R.parseDriveLink(`https://drive.google.com/drive/u/0/folders/${id}`).kind,
-      R.parseDriveLink(`https://docs.google.com/presentation/d/${id}/edit`).kind,
-      R.parseDriveLink(`https://drive.google.com/open?id=${id}`).kind],
+      R.parseDriveLink(`https://docs.google.com/presentation/d/${id}/edit`)
+        .kind,
+      R.parseDriveLink(`https://drive.google.com/open?id=${id}`).kind
+    ],
     ['file', 'folder', 'slides', 'file']
   );
   assert.equal(R.parseDriveLink(`https://example.com/file/d/${id}`).ok, false);
-  assert.equal(R.validateDriveLink(`https://drive.google.com/file/d/${id}/view`, { kinds: ['folder'] }).error, 'link_kind');
+  assert.equal(
+    R.validateDriveLink(`https://drive.google.com/file/d/${id}/view`, {
+      kinds: ['folder']
+    }).error,
+    'link_kind'
+  );
   assert.equal(R.validateDriveLink('not a link').error, 'invalid_link');
 });
 
 test('Slots: generator reproduces the old seminar timetable style', () => {
-  const slots = R.generateSlots({ start: '12:30', end: '15:30', length: 20, gap: 5 });
-  assert.deepEqual(slots.slice(0, 3), ['12:30 - 12:50', '12:55 - 1:15', '1:20 - 1:40']);
-  assert.equal(R.generateSlots({ start: '10:00', end: '09:00', length: 10 }).length, 0);
-  assert.deepEqual(R.generateSlots({ start: '13:00', end: '13:40', length: 20, style: '24h' }), ['13:00 - 13:20', '13:20 - 13:40']);
+  const slots = R.generateSlots({
+    start: '12:30',
+    end: '15:30',
+    length: 20,
+    gap: 5
+  });
+  assert.deepEqual(slots.slice(0, 3), [
+    '12:30 - 12:50',
+    '12:55 - 1:15',
+    '1:20 - 1:40'
+  ]);
+  assert.equal(
+    R.generateSlots({ start: '10:00', end: '09:00', length: 10 }).length,
+    0
+  );
+  assert.deepEqual(
+    R.generateSlots({ start: '13:00', end: '13:40', length: 20, style: '24h' }),
+    ['13:00 - 13:20', '13:20 - 13:40']
+  );
 });
 
 const teamForm = {
@@ -80,16 +128,27 @@ const teamForm = {
     { id: 'leader_code', type: 'code', role: 'code' },
     { id: 'phone', type: 'phone', role: 'phone' },
     { id: 'level', type: 'select', options: [{ value: 'a' }, { value: 'b' }] },
-    { id: 'members', type: 'members', role: 'members', max: 2, fields: [
-      { id: 'name', type: 'arabic_name', role: 'name' },
-      { id: 'code', type: 'code', role: 'code' }
-    ] },
+    {
+      id: 'members',
+      type: 'members',
+      role: 'members',
+      max: 2,
+      fields: [
+        { id: 'name', type: 'arabic_name', role: 'name' },
+        { id: 'code', type: 'code', role: 'code' }
+      ]
+    },
     { id: 'title', type: 'english_text', role: 'title' }
   ]
 };
 const base = () => ({
-  email: 'A@B.com', leader_name: 'أحمد محمد محمود أحمد', leader_code: '4230999', phone: '+201012345678',
-  level: 'a', members: [{ name: 'سارة خالد حسن علي', code: '4230998' }], title: 'Library System'
+  email: 'A@B.com',
+  leader_name: 'أحمد محمد محمود أحمد',
+  leader_code: '4230999',
+  phone: '+201012345678',
+  level: 'a',
+  members: [{ name: 'سارة خالد حسن علي', code: '4230998' }],
+  title: 'Library System'
 });
 
 test('Submission: valid data is cleaned', () => {
@@ -113,28 +172,52 @@ test('Submission: reports field and nested member errors', () => {
 test('Submission: blocks the same code twice and too many members', () => {
   const d = base();
   d.members = [{ name: 'سارة خالد حسن علي', code: '4230999' }];
-  assert.equal(R.validateSubmission(teamForm, d).errors.members.nested['0.code'].error, 'duplicate_code');
-  d.members = [1, 2, 3].map((n) => ({ name: 'سارة خالد حسن علي', code: '423099' + n }));
-  assert.equal(R.validateSubmission(teamForm, d).errors.members.error, 'too_many_members');
+  assert.equal(
+    R.validateSubmission(teamForm, d).errors.members.nested['0.code'].error,
+    'duplicate_code'
+  );
+  d.members = [1, 2, 3].map((n) => ({
+    name: 'سارة خالد حسن علي',
+    code: '423099' + n
+  }));
+  assert.equal(
+    R.validateSubmission(teamForm, d).errors.members.error,
+    'too_many_members'
+  );
 });
 
 test('Helpers: members list, role lookup and form state', () => {
-  const list = R.membersOf(teamForm, R.validateSubmission(teamForm, base()).data);
+  const list = R.membersOf(
+    teamForm,
+    R.validateSubmission(teamForm, base()).data
+  );
   assert.equal(list.length, 2);
   assert.equal(list[0].leader, true);
   assert.equal(R.fieldByRole(teamForm, 'title').id, 'title');
   const now = Date.parse('2027-09-01T00:00:00Z');
   assert.equal(R.formState({ status: 'open' }, now), 'open');
-  assert.equal(R.formState({ status: 'open', opensAt: '2027-10-01T00:00:00Z' }, now), 'not_yet');
-  assert.equal(R.formState({ status: 'open', closesAt: '2027-08-01T00:00:00Z' }, now), 'closed');
+  assert.equal(
+    R.formState({ status: 'open', opensAt: '2027-10-01T00:00:00Z' }, now),
+    'not_yet'
+  );
+  assert.equal(
+    R.formState({ status: 'open', closesAt: '2027-08-01T00:00:00Z' }, now),
+    'closed'
+  );
   assert.equal(R.formState({ status: 'draft' }, now), 'draft');
 });
 
 test('Slot validation: day and time must exist on the form', () => {
   const form = { slots: { days: [{ id: 'w1', times: ['1:00 - 1:10'] }] } };
   const f = { id: 'slot', type: 'slot' };
-  assert.equal(R.validateField(f, { day: 'w1', time: '1:00 - 1:10' }, { form }).ok, true);
-  assert.equal(R.validateField(f, { day: 'w1', time: '9:00 - 9:10' }, { form }).error, 'invalid_slot');
+  assert.equal(
+    R.validateField(f, { day: 'w1', time: '1:00 - 1:10' }, { form }).ok,
+    true
+  );
+  assert.equal(
+    R.validateField(f, { day: 'w1', time: '9:00 - 9:10' }, { form }).error,
+    'invalid_slot'
+  );
   assert.equal(R.validateField(f, null, { form }).error, 'required');
 });
 
@@ -143,7 +226,15 @@ test('Submission: disabled fields are skipped, including inside members', () => 
     fields: [
       { id: 'a', type: 'text' },
       { id: 'link', type: 'drive_link', enabled: false },
-      { id: 'members', type: 'members', max: 2, fields: [{ id: 'name', type: 'text' }, { id: 'extra', type: 'code', enabled: false }] }
+      {
+        id: 'members',
+        type: 'members',
+        max: 2,
+        fields: [
+          { id: 'name', type: 'text' },
+          { id: 'extra', type: 'code', enabled: false }
+        ]
+      }
     ]
   };
   const r = R.validateSubmission(form, { a: 'x', members: [{ name: 'y' }] });
@@ -153,55 +244,198 @@ test('Submission: disabled fields are skipped, including inside members', () => 
 
 test('Folder names: Team_Leader_Name_Project_Name_Subject_Name, no spaces, ending with the subject name', () => {
   const SE = { subject: 'Software Engineering' };
-  assert.equal(R.checkFolderName('Ahmed_Mohamed_Library_System_Software_Engineering', SE).ok, true);
-  assert.equal(R.checkFolderName('ahmed_library_software_engineering', SE).ok, true, 'case does not matter');
-  assert.equal(R.checkFolderName('Ahmed Library_System_Software_Engineering', SE).error, 'folder_name_spaces');
-  assert.equal(R.checkFolderName('Ahmed_Software_Engineering', SE).error, 'folder_name_format', 'needs the leader name and project before the subject name');
-  assert.equal(R.checkFolderName('Ahmed__Library_Software_Engineering', {}).error, 'folder_name_format', 'no empty parts');
-  assert.equal(R.checkFolderName('Ahmed_Library_System_CMPn323', SE).error, 'folder_name_subject', 'the code is not the subject name');
-  assert.equal(R.checkFolderName('Ahmed_Library_System_Anything', {}).ok, true, 'without a subject name any ending is fine');
-  assert.equal(R.folderNameExample({ project: 'Library System', subject: 'Software Engineering' }), 'Ahmed_Mohamed_Library_System_Software_Engineering');
-  assert.equal(R.folderNameExample({ project: 'Library System' }), 'Ahmed_Mohamed_Library_System_Subject_Name');
-  assert.equal(R.checkFolderName('My Folder', { subject: 'Databases', example: { project: 'Smart Parking' } }).params.example, 'Ahmed_Mohamed_Smart_Parking_Databases');
+  assert.equal(
+    R.checkFolderName('Ahmed_Mohamed_Library_System_Software_Engineering', SE)
+      .ok,
+    true
+  );
+  assert.equal(
+    R.checkFolderName('ahmed_library_software_engineering', SE).ok,
+    true,
+    'case does not matter'
+  );
+  assert.equal(
+    R.checkFolderName('Ahmed Library_System_Software_Engineering', SE).error,
+    'folder_name_spaces'
+  );
+  assert.equal(
+    R.checkFolderName('Ahmed_Software_Engineering', SE).error,
+    'folder_name_format',
+    'needs the leader name and project before the subject name'
+  );
+  assert.equal(
+    R.checkFolderName('Ahmed__Library_Software_Engineering', {}).error,
+    'folder_name_format',
+    'no empty parts'
+  );
+  assert.equal(
+    R.checkFolderName('Ahmed_Library_System_CMPn323', SE).error,
+    'folder_name_subject',
+    'the code is not the subject name'
+  );
+  assert.equal(
+    R.checkFolderName('Ahmed_Library_System_Anything', {}).ok,
+    true,
+    'without a subject name any ending is fine'
+  );
+  assert.equal(
+    R.folderNameExample({
+      project: 'Library System',
+      subject: 'Software Engineering'
+    }),
+    'Ahmed_Mohamed_Library_System_Software_Engineering'
+  );
+  assert.equal(
+    R.folderNameExample({ project: 'Library System' }),
+    'Ahmed_Mohamed_Library_System_Subject_Name'
+  );
+  assert.equal(
+    R.checkFolderName('My Folder', {
+      subject: 'Databases',
+      example: { project: 'Smart Parking' }
+    }).params.example,
+    'Ahmed_Mohamed_Smart_Parking_Databases'
+  );
 });
 
 test('People: leaders and members are counted, a student code once', () => {
-  const row = (code, members = []) => ({ data: { leader_name: 'x', leader_code: code, members } });
+  const row = (code, members = []) => ({
+    data: { leader_name: 'x', leader_code: code, members }
+  });
   assert.equal(R.countPeople(teamForm, []), 0);
-  assert.equal(R.countPeople(teamForm, [row('1', [{ name: 'a', code: '2' }, { name: 'b', code: '3' }]), row('4')]), 4);
-  assert.equal(R.countPeople(teamForm, [row('1', [{ name: 'a', code: '2' }]), row('2', [{ name: 'c', code: '1' }])]), 2, 'a code in two responses is one person');
-  assert.equal(R.countPeople(teamForm, [row('', [{ name: 'a', code: '' }]), row('')]), 3, 'without a code nobody can be matched, so each counts');
-  const solo = { fields: [{ id: 'leader_name', role: 'name' }, { id: 'leader_code', role: 'code' }, { id: 'members', role: 'members', enabled: false }] };
-  assert.equal(R.countPeople(solo, [row('1', [{ name: 'a', code: '2' }])]), 1, 'teammates a form does not ask about are not counted');
+  assert.equal(
+    R.countPeople(teamForm, [
+      row('1', [
+        { name: 'a', code: '2' },
+        { name: 'b', code: '3' }
+      ]),
+      row('4')
+    ]),
+    4
+  );
+  assert.equal(
+    R.countPeople(teamForm, [
+      row('1', [{ name: 'a', code: '2' }]),
+      row('2', [{ name: 'c', code: '1' }])
+    ]),
+    2,
+    'a code in two responses is one person'
+  );
+  assert.equal(
+    R.countPeople(teamForm, [row('', [{ name: 'a', code: '' }]), row('')]),
+    3,
+    'without a code nobody can be matched, so each counts'
+  );
+  const solo = {
+    fields: [
+      { id: 'leader_name', role: 'name' },
+      { id: 'leader_code', role: 'code' },
+      { id: 'members', role: 'members', enabled: false }
+    ]
+  };
+  assert.equal(
+    R.countPeople(solo, [row('1', [{ name: 'a', code: '2' }])]),
+    1,
+    'teammates a form does not ask about are not counted'
+  );
 });
 
 test('Slots: the room left in a slot is its capacity less the bookings of everyone else', () => {
   const form = { slots: { capacity: 3 } };
   assert.equal(R.slotRoom(form, { 'd|1': 2 }, 'd|1'), 1);
   assert.equal(R.slotRoom(form, { 'd|1': 5 }, 'd|1'), 0, 'never below none');
-  assert.equal(R.slotRoom({ slots: {} }, {}, 'd|1'), 1, 'one booking a slot when no capacity is set');
+  assert.equal(
+    R.slotRoom({ slots: {} }, {}, 'd|1'),
+    1,
+    'one booking a slot when no capacity is set'
+  );
 });
 
 test('Small teams: the two warnings start from the biggest team size and are off until switched on', () => {
   const six = { rules: { teamSize: { min: 1, max: 6 } } };
-  assert.deepEqual(R.sizeAlerts(six), { critical: { on: false, below: 3 }, warning: { on: false, below: 5 } });
-  assert.deepEqual(R.sizeAlerts({ rules: { teamSize: { min: 1, max: 4 } } }).warning, { on: false, below: 3 });
+  assert.deepEqual(R.sizeAlerts(six), {
+    critical: { on: false, below: 3 },
+    warning: { on: false, below: 5 }
+  });
+  assert.deepEqual(
+    R.sizeAlerts({ rules: { teamSize: { min: 1, max: 4 } } }).warning,
+    { on: false, below: 3 }
+  );
   assert.deepEqual(R.sizeAlertLevels(R.sizeAlerts(six)), [], 'no level is on');
-  const saved = { rules: { teamSize: { min: 1, max: 4 }, sizeAlerts: { critical: { on: true, below: '2' }, warning: { on: true, below: 9 } } } };
-  assert.deepEqual(R.sizeAlerts(saved), { critical: { on: true, below: 2 }, warning: { on: true, below: 4 } }, 'a number over the biggest team is brought down to it');
+  const saved = {
+    rules: {
+      teamSize: { min: 1, max: 4 },
+      sizeAlerts: {
+        critical: { on: true, below: '2' },
+        warning: { on: true, below: 9 }
+      }
+    }
+  };
+  assert.deepEqual(
+    R.sizeAlerts(saved),
+    { critical: { on: true, below: 2 }, warning: { on: true, below: 4 } },
+    'a number over the biggest team is brought down to it'
+  );
 });
 
 test('Small teams: a team gets the stronger level it falls under, and a wrong number or order is named', () => {
-  const form = (sizeAlerts) => ({ rules: { teamSize: { min: 1, max: 6 }, sizeAlerts } });
-  const both = R.sizeAlerts(form({ critical: { on: true, below: 3 }, warning: { on: true, below: 5 } }));
-  assert.deepEqual(R.sizeAlertLevels(both), [{ level: 'critical', below: 3 }, { level: 'warning', below: 5 }]);
-  assert.deepEqual([1, 2, 3, 4, 5, 6].map((n) => R.sizeAlertOf(both, n)), ['critical', 'critical', 'warning', 'warning', '', '']);
+  const form = (sizeAlerts) => ({
+    rules: { teamSize: { min: 1, max: 6 }, sizeAlerts }
+  });
+  const both = R.sizeAlerts(
+    form({ critical: { on: true, below: 3 }, warning: { on: true, below: 5 } })
+  );
+  assert.deepEqual(R.sizeAlertLevels(both), [
+    { level: 'critical', below: 3 },
+    { level: 'warning', below: 5 }
+  ]);
+  assert.deepEqual(
+    [1, 2, 3, 4, 5, 6].map((n) => R.sizeAlertOf(both, n)),
+    ['critical', 'critical', 'warning', 'warning', '', '']
+  );
   const one = R.sizeAlerts(form({ warning: { on: true, below: 4 } }));
-  assert.deepEqual([2, 3, 4].map((n) => R.sizeAlertOf(one, n)), ['warning', 'warning', '']);
-  assert.equal(R.sizeAlertsProblem(form({ critical: { on: true, below: 3 }, warning: { on: true, below: 5 } })), null);
-  assert.deepEqual(R.sizeAlertsProblem(form({ critical: { on: true, below: 4 }, warning: { on: true, below: 4 } })), { level: 'warning', error: 'order', min: 2, max: 6 });
-  assert.deepEqual(R.sizeAlertsProblem(form({ critical: { on: true, below: 1 } })), { level: 'critical', error: 'range', min: 2, max: 6 });
-  assert.equal(R.sizeAlertsProblem(form({ warning: { on: true, below: 7 } })).error, 'range');
-  assert.equal(R.sizeAlertsProblem(form({ warning: { on: true, below: '' } })).error, 'range');
-  assert.equal(R.sizeAlertsProblem(form({ critical: { on: false, below: 99 }, warning: { on: true, below: 2 } })), null, 'a level that is off is not checked');
+  assert.deepEqual(
+    [2, 3, 4].map((n) => R.sizeAlertOf(one, n)),
+    ['warning', 'warning', '']
+  );
+  assert.equal(
+    R.sizeAlertsProblem(
+      form({
+        critical: { on: true, below: 3 },
+        warning: { on: true, below: 5 }
+      })
+    ),
+    null
+  );
+  assert.deepEqual(
+    R.sizeAlertsProblem(
+      form({
+        critical: { on: true, below: 4 },
+        warning: { on: true, below: 4 }
+      })
+    ),
+    { level: 'warning', error: 'order', min: 2, max: 6 }
+  );
+  assert.deepEqual(
+    R.sizeAlertsProblem(form({ critical: { on: true, below: 1 } })),
+    { level: 'critical', error: 'range', min: 2, max: 6 }
+  );
+  assert.equal(
+    R.sizeAlertsProblem(form({ warning: { on: true, below: 7 } })).error,
+    'range'
+  );
+  assert.equal(
+    R.sizeAlertsProblem(form({ warning: { on: true, below: '' } })).error,
+    'range'
+  );
+  assert.equal(
+    R.sizeAlertsProblem(
+      form({
+        critical: { on: false, below: 99 },
+        warning: { on: true, below: 2 }
+      })
+    ),
+    null,
+    'a level that is off is not checked'
+  );
 });

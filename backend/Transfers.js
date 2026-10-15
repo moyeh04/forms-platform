@@ -18,17 +18,35 @@
  * first request, so a form that never has one keeps its sheet as it is.
  */
 
-var TRANSFER_COLS = ['id', 'created', 'updated', 'status', 'code', 'member', 'fromId', 'fromRef', 'toId', 'toRef', 'decidedBy'];
+var TRANSFER_COLS = [
+  'id',
+  'created',
+  'updated',
+  'status',
+  'code',
+  'member',
+  'fromId',
+  'fromRef',
+  'toId',
+  'toRef',
+  'decidedBy'
+];
 var TRANSFER_TAB_ = 'Transfers';
 
 function transfersOn_(form) {
   var rules = form.rules || {};
-  return !!(rules.transfers && rules.uniqueAcrossForm && Rules.fieldByRole(form, 'members'));
+  return !!(
+    rules.transfers &&
+    rules.uniqueAcrossForm &&
+    Rules.fieldByRole(form, 'members')
+  );
 }
 
 function transfersSheet_(form, create) {
   var ss = SpreadsheetApp.openById(form.sheetId);
-  return create ? ensureTab(ss, TRANSFER_TAB_, TRANSFER_COLS) : ss.getSheetByName(TRANSFER_TAB_);
+  return create
+    ? ensureTab(ss, TRANSFER_TAB_, TRANSFER_COLS)
+    : ss.getSheetByName(TRANSFER_TAB_);
 }
 
 function readTransfers_(form) {
@@ -36,9 +54,18 @@ function readTransfers_(form) {
   if (!sh) return [];
   return readTable(sh, TRANSFER_COLS).map(function (r) {
     return {
-      _row: r._row, id: String(r.id), created: String(r.created), updated: String(r.updated), status: String(r.status),
-      code: String(r.code), member: parseJson(r.member, {}), fromId: String(r.fromId), fromRef: String(r.fromRef),
-      toId: String(r.toId), toRef: String(r.toRef), decidedBy: String(r.decidedBy || '')
+      _row: r._row,
+      id: String(r.id),
+      created: String(r.created),
+      updated: String(r.updated),
+      status: String(r.status),
+      code: String(r.code),
+      member: parseJson(r.member, {}),
+      fromId: String(r.fromId),
+      fromRef: String(r.fromRef),
+      toId: String(r.toId),
+      toRef: String(r.toRef),
+      decidedBy: String(r.decidedBy || '')
     };
   });
 }
@@ -55,7 +82,9 @@ function saveTransfer_(form, t) {
 
 function memberCodeId_(form) {
   var mf = Rules.fieldByRole(form, 'members');
-  var sub = ((mf && mf.fields) || []).filter(function (sf) { return sf.role === 'code'; })[0];
+  var sub = ((mf && mf.fields) || []).filter(function (sf) {
+    return sf.role === 'code';
+  })[0];
   return sub ? sub.id : 'code';
 }
 
@@ -63,7 +92,8 @@ function memberCodeId_(form) {
 function setTeamSize_(form, data) {
   var mf = Rules.fieldByRole(form, 'members');
   var sf = Rules.fieldByRole(form, 'team_size');
-  if (mf && sf && data[sf.id] != null) data[sf.id] = String((data[mf.id] || []).length + 1);
+  if (mf && sf && data[sf.id] != null)
+    data[sf.id] = String((data[mf.id] || []).length + 1);
 }
 
 /**
@@ -72,14 +102,21 @@ function setTeamSize_(form, data) {
  * Nothing unless the form shows the phones. The teams are read once, on the first call.
  */
 function leaderContacts_(form) {
-  var rules = form.rules || {}, rows = null;
+  var rules = form.rules || {},
+    rows = null;
   return function (teamId) {
     if (rules.transferPhones !== true) return {};
     rows = rows || readResponses(form);
-    var team = rows.filter(function (r) { return r.id === teamId; })[0];
-    var phone = team ? String(Rules.valueByRole(form, team.data, 'phone') || '') : '';
+    var team = rows.filter(function (r) {
+      return r.id === teamId;
+    })[0];
+    var phone = team
+      ? String(Rules.valueByRole(form, team.data, 'phone') || '')
+      : '';
     if (!phone) return {};
-    return rules.transferWhatsapp === true ? { phone: phone, whatsapp: true } : { phone: phone };
+    return rules.transferWhatsapp === true
+      ? { phone: phone, whatsapp: true }
+      : { phone: phone };
   };
 }
 
@@ -89,10 +126,21 @@ function leaderContacts_(form) {
  */
 function leaderAsked_(form, team, code) {
   var people = team ? Rules.membersOf(form, team.data) : [];
-  if (!people.some(function (m) { return m.leader && String(m.code) === String(code); })) return {};
+  if (
+    !people.some(function (m) {
+      return m.leader && String(m.code) === String(code);
+    })
+  )
+    return {};
   return {
     leader: true,
-    heirs: people.filter(function (m) { return !m.leader && m.code; }).map(function (m) { return { code: String(m.code), name: m.name }; })
+    heirs: people
+      .filter(function (m) {
+        return !m.leader && m.code;
+      })
+      .map(function (m) {
+        return { code: String(m.code), name: m.name };
+      })
   };
 }
 
@@ -106,20 +154,37 @@ function handOver_(form, data, next) {
   var mf = Rules.fieldByRole(form, 'members');
   var codeId = memberCodeId_(form);
   var list = Array.isArray(data[mf.id]) ? data[mf.id] : [];
-  if (!list.length) fail('transfer_leader', 'This student leads a team alone and cannot be moved.');
-  var heir = list.filter(function (m) { return String(m[codeId]) === String(next.leader || ''); })[0];
-  if (!heir) fail('transfer_heir', 'Choose who leads the team after this student.');
+  if (!list.length)
+    fail(
+      'transfer_leader',
+      'This student leads a team alone and cannot be moved.'
+    );
+  var heir = list.filter(function (m) {
+    return String(m[codeId]) === String(next.leader || '');
+  })[0];
+  if (!heir)
+    fail('transfer_heir', 'Choose who leads the team after this student.');
   var emailField = Rules.fieldByRole(form, 'email');
   if (emailField && emailField.enabled !== false) {
     var email = Rules.validateField(emailField, next.email, { form: form });
-    if (!email.ok) fail('transfer_email', 'Write the email of the new leader.', { error: email.error });
+    if (!email.ok)
+      fail('transfer_email', 'Write the email of the new leader.', {
+        error: email.error
+      });
     data[emailField.id] = email.value;
   }
   (mf.fields || []).forEach(function (sf) {
-    var top = (form.fields || []).filter(function (f) { return f.type === sf.type && (sf.role ? f.role === sf.role : f.id === sf.id); })[0];
-    if (top && heir[sf.id] != null && heir[sf.id] !== '') data[top.id] = heir[sf.id];
+    var top = (form.fields || []).filter(function (f) {
+      return (
+        f.type === sf.type && (sf.role ? f.role === sf.role : f.id === sf.id)
+      );
+    })[0];
+    if (top && heir[sf.id] != null && heir[sf.id] !== '')
+      data[top.id] = heir[sf.id];
   });
-  data[mf.id] = list.filter(function (m) { return m !== heir; });
+  data[mf.id] = list.filter(function (m) {
+    return m !== heir;
+  });
 }
 
 /**
@@ -137,40 +202,95 @@ function takeOutTransfers_(form, data, rows, selfId, asked) {
   rows.forEach(function (r) {
     if (r.id === selfId) return;
     var people = Rules.membersOf(form, r.data);
-    people.forEach(function (m) { if (m.code) holders[m.code] = { id: r.id, ref: r.ref, leader: m.leader, alone: people.length === 1 }; });
-  });
-  var clash = list.filter(function (m) { return holders[m[codeId]]; });
-  if (!clash.length) return [];
-  var movable = clash.filter(function (m) { return !holders[m[codeId]].alone; });
-  asked = (asked || []).map(String);
-  var askedAll = movable.length === clash.length && movable.every(function (m) { return asked.indexOf(String(m[codeId])) !== -1; });
-  if (!askedAll) {
-    fail('duplicate_member', 'Someone on this team is already registered in another team.', {
-      codes: clash.map(function (m) { return m[codeId]; }),
-      transfer: movable.map(function (m) {
-        var held = holders[m[codeId]];
-        return held.leader ? { code: m[codeId], team: held.ref, leader: true } : { code: m[codeId], team: held.ref };
-      })
+    people.forEach(function (m) {
+      if (m.code)
+        holders[m.code] = {
+          id: r.id,
+          ref: r.ref,
+          leader: m.leader,
+          alone: people.length === 1
+        };
     });
+  });
+  var clash = list.filter(function (m) {
+    return holders[m[codeId]];
+  });
+  if (!clash.length) return [];
+  var movable = clash.filter(function (m) {
+    return !holders[m[codeId]].alone;
+  });
+  asked = (asked || []).map(String);
+  var askedAll =
+    movable.length === clash.length &&
+    movable.every(function (m) {
+      return asked.indexOf(String(m[codeId])) !== -1;
+    });
+  if (!askedAll) {
+    fail(
+      'duplicate_member',
+      'Someone on this team is already registered in another team.',
+      {
+        codes: clash.map(function (m) {
+          return m[codeId];
+        }),
+        transfer: movable.map(function (m) {
+          var held = holders[m[codeId]];
+          return held.leader
+            ? { code: m[codeId], team: held.ref, leader: true }
+            : { code: m[codeId], team: held.ref };
+        })
+      }
+    );
   }
-  data[mf.id] = list.filter(function (m) { return !holders[m[codeId]]; });
+  data[mf.id] = list.filter(function (m) {
+    return !holders[m[codeId]];
+  });
   setTeamSize_(form, data);
-  return movable.map(function (m) { return { code: String(m[codeId]), member: m, fromId: holders[m[codeId]].id, fromRef: holders[m[codeId]].ref }; });
+  return movable.map(function (m) {
+    return {
+      code: String(m[codeId]),
+      member: m,
+      fromId: holders[m[codeId]].id,
+      fromRef: holders[m[codeId]].ref
+    };
+  });
 }
 
 /** Records one request for each wanted member, unless the same one is already waiting. */
 function recordTransfers_(form, team, wants) {
   if (!wants.length) return [];
-  var waiting = readTransfers_(form).filter(function (t) { return t.status === 'pending' && t.toId === team.id; });
-  return wants.filter(function (w) { return !waiting.some(function (t) { return t.code === w.code; }); }).map(function (w) {
-    return saveTransfer_(form, { id: uuid(), created: nowIso(), status: 'pending', code: w.code, member: w.member, fromId: w.fromId, fromRef: w.fromRef, toId: team.id, toRef: team.ref, decidedBy: '' });
+  var waiting = readTransfers_(form).filter(function (t) {
+    return t.status === 'pending' && t.toId === team.id;
   });
+  return wants
+    .filter(function (w) {
+      return !waiting.some(function (t) {
+        return t.code === w.code;
+      });
+    })
+    .map(function (w) {
+      return saveTransfer_(form, {
+        id: uuid(),
+        created: nowIso(),
+        status: 'pending',
+        code: w.code,
+        member: w.member,
+        fromId: w.fromId,
+        fromRef: w.fromRef,
+        toId: team.id,
+        toRef: team.ref,
+        decidedBy: ''
+      });
+    });
 }
 
 /** Closes the waiting requests of a team that no longer exists. */
 function closeTransfersOf_(form, teamId) {
   readTransfers_(form).forEach(function (t) {
-    if (t.status === 'pending' && (t.toId === teamId || t.fromId === teamId)) { t.status = 'closed'; saveTransfer_(form, t); }
+    if (t.status === 'pending' && (t.toId === teamId || t.fromId === teamId)) {
+      t.status = 'closed';
+      saveTransfer_(form, t);
+    }
   });
 }
 
@@ -181,33 +301,53 @@ function closeTransfersOf_(form, teamId) {
  */
 function decideTransfer_(form, id, approve, by, fromId, next) {
   var all = readTransfers_(form);
-  var t = all.filter(function (x) { return x.id === String(id) && x.status === 'pending'; })[0];
-  if (!t || (fromId && t.fromId !== fromId)) fail('transfer_gone', 'This request was already answered.');
+  var t = all.filter(function (x) {
+    return x.id === String(id) && x.status === 'pending';
+  })[0];
+  if (!t || (fromId && t.fromId !== fromId))
+    fail('transfer_gone', 'This request was already answered.');
   if (!approve) {
-    t.status = 'rejected'; t.decidedBy = by;
+    t.status = 'rejected';
+    t.decidedBy = by;
     return { transfer: saveTransfer_(form, t), underMin: false, handed: false };
   }
   var rows = readResponses(form);
   var mf = Rules.fieldByRole(form, 'members');
   var codeId = memberCodeId_(form);
   var range = Rules.teamSizeRange(form);
-  var to = rows.filter(function (r) { return r.id === t.toId; })[0];
+  var to = rows.filter(function (r) {
+    return r.id === t.toId;
+  })[0];
   if (!to) {
-    t.status = 'closed'; saveTransfer_(form, t);
+    t.status = 'closed';
+    saveTransfer_(form, t);
     fail('transfer_gone', 'The team that asked no longer exists.');
   }
   var toList = Array.isArray(to.data[mf.id]) ? to.data[mf.id] : [];
   var most = mf.max == null ? range.max - 1 : mf.max;
-  var has = function (list) { return list.some(function (m) { return String(m[codeId]) === t.code; }); };
-  if (!has(toList) && toList.length >= most) fail('transfer_full', 'The team that asked is full now.');
+  var has = function (list) {
+    return list.some(function (m) {
+      return String(m[codeId]) === t.code;
+    });
+  };
+  if (!has(toList) && toList.length >= most)
+    fail('transfer_full', 'The team that asked is full now.');
 
-  var underMin = false, handed = false;
+  var underMin = false,
+    handed = false;
   rows.forEach(function (r) {
     if (r.id === to.id) return;
-    var mine = Rules.membersOf(form, r.data).filter(function (m) { return m.code === t.code; })[0];
+    var mine = Rules.membersOf(form, r.data).filter(function (m) {
+      return m.code === t.code;
+    })[0];
     if (!mine) return;
-    if (mine.leader) { handOver_(form, r.data, next); handed = true; }
-    else r.data[mf.id] = (r.data[mf.id] || []).filter(function (m) { return String(m[codeId]) !== t.code; });
+    if (mine.leader) {
+      handOver_(form, r.data, next);
+      handed = true;
+    } else
+      r.data[mf.id] = (r.data[mf.id] || []).filter(function (m) {
+        return String(m[codeId]) !== t.code;
+      });
     setTeamSize_(form, r.data);
     underMin = underMin || r.data[mf.id].length + 1 < range.min;
     applyDerived_(form, r);
@@ -219,10 +359,16 @@ function decideTransfer_(form, id, approve, by, fromId, next) {
     applyDerived_(form, to);
     saveResponse_(form, to);
   }
-  t.status = 'approved'; t.decidedBy = by;
+  t.status = 'approved';
+  t.decidedBy = by;
   saveTransfer_(form, t);
   // The student moved, so nobody else can be given the same student.
-  all.forEach(function (x) { if (x.id !== t.id && x.status === 'pending' && x.code === t.code) { x.status = 'closed'; saveTransfer_(form, x); } });
+  all.forEach(function (x) {
+    if (x.id !== t.id && x.status === 'pending' && x.code === t.code) {
+      x.status = 'closed';
+      saveTransfer_(form, x);
+    }
+  });
   return { transfer: t, underMin: underMin, handed: handed };
 }
 
@@ -234,13 +380,44 @@ function teamTransfers_(form, team) {
   var people = Rules.membersOf(form, team.data);
   var contact = leaderContacts_(form);
   return {
-    incoming: all.filter(function (t) { return t.status === 'pending' && t.fromId === team.id; }).map(function (t) {
-      var m = people.filter(function (x) { return String(x.code) === t.code; })[0] || {};
-      return Object.assign({ id: t.id, code: t.code, name: m.name || '', team: t.toRef, sizeAfter: Math.max(people.length - 1, 0), min: range.min }, leaderAsked_(form, team, t.code), contact(t.toId));
-    }),
-    outgoing: all.filter(function (t) { return t.toId === team.id && t.status !== 'cancelled'; }).map(function (t) {
-      return Object.assign({ id: t.id, code: t.code, name: t.member.name || '', team: t.fromRef, status: t.status }, t.status === 'pending' ? contact(t.fromId) : {});
-    })
+    incoming: all
+      .filter(function (t) {
+        return t.status === 'pending' && t.fromId === team.id;
+      })
+      .map(function (t) {
+        var m =
+          people.filter(function (x) {
+            return String(x.code) === t.code;
+          })[0] || {};
+        return Object.assign(
+          {
+            id: t.id,
+            code: t.code,
+            name: m.name || '',
+            team: t.toRef,
+            sizeAfter: Math.max(people.length - 1, 0),
+            min: range.min
+          },
+          leaderAsked_(form, team, t.code),
+          contact(t.toId)
+        );
+      }),
+    outgoing: all
+      .filter(function (t) {
+        return t.toId === team.id && t.status !== 'cancelled';
+      })
+      .map(function (t) {
+        return Object.assign(
+          {
+            id: t.id,
+            code: t.code,
+            name: t.member.name || '',
+            team: t.fromRef,
+            status: t.status
+          },
+          t.status === 'pending' ? contact(t.fromId) : {}
+        );
+      })
   };
 }
 
@@ -250,20 +427,66 @@ function mailTransfer_(form, t, kind) {
     // The leaders see requests when they open the form with their key; email only when switched on.
     if ((form.rules || {}).transferEmails !== true) return;
     var rows = readResponses(form);
-    var team = rows.filter(function (r) { return r.id === (kind === 'asked' || kind === 'leads' ? t.fromId : t.toId); })[0];
+    var team = rows.filter(function (r) {
+      return (
+        r.id === (kind === 'asked' || kind === 'leads' ? t.fromId : t.toId)
+      );
+    })[0];
     var to = team && Rules.valueByRole(form, team.data, 'email');
     if (!to) return;
     var who = (t.member.name || '') + ' (' + t.code + ')';
     var link = siteLink_(form);
-    var lines = kind === 'asked'
-      ? ['Team ' + t.toRef + ' asks for ' + who + ', who is on your team ' + t.fromRef + '.', '', 'Open the form with your edit key to approve or reject.' + (link ? ' ' + link : '')]
-      : kind === 'leads'
-        ? ['You now lead team ' + t.fromRef + '. ' + who + ' led it and moved to team ' + t.toRef + '.', '', 'Ask them for the edit key of the team; it opens the form for you.' + (link ? ' ' + link : '')]
-        : kind === 'approved'
-          ? [who + ' moved to your team ' + t.toRef + '.']
-          : ['Team ' + t.fromRef + ' kept ' + who + '. Your team ' + t.toRef + ' stays as it is.'];
-    var subject = kind === 'asked' ? 'A team asks for one of your members' : kind === 'leads' ? 'You now lead your team' : kind === 'approved' ? 'Your request was approved' : 'Your request was rejected';
-    MailApp.sendEmail({ to: to, subject: '[' + form.title + '] ' + subject, body: lines.join('\n') });
+    var lines =
+      kind === 'asked'
+        ? [
+            'Team ' +
+              t.toRef +
+              ' asks for ' +
+              who +
+              ', who is on your team ' +
+              t.fromRef +
+              '.',
+            '',
+            'Open the form with your edit key to approve or reject.' +
+              (link ? ' ' + link : '')
+          ]
+        : kind === 'leads'
+          ? [
+              'You now lead team ' +
+                t.fromRef +
+                '. ' +
+                who +
+                ' led it and moved to team ' +
+                t.toRef +
+                '.',
+              '',
+              'Ask them for the edit key of the team; it opens the form for you.' +
+                (link ? ' ' + link : '')
+            ]
+          : kind === 'approved'
+            ? [who + ' moved to your team ' + t.toRef + '.']
+            : [
+                'Team ' +
+                  t.fromRef +
+                  ' kept ' +
+                  who +
+                  '. Your team ' +
+                  t.toRef +
+                  ' stays as it is.'
+              ];
+    var subject =
+      kind === 'asked'
+        ? 'A team asks for one of your members'
+        : kind === 'leads'
+          ? 'You now lead your team'
+          : kind === 'approved'
+            ? 'Your request was approved'
+            : 'Your request was rejected';
+    MailApp.sendEmail({
+      to: to,
+      subject: '[' + form.title + '] ' + subject,
+      body: lines.join('\n')
+    });
   } catch (e) {
     Logger.log('Transfer email not sent: ' + e.message);
   }
@@ -281,11 +504,26 @@ API['transfer.decide'] = function (req) {
   var form = requireForm(String(req.slug || ''));
   var vform = validationForm(form);
   var found = findByKey_(form, req.key);
-  var out = withLock_(function () { return decideTransfer_(vform, req.id, !!req.approve, 'leader', found.id, req.handover); });
+  var out = withLock_(function () {
+    return decideTransfer_(
+      vform,
+      req.id,
+      !!req.approve,
+      'leader',
+      found.id,
+      req.handover
+    );
+  });
   afterChange_(form);
   mailDecision_(vform, out);
-  var fresh = readResponses(form).filter(function (r) { return r.id === found.id; })[0];
-  return { submission: publicSubmission_(fresh), transfers: teamTransfers_(vform, fresh), underMin: out.underMin };
+  var fresh = readResponses(form).filter(function (r) {
+    return r.id === found.id;
+  })[0];
+  return {
+    submission: publicSubmission_(fresh),
+    transfers: teamTransfers_(vform, fresh),
+    underMin: out.underMin
+  };
 };
 
 API['transfer.cancel'] = function (req) {
@@ -293,7 +531,11 @@ API['transfer.cancel'] = function (req) {
   var vform = validationForm(form);
   var found = findByKey_(form, req.key);
   withLock_(function () {
-    var t = readTransfers_(form).filter(function (x) { return x.id === String(req.id) && x.status === 'pending' && x.toId === found.id; })[0];
+    var t = readTransfers_(form).filter(function (x) {
+      return (
+        x.id === String(req.id) && x.status === 'pending' && x.toId === found.id
+      );
+    })[0];
     if (!t) fail('transfer_gone', 'This request was already answered.');
     t.status = 'cancelled';
     saveTransfer_(form, t);
@@ -305,18 +547,41 @@ API['transfer.cancel'] = function (req) {
 
 /** The waiting requests, with the names the dashboard shows and, for a leader, who can lead next. */
 function adminTransfers_(form) {
-  var waiting = readTransfers_(form).filter(function (t) { return t.status === 'pending'; });
+  var waiting = readTransfers_(form).filter(function (t) {
+    return t.status === 'pending';
+  });
   var rows = waiting.length ? readResponses(form) : [];
   return waiting.map(function (t) {
-    var from = rows.filter(function (r) { return r.id === t.fromId; })[0];
-    return Object.assign({ id: t.id, created: t.created, code: t.code, name: t.member.name || '', from: t.fromRef, to: t.toRef }, leaderAsked_(form, from, t.code));
+    var from = rows.filter(function (r) {
+      return r.id === t.fromId;
+    })[0];
+    return Object.assign(
+      {
+        id: t.id,
+        created: t.created,
+        code: t.code,
+        name: t.member.name || '',
+        from: t.fromRef,
+        to: t.toRef
+      },
+      leaderAsked_(form, from, t.code)
+    );
   });
 }
 
 API['admin.transfer.decide'] = admin(function (req) {
   var form = requireForm(req.slug || req.id);
   var vform = validationForm(form);
-  var out = withLock_(function () { return decideTransfer_(vform, req.transfer, !!req.approve, 'admin', '', req.handover); });
+  var out = withLock_(function () {
+    return decideTransfer_(
+      vform,
+      req.transfer,
+      !!req.approve,
+      'admin',
+      '',
+      req.handover
+    );
+  });
   afterChange_(form);
   mailDecision_(vform, out);
   return { transfers: adminTransfers_(form), underMin: out.underMin };

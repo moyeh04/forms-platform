@@ -4,7 +4,12 @@
  */
 
 var SUBMISSION_STATUSES = ['new', 'in_review', 'approved', 'rejected', 'done'];
-var REF_PREFIX_ = { team_registration: 'TR', task_submission: 'TK', reservation: 'RS', whatsapp_registration: 'WA' };
+var REF_PREFIX_ = {
+  team_registration: 'TR',
+  task_submission: 'TK',
+  reservation: 'RS',
+  whatsapp_registration: 'WA'
+};
 
 function responsesSheet(form) {
   var ss = SpreadsheetApp.openById(form.sheetId);
@@ -14,18 +19,36 @@ function responsesSheet(form) {
 function rowToResponse_(r) {
   return {
     _row: r._row,
-    id: String(r.id), ref: String(r.ref), created: String(r.created), updated: String(r.updated),
-    status: String(r.status || 'new'), review: parseJson(r.review, {}),
-    email: String(r.email), name: String(r.name), code: String(r.code), phone: String(r.phone),
-    title: String(r.title), link: String(r.link), slot: String(r.slot), members: String(r.members),
-    data: parseJson(r.data, {}), keyHash: String(r.keyHash), keyExpires: String(r.keyExpires),
-    deleted: String(r.deleted) === '1', keySeal: String(r.keySeal || ''), number: parseInt(r.number, 10) || 0
+    id: String(r.id),
+    ref: String(r.ref),
+    created: String(r.created),
+    updated: String(r.updated),
+    status: String(r.status || 'new'),
+    review: parseJson(r.review, {}),
+    email: String(r.email),
+    name: String(r.name),
+    code: String(r.code),
+    phone: String(r.phone),
+    title: String(r.title),
+    link: String(r.link),
+    slot: String(r.slot),
+    members: String(r.members),
+    data: parseJson(r.data, {}),
+    keyHash: String(r.keyHash),
+    keyExpires: String(r.keyExpires),
+    deleted: String(r.deleted) === '1',
+    keySeal: String(r.keySeal || ''),
+    number: parseInt(r.number, 10) || 0
   };
 }
 
 function readResponses(form, includeDeleted) {
   var rows = readTable(responsesSheet(form), RESPONSE_COLS).map(rowToResponse_);
-  return includeDeleted ? rows : rows.filter(function (r) { return !r.deleted; });
+  return includeDeleted
+    ? rows
+    : rows.filter(function (r) {
+        return !r.deleted;
+      });
 }
 
 function responseToRow_(r) {
@@ -56,26 +79,47 @@ function applyDerived_(form, r) {
   r.phone = Rules.valueByRole(form, d, 'phone') || '';
   r.title = Rules.valueByRole(form, d, 'title') || '';
   r.link = Rules.valueByRole(form, d, 'link') || '';
-  r.slot = slotField && d[slotField.id] ? Rules.slotKey(d[slotField.id].day, d[slotField.id].time) : '';
-  r.members = Rules.membersOf(form, d).filter(function (m) { return !m.leader; }).map(function (m) { return m.name + ' (' + m.code + ')'; }).join('; ');
+  r.slot =
+    slotField && d[slotField.id]
+      ? Rules.slotKey(d[slotField.id].day, d[slotField.id].time)
+      : '';
+  r.members = Rules.membersOf(form, d)
+    .filter(function (m) {
+      return !m.leader;
+    })
+    .map(function (m) {
+      return m.name + ' (' + m.code + ')';
+    })
+    .join('; ');
   return r;
 }
 
 function nextRef_(form) {
   var count = Math.max(0, responsesSheet(form).getLastRow() - 1);
   var year = new Date().getUTCFullYear();
-  return (REF_PREFIX_[form.type] || 'FM') + '-' + year + '-' + ('000' + (count + 1)).slice(-4);
+  return (
+    (REF_PREFIX_[form.type] || 'FM') +
+    '-' +
+    year +
+    '-' +
+    ('000' + (count + 1)).slice(-4)
+  );
 }
 
 function defaultReview_(form) {
   var out = {};
-  ((form.review && form.review.steps) || []).forEach(function (s) { out[s.id] = 'pending'; });
+  ((form.review && form.review.steps) || []).forEach(function (s) {
+    out[s.id] = 'pending';
+  });
   return out;
 }
 
 function assertAcceptingSubmissions_(form) {
   var state = Rules.formState(form);
-  if (state !== 'open') fail('form_' + state, 'This form is not accepting submissions.', { state: state });
+  if (state !== 'open')
+    fail('form_' + state, 'This form is not accepting submissions.', {
+      state: state
+    });
 }
 
 /* ── Review steps ─────────────────────────────────────────────── */
@@ -84,10 +128,17 @@ var REVIEW_STATUSES = ['pending', 'approved', 'rejected'];
 
 /** new -> in_review -> approved, or rejected as soon as any step is rejected. */
 function reviewStatus_(steps, review) {
-  var vals = steps.map(function (s) { return review[s.id] || 'pending'; });
+  var vals = steps.map(function (s) {
+    return review[s.id] || 'pending';
+  });
   if (!vals.length) return null;
   if (vals.indexOf('rejected') !== -1) return 'rejected';
-  if (vals.every(function (v) { return v === 'approved'; })) return 'approved';
+  if (
+    vals.every(function (v) {
+      return v === 'approved';
+    })
+  )
+    return 'approved';
   if (vals.indexOf('approved') !== -1) return 'in_review';
   return 'new';
 }
@@ -100,16 +151,26 @@ function reviewStatus_(steps, review) {
 function setReviewStep_(form, r, stepId, status) {
   var steps = (form.review && form.review.steps) || [];
   var idx = -1;
-  steps.forEach(function (s, i) { if (s.id === stepId) idx = i; });
+  steps.forEach(function (s, i) {
+    if (s.id === stepId) idx = i;
+  });
   if (idx < 0) fail('bad_step', 'Unknown review step.');
-  if (REVIEW_STATUSES.indexOf(status) === -1) fail('bad_status', 'Unknown review status.');
+  if (REVIEW_STATUSES.indexOf(status) === -1)
+    fail('bad_status', 'Unknown review status.');
   var sequential = form.review.sequential !== false;
-  if (sequential && status === 'approved' && idx > 0 && r.review[steps[idx - 1].id] !== 'approved') {
+  if (
+    sequential &&
+    status === 'approved' &&
+    idx > 0 &&
+    r.review[steps[idx - 1].id] !== 'approved'
+  ) {
     fail('review_order', 'Finish "' + steps[idx - 1].label.en + '" first.');
   }
   r.review[stepId] = status;
   if (sequential && status !== 'approved') {
-    for (var i = idx + 1; i < steps.length; i++) if (r.review[steps[i].id] === 'approved') r.review[steps[i].id] = 'pending';
+    for (var i = idx + 1; i < steps.length; i++)
+      if (r.review[steps[i].id] === 'approved')
+        r.review[steps[i].id] = 'pending';
   }
   var derived = reviewStatus_(steps, r.review);
   if (derived) r.status = derived;
@@ -132,13 +193,29 @@ function keyPad_(form, responseId) {
 
 /** Shifts each digit of `key` by the matching hex digit of `pad`. Client keys use it too. */
 function sealDigits_(pad, key) {
-  return 'S' + String(key).split('').map(function (d, i) { return String((parseInt(d, 10) + parseInt(pad.charAt(i), 16)) % 10); }).join('');
+  return (
+    'S' +
+    String(key)
+      .split('')
+      .map(function (d, i) {
+        return String((parseInt(d, 10) + parseInt(pad.charAt(i), 16)) % 10);
+      })
+      .join('')
+  );
 }
 
 function unsealDigits_(pad, seal, length) {
   var s = String(seal || '');
   if (!new RegExp('^S\\d{' + length + '}$').test(s)) return '';
-  return s.slice(1).split('').map(function (d, i) { return String(((parseInt(d, 10) - parseInt(pad.charAt(i), 16)) % 10 + 10) % 10); }).join('');
+  return s
+    .slice(1)
+    .split('')
+    .map(function (d, i) {
+      return String(
+        (((parseInt(d, 10) - parseInt(pad.charAt(i), 16)) % 10) + 10) % 10
+      );
+    })
+    .join('');
 }
 
 function sealKey_(form, responseId, key) {
@@ -151,7 +228,9 @@ function unsealKey_(form, responseId, seal) {
 
 function issueKey_(form, rows) {
   var used = {};
-  rows.forEach(function (r) { if (!r.deleted && r.keyHash) used[r.keyHash] = true; });
+  rows.forEach(function (r) {
+    if (!r.deleted && r.keyHash) used[r.keyHash] = true;
+  });
   for (var i = 0; i < 60; i++) {
     var key = randomDigits(5);
     var h = keyHash_(form, key);
@@ -164,7 +243,9 @@ function issueKey_(form, rows) {
 function bookingKey_(form, rows, key) {
   key = String(key || '').trim();
   var hash = keyHash_(form, key);
-  var used = rows.some(function (r) { return !r.deleted && r.keyHash === hash; });
+  var used = rows.some(function (r) {
+    return !r.deleted && r.keyHash === hash;
+  });
   return used ? issueKey_(form, rows) : { key: key, hash: hash };
 }
 
@@ -174,7 +255,8 @@ function keyExpiry_(form) {
 }
 
 function requireKeyEnabled_(form) {
-  if (!form.editKey || !form.editKey.enabled) fail('key_disabled', 'Editing with a key is turned off for this form.');
+  if (!form.editKey || !form.editKey.enabled)
+    fail('key_disabled', 'Editing with a key is turned off for this form.');
 }
 
 /** Finds the registration a key belongs to. Wrong guesses are throttled. `anyAge` accepts a key that has expired. */
@@ -183,53 +265,87 @@ function findByKey_(form, key, anyAge) {
   var cache = CacheService.getScriptCache();
   var tag = 'badkey:' + form.id;
   var fails = parseInt(cache.get(tag) || '0', 10);
-  if (fails >= 10) fail('too_many_attempts', 'Too many wrong keys. Wait a minute and try again.');
+  if (fails >= 10)
+    fail(
+      'too_many_attempts',
+      'Too many wrong keys. Wait a minute and try again.'
+    );
   key = String(key || '').trim();
   var h = /^\d{5}$/.test(key) ? keyHash_(form, key) : '';
   var hit = null;
-  readResponses(form).forEach(function (r) { if (h && r.keyHash === h) hit = r; });
+  readResponses(form).forEach(function (r) {
+    if (h && r.keyHash === h) hit = r;
+  });
   if (!hit) {
     cache.put(tag, String(fails + 1), 60);
     fail('bad_key', 'That key is not right.');
   }
-  if (!anyAge && hit.keyExpires && Date.parse(hit.keyExpires) < Date.now()) fail('key_expired', 'This key has expired. Ask your instructor to extend it, or to make the change for you.');
+  if (!anyAge && hit.keyExpires && Date.parse(hit.keyExpires) < Date.now())
+    fail(
+      'key_expired',
+      'This key has expired. Ask your instructor to extend it, or to make the change for you.'
+    );
   return hit;
 }
 
 /* ── Rules that need the other rows ───────────────────────────── */
 
 function checkLimits_(form, data, rows, selfId) {
-  var others = rows.filter(function (r) { return r.id !== selfId; });
+  var others = rows.filter(function (r) {
+    return r.id !== selfId;
+  });
   var rules = form.rules || {};
 
-  if (rules.maxSubmissions && !selfId && others.length >= rules.maxSubmissions) {
+  if (
+    rules.maxSubmissions &&
+    !selfId &&
+    others.length >= rules.maxSubmissions
+  ) {
     fail('form_full', 'This form is full.');
   }
 
   if (rules.uniqueBy && data[rules.uniqueBy]) {
     others.forEach(function (r) {
       if (String(r.data[rules.uniqueBy]) === String(data[rules.uniqueBy])) {
-        fail('duplicate', 'This code is already registered. Use your key to edit it.', { field: rules.uniqueBy });
+        fail(
+          'duplicate',
+          'This code is already registered. Use your key to edit it.',
+          { field: rules.uniqueBy }
+        );
       }
     });
   }
 
   if (rules.uniqueAcrossForm) {
     var mine = {};
-    Rules.membersOf(form, data).forEach(function (m) { if (m.code) mine[m.code] = true; });
+    Rules.membersOf(form, data).forEach(function (m) {
+      if (m.code) mine[m.code] = true;
+    });
     var clash = [];
     others.forEach(function (r) {
-      Rules.membersOf(form, r.data).forEach(function (m) { if (m.code && mine[m.code]) clash.push(m.code); });
+      Rules.membersOf(form, r.data).forEach(function (m) {
+        if (m.code && mine[m.code]) clash.push(m.code);
+      });
     });
-    if (clash.length) fail('duplicate_member', 'Someone on this team is already registered in another team.', { codes: clash });
+    if (clash.length)
+      fail(
+        'duplicate_member',
+        'Someone on this team is already registered in another team.',
+        { codes: clash }
+      );
   }
 
   var slotField = Rules.fieldByRole(form, 'slot');
   if (slotField && data[slotField.id]) {
     var key = Rules.slotKey(data[slotField.id].day, data[slotField.id].time);
     var counts = {};
-    others.forEach(function (r) { if (r.slot) counts[r.slot] = (counts[r.slot] || 0) + 1; });
-    if (!Rules.slotRoom(form, counts, key)) fail('slot_taken', 'That slot was just taken. Pick another.', { slot: key });
+    others.forEach(function (r) {
+      if (r.slot) counts[r.slot] = (counts[r.slot] || 0) + 1;
+    });
+    if (!Rules.slotRoom(form, counts, key))
+      fail('slot_taken', 'That slot was just taken. Pick another.', {
+        slot: key
+      });
   }
 }
 
@@ -246,13 +362,18 @@ function countResponses_(form, numberOf) {
 /** How many saved teams have each size. A team with no size counts under 0. */
 function teamSizes_(form) {
   var field = Rules.fieldByRole(form, 'team_size');
-  return countResponses_(form, function (r) { return parseInt(r.data[field.id], 10) || 0; });
+  return countResponses_(form, function (r) {
+    return parseInt(r.data[field.id], 10) || 0;
+  });
 }
 
 /** How many saved bookings have each number of teammates. */
 function teammateCounts_(form) {
   var field = Rules.fieldByRole(form, 'members');
-  return countResponses_(form, function (r) { var list = r.data[field.id]; return Array.isArray(list) ? list.length : 0; });
+  return countResponses_(form, function (r) {
+    var list = r.data[field.id];
+    return Array.isArray(list) ? list.length : 0;
+  });
 }
 
 /* ── Drive links ──────────────────────────────────────────────── */
@@ -262,16 +383,28 @@ function checkDriveLink_(link, naming) {
   if (!p.ok) return { ok: false, error: 'invalid_link' };
   var item;
   try {
-    item = p.kind === 'folder' ? DriveApp.getFolderById(p.id) : DriveApp.getFileById(p.id);
+    item =
+      p.kind === 'folder'
+        ? DriveApp.getFolderById(p.id)
+        : DriveApp.getFileById(p.id);
   } catch (e) {
     return { ok: false, error: 'link_unreachable' };
   }
   var access = null;
-  try { access = String(item.getSharingAccess()); } catch (e) { access = null; }
-  if (access && access !== 'ANYONE' && access !== 'ANYONE_WITH_LINK') return { ok: false, error: 'link_not_public' };
+  try {
+    access = String(item.getSharingAccess());
+  } catch (e) {
+    access = null;
+  }
+  if (access && access !== 'ANYONE' && access !== 'ANYONE_WITH_LINK')
+    return { ok: false, error: 'link_not_public' };
   if (naming && p.kind === 'folder') {
     var name = '';
-    try { name = String(item.getName()); } catch (e) { return { ok: true }; }
+    try {
+      name = String(item.getName());
+    } catch (e) {
+      return { ok: true };
+    }
     var r = Rules.checkFolderName(name, naming);
     if (!r.ok) return r;
   }
@@ -282,7 +415,10 @@ function checkDriveLink_(link, naming) {
 function folderNaming_(form, data) {
   var fn = form.rules && form.rules.folderName;
   if (!fn || !fn.enabled) return null;
-  return { subject: String(fn.subject || ''), example: { project: Rules.valueByRole(form, data || {}, 'title') } };
+  return {
+    subject: String(fn.subject || ''),
+    example: { project: Rules.valueByRole(form, data || {}, 'title') }
+  };
 }
 
 function checkDriveFields_(form, data) {
@@ -294,7 +430,8 @@ function checkDriveFields_(form, data) {
     var r = checkDriveLink_(data[f.id], naming);
     if (!r.ok) errors[f.id] = { error: r.error, params: r.params };
   });
-  if (Object.keys(errors).length) fail('invalid', 'Check the Google Drive links.', errors);
+  if (Object.keys(errors).length)
+    fail('invalid', 'Check the Google Drive links.', errors);
 }
 
 /* ── Notifications ────────────────────────────────────────────── */
@@ -314,21 +451,40 @@ function sendConfirmation_(form, result, data) {
       var lines = [
         'Your registration was received.',
         '',
-        'Form: ' + form.title + (FormMetadata.caption(form) ? ' (' + FormMetadata.caption(form) + ')' : ''),
+        'Form: ' +
+          form.title +
+          (FormMetadata.caption(form)
+            ? ' (' + FormMetadata.caption(form) + ')'
+            : ''),
         'Reference: ' + result.ref
       ];
       var keyed = form.editKey && form.editKey.enabled;
       if (keyed) {
-        lines.push('Edit key: ' + result.key, 'The key works until ' + result.keyExpires.slice(0, 10) + '.');
+        lines.push(
+          'Edit key: ' + result.key,
+          'The key works until ' + result.keyExpires.slice(0, 10) + '.'
+        );
         var link = siteLink_(form);
         if (link) lines.push('Edit or delete here: ' + link);
       }
-      lines.push('', 'تم استلام تسجيلك. ' + (keyed ? 'احتفظ بالرقم المرجعي والمفتاح.' : 'احتفظ بالرقم المرجعي.'));
-      MailApp.sendEmail({ to: to, subject: '[' + form.title + '] Registration received - ' + result.ref, body: lines.join('\n') });
+      lines.push(
+        '',
+        'تم استلام تسجيلك. ' +
+          (keyed ? 'احتفظ بالرقم المرجعي والمفتاح.' : 'احتفظ بالرقم المرجعي.')
+      );
+      MailApp.sendEmail({
+        to: to,
+        subject: '[' + form.title + '] Registration received - ' + result.ref,
+        body: lines.join('\n')
+      });
       sent = true;
     }
     if (n.alertEmail) {
-      MailApp.sendEmail({ to: n.alertEmail, subject: '[' + form.title + '] New submission ' + result.ref, body: 'A new submission arrived: ' + result.ref });
+      MailApp.sendEmail({
+        to: n.alertEmail,
+        subject: '[' + form.title + '] New submission ' + result.ref,
+        body: 'A new submission arrived: ' + result.ref
+      });
     }
   } catch (e) {
     Logger.log('Email not sent: ' + e.message);
@@ -338,5 +494,9 @@ function sendConfirmation_(form, result, data) {
 
 /** After a saved change: the form's sheet views are marked for a repaint. A failure here never fails the save. */
 function afterChange_(form) {
-  try { refreshViews(form); } catch (e) { Logger.log('Views not marked: ' + e.message); }
+  try {
+    refreshViews(form);
+  } catch (e) {
+    Logger.log('Views not marked: ' + e.message);
+  }
 }

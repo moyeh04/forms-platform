@@ -9,17 +9,44 @@
 
   var h = App.ui.h;
   var icon = App.ui.icon;
-  var t = function (k, p) { return App.i18n.t(k, p); };
+  var t = function (k, p) {
+    return App.i18n.t(k, p);
+  };
   // The bar about a newer version of the page speaks the language of the form.
-  App.fresh.words = function () { return { text: t('freshReady'), action: t('freshReload') }; };
-  var L = function (o) { return App.i18n.L(o); };
+  App.fresh.words = function () {
+    return { text: t('freshReady'), action: t('freshReload') };
+  };
+  var L = function (o) {
+    return App.i18n.L(o);
+  };
   var root = document.getElementById('app');
 
   var S = {
-    slug: '', form: null, state: '', taken: {}, view: 'loading', loadError: '',
-    steps: [], stepIndex: 0, data: {}, errors: {}, banner: null, busy: false,
-    mode: 'new', key: '', keyInfo: null, ownSlot: '', result: null, keyError: '',
-    team: null, teamBooked: false, teamSlot: null, teamCanMove: false, sourceKey: '', teamKey: '', teamError: ''
+    slug: '',
+    form: null,
+    state: '',
+    taken: {},
+    view: 'loading',
+    loadError: '',
+    steps: [],
+    stepIndex: 0,
+    data: {},
+    errors: {},
+    banner: null,
+    busy: false,
+    mode: 'new',
+    key: '',
+    keyInfo: null,
+    ownSlot: '',
+    result: null,
+    keyError: '',
+    team: null,
+    teamBooked: false,
+    teamSlot: null,
+    teamCanMove: false,
+    sourceKey: '',
+    teamKey: '',
+    teamError: ''
   };
 
   /* ── Data helpers ───────────────────────────────────────────── */
@@ -35,67 +62,141 @@
     var parts = path.split('.');
     var cur = S.data;
     for (var i = 0; i < parts.length - 1; i++) {
-      if (cur[parts[i]] == null) cur[parts[i]] = /^\d+$/.test(parts[i + 1]) ? [] : {};
+      if (cur[parts[i]] == null)
+        cur[parts[i]] = /^\d+$/.test(parts[i + 1]) ? [] : {};
       cur = cur[parts[i]];
     }
     cur[parts[parts.length - 1]] = v;
   }
 
-  function activeFields() { return (S.form.fields || []).filter(function (f) { return f.enabled !== false; }); }
+  function activeFields() {
+    return (S.form.fields || []).filter(function (f) {
+      return f.enabled !== false;
+    });
+  }
 
-  function fieldById(id) { return activeFields().filter(function (f) { return f.id === id; })[0]; }
+  function fieldById(id) {
+    return activeFields().filter(function (f) {
+      return f.id === id;
+    })[0];
+  }
 
-  function slotField() { return Rules.fieldByRole(S.form, 'slot'); }
+  function slotField() {
+    return Rules.fieldByRole(S.form, 'slot');
+  }
 
   /** True while a new booking is made with a registration key instead of typed answers. */
-  function keyMode() { return !!(S.form && S.form.keyBooking) && S.mode === 'new'; }
+  function keyMode() {
+    return !!(S.form && S.form.keyBooking) && S.mode === 'new';
+  }
 
   /** True for a booking opened with its key that may move to another time and change nothing else. */
-  function slotOnly() { return S.mode === 'edit' && !!(S.keyInfo && S.keyInfo.slotOnly) && !!slotField(); }
+  function slotOnly() {
+    return (
+      S.mode === 'edit' && !!(S.keyInfo && S.keyInfo.slotOnly) && !!slotField()
+    );
+  }
 
   /* ── Steps ──────────────────────────────────────────────────── */
 
   function buildSteps() {
     if (keyMode()) {
       var sf = slotField();
-      var def = (S.form.steps || []).filter(function (s) { return s.fields.indexOf(sf.id) !== -1; })[0];
-      S.steps = [{ id: '_team', team: true, fields: [] }, { id: 'slot', title: def ? def.title : sf.label, fields: [sf] }, { id: '_review', review: true, fields: [] }];
+      var def = (S.form.steps || []).filter(function (s) {
+        return s.fields.indexOf(sf.id) !== -1;
+      })[0];
+      S.steps = [
+        { id: '_team', team: true, fields: [] },
+        { id: 'slot', title: def ? def.title : sf.label, fields: [sf] },
+        { id: '_review', review: true, fields: [] }
+      ];
       return;
     }
     var fields = activeFields();
     var byId = {};
-    fields.forEach(function (f) { byId[f.id] = f; });
-    var defs = S.form.steps && S.form.steps.length ? S.form.steps : [{ id: 'all', title: { en: 'Details', ar: 'البيانات' }, fields: fields.map(function (f) { return f.id; }) }];
+    fields.forEach(function (f) {
+      byId[f.id] = f;
+    });
+    var defs =
+      S.form.steps && S.form.steps.length
+        ? S.form.steps
+        : [
+            {
+              id: 'all',
+              title: { en: 'Details', ar: 'البيانات' },
+              fields: fields.map(function (f) {
+                return f.id;
+              })
+            }
+          ];
     var used = {};
-    var steps = defs.map(function (s) {
-      return { id: s.id, title: s.title, fields: s.fields.filter(function (id) { return byId[id]; }).map(function (id) { used[id] = true; return byId[id]; }) };
-    }).filter(function (s) { return s.fields.length; });
-    var left = fields.filter(function (f) { return !used[f.id]; });
+    var steps = defs
+      .map(function (s) {
+        return {
+          id: s.id,
+          title: s.title,
+          fields: s.fields
+            .filter(function (id) {
+              return byId[id];
+            })
+            .map(function (id) {
+              used[id] = true;
+              return byId[id];
+            })
+        };
+      })
+      .filter(function (s) {
+        return s.fields.length;
+      });
+    var left = fields.filter(function (f) {
+      return !used[f.id];
+    });
     if (left.length) {
-      if (!steps.length) steps.push({ id: 'more', title: { en: 'Details', ar: 'البيانات' }, fields: [] });
-      steps[steps.length - 1].fields = steps[steps.length - 1].fields.concat(left);
+      if (!steps.length)
+        steps.push({
+          id: 'more',
+          title: { en: 'Details', ar: 'البيانات' },
+          fields: []
+        });
+      steps[steps.length - 1].fields =
+        steps[steps.length - 1].fields.concat(left);
     }
     steps.push({ id: '_review', review: true, fields: [] });
     S.steps = steps;
   }
 
-  function stepTitle(s) { return s.review ? t('reviewStep') : s.team ? t('teamStep') : L(s.title); }
+  function stepTitle(s) {
+    return s.review ? t('reviewStep') : s.team ? t('teamStep') : L(s.title);
+  }
 
   function stepOfPath(path) {
     var id = path.split('.')[0];
     for (var i = 0; i < S.steps.length; i++) {
-      for (var j = 0; j < S.steps[i].fields.length; j++) if (S.steps[i].fields[j].id === id) return i;
+      for (var j = 0; j < S.steps[i].fields.length; j++)
+        if (S.steps[i].fields[j].id === id) return i;
     }
     return 0;
   }
 
   /* ── Drafts: a reload should not wipe a half-filled form ───── */
 
-  function draftKey() { return 'fp_draft_' + S.slug; }
-  function sess() { try { return window.sessionStorage; } catch (e) { return null; } }
+  function draftKey() {
+    return 'fp_draft_' + S.slug;
+  }
+  function sess() {
+    try {
+      return window.sessionStorage;
+    } catch (e) {
+      return null;
+    }
+  }
   function saveDraft() {
     var s = sess();
-    if (s && S.mode === 'new') s.setItem(draftKey(), JSON.stringify({ data: S.data, step: S.stepIndex }));
+    if (s && S.mode === 'new')
+      s.setItem(
+        draftKey(),
+        JSON.stringify({ data: S.data, step: S.stepIndex })
+      );
   }
   function restoreDraft() {
     var s = sess();
@@ -106,9 +207,14 @@
       S.data = d.data || {};
       // The team is asked for again after a reload: the key is never kept in the browser.
       S.stepIndex = keyMode() ? 0 : Math.min(d.step || 0, S.steps.length - 1);
-    } catch (e) { /* ignore a broken draft */ }
+    } catch (e) {
+      /* ignore a broken draft */
+    }
   }
-  function clearDraft() { var s = sess(); if (s) s.removeItem(draftKey()); }
+  function clearDraft() {
+    var s = sess();
+    if (s) s.removeItem(draftKey());
+  }
 
   /* ── Loading ────────────────────────────────────────────────── */
 
@@ -121,14 +227,31 @@
       S.state = res.state;
       S.taken = res.taken || {};
       var metadata = FormMetadata.display(S.form);
-      document.title = S.form.title + metadata.map(function (item) { return item.variant === 'subject' ? ' (' + item.value + ')' : ' - ' + item.value; }).join('');
+      document.title =
+        S.form.title +
+        metadata
+          .map(function (item) {
+            return item.variant === 'subject'
+              ? ' (' + item.value + ')'
+              : ' - ' + item.value;
+          })
+          .join('');
       var cfg = S.form.lang || {};
-      var lang = cfg.allowSwitch === false ? cfg.default || 'en' : App.i18n.saved() || cfg.default || 'en';
+      var lang =
+        cfg.allowSwitch === false
+          ? cfg.default || 'en'
+          : App.i18n.saved() || cfg.default || 'en';
       App.i18n.set(lang);
       if (S.state === 'open' || S.state === 'closed') buildSteps();
-      if (S.state === 'open') { restoreDraft(); S.view = 'form'; } else S.view = 'closed';
+      if (S.state === 'open') {
+        restoreDraft();
+        S.view = 'form';
+      } else S.view = 'closed';
     } catch (e) {
-      S.loadError = e.code === 'form_not_found' ? t('notFound') : App.i18n.err({ error: e.code }) || e.message;
+      S.loadError =
+        e.code === 'form_not_found'
+          ? t('notFound')
+          : App.i18n.err({ error: e.code }) || e.message;
       S.view = 'error';
     }
     render();
@@ -138,7 +261,9 @@
     try {
       var res = await App.api.call({ action: 'getForm', slug: S.slug });
       S.taken = res.taken || {};
-    } catch (e) { /* keep what we have */ }
+    } catch (e) {
+      /* keep what we have */
+    }
   }
 
   /* ── Page chrome ────────────────────────────────────────────── */
@@ -147,10 +272,21 @@
     var bar = h('div', { class: 'topbar' });
     var allow = !S.form || !S.form.lang || S.form.lang.allowSwitch !== false;
     if (allow) {
-      bar.appendChild(h('button', { type: 'button', class: 'icon-btn', lang: App.i18n.lang === 'ar' ? 'en' : 'ar', onclick: function () {
-        App.i18n.set(App.i18n.lang === 'ar' ? 'en' : 'ar', true);
-        render();
-      } }, t('langToggle')));
+      bar.appendChild(
+        h(
+          'button',
+          {
+            type: 'button',
+            class: 'icon-btn',
+            lang: App.i18n.lang === 'ar' ? 'en' : 'ar',
+            onclick: function () {
+              App.i18n.set(App.i18n.lang === 'ar' ? 'en' : 'ar', true);
+              render();
+            }
+          },
+          t('langToggle')
+        )
+      );
     }
     bar.appendChild(App.ui.themeButton(t('themeToggle')));
     return bar;
@@ -160,23 +296,51 @@
   function audience() {
     var allowed = S.form && S.form.rules && S.form.rules.majors;
     if (!allowed || !allowed.length) return null;
-    var mf = (S.form.fields || []).filter(function (f) { return f.list === 'majors'; })[0];
+    var mf = (S.form.fields || []).filter(function (f) {
+      return f.list === 'majors';
+    })[0];
     var names = allowed.map(function (v) {
-      var o = mf && (mf.options || []).filter(function (x) { return String(x.value) === String(v); })[0];
+      var o =
+        mf &&
+        (mf.options || []).filter(function (x) {
+          return String(x.value) === String(v);
+        })[0];
       return o ? L(o.label) : v;
     });
-    return h('p', { class: 'audience' }, icon('team', 18), h('span', null, t('onlyFor', { names: names.join(t('and')) })));
+    return h(
+      'p',
+      { class: 'audience' },
+      icon('team', 18),
+      h('span', null, t('onlyFor', { names: names.join(t('and')) }))
+    );
   }
 
   function head() {
-    var ic = S.form && S.form.icon !== 'none' ? App.ui.formIcon(S.form.icon) : null;
-    return h('header', { class: 'form-head' },
+    var ic =
+      S.form && S.form.icon !== 'none' ? App.ui.formIcon(S.form.icon) : null;
+    return h(
+      'header',
+      { class: 'form-head' },
       ic ? h('span', { class: 'form-icon' }, icon(ic, 30)) : null,
       h('h1', { class: 'form-title' }, S.form ? S.form.title : ''),
-      S.form && FormMetadata.display(S.form).length ? h('div', { class: 'tags' },
-        FormMetadata.display(S.form).map(function (item) {
-          return h('span', { class: 'tag' + (item.variant === 'subject' ? ' tag-subject' : ''), lang: item.variant === 'subject' ? 'en' : null, dir: item.variant === 'subject' ? 'ltr' : null }, item.value);
-        })) : null,
+      S.form && FormMetadata.display(S.form).length
+        ? h(
+            'div',
+            { class: 'tags' },
+            FormMetadata.display(S.form).map(function (item) {
+              return h(
+                'span',
+                {
+                  class:
+                    'tag' + (item.variant === 'subject' ? ' tag-subject' : ''),
+                  lang: item.variant === 'subject' ? 'en' : null,
+                  dir: item.variant === 'subject' ? 'ltr' : null
+                },
+                item.value
+              );
+            })
+          )
+        : null,
       audience()
     );
   }
@@ -184,36 +348,94 @@
   // The step the ship was last drawn at, so that it sails on from there to the next island.
   var shipAt = null;
 
-  function art(name, cls) { return h('img', { class: cls, src: 'assets/img/' + name + '.svg', alt: '', draggable: 'false' }); }
+  function art(name, cls) {
+    return h('img', {
+      class: cls,
+      src: 'assets/img/' + name + '.svg',
+      alt: '',
+      draggable: 'false'
+    });
+  }
 
   /** The route as a sea: an island for each step, then the treasure island, and the ship at the island of the current step. */
   function trail() {
     var stops = S.steps.length + 1;
-    var at = function (i) { return ((i + 0.5) * 100 / stops).toFixed(3) + '%'; };
+    var at = function (i) {
+      return (((i + 0.5) * 100) / stops).toFixed(3) + '%';
+    };
     var from = shipAt === null ? S.stepIndex : shipAt;
     shipAt = S.stepIndex;
     var items = S.steps.map(function (s, i) {
-      return h('li', { class: i < S.stepIndex ? 'is-done' : i === S.stepIndex ? 'is-current' : '', 'aria-current': i === S.stepIndex ? 'step' : null },
-        h('span', { class: 'isle' }, art('island')), h('span', { class: 'trail-label' }, stepTitle(s)));
+      return h(
+        'li',
+        {
+          class:
+            i < S.stepIndex ? 'is-done' : i === S.stepIndex ? 'is-current' : '',
+          'aria-current': i === S.stepIndex ? 'step' : null
+        },
+        h('span', { class: 'isle' }, art('island')),
+        h('span', { class: 'trail-label' }, stepTitle(s))
+      );
     });
     // The treasure waits at the X on the last island, at the end of the route.
-    items.push(h('li', { class: 'trail-x', 'aria-hidden': 'true' },
-      h('span', { class: 'isle' }, art('island'), art('treasure', 'trail-treasure'), icon('x', 26)), h('span', { class: 'trail-label' }, t('treasure'))));
+    items.push(
+      h(
+        'li',
+        { class: 'trail-x', 'aria-hidden': 'true' },
+        h(
+          'span',
+          { class: 'isle' },
+          art('island'),
+          art('treasure', 'trail-treasure'),
+          icon('x', 26)
+        ),
+        h('span', { class: 'trail-label' }, t('treasure'))
+      )
+    );
     return [
-      h('div', { class: 'trail-sea' }, h('ol', { class: 'trail' }, items),
-        h('span', { class: 'trail-ship', style: '--at:' + at(S.stepIndex) + ';--from:' + at(from) }, art('ship'))),
-      h('p', { class: 'step-count' }, t('stepOf', { n: S.stepIndex + 1, total: S.steps.length }) + ' - ' + stepTitle(S.steps[S.stepIndex]))
+      h(
+        'div',
+        { class: 'trail-sea' },
+        h('ol', { class: 'trail' }, items),
+        h(
+          'span',
+          {
+            class: 'trail-ship',
+            style: '--at:' + at(S.stepIndex) + ';--from:' + at(from)
+          },
+          art('ship')
+        )
+      ),
+      h(
+        'p',
+        { class: 'step-count' },
+        t('stepOf', { n: S.stepIndex + 1, total: S.steps.length }) +
+          ' - ' +
+          stepTitle(S.steps[S.stepIndex])
+      )
     ];
   }
 
   function sheet() {
-    return h('section', { class: 'sheet' }, h('div', { class: 'wrap' }, Array.prototype.slice.call(arguments)));
+    return h(
+      'section',
+      { class: 'sheet' },
+      h('div', { class: 'wrap' }, Array.prototype.slice.call(arguments))
+    );
   }
 
   function bannerEl() {
     if (!S.banner) return null;
-    return h('div', { class: 'banner' + (S.banner.kind === 'info' ? ' info' : ''), role: S.banner.kind === 'info' ? 'status' : 'alert' },
-      S.banner.text, ' ', S.banner.action || null);
+    return h(
+      'div',
+      {
+        class: 'banner' + (S.banner.kind === 'info' ? ' info' : ''),
+        role: S.banner.kind === 'info' ? 'status' : 'alert'
+      },
+      S.banner.text,
+      ' ',
+      S.banner.action || null
+    );
   }
 
   /* ── Rendering ──────────────────────────────────────────────── */
@@ -221,8 +443,20 @@
   function render() {
     App.ui.clear(root);
     root.appendChild(topbar());
-    if (S.view === 'loading') root.appendChild(h('div', { class: 'loading' }, t('loading')));
-    else if (S.view === 'error') root.appendChild(sheet(h('h2', { class: 'state-title' }, S.loadError), h('button', { type: 'button', class: 'btn btn-quiet', onclick: load }, icon('refresh', 20), t('retry'))));
+    if (S.view === 'loading')
+      root.appendChild(h('div', { class: 'loading' }, t('loading')));
+    else if (S.view === 'error')
+      root.appendChild(
+        sheet(
+          h('h2', { class: 'state-title' }, S.loadError),
+          h(
+            'button',
+            { type: 'button', class: 'btn btn-quiet', onclick: load },
+            icon('refresh', 20),
+            t('retry')
+          )
+        )
+      );
     else if (S.view === 'closed') root.appendChild(closedView());
     else if (S.view === 'form') root.appendChild(formView());
     else if (S.view === 'keyEntry') root.appendChild(keyEntryView());
@@ -233,72 +467,226 @@
   }
 
   function closedView() {
-    var key = { closed: 'closed', not_yet: 'notYet', draft: 'draft', archived: 'closed' }[S.state] || 'closed';
-    var msg = S.form.messages && S.form.messages[key] ? L(S.form.messages[key]) : t(key);
+    var key =
+      {
+        closed: 'closed',
+        not_yet: 'notYet',
+        draft: 'draft',
+        archived: 'closed'
+      }[S.state] || 'closed';
+    var msg =
+      S.form.messages && S.form.messages[key]
+        ? L(S.form.messages[key])
+        : t(key);
     return sheet(head(), h('h2', { class: 'state-title' }, msg), editLink());
   }
 
   function editLink() {
-    if (!S.form.editKey || !S.form.editKey.enabled || !S.form.fields) return null;
-    return h('p', { class: 'foot' }, h('button', { type: 'button', class: 'link-btn', onclick: function () { S.view = 'keyEntry'; S.keyError = ''; render(); } }, t('editLink')));
+    if (!S.form.editKey || !S.form.editKey.enabled || !S.form.fields)
+      return null;
+    return h(
+      'p',
+      { class: 'foot' },
+      h(
+        'button',
+        {
+          type: 'button',
+          class: 'link-btn',
+          onclick: function () {
+            S.view = 'keyEntry';
+            S.keyError = '';
+            render();
+          }
+        },
+        t('editLink')
+      )
+    );
   }
 
   /** With a key the form is not a path: it opens on the summary, and each page is reached from there and returns to it. */
-  function hub() { return S.mode === 'edit'; }
-  function changed() { return JSON.stringify(S.data) !== S.original; }
+  function hub() {
+    return S.mode === 'edit';
+  }
+  function changed() {
+    return JSON.stringify(S.data) !== S.original;
+  }
 
   function formView() {
     var step = S.steps[S.stepIndex];
-    var title = h('h2', { class: 'step-title', tabindex: '-1', id: 'step-title' }, step.review ? t(hub() ? 'yourRegistration' : 'reviewTitle') : stepTitle(step));
-    var body = step.review ? reviewBody() : step.team ? teamBody() : step.fields.map(function (f) { return renderField(f, f.id); });
+    var title = h(
+      'h2',
+      { class: 'step-title', tabindex: '-1', id: 'step-title' },
+      step.review
+        ? t(hub() ? 'yourRegistration' : 'reviewTitle')
+        : stepTitle(step)
+    );
+    var body = step.review
+      ? reviewBody()
+      : step.team
+        ? teamBody()
+        : step.fields.map(function (f) {
+            return renderField(f, f.id);
+          });
     var last = S.stepIndex === S.steps.length - 1;
-    var primary = h('button', { type: 'submit', class: 'btn btn-primary', disabled: S.busy }, last ? (S.busy ? t('submitting') : t(S.mode === 'edit' ? 'saveChanges' : keyMode() ? 'book' : 'submit')) : hub() ? t('done') : t(step.team && !S.team ? 'findTeam' : 'next'), last || hub() ? null : icon('arrow', 20));
+    var primary = h(
+      'button',
+      { type: 'submit', class: 'btn btn-primary', disabled: S.busy },
+      last
+        ? S.busy
+          ? t('submitting')
+          : t(S.mode === 'edit' ? 'saveChanges' : keyMode() ? 'book' : 'submit')
+        : hub()
+          ? t('done')
+          : t(step.team && !S.team ? 'findTeam' : 'next'),
+      last || hub() ? null : icon('arrow', 20)
+    );
     // A team that has booked does not book again: its button opens the booking, at the time when it can move.
     if (step.team && S.team && S.teamBooked) {
-      primary = h('button', { type: 'button', class: 'btn btn-primary', name: 'open-booking', disabled: S.busy, onclick: function () { S.view = 'keyEntry'; S.keyError = ''; openByKey(S.sourceKey, S.teamCanMove); } },
-        t(S.teamCanMove ? 'moveTime' : 'editOpen'), icon('arrow', 20));
+      primary = h(
+        'button',
+        {
+          type: 'button',
+          class: 'btn btn-primary',
+          name: 'open-booking',
+          disabled: S.busy,
+          onclick: function () {
+            S.view = 'keyEntry';
+            S.keyError = '';
+            openByKey(S.sourceKey, S.teamCanMove);
+          }
+        },
+        t(S.teamCanMove ? 'moveTime' : 'editOpen'),
+        icon('arrow', 20)
+      );
     }
     // Save exists only when an answer differs from the saved registration.
-    if (hub() && last && !changed()) primary = h('p', { class: 'help no-changes' }, t('noChanges'));
-    var back = S.stepIndex > 0 && !hub() ? h('button', { type: 'button', class: 'btn btn-quiet', onclick: function () { go(S.stepIndex - 1); } }, t('back')) : null;
+    if (hub() && last && !changed())
+      primary = h('p', { class: 'help no-changes' }, t('noChanges'));
+    var back =
+      S.stepIndex > 0 && !hub()
+        ? h(
+            'button',
+            {
+              type: 'button',
+              class: 'btn btn-quiet',
+              onclick: function () {
+                go(S.stepIndex - 1);
+              }
+            },
+            t('back')
+          )
+        : null;
     // The summary of a registration opened with a key is also the way out of it.
     if (hub() && last) back = closeButton();
     var nav = h('div', { class: 'nav' }, back, primary);
-    var help = !step.review ? null : hub() ? t(slotOnly() ? 'yourBookingHelp' : 'yourRegistrationHelp') : t(S.form.editKey && S.form.editKey.enabled ? 'reviewHelpKey' : 'reviewHelp');
-    var f = h('form', { novalidate: 'novalidate', onsubmit: function (e) { e.preventDefault(); if (!S.busy) next(); } },
-      title, help ? h('p', { class: 'step-help' }, help) : null, body, nav);
-    var edit = S.mode === 'edit'
-      ? h('div', { class: 'banner info', role: 'status' }, t('editing', { ref: S.keyInfo.ref }) + '. ' + t('keyUntil', { date: App.i18n.fmtDate(S.keyInfo.keyExpires) }))
-      : null;
-    var cancel = S.mode === 'edit' && S.keyInfo.canDelete && last
-      ? h('p', { class: 'foot' }, h('button', { type: 'button', class: 'link-btn', onclick: askCancel }, t('cancelReg')))
-      : null;
+    var help = !step.review
+      ? null
+      : hub()
+        ? t(slotOnly() ? 'yourBookingHelp' : 'yourRegistrationHelp')
+        : t(
+            S.form.editKey && S.form.editKey.enabled
+              ? 'reviewHelpKey'
+              : 'reviewHelp'
+          );
+    var f = h(
+      'form',
+      {
+        novalidate: 'novalidate',
+        onsubmit: function (e) {
+          e.preventDefault();
+          if (!S.busy) next();
+        }
+      },
+      title,
+      help ? h('p', { class: 'step-help' }, help) : null,
+      body,
+      nav
+    );
+    var edit =
+      S.mode === 'edit'
+        ? h(
+            'div',
+            { class: 'banner info', role: 'status' },
+            t('editing', { ref: S.keyInfo.ref }) +
+              '. ' +
+              t('keyUntil', { date: App.i18n.fmtDate(S.keyInfo.keyExpires) })
+          )
+        : null;
+    var cancel =
+      S.mode === 'edit' && S.keyInfo.canDelete && last
+        ? h(
+            'p',
+            { class: 'foot' },
+            h(
+              'button',
+              { type: 'button', class: 'link-btn', onclick: askCancel },
+              t('cancelReg')
+            )
+          )
+        : null;
     // A booking made with a team's key starts with that key, so the page asks for a key in one place only:
     // a team that has booked is told so there, with the way to its booking.
-    return sheet(head(), edit, hub() ? transferNotes() : null, hub() ? null : trail(), bannerEl(), f, cancel, S.mode === 'new' && S.stepIndex === 0 && !keyMode() ? editLink() : null);
+    return sheet(
+      head(),
+      edit,
+      hub() ? transferNotes() : null,
+      hub() ? null : trail(),
+      bannerEl(),
+      f,
+      cancel,
+      S.mode === 'new' && S.stepIndex === 0 && !keyMode() ? editLink() : null
+    );
   }
 
   /* ── Fields ─────────────────────────────────────────────────── */
 
-  function fid(path) { return 'f-' + path.replace(/\./g, '-'); }
+  function fid(path) {
+    return 'f-' + path.replace(/\./g, '-');
+  }
 
   function renderField(field, path) {
     var id = fid(path);
     var control;
     switch (field.type) {
-      case 'team_size': control = teamSizeControl(field, path, id); break;
-      case 'members': control = membersControl(field, path); break;
-      case 'slot': control = slotControl(field, path, id); break;
-      case 'select': control = selectControl(field, path, id); break;
-      case 'textarea': control = textControl(field, path, id); break;
-      default: control = textControl(field, path, id);
+      case 'team_size':
+        control = teamSizeControl(field, path, id);
+        break;
+      case 'members':
+        control = membersControl(field, path);
+        break;
+      case 'slot':
+        control = slotControl(field, path, id);
+        break;
+      case 'select':
+        control = selectControl(field, path, id);
+        break;
+      case 'textarea':
+        control = textControl(field, path, id);
+        break;
+      default:
+        control = textControl(field, path, id);
     }
     var optional = field.required === false;
     var help = field.help ? L(field.help) : '';
-    var node = h('div', { class: 'field', dataset: { path: path } },
-      h('label', { class: 'label' + (field.type === 'members' ? ' sr-only' : ''), for: field.type === 'select' && (field.options || []).length <= 4 ? null : id }, L(field.label), optional ? h('span', { class: 'opt' }, '(' + t('optional') + ')') : null),
+    var node = h(
+      'div',
+      { class: 'field', dataset: { path: path } },
+      h(
+        'label',
+        {
+          class: 'label' + (field.type === 'members' ? ' sr-only' : ''),
+          for:
+            field.type === 'select' && (field.options || []).length <= 4
+              ? null
+              : id
+        },
+        L(field.label),
+        optional ? h('span', { class: 'opt' }, '(' + t('optional') + ')') : null
+      ),
       // The description sits between the question and the answer, where it is read first.
-      help ? h('p', { class: 'help field-desc', id: id + '-help' }, help) : null,
+      help
+        ? h('p', { class: 'help field-desc', id: id + '-help' }, help)
+        : null,
       control,
       folderRule(field),
       h('p', { class: 'error', id: id + '-err', role: 'alert', hidden: true })
@@ -310,13 +698,31 @@
   /** The folder naming rule under a Drive folder question, with an example from the project title. */
   function folderExample() {
     var fn = S.form.rules && S.form.rules.folderName;
-    return Rules.folderNameExample({ project: Rules.valueByRole(S.form, S.data, 'title'), subject: fn && fn.subject });
+    return Rules.folderNameExample({
+      project: Rules.valueByRole(S.form, S.data, 'title'),
+      subject: fn && fn.subject
+    });
   }
 
   function folderRule(field) {
     var fn = S.form.rules && S.form.rules.folderName;
-    if (!fn || !fn.enabled || field.type !== 'drive_link' || (field.kinds && field.kinds.indexOf('folder') === -1)) return null;
-    return h('p', { class: 'folder-rule' }, icon('info', 16), h('span', { class: 'folder-rule-text' }, t('folderRule', { example: folderExample() })));
+    if (
+      !fn ||
+      !fn.enabled ||
+      field.type !== 'drive_link' ||
+      (field.kinds && field.kinds.indexOf('folder') === -1)
+    )
+      return null;
+    return h(
+      'p',
+      { class: 'folder-rule' },
+      icon('info', 16),
+      h(
+        'span',
+        { class: 'folder-rule-text' },
+        t('folderRule', { example: folderExample() })
+      )
+    );
   }
 
   function paintFolderRule() {
@@ -327,8 +733,15 @@
   function paintErrorNode(node, err) {
     var p = node.querySelector(':scope > .error');
     if (!p) return;
-    if (err) { node.classList.add('has-error'); p.textContent = App.i18n.err(err); p.hidden = false; }
-    else { node.classList.remove('has-error'); p.textContent = ''; p.hidden = true; }
+    if (err) {
+      node.classList.add('has-error');
+      p.textContent = App.i18n.err(err);
+      p.hidden = false;
+    } else {
+      node.classList.remove('has-error');
+      p.textContent = '';
+      p.hidden = true;
+    }
   }
 
   function paintError(path) {
@@ -343,7 +756,9 @@
     if (old) old.remove();
     var el = h('p', { class: 'hint', role: 'status' }, text);
     field.insertBefore(el, field.querySelector(':scope > .error'));
-    setTimeout(function () { if (el.parentNode) el.remove(); }, 2400);
+    setTimeout(function () {
+      if (el.parentNode) el.remove();
+    }, 2400);
   }
 
   function validateOne(field, path) {
@@ -377,39 +792,87 @@
     if (after !== before) {
       var pos = input.selectionStart;
       input.value = after;
-      try { var np = Math.max(0, (pos == null ? after.length : pos) - (before.length - after.length)); input.setSelectionRange(np, np); } catch (e) { /* not all inputs */ }
+      try {
+        var np = Math.max(
+          0,
+          (pos == null ? after.length : pos) - (before.length - after.length)
+        );
+        input.setSelectionRange(np, np);
+      } catch (e) {
+        /* not all inputs */
+      }
     }
     if (message) hint(input, message);
     setVal(path, input.value);
     if (field.role === 'title') paintFolderRule();
-    if (S.errors[path]) { delete S.errors[path]; paintError(path); }
+    if (S.errors[path]) {
+      delete S.errors[path];
+      paintError(path);
+    }
   }
 
   // A hint of the shape of an answer. It must not read as an answer that is already there.
-  var PLACEHOLDERS = { email: 'name@example.com', phone: '01xxxxxxxxx', drive_link: 'https://drive.google.com/...' };
+  var PLACEHOLDERS = {
+    email: 'name@example.com',
+    phone: '01xxxxxxxxx',
+    drive_link: 'https://drive.google.com/...'
+  };
 
   function textControl(field, path, id) {
     var isArea = field.type === 'textarea';
     var attrs = {
-      id: id, class: isArea ? 'textarea' : 'input', name: path, value: getVal(path) == null ? '' : String(getVal(path)),
-      'aria-describedby': id + '-help ' + id + '-err', autocomplete: 'off', placeholder: PLACEHOLDERS[field.type] || null
+      id: id,
+      class: isArea ? 'textarea' : 'input',
+      name: path,
+      value: getVal(path) == null ? '' : String(getVal(path)),
+      'aria-describedby': id + '-help ' + id + '-err',
+      autocomplete: 'off',
+      placeholder: PLACEHOLDERS[field.type] || null
     };
     if (!isArea) {
-      attrs.type = { email: 'email', phone: 'tel', drive_link: 'url' }[field.type] || 'text';
-      if (field.type === 'arabic_name') { attrs.lang = 'ar'; attrs.dir = 'rtl'; attrs.autocomplete = 'name'; }
-      else { attrs.dir = 'ltr'; }
+      attrs.type =
+        { email: 'email', phone: 'tel', drive_link: 'url' }[field.type] ||
+        'text';
+      if (field.type === 'arabic_name') {
+        attrs.lang = 'ar';
+        attrs.dir = 'rtl';
+        attrs.autocomplete = 'name';
+      } else {
+        attrs.dir = 'ltr';
+      }
       if (field.type === 'code') attrs.inputmode = 'numeric';
-      if (field.type === 'phone') { attrs.inputmode = 'tel'; attrs.autocomplete = 'tel'; }
-      if (field.type === 'email') { attrs.inputmode = 'email'; attrs.autocomplete = 'email'; attrs.autocapitalize = 'off'; }
+      if (field.type === 'phone') {
+        attrs.inputmode = 'tel';
+        attrs.autocomplete = 'tel';
+      }
+      if (field.type === 'email') {
+        attrs.inputmode = 'email';
+        attrs.autocomplete = 'email';
+        attrs.autocapitalize = 'off';
+      }
       if (field.type === 'code') attrs.maxlength = String(field.length || 7);
     }
     var input = h(isArea ? 'textarea' : 'input', attrs);
     if (isArea) input.value = attrs.value;
-    input.addEventListener('input', function () { liveFilter(field, input, path); saveDraft(); });
+    input.addEventListener('input', function () {
+      liveFilter(field, input, path);
+      saveDraft();
+    });
     input.addEventListener('blur', function () {
-      if (field.type === 'phone') { var p = Rules.normalizePhone(input.value); if (p) { input.value = p; setVal(path, p); } }
-      if (input.value.trim() !== '' || S.errors[path] || field.required !== false) {
-        if (input.value.trim() !== '' || S.errors[path]) validateOne(field, path);
+      if (field.type === 'phone') {
+        var p = Rules.normalizePhone(input.value);
+        if (p) {
+          input.value = p;
+          setVal(path, p);
+        }
+      }
+      if (
+        input.value.trim() !== '' ||
+        S.errors[path] ||
+        field.required !== false
+      ) {
+        if (input.value.trim() !== '' || S.errors[path])
+          validateOne(field, path);
       }
     });
     return input;
@@ -419,19 +882,69 @@
     var opts = field.options || [];
     var cur = getVal(path) || '';
     // Only one possible answer (a form limited to one specialization): fill it in.
-    if (opts.length === 1 && field.required !== false && String(cur) !== String(opts[0].value)) { cur = opts[0].value; setVal(path, cur); }
-    var onPick = function (v) { setVal(path, v); if (S.errors[path]) { delete S.errors[path]; paintError(path); } saveDraft(); };
-    if (opts.length <= 4 && opts.length > 0) {
-      return h('div', { class: 'chips', role: 'radiogroup', id: id, 'aria-describedby': id + '-err' },
-        opts.map(function (o) {
-          return h('label', { class: 'chip' },
-            h('input', { type: 'radio', name: path, value: o.value, checked: String(cur) === String(o.value), onchange: function () { onPick(o.value); } }),
-            h('span', null, L(o.label)));
-        }));
+    if (
+      opts.length === 1 &&
+      field.required !== false &&
+      String(cur) !== String(opts[0].value)
+    ) {
+      cur = opts[0].value;
+      setVal(path, cur);
     }
-    var sel = h('select', { id: id, class: 'select', name: path, 'aria-describedby': id + '-help ' + id + '-err', onchange: function (e) { onPick(e.target.value); } },
+    var onPick = function (v) {
+      setVal(path, v);
+      if (S.errors[path]) {
+        delete S.errors[path];
+        paintError(path);
+      }
+      saveDraft();
+    };
+    if (opts.length <= 4 && opts.length > 0) {
+      return h(
+        'div',
+        {
+          class: 'chips',
+          role: 'radiogroup',
+          id: id,
+          'aria-describedby': id + '-err'
+        },
+        opts.map(function (o) {
+          return h(
+            'label',
+            { class: 'chip' },
+            h('input', {
+              type: 'radio',
+              name: path,
+              value: o.value,
+              checked: String(cur) === String(o.value),
+              onchange: function () {
+                onPick(o.value);
+              }
+            }),
+            h('span', null, L(o.label))
+          );
+        })
+      );
+    }
+    var sel = h(
+      'select',
+      {
+        id: id,
+        class: 'select',
+        name: path,
+        'aria-describedby': id + '-help ' + id + '-err',
+        onchange: function (e) {
+          onPick(e.target.value);
+        }
+      },
       h('option', { value: '' }, t('choose')),
-      opts.map(function (o) { return h('option', { value: o.value, selected: String(cur) === String(o.value) }, L(o.label)); }));
+      opts.map(function (o) {
+        return h(
+          'option',
+          { value: o.value, selected: String(cur) === String(o.value) },
+          L(o.label)
+        );
+      })
+    );
     return sel;
   }
 
@@ -469,7 +982,13 @@
 
   function scrollToMembers() {
     var el = root.querySelector('.members-wrap');
-    if (el && el.scrollIntoView) { try { el.scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch (e) { /* not available */ } }
+    if (el && el.scrollIntoView) {
+      try {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      } catch (e) {
+        /* not available */
+      }
+    }
   }
 
   /* ── Team size: pick the total, then the member forms appear ── */
@@ -479,7 +998,11 @@
     var sizes = [];
     for (var n = range.min; n <= range.max; n++) sizes.push(n);
     var cur = getVal(path);
-    if (sizes.length === 1 && !cur) { cur = String(sizes[0]); setVal(path, cur); syncMembers(sizes[0]); }
+    if (sizes.length === 1 && !cur) {
+      cur = String(sizes[0]);
+      setVal(path, cur);
+      syncMembers(sizes[0]);
+    }
     var pick = function (n) {
       setVal(path, String(n));
       delete S.errors[path];
@@ -491,33 +1014,115 @@
     var note = cur ? Rules.teamSizeNotice(S.form, cur, App.i18n.lang) : '';
     var noteEl = sizeNote(note);
     if (sizes.length > 8) {
-      return [h('select', { id: id, class: 'select', name: path, 'aria-describedby': id + '-help ' + id + '-err', onchange: function (e) { if (e.target.value) pick(parseInt(e.target.value, 10)); } },
-        h('option', { value: '' }, t('choose')),
-        sizes.map(function (n) { return h('option', { value: String(n), selected: String(cur) === String(n) }, String(n)); })), noteEl];
+      return [
+        h(
+          'select',
+          {
+            id: id,
+            class: 'select',
+            name: path,
+            'aria-describedby': id + '-help ' + id + '-err',
+            onchange: function (e) {
+              if (e.target.value) pick(parseInt(e.target.value, 10));
+            }
+          },
+          h('option', { value: '' }, t('choose')),
+          sizes.map(function (n) {
+            return h(
+              'option',
+              { value: String(n), selected: String(cur) === String(n) },
+              String(n)
+            );
+          })
+        ),
+        noteEl
+      ];
     }
-    return [h('div', { class: 'chips size-chips', role: 'radiogroup', id: id, 'aria-describedby': id + '-help ' + id + '-err' },
-      sizes.map(function (n) {
-        return h('label', { class: 'chip' },
-          h('input', { type: 'radio', name: path, value: String(n), checked: String(cur) === String(n), onchange: function () { pick(n); } }),
-          h('span', null, String(n)));
-      })), noteEl];
+    return [
+      h(
+        'div',
+        {
+          class: 'chips size-chips',
+          role: 'radiogroup',
+          id: id,
+          'aria-describedby': id + '-help ' + id + '-err'
+        },
+        sizes.map(function (n) {
+          return h(
+            'label',
+            { class: 'chip' },
+            h('input', {
+              type: 'radio',
+              name: path,
+              value: String(n),
+              checked: String(cur) === String(n),
+              onchange: function () {
+                pick(n);
+              }
+            }),
+            h('span', null, String(n))
+          );
+        })
+      ),
+      noteEl
+    ];
   }
 
   /* ── Team members ───────────────────────────────────────────── */
 
   /** The note the admin set for a team size or a number of teammates, under its control; null when there is none. */
-  function sizeNote(text) { return text ? h('p', { class: 'size-notice', role: 'status' }, icon('info', 18), h('span', null, text)) : null; }
+  function sizeNote(text) {
+    return text
+      ? h(
+          'p',
+          { class: 'size-notice', role: 'status' },
+          icon('info', 18),
+          h('span', null, text)
+        )
+      : null;
+  }
 
   /** A value of the summary with the note of its number after it. */
-  function withNote(value, text) { return text ? h('span', null, value, h('span', { class: 'size-notice-inline' }, text)) : value; }
+  function withNote(value, text) {
+    return text
+      ? h('span', null, value, h('span', { class: 'size-notice-inline' }, text))
+      : value;
+  }
 
   /** `remove` is given only when the team can lose a member; then the card has the button. */
   function memberCard(field, path, i, remove) {
-    var subs = (field.fields || []).filter(function (sf) { return sf.enabled !== false; });
-    var head = h('div', { class: 'member-head' },
+    var subs = (field.fields || []).filter(function (sf) {
+      return sf.enabled !== false;
+    });
+    var head = h(
+      'div',
+      { class: 'member-head' },
       h('span', { class: 'member-title' }, t('memberN', { n: i + 1 })),
-      remove ? h('button', { type: 'button', class: 'btn btn-quiet', name: 'remove-member-' + i, 'aria-label': t('removeMember') + ' ' + (i + 1), onclick: function () { remove(i); } }, icon('trash', 18), t('removeMember')) : null);
-    return h('div', { class: 'member' }, head, subs.map(function (sf) { return renderField(sf, path + '.' + i + '.' + sf.id); }));
+      remove
+        ? h(
+            'button',
+            {
+              type: 'button',
+              class: 'btn btn-quiet',
+              name: 'remove-member-' + i,
+              'aria-label': t('removeMember') + ' ' + (i + 1),
+              onclick: function () {
+                remove(i);
+              }
+            },
+            icon('trash', 18),
+            t('removeMember')
+          )
+        : null
+    );
+    return h(
+      'div',
+      { class: 'member' },
+      head,
+      subs.map(function (sf) {
+        return renderField(sf, path + '.' + i + '.' + sf.id);
+      })
+    );
   }
 
   /**
@@ -527,26 +1132,73 @@
    */
   function memberList(field, path, list, min, max, resize) {
     var commit = function (next, banner) {
-      S.errors = dropErrors(path); delete S.errors[path];
+      S.errors = dropErrors(path);
+      delete S.errors[path];
       resize(next);
       S.banner = banner || null;
       saveDraft();
       render();
     };
-    var remove = list.length > min ? function (i) {
-      var before = list.slice();
-      commit(list.filter(function (m, k) { return k !== i; }), { kind: 'info', text: t('memberRemoved', { n: i + 1 }),
-        action: h('button', { type: 'button', class: 'link-btn', name: 'undo-remove', onclick: function () { commit(before); } }, t('undo')) });
-    } : null;
+    var remove =
+      list.length > min
+        ? function (i) {
+            var before = list.slice();
+            commit(
+              list.filter(function (m, k) {
+                return k !== i;
+              }),
+              {
+                kind: 'info',
+                text: t('memberRemoved', { n: i + 1 }),
+                action: h(
+                  'button',
+                  {
+                    type: 'button',
+                    class: 'link-btn',
+                    name: 'undo-remove',
+                    onclick: function () {
+                      commit(before);
+                    }
+                  },
+                  t('undo')
+                )
+              }
+            );
+          }
+        : null;
     return [
-      list.length ? h('div', { class: 'members' }, list.map(function (m, i) { return memberCard(field, path, i, remove); })) : null,
-      list.length ? h('p', { class: 'team-size' }, t('teamSize', { n: list.length + 1 })) : null,
-      list.length < max ? h('button', { type: 'button', class: 'btn btn-quiet', name: 'add-member', onclick: function () {
-        commit(list.concat([freshMember(field)]));
-        var cards = root.querySelectorAll('.member');
-        var input = cards.length && cards[cards.length - 1].querySelector('input, select');
-        if (input && input.focus) input.focus();
-      } }, icon('plus', 20), t('addMember')) : null
+      list.length
+        ? h(
+            'div',
+            { class: 'members' },
+            list.map(function (m, i) {
+              return memberCard(field, path, i, remove);
+            })
+          )
+        : null,
+      list.length
+        ? h('p', { class: 'team-size' }, t('teamSize', { n: list.length + 1 }))
+        : null,
+      list.length < max
+        ? h(
+            'button',
+            {
+              type: 'button',
+              class: 'btn btn-quiet',
+              name: 'add-member',
+              onclick: function () {
+                commit(list.concat([freshMember(field)]));
+                var cards = root.querySelectorAll('.member');
+                var input =
+                  cards.length &&
+                  cards[cards.length - 1].querySelector('input, select');
+                if (input && input.focus) input.focus();
+              }
+            },
+            icon('plus', 20),
+            t('addMember')
+          )
+        : null
     ];
   }
 
@@ -554,7 +1206,10 @@
     var wrap = h('div', { class: 'members-wrap' });
     var sf = sizeField();
     var list = getVal(path);
-    if (!Array.isArray(list)) { list = []; setVal(path, list); }
+    if (!Array.isArray(list)) {
+      list = [];
+      setVal(path, list);
+    }
     var range = Rules.teamSizeRange(S.form);
 
     if (sf) {
@@ -564,18 +1219,37 @@
         wrap.appendChild(h('p', { class: 'help pick-size' }, t('pickSize')));
         return wrap;
       }
-      if (list.length !== size - 1) { syncMembers(size); list = getVal(path); }
-      if (size === 1) wrap.appendChild(h('p', { class: 'help solo-team' }, t('soloTeam')));
-      memberList(field, path, list, range.min - 1, range.max - 1, function (next) {
-        setVal(path, next); setVal(sf.id, String(next.length + 1)); delete S.errors[sf.id];
-      }).forEach(function (n) { if (n) wrap.appendChild(n); });
+      if (list.length !== size - 1) {
+        syncMembers(size);
+        list = getVal(path);
+      }
+      if (size === 1)
+        wrap.appendChild(h('p', { class: 'help solo-team' }, t('soloTeam')));
+      memberList(
+        field,
+        path,
+        list,
+        range.min - 1,
+        range.max - 1,
+        function (next) {
+          setVal(path, next);
+          setVal(sf.id, String(next.length + 1));
+          delete S.errors[sf.id];
+        }
+      ).forEach(function (n) {
+        if (n) wrap.appendChild(n);
+      });
       return wrap;
     }
 
     // Forms without a team size question have only the add and remove buttons, and the note the admin set for that many teammates.
     var min = field.min == null ? 0 : field.min;
     var max = field.max == null ? range.max - 1 : field.max;
-    memberList(field, path, list, min, max, function (next) { setVal(path, next); }).forEach(function (n) { if (n) wrap.appendChild(n); });
+    memberList(field, path, list, min, max, function (next) {
+      setVal(path, next);
+    }).forEach(function (n) {
+      if (n) wrap.appendChild(n);
+    });
     var note = Rules.teammateNotice(S.form, list.length, App.i18n.lang);
     if (note) wrap.appendChild(sizeNote(note));
     return wrap;
@@ -583,7 +1257,9 @@
 
   function dropErrors(prefix) {
     var out = {};
-    Object.keys(S.errors).forEach(function (k) { if (k.indexOf(prefix + '.') !== 0) out[k] = S.errors[k]; });
+    Object.keys(S.errors).forEach(function (k) {
+      if (k.indexOf(prefix + '.') !== 0) out[k] = S.errors[k];
+    });
     return out;
   }
 
@@ -595,8 +1271,12 @@
     if (S.ownSlot && counts[S.ownSlot]) counts[S.ownSlot] -= 1;
     return counts;
   }
-  function roomIn(dayId, time) { return Rules.slotRoom(S.form, othersIn(), Rules.slotKey(dayId, time)); }
-  function slotsTaken(dayId, time) { return !roomIn(dayId, time); }
+  function roomIn(dayId, time) {
+    return Rules.slotRoom(S.form, othersIn(), Rules.slotKey(dayId, time));
+  }
+  function slotsTaken(dayId, time) {
+    return !roomIn(dayId, time);
+  }
 
   function slotControl(field, path, id) {
     var wrap = h('div', { class: 'slot', id: id });
@@ -607,27 +1287,101 @@
       var cur = getVal(path) || {};
       // Each day says how many places it still has, so a student sees a full day before choosing it.
       var dayChips = days.map(function (d) {
-        var left = d.times.reduce(function (n, tm) { return n + roomIn(d.id, tm); }, 0);
-        return h('button', { type: 'button', class: 'slot-chip' + (left ? '' : ' is-full'), disabled: !left, 'aria-pressed': cur.day === d.id ? 'true' : 'false', onclick: function () {
-          setVal(path, { day: d.id, time: '' }); delete S.errors[path]; paintError(path); saveDraft(); paint();
-        } }, d.label, d.date ? h('small', null, d.date) : null, h('small', { class: 'slot-left' }, left ? t('slotsLeft', { n: left }) : t('slotFull')));
+        var left = d.times.reduce(function (n, tm) {
+          return n + roomIn(d.id, tm);
+        }, 0);
+        return h(
+          'button',
+          {
+            type: 'button',
+            class: 'slot-chip' + (left ? '' : ' is-full'),
+            disabled: !left,
+            'aria-pressed': cur.day === d.id ? 'true' : 'false',
+            onclick: function () {
+              setVal(path, { day: d.id, time: '' });
+              delete S.errors[path];
+              paintError(path);
+              saveDraft();
+              paint();
+            }
+          },
+          d.label,
+          d.date ? h('small', null, d.date) : null,
+          h(
+            'small',
+            { class: 'slot-left' },
+            left ? t('slotsLeft', { n: left }) : t('slotFull')
+          )
+        );
       });
-      wrap.appendChild(h('div', { class: 'slot-days', role: 'group', 'aria-label': t('slotDay') }, dayChips));
-      var day = days.filter(function (d) { return d.id === cur.day; })[0];
-      if (!day) { wrap.appendChild(h('p', { class: 'help' }, t('slotPick'))); return; }
-      var open = day.times.filter(function (tm) { return !slotsTaken(day.id, tm) || cur.time === tm; });
-      if (!open.length) { wrap.appendChild(h('p', { class: 'help' }, t('slotNone'))); return; }
-      wrap.appendChild(h('div', { class: 'slot-times', role: 'group', 'aria-label': t('slotTime') }, day.times.map(function (tm) {
-        var room = roomIn(day.id, tm);
-        var taken = !room && cur.time !== tm;
-        return h('button', { type: 'button', class: 'slot-chip time' + (taken ? ' is-full' : ''), disabled: taken, 'aria-pressed': cur.time === tm ? 'true' : 'false', onclick: function () {
-          setVal(path, { day: day.id, time: tm }); delete S.errors[path]; paintError(path); saveDraft(); paint();
-        } }, h('span', { dir: 'ltr' }, tm), taken ? h('small', { class: 'slot-left' }, t('slotFull')) : many ? h('small', { class: 'slot-left' }, t('slotsLeft', { n: room })) : null);
-      })));
+      wrap.appendChild(
+        h(
+          'div',
+          { class: 'slot-days', role: 'group', 'aria-label': t('slotDay') },
+          dayChips
+        )
+      );
+      var day = days.filter(function (d) {
+        return d.id === cur.day;
+      })[0];
+      if (!day) {
+        wrap.appendChild(h('p', { class: 'help' }, t('slotPick')));
+        return;
+      }
+      var open = day.times.filter(function (tm) {
+        return !slotsTaken(day.id, tm) || cur.time === tm;
+      });
+      if (!open.length) {
+        wrap.appendChild(h('p', { class: 'help' }, t('slotNone')));
+        return;
+      }
+      wrap.appendChild(
+        h(
+          'div',
+          { class: 'slot-times', role: 'group', 'aria-label': t('slotTime') },
+          day.times.map(function (tm) {
+            var room = roomIn(day.id, tm);
+            var taken = !room && cur.time !== tm;
+            return h(
+              'button',
+              {
+                type: 'button',
+                class: 'slot-chip time' + (taken ? ' is-full' : ''),
+                disabled: taken,
+                'aria-pressed': cur.time === tm ? 'true' : 'false',
+                onclick: function () {
+                  setVal(path, { day: day.id, time: tm });
+                  delete S.errors[path];
+                  paintError(path);
+                  saveDraft();
+                  paint();
+                }
+              },
+              h('span', { dir: 'ltr' }, tm),
+              taken
+                ? h('small', { class: 'slot-left' }, t('slotFull'))
+                : many
+                  ? h(
+                      'small',
+                      { class: 'slot-left' },
+                      t('slotsLeft', { n: room })
+                    )
+                  : null
+            );
+          })
+        )
+      );
       // Moving a booking gives up the time it had; the student is told before saving that anyone can then take it.
       var picked = cur.day && cur.time ? Rules.slotKey(cur.day, cur.time) : '';
       if (S.mode === 'edit' && S.ownSlot && picked && picked !== S.ownSlot) {
-        wrap.appendChild(h('p', { class: 'slot-move', role: 'status', name: 'slot-move' }, App.ui.icon('info', 18), h('span', null, t('slotMove', { was: slotText(S.ownSlot) }))));
+        wrap.appendChild(
+          h(
+            'p',
+            { class: 'slot-move', role: 'status', name: 'slot-move' },
+            App.ui.icon('info', 18),
+            h('span', null, t('slotMove', { was: slotText(S.ownSlot) }))
+          )
+        );
       }
     }
     paint();
@@ -635,34 +1389,62 @@
   }
 
   /** Text that keeps its left-to-right order inside an Arabic sentence, such as a day and a time. */
-  function ltr(text) { return '\u2066' + text + '\u2069'; }
+  function ltr(text) {
+    return '\u2066' + text + '\u2069';
+  }
 
   /** "Sunday 14 Nov - 12:30 - 12:50" for a slot key. */
   function slotText(key) {
     var parts = String(key).split('|');
-    return displayValue(slotField(), { day: parts[0], time: parts.slice(1).join('|') });
+    return displayValue(slotField(), {
+      day: parts[0],
+      time: parts.slice(1).join('|')
+    });
   }
 
   /* ── Review ─────────────────────────────────────────────────── */
 
   function optionLabel(field, value) {
-    var o = (field.options || []).filter(function (x) { return String(x.value) === String(value); })[0];
+    var o = (field.options || []).filter(function (x) {
+      return String(x.value) === String(value);
+    })[0];
     return o ? L(o.label) : value;
   }
 
   function displayValue(field, value) {
-    if (value === undefined || value === null || value === '' || (Array.isArray(value) && !value.length)) return '-';
+    if (
+      value === undefined ||
+      value === null ||
+      value === '' ||
+      (Array.isArray(value) && !value.length)
+    )
+      return '-';
     if (field.type === 'select') return optionLabel(field, value);
     if (field.type === 'slot') {
-      var day = ((S.form.slots && S.form.slots.days) || []).filter(function (d) { return d.id === value.day; })[0];
+      var day = ((S.form.slots && S.form.slots.days) || []).filter(
+        function (d) {
+          return d.id === value.day;
+        }
+      )[0];
       // A day and a time keep their order inside an Arabic page.
       return ltr((day ? day.label : value.day) + ' - ' + value.time);
     }
     if (field.type === 'members') {
-      var people = h('ul', { class: 'plain' }, value.map(function (m) {
-        return h('li', { class: 'person' }, h('bdi', null, m.name || ''), m.code ? h('span', { class: 'code' }, m.code) : null);
-      }));
-      var mates = sizeField() ? '' : Rules.teammateNotice(S.form, value.length, App.i18n.lang);
+      var people = h(
+        'ul',
+        { class: 'plain' },
+        value.map(function (m) {
+          return h(
+            'li',
+            { class: 'person' },
+            h('bdi', null, m.name || ''),
+            m.code ? h('span', { class: 'code' }, m.code) : null
+          );
+        })
+      );
+      var mates = sizeField()
+        ? ''
+        : Rules.teammateNotice(S.form, value.length, App.i18n.lang);
       return withNote(people, mates);
     }
     if (field.type === 'code') return h('span', { class: 'code' }, value);
@@ -674,16 +1456,38 @@
   }
 
   function teamRows() {
-    var rows = [[t('teamLeader'), S.team.leader], [t('teamCode'), S.team.code]];
+    var rows = [
+      [t('teamLeader'), S.team.leader],
+      [t('teamCode'), S.team.code]
+    ];
     if (S.team.title) rows.push([t('teamProject'), S.team.title]);
-    rows.push([t('teamPeople'), S.team.size > 1 ? t('teamPeopleN', { n: S.team.size }) : t('teamSolo')]);
+    rows.push([
+      t('teamPeople'),
+      S.team.size > 1 ? t('teamPeopleN', { n: S.team.size }) : t('teamSolo')
+    ]);
     var mates = S.team.teammates || [];
-    if (mates.length) rows.push([t('teamMates'), h('ul', { class: 'plain' }, mates.map(function (n) { return h('li', { class: 'person' }, h('bdi', null, n)); }))]);
+    if (mates.length)
+      rows.push([
+        t('teamMates'),
+        h(
+          'ul',
+          { class: 'plain' },
+          mates.map(function (n) {
+            return h('li', { class: 'person' }, h('bdi', null, n));
+          })
+        )
+      ]);
     return rows;
   }
 
   function teamSummary() {
-    return h('dl', { class: 'summary' }, teamRows().map(function (r) { return [h('dt', null, r[0]), h('dd', null, r[1])]; }));
+    return h(
+      'dl',
+      { class: 'summary' },
+      teamRows().map(function (r) {
+        return [h('dt', null, r[0]), h('dd', null, r[1])];
+      })
+    );
   }
 
   /** Step one of a key booking: the key, then the team it opens for the student to confirm. */
@@ -693,29 +1497,101 @@
         h('p', { class: 'step-help' }, t('teamIs') + ' (' + S.team.ref + ')'),
         teamSummary(),
         // The key that found the team usually opens its booking too; when it does not, the key screen says so.
-        S.teamBooked ? h('div', { class: 'banner info', role: 'status', name: 'team-booked' }, S.teamSlot ? t('teamBookedAt', { when: displayValue(slotField(), S.teamSlot) }) : t('teamBooked')) : null,
-        h('p', { class: 'foot' }, h('button', { type: 'button', class: 'link-btn', name: 'other-key', onclick: function () { forgetTeam(); render(); } }, t('otherKey')))
+        S.teamBooked
+          ? h(
+              'div',
+              { class: 'banner info', role: 'status', name: 'team-booked' },
+              S.teamSlot
+                ? t('teamBookedAt', {
+                    when: displayValue(slotField(), S.teamSlot)
+                  })
+                : t('teamBooked')
+            )
+          : null,
+        h(
+          'p',
+          { class: 'foot' },
+          h(
+            'button',
+            {
+              type: 'button',
+              class: 'link-btn',
+              name: 'other-key',
+              onclick: function () {
+                forgetTeam();
+                render();
+              }
+            },
+            t('otherKey')
+          )
+        )
       ];
     }
-    var input = h('input', { class: 'input key-input', id: 'team-key', type: 'text', inputmode: 'numeric', maxlength: '5', autocomplete: 'off', placeholder: '00000', value: S.teamKey });
-    input.addEventListener('input', function () { input.value = S.teamKey = Rules.latinDigits(input.value).replace(/\D/g, '').slice(0, 5); });
+    var input = h('input', {
+      class: 'input key-input',
+      id: 'team-key',
+      type: 'text',
+      inputmode: 'numeric',
+      maxlength: '5',
+      autocomplete: 'off',
+      placeholder: '00000',
+      value: S.teamKey
+    });
+    input.addEventListener('input', function () {
+      input.value = S.teamKey = Rules.latinDigits(input.value)
+        .replace(/\D/g, '')
+        .slice(0, 5);
+    });
     return [
-      h('p', { class: 'step-help' }, t('teamHelp', { form: S.form.keyBooking.title })),
-      h('div', { class: 'field' + (S.teamError ? ' has-error' : '') }, h('label', { class: 'label', for: 'team-key' }, t('keyLabel')), input,
-        h('p', { class: 'error', role: 'alert', hidden: !S.teamError }, S.teamError))
+      h(
+        'p',
+        { class: 'step-help' },
+        t('teamHelp', { form: S.form.keyBooking.title })
+      ),
+      h(
+        'div',
+        { class: 'field' + (S.teamError ? ' has-error' : '') },
+        h('label', { class: 'label', for: 'team-key' }, t('keyLabel')),
+        input,
+        h(
+          'p',
+          { class: 'error', role: 'alert', hidden: !S.teamError },
+          S.teamError
+        )
+      )
     ];
   }
 
   function forgetTeam() {
-    S.team = null; S.teamBooked = false; S.teamSlot = null; S.teamCanMove = false; S.sourceKey = ''; S.teamKey = ''; S.teamError = '';
+    S.team = null;
+    S.teamBooked = false;
+    S.teamSlot = null;
+    S.teamCanMove = false;
+    S.sourceKey = '';
+    S.teamKey = '';
+    S.teamError = '';
   }
 
   async function findTeam() {
-    if (!/^\d{5}$/.test(S.teamKey)) { S.teamError = t('errors.bad_key'); render(); return focusFirstError(); }
-    S.busy = true; S.teamError = ''; render();
+    if (!/^\d{5}$/.test(S.teamKey)) {
+      S.teamError = t('errors.bad_key');
+      render();
+      return focusFirstError();
+    }
+    S.busy = true;
+    S.teamError = '';
+    render();
     try {
-      var res = await App.api.call({ action: 'bookingTeam', slug: S.slug, key: S.teamKey });
-      S.team = res.team; S.teamBooked = !!res.booked; S.teamSlot = res.slot || null; S.teamCanMove = !!res.canMove; S.sourceKey = S.teamKey;
+      var res = await App.api.call({
+        action: 'bookingTeam',
+        slug: S.slug,
+        key: S.teamKey
+      });
+      S.team = res.team;
+      S.teamBooked = !!res.booked;
+      S.teamSlot = res.slot || null;
+      S.teamCanMove = !!res.canMove;
+      S.sourceKey = S.teamKey;
       S.busy = false;
       render();
       var title = document.getElementById('step-title');
@@ -723,7 +1599,8 @@
     } catch (e) {
       S.busy = false;
       S.teamError = App.i18n.err({ error: e.code }) || e.message;
-      render(); focusFirstError();
+      render();
+      focusFirstError();
     }
   }
 
@@ -731,35 +1608,71 @@
     if (step.team) return teamSummary();
     var rows = [];
     step.fields.forEach(function (f) {
-      rows.push(h('dt', null, L(f.label)), h('dd', null, displayValue(f, S.data[f.id])));
+      rows.push(
+        h('dt', null, L(f.label)),
+        h('dd', null, displayValue(f, S.data[f.id]))
+      );
     });
     return h('dl', { class: 'summary' }, rows);
   }
 
   function reviewBody() {
-    return S.steps.filter(function (s) { return !s.review; }).map(function (s) {
-      var i = S.steps.indexOf(s);
-      var canChange = !slotOnly() || s.fields.indexOf(slotField()) !== -1;
-      return h('div', { class: 'review-group' },
-        h('div', { class: 'member-head' }, h('h3', { class: 'member-title' }, stepTitle(s)),
-          canChange ? h('button', { type: 'button', class: 'link-btn', onclick: function () { go(i); } }, t('change')) : null),
-        summaryList(s));
-    });
+    return S.steps
+      .filter(function (s) {
+        return !s.review;
+      })
+      .map(function (s) {
+        var i = S.steps.indexOf(s);
+        var canChange = !slotOnly() || s.fields.indexOf(slotField()) !== -1;
+        return h(
+          'div',
+          { class: 'review-group' },
+          h(
+            'div',
+            { class: 'member-head' },
+            h('h3', { class: 'member-title' }, stepTitle(s)),
+            canChange
+              ? h(
+                  'button',
+                  {
+                    type: 'button',
+                    class: 'link-btn',
+                    onclick: function () {
+                      go(i);
+                    }
+                  },
+                  t('change')
+                )
+              : null
+          ),
+          summaryList(s)
+        );
+      });
   }
 
   function ticketSummary() {
     var rows = [];
     if (S.team && S.form.keyBooking && S.mode === 'new') {
-      teamRows().forEach(function (r) { rows.push({ label: r[0], value: r[1] }); });
+      teamRows().forEach(function (r) {
+        rows.push({ label: r[0], value: r[1] });
+      });
       var sf = slotField();
       rows.push({ label: L(sf.label), value: displayValue(sf, S.data[sf.id]) });
       return rows;
     }
-    S.form.fields.filter(function (f) { return f.enabled !== false && ['name', 'code', 'team_size', 'title', 'slot'].indexOf(f.role) !== -1; }).forEach(function (f) {
-      rows.push({ label: L(f.label), value: displayValue(f, S.data[f.id]) });
-    });
+    S.form.fields
+      .filter(function (f) {
+        return (
+          f.enabled !== false &&
+          ['name', 'code', 'team_size', 'title', 'slot'].indexOf(f.role) !== -1
+        );
+      })
+      .forEach(function (f) {
+        rows.push({ label: L(f.label), value: displayValue(f, S.data[f.id]) });
+      });
     var mf = Rules.fieldByRole(S.form, 'members');
-    if (mf && Array.isArray(S.data[mf.id]) && S.data[mf.id].length) rows.push({ label: L(mf.label), value: displayValue(mf, S.data[mf.id]) });
+    if (mf && Array.isArray(S.data[mf.id]) && S.data[mf.id].length)
+      rows.push({ label: L(mf.label), value: displayValue(mf, S.data[mf.id]) });
     return rows;
   }
 
@@ -769,7 +1682,10 @@
     var out = {};
     Object.keys(errors || {}).forEach(function (id) {
       var e = errors[id];
-      if (e.nested) Object.keys(e.nested).forEach(function (k) { out[id + '.' + k] = e.nested[k]; });
+      if (e.nested)
+        Object.keys(e.nested).forEach(function (k) {
+          out[id + '.' + k] = e.nested[k];
+        });
       else out[id] = { error: e.error, params: e.params };
     });
     return out;
@@ -778,8 +1694,15 @@
   function validateAll() {
     if (keyMode() || slotOnly()) {
       // Only the slot is answered here; everything else comes from the registration, or is kept as saved.
-      var sf = slotField(), r = Rules.validateField(sf, S.data[sf.id], { form: S.form }), out = { ok: r.ok, errors: {}, data: keyMode() ? {} : Object.assign({}, S.data) };
-      if (r.ok) out.data[sf.id] = r.value; else out.errors[sf.id] = { error: r.error };
+      var sf = slotField(),
+        r = Rules.validateField(sf, S.data[sf.id], { form: S.form }),
+        out = {
+          ok: r.ok,
+          errors: {},
+          data: keyMode() ? {} : Object.assign({}, S.data)
+        };
+      if (r.ok) out.data[sf.id] = r.value;
+      else out.errors[sf.id] = { error: r.error };
       return out;
     }
     var v = Rules.validateSubmission(S.form, S.data);
@@ -791,7 +1714,11 @@
     S.banner = null;
     saveDraft();
     render();
-    try { window.scrollTo(0, 0); } catch (e) { /* not available */ }
+    try {
+      window.scrollTo(0, 0);
+    } catch (e) {
+      /* not available */
+    }
     var title = document.getElementById('step-title');
     if (title && title.focus) title.focus({ preventScroll: true });
   }
@@ -799,7 +1726,11 @@
   function focusFirstError() {
     var node = root.querySelector('.field.has-error');
     if (!node) return;
-    try { node.scrollIntoView({ block: 'center', behavior: 'smooth' }); } catch (e) { /* not available */ }
+    try {
+      node.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    } catch (e) {
+      /* not available */
+    }
     var input = node.querySelector('input, select, textarea, button');
     if (input && input.focus) input.focus({ preventScroll: true });
   }
@@ -807,12 +1738,23 @@
   function next() {
     var step = S.steps[S.stepIndex];
     if (step.review) return submit();
-    if (step.team) return S.team ? (S.teamBooked ? undefined : go(S.stepIndex + 1)) : findTeam();
+    if (step.team)
+      return S.team
+        ? S.teamBooked
+          ? undefined
+          : go(S.stepIndex + 1)
+        : findTeam();
     var v = validateAll();
-    var ids = step.fields.map(function (f) { return f.id; });
+    var ids = step.fields.map(function (f) {
+      return f.id;
+    });
     var stepErrors = {};
-    Object.keys(v.errors).forEach(function (k) { if (ids.indexOf(k.split('.')[0]) !== -1) stepErrors[k] = v.errors[k]; });
-    Object.keys(S.errors).forEach(function (k) { if (ids.indexOf(k.split('.')[0]) !== -1) delete S.errors[k]; });
+    Object.keys(v.errors).forEach(function (k) {
+      if (ids.indexOf(k.split('.')[0]) !== -1) stepErrors[k] = v.errors[k];
+    });
+    Object.keys(S.errors).forEach(function (k) {
+      if (ids.indexOf(k.split('.')[0]) !== -1) delete S.errors[k];
+    });
     if (Object.keys(stepErrors).length) {
       Object.assign(S.errors, stepErrors);
       S.banner = { kind: 'err', text: t('fixErrors') };
@@ -842,13 +1784,30 @@
     try {
       var res;
       if (S.mode === 'edit') {
-        res = await App.api.call({ action: 'update', slug: S.slug, key: S.key, data: v.data, transfer: S.transfer || undefined });
+        res = await App.api.call({
+          action: 'update',
+          slug: S.slug,
+          key: S.key,
+          data: v.data,
+          transfer: S.transfer || undefined
+        });
         S.result = { ref: res.ref, edited: true };
       } else {
-        var request = { action: 'submit', slug: S.slug, data: v.data, lang: App.i18n.lang, transfer: S.transfer || undefined };
+        var request = {
+          action: 'submit',
+          slug: S.slug,
+          data: v.data,
+          lang: App.i18n.lang,
+          transfer: S.transfer || undefined
+        };
         if (keyMode()) request.sourceKey = S.sourceKey;
         res = await App.api.call(request);
-        S.result = { ref: res.ref, key: res.key, keyExpires: res.keyExpires, emailed: !!res.emailed };
+        S.result = {
+          ref: res.ref,
+          key: res.key,
+          keyExpires: res.keyExpires,
+          emailed: !!res.emailed
+        };
       }
       // A member that was asked for from another team is not in the saved answers yet.
       S.data = res.data || v.data;
@@ -858,7 +1817,11 @@
       S.busy = false;
       S.view = 'ticket';
       render();
-      try { window.scrollTo(0, 0); } catch (e) { /* not available */ }
+      try {
+        window.scrollTo(0, 0);
+      } catch (e) {
+        /* not available */
+      }
     } catch (e) {
       S.busy = false;
       await handleSubmitError(e);
@@ -872,91 +1835,252 @@
       var errs = {};
       Object.keys(d).forEach(function (id) {
         var x = d[id];
-        if (x && x.nested) Object.keys(x.nested).forEach(function (k) { errs[id + '.' + k] = x.nested[k]; });
+        if (x && x.nested)
+          Object.keys(x.nested).forEach(function (k) {
+            errs[id + '.' + k] = x.nested[k];
+          });
         else errs[id] = x;
       });
       return showErrorsAndJump(errs);
     }
     if (code === 'duplicate') {
       var field = d.field || (S.steps[0].fields[0] || {}).id;
-      S.errors = {}; S.errors[field] = { error: 'duplicate' };
+      S.errors = {};
+      S.errors[field] = { error: 'duplicate' };
       S.stepIndex = stepOfPath(field);
-      S.banner = { kind: 'err', text: t('errors.duplicate'), action: h('button', { type: 'button', class: 'link-btn', onclick: function () { S.view = 'keyEntry'; S.keyError = ''; S.banner = null; render(); } }, t('editLink')) };
-      render(); focusFirstError();
+      S.banner = {
+        kind: 'err',
+        text: t('errors.duplicate'),
+        action: h(
+          'button',
+          {
+            type: 'button',
+            class: 'link-btn',
+            onclick: function () {
+              S.view = 'keyEntry';
+              S.keyError = '';
+              S.banner = null;
+              render();
+            }
+          },
+          t('editLink')
+        )
+      };
+      render();
+      focusFirstError();
       return;
     }
     if (code === 'already_booked') {
-      S.stepIndex = 0; S.banner = null;
+      S.stepIndex = 0;
+      S.banner = null;
       return findTeam();
     }
     if (code === 'duplicate_member') {
       // Every clashing member can be asked for: offer that before refusing.
-      var offer = d.transfer || [], codes = d.codes || [];
+      var offer = d.transfer || [],
+        codes = d.codes || [];
       if (offer.length && offer.length === codes.length && !S.transfer) {
-        var list = offer.map(function (o) { return who(memberName(o.code), o.code) + ' → ' + o.team + (o.leader ? ' ' + t('transferLeads') : ''); }).join(t('listSep'));
-        var body = t('transferBody', { list: list }) + (offer.some(function (o) { return o.leader; }) ? ' ' + t('transferBodyLeader') : '');
-        var ask = await App.ui.confirm({ title: t('transferTitle'), body: body, confirmText: t('transferAsk'), cancelText: t('transferNo') });
-        if (ask) { S.transfer = offer.map(function (o) { return o.code; }); return submit(); }
+        var list = offer
+          .map(function (o) {
+            return (
+              who(memberName(o.code), o.code) +
+              ' → ' +
+              o.team +
+              (o.leader ? ' ' + t('transferLeads') : '')
+            );
+          })
+          .join(t('listSep'));
+        var body =
+          t('transferBody', { list: list }) +
+          (offer.some(function (o) {
+            return o.leader;
+          })
+            ? ' ' + t('transferBodyLeader')
+            : '');
+        var ask = await App.ui.confirm({
+          title: t('transferTitle'),
+          body: body,
+          confirmText: t('transferAsk'),
+          cancelText: t('transferNo')
+        });
+        if (ask) {
+          S.transfer = offer.map(function (o) {
+            return o.code;
+          });
+          return submit();
+        }
       }
       // Asking is on, yet these were not offered: each leads a team with nobody to hand it to.
-      var alone = d.transfer ? codes.filter(function (c) { return !offer.some(function (o) { return String(o.code) === String(c); }); }) : [];
+      var alone = d.transfer
+        ? codes.filter(function (c) {
+            return !offer.some(function (o) {
+              return String(o.code) === String(c);
+            });
+          })
+        : [];
       S.transfer = null;
-      S.banner = { kind: 'err', text: t('errors.duplicate_member') + (d.codes ? ' (' + d.codes.join(', ') + ')' : '') +
-        (alone.length ? ' ' + t('transferAlone', { list: alone.map(function (c) { return who(memberName(c), c); }).join(t('listSep')) }) : '') };
-      S.stepIndex = Math.max(0, S.steps.findIndex(function (s) { return s.fields.some(function (f) { return f.type === 'members'; }); }));
+      S.banner = {
+        kind: 'err',
+        text:
+          t('errors.duplicate_member') +
+          (d.codes ? ' (' + d.codes.join(', ') + ')' : '') +
+          (alone.length
+            ? ' ' +
+              t('transferAlone', {
+                list: alone
+                  .map(function (c) {
+                    return who(memberName(c), c);
+                  })
+                  .join(t('listSep'))
+              })
+            : '')
+      };
+      S.stepIndex = Math.max(
+        0,
+        S.steps.findIndex(function (s) {
+          return s.fields.some(function (f) {
+            return f.type === 'members';
+          });
+        })
+      );
       return render();
     }
     if (code === 'slot_taken') {
       await refreshAvailability();
       var sf = slotField();
-      if (sf) { S.data[sf.id] = { day: (S.data[sf.id] || {}).day, time: '' }; S.errors = {}; S.errors[sf.id] = { error: 'slot_taken' }; S.stepIndex = stepOfPath(sf.id); }
+      if (sf) {
+        S.data[sf.id] = { day: (S.data[sf.id] || {}).day, time: '' };
+        S.errors = {};
+        S.errors[sf.id] = { error: 'slot_taken' };
+        S.stepIndex = stepOfPath(sf.id);
+      }
       S.banner = { kind: 'err', text: t('errors.slot_taken') };
       return render();
     }
-    if (code === 'form_closed' || code === 'form_not_yet' || code === 'form_draft') {
-      S.state = { form_closed: 'closed', form_not_yet: 'not_yet', form_draft: 'draft' }[code];
+    if (
+      code === 'form_closed' ||
+      code === 'form_not_yet' ||
+      code === 'form_draft'
+    ) {
+      S.state = {
+        form_closed: 'closed',
+        form_not_yet: 'not_yet',
+        form_draft: 'draft'
+      }[code];
       S.view = 'closed';
       return render();
     }
-    S.banner = { kind: 'err', text: App.i18n.err({ error: code }) || e.message };
+    S.banner = {
+      kind: 'err',
+      text: App.i18n.err({ error: code }) || e.message
+    };
     render();
   }
 
   /* ── Edit and cancel with the key ───────────────────────────── */
 
   function keyEntryView() {
-    var input = h('input', { class: 'input key-input', id: 'key-input', type: 'text', inputmode: 'numeric', maxlength: '5', autocomplete: 'one-time-code', 'aria-label': t('keyLabel'), placeholder: '00000' });
-    var error = h('p', { class: 'error', role: 'alert', hidden: !S.keyError }, S.keyError);
-    input.addEventListener('input', function () { input.value = Rules.latinDigits(input.value).replace(/\D/g, '').slice(0, 5); });
-    var f = h('form', { novalidate: 'novalidate', onsubmit: function (e) { e.preventDefault(); openByKey(input.value); } },
+    var input = h('input', {
+      class: 'input key-input',
+      id: 'key-input',
+      type: 'text',
+      inputmode: 'numeric',
+      maxlength: '5',
+      autocomplete: 'one-time-code',
+      'aria-label': t('keyLabel'),
+      placeholder: '00000'
+    });
+    var error = h(
+      'p',
+      { class: 'error', role: 'alert', hidden: !S.keyError },
+      S.keyError
+    );
+    input.addEventListener('input', function () {
+      input.value = Rules.latinDigits(input.value)
+        .replace(/\D/g, '')
+        .slice(0, 5);
+    });
+    var f = h(
+      'form',
+      {
+        novalidate: 'novalidate',
+        onsubmit: function (e) {
+          e.preventDefault();
+          openByKey(input.value);
+        }
+      },
       h('h2', { class: 'step-title' }, t('editTitle')),
       h('p', { class: 'step-help' }, t('editHelp')),
-      h('div', { class: 'field' }, h('label', { class: 'label', for: 'key-input' }, t('keyLabel')), input, error),
-      h('div', { class: 'nav' },
-        h('button', { type: 'button', class: 'btn btn-quiet', onclick: function () { S.view = S.state === 'open' ? 'form' : 'closed'; render(); } }, t('backToForm')),
-        h('button', { type: 'submit', class: 'btn btn-primary', disabled: S.busy }, t('editOpen'))));
+      h(
+        'div',
+        { class: 'field' },
+        h('label', { class: 'label', for: 'key-input' }, t('keyLabel')),
+        input,
+        error
+      ),
+      h(
+        'div',
+        { class: 'nav' },
+        h(
+          'button',
+          {
+            type: 'button',
+            class: 'btn btn-quiet',
+            onclick: function () {
+              S.view = S.state === 'open' ? 'form' : 'closed';
+              render();
+            }
+          },
+          t('backToForm')
+        ),
+        h(
+          'button',
+          { type: 'submit', class: 'btn btn-primary', disabled: S.busy },
+          t('editOpen')
+        )
+      )
+    );
     return sheet(head(), f);
   }
 
   /** Opens a registration with its key, on its summary, or on its time when `toSlot` and the time can change. */
   async function openByKey(key, toSlot) {
     key = String(key || '').trim();
-    if (!/^\d{5}$/.test(key)) { S.keyError = t('errors.bad_key'); return render(); }
+    if (!/^\d{5}$/.test(key)) {
+      S.keyError = t('errors.bad_key');
+      return render();
+    }
     S.busy = true;
     try {
-      var res = await App.api.call({ action: 'lookup', slug: S.slug, key: key });
+      var res = await App.api.call({
+        action: 'lookup',
+        slug: S.slug,
+        key: key
+      });
       S.busy = false;
       S.mode = 'edit';
       S.key = key;
-      S.keyInfo = { ref: res.submission.ref, keyExpires: res.keyExpires, canEdit: res.canEdit, slotOnly: !!res.slotOnly, canDelete: res.canDelete, locked: !!res.locked };
+      S.keyInfo = {
+        ref: res.submission.ref,
+        keyExpires: res.keyExpires,
+        canEdit: res.canEdit,
+        slotOnly: !!res.slotOnly,
+        canDelete: res.canDelete,
+        locked: !!res.locked
+      };
       S.data = res.submission.data || {};
       var sf = slotField();
-      S.ownSlot = sf && S.data[sf.id] ? Rules.slotKey(S.data[sf.id].day, S.data[sf.id].time) : '';
-      S.errors = {}; S.banner = null;
+      S.ownSlot =
+        sf && S.data[sf.id]
+          ? Rules.slotKey(S.data[sf.id].day, S.data[sf.id].time)
+          : '';
+      S.errors = {};
+      S.banner = null;
       S.original = JSON.stringify(S.data);
       S.transfers = res.transfers || { incoming: [], outgoing: [] };
       buildSteps();
-      S.stepIndex = toSlot && res.canEdit && sf ? stepOfPath(sf.id) : S.steps.length - 1;
+      S.stepIndex =
+        toSlot && res.canEdit && sf ? stepOfPath(sf.id) : S.steps.length - 1;
       S.view = res.canEdit ? 'form' : 'readonly';
       render();
       askTransfers();
@@ -968,74 +2092,196 @@
   }
 
   function readonlyView() {
-    var groups = S.steps.filter(function (s) { return !s.review; }).map(function (s) { return h('div', null, h('h3', { class: 'member-title' }, stepTitle(s)), summaryList(s)); });
-    return sheet(head(),
-      h('div', { class: 'banner info', role: 'status' }, t('editing', { ref: S.keyInfo.ref }) + '. ' + t(S.keyInfo.locked ? 'deadlineLocked' : 'readOnly')),
-      transferNotes(), bannerEl(),
+    var groups = S.steps
+      .filter(function (s) {
+        return !s.review;
+      })
+      .map(function (s) {
+        return h(
+          'div',
+          null,
+          h('h3', { class: 'member-title' }, stepTitle(s)),
+          summaryList(s)
+        );
+      });
+    return sheet(
+      head(),
+      h(
+        'div',
+        { class: 'banner info', role: 'status' },
+        t('editing', { ref: S.keyInfo.ref }) +
+          '. ' +
+          t(S.keyInfo.locked ? 'deadlineLocked' : 'readOnly')
+      ),
+      transferNotes(),
+      bannerEl(),
       groups,
-      h('div', { class: 'nav' }, closeButton(), S.keyInfo.canDelete ? h('button', { type: 'button', class: 'btn btn-danger', onclick: askCancel }, icon('trash', 20), t('cancelReg')) : null));
+      h(
+        'div',
+        { class: 'nav' },
+        closeButton(),
+        S.keyInfo.canDelete
+          ? h(
+              'button',
+              { type: 'button', class: 'btn btn-danger', onclick: askCancel },
+              icon('trash', 20),
+              t('cancelReg')
+            )
+          : null
+      )
+    );
   }
 
   /** Leaves a registration that was opened with a key. Changes that were not saved are lost only after a yes. */
   function closeButton() {
     var unsaved = S.view === 'form' && changed();
-    return h('button', { type: 'button', class: 'btn btn-quiet', name: 'close-edit', onclick: async function () {
-      if (unsaved && !(await App.ui.confirm({ title: t('leaveTitle'), body: t('leaveBody'), confirmText: t('leaveYes'), cancelText: t('leaveNo'), danger: true }))) return;
-      resetForNew();
-    } }, t(unsaved ? 'closeUnsaved' : 'closeEdit'));
+    return h(
+      'button',
+      {
+        type: 'button',
+        class: 'btn btn-quiet',
+        name: 'close-edit',
+        onclick: async function () {
+          if (
+            unsaved &&
+            !(await App.ui.confirm({
+              title: t('leaveTitle'),
+              body: t('leaveBody'),
+              confirmText: t('leaveYes'),
+              cancelText: t('leaveNo'),
+              danger: true
+            }))
+          )
+            return;
+          resetForNew();
+        }
+      },
+      t(unsaved ? 'closeUnsaved' : 'closeEdit')
+    );
   }
 
   async function askCancel() {
-    var yes = await App.ui.confirm({ title: t('cancelTitle'), body: t('cancelBody'), confirmText: t('cancelYes'), cancelText: t('cancelNo'), danger: true });
+    var yes = await App.ui.confirm({
+      title: t('cancelTitle'),
+      body: t('cancelBody'),
+      confirmText: t('cancelYes'),
+      cancelText: t('cancelNo'),
+      danger: true
+    });
     if (!yes) return;
     try {
       await App.api.call({ action: 'remove', slug: S.slug, key: S.key });
       S.view = 'cancelled';
       render();
     } catch (e) {
-      S.banner = { kind: 'err', text: App.i18n.err({ error: e.code }) || e.message };
+      S.banner = {
+        kind: 'err',
+        text: App.i18n.err({ error: e.code }) || e.message
+      };
       render();
     }
   }
 
   function cancelledView() {
-    return sheet(head(), h('h2', { class: 'state-title' }, t('cancelledTitle')), h('p', null, t('cancelledBody')),
-      h('div', { class: 'nav' }, h('button', { type: 'button', class: 'btn btn-primary', onclick: function () { resetForNew(); } }, t('newRegistration'))));
+    return sheet(
+      head(),
+      h('h2', { class: 'state-title' }, t('cancelledTitle')),
+      h('p', null, t('cancelledBody')),
+      h(
+        'div',
+        { class: 'nav' },
+        h(
+          'button',
+          {
+            type: 'button',
+            class: 'btn btn-primary',
+            onclick: function () {
+              resetForNew();
+            }
+          },
+          t('newRegistration')
+        )
+      )
+    );
   }
 
   function resetForNew() {
-    S.mode = 'new'; S.key = ''; S.keyInfo = null; S.data = {}; S.errors = {}; S.banner = null; S.stepIndex = 0; S.ownSlot = '';
+    S.mode = 'new';
+    S.key = '';
+    S.keyInfo = null;
+    S.data = {};
+    S.errors = {};
+    S.banner = null;
+    S.stepIndex = 0;
+    S.ownSlot = '';
     forgetTeam();
     buildSteps();
-    refreshAvailability().then(function () { S.view = S.state === 'open' ? 'form' : 'closed'; render(); });
+    refreshAvailability().then(function () {
+      S.view = S.state === 'open' ? 'form' : 'closed';
+      render();
+    });
   }
 
   /** The day and time of a booking, for the picture on its ticket. */
   function bookedWhen() {
-    var sf = slotField(), v = sf && S.data[sf.id];
-    var day = v && ((S.form.slots && S.form.slots.days) || []).filter(function (d) { return d.id === v.day; })[0];
+    var sf = slotField(),
+      v = sf && S.data[sf.id];
+    var day =
+      v &&
+      ((S.form.slots && S.form.slots.days) || []).filter(function (d) {
+        return d.id === v.day;
+      })[0];
     return day && v.time ? { day: day, time: v.time } : null;
   }
 
   function ticketView() {
     var em = Rules.valueByRole(S.form, S.data, 'email');
     // A booking made with a team's key answers to that key, which the team has already; a new key is shown.
-    var key = S.form.keyBooking && S.result.key === S.sourceKey ? '' : S.result.key;
+    var key =
+      S.form.keyBooking && S.result.key === S.sourceKey ? '' : S.result.key;
     var opts = {
-      ref: S.result.ref, key: key, keyExpires: S.result.keyExpires, edited: !!S.result.edited, when: bookedWhen(), teamKey: !!S.form.keyBooking && !key && !S.result.edited,
-      email: !S.result.edited && S.result.emailed ? em : '', summary: ticketSummary()
+      ref: S.result.ref,
+      key: key,
+      keyExpires: S.result.keyExpires,
+      edited: !!S.result.edited,
+      when: bookedWhen(),
+      teamKey: !!S.form.keyBooking && !key && !S.result.edited,
+      email: !S.result.edited && S.result.emailed ? em : '',
+      summary: ticketSummary()
     };
     var asked = S.result.transfers || [];
-    var note = asked.length ? h('div', { class: 'banner info', role: 'status', name: 'transfer-sent' }, t('transferSent', { list: asked.map(function (a) { return who(a.name, a.code) + ' → ' + a.team; }).join(t('listSep')) }), leaderContacts(asked)) : null;
-    return sheet(head(), note, App.ticket.render(opts), App.ticket.actions(opts));
+    var note = asked.length
+      ? h(
+          'div',
+          { class: 'banner info', role: 'status', name: 'transfer-sent' },
+          t('transferSent', {
+            list: asked
+              .map(function (a) {
+                return who(a.name, a.code) + ' → ' + a.team;
+              })
+              .join(t('listSep'))
+          }),
+          leaderContacts(asked)
+        )
+      : null;
+    return sheet(
+      head(),
+      note,
+      App.ticket.render(opts),
+      App.ticket.actions(opts)
+    );
   }
 
   /* ── Members asked for by, or from, another team ────────────── */
 
-  function who(name, code) { return name ? name + ' (' + code + ')' : String(code); }
+  function who(name, code) {
+    return name ? name + ' (' + code + ')' : String(code);
+  }
   function memberName(code) {
     var mf = Rules.fieldByRole(S.form, 'members');
-    var hit = ((mf && S.data[mf.id]) || []).filter(function (m) { return String(m.code) === String(code); })[0];
+    var hit = ((mf && S.data[mf.id]) || []).filter(function (m) {
+      return String(m.code) === String(code);
+    })[0];
     return hit ? hit.name : '';
   }
 
@@ -1046,23 +2292,57 @@
   function leaderContact(r) {
     if (!r.phone) return null;
     var link = r.whatsapp ? Rules.whatsappLink(r.phone) : '';
-    return h('p', { class: 'leader-contact', dataset: { team: r.team } }, h('span', null, t('transferLeaderPhone', { team: r.team })),
-      link ? h('a', { class: 'mono', href: link, target: '_blank', rel: 'noopener', dir: 'ltr', title: t('openWhatsapp') }, icon('chat', 18), r.phone) : h('span', { class: 'mono', dir: 'ltr' }, r.phone),
-      h('button', { type: 'button', class: 'link-btn', name: 'copy-phone', onclick: async function () {
-        var ok = await App.ui.copyText(r.phone);
-        App.ui.toast(t(ok ? 'copied' : 'copyFail'), ok ? 'ok' : 'err');
-      } }, icon('copy', 18), t('copyNumber')));
+    return h(
+      'p',
+      { class: 'leader-contact', dataset: { team: r.team } },
+      h('span', null, t('transferLeaderPhone', { team: r.team })),
+      link
+        ? h(
+            'a',
+            {
+              class: 'mono',
+              href: link,
+              target: '_blank',
+              rel: 'noopener',
+              dir: 'ltr',
+              title: t('openWhatsapp')
+            },
+            icon('chat', 18),
+            r.phone
+          )
+        : h('span', { class: 'mono', dir: 'ltr' }, r.phone),
+      h(
+        'button',
+        {
+          type: 'button',
+          class: 'link-btn',
+          name: 'copy-phone',
+          onclick: async function () {
+            var ok = await App.ui.copyText(r.phone);
+            App.ui.toast(t(ok ? 'copied' : 'copyFail'), ok ? 'ok' : 'err');
+          }
+        },
+        icon('copy', 18),
+        t('copyNumber')
+      )
+    );
   }
 
   /** One line for each other team of `list`, however many of its students were asked for. */
   function leaderContacts(list) {
     var seen = {};
-    return list.filter(function (r) { return r.phone && !seen[r.team] && (seen[r.team] = true); }).map(leaderContact);
+    return list
+      .filter(function (r) {
+        return r.phone && !seen[r.team] && (seen[r.team] = true);
+      })
+      .map(leaderContact);
   }
 
   /** What a request asks: for a member of this team, or for the leader who reads it. */
   function askedText(r) {
-    return r.leader ? t('transferAskedYou', { team: r.team }) : t('transferAskedBody', { team: r.team, who: who(r.name, r.code) });
+    return r.leader
+      ? t('transferAskedYou', { team: r.team })
+      : t('transferAskedBody', { team: r.team, who: who(r.name, r.code) });
   }
 
   /**
@@ -1072,28 +2352,111 @@
    */
   function transferDialog(r) {
     return new Promise(function (resolve) {
-      var done = function (v) { if (overlay.parentNode) overlay.parentNode.removeChild(overlay); resolve(v); };
-      var btn = function (cls, name, text, act) { return h('button', { type: 'button', class: 'btn ' + cls, name: name, onclick: act }, text); };
+      var done = function (v) {
+        if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
+        resolve(v);
+      };
+      var btn = function (cls, name, text, act) {
+        return h(
+          'button',
+          { type: 'button', class: 'btn ' + cls, name: name, onclick: act },
+          text
+        );
+      };
       var heirs = r.leader ? r.heirs || [] : null;
-      var next = heirs && heirs.length ? App.handover({
-        heirs: heirs, email: emailQuestion(),
-        words: { who: t('handoverWho'), email: t('handoverEmail'), choose: t('handoverPick'), error: function (code) { return App.i18n.err({ error: code }); } }
-      }) : null;
+      var next =
+        heirs && heirs.length
+          ? App.handover({
+              heirs: heirs,
+              email: emailQuestion(),
+              words: {
+                who: t('handoverWho'),
+                email: t('handoverEmail'),
+                choose: t('handoverPick'),
+                error: function (code) {
+                  return App.i18n.err({ error: code });
+                }
+              }
+            })
+          : null;
       var title = t(r.leader ? 'transferAskedYouTitle' : 'transferAskedTitle');
-      var after = r.leader ? t('handoverSizeAfter', { n: r.sizeAfter }) : t('transferSizeAfter', { n: r.sizeAfter });
-      var later = btn('btn-quiet', 'transfer-later', t('transferLater'), function () { done(null); });
-      var approve = heirs && !next ? null : btn('btn-primary', 'transfer-approve', t(next ? 'handoverApprove' : 'transferApprove'), function () {
-        if (next && next.problem()) return;
-        done({ approve: true, handover: next ? next.value() : undefined });
-      });
-      var overlay = h('div', { class: 'overlay', onclick: function (e) { if (e.target === overlay) done(null); } },
-        h('div', { class: 'dialog', role: 'dialog', 'aria-modal': 'true', 'aria-label': title },
+      var after = r.leader
+        ? t('handoverSizeAfter', { n: r.sizeAfter })
+        : t('transferSizeAfter', { n: r.sizeAfter });
+      var later = btn(
+        'btn-quiet',
+        'transfer-later',
+        t('transferLater'),
+        function () {
+          done(null);
+        }
+      );
+      var approve =
+        heirs && !next
+          ? null
+          : btn(
+              'btn-primary',
+              'transfer-approve',
+              t(next ? 'handoverApprove' : 'transferApprove'),
+              function () {
+                if (next && next.problem()) return;
+                done({
+                  approve: true,
+                  handover: next ? next.value() : undefined
+                });
+              }
+            );
+      var overlay = h(
+        'div',
+        {
+          class: 'overlay',
+          onclick: function (e) {
+            if (e.target === overlay) done(null);
+          }
+        },
+        h(
+          'div',
+          {
+            class: 'dialog',
+            role: 'dialog',
+            'aria-modal': 'true',
+            'aria-label': title
+          },
           h('h2', { class: 'dialog-title' }, title),
-          h('p', null, askedText(r) + (heirs ? ' ' + t(next ? 'handoverChoose' : 'handoverAlone') : '')),
+          h(
+            'p',
+            null,
+            askedText(r) +
+              (heirs ? ' ' + t(next ? 'handoverChoose' : 'handoverAlone') : '')
+          ),
           leaderContact(r),
           next ? next.node : null,
-          approve ? h('p', { class: 'help' }, after + (r.sizeAfter < r.min ? ' ' + t('transferUnderMin', { min: r.min }) : '')) : null,
-          h('div', { class: 'dialog-actions transfer-actions' }, later, btn('btn-quiet', 'transfer-reject', t('transferReject'), function () { done({ approve: false }); }), approve)));
+          approve
+            ? h(
+                'p',
+                { class: 'help' },
+                after +
+                  (r.sizeAfter < r.min
+                    ? ' ' + t('transferUnderMin', { min: r.min })
+                    : '')
+              )
+            : null,
+          h(
+            'div',
+            { class: 'dialog-actions transfer-actions' },
+            later,
+            btn(
+              'btn-quiet',
+              'transfer-reject',
+              t('transferReject'),
+              function () {
+                done({ approve: false });
+              }
+            ),
+            approve
+          )
+        )
+      );
       document.body.appendChild(overlay);
       later.focus();
     });
@@ -1106,33 +2469,91 @@
 
   /** The page a leader lands on after moving: the team they led is no longer theirs to edit. */
   function movedView() {
-    return sheet(head(), h('h2', { class: 'state-title' }, t('movedTitle', { team: S.moved.team })),
+    return sheet(
+      head(),
+      h(
+        'h2',
+        { class: 'state-title' },
+        t('movedTitle', { team: S.moved.team })
+      ),
       h('p', { name: 'moved-note' }, t('movedBody', S.moved)),
-      h('div', { class: 'nav' }, h('button', { type: 'button', class: 'btn btn-primary', name: 'close-edit', onclick: function () { resetForNew(); } }, t('closeEdit'))));
+      h(
+        'div',
+        { class: 'nav' },
+        h(
+          'button',
+          {
+            type: 'button',
+            class: 'btn btn-primary',
+            name: 'close-edit',
+            onclick: function () {
+              resetForNew();
+            }
+          },
+          t('closeEdit')
+        )
+      )
+    );
   }
 
   async function answerTransfer(r) {
     // An approval replaces the answers on this page with the saved ones, so edits are saved first.
-    if (changed()) { S.banner = { kind: 'err', text: t('transferSaveFirst') }; return render(); }
+    if (changed()) {
+      S.banner = { kind: 'err', text: t('transferSaveFirst') };
+      return render();
+    }
     var answer = await transferDialog(r);
     if (!answer) return;
     try {
-      var res = await App.api.call({ action: 'transfer.decide', slug: S.slug, key: S.key, id: r.id, approve: answer.approve, handover: answer.handover });
+      var res = await App.api.call({
+        action: 'transfer.decide',
+        slug: S.slug,
+        key: S.key,
+        id: r.id,
+        approve: answer.approve,
+        handover: answer.handover
+      });
       if (answer.handover) {
-        var heir = r.heirs.filter(function (m) { return m.code === answer.handover.leader; })[0];
-        S.moved = { team: r.team, ref: S.keyInfo.ref, who: who(heir.name, heir.code), key: S.key };
+        var heir = r.heirs.filter(function (m) {
+          return m.code === answer.handover.leader;
+        })[0];
+        S.moved = {
+          team: r.team,
+          ref: S.keyInfo.ref,
+          who: who(heir.name, heir.code),
+          key: S.key
+        };
         S.view = 'moved';
         return render();
       }
       S.data = res.submission.data || {};
       S.original = JSON.stringify(S.data);
       S.transfers = res.transfers;
-      S.banner = { kind: 'info', text: t(answer.approve ? 'transferApproved' : r.leader ? 'transferStayed' : 'transferRejected', { who: who(r.name, r.code), team: r.team }) };
+      S.banner = {
+        kind: 'info',
+        text: t(
+          answer.approve
+            ? 'transferApproved'
+            : r.leader
+              ? 'transferStayed'
+              : 'transferRejected',
+          { who: who(r.name, r.code), team: r.team }
+        )
+      };
       buildSteps();
       S.stepIndex = S.steps.length - 1;
     } catch (e) {
-      S.banner = { kind: 'err', text: App.i18n.err({ error: e.code }) || e.message };
-      try { S.transfers = (await App.api.call({ action: 'lookup', slug: S.slug, key: S.key })).transfers; } catch (x) { /* keep what is shown */ }
+      S.banner = {
+        kind: 'err',
+        text: App.i18n.err({ error: e.code }) || e.message
+      };
+      try {
+        S.transfers = (
+          await App.api.call({ action: 'lookup', slug: S.slug, key: S.key })
+        ).transfers;
+      } catch (x) {
+        /* keep what is shown */
+      }
     }
     render();
   }
@@ -1141,14 +2562,25 @@
   async function askTransfers() {
     var list = (S.transfers.incoming || []).slice();
     // A leader who moved has left the team, so the rest of its requests are no longer theirs to answer.
-    for (var i = 0; i < list.length && S.view !== 'moved'; i++) await answerTransfer(list[i]);
+    for (var i = 0; i < list.length && S.view !== 'moved'; i++)
+      await answerTransfer(list[i]);
   }
 
   async function cancelTransfer(r) {
     try {
-      S.transfers = (await App.api.call({ action: 'transfer.cancel', slug: S.slug, key: S.key, id: r.id })).transfers;
+      S.transfers = (
+        await App.api.call({
+          action: 'transfer.cancel',
+          slug: S.slug,
+          key: S.key,
+          id: r.id
+        })
+      ).transfers;
     } catch (e) {
-      S.banner = { kind: 'err', text: App.i18n.err({ error: e.code }) || e.message };
+      S.banner = {
+        kind: 'err',
+        text: App.i18n.err({ error: e.code }) || e.message
+      };
     }
     render();
   }
@@ -1156,15 +2588,69 @@
   /** One line for each request that waits or was answered, above the registration. */
   function transferNotes() {
     var tr = S.transfers || {};
-    var lines = (tr.incoming || []).map(function (r) {
-      return h('div', { class: 'banner info transfer-note', role: 'status', dataset: { transfer: 'incoming' } }, askedText(r), ' ',
-        h('button', { type: 'button', class: 'link-btn', name: 'transfer-answer', onclick: function () { answerTransfer(r); } }, t('transferAnswer')), leaderContact(r));
-    }).concat((tr.outgoing || []).map(function (r) {
-      var key = { pending: 'transferWaiting', approved: 'transferJoined', rejected: 'transferKept', closed: 'transferElsewhere' }[r.status];
-      if (!key) return null;
-      return h('div', { class: 'banner info transfer-note', role: 'status', dataset: { transfer: r.status } }, t(key, { team: r.team, who: who(r.name, r.code) }), ' ',
-        r.status === 'pending' ? h('button', { type: 'button', class: 'link-btn', name: 'transfer-cancel', onclick: function () { cancelTransfer(r); } }, t('transferCancel')) : null, leaderContact(r));
-    })).filter(Boolean);
+    var lines = (tr.incoming || [])
+      .map(function (r) {
+        return h(
+          'div',
+          {
+            class: 'banner info transfer-note',
+            role: 'status',
+            dataset: { transfer: 'incoming' }
+          },
+          askedText(r),
+          ' ',
+          h(
+            'button',
+            {
+              type: 'button',
+              class: 'link-btn',
+              name: 'transfer-answer',
+              onclick: function () {
+                answerTransfer(r);
+              }
+            },
+            t('transferAnswer')
+          ),
+          leaderContact(r)
+        );
+      })
+      .concat(
+        (tr.outgoing || []).map(function (r) {
+          var key = {
+            pending: 'transferWaiting',
+            approved: 'transferJoined',
+            rejected: 'transferKept',
+            closed: 'transferElsewhere'
+          }[r.status];
+          if (!key) return null;
+          return h(
+            'div',
+            {
+              class: 'banner info transfer-note',
+              role: 'status',
+              dataset: { transfer: r.status }
+            },
+            t(key, { team: r.team, who: who(r.name, r.code) }),
+            ' ',
+            r.status === 'pending'
+              ? h(
+                  'button',
+                  {
+                    type: 'button',
+                    class: 'link-btn',
+                    name: 'transfer-cancel',
+                    onclick: function () {
+                      cancelTransfer(r);
+                    }
+                  },
+                  t('transferCancel')
+                )
+              : null,
+            leaderContact(r)
+          );
+        })
+      )
+      .filter(Boolean);
     return lines.length ? h('div', { class: 'transfer-notes' }, lines) : null;
   }
 
@@ -1174,7 +2660,11 @@
 
   function init() {
     var params = new URLSearchParams(window.location.search);
-    S.slug = (params.get('f') || window.location.hash.replace('#', '') || '').trim();
+    S.slug = (
+      params.get('f') ||
+      window.location.hash.replace('#', '') ||
+      ''
+    ).trim();
     if (!S.slug) {
       S.loadError = t('notFound');
       S.view = 'error';
@@ -1184,4 +2674,4 @@
   }
 
   if (!window.__FORM_NO_AUTOSTART__) init();
-})(window.App = window.App || {});
+})((window.App = window.App || {}));

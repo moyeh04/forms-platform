@@ -22,6 +22,12 @@ Biome wraps code at 80 columns but cannot break a long string or comment;
 `check-lines.js` refuses those (see [CHECKS.md](CHECKS.md)). Split the string
 with `+`, or move it into a constant.
 
+The whole tree was laid out by Biome once, one commit per folder. Those
+commits change only layout, and `.git-blame-ignore-revs` lists them so
+`git blame` shows who wrote a line, not who formatted it. `npm install` sets
+`blame.ignoreRevsFile`; GitHub reads the file by itself. A later commit that
+only changes layout is added to the list.
+
 `npx biome format --write <file>` lays a file out. `npx biome check <file>`
 reports what is wrong without changing anything.
 

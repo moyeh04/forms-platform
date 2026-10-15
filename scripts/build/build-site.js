@@ -23,9 +23,18 @@ function fingerprint(...parts) {
 
 /** Every file under a folder of the package, as sorted paths with forward slashes. */
 function filesUnder(output, dir) {
-  return fs.readdirSync(path.join(output, dir), { recursive: true, withFileTypes: true })
+  return fs
+    .readdirSync(path.join(output, dir), {
+      recursive: true,
+      withFileTypes: true
+    })
     .filter((entry) => entry.isFile())
-    .map((entry) => path.relative(output, path.join(entry.parentPath || entry.path, entry.name)).split(path.sep).join('/'))
+    .map((entry) =>
+      path
+        .relative(output, path.join(entry.parentPath || entry.path, entry.name))
+        .split(path.sep)
+        .join('/')
+    )
     .sort();
 }
 
@@ -36,10 +45,12 @@ function filesUnder(output, dir) {
  */
 function siteVersion(output, url) {
   const parts = [url];
-  for (const page of PAGES) parts.push(page, fs.readFileSync(path.join(output, page)));
+  for (const page of PAGES)
+    parts.push(page, fs.readFileSync(path.join(output, page)));
   for (const dir of DIRS) {
     for (const file of filesUnder(output, dir)) {
-      if (file !== CONFIG) parts.push(file, fs.readFileSync(path.join(output, file)));
+      if (file !== CONFIG)
+        parts.push(file, fs.readFileSync(path.join(output, file)));
     }
   }
   return fingerprint(...parts);
@@ -51,17 +62,35 @@ function siteVersion(output, url) {
  * page that names it, and a file that did not change stays in the cache.
  */
 function stampPage(html, output) {
-  return html.replace(/(<script src="|<link rel="stylesheet" href=")((?:assets|shared)\/[^"?#]+)"/g, (whole, start, file) =>
-    start + file + '?v=' + fingerprint(fs.readFileSync(path.join(output, file))) + '"');
+  return html.replace(
+    /(<script src="|<link rel="stylesheet" href=")((?:assets|shared)\/[^"?#]+)"/g,
+    (whole, start, file) =>
+      start +
+      file +
+      '?v=' +
+      fingerprint(fs.readFileSync(path.join(output, file))) +
+      '"'
+  );
 }
 
 function apiUrl(env) {
   const value = (env.API_URL || '').trim();
-  if (!/^https:\/\/script\.google\.com\/macros\/s\/[A-Za-z0-9_-]+\/exec$/.test(value)) {
-    throw new Error('API_URL must be set to the Apps Script HTTPS web app URL ending in /exec.');
+  if (
+    !/^https:\/\/script\.google\.com\/macros\/s\/[A-Za-z0-9_-]+\/exec$/.test(
+      value
+    )
+  ) {
+    throw new Error(
+      'API_URL must be set to the Apps Script HTTPS web app URL ending in /exec.'
+    );
   }
-  if (env.APPS_SCRIPT_DEPLOYMENT_ID && value.split('/')[5] !== env.APPS_SCRIPT_DEPLOYMENT_ID) {
-    throw new Error('API_URL and APPS_SCRIPT_DEPLOYMENT_ID must refer to the same deployment.');
+  if (
+    env.APPS_SCRIPT_DEPLOYMENT_ID &&
+    value.split('/')[5] !== env.APPS_SCRIPT_DEPLOYMENT_ID
+  ) {
+    throw new Error(
+      'API_URL and APPS_SCRIPT_DEPLOYMENT_ID must refer to the same deployment.'
+    );
   }
   return value;
 }
@@ -74,24 +103,41 @@ function buildSite(env = process.env, output = path.join(ROOT, '_site')) {
     fs.copyFileSync(path.join(ROOT, sourceOf(file)), path.join(output, file));
   }
   for (const { published, source } of FOLDERS) {
-    fs.cpSync(path.join(ROOT, source), path.join(output, published), { recursive: true });
+    fs.cpSync(path.join(ROOT, source), path.join(output, published), {
+      recursive: true
+    });
   }
   // The version is taken from the files as they are in the repository, before anything is stamped.
   const version = siteVersion(output, url);
-  fs.writeFileSync(path.join(output, CONFIG),
-    'window.APP_CONFIG = ' + JSON.stringify({ API_URL: url, VERSION: version }) + ';\nwindow.App = window.App || {};\n');
+  fs.writeFileSync(
+    path.join(output, CONFIG),
+    'window.APP_CONFIG = ' +
+      JSON.stringify({ API_URL: url, VERSION: version }) +
+      ';\nwindow.App = window.App || {};\n'
+  );
   for (const file of PAGES) {
-    fs.writeFileSync(path.join(output, file), stampPage(fs.readFileSync(path.join(output, file), 'utf8'), output));
+    fs.writeFileSync(
+      path.join(output, file),
+      stampPage(fs.readFileSync(path.join(output, file), 'utf8'), output)
+    );
   }
   // An open page asks for this file to learn that a newer site is published.
-  fs.writeFileSync(path.join(output, 'version.json'), JSON.stringify({ version }) + '\n');
+  fs.writeFileSync(
+    path.join(output, 'version.json'),
+    JSON.stringify({ version }) + '\n'
+  );
   fs.writeFileSync(path.join(output, '.nojekyll'), '');
   return output;
 }
 
 if (require.main === module) {
-  try { buildSite(); console.log('Site packaged with the configured API_URL.'); }
-  catch (err) { console.error(err.message); process.exitCode = 1; }
+  try {
+    buildSite();
+    console.log('Site packaged with the configured API_URL.');
+  } catch (err) {
+    console.error(err.message);
+    process.exitCode = 1;
+  }
 }
 
 module.exports = { apiUrl, buildSite, siteVersion, stampPage };

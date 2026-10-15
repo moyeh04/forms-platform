@@ -10,7 +10,7 @@
     "build:site": "node scripts/build/build-site.js",
     "setup": "node scripts/deploy/setup-deployment.js",
     "dev": "node scripts/dev/dev-server.js",
-    "prepare": "git config core.hooksPath .githooks || exit 0"
+    "prepare": "sh scripts/dev/setup-git.sh"
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.15",
