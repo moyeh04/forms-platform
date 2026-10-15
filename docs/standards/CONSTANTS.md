@@ -92,7 +92,7 @@ is silenced on its own line with the reason, and both checks honour it:
 | `web/js/*.js` | Each page module's own labels, choices and browser storage keys (`fp_*`) at the top of its wrapper |
 | `web/js/config.js` | The backend URL, written by the deploy workflow |
 
-Known gaps, counted in the check baseline until they are fixed:
-
-- Month names are declared in both `domain/rules/slots.js` and
-  `web/js/admin/settings/timetable-calendar.view.js`.
+Two month lists are not one: `domain/rules/slots.js` holds the short names
+of a booking day label (`Jan`), and
+`web/js/admin/settings/timetable-calendar.view.js` the full names of the
+calendar heading (`January`).
