@@ -93,6 +93,13 @@
     undo: 'تراجع',
     memberRemoved: 'تم حذف عضو الفريق {n}.',
     yourRegistration: 'تسجيلك',
+    progressTitle: 'تقدّم فريقك',
+    progressStates: {
+      not_yet: 'لسه',
+      submitted: 'اتسلّم',
+      discussed: 'اتناقش'
+    },
+    progressNewKey: 'المفتاح خلص، فده للعرض بس. التعديل محتاج مفتاح جديد.',
     yourRegistrationHelp:
       'دوس "تعديل" جنب الجزء اللي عايز تصححه. مفيش حاجة بتتحفظ غير لما تدوس ' +
       '"احفظ التعديلات".',

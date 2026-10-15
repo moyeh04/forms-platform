@@ -49,6 +49,8 @@
     ownSlot: '',
     result: null,
     keyError: '',
+    progress: null,
+    expiredProgress: null,
     team: null,
     teamBooked: false,
     teamSlot: null,

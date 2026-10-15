@@ -101,6 +101,14 @@
     undo: 'Undo',
     memberRemoved: 'Team member {n} was removed.',
     yourRegistration: 'Your registration',
+    progressTitle: 'Your progress',
+    progressStates: {
+      not_yet: 'Not yet',
+      submitted: 'Submitted',
+      discussed: 'Discussed'
+    },
+    progressNewKey:
+      'Your key has ended, so this is read only. Changes need a new key.',
     yourRegistrationHelp:
       'Choose Change next to the part you want to correct. Nothing is saved ' +
       'until you choose Save changes.',

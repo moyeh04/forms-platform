@@ -59,6 +59,7 @@
       ),
       P.transferNotes(),
       P.bannerEl(),
+      P.progressBlock(S.progress),
       answerGroups(),
       h('div', { class: 'nav' }, closeButton(), cancel)
     );

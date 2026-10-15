@@ -83,17 +83,6 @@ button.pcell:hover {
 .pcell.is-discussed .pdot {
   background: currentColor;
 }
-.pstate.is-not_yet {
-  color: var(--mute);
-}
-.pstate.is-submitted {
-  color: var(--gold);
-  font-weight: 700;
-}
-.pstate.is-discussed {
-  color: var(--sea);
-  font-weight: 700;
-}
 .progress-states {
   display: flex;
   flex-wrap: wrap;
@@ -147,11 +136,6 @@ button.pcell:hover {
   flex-wrap: wrap;
   gap: 4px 8px;
   align-items: baseline;
-}
-.progress-note {
-  margin: 0;
-  white-space: pre-wrap;
-  overflow-wrap: anywhere;
 }
 .progress-line > .progress-note {
   grid-column: 1 / -1;

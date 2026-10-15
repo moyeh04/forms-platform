@@ -147,6 +147,7 @@ The site is published at the paths it has always had: the pages at the root,
 | `web/css/app/dialogs.css` | Dialogs, toasts and the strip that says a newer site is published. |
 | `web/css/app/print.css` | Print: only the ticket, on plain paper. |
 | `web/css/app/notes.css` | Lists inside summaries, the note of a chosen team size and the requests to move a member. |
+| `web/css/app/progress.css` | The words of the progress states and the notes of a mark, and a team's own progress on its registration. |
 | `web/css/admin/layout.css` | The dashboard layout classes, the tabs of a form and the settings sections. The dashboard and the instructor page load the `admin/` files in the order of these rows, so the cascade is the one the single file had. |
 | `web/css/admin/questions.css` | The Questions tab: a row per question under its page. |
 | `web/css/admin/forms-list.css` | The header of a form and the forms list grouped by status. |
@@ -163,7 +164,7 @@ The site is published at the paths it has always had: the pages at the root,
 | `web/css/admin/phone.css` | The phone layout of team members, the page header and bookings. |
 | `web/css/admin/phone-tables.css` | The phone layout of wide tables: one card per row. |
 | `web/css/admin/keys.css` | Client links, the until picker of keys and links, and Download all. |
-| `web/css/admin/progress.css` | Team progress: the board, its phone view, the mark box and the Progress panel. |
+| `web/css/admin/progress.css` | Team progress on the dashboard and the instructor page: the board, its phone view, the mark box and the Progress panel. |
 | `web/img/` | The tab icon (`favicon.svg`), PNG sizes for phones and older browsers, and `site.webmanifest`. The pirate and the parrot of the ticket picture (`pirate.webp`, `parrot.webp`), with clear backgrounds; `web/js/form/ticket/` draws the clock and the calendar around them. The pictures of the route: the ship (`ship.svg`), an island (`island.svg`), the treasure chest (`treasure.svg`), the waves (`sea.svg`), the sky by day and by night (`sky-day.svg`, `sky-night.svg`) the sun and moon (`sun.svg`, `moon.svg`) and the red flag of an explored island (`crew-flag.svg`). The arrow of a select (`select-arrow.svg`). They have their own colours; the sea and sky behind them take theirs from the theme. |
 | `web/js/config.js` | Source placeholder; `scripts/build/build-site.js` generates its published copy from the Actions `API_URL` variable, with the version of the site. |
 | `web/js/app/fresh.js` | Keeps an open page on the published version: compares the version in `config.js` with `version.json`, reloads an older page when nothing would be lost, and offers **Reload** otherwise. |
@@ -185,6 +186,7 @@ The site is published at the paths it has always had: the pages at the root,
 | `web/js/form/navigation.page.js` | Moving between steps and showing their errors. |
 | `web/js/form/submit.page.js` | Sending the registration and showing its ticket. |
 | `web/js/form/submit-errors.page.js` | What the page does with each error the server gives back when a registration is sent. |
+| `web/js/form/progress.view.js` | A team's own progress on its registration, read only, and on the key page once its key has ended. |
 | `web/js/form/key-entry.page.js` | Opening a registration with its key. |
 | `web/js/form/edit.page.js` | A registration opened with its key: read only, Close, cancel, start again. |
 | `web/js/form/success.view.js` | The page with the ticket after sending. |

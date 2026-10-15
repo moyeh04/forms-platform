@@ -1,11 +1,11 @@
 # Testing
 
-394 automated tests run without a Google account, a browser, or a network.
+397 automated tests run without a Google account, a browser, or a network.
 They run the **real** backend and the **real** pages. This page explains how
 that works and what it can and cannot prove.
 
 ```
-npm test    # 394 tests
+npm test    # 397 tests
 ```
 
 ## The layers
@@ -171,6 +171,7 @@ says something else.
 | Viewer API | `backend/features/access/viewer/viewer.test.js` | 13 | Tokens, hidden columns, the level of a small team sent only to a link that shows the warnings, today and by day, review rights, revoked links, access keys with the lock after wrong tries, reading a lost key again, links that end on a date and open again when it moves |
 | Student page | `web/index.form.test.js` | 20 | Steps, the title and its tags, the Arabic name and code fields, errors on an empty step, a draft kept over a reload, a duplicate code that offers the key flow, a full registration ending on a ticket with its email notice, a closed form and an unknown link, Arabic and a locked language, themes, descriptions, the subject tag, the batch year of a WhatsApp form, who can register, the folder rule example, and the ship over the current step |
 | Student page: edit | `web/index.edit.test.js` | 3 | Editing by key and registering again, a task locked after its deadline, Close out of a registration opened with a key |
+| Form page: progress | `web/index.progress.test.js` | 3 | A key that opens the summary shows the team's progress with its note but never the private one, no block when teams do not see it, and an ended key that still shows the progress read only |
 | Student page: booking | `web/index.reservation.test.js` | 3 | Teammates added to a booking and checked, taken slots, and the note for a number of teammates |
 | Student page: team size | `web/index.team-size.test.js` | 8 | The size picker and the member forms it shows, the range and a fixed size, sizes kept when changed, remove and add a member with Undo, a team of three saved, and the note of a size |
 | Student page: transfers | `web/index.transfer.test.js` | 6 | Asking for a member of another team, the leader who is asked approving or rejecting, a leader who is asked for naming the new leader and passing the key on, the phone of the other leader with Copy and as a WhatsApp link, a leader alone in a team not offered |

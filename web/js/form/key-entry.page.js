@@ -119,7 +119,11 @@
       ),
       keyButtons()
     );
-    return P.sheet(P.head(), f);
+    return P.sheet(
+      P.head(),
+      f,
+      P.progressBlock(S.expiredProgress, t('progressNewKey'))
+    );
   }
 
   /**
@@ -140,6 +144,7 @@
       locked: !!res.locked
     };
     S.data = res.submission.data || {};
+    S.progress = res.progress || null;
     var sf = P.slotField();
     var slot = sf && S.data[sf.id];
     S.ownSlot = slot ? Rules.slotKey(slot.day, slot.time) : '';
@@ -165,10 +170,12 @@
       return P.render();
     }
     S.busy = true;
+    S.expiredProgress = null;
     var res;
     try {
       res = await App.api.call({ action: 'lookup', slug: S.slug, key: key });
     } catch (e) {
+      if (e.code === 'key_expired') await P.loadExpiredProgress(key);
       S.busy = false;
       S.keyError = App.i18n.err({ error: e.code }) || e.message;
       return P.render();
