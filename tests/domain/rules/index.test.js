@@ -10,7 +10,8 @@ const root = path.resolve(__dirname, '..', '..', '..');
 const parts = JOINED.find((j) => j.published === 'shared/rules.js').sources;
 
 test('Rules: the loader gathers every function of every part', () => {
-  for (const file of parts.filter((f) => !f.endsWith('/index.js'))) {
+  const own = parts.filter((f) => /^domain\/rules\/(?!index)/.test(f));
+  for (const file of own) {
     const part = require(path.join(root, file));
     for (const name of Object.keys(part)) {
       assert.equal(R[name], part[name], file + ': ' + name);
@@ -20,7 +21,7 @@ test('Rules: the loader gathers every function of every part', () => {
 
 test('Rules: a page loading the enums and parts gets the same Rules', () => {
   const page = vm.createContext({});
-  for (const file of ['domain/enums.js', ...parts]) {
+  for (const file of parts) {
     vm.runInContext(fs.readFileSync(path.join(root, file), 'utf8'), page, {
       filename: file
     });

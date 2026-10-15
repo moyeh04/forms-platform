@@ -84,11 +84,11 @@ flowchart LR
         fr["fresh.js"]
         th["theme.js"]
         api["api.js"]
-        ui["ui.js"]
+        ui["ui/: dom, icons, dialogs,<br/>clipboard, theme-button"]
     end
     subgraph index["index.html: the student form"]
         r1["domain/rules/"]
-        i18n["i18n.js"]
+        i18n["i18n/: en, ar, i18n"]
         tk["ticket.js"]
         h1["handover.js"]
         fm["form.js"]
@@ -141,12 +141,18 @@ The site is published at the paths it has always had: the pages at the root,
 | `web/css/admin.css` | Dashboard and instructor layout, including the team cards (a coloured band per team, header strip, leader tag). |
 | `web/img/` | The tab icon (`favicon.svg`), PNG sizes for phones and older browsers, and `site.webmanifest`. The pirate and the parrot of the ticket picture (`pirate.webp`, `parrot.webp`), with clear backgrounds; `ticket.js` draws the clock and the calendar around them. The pictures of the route: the ship (`ship.svg`), an island (`island.svg`), the treasure chest (`treasure.svg`), the waves (`sea.svg`), the sky by day and by night (`sky-day.svg`, `sky-night.svg`) and the sun and moon (`sun.svg`, `moon.svg`). They have their own colours; the sea and sky behind them take theirs from the theme. |
 | `web/js/config.js` | Source placeholder; `scripts/build/build-site.js` generates its published copy from the Actions `API_URL` variable, with the version of the site. |
-| `web/js/fresh.js` | Keeps an open page on the published version: compares the version in `config.js` with `version.json`, reloads an older page when nothing would be lost, and offers **Reload** otherwise. |
-| `web/js/api.js` | Sends requests to the backend as plain-text JSON (avoids browser CORS checks). |
-| `web/js/form.js`, `ticket.js`, `i18n.js` | The student page, the success ticket, English and Arabic text. |
-| `web/js/handover.js` | The question asked before the leader of a team moves to another team: who leads next, and their email. Used by the student page and the dashboard. |
-| `web/js/theme.js` | Light, dark, or follow the device; the choice is remembered on this device only. |
-| `web/js/ui.js` | DOM building, inline icons, dialogs and the clipboard, used by every page. |
+| `web/js/app/fresh.js` | Keeps an open page on the published version: compares the version in `config.js` with `version.json`, reloads an older page when nothing would be lost, and offers **Reload** otherwise. |
+| `web/js/app/api.js` | Sends requests to the backend as plain-text JSON (avoids browser CORS checks). |
+| `web/js/form.js`, `ticket.js` | The student page and the success ticket. |
+| `web/js/i18n/en.js`, `ar.js` | The English and Arabic text of the student page, by key, in `App.strings`. |
+| `web/js/i18n/i18n.js` | `App.i18n`: the page language and its direction, the text of a key, `{en, ar}` labels, error sentences and dates. Loaded after `en.js` and `ar.js`. |
+| `web/js/teams/handover.view.js` | The question asked before the leader of a team moves to another team: who leads next, and their email. Used by the student page and the dashboard. |
+| `web/js/app/theme.js` | Light, dark, or follow the device; the choice is remembered on this device only. |
+| `web/js/ui/dom.js` | `App.ui.h` builds an element with its attributes and children; `clear` empties one. Loaded first of the `ui/` parts, since the others draw with it. |
+| `web/js/ui/icons.js` | The inline SVG icons and the icons a form may show. |
+| `web/js/ui/dialogs.js` | The toast and the confirmation dialog. |
+| `web/js/ui/clipboard.js` | Copies text, with a fallback for browsers without the clipboard API. |
+| `web/js/ui/theme-button.js` | The light and dark switch every page has. |
 | `web/js/admin.js` | Dashboard core: login with the PIN, navigation, the widgets the dashboard modules share, and the forms list. |
 | `web/js/admin-settings.js` | Form settings: everything an admin can change without touching code. |
 | `web/js/admin-timetable.js` | The timetable of a reservation form: dates on a calendar, the hours, and the slots of each day. |
@@ -157,7 +163,7 @@ The site is published at the paths it has always had: the pages at the root,
 | `web/js/admin-download.js` | Download all. |
 | `web/js/admin-people.js` | Instructor and client links. |
 | `web/js/admin-lists.js` | The lists behind dropdown questions, each edited the way its kind needs. |
-| `web/js/size-alerts.js` | The warnings about small teams as they are drawn: a line for each level and a mark on the card of a small team. Used by the dashboard and the instructor page. |
+| `web/js/teams/size-alerts.view.js` | The warnings about small teams as they are drawn: a line for each level and a mark on the card of a small team. Used by the dashboard and the instructor page. |
 | `web/js/viewer.js` | The instructor page. |
 | `domain/enums.js` | The words the pages and the backend share, as frozen enums of stored values: `FormType`, `FormStatus`, `ReviewStatus` and `ListKind`. Loaded before the other domain files. |
 | `domain/form-metadata/index.js` | What each form type shows beside its title (term, subject code, batch year) and how it is read, saved and copied. Used by the pages and the backend. It picks the part of the form type; the pages and the bundle load the parts before it. |

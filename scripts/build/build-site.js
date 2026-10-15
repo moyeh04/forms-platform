@@ -2,7 +2,7 @@
 /**
  * Package public files and generate browser configuration from API_URL.
  * The package also carries its own version, so a page that a browser kept from before a publish
- * can tell and load the new one: see siteVersion and stampPage below, and assets/js/fresh.js.
+ * can tell and load the new one: see siteVersion and stampPage below, and web/js/app/fresh.js.
  */
 const crypto = require('node:crypto');
 const fs = require('node:fs');
