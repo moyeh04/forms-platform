@@ -85,6 +85,7 @@ const JOINED = [
       'web/js/form/ticket/time.model.js',
       'web/js/form/ticket/shapes.view.js',
       'web/js/form/ticket/calendar.view.js',
+      'web/js/form/ticket/clock-hands.view.js',
       'web/js/form/ticket/clock.view.js',
       'web/js/form/ticket/when.view.js',
       'web/js/form/ticket/save-image.page.js',

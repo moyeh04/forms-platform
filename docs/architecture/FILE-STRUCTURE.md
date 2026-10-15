@@ -170,7 +170,8 @@ The site is published at the paths it has always had: the pages at the root,
 | `web/js/form/ticket/time.model.js` | The clock hands and the slice of the dial for the time of a booking. Loaded first of the ticket parts; creates `App.ticket`. |
 | `web/js/form/ticket/shapes.view.js` | The colours of the ticket picture and its small SVG shapes: a shadow, a brass knob. |
 | `web/js/form/ticket/calendar.view.js` | The desk calendar of the ticket picture. |
-| `web/js/form/ticket/clock.view.js` | The ship's clock of the ticket picture. |
+| `web/js/form/ticket/clock-hands.view.js` | The hands of the ticket's clock, and the slot as a shaded slice of the dial with an arrow along it. |
+| `web/js/form/ticket/clock.view.js` | The ship's clock of the ticket picture: the wooden ring, the rim, the face and its numbers, the knobs. |
 | `web/js/form/ticket/when.view.js` | The time of a booking as a picture: the clock, the calendar, the pirate and the parrot, with the day and time as text over them. |
 | `web/js/form/ticket/save-image.page.js` | Saves the ticket as an image, with its torn edges. |
 | `web/js/form/ticket/ticket.view.js` | The success ticket: the reference, the picture, the key, and the buttons that save or print it. Loaded last. |

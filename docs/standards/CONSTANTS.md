@@ -72,6 +72,7 @@ is silenced on its own line with the reason, and both checks honour it:
 | `web/js/ui/icons.js`, `dialogs.js`, `theme-button.js` | The icon paths, their default size and stroke, the icons a form may use, how long a toast stays |
 | `web/js/i18n/i18n.js` | The storage key of the chosen language |
 | `web/js/app/fresh.js`, `api.js`, `theme.js` | How often an open page checks its version and the shortest gap between checks, the storage keys of the theme, the admin PIN and the tried version |
+| `web/js/form/ticket/*.js` | The colours of the ticket picture, the place and size of each of its shapes (`CALENDAR`, `RING`, `WOOD`, `RIM`, `HAND`, `SLOT`), the degrees of the dial (`DIAL`), the scale and torn edges of the saved image |
 | `web/js/teams/size-alerts.view.js` | The name of each warning level and the sizes of its icons |
 | `web/js/*.js` | Each page module's own labels, choices and browser storage keys (`fp_*`) at the top of its wrapper |
 | `web/js/config.js` | The backend URL, written by the deploy workflow |
@@ -80,5 +81,3 @@ Known gaps, counted in the check baseline until they are fixed:
 
 - Month names are declared in both `domain/rules/slots.js` and
   `web/js/admin-timetable.js`.
-- The ticket drawing in `web/js/form/ticket/` places its shapes with unnamed
-  numbers.
