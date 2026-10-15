@@ -197,19 +197,16 @@
     "lines": 46
   },
   "domain/form-metadata.js": {
-    "biome/format": 1,
     "biome/lint/complexity/useOptionalChain": 13,
     "biome/lint/correctness/noInnerDeclarations": 3,
     "biome/lint/correctness/noUnusedVariables": 1,
     "biome/lint/style/noMagicNumbers": 3,
     "biome/lint/suspicious/noPrototypeBuiltins": 1,
-    "jsdoc": 41,
-    "lines": 27
+    "jsdoc": 41
   },
   "domain/rules.js": {
-    "biome/format": 1,
     "biome/lint/complexity/noExcessiveCognitiveComplexity": 7,
-    "biome/lint/complexity/noExcessiveLinesPerFunction": 1,
+    "biome/lint/complexity/noExcessiveLinesPerFunction": 2,
     "biome/lint/complexity/useOptionalChain": 15,
     "biome/lint/correctness/noInnerDeclarations": 14,
     "biome/lint/style/noExcessiveLinesPerFile": 1,
@@ -217,7 +214,7 @@
     "biome/lint/suspicious/noAssignInExpressions": 7,
     "biome/lint/suspicious/noGlobalIsNan": 5,
     "jsdoc": 69,
-    "lines": 90,
+    "lines": 26,
     "numbers": 2
   },
   "package.json": {

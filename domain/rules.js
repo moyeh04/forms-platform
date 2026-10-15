@@ -15,18 +15,38 @@
   var DIACRITICS = /[\u064B-\u065F\u0670\u0640]/g;
   var NOT_ARABIC_LETTER_OR_SPACE = /[^\u0621-\u063A\u0641-\u064A\u0671\s]/g;
   var HAS_ARABIC = /[\u0600-\u06FF\u0750-\u077F]/;
-  var ARABIC_DIGITS = { '٠': '0', '١': '1', '٢': '2', '٣': '3', '٤': '4', '٥': '5', '٦': '6', '٧': '7', '٨': '8', '٩': '9' };
+  var ARABIC_DIGITS = {
+    '٠': '0',
+    '١': '1',
+    '٢': '2',
+    '٣': '3',
+    '٤': '4',
+    '٥': '5',
+    '٦': '6',
+    '٧': '7',
+    '٨': '8',
+    '٩': '9'
+  };
 
   function latinDigits(s) {
-    return String(s == null ? '' : s).replace(/[٠-٩]/g, function (d) { return ARABIC_DIGITS[d]; });
+    return String(s == null ? '' : s).replace(/[٠-٩]/g, function (d) {
+      return ARABIC_DIGITS[d];
+    });
   }
 
   function isEmpty(v) {
-    return v === undefined || v === null || (typeof v === 'string' && v.trim() === '') || (Array.isArray(v) && v.length === 0);
+    return (
+      v === undefined ||
+      v === null ||
+      (typeof v === 'string' && v.trim() === '') ||
+      (Array.isArray(v) && v.length === 0)
+    );
   }
 
   function squash(s) {
-    return String(s == null ? '' : s).replace(/\s+/g, ' ').trim();
+    return String(s == null ? '' : s)
+      .replace(/\s+/g, ' ')
+      .trim();
   }
 
   /* ── Arabic names ─────────────────────────────────────────────── */
@@ -47,7 +67,12 @@
 
   function arabicNameParts(value, minPartLength) {
     var min = minPartLength || 2;
-    return String(value || '').trim().split(/\s+/).filter(function (p) { return p.length >= min; }).length;
+    return String(value || '')
+      .trim()
+      .split(/\s+/)
+      .filter(function (p) {
+        return p.length >= min;
+      }).length;
   }
 
   function validateArabicName(raw, opts) {
@@ -57,8 +82,10 @@
     if (isEmpty(raw)) return { ok: false, error: 'required' };
     if (c.blocked) return { ok: false, error: 'arabic_only' };
     if (!c.value) return { ok: false, error: 'required' };
-    if (arabicNameParts(c.value) < minParts) return { ok: false, error: 'arabic_parts', params: { min: minParts } };
-    if (c.value.length > 120) return { ok: false, error: 'too_long', params: { max: 120 } };
+    if (arabicNameParts(c.value) < minParts)
+      return { ok: false, error: 'arabic_parts', params: { min: minParts } };
+    if (c.value.length > 120)
+      return { ok: false, error: 'too_long', params: { max: 120 } };
     return { ok: true, value: c.value };
   }
 
@@ -71,8 +98,10 @@
     if (HAS_ARABIC.test(v)) return { ok: false, error: 'english_only' };
     var min = opts.min || 2;
     var max = opts.max || 120;
-    if (v.length < min) return { ok: false, error: 'too_short', params: { min: min } };
-    if (v.length > max) return { ok: false, error: 'too_long', params: { max: max } };
+    if (v.length < min)
+      return { ok: false, error: 'too_short', params: { min: min } };
+    if (v.length > max)
+      return { ok: false, error: 'too_long', params: { max: max } };
     return { ok: true, value: v };
   }
 
@@ -120,7 +149,8 @@
     var len = opts.length || 7;
     var v = latinDigits(raw).replace(/\s+/g, '');
     if (!v) return { ok: false, error: 'required' };
-    if (!/^\d+$/.test(v) || v.length !== len) return { ok: false, error: 'invalid_code', params: { length: len } };
+    if (!/^\d+$/.test(v) || v.length !== len)
+      return { ok: false, error: 'invalid_code', params: { length: len } };
     return { ok: true, value: v };
   }
 
@@ -129,7 +159,8 @@
   function validateEmail(raw) {
     var v = squash(raw).toLowerCase();
     if (!v) return { ok: false, error: 'required' };
-    if (v.length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v)) return { ok: false, error: 'invalid_email' };
+    if (v.length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v))
+      return { ok: false, error: 'invalid_email' };
     return { ok: true, value: v };
   }
 
@@ -140,16 +171,30 @@
     if (!/^https?:\/\//i.test(u)) return { ok: false };
     var host = (u.match(/^https?:\/\/([^\/?#]+)/i) || [])[1] || '';
     host = host.toLowerCase();
-    if (host !== 'drive.google.com' && host !== 'docs.google.com') return { ok: false };
+    if (host !== 'drive.google.com' && host !== 'docs.google.com')
+      return { ok: false };
     var id = '';
     var kind = 'file';
     var m;
-    if ((m = u.match(/\/folders\/([-\w]{20,})/))) { id = m[1]; kind = 'folder'; }
-    else if ((m = u.match(/\/presentation\/d\/([-\w]{20,})/))) { id = m[1]; kind = 'slides'; }
-    else if ((m = u.match(/\/document\/d\/([-\w]{20,})/))) { id = m[1]; kind = 'doc'; }
-    else if ((m = u.match(/\/spreadsheets\/d\/([-\w]{20,})/))) { id = m[1]; kind = 'sheet'; }
-    else if ((m = u.match(/\/file\/d\/([-\w]{20,})/))) { id = m[1]; kind = 'file'; }
-    else if ((m = u.match(/[?&]id=([-\w]{20,})/))) { id = m[1]; kind = 'file'; }
+    if ((m = u.match(/\/folders\/([-\w]{20,})/))) {
+      id = m[1];
+      kind = 'folder';
+    } else if ((m = u.match(/\/presentation\/d\/([-\w]{20,})/))) {
+      id = m[1];
+      kind = 'slides';
+    } else if ((m = u.match(/\/document\/d\/([-\w]{20,})/))) {
+      id = m[1];
+      kind = 'doc';
+    } else if ((m = u.match(/\/spreadsheets\/d\/([-\w]{20,})/))) {
+      id = m[1];
+      kind = 'sheet';
+    } else if ((m = u.match(/\/file\/d\/([-\w]{20,})/))) {
+      id = m[1];
+      kind = 'file';
+    } else if ((m = u.match(/[?&]id=([-\w]{20,})/))) {
+      id = m[1];
+      kind = 'file';
+    }
     return id ? { ok: true, id: id, kind: kind, url: u } : { ok: false };
   }
 
@@ -159,7 +204,11 @@
     var p = parseDriveLink(raw);
     if (!p.ok) return { ok: false, error: 'invalid_link' };
     if (opts.kinds && opts.kinds.length && opts.kinds.indexOf(p.kind) === -1) {
-      return { ok: false, error: 'link_kind', params: { kinds: opts.kinds.join(', ') } };
+      return {
+        ok: false,
+        error: 'link_kind',
+        params: { kinds: opts.kinds.join(', ') }
+      };
     }
     return { ok: true, value: p.url, meta: { id: p.id, kind: p.kind } };
   }
@@ -168,13 +217,21 @@
 
   /** Turns free text into an underscore part: "Library System" -> "Library_System". */
   function folderPart(s) {
-    return String(s == null ? '' : s).trim().replace(/[^A-Za-z0-9\u0600-\u06FF\-]+/g, '_').replace(/_+/g, '_').replace(/^_|_$/g, '');
+    return String(s == null ? '' : s)
+      .trim()
+      .replace(/[^A-Za-z0-9\u0600-\u06FF\-]+/g, '_')
+      .replace(/_+/g, '_')
+      .replace(/^_|_$/g, '');
   }
 
   /** An example of a correct folder name, built from what the student typed. */
   function folderNameExample(o) {
     o = o || {};
-    return [folderPart(o.name) || 'Ahmed_Mohamed', folderPart(o.project) || 'Project_Name', folderPart(o.subject) || 'Subject_Name'].join('_');
+    return [
+      folderPart(o.name) || 'Ahmed_Mohamed',
+      folderPart(o.project) || 'Project_Name',
+      folderPart(o.subject) || 'Subject_Name'
+    ].join('_');
   }
 
   /**
@@ -187,14 +244,31 @@
     opts = opts || {};
     var n = String(name == null ? '' : name).trim();
     var subject = folderPart(opts.subject);
-    var params = { example: folderNameExample({ name: opts.example && opts.example.name, project: opts.example && opts.example.project, subject: subject }), subject: subject, name: n };
-    if (/\s/.test(n)) return { ok: false, error: 'folder_name_spaces', params: params };
+    var params = {
+      example: folderNameExample({
+        name: opts.example && opts.example.name,
+        project: opts.example && opts.example.project,
+        subject: subject
+      }),
+      subject: subject,
+      name: n
+    };
+    if (/\s/.test(n))
+      return { ok: false, error: 'folder_name_spaces', params: params };
     var parts = n.split('_');
-    if (parts.length < 3 || parts.some(function (p) { return !p; })) return { ok: false, error: 'folder_name_format', params: params };
+    if (
+      parts.length < 3 ||
+      parts.some(function (p) {
+        return !p;
+      })
+    )
+      return { ok: false, error: 'folder_name_format', params: params };
     var tail = '_' + subject.toLowerCase();
-    if (subject && n.toLowerCase().slice(-tail.length) !== tail) return { ok: false, error: 'folder_name_subject', params: params };
+    if (subject && n.toLowerCase().slice(-tail.length) !== tail)
+      return { ok: false, error: 'folder_name_subject', params: params };
     // The leader's name and the project come before the subject name.
-    if (subject && n.slice(0, -tail.length).split('_').length < 2) return { ok: false, error: 'folder_name_format', params: params };
+    if (subject && n.slice(0, -tail.length).split('_').length < 2)
+      return { ok: false, error: 'folder_name_format', params: params };
     return { ok: true };
   }
 
@@ -210,7 +284,7 @@
     var h = Math.floor(mins / 60);
     var mm = ('0' + (mins % 60)).slice(-2);
     if (style === '24h') return ('0' + h).slice(-2) + ':' + mm;
-    return ((h % 12) || 12) + ':' + mm;
+    return (h % 12 || 12) + ':' + mm;
   }
 
   /**
@@ -223,7 +297,8 @@
     var end = toMinutes(o.end);
     var len = Number(o.length);
     var gap = Number(o.gap || 0);
-    if (isNaN(start) || isNaN(end) || !(len > 0) || gap < 0 || end <= start) return [];
+    if (isNaN(start) || isNaN(end) || !(len > 0) || gap < 0 || end <= start)
+      return [];
     var out = [];
     for (var t = start; t + len <= end; t += len + gap) {
       out.push(fmtTime(t, o.style) + ' - ' + fmtTime(t + len, o.style));
@@ -245,7 +320,8 @@
 
   function fieldByRole(form, role) {
     var fields = (form && form.fields) || [];
-    for (var i = 0; i < fields.length; i++) if (fields[i].role === role) return fields[i];
+    for (var i = 0; i < fields.length; i++)
+      if (fields[i].role === role) return fields[i];
     return null;
   }
 
@@ -254,33 +330,43 @@
     return f && data ? data[f.id] : undefined;
   }
 
- /** Everyone on a submission: the leader (or the single person) first, then members. */
- function membersOf(form, data) {
-   var out = [];
-   var name = valueByRole(form, data, 'name');
-   if (name) {
-     out.push({
-       name: name,
-       code: valueByRole(form, data, 'code') || '',
-       phone: valueByRole(form, data, 'phone') || '',
+  /** Everyone on a submission: the leader (or the single person) first, then members. */
+  function membersOf(form, data) {
+    var out = [];
+    var name = valueByRole(form, data, 'name');
+    if (name) {
+      out.push({
+        name: name,
+        code: valueByRole(form, data, 'code') || '',
+        phone: valueByRole(form, data, 'phone') || '',
         section: (data && data.section) || '',
-       leader: true
-     });
-   }
-   var mf = fieldByRole(form, 'members');
-   var list = mf && mf.enabled !== false && data && Array.isArray(data[mf.id]) ? data[mf.id] : [];
-   list.forEach(function (m) {
-      out.push({ name: m.name || '', code: m.code || '', phone: m.phone || '', section: m.section || '', leader: false });
-   });
-   return out;
- }
+        leader: true
+      });
+    }
+    var mf = fieldByRole(form, 'members');
+    var list =
+      mf && mf.enabled !== false && data && Array.isArray(data[mf.id])
+        ? data[mf.id]
+        : [];
+    list.forEach(function (m) {
+      out.push({
+        name: m.name || '',
+        code: m.code || '',
+        phone: m.phone || '',
+        section: m.section || '',
+        leader: false
+      });
+    });
+    return out;
+  }
 
   /**
    * How many different people the responses of a form hold: leaders and members, a student
    * code counted once however many responses name it. A person without a code counts each time.
    */
   function countPeople(form, rows) {
-    var seen = {}, n = 0;
+    var seen = {},
+      n = 0;
     (rows || []).forEach(function (r) {
       membersOf(form, r.data).forEach(function (m) {
         var code = String(m.code || '').trim();
@@ -324,9 +410,19 @@
    */
   function sizeNotice(notice, size, max, lang) {
     var v = parseInt(size, 10);
-    if (!notice || !Array.isArray(notice.sizes) || notice.sizes.map(Number).indexOf(v) === -1) return '';
-    var text = (notice.text && (notice.text[lang] || notice.text.en || notice.text.ar)) || '';
-    return String(text).replace(/\{n\}/g, String(v)).replace(/\{max\}/g, String(max));
+    if (
+      !notice ||
+      !Array.isArray(notice.sizes) ||
+      notice.sizes.map(Number).indexOf(v) === -1
+    )
+      return '';
+    var text =
+      (notice.text &&
+        (notice.text[lang] || notice.text.en || notice.text.ar)) ||
+      '';
+    return String(text)
+      .replace(/\{n\}/g, String(v))
+      .replace(/\{max\}/g, String(max));
   }
 
   /** The note a student sees after choosing a team size. */
@@ -347,7 +443,9 @@
   var SIZE_ALERT_LEVELS = ['critical', 'warning'];
 
   /** The highest number a level can ask for: a team of the biggest size is never small. */
-  function sizeAlertCeiling(form) { return Math.max(teamSizeRange(form).max, 2); }
+  function sizeAlertCeiling(form) {
+    return Math.max(teamSizeRange(form).max, 2);
+  }
 
   /**
    * The warnings about small teams of a form: { critical, warning }.
@@ -359,11 +457,17 @@
     var raw = (form && form.rules && form.rules.sizeAlerts) || {};
     var max = sizeAlertCeiling(form);
     var half = Math.max(2, Math.ceil(max / 2));
-    var start = { critical: half, warning: Math.min(max, Math.max(max - 1, half + 1)) };
+    var start = {
+      critical: half,
+      warning: Math.min(max, Math.max(max - 1, half + 1))
+    };
     var out = {};
     SIZE_ALERT_LEVELS.forEach(function (k) {
       var n = parseInt(raw[k] && raw[k].below, 10);
-      out[k] = { on: !!(raw[k] && raw[k].on === true), below: n >= 2 ? Math.min(n, max) : start[k] };
+      out[k] = {
+        on: !!(raw[k] && raw[k].on === true),
+        below: n >= 2 ? Math.min(n, max) : start[k]
+      };
     });
     return out;
   }
@@ -376,25 +480,33 @@
   function sizeAlertsProblem(form) {
     var raw = (form && form.rules && form.rules.sizeAlerts) || {};
     var max = sizeAlertCeiling(form);
-    var on = SIZE_ALERT_LEVELS.filter(function (k) { return raw[k] && raw[k].on === true; });
+    var on = SIZE_ALERT_LEVELS.filter(function (k) {
+      return raw[k] && raw[k].on === true;
+    });
     var bad = on.filter(function (k) {
       var s = String(raw[k].below == null ? '' : raw[k].below).trim();
       return !/^\d+$/.test(s) || +s < 2 || +s > max;
     })[0];
     if (bad) return { level: bad, error: 'range', min: 2, max: max };
-    if (on.length === 2 && +raw.warning.below <= +raw.critical.below) return { level: 'warning', error: 'order', min: 2, max: max };
+    if (on.length === 2 && +raw.warning.below <= +raw.critical.below)
+      return { level: 'warning', error: 'order', min: 2, max: max };
     return null;
   }
 
   /** The levels that are on, the stronger one first: [{ level, below }]. */
   function sizeAlertLevels(alerts) {
-    return SIZE_ALERT_LEVELS.filter(function (k) { return alerts[k] && alerts[k].on; })
-      .map(function (k) { return { level: k, below: alerts[k].below }; });
+    return SIZE_ALERT_LEVELS.filter(function (k) {
+      return alerts[k] && alerts[k].on;
+    }).map(function (k) {
+      return { level: k, below: alerts[k].below };
+    });
   }
 
   /** The level a team of `count` people falls under, or ''. */
   function sizeAlertOf(alerts, count) {
-    var hit = sizeAlertLevels(alerts).filter(function (l) { return count < l.below; })[0];
+    var hit = sizeAlertLevels(alerts).filter(function (l) {
+      return count < l.below;
+    })[0];
     return hit ? hit.level : '';
   }
 
@@ -402,32 +514,68 @@
     var r = teamSizeRange(form);
     var s = latinDigits(raw).trim();
     var n = /^\d+$/.test(s) ? parseInt(s, 10) : NaN;
-    if (isNaN(n) || n < r.min || n > r.max) return { ok: false, error: 'invalid_team_size', params: { min: r.min, max: r.max } };
+    if (isNaN(n) || n < r.min || n > r.max)
+      return {
+        ok: false,
+        error: 'invalid_team_size',
+        params: { min: r.min, max: r.max }
+      };
     return { ok: true, value: String(n) };
   }
 
   /* ── Field and submission validation ──────────────────────────── */
 
   function optionValues(field) {
-    return (field.options || []).map(function (o) { return String(typeof o === 'object' ? o.value : o); });
+    return (field.options || []).map(function (o) {
+      return String(typeof o === 'object' ? o.value : o);
+    });
   }
 
-  var WEEKDAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-  var MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  var WEEKDAYS = [
+    'Sunday',
+    'Monday',
+    'Tuesday',
+    'Wednesday',
+    'Thursday',
+    'Friday',
+    'Saturday'
+  ];
+  var MONTHS = [
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'May',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec'
+  ];
 
   /** The name a dated day gets when the admin does not type one: "Sunday 14 Nov" for 2027-11-14. */
   function dayLabel(date) {
     var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(date || ''));
     if (!m) return '';
     var d = new Date(Date.UTC(+m[1], +m[2] - 1, +m[3]));
-    return WEEKDAYS[d.getUTCDay()] + ' ' + d.getUTCDate() + ' ' + MONTHS[d.getUTCMonth()];
+    return (
+      WEEKDAYS[d.getUTCDay()] +
+      ' ' +
+      d.getUTCDate() +
+      ' ' +
+      MONTHS[d.getUTCMonth()]
+    );
   }
 
   /** A date that many days later, as text: shiftDate('2027-11-14', 7) is '2027-11-21'. */
   function shiftDate(date, days) {
     var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(date || ''));
     if (!m) return '';
-    return new Date(Date.UTC(+m[1], +m[2] - 1, +m[3] + days)).toISOString().slice(0, 10);
+    return new Date(Date.UTC(+m[1], +m[2] - 1, +m[3] + days))
+      .toISOString()
+      .slice(0, 10);
   }
 
   function validateField(field, raw, ctx) {
@@ -437,31 +585,56 @@
     if (t === 'slot') return validateSlot(field, raw, ctx);
 
     if (isEmpty(raw)) {
-      return field.required === false ? { ok: true, value: '' } : { ok: false, error: 'required' };
+      return field.required === false
+        ? { ok: true, value: '' }
+        : { ok: false, error: 'required' };
     }
     var r;
     switch (t) {
-      case 'arabic_name': r = validateArabicName(raw, { minParts: field.minParts }); break;
-      case 'english_text': r = validateEnglishText(raw, { min: field.min, max: field.max }); break;
-      case 'team_size': r = validateTeamSize(raw, ctx.form); break;
-      case 'phone': r = validatePhone(raw); break;
-      case 'code': r = validateCode(raw, { length: field.length }); break;
-      case 'email': r = validateEmail(raw); break;
-      case 'drive_link': r = validateDriveLink(raw, { kinds: field.kinds }); break;
+      case 'arabic_name':
+        r = validateArabicName(raw, { minParts: field.minParts });
+        break;
+      case 'english_text':
+        r = validateEnglishText(raw, { min: field.min, max: field.max });
+        break;
+      case 'team_size':
+        r = validateTeamSize(raw, ctx.form);
+        break;
+      case 'phone':
+        r = validatePhone(raw);
+        break;
+      case 'code':
+        r = validateCode(raw, { length: field.length });
+        break;
+      case 'email':
+        r = validateEmail(raw);
+        break;
+      case 'drive_link':
+        r = validateDriveLink(raw, { kinds: field.kinds });
+        break;
       case 'select': {
         var v = String(raw);
-        r = optionValues(field).indexOf(v) === -1 ? { ok: false, error: 'invalid_choice' } : { ok: true, value: v };
+        r =
+          optionValues(field).indexOf(v) === -1
+            ? { ok: false, error: 'invalid_choice' }
+            : { ok: true, value: v };
         break;
       }
       case 'textarea': {
         var tv = String(raw).trim();
-        r = tv.length > 2000 ? { ok: false, error: 'too_long', params: { max: 2000 } } : { ok: true, value: tv };
+        r =
+          tv.length > 2000
+            ? { ok: false, error: 'too_long', params: { max: 2000 } }
+            : { ok: true, value: tv };
         break;
       }
       default: {
         var sv = squash(raw);
         var max = field.max || 200;
-        r = sv.length > max ? { ok: false, error: 'too_long', params: { max: max } } : { ok: true, value: sv };
+        r =
+          sv.length > max
+            ? { ok: false, error: 'too_long', params: { max: max } }
+            : { ok: true, value: sv };
       }
     }
     return r;
@@ -470,9 +643,13 @@
   function validateSlot(field, raw, ctx) {
     var form = ctx.form || {};
     var days = (form.slots && form.slots.days) || [];
-    if (!raw || !raw.day || !raw.time) return { ok: false, error: field.required === false ? 'ok' : 'required' };
+    if (!raw || !raw.day || !raw.time)
+      return { ok: false, error: field.required === false ? 'ok' : 'required' };
     for (var i = 0; i < days.length; i++) {
-      if (days[i].id === raw.day && (days[i].times || []).indexOf(raw.time) !== -1) {
+      if (
+        days[i].id === raw.day &&
+        (days[i].times || []).indexOf(raw.time) !== -1
+      ) {
         return { ok: true, value: { day: raw.day, time: raw.time } };
       }
     }
@@ -483,13 +660,20 @@
     var list = Array.isArray(raw) ? raw : [];
     if (ctx.memberCount != null) {
       // The team size the person chose decides exactly how many members are needed.
-      if (list.length !== ctx.memberCount) return { ok: false, error: 'members_count', params: { count: ctx.memberCount } };
+      if (list.length !== ctx.memberCount)
+        return {
+          ok: false,
+          error: 'members_count',
+          params: { count: ctx.memberCount }
+        };
     } else {
       var range = teamSizeRange(ctx.form);
       var min = field.min == null ? range.min - 1 : field.min;
       var max = field.max == null ? range.max - 1 : field.max;
-      if (list.length < min) return { ok: false, error: 'too_few_members', params: { min: min } };
-      if (list.length > max) return { ok: false, error: 'too_many_members', params: { max: max } };
+      if (list.length < min)
+        return { ok: false, error: 'too_few_members', params: { min: min } };
+      if (list.length > max)
+        return { ok: false, error: 'too_many_members', params: { max: max } };
     }
     var errors = {};
     var clean = list.map(function (m, i) {
@@ -497,12 +681,14 @@
       (field.fields || []).forEach(function (sf) {
         if (sf.enabled === false) return;
         var r = validateField(sf, m ? m[sf.id] : undefined, ctx);
-        if (!r.ok) errors[i + '.' + sf.id] = { error: r.error, params: r.params };
+        if (!r.ok)
+          errors[i + '.' + sf.id] = { error: r.error, params: r.params };
         else row[sf.id] = r.value;
       });
       return row;
     });
-    if (Object.keys(errors).length) return { ok: false, error: 'members_invalid', nested: errors };
+    if (Object.keys(errors).length)
+      return { ok: false, error: 'members_invalid', nested: errors };
     return { ok: true, value: clean };
   }
 
@@ -521,7 +707,11 @@
     var sizeField = fieldByRole(form, 'team_size');
     var hasSize = !!(sizeField && sizeField.enabled !== false);
     if (hasSize) {
-      var sz = validateField(sizeField, data ? data[sizeField.id] : undefined, ctx);
+      var sz = validateField(
+        sizeField,
+        data ? data[sizeField.id] : undefined,
+        ctx
+      );
       if (sz.ok) ctx.memberCount = parseInt(sz.value, 10) - 1;
     }
 
@@ -529,24 +719,37 @@
       if (f.enabled === false) return;
       if (f.type === 'members' && hasSize && ctx.memberCount == null) return;
       var r = validateField(f, data ? data[f.id] : undefined, ctx);
-      if (!r.ok) errors[f.id] = { error: r.error, params: r.params, nested: r.nested };
+      if (!r.ok)
+        errors[f.id] = { error: r.error, params: r.params, nested: r.nested };
       else out[f.id] = r.value;
     });
 
     // Nobody may appear twice in the same submission.
     var codeField = fieldByRole(form, 'code');
     var membersField = fieldByRole(form, 'members');
-    if (codeField && membersField && !errors[membersField.id] && Array.isArray(out[membersField.id])) {
+    if (
+      codeField &&
+      membersField &&
+      !errors[membersField.id] &&
+      Array.isArray(out[membersField.id])
+    ) {
       var seen = {};
       if (out[codeField.id]) seen[out[codeField.id]] = true;
-      var codeSub = (membersField.fields || []).filter(function (sf) { return sf.role === 'code'; })[0];
+      var codeSub = (membersField.fields || []).filter(function (sf) {
+        return sf.role === 'code';
+      })[0];
       if (codeSub) {
         out[membersField.id].forEach(function (m, i) {
           var c = m[codeSub.id];
           if (!c) return;
           if (seen[c]) {
-            errors[membersField.id] = errors[membersField.id] || { error: 'members_invalid', nested: {} };
-            errors[membersField.id].nested[i + '.' + codeSub.id] = { error: 'duplicate_code' };
+            errors[membersField.id] = errors[membersField.id] || {
+              error: 'members_invalid',
+              nested: {}
+            };
+            errors[membersField.id].nested[i + '.' + codeSub.id] = {
+              error: 'duplicate_code'
+            };
           }
           seen[c] = true;
         });
