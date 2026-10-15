@@ -74,6 +74,7 @@ is silenced on its own line with the reason, and both checks honour it:
 | `web/js/app/fresh.js`, `api.js`, `theme.js` | How often an open page checks its version and the shortest gap between checks, the storage keys of the theme, the admin PIN and the tried version |
 | `web/js/form/ticket/*.js` | The colours of the ticket picture, the place and size of each of its shapes (`CALENDAR`, `RING`, `WOOD`, `RIM`, `HAND`, `SLOT`), the degrees of the dial (`DIAL`), the scale and torn edges of the saved image |
 | `web/js/teams/size-alerts.view.js` | The name of each warning level and the sizes of its icons |
+| `web/js/admin/settings/*.view.js`, `web/js/admin/questions/*.js` | The defaults and bounds of the settings: the team size (`TEAM_SIZE`), the teammates of a booking (`TEAMMATES`), the days a new edit key works (`KEY_DAYS`), the name parts (`NAME_PARTS`), the shape of a new question or page id (`ID`), and the questions that are always asked or fixed to their page |
 | `web/js/admin/settings/timetable*.js` | The default general hours, the bounds of the bookings per slot and of the minutes of a slot and its break |
 | `web/js/*.js` | Each page module's own labels, choices and browser storage keys (`fp_*`) at the top of its wrapper |
 | `web/js/config.js` | The backend URL, written by the deploy workflow |

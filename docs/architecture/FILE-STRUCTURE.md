@@ -96,7 +96,8 @@ flowchart LR
     subgraph admin["admin.html: the dashboard"]
         r2["domain/rules/"]
         a1["admin/shell/"]
-        a2["admin/settings/settings.page.js"]
+        a2["admin/settings/"]
+        a12["admin/questions/"]
         a5["admin/settings/timetable*.js"]
         a9["admin/settings/range.view.js"]
         a11["admin/settings/range-note.view.js"]
@@ -198,7 +199,25 @@ The site is published at the paths it has always had: the pages at the root,
 | `web/js/admin/shell/create.view.js` | The page that makes a new form. |
 | `web/js/admin/shell/login.view.js` | The PIN screen. |
 | `web/js/admin/shell/router.page.js` | Reads the address, draws the bar and the page it names, and guards unsaved changes. Loaded last of the shell parts. |
-| `web/js/admin/settings/settings.page.js` | Form settings: everything an admin can change without touching code. |
+| `web/js/admin/settings/settings.page.js` | The settings page of a form: loads it, places the panels in the Questions, Timetable and Setup tabs, and keeps the open sections. |
+| `web/js/admin/settings/panel.view.js` | A settings section folded to one line: its name and what it is set to now. |
+| `web/js/admin/settings/allow-picker.view.js` | The chips that limit a form to some values of a list, grouped by section year. |
+| `web/js/admin/settings/general.view.js` | The Name and dates panel: title, subject and term, link name, opening and closing, language, icon. |
+| `web/js/admin/settings/who.view.js` | The Who can register panel: the specializations and sections a form is limited to. |
+| `web/js/admin/settings/key-booking.view.js` | The Booking with a key panel of a reservation. |
+| `web/js/admin/settings/team-size.view.js` | The Team size panel and the Small teams panel. |
+| `web/js/admin/settings/edit-key.view.js` | The Edit key panel: whether students get a key, for how long, and what it lets them do. |
+| `web/js/admin/settings/limits.view.js` | The Limits and checks panel: most submissions, Drive check, one team per student with transfer requests, folder names. |
+| `web/js/admin/settings/emails.view.js` | The Emails panel: the confirmation to students and the note to the admin. |
+| `web/js/admin/settings/review.view.js` | The Review steps panel, and matching to pasted WhatsApp requests. |
+| `web/js/admin/settings/settings.model.js` | What the settings page saves, and the first thing that stops a save with its panel. |
+| `web/js/admin/settings/savebar.view.js` | The save bar: shown while something changed, sends only what changed, shows why a save was refused. |
+| `web/js/admin/questions/questions.model.js` | The questions and pages of a form as the Questions tab changes them: kinds, moves, adding and removing, choices, what stops a save. |
+| `web/js/admin/questions/page-head.view.js` | The heading of a page in the Questions list, and the picker of the list a choice question reads. |
+| `web/js/admin/questions/question-tools.view.js` | The folded tools of a question: its page, its order, and for an added question its kind, choices and Remove. |
+| `web/js/admin/questions/question-row.view.js` | A question in the list: Show, Required, its labels, kind and description, and the rows of the questions about each member. |
+| `web/js/admin/questions/questions.view.js` | The Questions panel: each page and its questions, the questions on no page, and Add a page. |
+| `web/js/admin/questions/teammates.view.js` | The Teammates panel of a booking: whether they are asked, how many, the words students read, and what is asked about each. |
 | `web/js/admin/settings/timetable.model.js` | The state of the timetable and its rules: the slots a day offers, the bookings counted, what stops a save, the saved shape. |
 | `web/js/admin/settings/timetable-calendar.view.js` | The month calendar where dates are added and removed. |
 | `web/js/admin/settings/timetable-hours.view.js` | The general hours and the bookings per slot. |

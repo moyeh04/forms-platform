@@ -732,7 +732,8 @@ flowchart LR
     end
     subgraph adminp["admin.html"]
         a1["admin/shell/<br/>shell, login, forms list"]
-        a2["admin/settings/settings.page.js"]
+        a2["admin/settings/<br/>Setup panels, save bar"]
+        a8["admin/questions/<br/>pages and questions"]
         a7["admin/settings/size-alerts.view.js<br/>warnings about small teams"]
         h2["handover.js<br/>who leads a team next"]
         s2["size-alerts.js<br/>small teams, drawn"]
@@ -995,9 +996,14 @@ used by both the responses page and the settings page:
 | Timetable | `#/f/<slug>/timetable` | Reservations only: the calendar of days, the hours and bookings per slot, the slots of each day, booking with a key |
 | Setup | `#/f/<slug>/settings` | Name and dates, who can register, edit key, emails, limits, review steps, delete |
 
-Questions, Timetable and Setup are one view (`admin/settings/settings.page.js`) over one
-form object, so a tab change only hides and shows sections and changes the
-address with `A.setHash`; it never loads the form again and never loses an edit.
+Questions, Timetable and Setup are one view (`admin/settings/settings.page.js`)
+over one form object, so a tab change only hides and shows sections and changes
+the address with `A.setHash`; it never loads the form again and never loses an
+edit. Each panel is drawn by its own part in `admin/settings/` (Setup) or
+`admin/questions/` (the question list and the teammates of a booking); they
+share one page object `s` with the form, the server's answer and the controls
+that can refuse a save. `settings.model.js` builds the patch and finds the
+first problem; `savebar.view.js` sends only what changed.
 Status is in the header because it is the setting that changes most often.
 
 Rules for this page, to keep when a setting is added:
