@@ -12,14 +12,6 @@
     "jsdoc": 1,
     "lines": 6
   },
-  "scripts/dev/sample-world.js": {
-    "biome/lint/complexity/noExcessiveLinesPerFunction": 1,
-    "biome/lint/style/noMagicNumbers": 5,
-    "biome/lint/suspicious/useIterableCallbackReturn": 1,
-    "jsdoc": 11,
-    "lines": 6,
-    "numbers": 4
-  },
   "web/css/admin/bookings.css": {
     "biome/lint/style/noDescendingSpecificity": 1
   },
