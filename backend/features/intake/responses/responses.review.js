@@ -4,27 +4,25 @@ var ResponsesReview = (function () {
   function defaultReview_(form) {
     var out = {};
     ((form.review && form.review.steps) || []).forEach(function (s) {
-      out[s.id] = 'pending';
+      out[s.id] = ReviewStatus.PENDING;
     });
     return out;
   }
 
-  var REVIEW_STATUSES = ['pending', 'approved', 'rejected'];
-
   /** new -> in_review -> approved, or rejected as soon as any step is rejected. */
   function reviewStatus_(steps, review) {
     var vals = steps.map(function (s) {
-      return review[s.id] || 'pending';
+      return review[s.id] || ReviewStatus.PENDING;
     });
     if (!vals.length) return null;
-    if (vals.indexOf('rejected') !== -1) return 'rejected';
+    if (vals.indexOf(ReviewStatus.REJECTED) !== -1) return 'rejected';
     if (
       vals.every(function (v) {
-        return v === 'approved';
+        return v === ReviewStatus.APPROVED;
       })
     )
       return 'approved';
-    if (vals.indexOf('approved') !== -1) return 'in_review';
+    if (vals.indexOf(ReviewStatus.APPROVED) !== -1) return 'in_review';
     return 'new';
   }
 
@@ -40,14 +38,14 @@ var ResponsesReview = (function () {
       if (s.id === stepId) idx = i;
     });
     if (idx < 0) ApiError.fail('bad_step', 'Unknown review step.');
-    if (REVIEW_STATUSES.indexOf(status) === -1)
+    if (Object.values(ReviewStatus).indexOf(status) === -1)
       ApiError.fail('bad_status', 'Unknown review status.');
     var sequential = form.review.sequential !== false;
     if (
       sequential &&
-      status === 'approved' &&
+      status === ReviewStatus.APPROVED &&
       idx > 0 &&
-      r.review[steps[idx - 1].id] !== 'approved'
+      r.review[steps[idx - 1].id] !== ReviewStatus.APPROVED
     ) {
       ApiError.fail(
         'review_order',
@@ -55,10 +53,10 @@ var ResponsesReview = (function () {
       );
     }
     r.review[stepId] = status;
-    if (sequential && status !== 'approved') {
+    if (sequential && status !== ReviewStatus.APPROVED) {
       for (var i = idx + 1; i < steps.length; i++)
-        if (r.review[steps[i].id] === 'approved')
-          r.review[steps[i].id] = 'pending';
+        if (r.review[steps[i].id] === ReviewStatus.APPROVED)
+          r.review[steps[i].id] = ReviewStatus.PENDING;
     }
     var derived = reviewStatus_(steps, r.review);
     if (derived) r.status = derived;
@@ -66,7 +64,6 @@ var ResponsesReview = (function () {
 
   return {
     setReviewStep: setReviewStep_,
-    REVIEW_STATUSES,
     defaultReview: defaultReview_
   };
 })();

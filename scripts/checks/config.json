@@ -78,7 +78,11 @@
     "extensions": [".js"],
     "exclude": ["domain/enums.js"],
     "source": "domain/enums.js",
-    "properties": { "type": "FormType", "status": "FormStatus" }
+    "properties": {
+      "type": "FormType",
+      "status": "FormStatus",
+      "review": "ReviewStatus"
+    }
   },
   "structure": {
     "root": [
