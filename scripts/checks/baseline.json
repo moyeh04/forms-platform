@@ -18,6 +18,7 @@
   "backend/features/access/clients/clients.controller.js": {
     "biome/lint/complexity/noExcessiveCognitiveComplexity": 1,
     "biome/lint/style/noMagicNumbers": 1,
+    "layers": 8,
     "lines": 2
   },
   "backend/features/access/clients/clients.repository.js": {
@@ -31,7 +32,8 @@
     "lines": 8
   },
   "backend/features/access/viewer/viewer.controller.js": {
-    "biome/lint/complexity/useOptionalChain": 2
+    "biome/lint/complexity/useOptionalChain": 2,
+    "layers": 2
   },
   "backend/features/access/viewer/viewer.rules.js": {
     "jsdoc": 5
@@ -45,6 +47,7 @@
   },
   "backend/features/catalog/forms/forms.controller.js": {
     "biome/lint/correctness/noInnerDeclarations": 1,
+    "layers": 6,
     "lines": 3
   },
   "backend/features/catalog/forms/forms.public.js": {
@@ -86,6 +89,7 @@
     "biome/lint/style/noMagicNumbers": 1,
     "biome/lint/suspicious/noPrototypeBuiltins": 3,
     "jsdoc": 6,
+    "layers": 16,
     "lines": 3
   },
   "backend/features/catalog/lists/lists.repository.js": {
@@ -127,6 +131,7 @@
     "biome/lint/style/noMagicNumbers": 1,
     "biome/lint/suspicious/noGlobalIsNan": 1,
     "jsdoc": 5,
+    "layers": 4,
     "lines": 4
   },
   "backend/features/intake/keys/keys.service.js": {
@@ -139,13 +144,15 @@
   "backend/features/intake/matching/matching.controller.js": {
     "biome/lint/complexity/useOptionalChain": 2,
     "biome/lint/suspicious/noAssignInExpressions": 1,
-    "jsdoc": 1
+    "jsdoc": 1,
+    "layers": 15
   },
   "backend/features/intake/matching/matching.repository.js": {
     "jsdoc": 2
   },
   "backend/features/intake/reservations/key-booking.controller.js": {
     "biome/lint/complexity/useOptionalChain": 1,
+    "layers": 3,
     "lines": 3
   },
   "backend/features/intake/reservations/key-booking.service.js": {
@@ -200,6 +207,7 @@
     "biome/lint/complexity/useOptionalChain": 1,
     "biome/lint/correctness/noInnerDeclarations": 2,
     "jsdoc": 1,
+    "layers": 12,
     "lines": 2
   },
   "backend/features/intake/submissions/submissions.controller.js": {
@@ -208,6 +216,7 @@
     "biome/lint/complexity/useOptionalChain": 1,
     "biome/lint/correctness/noInnerDeclarations": 1,
     "jsdoc": 10,
+    "layers": 13,
     "lines": 11
   },
   "backend/features/intake/teams/team-numbers.js": {
@@ -219,6 +228,7 @@
   },
   "backend/features/intake/transfers/transfers.controller.js": {
     "jsdoc": 2,
+    "layers": 8,
     "lines": 1
   },
   "backend/features/intake/transfers/transfers.mail.js": {
@@ -248,6 +258,7 @@
     "biome/lint/correctness/noInnerDeclarations": 12,
     "biome/lint/style/noMagicNumbers": 5,
     "jsdoc": 2,
+    "layers": 1,
     "lines": 16
   },
   "backend/features/outputs/downloads/downloads.jobs.js": {
@@ -275,6 +286,9 @@
     "jsdoc": 4,
     "lines": 8
   },
+  "backend/features/outputs/print/print.controller.js": {
+    "layers": 2
+  },
   "backend/features/outputs/print/print.service.js": {
     "biome/lint/complexity/noExcessiveLinesPerFunction": 2,
     "biome/lint/complexity/useOptionalChain": 1,
@@ -290,6 +304,9 @@
     "biome/lint/correctness/noInnerDeclarations": 1,
     "biome/lint/style/noMagicNumbers": 41,
     "jsdoc": 6
+  },
+  "backend/features/outputs/sheet-views/sheet-views.controller.js": {
+    "layers": 1
   },
   "backend/features/outputs/sheet-views/sheet-views.layout.js": {
     "biome/lint/complexity/useMaxParams": 2,
@@ -334,6 +351,7 @@
   "backend/platform/sheets/sheet-style.js": {
     "biome/lint/style/noMagicNumbers": 1,
     "jsdoc": 6,
+    "layers": 13,
     "lines": 9
   },
   "backend/platform/sheets/table.js": {
