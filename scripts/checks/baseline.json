@@ -385,11 +385,7 @@
     "lines": 3
   },
   "tests/backend/features/catalog/forms/forms.test.js": {
-    "lines": 7
-  },
-  "tests/scripts/deploy/deployment.test.js": {
-    "biome/lint/correctness/noUnusedFunctionParameters": 1,
-    "lines": 15
+    "lines": 5
   },
   "tests/backend/features/outputs/downloads/downloads.test.js": {
     "biome/lint/suspicious/noAssignInExpressions": 1,
@@ -421,13 +417,13 @@
     "lines": 3
   },
   "tests/backend/features/intake/reservations/key-booking.test.js": {
-    "lines": 17
+    "lines": 11
   },
   "tests/backend/features/intake/matching/matching.test.js": {
     "lines": 7
   },
   "tests/backend/features/outputs/print/print.test.js": {
-    "lines": 4
+    "lines": 3
   },
   "tests/backend/features/catalog/registry/registry-writes.test.js": {
     "lines": 4
@@ -440,23 +436,23 @@
     "lines": 6
   },
   "tests/backend/features/intake/submissions/submissions.test.js": {
-    "lines": 10
+    "lines": 4
   },
   "tests/backend/features/intake/teams/team-size.test.js": {
     "lines": 14
   },
   "tests/backend/features/intake/transfers/transfers.test.js": {
     "biome/lint/style/useConst": 1,
-    "lines": 15
+    "lines": 12
   },
   "tests/web/viewer.test.js": {
     "lines": 13
   },
   "tests/backend/features/access/viewer/viewer.test.js": {
-    "lines": 6
+    "lines": 5
   },
   "tests/backend/features/outputs/sheet-views/sheet-views.test.js": {
-    "lines": 12
+    "lines": 10
   },
   "web/admin.html": {
     "lines": 5
@@ -698,6 +694,52 @@
     "lines": 5
   },
   "web/viewer.html": {
+    "lines": 4
+  },
+  "tests/scripts/deploy/backend-changed.test.js": {
+    "biome/lint/correctness/noUnusedFunctionParameters": 1,
+    "lines": 1
+  },
+  "tests/backend/features/access/auth/auth.test.js": {
+    "lines": 1
+  },
+  "tests/backend/features/access/clients/clients.test.js": {
+    "lines": 1
+  },
+  "tests/backend/features/catalog/registry/registry.setup.test.js": {
+    "lines": 1
+  },
+  "tests/backend/features/intake/keys/keys.test.js": {
+    "lines": 3
+  },
+  "tests/backend/features/intake/teams/team-numbers.test.js": {
+    "lines": 2
+  },
+  "tests/backend/features/outputs/menu/menu.test.js": {
+    "lines": 1
+  },
+  "tests/backend/platform/sheets/sheet-style.test.js": {
+    "lines": 2
+  },
+  "tests/backend/platform/sheets/table.test.js": {
+    "lines": 1
+  },
+  "tests/scripts/build/build-site.test.js": {
+    "lines": 5
+  },
+  "tests/scripts/deploy/prepare-clasp.test.js": {
+    "lines": 2
+  },
+  "tests/scripts/deploy/setup-deployment.test.js": {
+    "lines": 7
+  },
+  "tests/web/admin.key-booking.test.js": {
+    "lines": 2
+  },
+  "tests/web/admin.transfers.test.js": {
+    "lines": 3
+  },
+  "tests/web/index.key-booking.test.js": {
     "lines": 4
   }
 }

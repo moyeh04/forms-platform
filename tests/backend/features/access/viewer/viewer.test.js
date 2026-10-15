@@ -113,27 +113,6 @@ function boot() {
   return w;
 }
 
-test('Clients: a link is created once, the token itself is never stored', () => {
-  const w = boot();
-  const c = w.client();
-  assert.match(c.token, /^[0-9a-f]{24}$/);
-  const row = w.registry.getSheetByName('Clients').rows()[1];
-  assert.equal(row.join('|').includes(c.token), false);
-  assert.equal(
-    w.admin({ action: 'admin.clients.list' }).clients[0].tokenHash,
-    undefined
-  );
-  assert.equal(
-    w.admin({ action: 'admin.clients.create', name: ' ' }).error.code,
-    'name_required'
-  );
-  assert.equal(
-    w.admin({ action: 'admin.clients.create', name: 'X', forms: ['missing'] })
-      .error.code,
-    'form_not_found'
-  );
-});
-
 test('Viewer: lists only the forms the link allows, never drafts', () => {
   const w = boot();
   const draft = w.admin({
