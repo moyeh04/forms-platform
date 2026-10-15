@@ -1062,19 +1062,19 @@ With `rules.transfers` also on, `transfers.service.js` turns the refusal into a 
    and `outgoing` (requests this team made). The page asks about each incoming
    one when the registration opens.
 4. `transfer.decide` (the key of the team that holds the member) and
-   `admin.transfer.decide` both call `decideTransfer_`. The first answer counts.
-   An approval removes the member from the team that holds the code, adds the
-   stored member to the team that asked, and moves both team sizes.
+   `admin.transfer.decide` both call `TransferDecision.decide`. The first answer
+   counts. An approval removes the member from the team that holds the code,
+   adds the stored member to the team that asked, and moves both team sizes.
 
 The leader of a team can be asked for like any member, so that a team is not
 stuck with a leader who wants to leave. The team must not be left without a
-leader, so the approval carries `handover`: `{ leader, email }`, the code of
-the member who leads next and that member's email. `handOver_` copies the
-member's answers to the leader's questions of the same role or id, writes the
-email (members are not asked for one), and takes the member out of the list.
+leader, so the approval carries `handover`: `{ leader, email }`, the code of the
+member who leads next and that member's email. `TransferMembers.handOver` copies
+the member's answers to the leader's questions of the same role or id, writes
+the email (members are not asked for one), and takes the member out of the list.
 What only a leader answers, like the major, stays. The team keeps its row, so
-its reference, team number and edit key do not change; the page tells the
-leader who left to give the key to the new leader.
+its reference, team number and edit key do not change; the page tells the leader
+who left to give the key to the new leader.
 
 The offer marks such a student with `leader: true`. A waiting request for a
 leader carries `leader: true` and `heirs`, the members who can lead, both in
@@ -1103,12 +1103,12 @@ Rules of the move:
   student leads it, so a code typed at random does not show who else is in
   which team.
 - With `rules.transferPhones` the two leaders of a request see each other's
-  phone while it waits: `leaderContacts_` adds `phone` to the request in
-  `lookup` and in the answer of the `submit` or `update` that made it. The
-  refusal that offers the request carries no number, so a phone is shown only
-  to a team that registered and asked, and it goes away with the answer. With
-  `rules.transferWhatsapp` the request also carries `whatsapp: true` and the
-  page links the number with `Rules.whatsappLink`. The page draws the number
+  phone while it waits: `TransfersView.leaderContacts` adds `phone` to the
+  request in `lookup` and in the answer of the `submit` or `update` that made
+  it. The refusal that offers the request carries no number, so a phone is shown
+  only to a team that registered and asked, and it goes away with the answer.
+  With `rules.transferWhatsapp` the request also carries `whatsapp: true` and
+  the page links the number with `Rules.whatsappLink`. The page draws the number
   in one place, `leaderContact` in `form.js`, always with a Copy button.
 - Nothing of a member who moves is asked: the two leaders, or the admin,
   decide. A leader who is asked for answers for themselves.

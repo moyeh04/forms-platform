@@ -1,6 +1,7 @@
 /** The Transfers tab of a form: reading and saving move requests. */
 
 var TransfersRepository = (function () {
+  /** The columns of the Transfers tab, in order. */
   var TRANSFER_COLS = [
     'id',
     'created',
@@ -15,8 +16,17 @@ var TransfersRepository = (function () {
     'decidedBy'
   ];
 
+  /** The name of the tab of the requests. */
   var TRANSFER_TAB_ = 'Transfers';
 
+  /**
+   * Says whether a form lets a leader ask for a member of another team:
+   * transfers are on, a student may be in one team only, and the form has
+   * members.
+   *
+   * @param {!Object} form The form.
+   * @return {boolean} True when transfers can happen.
+   */
   function transfersOn_(form) {
     var rules = form.rules || {};
     return !!(
@@ -26,6 +36,14 @@ var TransfersRepository = (function () {
     );
   }
 
+  /**
+   * Opens the Transfers tab of a form.
+   *
+   * @param {!Object} form The form.
+   * @param {boolean} create Whether to make the tab when it is missing.
+   * @return {?SpreadsheetApp.Sheet} The tab, or null when it is missing
+   *     and not made.
+   */
   function transfersSheet_(form, create) {
     var ss = SpreadsheetApp.openById(form.sheetId);
     return create
@@ -33,6 +51,13 @@ var TransfersRepository = (function () {
       : ss.getSheetByName(TRANSFER_TAB_);
   }
 
+  /**
+   * Reads every request of a form.
+   *
+   * @param {!Object} form The form.
+   * @return {!Array<!Object>} The requests, each with its `_row`; empty
+   *     when the form never had one.
+   */
   function readTransfers_(form) {
     var sh = transfersSheet_(form, false);
     if (!sh) return [];
@@ -54,6 +79,14 @@ var TransfersRepository = (function () {
     });
   }
 
+  /**
+   * Saves a request, stamping when it changed. A new one is added under the
+   * others and gets its `_row`.
+   *
+   * @param {!Object} form The form.
+   * @param {!Object} t The request, changed in place.
+   * @return {!Object} The request.
+   */
   function saveTransfer_(form, t) {
     t.updated = Time.nowIso();
     var sh = transfersSheet_(form, true);

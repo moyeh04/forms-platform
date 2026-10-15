@@ -44,31 +44,8 @@
   "backend/features/intake/reservations/key-booking.service.js": {
     "jsdoc": 1
   },
-  "backend/features/intake/transfers/transfers.controller.js": {
-    "jsdoc": 2,
-    "layers": 8,
-    "lines": 1
-  },
   "backend/features/intake/transfers/transfers.mail.js": {
-    "biome/lint/complexity/noExcessiveCognitiveComplexity": 1,
-    "biome/lint/complexity/noExcessiveLinesPerFunction": 1,
-    "biome/lint/complexity/useOptionalChain": 1,
-    "biome/lint/correctness/noInnerDeclarations": 7,
-    "jsdoc": 2,
-    "lines": 4
-  },
-  "backend/features/intake/transfers/transfers.repository.js": {
-    "jsdoc": 4
-  },
-  "backend/features/intake/transfers/transfers.service.js": {
-    "biome/lint/complexity/noExcessiveCognitiveComplexity": 1,
-    "biome/lint/complexity/noExcessiveLinesPerFunction": 1,
-    "biome/lint/complexity/useMaxParams": 2,
-    "biome/lint/complexity/useOptionalChain": 1,
-    "biome/lint/correctness/noInnerDeclarations": 1,
-    "biome/lint/style/noExcessiveLinesPerFile": 1,
-    "jsdoc": 17,
-    "lines": 24
+    "biome/lint/complexity/useOptionalChain": 1
   },
   "backend/features/outputs/downloads/downloads.controller.js": {
     "biome/lint/complexity/noExcessiveCognitiveComplexity": 2,

@@ -17,7 +17,7 @@ var AdminSubmissionsController = (function () {
         form,
         !!req.includeDeleted
       ),
-      transfers: TransfersController.adminTransfers(form)
+      transfers: TransfersView.adminTransfers(form)
     };
   }
 

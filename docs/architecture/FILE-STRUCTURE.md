@@ -240,7 +240,10 @@ the file name says the role:
 | `backend/features/intake/teams/team-numbers.js` | The number of each team, given once and kept. |
 | `backend/features/intake/teams/teams.service.js` | Which forms gather teams, and the teams as blocks of members. |
 | `backend/features/intake/transfers/transfers.repository.js` | The Transfers tab of a form: reading and saving move requests. |
-| `backend/features/intake/transfers/transfers.service.js` | Moving a member between two teams: asking, deciding, handing over the lead and moving. |
+| `backend/features/intake/transfers/transfers.service.js` | Asking for a member of another team: taking the member out, recording, cancelling and closing requests. |
+| `backend/features/intake/transfers/transfers.decision.js` | The answer to a request: a rejection, or an approval that moves the member and closes the other requests. |
+| `backend/features/intake/transfers/transfers.members.js` | The members of a team as a transfer moves them: the member code, the team size and the hand-over of the lead. |
+| `backend/features/intake/transfers/transfers.view.js` | What the leaders and the dashboard see of the requests, with who can lead next and the other leader's phone. |
 | `backend/features/intake/transfers/transfers.mail.js` | The emails of a transfer request and of its answer. |
 | `backend/features/intake/transfers/transfers.controller.js` | The transfer actions of the team leader and of the admin. |
 | `backend/features/intake/reservations/slots.rules.js` | The slots of a reservation form: cleaned, labelled and counted. |

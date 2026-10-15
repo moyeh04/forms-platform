@@ -173,13 +173,10 @@ var SubmissionsService = (function () {
       });
       var wants = how.source
         ? []
-        : TransfersService.takeOutTransfers(
-            vform,
-            data,
-            live,
-            null,
-            how.transfer
-          );
+        : TransfersService.takeOutTransfers(vform, data, live, {
+            selfId: null,
+            asked: how.transfer
+          });
       checkNewLimits_(vform, data, live, !!how.source);
       var k = how.source
         ? KeysService.bookingKey(vform, live, how.sourceKey)
@@ -217,13 +214,10 @@ var SubmissionsService = (function () {
         return r.id === id;
       })[0];
       if (!current) ApiError.fail('bad_key', 'That key is not right.');
-      var wants = TransfersService.takeOutTransfers(
-        vform,
-        data,
-        live,
-        current.id,
-        change.transfer
-      );
+      var wants = TransfersService.takeOutTransfers(vform, data, live, {
+        selfId: current.id,
+        asked: change.transfer
+      });
       ResponsesRules.checkLimits(vform, data, live, current.id);
       current.data = data;
       ResponsesRepository.applyDerived(vform, current);
@@ -248,7 +242,7 @@ var SubmissionsService = (function () {
     asked.forEach(function (t) {
       TransfersMail.mailTransfer(form, t, 'asked');
     });
-    var contact = TransfersService.leaderContacts(form);
+    var contact = TransfersView.leaderContacts(form);
     result.data = data;
     result.transfers = asked.map(function (t) {
       return Object.assign(

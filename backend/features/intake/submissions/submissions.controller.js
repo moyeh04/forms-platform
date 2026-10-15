@@ -43,7 +43,7 @@ var SubmissionsController = (function () {
     var scope = SubmissionsService.editScope(form);
     return {
       submission: SubmissionsService.publicSubmission(r),
-      transfers: TransfersService.teamTransfers(
+      transfers: TransfersView.teamTransfers(
         FormsPublic.validationForm(form),
         r
       ),
