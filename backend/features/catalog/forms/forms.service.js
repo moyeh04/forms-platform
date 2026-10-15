@@ -134,7 +134,7 @@ function applyFormPatch_(form, patch, base) {
       var clash = findForm(wanted);
       if (clash && clash.id !== form.id)
         ApiError.fail('slug_taken', 'Another form already uses that link name.');
-      if (wanted !== form.slug) keepClientForms_();
+      if (wanted !== form.slug) ClientsRepository.keepClientForms();
       form.slug = wanted;
       return;
     }
@@ -184,12 +184,12 @@ function removeForm_(form) {
   } catch (e) {
     /* nothing to clean */
   }
-  readClients_().forEach(function (c) {
+  ClientsRepository.readClients().forEach(function (c) {
     if (c.forms.indexOf(form.id) === -1) return;
     c.forms = c.forms.filter(function (s) {
       return s !== form.id;
     });
-    saveClient_(c);
+    ClientsRepository.saveClient(c);
   });
   return { deleted: true, sheetTrashed: trashed, title: form.title };
 }

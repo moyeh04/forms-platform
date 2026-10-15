@@ -1,5 +1,6 @@
 /** The Clients tab: the private links of instructors and clients. */
 
+var ClientsRepository = (function () {
 var CLIENT_COLS_ = [
   'id',
   'name',
@@ -110,3 +111,6 @@ function saveClient_(c) {
   else c._row = Table.appendPlain(sh, Table.rowValues(CLIENT_COLS_, clientToRow_(c)));
   return c;
 }
+
+return { CLIENT_COLS: CLIENT_COLS_, readClients: readClients_, saveClient: saveClient_, changeClient: changeClient_, clientsSheet: clientsSheet_, keepClientForms: keepClientForms_ };
+})();

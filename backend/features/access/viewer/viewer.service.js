@@ -5,7 +5,7 @@
 function requireClientForm_(client, slug) {
   var form = requireForm(String(slug || ''));
   if (
-    !clientAllows_(client, form) ||
+    !ClientsAccess.clientAllows(client, form) ||
     form.status === 'draft' ||
     form.status === 'archived'
   )

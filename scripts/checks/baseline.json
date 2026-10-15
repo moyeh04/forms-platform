@@ -13,6 +13,7 @@
     "lines": 2
   },
   "backend/features/access/clients/clients.access.js": {
+    "biome/format": 1,
     "biome/lint/complexity/noExcessiveCognitiveComplexity": 1,
     "biome/lint/complexity/useOptionalChain": 2,
     "biome/lint/correctness/noInnerDeclarations": 3,
@@ -23,20 +24,20 @@
     "biome/format": 1,
     "biome/lint/complexity/noExcessiveCognitiveComplexity": 1,
     "biome/lint/style/noMagicNumbers": 1,
-    "lines": 3
+    "lines": 6
   },
   "backend/features/access/clients/clients.repository.js": {
     "biome/format": 1,
     "flags": 6,
     "jsdoc": 9,
-    "lines": 6
+    "lines": 7
   },
   "backend/features/access/clients/clients.service.js": {
     "biome/format": 1,
     "biome/lint/style/noMagicNumbers": 2,
     "biome/lint/suspicious/noGlobalIsNan": 1,
     "jsdoc": 11,
-    "lines": 9
+    "lines": 10
   },
   "backend/features/access/viewer/viewer.controller.js": {
     "biome/format": 1,
@@ -369,7 +370,7 @@
     "biome/format": 1,
     "biome/lint/style/noMagicNumbers": 1,
     "jsdoc": 6,
-    "lines": 10
+    "lines": 11
   },
   "backend/platform/sheets/table.js": {
     "biome/format": 1,
@@ -478,8 +479,9 @@
     "lines": 6
   },
   "tests/golden.test.js": {
+    "biome/format": 1,
     "biome/lint/suspicious/useIterableCallbackReturn": 1,
-    "lines": 7
+    "lines": 8
   },
   "tests/harness.test.js": {
     "lines": 1

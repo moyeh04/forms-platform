@@ -6,7 +6,7 @@ function setup() {
   Properties.setProp('REGISTRY_ID', ss.getId());
   Properties.pepper();
   Table.ensureTab(ss, Constants.TABS.forms, FORM_COLS);
-  Table.ensureTab(ss, Constants.TABS.clients, CLIENT_COLS_);
+  Table.ensureTab(ss, Constants.TABS.clients, ClientsRepository.CLIENT_COLS);
   var lists = Table.ensureTab(ss, Constants.TABS.lists, ['key', 'values']);
   if (lists.getLastRow() < 2) {
     Object.keys(DEFAULT_LISTS).forEach(function (k) {

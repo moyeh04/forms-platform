@@ -3,6 +3,7 @@
  * wrong keys.
  */
 
+var ClientsAccess = (function () {
 var CLIENT_KEY_TRIES_ = 5;
 
 /** Resolves a token to an active client, or fails. */
@@ -15,9 +16,9 @@ function requireClient_(req) {
       'Too many tries. Wait a minute and open the link again.'
     );
   var token = String((req && req.token) || '');
-  var h = token ? clientToken_(token) : '';
+  var h = token ? ClientsService.clientToken(token) : '';
   var hit = null;
-  readClients_().forEach(function (c) {
+  ClientsRepository.readClients().forEach(function (c) {
     if (h && c.tokenHash === h) hit = c;
   });
   if (!hit) {
@@ -25,7 +26,7 @@ function requireClient_(req) {
     ApiError.fail('bad_token', 'This link is not valid.');
   }
   if (!hit.active) ApiError.fail('revoked', 'This link was turned off.');
-  if (clientExpired_(hit))
+  if (ClientsService.clientExpired(hit))
     ApiError.fail(
       'link_expired',
       'This link ended on ' +
@@ -42,7 +43,7 @@ function requireClient_(req) {
       );
     var key = String((req && req.accessKey) || '').replace(/\D/g, '');
     if (!key) ApiError.fail('key_needed', 'This link needs its access key.');
-    if (clientKeyHash_(hit, key) !== hit.keyHash) {
+    if (ClientsService.clientKeyHash(hit, key) !== hit.keyHash) {
       cache.put(tag, String(wrong + 1), 600);
       ApiError.fail('bad_access_key', 'That access key is not right.');
     }
@@ -55,3 +56,6 @@ function clientAllows_(client, form) {
     client.forms.indexOf('*') !== -1 || client.forms.indexOf(form.id) !== -1
   );
 }
+
+return { requireClient: requireClient_, clientAllows: clientAllows_ };
+})();

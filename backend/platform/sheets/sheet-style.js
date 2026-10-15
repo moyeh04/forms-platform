@@ -124,7 +124,7 @@ function styleFormTabs_(ss) {
 function styleRegistryTabs_() {
   var ss = registry();
   styleDataTab_(ss.getSheetByName(Constants.TABS.forms), FORM_COLS);
-  styleDataTab_(ss.getSheetByName(Constants.TABS.clients), CLIENT_COLS_);
+  styleDataTab_(ss.getSheetByName(Constants.TABS.clients), ClientsRepository.CLIENT_COLS);
   styleDataTab_(ss.getSheetByName(Constants.TABS.lists), ['key', 'values']);
 }
 

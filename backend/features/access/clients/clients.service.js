@@ -19,6 +19,7 @@
  * from it. Links saved with link names are read as ids and stored as ids on their next save.
  */
 
+var ClientsService = (function () {
 function clientToken_(token) {
   return Crypto.sha256Hex(Properties.pepper() + ':client:' + token);
 }
@@ -85,3 +86,6 @@ function cleanClientForms_(list) {
     return f.id;
   });
 }
+
+return { clientToken: clientToken_, clientExpired: clientExpired_, clientKeyHash: clientKeyHash_, publicClient: publicClient_, newToken: newToken_, cleanClientForms: cleanClientForms_, cleanExpiry: cleanExpiry_, newClientKey: newClientKey_, setClientKey: setClientKey_, clientKeyPad: clientKeyPad_ };
+})();

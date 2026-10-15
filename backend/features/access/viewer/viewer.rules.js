@@ -64,7 +64,7 @@ function viewerForms_(client) {
     return (
       f.status !== 'draft' &&
       f.status !== 'archived' &&
-      clientAllows_(client, f)
+      ClientsAccess.clientAllows(client, f)
     );
   });
 }

@@ -6,7 +6,7 @@
 var API = API || {};
 
 API['viewer.me'] = function (req) {
-  var client = requireClient_(req);
+  var client = ClientsAccess.requireClient(req);
   return {
     client: { name: client.name, canReview: client.canReview },
     forms: viewerForms_(client).map(function (f) {
@@ -16,7 +16,7 @@ API['viewer.me'] = function (req) {
 };
 
 API['viewer.data'] = function (req) {
-  var client = requireClient_(req);
+  var client = ClientsAccess.requireClient(req);
   var form = requireClientForm_(client, req.slug);
   var vform = validationForm(form);
   var kind = viewKind_(form);
@@ -45,7 +45,7 @@ API['viewer.data'] = function (req) {
 };
 
 API['viewer.review'] = function (req) {
-  var client = requireClient_(req);
+  var client = ClientsAccess.requireClient(req);
   var form = requireClientForm_(client, req.slug);
   if (!client.canReview) ApiError.fail('forbidden', 'This link is read-only.');
   Lock.withLock(function () {
