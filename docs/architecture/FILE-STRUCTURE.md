@@ -138,7 +138,15 @@ The site is published at the paths it has always had: the pages at the root,
 | `web/admin.html` | The admin dashboard (PIN). |
 | `web/viewer.html` | The read-only instructor and client page (`?t=private-token`). |
 | `web/css/theme.css` | Colors, fonts, and the type scale as variables. Change the look here; the contrast standard is in its header and enforced by `tests/web/css/theme.test.js`. |
-| `web/css/app.css` | Components of the student page. |
+| `web/css/app/page.css` | The page, its top bar and icon buttons, and the sheet. Every page loads the `app/` files in the order of these rows, so the cascade is the one the single file had. |
+| `web/css/app/route.css` | The route of the steps: the sea, the islands, the treasure island and the ship. |
+| `web/css/app/fields.css` | The title of a step, the fields, the chips of small lists and the team members. |
+| `web/css/app/slots.css` | The booking slots, and the torn ticket of a full slot. |
+| `web/css/app/buttons.css` | The buttons, and the lists of the review summary and of a ticket. |
+| `web/css/app/ticket.css` | The ticket, and the clock and calendar that show the time of a booking. |
+| `web/css/app/dialogs.css` | Dialogs, toasts and the strip that says a newer site is published. |
+| `web/css/app/print.css` | Print: only the ticket, on plain paper. |
+| `web/css/app/notes.css` | Lists inside summaries, the note of a chosen team size and the requests to move a member. |
 | `web/css/admin/layout.css` | The dashboard layout classes, the tabs of a form and the settings sections. The dashboard and the instructor page load the `admin/` files in the order of these rows, so the cascade is the one the single file had. |
 | `web/css/admin/questions.css` | The Questions tab: a row per question under its page. |
 | `web/css/admin/forms-list.css` | The header of a form and the forms list grouped by status. |
@@ -155,7 +163,7 @@ The site is published at the paths it has always had: the pages at the root,
 | `web/css/admin/phone.css` | The phone layout of team members, the page header and bookings. |
 | `web/css/admin/phone-tables.css` | The phone layout of wide tables: one card per row. |
 | `web/css/admin/keys.css` | Client links, the until picker of keys and links, and Download all. |
-| `web/img/` | The tab icon (`favicon.svg`), PNG sizes for phones and older browsers, and `site.webmanifest`. The pirate and the parrot of the ticket picture (`pirate.webp`, `parrot.webp`), with clear backgrounds; `web/js/form/ticket/` draws the clock and the calendar around them. The pictures of the route: the ship (`ship.svg`), an island (`island.svg`), the treasure chest (`treasure.svg`), the waves (`sea.svg`), the sky by day and by night (`sky-day.svg`, `sky-night.svg`) and the sun and moon (`sun.svg`, `moon.svg`). They have their own colours; the sea and sky behind them take theirs from the theme. |
+| `web/img/` | The tab icon (`favicon.svg`), PNG sizes for phones and older browsers, and `site.webmanifest`. The pirate and the parrot of the ticket picture (`pirate.webp`, `parrot.webp`), with clear backgrounds; `web/js/form/ticket/` draws the clock and the calendar around them. The pictures of the route: the ship (`ship.svg`), an island (`island.svg`), the treasure chest (`treasure.svg`), the waves (`sea.svg`), the sky by day and by night (`sky-day.svg`, `sky-night.svg`) the sun and moon (`sun.svg`, `moon.svg`) and the red flag of an explored island (`crew-flag.svg`). The arrow of a select (`select-arrow.svg`). They have their own colours; the sea and sky behind them take theirs from the theme. |
 | `web/js/config.js` | Source placeholder; `scripts/build/build-site.js` generates its published copy from the Actions `API_URL` variable, with the version of the site. |
 | `web/js/app/fresh.js` | Keeps an open page on the published version: compares the version in `config.js` with `version.json`, reloads an older page when nothing would be lost, and offers **Reload** otherwise. |
 | `web/js/app/api.js` | Sends requests to the backend as plain-text JSON (avoids browser CORS checks). |
@@ -475,8 +483,10 @@ the file name says the role:
 | `scripts/deploy/prepare-clasp.js` | Checks the deployment variables of the workflow and writes the clasp configuration git ignores. |
 | `scripts/deploy/backend-changed.js` | Tells the workflow whether a push changed a backend file, so a push of pages or documents alone does not deploy the backend. |
 | `scripts/deploy/setup-deployment.js` | First deployment from your computer (`npm run setup`): creates the sheet and its script, pushes the bundle, creates the web app, and stores the IDs, the credential and the Pages setting in GitHub. |
+| `scripts/deploy/clasp-output.js` | Reads the Script ID and the deployment ID from what clasp prints, for the first deployment. |
 | `scripts/dev/setup-git.sh` | Run by `npm install`: points git at `.githooks/` and at `.git-blame-ignore-revs`, the layout-only commits `git blame` skips. |
 | `scripts/dev/dev-server.js` | `npm run dev`: serves the site and answers its API calls from the in-memory Google, with sample forms, so pages can be opened in a real browser. |
+| `scripts/dev/sample-world.js` | The admin PIN and the sample forms and registrations of the preview, made through the API as a person would. |
 | `tests/harness/appsscript-mock.js` | An in-memory Sheets, Drive, Mail, Cache, and clock, so the real backend code runs in tests. |
 | `tests/harness/dom.js` | Opens the real pages in jsdom wired to that backend. |
 | `tests/harness/admin-page.js` | What the dashboard tests share: a world with an admin PIN that makes open forms, the dashboard opened in it, and the answers of a team. |

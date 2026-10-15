@@ -95,56 +95,6 @@
   padding: 2px 0;
   font-size: var(--fs-help);
 }
-.more {
-  position: relative;
-}
-.more > summary {
-  list-style: none;
-  cursor: pointer;
-}
-.more > summary::-webkit-details-marker {
-  display: none;
-}
-.more-menu {
-  position: absolute;
-  z-index: 20;
-  inset-inline-start: 0;
-  top: calc(100% + 6px);
-  min-width: 230px;
-  padding: 6px;
-  background: var(--sheet);
-  border: 1.5px solid var(--ink);
-  border-radius: 6px;
-  box-shadow: 0 8px 22px var(--shadow);
-  display: flex;
-  flex-direction: column;
-}
-.more-menu a,
-.more-menu button {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 9px 12px;
-  border: 0;
-  border-radius: 4px;
-  background: none;
-  color: var(--ink);
-  text-decoration: none;
-  font-weight: 700;
-  font-size: 0.95rem;
-  text-align: start;
-  cursor: pointer;
-}
-.more-menu a:hover,
-.more-menu button:hover {
-  background: var(--sheet-2);
-}
-.more-menu .danger {
-  color: var(--err);
-  border-top: 1px solid var(--line);
-  border-radius: 0 0 4px 4px;
-  margin-top: 4px;
-}
 .term-picker {
   display: grid;
   grid-template-columns: minmax(0, 1.4fr) minmax(110px, 0.6fr) minmax(0, 1fr);
@@ -204,10 +154,7 @@
 }
 .l-grid {
   display: grid;
-  grid-template-columns: repeat(
-      auto-fit,
-      minmax(min(100%, var(--l-min, 260px)), 1fr)
-    );
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--l-min, 260px)), 1fr));
   gap: 12px;
 }
 .l-stack {

@@ -74,10 +74,6 @@
   gap: 10px;
   align-items: center;
 }
-.choice-head.with-ar,
-.with-ar > .choice {
-  grid-template-columns: 2rem minmax(0, 1.2fr) minmax(0, 1fr) minmax(0, 1fr) auto;
-}
 .choice-head {
   font-size: var(--fs-help);
   color: var(--mute);
@@ -96,6 +92,10 @@
 }
 .choice:hover {
   background: var(--sheet-2);
+}
+.choice-head.with-ar,
+.with-ar > .choice {
+  grid-template-columns: 2rem minmax(0, 1.2fr) repeat(2, minmax(0, 1fr)) auto;
 }
 .choice.bad {
   background: var(--tint-b);

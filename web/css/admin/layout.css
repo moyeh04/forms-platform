@@ -178,9 +178,6 @@ body.admin {
   transform: rotate(45deg);
   transition: transform 0.15s;
 }
-.panel.open > h2 .panel-head::after {
-  transform: rotate(-135deg);
-}
 .panel-head:hover {
   background: var(--sheet-2);
 }
@@ -219,4 +216,7 @@ body.admin {
 .panel.pinned .panel-head::after,
 .panel.pinned .panel-sum {
   display: none;
+}
+.panel.open > h2 .panel-head::after {
+  transform: rotate(-135deg);
 }

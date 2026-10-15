@@ -24,7 +24,6 @@
     gap: 10px;
     padding: 3px 0;
     border: 0;
-    background: none !important;
   }
   .data-table.cards td.num {
     display: none;
@@ -50,16 +49,16 @@
   .data-table.cards td:last-child {
     margin-top: 6px;
   }
-  .data-table.cards .actions .btn {
-    flex: 1 1 auto;
-    justify-content: center;
-  }
   .dialog-actions {
     flex-wrap: wrap;
   }
   .dialog-actions .btn {
     flex: 1 1 auto;
     white-space: nowrap;
+    justify-content: center;
+  }
+  .data-table.cards .actions .btn {
+    flex: 1 1 auto;
     justify-content: center;
   }
 }
@@ -70,7 +69,7 @@
   .savebar,
   .block-side .actions,
   .no-print {
-    display: none !important;
+    display: none;
   }
   .block {
     break-inside: avoid;
@@ -79,10 +78,10 @@
   }
   .block-head,
   .day-head {
-    background: #f2f2f2 !important;
+    background: #f2f2f2;
   }
   .block-actions {
-    display: none !important;
+    display: none;
   }
 }
 

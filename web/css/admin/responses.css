@@ -164,10 +164,10 @@
   border-top: 1px solid color-mix(in srgb, var(--line) 70%, transparent);
   vertical-align: middle;
 }
-.mini tbody tr:nth-child(even) td {
+.mini tbody tr:nth-child(even) {
   background: color-mix(in srgb, var(--ink) 3%, transparent);
 }
-.mini tr.leader td {
+.mini tr.leader {
   background: color-mix(in srgb, var(--band) 10%, transparent);
 }
 .team-card .mini {

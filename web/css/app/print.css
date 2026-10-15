@@ -1,0 +1,35 @@
+/* Print: only the ticket, on plain paper. */
+@media print {
+  body {
+    background: #fff;
+    color: #000;
+  }
+  .page > *:not(.sheet),
+  .topbar,
+  .ticket-actions,
+  .foot,
+  .nav,
+  .trail,
+  .form-head {
+    display: none;
+  }
+  .sheet {
+    clip-path: none;
+    filter: none;
+    background: #fff;
+    padding: 0;
+  }
+  .sheet::after {
+    display: none;
+  }
+  .ticket {
+    color: #000;
+  }
+  .key-block {
+    border-color: #000;
+  }
+  .key-note,
+  .callout-arrow {
+    color: #000;
+  }
+}

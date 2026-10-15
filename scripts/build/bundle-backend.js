@@ -16,6 +16,12 @@ const vm = require('vm');
 const root = path.resolve(__dirname, '..', '..');
 const out = path.join(root, 'dist');
 
+/**
+ * Reads a file of the repository.
+ *
+ * @param {string} rel Its path from the repository root.
+ * @return {string} Its text.
+ */
 function read(rel) {
   return fs.readFileSync(path.join(root, rel), 'utf8');
 }
@@ -83,6 +89,13 @@ function listBackend() {
     .map((f) => path.posix.join('backend', f));
 }
 
+/**
+ * Joins the domain files and the backend files into one script, and
+ * refuses it when it does not parse.
+ *
+ * @return {{code: string, files: !Array<string>}} The script and the files
+ *     it holds, in order.
+ */
 function bundleSource() {
   const files = DOMAIN_FIRST.filter((f) => fs.existsSync(path.join(root, f)));
   files.push(...listBackend());
@@ -97,6 +110,7 @@ function bundleSource() {
   return { code, files };
 }
 
+/** Writes the bundle and the manifest into dist/. */
 function bundle() {
   const { code, files } = bundleSource();
   fs.mkdirSync(out, { recursive: true });
