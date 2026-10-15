@@ -15,7 +15,7 @@ runs `scripts/build/bundle-backend.js`, which writes two files into `dist/`:
 
 | Output | Made from | You do |
 |---|---|---|
-| `dist/Code.gs` | `domain/rules.js` + every `backend/*.js` | Actions pushes it with pinned clasp |
+| `dist/Code.gs` | `domain/rules/` + every `backend/*.js` | Actions pushes it with pinned clasp |
 | `dist/appsscript.json` | `backend/appsscript.json` (copied as-is) | Actions pushes it with pinned clasp |
 
 `dist/` is listed in `.gitignore`, so it is **not committed**. It is regenerated
@@ -54,7 +54,7 @@ Node's built-in modules (`fs`, `path`, `vm`).
 }}%%
 flowchart TD
     subgraph sources["Source files you edit and commit"]
-        rules["domain/rules.js, domain/form-metadata.js<br/>rules and form metadata, also loaded by the pages"]
+        rules["domain/rules/, domain/form-metadata/<br/>rules and form metadata, also loaded by the pages"]
         gs["backend/*.js<br/>23 modules"]
         manifest["backend/appsscript.json<br/>time zone, scopes, web app mode"]
     end
@@ -86,9 +86,10 @@ flowchart TD
 
 ### Step by step
 
-1. **List the files.** `domain/enums.js`, `domain/rules.js` and
-   `domain/form-metadata.js` go first (`DOMAIN_FIRST` in the bundler) so the
-   enums and the globals `Rules` and `FormMetadata` exist. Every `.js` file
+1. **List the files.** `domain/enums.js`, the parts of `domain/rules/` and
+   of `domain/form-metadata/`, each folder's `index.js` last, go first
+   (`DOMAIN_FIRST` in the bundler) so the enums and the globals `Rules` and
+   `FormMetadata` exist. Every `.js` file
    under `backend/` follows: `platform/` first, then `features/`, each in
    alphabetical order of its path, then `routes.js`, `entry-points.js` and
    `main.js` (`rankOf` in the bundler).
@@ -205,7 +206,7 @@ mistake here would fail every test.
   'sequence': {'mirrorActors': false, 'messageMargin': 34, 'boxMargin': 8}
 }}%%
 flowchart TD
-    A["dist/Code.gs"] --> B["// ===== domain/rules.js =====<br/>creates the global Rules"]
+    A["dist/Code.gs"] --> B["// ===== domain/rules/*.js =====<br/>the parts, then index.js creates the global Rules"]
     A --> C["// ===== backend/platform/... =====<br/>errors, sheet tables, lock, crypto, format, xlsx"]
     A --> D["// ===== backend/features/access/auth/auth.service.js =====<br/>PIN and admin wrapper"]
     A --> E["...  every other feature file, area by area:<br/>access, catalog, intake, outputs"]
@@ -273,14 +274,14 @@ similar copy. The workflow pushes the same `backend-dist` artifact the tests ran
 
 | You changed | Rebuild? | Then |
 |---|---|---|
-| Anything in `backend/` or `domain/rules.js` | Yes, Actions does it | Push to `master`; clasp pushes the bundle and updates the existing deployment |
+| Anything in `backend/` or `domain/rules/` | Yes, Actions does it | Push to `master`; clasp pushes the bundle and updates the existing deployment |
 | `backend/appsscript.json` (scopes, time zone) | Yes, Actions does it | The same push carries the manifest |
 | Only files under `web/` | No | Push to `master`; GitHub Pages updates |
 
 Run `npm run build` yourself only to inspect the bundle or to run the tests
 locally; a routine update needs no local build.
 
-Note that `domain/rules.js` is used by **both sides**: the browser copy ships
+Note that `domain/rules/` is used by **both sides**: the browser copy ships
 with the website and the server copy is inside the bundle. One push to `master`
 updates both, the server first, and Pages is published only after the backend
 deployment succeeds. The server is always the final judge.
@@ -322,5 +323,5 @@ source placeholder and never runs the configuration generator. See
 | `dist/` is missing | It is git-ignored and was not built on this machine | `npm install` then `npm run build` |
 | Backend change is not live after a push | The **Deploy Google Apps Script** job failed or was skipped (not `master`, or a pull request) | Open the run in the Actions tab and fix the reported variable or credential |
 | Manual recovery: pasted code has no effect | You saved but did not create a **New version** of the deployment | Deploy > Manage deployments > pencil > New version |
-| Manual recovery: `Rules is not defined` in Apps Script | `rules.js` was not pasted (partial paste) | Paste the whole `Code.gs` from the `backend-dist` artifact |
+| Manual recovery: `Rules is not defined` in Apps Script | the rules were not pasted (partial paste) | Paste the whole `Code.gs` from the `backend-dist` artifact |
 | Menu **Forms Platform** missing | Sheet not reloaded after saving the script | Reload the sheet and wait a few seconds |

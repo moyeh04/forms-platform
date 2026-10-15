@@ -30,7 +30,7 @@ Each folder goes somewhere different. Only one of them needs a build step.
 flowchart TD
     repo["Repository"]
     repo --> web["web/<br/>index.html, admin.html, viewer.html<br/>css, js, img"]
-    repo --> shared["domain/<br/>rules.js, form-metadata.js"]
+    repo --> shared["domain/<br/>rules/, form-metadata/"]
     repo --> be["backend/<br/>23 .js files + appsscript.json"]
     repo --> sc["scripts/<br/>build/, dev/, deploy/, checks/"]
     repo --> ts["tests/<br/>JavaScript"]
@@ -87,14 +87,14 @@ flowchart LR
         ui["ui.js"]
     end
     subgraph index["index.html: the student form"]
-        r1["domain/rules.js"]
+        r1["domain/rules/"]
         i18n["i18n.js"]
         tk["ticket.js"]
         h1["handover.js"]
         fm["form.js"]
     end
     subgraph admin["admin.html: the dashboard"]
-        r2["domain/rules.js"]
+        r2["domain/rules/"]
         a1["admin.js"]
         a2["admin-settings.js"]
         a5["admin-timetable.js"]
@@ -122,7 +122,7 @@ flowchart LR
     classDef cOk fill:#BFD9CF,stroke:#2E5A55,stroke-width:1.5px,color:#17302D
 ```
 
-The instructor page does not load `rules.js`: it only reads data, so it needs
+The instructor page does not load the rules: it only reads data, so it needs
 no validation.
 
 ## Website (static files, no build step)
@@ -314,8 +314,8 @@ the file name says the role:
 | `backend/entry-points.js` | The functions Apps Script calls by name (the sheet menu, its print dialog, setup, the PIN commands and the view trigger), each handing the call to its namespace. |
 | `backend/main.js` | The web app: every request arrives here, is read as JSON, and goes to the router. |
 
-`npm run build` joins `domain/enums.js`, `domain/rules.js`,
-`domain/form-metadata.js` and every backend file into `dist/Code.gs`: `platform/` first, then `features/`, then
+`npm run build` joins `domain/enums.js`, the parts of `domain/rules/` and
+`domain/form-metadata/` and every backend file into `dist/Code.gs`: `platform/` first, then `features/`, then
 `routes.js`, `entry-points.js` and `main.js`.
 
 ## Tools and tests

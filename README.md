@@ -51,7 +51,7 @@ one link per form.
 | Layer | Technology | Why |
 |---|---|---|
 | Pages | HTML, CSS and plain JavaScript, no framework and no build step | Small and fast on a phone; the files are served as they are written |
-| Rules | `domain/rules.js`, loaded by the browser, the backend and the tests | One copy of every check, so the page and the server can never disagree |
+| Rules | `domain/rules/`, loaded by the browser, the backend and the tests | One copy of every check, so the page and the server can never disagree |
 | Backend | Google Apps Script web app, bundled into one `Code.gs` by a Node script | Runs as the owner, free, with Sheets, Drive, Mail and a cache built in |
 | Data | Google Sheets (a registry plus one spreadsheet per form) and Google Drive | The owner can open, sort and print the data without the platform |
 | Excel | Office Open XML written by hand in `backend/platform/xlsx/` | Real `.xlsx` files with merged cells, tints and links, with no library |

@@ -12,8 +12,8 @@ change it.
   `_DAYS`, `_BYTES`, `_PX`.
 - **Declared at the top of the file that owns it**, under the imports, never
   inside a function. A value two files need belongs to the lower layer they
-  share: `backend/platform/config/constants.js` for the backend, `domain/rules.js` for both
-  sides.
+  share: `backend/platform/config/constants.js` for the backend, a part of
+  `domain/rules/` for both sides.
 - **Built from smaller names** when it is a product: `40 * 1024 * 1024`
   stays readable, so write it out instead of `41943040`.
 - **A vocabulary is one enum.** The words the pages and the backend share
@@ -63,13 +63,18 @@ is silenced on its own line with the reason, and both checks honour it:
 | `clients.access.js` | `CLIENT_KEY_TRIES_` |
 | `downloads.jobs.js` | The size, time and file limits of a download job |
 | `keys.controller.js`, `forms.questions.js`, `sheet-views.*.js`, `workbook.js`, `sheet-style.js` | The limits and sizes of their own feature |
-| `domain/rules.js` | The Arabic letter and digit tables, `SIZE_ALERT_LEVELS`, week day and month names |
+| `domain/rules/text.js` | The Arabic letter and digit tables, the lengths of a name, an English title and an email address |
+| `domain/rules/phone.js`, `codes.js`, `drive-link.js` | The Egyptian country code and number lengths, the digits of a student code, the Drive hosts and link kinds, the parts of a folder name |
+| `domain/rules/slots.js` | Week day and month names, the minutes of an hour and the hours of a clock face |
+| `domain/rules/team-size.js` | `SIZE_ALERT_LEVELS`, the biggest team when a form does not say, the smallest number a warning can ask for |
+| `domain/rules/submission.js` | The longest answer of a short and of a long text field |
+| `domain/form-metadata/*.js` | The longest subject code, how many academic years are offered ahead and back |
 | `web/js/*.js` | Each page module's own labels, choices and browser storage keys (`fp_*`) at the top of its wrapper |
 | `web/js/config.js` | The backend URL, written by the deploy workflow |
 
 Known gaps, counted in the check baseline until they are fixed:
 
-- Month names are declared in both `domain/rules.js` and
+- Month names are declared in both `domain/rules/slots.js` and
   `web/js/admin-timetable.js`.
 - The ticket drawing in `web/js/ticket.js` places its shapes with unnamed
   numbers.

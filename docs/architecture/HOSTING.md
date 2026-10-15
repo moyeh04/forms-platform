@@ -125,7 +125,7 @@ sequenceDiagram
     Note over Pages: No build. Files are served as committed, except config.js, generated from API_URL.
     Stu->>CDN: GET /forms/index.html?f=slug
     CDN-->>Stu: static HTML (cached, over HTTPS)
-    Stu->>CDN: GET assets/css, assets/js, shared/rules.js
+    Stu->>CDN: GET assets/css, assets/js, shared/rules/*.js
     CDN-->>Stu: static files
     Note over Stu: From here the page talks to Google, not GitHub.
 ```
@@ -140,7 +140,11 @@ Why it suits this project:
   `web/` and the rules in `domain/` into the published artifact, at the paths
   `scripts/build/site-map.js` gives them: the pages at the root, `web/js`,
   `web/css` and `web/img` under `assets/`, and `domain/` as `shared/`. Those
-  paths never change, so a page a browser kept still finds its files. Backend code, tests, scripts, and docs never go online.
+  paths never change, so a page a browser kept still finds its files. When
+  a file is split into a folder of parts, its old path stays published for
+  one release as the parts joined in order (`JOINED` in the site map):
+  `shared/rules.js` and `shared/form-metadata.js`. Backend code, tests,
+  scripts, and docs never go online.
 - **Tested before it is public.** Pages' source is *GitHub Actions*, so a push
   that breaks a test is never published.
 - **No special folders.** Nothing starts with an underscore, so GitHub's
@@ -267,8 +271,8 @@ read, filter, and print.
 flowchart TD
     q{"What did you change?"}
     q -- "pages, styles, scripts in assets" --> a1["push master<br/>Actions tests, skips the backend,<br/>Pages republishes"]
-    q -- "backend or domain/rules.js" --> a2["push master<br/>Actions tests and builds<br/>clasp updates existing deployment"]
-    q -- "a rule in domain/rules.js" --> a3["push master once<br/>Actions updates the server copy,<br/>then publishes the browser copy"]
+    q -- "backend or domain/rules/" --> a2["push master<br/>Actions tests and builds<br/>clasp updates existing deployment"]
+    q -- "a rule in domain/rules/" --> a3["push master once<br/>Actions updates the server copy,<br/>then publishes the browser copy"]
     q -- "a form's questions or team sizes" --> a4["Nothing to deploy.<br/>Change it in the dashboard."]
     classDef cDb fill:#F3E2B3,stroke:#B8892D,stroke-width:1.5px,color:#2F2418
     classDef cActor fill:#F4D9D3,stroke:#9A3328,stroke-width:1.5px,color:#2F2418
