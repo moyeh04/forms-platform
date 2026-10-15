@@ -19,69 +19,88 @@
  * from it. Links saved with link names are read as ids and stored as ids on their next save.
  */
 
-function clientToken_(token) {
-  return sha256Hex(pepper() + ':client:' + token);
-}
+var ClientsService = (function () {
+  function clientToken_(token) {
+    return Crypto.sha256Hex(Properties.pepper() + ':client:' + token);
+  }
 
-function clientKeyHash_(c, key) {
-  return sha256Hex(pepper() + ':clientkey:' + c.id + ':' + key);
-}
+  function clientKeyHash_(c, key) {
+    return Crypto.sha256Hex(
+      Properties.pepper() + ':clientkey:' + c.id + ':' + key
+    );
+  }
 
-function clientKeyPad_(c) {
-  return sha256Hex(pepper() + ':clientseal:' + c.id);
-}
+  function clientKeyPad_(c) {
+    return Crypto.sha256Hex(Properties.pepper() + ':clientseal:' + c.id);
+  }
 
-/** Gives the link `key`, or no key when it is empty. */
-function setClientKey_(c, key) {
-  c.keyHash = key ? clientKeyHash_(c, key) : '';
-  c.keySeal = key ? sealDigits_(clientKeyPad_(c), key) : '';
-}
+  /** Gives the link `key`, or no key when it is empty. */
+  function setClientKey_(c, key) {
+    c.keyHash = key ? clientKeyHash_(c, key) : '';
+    c.keySeal = key ? Crypto.sealDigits(clientKeyPad_(c), key) : '';
+  }
 
-function clientExpired_(c) {
-  return !!(c.expires && Date.parse(c.expires) < Date.now());
-}
+  function clientExpired_(c) {
+    return !!(c.expires && Date.parse(c.expires) < Date.now());
+  }
 
-/** An end date from the admin: an ISO time, or empty for no end. */
-function cleanExpiry_(value) {
-  var v = String(value || '').trim();
-  if (!v) return '';
-  var t = Date.parse(v);
-  if (isNaN(t)) fail('bad_date', 'That end date is not a date.');
-  return new Date(t).toISOString();
-}
+  /** An end date from the admin: an ISO time, or empty for no end. */
+  function cleanExpiry_(value) {
+    var v = String(value || '').trim();
+    if (!v) return '';
+    var t = Date.parse(v);
+    if (isNaN(t)) ApiError.fail('bad_date', 'That end date is not a date.');
+    return new Date(t).toISOString();
+  }
 
-function newClientKey_() {
-  var n = parseInt(uuid().replace(/-/g, '').slice(0, 10), 16) % 1000000;
-  return ('00000' + n).slice(-6);
-}
+  function newClientKey_() {
+    var n =
+      parseInt(Crypto.uuid().replace(/-/g, '').slice(0, 10), 16) % 1000000;
+    return ('00000' + n).slice(-6);
+  }
 
-function newToken_() {
-  return (uuid() + uuid()).replace(/-/g, '').slice(0, 24);
-}
+  function newToken_() {
+    return (Crypto.uuid() + Crypto.uuid()).replace(/-/g, '').slice(0, 24);
+  }
 
-function publicClient_(c) {
+  function publicClient_(c) {
+    return {
+      id: c.id,
+      name: c.name,
+      forms: c.forms,
+      hiddenColumns: c.hiddenColumns,
+      canReview: c.canReview,
+      showSizeAlerts: c.showSizeAlerts !== false,
+      active: c.active,
+      createdAt: c.createdAt,
+      hasKey: !!c.keyHash,
+      keyKnown: !!(c.keyHash && c.keySeal),
+      expires: c.expires,
+      expired: clientExpired_(c)
+    };
+  }
+
+  function cleanClientForms_(list) {
+    list = Array.isArray(list) ? list : [];
+    if (list.indexOf('*') !== -1) return ['*'];
+    return list.map(function (s) {
+      var f = FormsRepository.findForm(String(s));
+      if (!f)
+        ApiError.fail('form_not_found', 'Form "' + s + '" does not exist.');
+      return f.id;
+    });
+  }
+
   return {
-    id: c.id,
-    name: c.name,
-    forms: c.forms,
-    hiddenColumns: c.hiddenColumns,
-    canReview: c.canReview,
-    showSizeAlerts: c.showSizeAlerts !== false,
-    active: c.active,
-    createdAt: c.createdAt,
-    hasKey: !!c.keyHash,
-    keyKnown: !!(c.keyHash && c.keySeal),
-    expires: c.expires,
-    expired: clientExpired_(c)
+    clientToken: clientToken_,
+    clientExpired: clientExpired_,
+    clientKeyHash: clientKeyHash_,
+    publicClient: publicClient_,
+    newToken: newToken_,
+    cleanClientForms: cleanClientForms_,
+    cleanExpiry: cleanExpiry_,
+    newClientKey: newClientKey_,
+    setClientKey: setClientKey_,
+    clientKeyPad: clientKeyPad_
   };
-}
-
-function cleanClientForms_(list) {
-  list = Array.isArray(list) ? list : [];
-  if (list.indexOf('*') !== -1) return ['*'];
-  return list.map(function (s) {
-    var f = findForm(String(s));
-    if (!f) fail('form_not_found', 'Form "' + s + '" does not exist.');
-    return f.id;
-  });
-}
+})();

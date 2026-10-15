@@ -20,18 +20,27 @@ function read(rel) {
   return fs.readFileSync(path.join(root, rel), 'utf8');
 }
 
-/** The order of the backend folders in the bundle; main.js comes last. */
+/** The order of the backend folders in the bundle. */
 const BACKEND_ORDER = ['platform/', 'features/'];
 
 /**
+ * The files at the top of backend/ that come after every folder, in order:
+ * the action table and the Apps Script entry points need the namespaces of
+ * the folders, and main.js reads best at the end.
+ */
+const BACKEND_LAST = ['routes.js', 'entry-points.js', 'main.js'];
+
+/**
  * Ranks a backend file for the bundle: platform code first, then the
- * features, then the files at the top of backend/, with main.js last.
+ * features, then any other file at the top of backend/, then the action
+ * table, the entry points and main.js.
  *
  * @param {string} file A path inside backend/, with forward slashes.
  * @return {number} The rank; lower comes first.
  */
 function rankOf(file) {
-  if (file === 'main.js') return BACKEND_ORDER.length + 1;
+  const last = BACKEND_LAST.indexOf(file);
+  if (last !== -1) return BACKEND_ORDER.length + 1 + last;
   const index = BACKEND_ORDER.findIndex((dir) => file.startsWith(dir));
   return index === -1 ? BACKEND_ORDER.length : index;
 }

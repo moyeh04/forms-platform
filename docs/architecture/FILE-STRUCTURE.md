@@ -167,7 +167,10 @@ The site is published at the paths it has always had: the pages at the root,
 Apps Script runs every file in one global scope, so the folders give the
 structure. `platform/<concern>/` holds code no feature owns, named by what it
 does. `features/<area>/<feature>/` holds one feature, with the business area
-above it. Inside a feature the file name says the role:
+above it. Each file defines one namespace named after it, in PascalCase
+(`forms.repository.js` defines `FormsRepository`), and returns only the
+functions other files use; the rest stay private to the file. Inside a feature
+the file name says the role:
 
 | Role | What it holds |
 |---|---|
@@ -175,7 +178,7 @@ above it. Inside a feature the file name says the role:
 | `*.rules.js` | business rules |
 | `*.access.js` | who may act |
 | `*.service.js` | the feature's work: loads data, applies the rules, saves |
-| `*.controller.js` | the API actions of the feature |
+| `*.controller.js` | the API actions of the feature, one named function each, listed in `routes.js` |
 
 ### Platform: code no feature owns
 
@@ -271,11 +274,13 @@ above it. Inside a feature the file name says the role:
 
 | File | What it does |
 |---|---|
+| `backend/routes.js` | Every action name and the handler that answers it, wrapped in `AuthService.admin` when it needs the admin. |
+| `backend/entry-points.js` | The functions Apps Script calls by name (the sheet menu, its print dialog, setup, the PIN commands and the view trigger), each handing the call to its namespace. |
 | `backend/main.js` | The web app: every request arrives here and goes to its handler. |
 
 `npm run build` joins `domain/rules.js`, `domain/form-metadata.js` and every
-backend file into `dist/Code.gs`: `platform/` first, then `features/`, with
-`main.js` last.
+backend file into `dist/Code.gs`: `platform/` first, then `features/`, then
+`routes.js`, `entry-points.js` and `main.js`.
 
 ## Tools and tests
 

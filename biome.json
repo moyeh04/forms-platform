@@ -82,8 +82,7 @@
       "linter": {
         "rules": {
           "correctness": {
-            "noUnusedVariables": "off",
-            "noInvalidUseBeforeDeclaration": "off"
+            "noUnusedVariables": "off"
           }
         }
       }

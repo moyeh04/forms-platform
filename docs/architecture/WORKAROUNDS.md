@@ -290,24 +290,30 @@ is ever pasted into the Apps Script editor.
 **Problem.** When files are glued together, order usually matters: a file that
 uses `API` before it exists breaks.
 
-**What the platform does.** Makes order irrelevant by convention. Every file is
-one of two things:
-
-1. Plain function declarations. JavaScript hoists these, so in one concatenated
-   script they exist everywhere before any line runs.
-2. Handler registrations that start with the same safe line:
+**What the platform does.** Keeps order down to one rule. Every feature or
+platform file defines one namespace named after it:
 
 ```js
-var API = API || {};
-API['admin.clients.list'] = admin(function () { /* ... */ });
+var ClientsRepository = (function () {
+  function readClients_() { /* calls Table.readTable(...) when it runs */ }
+  return { readClients: readClients_ };
+})();
 ```
 
-`var API = API || {}` means "use the table if it exists, otherwise create it",
-so whichever file loads first creates it and the rest reuse it. The call to
-`admin(...)` works from any file because `admin` is a hoisted declaration, and
-it only wraps the handler; the PIN check runs later, per request. The bundler
-therefore only needs a stable order (rules first, `main.js` last), not a clever
-one.
+The function runs while the file loads, but it only declares functions and
+constants; it calls another namespace only from inside them, when a request
+runs. So the namespaces load in any order. One file, `routes.js`, joins every
+action to its handler:
+
+```js
+var API = {};
+API['admin.clients.list'] = AuthService.admin(ClientsController.list);
+```
+
+It reads the namespaces while it loads, so the bundler puts it after them.
+`AuthService.admin` only wraps the handler; the PIN check runs later, per
+request. The bundler therefore only needs a stable order (rules first, then the
+namespaces, then `routes.js`), not a clever one.
 
 **Cost.** A convention to follow when adding a file (the guide in
 [ARCHITECTURE.md](ARCHITECTURE.md#where-to-change-what) shows how).

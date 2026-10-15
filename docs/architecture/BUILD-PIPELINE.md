@@ -89,8 +89,8 @@ flowchart TD
 1. **List the files.** `domain/rules.js` and `domain/form-metadata.js` go
    first so the globals `Rules` and `FormMetadata` exist. Every `.js` file
    under `backend/` follows: `platform/` first, then `features/`, each in
-   alphabetical order of its path, with `main.js` last (`rankOf` in the
-   bundler).
+   alphabetical order of its path, then `routes.js`, `entry-points.js` and
+   `main.js` (`rankOf` in the bundler).
 2. **Read and label.** Each file is trimmed and prefixed with a comment such as
    `// ===== backend/features/access/auth/auth.service.js =====`, so when you read the deployed code in the
    Apps Script editor you can still see where every part came from.
@@ -108,15 +108,15 @@ flowchart TD
 Typical output:
 
 ```
-Bundled 25 files into dist/Code.gs (192797 chars).
+Bundled 70 files into dist/Code.gs (253843 chars).
 ```
 
-25 = the two shared files + 23 backend files.
+70 = the two shared files + 68 backend files.
 
 ## Why joining files is safe
 
-Concatenation breaks code when order matters. This project avoids that by
-convention, so the bundler can stay simple:
+Concatenation breaks code when order matters. This project keeps the order
+down to one rule, so the bundler can stay simple:
 
 ```mermaid
 %%{init: {
@@ -142,16 +142,16 @@ convention, so the bundler can stay simple:
   'sequence': {'mirrorActors': false, 'messageMargin': 34, 'boxMargin': 8}
 }}%%
 flowchart LR
-    subgraph rule1["Rule 1: declarations are hoisted"]
-        fn["function checkLimits_(...) { ... }<br/>exists everywhere before any code runs"]
+    subgraph rule1["Rule 1: a namespace needs nothing to load"]
+        fn["var ResponsesRules = (function () { ... })();<br/>reads other namespaces only inside its functions"]
     end
-    subgraph rule2["Rule 2: registrations are self-starting"]
-        reg["var API = API || {};<br/>API.submit = function (req) { ... };"]
+    subgraph rule2["Rule 2: routes.js comes after the namespaces"]
+        reg["var API = {};<br/>API['submit'] = SubmissionsController.submit;"]
     end
-    subgraph rule3["Rule 3: load-time code only registers"]
-        none["Registrations create closures and call admin(),<br/>itself a hoisted declaration.<br/>No handler runs until a request arrives."]
+    subgraph rule3["Rule 3: no handler runs while loading"]
+        none["AuthService.admin(...) only wraps a handler.<br/>No handler runs until a request arrives."]
     end
-    rule1 --> ok(("Any order works"))
+    rule1 --> ok(("One order rule"))
     rule2 --> ok
     rule3 --> ok
     classDef cDb fill:#F3E2B3,stroke:#B8892D,stroke-width:1.5px,color:#2F2418
@@ -163,17 +163,20 @@ flowchart LR
     class ok cEnd
 ```
 
-One detail deserves a sentence. A registration such as
-`API['admin.clients.list'] = admin(function () { ... })` *does* run while the
-file loads, and it calls `admin(...)`, which is defined in `auth.service.js`. That works
-whatever the order because `admin` is a **function declaration**, and the whole
-bundle is one script, so declarations are hoisted to the top before any line
-runs. The wrapper only stores the handler; the PIN check happens later, when a
-request arrives.
+Each backend file defines one namespace, `var Name = (function () { ... })();`.
+The function runs while the file loads, but it only declares the file's
+functions and constants and returns the ones other files use; it calls into
+another namespace only from inside those functions, which run later. So the
+namespaces load in any order.
 
-`main.js` goes last only by tradition (it is the entry point and reads best at
-the end). Moving it would not break anything. The test suite loads the bundle in
-this exact order, so a mistake here would fail every test.
+`routes.js` is the exception. A line such as
+`API['admin.clients.list'] = AuthService.admin(ClientsController.list);` reads
+two namespaces while it loads, so `routes.js` comes after all of them
+(`BACKEND_LAST` in the bundler). `AuthService.admin` only wraps the handler; the
+PIN check happens later, when a request arrives. `entry-points.js` and `main.js`
+only declare functions, so they could go anywhere; they come last because they
+read best at the end. The test suite loads the bundle in this exact order, so a
+mistake here would fail every test.
 
 ## What is inside the final file
 

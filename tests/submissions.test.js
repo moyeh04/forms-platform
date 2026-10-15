@@ -657,7 +657,12 @@ test('Team numbers: a team keeps its number when another one cancels, and the ga
     'the sheet holds the numbers, also of the cancelled team'
   );
   assert.deepEqual(
-    w.call('teamBlocks_', w.call('findForm', w.form.id)).map((t) => t.number),
+    w
+      .call(
+        'TeamsService.teamBlocks',
+        w.call('FormsRepository.findForm', w.form.id)
+      )
+      .map((t) => t.number),
     [1, 3, 4],
     'the sheet view, the print and the download read the same numbers'
   );
@@ -709,9 +714,9 @@ test('Team numbers: teams registered before the column existed keep the numbers 
 
 test('Team numbers: a booking or a WhatsApp registration gets none', () => {
   const w = boot('whatsapp_registration');
-  const f = w.call('findForm', w.form.id);
+  const f = w.call('FormsRepository.findForm', w.form.id);
   const rows = [{ created: '2027-09-01T00:00:00Z', deleted: false }];
-  w.call('keepTeamNumbers_', f, rows);
+  w.call('TeamNumbers.keepTeamNumbers', f, rows);
   assert.equal(rows[0].number, undefined);
   assert.equal(
     w.rows()[0].indexOf('number'),
