@@ -86,9 +86,9 @@ function menuPrint(kind, slug, dayId, includeEmpty) {
   var form = FormsRepository.requireForm(slug);
   var printed =
     kind === 'reservations'
-      ? printReservations_(form, dayId, includeEmpty)
-      : printTeamList_(form);
-  return printResult_(form, printed);
+      ? PrintService.printReservations(form, dayId, includeEmpty)
+      : PrintService.printTeamList(form);
+  return PrintService.printResult(form, printed);
 }
 
 function menuRebuildViews() {

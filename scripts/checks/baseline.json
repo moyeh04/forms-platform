@@ -332,6 +332,10 @@
     "jsdoc": 4,
     "lines": 7
   },
+  "backend/features/outputs/print/print.controller.js": {
+    "biome/format": 1,
+    "lines": 1
+  },
   "backend/features/outputs/print/print.service.js": {
     "biome/format": 1,
     "biome/lint/complexity/noExcessiveLinesPerFunction": 2,
@@ -340,7 +344,7 @@
     "biome/lint/style/noMagicNumbers": 46,
     "biome/lint/suspicious/noAssignInExpressions": 1,
     "jsdoc": 11,
-    "lines": 4
+    "lines": 5
   },
   "backend/features/outputs/sheet-views/sheet-views.builder.js": {
     "biome/format": 1,

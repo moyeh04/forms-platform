@@ -58,7 +58,7 @@ function dlBase_(form, team) {
 }
 
 function dlDownloadsFolder_() {
-  var exp = exportsFolder_();
+  var exp = PrintService.exportsFolder();
   var it = exp.getFoldersByName('Downloads');
   return it.hasNext() ? it.next() : exp.createFolder('Downloads');
 }

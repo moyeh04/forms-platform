@@ -80,3 +80,8 @@ API['admin.download.team'] = AuthService.admin(
 API['admin.download.finish'] = AuthService.admin(DownloadsController.finish);
 API['admin.download.pack'] = AuthService.admin(DownloadsController.pack);
 API['admin.download.chunk'] = AuthService.admin(DownloadsController.chunk);
+
+API['admin.print.reservations'] = AuthService.admin(
+  PrintController.reservations
+);
+API['admin.print.teamList'] = AuthService.admin(PrintController.teamList);

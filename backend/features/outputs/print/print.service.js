@@ -3,6 +3,7 @@
  * The tabs are rebuilt on demand, so they always show the latest data.
  */
 
+var PrintService = (function () {
 function printSheetName_(label) {
   return ('Print - ' + String(label).replace(/[\[\]*?:\/\\]/g, '-')).slice(
     0,
@@ -270,3 +271,6 @@ function printResult_(form, printed) {
     pdfUrl: exportPdf_(form, printed)
   };
 }
+
+return { exportsFolder: exportsFolder_, printReservations: printReservations_, printTeamList: printTeamList_, printResult: printResult_ };
+})();
