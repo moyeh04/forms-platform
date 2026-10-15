@@ -1,7 +1,8 @@
 /**
  * Checks that yes/no values stay booleans in code. The sheet stores them as
- * the strings '1' and '0', so reading and writing them belongs to the code
- * that turns a row into an object and back. Anywhere else, a field compared
+ * the strings '1' and '0', so reading and writing them belongs to
+ * `Cell.readFlag` and `Cell.writeFlag` in `backend/platform/sheets/cell.js`,
+ * the one file `flags.exclude` lets through. Anywhere else, a field compared
  * with '1' or '0', or a choice that writes '1' or '0', is refused.
  */
 const walk = require('acorn-walk');
@@ -76,7 +77,7 @@ function checkSource(file, source) {
       file,
       line: node.loc.start.line,
       rule: 'flags',
-      message: `${problem}; only a row codec may read or write '1'/'0'`
+      message: `${problem}; use Cell.readFlag or Cell.writeFlag`
     });
   });
   return out;

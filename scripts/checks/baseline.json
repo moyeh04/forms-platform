@@ -21,7 +21,6 @@
     "lines": 2
   },
   "backend/features/access/clients/clients.repository.js": {
-    "flags": 6,
     "jsdoc": 9,
     "lines": 4
   },
@@ -181,7 +180,6 @@
   },
   "backend/features/intake/responses/responses.repository.js": {
     "biome/lint/style/noMagicNumbers": 1,
-    "flags": 2,
     "jsdoc": 8
   },
   "backend/features/intake/responses/responses.review.js": {

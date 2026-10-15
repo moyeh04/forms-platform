@@ -71,7 +71,7 @@
   "flags": {
     "include": ["web/js/", "backend/", "domain/"],
     "extensions": [".js"],
-    "exclude": []
+    "exclude": ["backend/platform/sheets/cell.js"]
   },
   "structure": {
     "root": [

@@ -298,7 +298,7 @@ backend file into `dist/Code.gs`: `platform/` first, then `features/`, then
 | `scripts/checks/check-lines.js` | No line wider than 80 columns, URLs not counted. |
 | `scripts/checks/check-jsdoc.js` | Every named function has a Google-style JSDoc comment whose tags match its parameters and return, with no metadata tags. |
 | `scripts/checks/check-numbers.js` | Every number that initialises something, which Biome skips, is held by a CONSTANT_CASE name. |
-| `scripts/checks/check-flags.js` | Yes/no values are compared and written as `'1'`/`'0'` only in a row codec. |
+| `scripts/checks/check-flags.js` | Yes/no values are compared and written as `'1'`/`'0'` only in `backend/platform/sheets/cell.js`. |
 | `scripts/checks/check-structure.js` | The structure rules above. |
 | `scripts/checks/check-docs.js` | [API.md](../backend/API.md) names exactly the actions the backend has, [TESTING.md](../process/TESTING.md) gives the real number of tests, and no Markdown link points at a file that is gone. |
 | `scripts/deploy/prepare-clasp.js` | Checks the deployment variables of the workflow and writes the clasp configuration git ignores. |
