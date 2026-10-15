@@ -2,9 +2,6 @@
   ".github/workflows/pages.yml": {
     "lines": 8
   },
-  "package.json": {
-    "lines": 1
-  },
   "web/css/admin/bookings.css": {
     "biome/lint/style/noDescendingSpecificity": 1
   },
