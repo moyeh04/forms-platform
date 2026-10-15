@@ -10,19 +10,6 @@
     "biome/lint/suspicious/noPrototypeBuiltins": 1,
     "jsdoc": 41
   },
-  "domain/rules/index.js": {
-    "biome/lint/complexity/noExcessiveCognitiveComplexity": 7,
-    "biome/lint/complexity/noExcessiveLinesPerFunction": 2,
-    "biome/lint/complexity/useOptionalChain": 15,
-    "biome/lint/correctness/noInnerDeclarations": 14,
-    "biome/lint/style/noExcessiveLinesPerFile": 1,
-    "biome/lint/style/noMagicNumbers": 12,
-    "biome/lint/suspicious/noAssignInExpressions": 7,
-    "biome/lint/suspicious/noGlobalIsNan": 5,
-    "jsdoc": 69,
-    "lines": 26,
-    "numbers": 2
-  },
   "package.json": {
     "lines": 1
   },

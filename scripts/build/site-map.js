@@ -27,7 +27,20 @@ const FOLDERS = [
  * address, so it stays for one release, made of the new parts.
  */
 const JOINED = [
-  { published: 'shared/rules.js', sources: ['domain/rules/index.js'] }
+  {
+    published: 'shared/rules.js',
+    sources: [
+      'domain/rules/text.js',
+      'domain/rules/phone.js',
+      'domain/rules/codes.js',
+      'domain/rules/drive-link.js',
+      'domain/rules/slots.js',
+      'domain/rules/form.js',
+      'domain/rules/team-size.js',
+      'domain/rules/submission.js',
+      'domain/rules/index.js'
+    ]
+  }
 ];
 
 /**

@@ -24,3 +24,20 @@ test('Site map: paths outside the site, or leaving it, have no source', () => {
   assert.equal(sourceOf('/assets/js/../../../package.json'), null);
   assert.equal(sourceOf('/.git/config'), null);
 });
+
+test('Site map: every rules loader reads the parts in one order', () => {
+  const { JOINED } = require('../../../scripts/build/site-map.js');
+  const { bundleSource } = require('../../../scripts/build/bundle-backend.js');
+  const parts = JOINED.find((j) => j.published === 'shared/rules.js').sources;
+  for (const page of ['web/index.html', 'web/admin.html']) {
+    const html = fs.readFileSync(path.join(root, page), 'utf8');
+    const loaded = [
+      ...html.matchAll(/<script src="(shared\/rules\/[^"]+)"/g)
+    ].map((m) => sourceOf(m[1]));
+    assert.deepEqual(loaded, parts, page);
+  }
+  const bundled = bundleSource().files.filter((f) =>
+    f.startsWith('domain/rules/')
+  );
+  assert.deepEqual(bundled, parts, 'bundle');
+});
