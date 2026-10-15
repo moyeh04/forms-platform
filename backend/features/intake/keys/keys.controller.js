@@ -49,18 +49,18 @@ API['admin.keys.extend'] = admin(function (req) {
     until = '';
   if (req.until) {
     var t = Date.parse(String(req.until));
-    if (isNaN(t)) fail('bad_date', 'That end date is not a date.');
-    if (t <= Date.now()) fail('bad_date', 'Pick an end date in the future.');
+    if (isNaN(t)) ApiError.fail('bad_date', 'That end date is not a date.');
+    if (t <= Date.now()) ApiError.fail('bad_date', 'Pick an end date in the future.');
     until = new Date(t).toISOString();
   } else {
     days = parseInt(req.days, 10);
     if (!(days >= 1 && days <= KEY_EXTEND_MAX_DAYS_))
-      fail('bad_days', 'Extend by 1 to ' + KEY_EXTEND_MAX_DAYS_ + ' days.');
+      ApiError.fail('bad_days', 'Extend by 1 to ' + KEY_EXTEND_MAX_DAYS_ + ' days.');
   }
   var which = String(req.which || 'chosen');
   var ids = Array.isArray(req.ids) ? req.ids.map(String) : [];
   if (which === 'chosen' && !ids.length)
-    fail('none_chosen', 'Choose at least one registration.');
+    ApiError.fail('none_chosen', 'Choose at least one registration.');
 
   var changed = withLock_(function () {
     var rows = keyedRows_(form);
@@ -70,7 +70,7 @@ API['admin.keys.extend'] = admin(function (req) {
       return ids.indexOf(r.id) !== -1;
     });
     if (which === 'chosen' && picked.length !== ids.length)
-      fail(
+      ApiError.fail(
         'submission_not_found',
         'A chosen registration no longer exists. Open the list again.'
       );

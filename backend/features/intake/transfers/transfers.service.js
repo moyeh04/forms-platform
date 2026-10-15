@@ -93,7 +93,7 @@ function handOver_(form, data, next) {
   var codeId = memberCodeId_(form);
   var list = Array.isArray(data[mf.id]) ? data[mf.id] : [];
   if (!list.length)
-    fail(
+    ApiError.fail(
       'transfer_leader',
       'This student leads a team alone and cannot be moved.'
     );
@@ -101,12 +101,12 @@ function handOver_(form, data, next) {
     return String(m[codeId]) === String(next.leader || '');
   })[0];
   if (!heir)
-    fail('transfer_heir', 'Choose who leads the team after this student.');
+    ApiError.fail('transfer_heir', 'Choose who leads the team after this student.');
   var emailField = Rules.fieldByRole(form, 'email');
   if (emailField && emailField.enabled !== false) {
     var email = Rules.validateField(emailField, next.email, { form: form });
     if (!email.ok)
-      fail('transfer_email', 'Write the email of the new leader.', {
+      ApiError.fail('transfer_email', 'Write the email of the new leader.', {
         error: email.error
       });
     data[emailField.id] = email.value;
@@ -164,7 +164,7 @@ function takeOutTransfers_(form, data, rows, selfId, asked) {
       return asked.indexOf(String(m[codeId])) !== -1;
     });
   if (!askedAll) {
-    fail(
+    ApiError.fail(
       'duplicate_member',
       'Someone on this team is already registered in another team.',
       {
@@ -243,7 +243,7 @@ function decideTransfer_(form, id, approve, by, fromId, next) {
     return x.id === String(id) && x.status === 'pending';
   })[0];
   if (!t || (fromId && t.fromId !== fromId))
-    fail('transfer_gone', 'This request was already answered.');
+    ApiError.fail('transfer_gone', 'This request was already answered.');
   if (!approve) {
     t.status = 'rejected';
     t.decidedBy = by;
@@ -259,7 +259,7 @@ function decideTransfer_(form, id, approve, by, fromId, next) {
   if (!to) {
     t.status = 'closed';
     saveTransfer_(form, t);
-    fail('transfer_gone', 'The team that asked no longer exists.');
+    ApiError.fail('transfer_gone', 'The team that asked no longer exists.');
   }
   var toList = Array.isArray(to.data[mf.id]) ? to.data[mf.id] : [];
   var most = mf.max == null ? range.max - 1 : mf.max;
@@ -269,7 +269,7 @@ function decideTransfer_(form, id, approve, by, fromId, next) {
     });
   };
   if (!has(toList) && toList.length >= most)
-    fail('transfer_full', 'The team that asked is full now.');
+    ApiError.fail('transfer_full', 'The team that asked is full now.');
 
   var underMin = false,
     handed = false;

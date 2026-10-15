@@ -11,7 +11,7 @@ API['admin.clients.list'] = admin(function () {
 
 API['admin.clients.create'] = admin(function (req) {
   var name = String(req.name || '').trim();
-  if (!name) fail('name_required', 'Give this person or group a name.');
+  if (!name) ApiError.fail('name_required', 'Give this person or group a name.');
   var token = newToken_();
   var c = {
     id: shortId('c_'),
@@ -72,11 +72,11 @@ API['admin.clients.showKey'] = admin(function (req) {
   var c = readClients_().filter(function (x) {
     return x.id === req.id;
   })[0];
-  if (!c) fail('client_not_found', 'That client does not exist.');
-  if (!c.keyHash) fail('no_key', 'This link does not ask for a key.');
+  if (!c) ApiError.fail('client_not_found', 'That client does not exist.');
+  if (!c.keyHash) ApiError.fail('no_key', 'This link does not ask for a key.');
   var key = unsealDigits_(clientKeyPad_(c), c.keySeal, 6);
   if (!key || clientKeyHash_(c, key) !== c.keyHash)
-    fail(
+    ApiError.fail(
       'key_unknown',
       'This key was made before keys could be shown. Make a new key to see it.'
     );
@@ -88,7 +88,7 @@ API['admin.clients.remove'] = admin(function (req) {
     var c = readClients_().filter(function (x) {
       return x.id === req.id;
     })[0];
-    if (!c) fail('client_not_found', 'That client does not exist.');
+    if (!c) ApiError.fail('client_not_found', 'That client does not exist.');
     clientsSheet_().deleteRow(c._row);
     return { removed: true };
   });

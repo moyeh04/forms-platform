@@ -35,7 +35,7 @@ API.submit = function (req) {
     v.data._source = { form: source.id, ref: registration.ref };
   } else {
     v = Rules.validateSubmission(vform, req.data || {});
-    if (!v.ok) fail('invalid', 'Some answers need fixing.', v.errors);
+    if (!v.ok) ApiError.fail('invalid', 'Some answers need fixing.', v.errors);
     checkDriveFields_(vform, v.data);
   }
 
@@ -52,7 +52,7 @@ API.submit = function (req) {
       checkLimits_(vform, v.data, live, null);
     } catch (e) {
       if (source && e.code === 'duplicate')
-        fail(
+        ApiError.fail(
           'already_booked',
           'Your team already has a booking. Open it with your key to change its time.'
         );
@@ -102,7 +102,7 @@ function taskLocked_(form) {
 
 function assertTaskOpen_(form) {
   if (taskLocked_(form))
-    fail(
+    ApiError.fail(
       'deadline_passed',
       'The deadline has passed, so this task can no longer be changed.'
     );
@@ -144,13 +144,13 @@ API.update = function (req) {
   var found = findByKey_(form, req.key);
   assertTaskOpen_(form);
   var scope = editScope_(form);
-  if (!scope) fail('edit_disabled', 'Editing is turned off for this form.');
+  if (!scope) ApiError.fail('edit_disabled', 'Editing is turned off for this form.');
   var v;
   if (scope === 'slot') {
     v = { ok: true, data: movedBooking_(vform, found.data, req.data || {}) };
   } else {
     v = Rules.validateSubmission(vform, req.data || {});
-    if (!v.ok) fail('invalid', 'Some answers need fixing.', v.errors);
+    if (!v.ok) ApiError.fail('invalid', 'Some answers need fixing.', v.errors);
     checkDriveFields_(vform, v.data);
   }
 
@@ -159,7 +159,7 @@ API.update = function (req) {
     var current = live.filter(function (r) {
       return r.id === found.id;
     })[0];
-    if (!current) fail('bad_key', 'That key is not right.');
+    if (!current) ApiError.fail('bad_key', 'That key is not right.');
     var wants = takeOutTransfers_(
       vform,
       v.data,
@@ -182,11 +182,11 @@ API.remove = function (req) {
   var form = requireForm(String(req.slug || ''));
   var found = findByKey_(form, req.key);
   if (!form.editKey.allowDelete)
-    fail('delete_disabled', 'Deleting is turned off for this form.');
+    ApiError.fail('delete_disabled', 'Deleting is turned off for this form.');
   assertTaskOpen_(form);
   withLock_(function () {
     if (!cancelResponse_(form, found.id))
-      fail('bad_key', 'That key is not right.');
+      ApiError.fail('bad_key', 'That key is not right.');
   });
   afterChange_(form);
   return { removed: true, ref: found.ref };

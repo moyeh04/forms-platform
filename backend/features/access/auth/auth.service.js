@@ -15,7 +15,7 @@ function pinHash_(pin) {
 function setAdminPin(pin) {
   pin = String(pin || '').trim();
   if (pin.length < 4)
-    fail('weak_pin', 'The admin PIN needs at least 4 characters.');
+    ApiError.fail('weak_pin', 'The admin PIN needs at least 4 characters.');
   setProp('ADMIN_PIN_HASH', pinHash_(pin));
   return true;
 }
@@ -31,21 +31,21 @@ function unlockAdmin() {
 function requireAdmin(req) {
   var stored = getProp('ADMIN_PIN_HASH');
   if (!stored)
-    fail(
+    ApiError.fail(
       'not_configured',
       'Set the admin PIN from the Forms Platform menu first.'
     );
   var cache = CacheService.getScriptCache();
   var fails = parseInt(cache.get('admin_fails') || '0', 10);
   if (fails >= ADMIN_MAX_FAILS)
-    fail(
+    ApiError.fail(
       'locked',
       'Too many wrong PINs. Wait ten minutes, or unlock the admin page from the Forms Platform menu in the sheet.'
     );
   var pin = req && req.admin && req.admin.pin;
   if (!pin || pinHash_(pin) !== stored) {
     cache.put('admin_fails', String(fails + 1), ADMIN_LOCK_SECONDS);
-    fail('bad_pin', 'That PIN is not correct.');
+    ApiError.fail('bad_pin', 'That PIN is not correct.');
   }
   cache.remove('admin_fails');
   return true;

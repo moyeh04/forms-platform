@@ -67,7 +67,7 @@ function dlJob_(req) {
   var raw = CacheService.getScriptCache().get('dl_job:' + req.job);
   var job = raw ? parseJson(raw, null) : null;
   if (!job || job.form !== form.id)
-    fail('download_gone', 'This download has expired. Start it again.');
+    ApiError.fail('download_gone', 'This download has expired. Start it again.');
   job.id = req.job;
   job.folder = DriveApp.getFolderById(job.folderId);
   return { form: form, job: job };

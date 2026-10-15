@@ -15,7 +15,7 @@ function normalizeKeyBooking_(form, next) {
   var source = String((next && next.source) || '');
   if (!enabled) return { enabled: false, source: source };
   if (form.type !== 'reservation')
-    fail(
+    ApiError.fail(
       'bad_key_booking',
       'Only a reservation form can be booked with a key.'
     );
@@ -23,7 +23,7 @@ function normalizeKeyBooking_(form, next) {
     return f.id === source;
   });
   if (!ok)
-    fail(
+    ApiError.fail(
       'bad_key_booking',
       'Choose the registration form whose keys students book with.'
     );
@@ -41,7 +41,7 @@ function keyBookingSource_(form) {
 
 function requireKeyBookingSource_(form) {
   var source = keyBookingSource_(form);
-  if (!source) fail('key_booking_off', 'This form is not booked with a key.');
+  if (!source) ApiError.fail('key_booking_off', 'This form is not booked with a key.');
   return source;
 }
 
@@ -78,7 +78,7 @@ function withSlot_(form, data, slot) {
   if (!checked.ok) {
     var errors = {};
     errors[slotField.id] = { error: checked.error };
-    fail('invalid', 'Some answers need fixing.', errors);
+    ApiError.fail('invalid', 'Some answers need fixing.', errors);
   }
   data[slotField.id] = checked.value;
   return data;

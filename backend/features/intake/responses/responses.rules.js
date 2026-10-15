@@ -3,7 +3,7 @@
 function assertAcceptingSubmissions_(form) {
   var state = Rules.formState(form);
   if (state !== 'open')
-    fail('form_' + state, 'This form is not accepting submissions.', {
+    ApiError.fail('form_' + state, 'This form is not accepting submissions.', {
       state: state
     });
 }
@@ -19,13 +19,13 @@ function checkLimits_(form, data, rows, selfId) {
     !selfId &&
     others.length >= rules.maxSubmissions
   ) {
-    fail('form_full', 'This form is full.');
+    ApiError.fail('form_full', 'This form is full.');
   }
 
   if (rules.uniqueBy && data[rules.uniqueBy]) {
     others.forEach(function (r) {
       if (String(r.data[rules.uniqueBy]) === String(data[rules.uniqueBy])) {
-        fail(
+        ApiError.fail(
           'duplicate',
           'This code is already registered. Use your key to edit it.',
           { field: rules.uniqueBy }
@@ -46,7 +46,7 @@ function checkLimits_(form, data, rows, selfId) {
       });
     });
     if (clash.length)
-      fail(
+      ApiError.fail(
         'duplicate_member',
         'Someone on this team is already registered in another team.',
         { codes: clash }
@@ -61,7 +61,7 @@ function checkLimits_(form, data, rows, selfId) {
       if (r.slot) counts[r.slot] = (counts[r.slot] || 0) + 1;
     });
     if (!Rules.slotRoom(form, counts, key))
-      fail('slot_taken', 'That slot was just taken. Pick another.', {
+      ApiError.fail('slot_taken', 'That slot was just taken. Pick another.', {
         slot: key
       });
   }

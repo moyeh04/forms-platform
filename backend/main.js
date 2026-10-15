@@ -4,7 +4,7 @@
  */
 
 function doGet() {
-  return json({ ok: true, service: APP.name, version: APP.version });
+  return ApiError.json({ ok: true, service: APP.name, version: APP.version });
 }
 
 function doPost(e) {
@@ -12,22 +12,22 @@ function doPost(e) {
   try {
     req = JSON.parse(e.postData.contents);
   } catch (err) {
-    return json({
+    return ApiError.json({
       ok: false,
       error: { code: 'bad_json', message: 'The request body must be JSON.' }
     });
   }
   var handler = API[String(req.action || '')];
   if (!handler)
-    return json({
+    return ApiError.json({
       ok: false,
       error: { code: 'unknown_action', message: 'Unknown action.' }
     });
   try {
-    return json(Object.assign({ ok: true }, handler(req)));
+    return ApiError.json(Object.assign({ ok: true }, handler(req)));
   } catch (err) {
     if (err && err.isApiError)
-      return json({
+      return ApiError.json({
         ok: false,
         error: { code: err.code, message: err.message, details: err.details }
       });
@@ -37,7 +37,7 @@ function doPost(e) {
         ': ' +
         (err && err.stack ? err.stack : err)
     );
-    return json({
+    return ApiError.json({
       ok: false,
       error: {
         code: 'server_error',

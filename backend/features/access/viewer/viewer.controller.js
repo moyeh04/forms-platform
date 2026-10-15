@@ -47,12 +47,12 @@ API['viewer.data'] = function (req) {
 API['viewer.review'] = function (req) {
   var client = requireClient_(req);
   var form = requireClientForm_(client, req.slug);
-  if (!client.canReview) fail('forbidden', 'This link is read-only.');
+  if (!client.canReview) ApiError.fail('forbidden', 'This link is read-only.');
   withLock_(function () {
     var r = readResponses(form).filter(function (x) {
       return x.id === req.submissionId;
     })[0];
-    if (!r) fail('submission_not_found', 'That submission does not exist.');
+    if (!r) ApiError.fail('submission_not_found', 'That submission does not exist.');
     setReviewStep_(form, r, String(req.stepId), String(req.status));
     saveResponse_(form, r);
   });

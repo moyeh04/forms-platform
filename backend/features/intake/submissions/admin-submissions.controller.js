@@ -39,7 +39,7 @@ API['admin.submission.update'] = admin(function (req) {
     var r = live.filter(function (x) {
       return x.id === req.submissionId;
     })[0];
-    if (!r) fail('submission_not_found', 'That submission does not exist.');
+    if (!r) ApiError.fail('submission_not_found', 'That submission does not exist.');
     if (patch.review) {
       var steps = (form.review && form.review.steps) || [];
       Object.keys(patch.review).forEach(function (k) {
@@ -48,7 +48,7 @@ API['admin.submission.update'] = admin(function (req) {
             return s.id === k;
           })
         )
-          fail('bad_step', 'Unknown review step.');
+          ApiError.fail('bad_step', 'Unknown review step.');
       });
       steps.forEach(function (s) {
         if (patch.review[s.id] !== undefined)
@@ -57,12 +57,12 @@ API['admin.submission.update'] = admin(function (req) {
     }
     if (patch.status !== undefined) {
       if (SUBMISSION_STATUSES.indexOf(patch.status) === -1)
-        fail('bad_status', 'Unknown status.');
+        ApiError.fail('bad_status', 'Unknown status.');
       r.status = patch.status;
     }
     if (patch.data) {
       var v = Rules.validateSubmission(vform, patch.data);
-      if (!v.ok) fail('invalid', 'Some answers need fixing.', v.errors);
+      if (!v.ok) ApiError.fail('invalid', 'Some answers need fixing.', v.errors);
       checkLimits_(vform, v.data, live, r.id);
       r.data = v.data;
       applyDerived_(vform, r);
@@ -78,7 +78,7 @@ API['admin.submission.delete'] = admin(function (req) {
   var form = requireForm(req.slug || req.id);
   withLock_(function () {
     if (!cancelResponse_(form, req.submissionId))
-      fail('submission_not_found', 'That submission does not exist.');
+      ApiError.fail('submission_not_found', 'That submission does not exist.');
   });
   afterChange_(form);
   return { deleted: true };
@@ -92,7 +92,7 @@ API['admin.submission.resetKey'] = admin(function (req) {
     var r = rows.filter(function (x) {
       return x.id === req.submissionId;
     })[0];
-    if (!r) fail('submission_not_found', 'That submission does not exist.');
+    if (!r) ApiError.fail('submission_not_found', 'That submission does not exist.');
     var k = issueKey_(vform, rows);
     r.keyHash = k.hash;
     r.keySeal = sealKey_(form, r.id, k.key);
@@ -108,10 +108,10 @@ API['admin.submission.key'] = admin(function (req) {
   var r = readResponses(form).filter(function (x) {
     return x.id === req.submissionId;
   })[0];
-  if (!r) fail('submission_not_found', 'That submission does not exist.');
+  if (!r) ApiError.fail('submission_not_found', 'That submission does not exist.');
   var key = unsealKey_(form, r.id, r.keySeal);
   if (!key || keyHash_(form, key) !== r.keyHash)
-    fail(
+    ApiError.fail(
       'key_unknown',
       'This key was issued before keys could be shown. Reset it to give the student a new one you can see.'
     );

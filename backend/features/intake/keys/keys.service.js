@@ -33,7 +33,7 @@ function issueKey_(form, rows) {
     var h = keyHash_(form, key);
     if (!used[h]) return { key: key, hash: h };
   }
-  fail('keys_exhausted', 'No free edit keys are left for this form.');
+  ApiError.fail('keys_exhausted', 'No free edit keys are left for this form.');
 }
 
 /** A booking made with a registration key is opened by that same key, unless another booking already holds it. */
@@ -53,7 +53,7 @@ function keyExpiry_(form) {
 
 function requireKeyEnabled_(form) {
   if (!form.editKey || !form.editKey.enabled)
-    fail('key_disabled', 'Editing with a key is turned off for this form.');
+    ApiError.fail('key_disabled', 'Editing with a key is turned off for this form.');
 }
 
 /** Finds the registration a key belongs to. Wrong guesses are throttled. `anyAge` accepts a key that has expired. */
@@ -63,7 +63,7 @@ function findByKey_(form, key, anyAge) {
   var tag = 'badkey:' + form.id;
   var fails = parseInt(cache.get(tag) || '0', 10);
   if (fails >= 10)
-    fail(
+    ApiError.fail(
       'too_many_attempts',
       'Too many wrong keys. Wait a minute and try again.'
     );
@@ -75,10 +75,10 @@ function findByKey_(form, key, anyAge) {
   });
   if (!hit) {
     cache.put(tag, String(fails + 1), 60);
-    fail('bad_key', 'That key is not right.');
+    ApiError.fail('bad_key', 'That key is not right.');
   }
   if (!anyAge && hit.keyExpires && Date.parse(hit.keyExpires) < Date.now())
-    fail(
+    ApiError.fail(
       'key_expired',
       'This key has expired. Ask your instructor to extend it, or to make the change for you.'
     );

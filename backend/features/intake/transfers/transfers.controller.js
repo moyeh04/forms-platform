@@ -38,7 +38,7 @@ API['transfer.cancel'] = function (req) {
         x.id === String(req.id) && x.status === 'pending' && x.toId === found.id
       );
     })[0];
-    if (!t) fail('transfer_gone', 'This request was already answered.');
+    if (!t) ApiError.fail('transfer_gone', 'This request was already answered.');
     t.status = 'cancelled';
     saveTransfer_(form, t);
   });

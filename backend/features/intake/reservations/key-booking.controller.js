@@ -34,7 +34,7 @@ API.bookingTeam = function (req) {
 API['admin.bookings.next'] = admin(function (req) {
   var source = requireForm(req.source);
   if (!issuesKeys_(source))
-    fail(
+    ApiError.fail(
       'bad_key_booking',
       'Only a form that gives its students a key can have bookings.'
     );
@@ -54,7 +54,7 @@ API['admin.bookings.next'] = admin(function (req) {
       }
     );
   } else {
-    if (!title) fail('title_required', 'Give the booking a title.');
+    if (!title) ApiError.fail('title_required', 'Give the booking a title.');
     form = createForm(
       Object.assign(
         { type: 'reservation', title: title },

@@ -56,5 +56,5 @@ function checkDriveFields_(form, data) {
     if (!r.ok) errors[f.id] = { error: r.error, params: r.params };
   });
   if (Object.keys(errors).length)
-    fail('invalid', 'Check the Google Drive links.', errors);
+    ApiError.fail('invalid', 'Check the Google Drive links.', errors);
 }

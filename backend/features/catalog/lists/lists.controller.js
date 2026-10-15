@@ -9,7 +9,7 @@ function listsOut_() {
 function requireList_(key) {
   key = String(key || '');
   if (!key || key.charAt(0) === '_' || !readLists().hasOwnProperty(key))
-    fail('list_not_found', 'There is no such list.');
+    ApiError.fail('list_not_found', 'There is no such list.');
   return key;
 }
 
@@ -18,7 +18,7 @@ function freeListName_(name, lists, info, self) {
   name = String(name || '')
     .trim()
     .slice(0, 60);
-  if (!name) fail('list_name', 'Give the list a name.');
+  if (!name) ApiError.fail('list_name', 'Give the list a name.');
   var taken = Object.keys(lists).some(function (k) {
     return (
       k !== self &&
@@ -29,7 +29,7 @@ function freeListName_(name, lists, info, self) {
       ).toLowerCase() === name.toLowerCase()
     );
   });
-  if (taken) fail('list_name_taken', 'Another list has that name.');
+  if (taken) ApiError.fail('list_name_taken', 'Another list has that name.');
   return name;
 }
 
@@ -77,7 +77,7 @@ API['admin.lists.rename'] = listChange_(function (req) {
   var key = requireList_(req.key);
   var info = readListInfo();
   if (!info[key])
-    fail(
+    ApiError.fail(
       'list_builtin',
       'The lists that came with the platform keep their names.'
     );
@@ -89,13 +89,13 @@ API['admin.lists.rename'] = listChange_(function (req) {
 API['admin.lists.delete'] = listChange_(function (req) {
   var key = requireList_(req.key);
   if (!readListInfo()[key])
-    fail(
+    ApiError.fail(
       'list_builtin',
       'The lists that came with the platform cannot be deleted.'
     );
   var users = formsUsingList_(key);
   if (users.length)
-    fail(
+    ApiError.fail(
       'list_in_use',
       'A form still asks this list: ' +
         users

@@ -38,9 +38,9 @@ function setReviewStep_(form, r, stepId, status) {
   steps.forEach(function (s, i) {
     if (s.id === stepId) idx = i;
   });
-  if (idx < 0) fail('bad_step', 'Unknown review step.');
+  if (idx < 0) ApiError.fail('bad_step', 'Unknown review step.');
   if (REVIEW_STATUSES.indexOf(status) === -1)
-    fail('bad_status', 'Unknown review status.');
+    ApiError.fail('bad_status', 'Unknown review status.');
   var sequential = form.review.sequential !== false;
   if (
     sequential &&
@@ -48,7 +48,7 @@ function setReviewStep_(form, r, stepId, status) {
     idx > 0 &&
     r.review[steps[idx - 1].id] !== 'approved'
   ) {
-    fail('review_order', 'Finish "' + steps[idx - 1].label.en + '" first.');
+    ApiError.fail('review_order', 'Finish "' + steps[idx - 1].label.en + '" first.');
   }
   r.review[stepId] = status;
   if (sequential && status !== 'approved') {

@@ -1,5 +1,6 @@
 /** The error every handler throws and the JSON reply the web app sends. */
 
+var ApiError = (function () {
 function ApiError(code, message, details) {
   var e = new Error(message);
   e.isApiError = true;
@@ -17,3 +18,6 @@ function json(obj) {
     ContentService.MimeType.JSON
   );
 }
+
+return { json, fail };
+})();

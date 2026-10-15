@@ -16,7 +16,7 @@ function normalizeRules_(current, next) {
     var min = parseInt(merged.teamSize && merged.teamSize.min, 10);
     var max = parseInt(merged.teamSize && merged.teamSize.max, 10);
     if (!(min >= 1) || !(max >= min) || max > 20) {
-      fail(
+      ApiError.fail(
         'bad_team_size',
         'Team size must be between 1 and 20, and the maximum cannot be lower than the minimum.'
       );
@@ -31,7 +31,7 @@ function normalizeRules_(current, next) {
   if (merged.sizeAlerts !== undefined) {
     var stop = Rules.sizeAlertsProblem({ rules: merged });
     if (stop) {
-      fail(
+      ApiError.fail(
         'bad_size_alerts',
         stop.error === 'order'
           ? 'The warning must be for a higher number than the critical warning, or no team gets it.'

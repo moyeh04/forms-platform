@@ -48,7 +48,7 @@ function printReservations_(form, dayId, includeEmpty) {
   var day = days.filter(function (d) {
     return d.id === dayId;
   })[0];
-  if (!day) fail('day_not_found', 'That day is not in the timetable.');
+  if (!day) ApiError.fail('day_not_found', 'That day is not in the timetable.');
 
   var byTime = {};
   readResponses(form).forEach(function (r) {

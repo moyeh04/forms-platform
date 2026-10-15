@@ -19,7 +19,7 @@ function customLabel_(label) {
   var ar = String((label && label.ar) || '')
     .trim()
     .slice(0, 120);
-  if (!en && !ar) fail('bad_question', 'A question needs a label.');
+  if (!en && !ar) ApiError.fail('bad_question', 'A question needs a label.');
   return { en: en || ar, ar: ar || en };
 }
 
@@ -39,7 +39,7 @@ function customOptions_(options) {
     out.push({ value: value, label: label });
   });
   if (out.length < 2)
-    fail(
+    ApiError.fail(
       'bad_question',
       'A choice question needs at least two different choices.'
     );
@@ -48,7 +48,7 @@ function customOptions_(options) {
 
 function customField_(f, taken) {
   if (CUSTOM_TYPES_.indexOf(f.type) === -1)
-    fail('bad_question', 'That kind of question cannot be added.');
+    ApiError.fail('bad_question', 'That kind of question cannot be added.');
   var id =
     /^q_[a-z0-9]{1,16}$/.test(String(f.id)) && !taken[f.id]
       ? String(f.id)
@@ -85,7 +85,7 @@ function normalizeQuestions_(form) {
   form.fields = (form.fields || []).map(function (f) {
     if (!f.custom) return f;
     if (++custom > CUSTOM_LIMIT_)
-      fail(
+      ApiError.fail(
         'bad_question',
         'A form can have at most ' + CUSTOM_LIMIT_ + ' added questions.'
       );
@@ -98,7 +98,7 @@ function normalizeQuestions_(form) {
   var known = function (fields) {
     (fields || []).forEach(function (f) {
       if (f.list && !lists.hasOwnProperty(f.list))
-        fail('list_not_found', 'The list "' + f.list + '" does not exist.');
+        ApiError.fail('list_not_found', 'The list "' + f.list + '" does not exist.');
       known(f.fields);
     });
   };
@@ -106,7 +106,7 @@ function normalizeQuestions_(form) {
   var placed = {};
   var pages = {};
   if ((form.steps || []).length > PAGE_LIMIT_)
-    fail('bad_question', 'A form can have at most ' + PAGE_LIMIT_ + ' pages.');
+    ApiError.fail('bad_question', 'A form can have at most ' + PAGE_LIMIT_ + ' pages.');
   (form.steps || []).forEach(function (step) {
     // A page keeps its id; a new or repeated one gets a fresh id. The title is what students read on the route.
     if (!/^[a-z0-9_]{1,24}$/.test(String(step.id)) || pages[step.id])
@@ -120,7 +120,7 @@ function normalizeQuestions_(form) {
     var ar = String((step.title && step.title.ar) || '')
       .trim()
       .slice(0, 60);
-    if (!en && !ar) fail('bad_question', 'A page needs a title.');
+    if (!en && !ar) ApiError.fail('bad_question', 'A page needs a title.');
     step.title = { en: en || ar, ar: ar || en };
     step.fields = (step.fields || []).map(String).filter(function (id) {
       if (!taken[id] || placed[id]) return false;

@@ -18,9 +18,9 @@ var API = API || {};
 API['admin.download.start'] = admin(function (req) {
   var form = requireForm(req.slug || req.id);
   if (!isTeamForm_(form))
-    fail('wrong_type', 'Only team and task forms can be downloaded.');
+    ApiError.fail('wrong_type', 'Only team and task forms can be downloaded.');
   var teams = teamBlocks_(form);
-  if (!teams.length) fail('nothing_to_download', 'Nobody has registered yet.');
+  if (!teams.length) ApiError.fail('nothing_to_download', 'Nobody has registered yet.');
   var downloads = dlDownloadsFolder_();
   var old = downloads.getFolders();
   while (old.hasNext()) {
@@ -63,7 +63,7 @@ API['admin.download.team'] = admin(function (req) {
   var team = teamBlocks_(form).filter(function (t) {
     return t.ref === req.ref;
   })[0];
-  if (!team) fail('submission_not_found', 'That team no longer exists.');
+  if (!team) ApiError.fail('submission_not_found', 'That team no longer exists.');
   var base = dlBase_(form, team);
   var miss = function (path, reason, url) {
     job.failed.push({
@@ -200,7 +200,7 @@ API['admin.download.pack'] = admin(function (req) {
     job = x.job;
   var i = parseInt(req.part, 10);
   if (!(i >= 0 && i < job.parts.length))
-    fail('bad_part', 'That part does not exist.');
+    ApiError.fail('bad_part', 'That part does not exist.');
   var root = dlName_(form.title, form.slug);
   var files = job.parts[i].map(function (id) {
     return DriveApp.getFileById(id);
@@ -230,7 +230,7 @@ API['admin.download.pack'] = admin(function (req) {
 API['admin.download.chunk'] = admin(function (req) {
   var job = dlJob_(req).job;
   if (job.zips.indexOf(req.file) === -1)
-    fail('bad_part', 'That part does not exist.');
+    ApiError.fail('bad_part', 'That part does not exist.');
   var size = DriveApp.getFileById(req.file).getSize();
   var from = Math.max(0, parseInt(req.offset, 10) || 0);
   var to = Math.min(size, from + DL_CHUNK_BYTES_);
@@ -248,7 +248,7 @@ API['admin.download.chunk'] = admin(function (req) {
     var code = r.getResponseCode();
     if (code === 429 || code >= 500) throw new Error('429 try again');
     if (code !== 206 && code !== 200)
-      fail(
+      ApiError.fail(
         'download_failed',
         'Drive would not give the file (' + code + '). Try again.'
       );

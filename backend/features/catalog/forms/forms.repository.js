@@ -71,7 +71,7 @@ function findForm(slugOrId) {
 
 function requireForm(slugOrId) {
   var f = findForm(slugOrId);
-  if (!f) fail('form_not_found', 'That form does not exist.');
+  if (!f) ApiError.fail('form_not_found', 'That form does not exist.');
   return f;
 }
 

@@ -8,7 +8,7 @@ var API = API || {};
 
 function requireMatching_(form) {
   if (!form.matching || !form.matching.enabled)
-    fail('no_matching', 'Matching is not turned on for this form.');
+    ApiError.fail('no_matching', 'Matching is not turned on for this form.');
 }
 
 API['admin.matching.import'] = admin(function (req) {
@@ -105,7 +105,7 @@ API['admin.matching.decide'] = admin(function (req) {
   requireMatching_(form);
   var decision = String(req.decision);
   if (REVIEW_STATUSES.indexOf(decision) === -1)
-    fail('bad_status', 'Decision must be pending, approved, or rejected.');
+    ApiError.fail('bad_status', 'Decision must be pending, approved, or rejected.');
   var stepId = form.matching.step || 'group';
   var hasStep = ((form.review && form.review.steps) || []).some(function (s) {
     return s.id === stepId;
@@ -115,7 +115,7 @@ API['admin.matching.decide'] = admin(function (req) {
     var q = readRequests_(form).filter(function (x) {
       return x.id === req.requestId;
     })[0];
-    if (!q) fail('request_not_found', 'That request does not exist.');
+    if (!q) ApiError.fail('request_not_found', 'That request does not exist.');
     var subs = readResponses(form).filter(function (r) {
       return Rules.normalizePhone(r.phone) === q.phone;
     });

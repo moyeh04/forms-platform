@@ -9,7 +9,7 @@ function requireClientForm_(client, slug) {
     form.status === 'draft' ||
     form.status === 'archived'
   )
-    fail('forbidden', 'You do not have access to this form.');
+    ApiError.fail('forbidden', 'You do not have access to this form.');
   return form;
 }
 

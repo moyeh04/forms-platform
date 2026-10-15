@@ -46,7 +46,7 @@ function cleanExpiry_(value) {
   var v = String(value || '').trim();
   if (!v) return '';
   var t = Date.parse(v);
-  if (isNaN(t)) fail('bad_date', 'That end date is not a date.');
+  if (isNaN(t)) ApiError.fail('bad_date', 'That end date is not a date.');
   return new Date(t).toISOString();
 }
 
@@ -81,7 +81,7 @@ function cleanClientForms_(list) {
   if (list.indexOf('*') !== -1) return ['*'];
   return list.map(function (s) {
     var f = findForm(String(s));
-    if (!f) fail('form_not_found', 'Form "' + s + '" does not exist.');
+    if (!f) ApiError.fail('form_not_found', 'Form "' + s + '" does not exist.');
     return f.id;
   });
 }

@@ -9,7 +9,7 @@ function normalizeSlots_(slots) {
   var out = days.map(function (d, i) {
     var label = String(d.label || '').trim();
     if (!label)
-      fail(
+      ApiError.fail(
         'bad_slots',
         'Every day needs a name, for example "Week 11 - Sunday".'
       );
@@ -20,13 +20,13 @@ function normalizeSlots_(slots) {
     seen[id] = true;
     var date = String(d.date || '').trim();
     if (date && !/^\d{4}-\d{2}-\d{2}$/.test(date))
-      fail('bad_slots', 'Dates must look like 2027-11-14.');
+      ApiError.fail('bad_slots', 'Dates must look like 2027-11-14.');
     var times = [];
     (d.times || []).forEach(function (t) {
       t = String(t).replace(/\s+/g, ' ').trim();
       if (t && times.indexOf(t) === -1) times.push(t);
     });
-    if (!times.length) fail('bad_slots', '"' + label + '" has no time slots.');
+    if (!times.length) ApiError.fail('bad_slots', '"' + label + '" has no time slots.');
     return { id: id, label: label, date: date, times: times };
   });
   var result = { days: out, capacity: capacity };

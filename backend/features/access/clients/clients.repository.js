@@ -78,7 +78,7 @@ function changeClient_(id, change) {
     var c = readClients_().filter(function (x) {
       return x.id === id;
     })[0];
-    if (!c) fail('client_not_found', 'That client does not exist.');
+    if (!c) ApiError.fail('client_not_found', 'That client does not exist.');
     var out = change(c);
     saveClient_(c);
     return out;

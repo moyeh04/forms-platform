@@ -63,9 +63,9 @@ function addForm_(form, wantedSlug, adjust) {
 
 function createForm(o, adjust) {
   if (FORM_TYPES.indexOf(o.type) === -1)
-    fail('unknown_type', 'Unknown form type.');
+    ApiError.fail('unknown_type', 'Unknown form type.');
   var title = String(o.title || '').trim();
-  if (!title) fail('title_required', 'Give the form a title.');
+  if (!title) ApiError.fail('title_required', 'Give the form a title.');
   var form = templateFor(o.type);
   form.type = o.type;
   form.title = title;
@@ -107,7 +107,7 @@ function updateForm(id, patch, base) {
 
 function applyFormPatch_(form, patch, base) {
   if (base && String(base) !== form.updatedAt) {
-    fail(
+    ApiError.fail(
       'stale',
       'This form was changed in another window since you opened it. Press Discard to load the latest, then make your change again.'
     );
@@ -116,7 +116,7 @@ function applyFormPatch_(form, patch, base) {
   PATCHABLE_.forEach(function (k) {
     if (patch[k] === undefined) return;
     if (k === 'status' && FORM_STATUSES.indexOf(patch[k]) === -1)
-      fail('bad_status', 'Status must be draft, open, closed, or archived.');
+      ApiError.fail('bad_status', 'Status must be draft, open, closed, or archived.');
     if (k === 'rules') {
       form.rules = normalizeRules_(form.rules, patch.rules);
       return;
@@ -133,7 +133,7 @@ function applyFormPatch_(form, patch, base) {
       var wanted = slugify(patch.slug);
       var clash = findForm(wanted);
       if (clash && clash.id !== form.id)
-        fail('slug_taken', 'Another form already uses that link name.');
+        ApiError.fail('slug_taken', 'Another form already uses that link name.');
       if (wanted !== form.slug) keepClientForms_();
       form.slug = wanted;
       return;

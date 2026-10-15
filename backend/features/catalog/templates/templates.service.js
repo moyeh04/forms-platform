@@ -193,7 +193,7 @@ function templateFor(type) {
     };
     cfg.matching = { enabled: true, field: 'phone' };
   } else {
-    fail('unknown_type', 'Unknown form type: ' + type);
+    ApiError.fail('unknown_type', 'Unknown form type: ' + type);
   }
   return cfg;
 }

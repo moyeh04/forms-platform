@@ -13,7 +13,7 @@ function withLock_(fn) {
   try {
     lock.waitLock(20000);
   } catch (e) {
-    fail('busy', 'The server is busy. Try again in a moment.');
+    ApiError.fail('busy', 'The server is busy. Try again in a moment.');
   }
   LOCK_DEPTH_++;
   try {

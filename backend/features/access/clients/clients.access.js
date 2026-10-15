@@ -10,7 +10,7 @@ function requireClient_(req) {
   var cache = CacheService.getScriptCache();
   var fails = parseInt(cache.get('bad_tokens') || '0', 10);
   if (fails >= 30)
-    fail(
+    ApiError.fail(
       'too_many_attempts',
       'Too many tries. Wait a minute and open the link again.'
     );
@@ -22,11 +22,11 @@ function requireClient_(req) {
   });
   if (!hit) {
     cache.put('bad_tokens', String(fails + 1), 60);
-    fail('bad_token', 'This link is not valid.');
+    ApiError.fail('bad_token', 'This link is not valid.');
   }
-  if (!hit.active) fail('revoked', 'This link was turned off.');
+  if (!hit.active) ApiError.fail('revoked', 'This link was turned off.');
   if (clientExpired_(hit))
-    fail(
+    ApiError.fail(
       'link_expired',
       'This link ended on ' +
         hit.expires.slice(0, 10) +
@@ -36,15 +36,15 @@ function requireClient_(req) {
     var tag = 'client_key:' + hit.id;
     var wrong = parseInt(cache.get(tag) || '0', 10);
     if (wrong >= CLIENT_KEY_TRIES_)
-      fail(
+      ApiError.fail(
         'key_locked',
         'Too many wrong keys. Wait ten minutes and try again.'
       );
     var key = String((req && req.accessKey) || '').replace(/\D/g, '');
-    if (!key) fail('key_needed', 'This link needs its access key.');
+    if (!key) ApiError.fail('key_needed', 'This link needs its access key.');
     if (clientKeyHash_(hit, key) !== hit.keyHash) {
       cache.put(tag, String(wrong + 1), 600);
-      fail('bad_access_key', 'That access key is not right.');
+      ApiError.fail('bad_access_key', 'That access key is not right.');
     }
   }
   return hit;
