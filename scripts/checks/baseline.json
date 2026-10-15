@@ -319,40 +319,6 @@
     "jsdoc": 4,
     "lines": 8
   },
-  "backend/main.js": {
-    "jsdoc": 2
-  },
-  "backend/platform/format/json.js": {
-    "jsdoc": 2
-  },
-  "backend/platform/format/text.js": {
-    "jsdoc": 2
-  },
-  "backend/platform/format/time.js": {
-    "jsdoc": 2
-  },
-  "backend/platform/http/api-error.js": {
-    "jsdoc": 3
-  },
-  "backend/platform/security/crypto.js": {
-    "biome/lint/correctness/noInnerDeclarations": 1,
-    "biome/lint/style/noMagicNumbers": 4,
-    "jsdoc": 7,
-    "lines": 1
-  },
-  "backend/platform/security/properties.js": {
-    "jsdoc": 3
-  },
-  "backend/platform/sheets/lock.js": {
-    "biome/lint/style/noMagicNumbers": 1,
-    "jsdoc": 2,
-    "lines": 2
-  },
-  "backend/platform/sheets/table.js": {
-    "biome/lint/style/noMagicNumbers": 1,
-    "jsdoc": 8,
-    "lines": 4
-  },
   "backend/platform/xlsx/workbook.js": {
     "biome/lint/complexity/noExcessiveCognitiveComplexity": 2,
     "biome/lint/complexity/noExcessiveLinesPerFunction": 3,
