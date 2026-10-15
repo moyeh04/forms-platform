@@ -69,7 +69,7 @@
   .savebar,
   .block-side .actions,
   .no-print {
-    display: none !important;
+    display: none;
   }
   .block {
     break-inside: avoid;
@@ -78,10 +78,10 @@
   }
   .block-head,
   .day-head {
-    background: #f2f2f2 !important;
+    background: #f2f2f2;
   }
   .block-actions {
-    display: none !important;
+    display: none;
   }
 }
 
