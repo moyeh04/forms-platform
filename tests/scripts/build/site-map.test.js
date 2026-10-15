@@ -12,7 +12,7 @@ test('Site map: each published path finds its source file', () => {
   assert.equal(sourceOf('assets/js/api.js?v=abc'), 'web/js/api.js');
   assert.equal(sourceOf('/assets/css/theme.css'), 'web/css/theme.css');
   assert.equal(sourceOf('assets/img/ship.svg'), 'web/img/ship.svg');
-  assert.equal(sourceOf('shared/rules.js'), 'domain/rules.js');
+  assert.equal(sourceOf('shared/rules/index.js'), 'domain/rules/index.js');
   for (const page of PAGES) {
     assert.ok(fs.existsSync(path.join(root, sourceOf(page))), page);
   }

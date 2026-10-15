@@ -1,6 +1,6 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const R = require('../../domain/rules.js');
+const R = require('../../domain/rules/index.js');
 
 test('Arabic names: accepts four Arabic parts and strips diacritics', () => {
   const ok = R.validateArabicName('أحمد محمد محمود أحمد');

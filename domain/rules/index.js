@@ -8,7 +8,7 @@
  */
 (function (root, factory) {
   var node = typeof module === 'object' && module.exports;
-  var api = factory(node ? require('./enums.js') : root);
+  var api = factory(node ? require('../enums.js') : root);
   if (node) module.exports = api;
   root.Rules = api;
 })(typeof globalThis !== 'undefined' ? globalThis : this, function (enums) {

@@ -1,6 +1,6 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const R = require('../../../../../domain/rules.js');
+const R = require('../../../../../domain/rules/index.js');
 const { createWorld } = require('../../../../harness/appsscript-mock.js');
 
 const form = {

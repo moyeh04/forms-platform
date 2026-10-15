@@ -36,7 +36,7 @@ const BACKEND_LAST = ['routes.js', 'entry-points.js', 'main.js'];
  */
 const DOMAIN_FIRST = [
   'domain/enums.js',
-  'domain/rules.js',
+  'domain/rules/index.js',
   'domain/form-metadata.js'
 ];
 

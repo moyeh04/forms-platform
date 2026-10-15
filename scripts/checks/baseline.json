@@ -10,7 +10,7 @@
     "biome/lint/suspicious/noPrototypeBuiltins": 1,
     "jsdoc": 41
   },
-  "domain/rules.js": {
+  "domain/rules/index.js": {
     "biome/lint/complexity/noExcessiveCognitiveComplexity": 7,
     "biome/lint/complexity/noExcessiveLinesPerFunction": 2,
     "biome/lint/complexity/useOptionalChain": 15,
