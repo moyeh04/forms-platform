@@ -3,6 +3,7 @@
  * members.
  */
 
+var TemplateFields = (function () {
 function field_(id, type, en, ar, extra) {
   return Object.assign(
     { id: id, type: type, label: { en: en, ar: ar }, required: true },
@@ -118,3 +119,6 @@ function normalizeReservationMembers_(form) {
     project.fields.push(members.id);
   return form;
 }
+
+return { normalizeReservationMembers: normalizeReservationMembers_, personFields: personFields_, studyFields: studyFields_, teamSizeField: teamSizeField_, membersField: membersField_, field: field_, reservationMembersField: reservationMembersField_ };
+})();

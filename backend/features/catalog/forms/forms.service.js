@@ -67,7 +67,7 @@ function createForm(o, adjust) {
     ApiError.fail('unknown_type', 'Unknown form type.');
   var title = String(o.title || '').trim();
   if (!title) ApiError.fail('title_required', 'Give the form a title.');
-  var form = templateFor(o.type);
+  var form = TemplatesService.templateFor(o.type);
   form.type = o.type;
   form.title = title;
   Object.assign(form, FormMetadata.create(form.type, o));

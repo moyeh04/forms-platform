@@ -3,6 +3,7 @@
  * Everything here is data: the engine never hard-codes a question.
  */
 
+var TemplatesService = (function () {
 function commonConfig_(icon, uniqueBy) {
   return {
     lang: { default: 'en', allowSwitch: true },
@@ -48,17 +49,17 @@ function templateFor(type) {
     cfg.rules.uniqueAcrossForm = true;
     cfg.rules.teamSize = { min: 1, max: 6 };
     cfg.rules.folderName = { enabled: true, subject: '' };
-    cfg.fields = personFields_().concat(studyFields_(), [
-      teamSizeField_(),
-      membersField_(),
-      field_(
+    cfg.fields = TemplateFields.personFields().concat(TemplateFields.studyFields(), [
+      TemplateFields.teamSizeField(),
+      TemplateFields.membersField(),
+      TemplateFields.field(
         'title',
         'english_text',
         'Project title',
         'اسم المشروع (بالإنجليزي)',
         { role: 'title', help: { en: 'In English', ar: 'بالإنجليزي' } }
       ),
-      field_(
+      TemplateFields.field(
         'link',
         'drive_link',
         'Project Drive folder link',
@@ -75,14 +76,14 @@ function templateFor(type) {
   } else if (type === 'task_submission') {
     cfg = commonConfig_('task', 'leader_code');
     cfg.rules.teamSize = { min: 1, max: 5 };
-    cfg.fields = personFields_().concat(studyFields_(), [
-      teamSizeField_(),
-      membersField_(),
-      field_('title', 'english_text', 'Task name', 'اسم التاسك (بالإنجليزي)', {
+    cfg.fields = TemplateFields.personFields().concat(TemplateFields.studyFields(), [
+      TemplateFields.teamSizeField(),
+      TemplateFields.membersField(),
+      TemplateFields.field('title', 'english_text', 'Task name', 'اسم التاسك (بالإنجليزي)', {
         role: 'title',
         help: { en: 'In English', ar: 'بالإنجليزي' }
       }),
-      field_(
+      TemplateFields.field(
         'link',
         'drive_link',
         'Task slides link',
@@ -105,16 +106,16 @@ function templateFor(type) {
     ];
   } else if (type === 'reservation') {
     cfg = commonConfig_('calendar', 'leader_code');
-    cfg.fields = personFields_().concat(studyFields_(), [
-      field_(
+    cfg.fields = TemplateFields.personFields().concat(TemplateFields.studyFields(), [
+      TemplateFields.field(
         'title',
         'english_text',
         'Project title',
         'اسم المشروع (بالإنجليزي)',
         { role: 'title' }
       ),
-      reservationMembersField_(),
-      field_('slot', 'slot', 'Booking slot', 'ميعاد المناقشة', { role: 'slot' })
+      TemplateFields.reservationMembersField(),
+      TemplateFields.field('slot', 'slot', 'Booking slot', 'ميعاد المناقشة', { role: 'slot' })
     ]);
     cfg.slots = { days: [], capacity: 1 };
     cfg.editKey.allowEdit = false;
@@ -127,8 +128,8 @@ function templateFor(type) {
   } else if (type === 'whatsapp_registration') {
     cfg = commonConfig_('chat', 'code');
     cfg.fields = [
-      field_('email', 'email', 'Email', 'البريد الإلكتروني', { role: 'email' }),
-      field_('name', 'arabic_name', 'Full name', 'الاسم رباعي', {
+      TemplateFields.field('email', 'email', 'Email', 'البريد الإلكتروني', { role: 'email' }),
+      TemplateFields.field('name', 'arabic_name', 'Full name', 'الاسم رباعي', {
         role: 'name',
         minParts: 4,
         help: {
@@ -136,32 +137,32 @@ function templateFor(type) {
           ar: 'الاسم رباعي وبالعربي فقط'
         }
       }),
-      field_('phone', 'phone', 'Phone number', 'رقم التليفون', {
+      TemplateFields.field('phone', 'phone', 'Phone number', 'رقم التليفون', {
         role: 'phone'
       }),
-      field_('code', 'code', 'Code in your timetable', 'الكود اللي في الجدول', {
+      TemplateFields.field('code', 'code', 'Code in your timetable', 'الكود اللي في الجدول', {
         role: 'code',
         length: 7
       }),
-      field_('level', 'select', 'Level / year', 'المستوى / الفرقة', {
+      TemplateFields.field('level', 'select', 'Level / year', 'المستوى / الفرقة', {
         list: 'levels'
       }),
-      field_('major', 'select', 'Major', 'التخصص', { list: 'majors' }),
-      field_('group', 'select', 'Group', 'الجروب', {
+      TemplateFields.field('major', 'select', 'Major', 'التخصص', { list: 'majors' }),
+      TemplateFields.field('group', 'select', 'Group', 'الجروب', {
         list: 'groups',
         help: {
           en: 'Pick A if your timetable includes Chemistry, B if it does not',
           ar: 'اختار A لو الجدول فيه كيمياء، و B لو مفيهوش'
         }
       }),
-      field_('section', 'select', 'Section number', 'رقم السكشن', {
+      TemplateFields.field('section', 'select', 'Section number', 'رقم السكشن', {
         list: 'wa_sections',
         help: {
           en: 'The number next to TH in your timetable, for example 21 in 1B-TH21',
           ar: 'الرقم اللي جنب TH في جدولك'
         }
       }),
-      field_(
+      TemplateFields.field(
         'schedule',
         'drive_link',
         'Screenshot of your timetable',
@@ -197,3 +198,6 @@ function templateFor(type) {
   }
   return cfg;
 }
+
+return { templateFor };
+})();

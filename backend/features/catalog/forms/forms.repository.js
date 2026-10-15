@@ -42,7 +42,7 @@ function rowToForm_(row) {
     form[k] = row[k] === undefined ? '' : String(row[k]);
   });
   Object.assign(form, FormMetadata.read(form));
-  normalizeReservationMembers_(form);
+  TemplateFields.normalizeReservationMembers(form);
   return form;
 }
 
