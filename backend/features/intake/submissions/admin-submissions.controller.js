@@ -3,153 +3,180 @@
  */
 
 var AdminSubmissionsController = (function () {
-function adminView_(r) {
-  var o = Json.clone(r);
-  o.keyKnown = !!(r.keyHash && r.keySeal);
-  delete o._row;
-  delete o.keyHash;
-  delete o.keySeal;
-  return o;
-}
+  function adminView_(r) {
+    var o = Json.clone(r);
+    o.keyKnown = !!(r.keyHash && r.keySeal);
+    delete o._row;
+    delete o.keyHash;
+    delete o.keySeal;
+    return o;
+  }
 
-/**
- * Answers the `admin.submissions` action.
- *
- * @param {!Object} req The request body.
- * @return {*} The answer, sent back as JSON.
- */
-function submissions(req) {
-  var form = FormsRepository.requireForm(req.slug || req.id);
-  var rows = TeamNumbers.numberedResponses(form, !!req.includeDeleted).map(function (r) {
-    var view = adminView_(r);
-    if (
-      form.type === 'reservation' &&
-      Rules.fieldByRole(form, 'members').enabled === false
-    ) {
-      view.data.members = [];
-      view.members = '';
-    }
-    return view;
-  });
-  return { submissions: rows, transfers: TransfersController.adminTransfers(form) };
-}
-
-/**
- * Answers the `admin.submission.update` action.
- *
- * @param {!Object} req The request body.
- * @return {*} The answer, sent back as JSON.
- */
-function update(req) {
-  var form = FormsRepository.requireForm(req.slug || req.id);
-  var vform = FormsPublic.validationForm(form);
-  var patch = req.patch || {};
-  var changedData = false;
-  Lock.withLock(function () {
-    var live = ResponsesRepository.readResponses(form);
-    var r = live.filter(function (x) {
-      return x.id === req.submissionId;
-    })[0];
-    if (!r) ApiError.fail('submission_not_found', 'That submission does not exist.');
-    if (patch.review) {
-      var steps = (form.review && form.review.steps) || [];
-      Object.keys(patch.review).forEach(function (k) {
+  /**
+   * Answers the `admin.submissions` action.
+   *
+   * @param {!Object} req The request body.
+   * @return {*} The answer, sent back as JSON.
+   */
+  function submissions(req) {
+    var form = FormsRepository.requireForm(req.slug || req.id);
+    var rows = TeamNumbers.numberedResponses(form, !!req.includeDeleted).map(
+      function (r) {
+        var view = adminView_(r);
         if (
-          !steps.some(function (s) {
-            return s.id === k;
-          })
+          form.type === 'reservation' &&
+          Rules.fieldByRole(form, 'members').enabled === false
+        ) {
+          view.data.members = [];
+          view.members = '';
+        }
+        return view;
+      }
+    );
+    return {
+      submissions: rows,
+      transfers: TransfersController.adminTransfers(form)
+    };
+  }
+
+  /**
+   * Answers the `admin.submission.update` action.
+   *
+   * @param {!Object} req The request body.
+   * @return {*} The answer, sent back as JSON.
+   */
+  function update(req) {
+    var form = FormsRepository.requireForm(req.slug || req.id);
+    var vform = FormsPublic.validationForm(form);
+    var patch = req.patch || {};
+    var changedData = false;
+    Lock.withLock(function () {
+      var live = ResponsesRepository.readResponses(form);
+      var r = live.filter(function (x) {
+        return x.id === req.submissionId;
+      })[0];
+      if (!r)
+        ApiError.fail(
+          'submission_not_found',
+          'That submission does not exist.'
+        );
+      if (patch.review) {
+        var steps = (form.review && form.review.steps) || [];
+        Object.keys(patch.review).forEach(function (k) {
+          if (
+            !steps.some(function (s) {
+              return s.id === k;
+            })
+          )
+            ApiError.fail('bad_step', 'Unknown review step.');
+        });
+        steps.forEach(function (s) {
+          if (patch.review[s.id] !== undefined)
+            ResponsesReview.setReviewStep(form, r, s.id, patch.review[s.id]);
+        });
+      }
+      if (patch.status !== undefined) {
+        if (
+          ResponsesRepository.SUBMISSION_STATUSES.indexOf(patch.status) === -1
         )
-          ApiError.fail('bad_step', 'Unknown review step.');
-      });
-      steps.forEach(function (s) {
-        if (patch.review[s.id] !== undefined)
-          ResponsesReview.setReviewStep(form, r, s.id, patch.review[s.id]);
-      });
-    }
-    if (patch.status !== undefined) {
-      if (ResponsesRepository.SUBMISSION_STATUSES.indexOf(patch.status) === -1)
-        ApiError.fail('bad_status', 'Unknown status.');
-      r.status = patch.status;
-    }
-    if (patch.data) {
-      var v = Rules.validateSubmission(vform, patch.data);
-      if (!v.ok) ApiError.fail('invalid', 'Some answers need fixing.', v.errors);
-      ResponsesRules.checkLimits(vform, v.data, live, r.id);
-      r.data = v.data;
-      ResponsesRepository.applyDerived(vform, r);
-      changedData = true;
-    }
-    ResponsesRepository.saveResponse(form, r);
-  });
-  ResponsesNotify.afterChange(form);
-  return { updated: true, dataChanged: changedData };
-}
+          ApiError.fail('bad_status', 'Unknown status.');
+        r.status = patch.status;
+      }
+      if (patch.data) {
+        var v = Rules.validateSubmission(vform, patch.data);
+        if (!v.ok)
+          ApiError.fail('invalid', 'Some answers need fixing.', v.errors);
+        ResponsesRules.checkLimits(vform, v.data, live, r.id);
+        r.data = v.data;
+        ResponsesRepository.applyDerived(vform, r);
+        changedData = true;
+      }
+      ResponsesRepository.saveResponse(form, r);
+    });
+    ResponsesNotify.afterChange(form);
+    return { updated: true, dataChanged: changedData };
+  }
 
-/**
- * Answers the `admin.submission.delete` action.
- *
- * @param {!Object} req The request body.
- * @return {*} The answer, sent back as JSON.
- */
-function remove(req) {
-  var form = FormsRepository.requireForm(req.slug || req.id);
-  Lock.withLock(function () {
-    if (!SubmissionsController.cancelResponse(form, req.submissionId))
-      ApiError.fail('submission_not_found', 'That submission does not exist.');
-  });
-  ResponsesNotify.afterChange(form);
-  return { deleted: true };
-}
+  /**
+   * Answers the `admin.submission.delete` action.
+   *
+   * @param {!Object} req The request body.
+   * @return {*} The answer, sent back as JSON.
+   */
+  function remove(req) {
+    var form = FormsRepository.requireForm(req.slug || req.id);
+    Lock.withLock(function () {
+      if (!SubmissionsController.cancelResponse(form, req.submissionId))
+        ApiError.fail(
+          'submission_not_found',
+          'That submission does not exist.'
+        );
+    });
+    ResponsesNotify.afterChange(form);
+    return { deleted: true };
+  }
 
-/**
- * Answers the `admin.submission.resetKey` action.
- *
- * @param {!Object} req The request body.
- * @return {*} The answer, sent back as JSON.
- */
-function resetKey(req) {
-  var form = FormsRepository.requireForm(req.slug || req.id);
-  var vform = FormsPublic.validationForm(form);
-  return Lock.withLock(function () {
-    var rows = ResponsesRepository.readResponses(form);
-    var r = rows.filter(function (x) {
+  /**
+   * Answers the `admin.submission.resetKey` action.
+   *
+   * @param {!Object} req The request body.
+   * @return {*} The answer, sent back as JSON.
+   */
+  function resetKey(req) {
+    var form = FormsRepository.requireForm(req.slug || req.id);
+    var vform = FormsPublic.validationForm(form);
+    return Lock.withLock(function () {
+      var rows = ResponsesRepository.readResponses(form);
+      var r = rows.filter(function (x) {
+        return x.id === req.submissionId;
+      })[0];
+      if (!r)
+        ApiError.fail(
+          'submission_not_found',
+          'That submission does not exist.'
+        );
+      var k = KeysService.issueKey(vform, rows);
+      r.keyHash = k.hash;
+      r.keySeal = KeysService.sealKey(form, r.id, k.key);
+      r.keyExpires = KeysService.keyExpiry(form);
+      ResponsesRepository.saveResponse(form, r);
+      return { key: k.key, keyExpires: r.keyExpires, ref: r.ref };
+    });
+  }
+
+  /**
+   * The admin reads a student's current key, for example when the student lost it.
+   *
+   * @param {!Object} req The request body.
+   * @return {*} The answer, sent back as JSON.
+   */
+  function submissionKey(req) {
+    var form = FormsRepository.requireForm(req.slug || req.id);
+    var r = ResponsesRepository.readResponses(form).filter(function (x) {
       return x.id === req.submissionId;
     })[0];
-    if (!r) ApiError.fail('submission_not_found', 'That submission does not exist.');
-    var k = KeysService.issueKey(vform, rows);
-    r.keyHash = k.hash;
-    r.keySeal = KeysService.sealKey(form, r.id, k.key);
-    r.keyExpires = KeysService.keyExpiry(form);
-    ResponsesRepository.saveResponse(form, r);
-    return { key: k.key, keyExpires: r.keyExpires, ref: r.ref };
-  });
-}
+    if (!r)
+      ApiError.fail('submission_not_found', 'That submission does not exist.');
+    var key = KeysService.unsealKey(form, r.id, r.keySeal);
+    if (!key || KeysService.keyHash(form, key) !== r.keyHash)
+      ApiError.fail(
+        'key_unknown',
+        'This key was issued before keys could be shown. Reset it to give the student a new one you can see.'
+      );
+    return {
+      key: key,
+      keyExpires: r.keyExpires,
+      ref: r.ref,
+      expired: !!(r.keyExpires && Date.parse(r.keyExpires) < Date.now())
+    };
+  }
 
-/**
- * The admin reads a student's current key, for example when the student lost it.
- *
- * @param {!Object} req The request body.
- * @return {*} The answer, sent back as JSON.
- */
-function submissionKey(req) {
-  var form = FormsRepository.requireForm(req.slug || req.id);
-  var r = ResponsesRepository.readResponses(form).filter(function (x) {
-    return x.id === req.submissionId;
-  })[0];
-  if (!r) ApiError.fail('submission_not_found', 'That submission does not exist.');
-  var key = KeysService.unsealKey(form, r.id, r.keySeal);
-  if (!key || KeysService.keyHash(form, key) !== r.keyHash)
-    ApiError.fail(
-      'key_unknown',
-      'This key was issued before keys could be shown. Reset it to give the student a new one you can see.'
-    );
   return {
-    key: key,
-    keyExpires: r.keyExpires,
-    ref: r.ref,
-    expired: !!(r.keyExpires && Date.parse(r.keyExpires) < Date.now())
+    adminView: adminView_,
+    submissions,
+    update,
+    remove,
+    resetKey,
+    submissionKey
   };
-}
-
-return { adminView: adminView_, submissions, update, remove, resetKey, submissionKey };
 })();

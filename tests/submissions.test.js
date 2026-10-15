@@ -657,7 +657,12 @@ test('Team numbers: a team keeps its number when another one cancels, and the ga
     'the sheet holds the numbers, also of the cancelled team'
   );
   assert.deepEqual(
-    w.call('TeamsService.teamBlocks', w.call('FormsRepository.findForm', w.form.id)).map((t) => t.number),
+    w
+      .call(
+        'TeamsService.teamBlocks',
+        w.call('FormsRepository.findForm', w.form.id)
+      )
+      .map((t) => t.number),
     [1, 3, 4],
     'the sheet view, the print and the download read the same numbers'
   );

@@ -9,62 +9,66 @@
  */
 
 var TeamNumbers = (function () {
-/** Gives each live row without a number the next one, in the order they registered. Returns the rows it numbered. */
-function numberTeams_(rows) {
-  var top = 0;
-  rows.forEach(function (r) {
-    top = Math.max(top, r.number || 0);
-  });
-  return rows
-    .filter(function (r) {
-      return !r.deleted && !r.number;
-    })
-    .sort(SheetViewsBuilder.byCreated)
-    .map(function (r) {
-      r.number = ++top;
-      return r;
+  /** Gives each live row without a number the next one, in the order they registered. Returns the rows it numbered. */
+  function numberTeams_(rows) {
+    var top = 0;
+    rows.forEach(function (r) {
+      top = Math.max(top, r.number || 0);
     });
-}
-
-/** The responses of a form with their team numbers, whether or not the numbers are stored yet. */
-function numberedResponses_(form, includeDeleted) {
-  var rows = ResponsesRepository.readResponses(form, true);
-  if (TeamsService.isTeamForm(form)) numberTeams_(rows);
-  return includeDeleted
-    ? rows
-    : rows.filter(function (r) {
-        return !r.deleted;
+    return rows
+      .filter(function (r) {
+        return !r.deleted && !r.number;
+      })
+      .sort(SheetViewsBuilder.byCreated)
+      .map(function (r) {
+        r.number = ++top;
+        return r;
       });
-}
+  }
 
-/**
- * Numbers the rows that have none and stores the numbers of those already in the sheet, in one
- * write of the column. Call it inside withLock_ before a team is added or cancelled.
- */
-function keepTeamNumbers_(form, rows) {
-  if (!TeamsService.isTeamForm(form)) return;
-  var stored = numberTeams_(rows).filter(function (r) {
-    return r._row;
-  });
-  if (!stored.length) return;
-  var sh = ResponsesRepository.responsesSheet(form);
-  Table.ensureHeaders(sh, ResponsesRepository.RESPONSE_COLS);
-  var column = sh.getRange(
-    2,
-    ResponsesRepository.RESPONSE_COLS.indexOf('number') + 1,
-    sh.getLastRow() - 1,
-    1
-  );
-  var values = column.getValues();
-  stored.forEach(function (r) {
-    values[r._row - 2][0] = String(r.number);
-  });
-  column.setNumberFormat('@').setValues(values);
-}
+  /** The responses of a form with their team numbers, whether or not the numbers are stored yet. */
+  function numberedResponses_(form, includeDeleted) {
+    var rows = ResponsesRepository.readResponses(form, true);
+    if (TeamsService.isTeamForm(form)) numberTeams_(rows);
+    return includeDeleted
+      ? rows
+      : rows.filter(function (r) {
+          return !r.deleted;
+        });
+  }
 
-function byTeamNumber_(a, b) {
-  return a.number - b.number;
-}
+  /**
+   * Numbers the rows that have none and stores the numbers of those already in the sheet, in one
+   * write of the column. Call it inside withLock_ before a team is added or cancelled.
+   */
+  function keepTeamNumbers_(form, rows) {
+    if (!TeamsService.isTeamForm(form)) return;
+    var stored = numberTeams_(rows).filter(function (r) {
+      return r._row;
+    });
+    if (!stored.length) return;
+    var sh = ResponsesRepository.responsesSheet(form);
+    Table.ensureHeaders(sh, ResponsesRepository.RESPONSE_COLS);
+    var column = sh.getRange(
+      2,
+      ResponsesRepository.RESPONSE_COLS.indexOf('number') + 1,
+      sh.getLastRow() - 1,
+      1
+    );
+    var values = column.getValues();
+    stored.forEach(function (r) {
+      values[r._row - 2][0] = String(r.number);
+    });
+    column.setNumberFormat('@').setValues(values);
+  }
 
-return { numberedResponses: numberedResponses_, byTeamNumber: byTeamNumber_, keepTeamNumbers: keepTeamNumbers_ };
+  function byTeamNumber_(a, b) {
+    return a.number - b.number;
+  }
+
+  return {
+    numberedResponses: numberedResponses_,
+    byTeamNumber: byTeamNumber_,
+    keepTeamNumbers: keepTeamNumbers_
+  };
 })();

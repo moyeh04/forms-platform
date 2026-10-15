@@ -162,7 +162,9 @@ test('Golden: legacy flag cells read the same and are written back the same', ()
   const read = w
     .call('ClientsRepository.readClients')
     .map((c) => [c.id, c.canReview, c.active, c.showSizeAlerts]);
-  w.call('ClientsRepository.readClients').forEach((c) => w.call('ClientsRepository.saveClient', c));
+  w.call('ClientsRepository.readClients').forEach((c) =>
+    w.call('ClientsRepository.saveClient', c)
+  );
   matchesFixture('legacy-cells.json', { read, written: sheet.rows() });
 });
 

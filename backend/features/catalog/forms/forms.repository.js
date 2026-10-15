@@ -1,100 +1,108 @@
 /** The Forms tab: reading, finding and saving form rows. */
 
 var FormsRepository = (function () {
-var FORM_COLS = [
-  'id',
-  'slug',
-  'type',
-  'title',
-  'term',
-  'status',
-  'opensAt',
-  'closesAt',
-  'sheetId',
-  'sheetUrl',
-  'config',
-  'createdAt',
-  'updatedAt'
-];
+  var FORM_COLS = [
+    'id',
+    'slug',
+    'type',
+    'title',
+    'term',
+    'status',
+    'opensAt',
+    'closesAt',
+    'sheetId',
+    'sheetUrl',
+    'config',
+    'createdAt',
+    'updatedAt'
+  ];
 
-var FORM_BASE_ = [
-  'id',
-  'slug',
-  'type',
-  'title',
-  'term',
-  'status',
-  'opensAt',
-  'closesAt',
-  'sheetId',
-  'sheetUrl',
-  'createdAt',
-  'updatedAt'
-];
+  var FORM_BASE_ = [
+    'id',
+    'slug',
+    'type',
+    'title',
+    'term',
+    'status',
+    'opensAt',
+    'closesAt',
+    'sheetId',
+    'sheetUrl',
+    'createdAt',
+    'updatedAt'
+  ];
 
-function formsSheet() {
-  return RegistryRepository.registry().getSheetByName(Constants.TABS.forms);
-}
+  function formsSheet() {
+    return RegistryRepository.registry().getSheetByName(Constants.TABS.forms);
+  }
 
-function rowToForm_(row) {
-  var form = Json.parseJson(row.config, {});
-  FORM_BASE_.forEach(function (k) {
-    form[k] = row[k] === undefined ? '' : String(row[k]);
-  });
-  Object.assign(form, FormMetadata.read(form));
-  TemplateFields.normalizeReservationMembers(form);
-  return form;
-}
+  function rowToForm_(row) {
+    var form = Json.parseJson(row.config, {});
+    FORM_BASE_.forEach(function (k) {
+      form[k] = row[k] === undefined ? '' : String(row[k]);
+    });
+    Object.assign(form, FormMetadata.read(form));
+    TemplateFields.normalizeReservationMembers(form);
+    return form;
+  }
 
-function formToRow_(form) {
-  var config = Json.clone(form);
-  FORM_BASE_.forEach(function (k) {
-    delete config[k];
-  });
-  var row = {};
-  FORM_BASE_.forEach(function (k) {
-    row[k] = form[k];
-  });
-  row.config = JSON.stringify(config);
-  return row;
-}
+  function formToRow_(form) {
+    var config = Json.clone(form);
+    FORM_BASE_.forEach(function (k) {
+      delete config[k];
+    });
+    var row = {};
+    FORM_BASE_.forEach(function (k) {
+      row[k] = form[k];
+    });
+    row.config = JSON.stringify(config);
+    return row;
+  }
 
-function readForms() {
-  return Table.readTable(formsSheet(), FORM_COLS).map(rowToForm_);
-}
+  function readForms() {
+    return Table.readTable(formsSheet(), FORM_COLS).map(rowToForm_);
+  }
 
-function findForm(slugOrId) {
-  var all = readForms();
-  for (var i = 0; i < all.length; i++)
-    if (all[i].slug === slugOrId || all[i].id === slugOrId) return all[i];
-  return null;
-}
+  function findForm(slugOrId) {
+    var all = readForms();
+    for (var i = 0; i < all.length; i++)
+      if (all[i].slug === slugOrId || all[i].id === slugOrId) return all[i];
+    return null;
+  }
 
-function requireForm(slugOrId) {
-  var f = findForm(slugOrId);
-  if (!f) ApiError.fail('form_not_found', 'That form does not exist.');
-  return f;
-}
+  function requireForm(slugOrId) {
+    var f = findForm(slugOrId);
+    if (!f) ApiError.fail('form_not_found', 'That form does not exist.');
+    return f;
+  }
 
-/** The row a form is on now. Rows move up when a form above is deleted, so it is looked up for each write. */
-function formRow_(sh, id) {
-  var last = sh.getLastRow();
-  if (last < 2) return 0;
-  var ids = sh.getRange(2, 1, last - 1, 1).getValues();
-  for (var i = 0; i < ids.length; i++)
-    if (String(ids[i][0]) === id) return i + 2;
-  return 0;
-}
+  /** The row a form is on now. Rows move up when a form above is deleted, so it is looked up for each write. */
+  function formRow_(sh, id) {
+    var last = sh.getLastRow();
+    if (last < 2) return 0;
+    var ids = sh.getRange(2, 1, last - 1, 1).getValues();
+    for (var i = 0; i < ids.length; i++)
+      if (String(ids[i][0]) === id) return i + 2;
+    return 0;
+  }
 
-/** Writes a form to its row, or to a new row when it has none. Call it inside withLock_. */
-function saveForm(form) {
-  form.updatedAt = Time.nowIso();
-  var sh = formsSheet();
-  var at = formRow_(sh, form.id);
-  if (at) Table.writeRow(sh, at, FORM_COLS, formToRow_(form));
-  else Table.appendPlain(sh, Table.rowValues(FORM_COLS, formToRow_(form)));
-  return form;
-}
+  /** Writes a form to its row, or to a new row when it has none. Call it inside withLock_. */
+  function saveForm(form) {
+    form.updatedAt = Time.nowIso();
+    var sh = formsSheet();
+    var at = formRow_(sh, form.id);
+    if (at) Table.writeRow(sh, at, FORM_COLS, formToRow_(form));
+    else Table.appendPlain(sh, Table.rowValues(FORM_COLS, formToRow_(form)));
+    return form;
+  }
 
-return { FORM_COLS, readForms, findForm, requireForm, saveForm, formsSheet, formRow: formRow_ };
+  return {
+    FORM_COLS,
+    readForms,
+    findForm,
+    requireForm,
+    saveForm,
+    formsSheet,
+    formRow: formRow_
+  };
 })();
