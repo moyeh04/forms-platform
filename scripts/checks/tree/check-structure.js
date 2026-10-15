@@ -2,7 +2,8 @@
  * Checks where files live: only the allowed entries at the root, no
  * catch-all names such as `utils`, every script and stylesheet a page loads
  * exists and every one is loaded, and FILE-STRUCTURE.md names every source
- * file. A finding about a folder names it with a trailing `/`. When the site
+ * file, and every folder of the tests is a folder of the sources. A finding
+ * about a folder names it with a trailing `/`. When the site
  * is published at other paths than its sources, the configured site map
  * turns each `src` back into its source path.
  */
@@ -10,6 +11,40 @@ const path = require('node:path');
 const { select, read } = require('../lib/files.js');
 
 const ASSET = /<(?:script|link)\b[^>]*\b(?:src|href)="([^"]+\.(?:js|css))"/g;
+
+/**
+ * Finds test folders that mirror no source folder. Node's test runner sets
+ * no layout, so a test sits at the path of the code it checks; only the
+ * test-only folders and the root of the tests, which holds the tests of the
+ * whole system, need no source folder.
+ *
+ * @param {!Array<string>} files Every tracked file.
+ * @param {{root: string, own: !Array<string>}} tests The tests folder and
+ *     the folders that exist only in it.
+ * @return {!Array<!Object>} One finding for each such folder.
+ */
+function testFindings(files, tests) {
+  const sources = new Set(
+    files
+      .filter((file) => !file.startsWith(tests.root))
+      .flatMap((file) => {
+        const parts = file.split('/').slice(0, -1);
+        return parts.map((_, i) => parts.slice(0, i + 1).join('/'));
+      })
+  );
+  const stray = new Set();
+  for (const file of files) {
+    if (!file.startsWith(tests.root)) continue;
+    const rel = file.slice(tests.root.length);
+    if (tests.own.some((dir) => rel.startsWith(dir))) continue;
+    const dir = path.posix.dirname(rel);
+    if (dir !== '.' && !sources.has(dir)) stray.add(`${tests.root}${dir}/`);
+  }
+  const message =
+    'mirrors no source folder; move each test to the path of ' +
+    'the code it checks';
+  return [...stray].map((dir) => finding(dir, 'tests', message));
+}
 
 /**
  * Makes one structure finding.
@@ -158,7 +193,8 @@ function check(root, files, config) {
     ...rootFindings(files, rules.root),
     ...nameFindings(files, rules.catchAllNames),
     ...pageFindings(root, files, rules),
-    ...documentedFindings(root, files, rules)
+    ...documentedFindings(root, files, rules),
+    ...testFindings(files, rules.tests)
   ];
 }
 
