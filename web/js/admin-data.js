@@ -49,7 +49,7 @@
       q: '',
       status: 'all',
       tab:
-        form.type === 'whatsapp_registration' &&
+        form.type === FormType.WHATSAPP_REGISTRATION &&
         form.matching &&
         form.matching.enabled
           ? 'matching'
@@ -313,7 +313,7 @@
     function paint() {
       ui.clear(content);
       if (
-        form.type === 'whatsapp_registration' &&
+        form.type === FormType.WHATSAPP_REGISTRATION &&
         form.matching &&
         form.matching.enabled
       ) {
@@ -380,9 +380,9 @@
               : 'No submissions yet. Share the form link to start collecting.'
           )
         );
-      if (form.type === 'reservation')
+      if (form.type === FormType.RESERVATION)
         content.appendChild(bookings(form, rows, reload));
-      else if (form.type === 'whatsapp_registration')
+      else if (form.type === FormType.WHATSAPP_REGISTRATION)
         content.appendChild(registrations(form, rows, reload));
       else content.appendChild(teams(form, rows, reload));
     }
@@ -434,7 +434,10 @@
         'Download CSV'
       )
     ];
-    if (form.type === 'team_registration' || form.type === 'task_submission') {
+    if (
+      form.type === FormType.TEAM_REGISTRATION ||
+      form.type === FormType.TASK_SUBMISSION
+    ) {
       tools.push(
         h(
           'button',
@@ -464,7 +467,7 @@
               }
             },
             icon('download', 18),
-            form.type === 'task_submission'
+            form.type === FormType.TASK_SUBMISSION
               ? 'Download all tasks'
               : 'Download all projects'
           )
@@ -472,7 +475,7 @@
     }
     // A day sheet needs a day: a reservation with no days yet has nothing to print.
     if (
-      form.type === 'reservation' &&
+      form.type === FormType.RESERVATION &&
       ((form.slots && form.slots.days) || []).length
     ) {
       var day = form.slots.days[0];
@@ -605,7 +608,7 @@
     ];
     (form.fields || []).forEach(function (f) {
       if (
-        form.type === 'reservation' &&
+        form.type === FormType.RESERVATION &&
         f.role === 'members' &&
         f.enabled === false
       )
@@ -804,7 +807,7 @@
     var sorted = rows.slice().sort(function (a, b) {
       return a.number - b.number;
     });
-    var third = form.type === 'task_submission' ? 'Task' : 'Project';
+    var third = form.type === FormType.TASK_SUBMISSION ? 'Task' : 'Project';
     var alerts = Rules.sizeAlerts(form),
       levels = Rules.sizeAlertLevels(alerts);
     return h(
@@ -1605,7 +1608,7 @@
     var lines = [head].concat(
       rows.map(function (s) {
         var members =
-          form.type === 'reservation'
+          form.type === FormType.RESERVATION
             ? Rules.fieldByRole(form, 'members').enabled !== false
               ? (s.data.members || [])
                   .map(function (member) {

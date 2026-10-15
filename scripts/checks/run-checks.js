@@ -18,13 +18,14 @@ const { formatFinding, printBlock } = require('./lib/report.js');
 const ROOT = path.resolve(__dirname, '..', '..');
 const CONFIG = require('./config.json');
 const CHECKS = [
-  require('./check-biome.js'),
-  require('./check-lines.js'),
-  require('./check-jsdoc.js'),
-  require('./check-numbers.js'),
-  require('./check-flags.js'),
-  require('./check-structure.js'),
-  require('./check-docs.js')
+  require('./code/check-biome.js'),
+  require('./code/check-lines.js'),
+  require('./code/check-jsdoc.js'),
+  require('./code/check-numbers.js'),
+  require('./code/check-flags.js'),
+  require('./code/check-enums.js'),
+  require('./tree/check-structure.js'),
+  require('./tree/check-docs.js')
 ];
 
 /**

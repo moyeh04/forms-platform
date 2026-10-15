@@ -7,7 +7,7 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const Module = require('node:module');
-const { select, read } = require('./lib/files.js');
+const { select, read } = require('../lib/files.js');
 
 const ROUTE = /\baction: '([A-Za-z.]+)',\s*access: Access\.([A-Z]+)/g;
 const SECTION = /^## (.*)$/;

@@ -2,7 +2,10 @@
 
 var TeamsService = (function () {
   function isTeamForm_(form) {
-    return form.type === 'team_registration' || form.type === 'task_submission';
+    return (
+      form.type === FormType.TEAM_REGISTRATION ||
+      form.type === FormType.TASK_SUBMISSION
+    );
   }
 
   function teamBlocks_(form) {
@@ -24,7 +27,7 @@ var TeamsService = (function () {
 
   /** "Task" or "Project": what the fourth column of a team list holds. */
   function teamThing_(form) {
-    return form.type === 'task_submission' ? 'Task' : 'Project';
+    return form.type === FormType.TASK_SUBMISSION ? 'Task' : 'Project';
   }
 
   return {

@@ -4,7 +4,7 @@
  * Suggestions Biome marks as "info" are left out.
  */
 const { spawnSync } = require('node:child_process');
-const { select } = require('./lib/files.js');
+const { select } = require('../lib/files.js');
 
 const BIOME = require.resolve('@biomejs/biome/bin/biome');
 const FILES_PER_CALL = 200;

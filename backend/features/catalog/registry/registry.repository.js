@@ -5,12 +5,12 @@
 
 var RegistryRepository = (function () {
   function registry() {
-    var id = Properties.getProp('REGISTRY_ID');
+    var id = Properties.getProp(Constants.PROPS.REGISTRY_ID);
     return id ? SpreadsheetApp.openById(id) : SpreadsheetApp.getActive();
   }
 
   function rootFolder() {
-    var id = Properties.getProp('ROOT_FOLDER_ID');
+    var id = Properties.getProp(Constants.PROPS.ROOT_FOLDER_ID);
     if (id) {
       try {
         return DriveApp.getFolderById(id);
@@ -19,7 +19,7 @@ var RegistryRepository = (function () {
       }
     }
     var f = DriveApp.createFolder('Forms Platform');
-    Properties.setProp('ROOT_FOLDER_ID', f.getId());
+    Properties.setProp(Constants.PROPS.ROOT_FOLDER_ID, f.getId());
     return f;
   }
 

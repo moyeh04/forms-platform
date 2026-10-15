@@ -4,7 +4,7 @@
  * the formatter leaves. A URL cannot be broken, so it does not count toward
  * the length of its line.
  */
-const { select, read } = require('./lib/files.js');
+const { select, read } = require('../lib/files.js');
 
 const URL = /https?:\/\/\S+/g;
 

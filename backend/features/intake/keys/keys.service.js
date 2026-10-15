@@ -71,7 +71,7 @@ var KeysService = (function () {
   function findByKey_(form, key, anyAge) {
     requireKeyEnabled_(form);
     var cache = CacheService.getScriptCache();
-    var tag = 'badkey:' + form.id;
+    var tag = Constants.CACHE.BAD_KEY_PREFIX + form.id;
     var fails = parseInt(cache.get(tag) || '0', 10);
     if (fails >= 10)
       ApiError.fail(

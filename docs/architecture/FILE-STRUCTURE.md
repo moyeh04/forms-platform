@@ -159,6 +159,7 @@ The site is published at the paths it has always had: the pages at the root,
 | `web/js/admin-lists.js` | The lists behind dropdown questions, each edited the way its kind needs. |
 | `web/js/size-alerts.js` | The warnings about small teams as they are drawn: a line for each level and a mark on the card of a small team. Used by the dashboard and the instructor page. |
 | `web/js/viewer.js` | The instructor page. |
+| `domain/enums.js` | The words the pages and the backend share, as frozen enums of stored values: `FormType`, `FormStatus`, `ReviewStatus` and `ListKind`. Loaded before the other domain files. |
 | `domain/form-metadata.js` | What each form type shows beside its title (term, subject code, batch year) and how it is read, saved and copied. Used by the pages and the backend. |
 | `domain/rules.js` | Validation and normalization rules (Arabic names, phones, codes, Drive links, team size, slots). Used by the browser, the backend, and the tests, so all three always agree. |
 
@@ -184,18 +185,19 @@ the file name says the role:
 
 | File | What it does |
 |---|---|
-| `backend/platform/http/access.js` | Who may call an action: the admin, a private link, the holder of a registration key, or anyone. |
 | `backend/platform/http/api-error.js` | The error every handler throws and the JSON reply the web app sends. |
 | `backend/platform/http/router.js` | Finds the handler of each request in the routes table, runs the admin or link check its access asks for, and turns what it returns or throws into the reply. |
 | `backend/platform/sheets/table.js` | Reading and writing the rows of a sheet tab by its header names. |
 | `backend/platform/sheets/lock.js` | The script lock every write runs under, safe to nest. |
+| `backend/platform/sheets/cell.js` | Yes/no values as the sheets store them: `readFlag` and `writeFlag`, the only code that reads or writes the stored `'1'` and `'0'`. |
 | `backend/platform/sheets/sheet-style.js` | The look of the data tabs and the registry tabs: row colours, widths and frozen headers. |
 | `backend/platform/security/crypto.js` | Ids, random digits, SHA-256 and the sealing of short digit strings. |
 | `backend/platform/security/properties.js` | Script properties, including the secret pepper of every hash. |
 | `backend/platform/format/text.js` | Turning text into link names and into safe HTML. |
 | `backend/platform/format/time.js` | The current time and date as ISO text. |
 | `backend/platform/format/json.js` | Copying values and reading JSON text safely. |
-| `backend/platform/config/constants.js` | The name of the app, the registry tab names, and the form types and statuses. |
+| `backend/platform/config/constants.js` | The name of the app, the registry tab names, and the names of the script properties and cache keys. |
+| `backend/platform/config/access.js` | Who may call an action: the admin, a private link, the holder of a registration key, or anyone. |
 | `backend/platform/xlsx/xml.js` | The XML pieces of an Excel file: escaped text, column letters and colours. |
 | `backend/platform/xlsx/workbook.js` | An Excel workbook built by hand: styles, column widths, sheets and the zipped file. |
 
@@ -280,8 +282,8 @@ the file name says the role:
 | `backend/entry-points.js` | The functions Apps Script calls by name (the sheet menu, its print dialog, setup, the PIN commands and the view trigger), each handing the call to its namespace. |
 | `backend/main.js` | The web app: every request arrives here, is read as JSON, and goes to the router. |
 
-`npm run build` joins `domain/rules.js`, `domain/form-metadata.js` and every
-backend file into `dist/Code.gs`: `platform/` first, then `features/`, then
+`npm run build` joins `domain/enums.js`, `domain/rules.js`,
+`domain/form-metadata.js` and every backend file into `dist/Code.gs`: `platform/` first, then `features/`, then
 `routes.js`, `entry-points.js` and `main.js`.
 
 ## Tools and tests
@@ -293,13 +295,14 @@ backend file into `dist/Code.gs`: `platform/` first, then `features/`, then
 | `scripts/checks/run-checks.js`, `.githooks/pre-commit`, `.githooks/pre-push` | Runs every check, on the staged files before each commit (`--staged`) or on the whole tree before each push and in CI (`--all`, `npm run check`), and the git hooks that call it. `npm install` points git at `.githooks`. [CHECKS.md](../standards/CHECKS.md) lists the checks. |
 | `scripts/checks/config.json`, `baseline.json`, `exceptions.json` | What each check covers and its limits; the findings old files may still have, which may only go down; and the paths allowed to break a structure rule, each with its reason. |
 | `scripts/checks/lib/` | `files.js` (which files a run looks at), `parse.js` (acorn with comments), `jsdoc.js` (reads a JSDoc comment into its summary and tags), `baseline.js`, `exceptions.js`, `report.js`. |
-| `scripts/checks/check-biome.js` | Runs Biome on the files of a run and turns what it reports into findings. |
-| `scripts/checks/check-lines.js` | No line wider than 80 columns, URLs not counted. |
-| `scripts/checks/check-jsdoc.js` | Every named function has a Google-style JSDoc comment whose tags match its parameters and return, with no metadata tags. |
-| `scripts/checks/check-numbers.js` | Every number that initialises something, which Biome skips, is held by a CONSTANT_CASE name. |
-| `scripts/checks/check-flags.js` | Yes/no values are compared and written as `'1'`/`'0'` only in a row codec. |
-| `scripts/checks/check-structure.js` | The structure rules above. |
-| `scripts/checks/check-docs.js` | [API.md](../backend/API.md) names exactly the actions the backend has, [TESTING.md](../process/TESTING.md) gives the real number of tests, and no Markdown link points at a file that is gone. |
+| `scripts/checks/code/check-biome.js` | Runs Biome on the files of a run and turns what it reports into findings. |
+| `scripts/checks/code/check-lines.js` | No line wider than 80 columns, URLs not counted. |
+| `scripts/checks/code/check-jsdoc.js` | Every named function has a Google-style JSDoc comment whose tags match its parameters and return, with no metadata tags. |
+| `scripts/checks/code/check-numbers.js` | Every number that initialises something, which Biome skips, is held by a CONSTANT_CASE name. |
+| `scripts/checks/code/check-enums.js` | The values of a shared enum are written as its members where they are compared with the property the enum names. |
+| `scripts/checks/code/check-flags.js` | Yes/no values are compared and written as `'1'`/`'0'` only in `backend/platform/sheets/cell.js`. |
+| `scripts/checks/tree/check-structure.js` | The structure rules above. |
+| `scripts/checks/tree/check-docs.js` | [API.md](../backend/API.md) names exactly the actions the backend has, [TESTING.md](../process/TESTING.md) gives the real number of tests, and no Markdown link points at a file that is gone. |
 | `scripts/deploy/prepare-clasp.js` | Checks the deployment variables of the workflow and writes the clasp configuration git ignores. |
 | `scripts/deploy/backend-changed.js` | Tells the workflow whether a push changed a backend file, so a push of pages or documents alone does not deploy the backend. |
 | `scripts/deploy/setup-deployment.js` | First deployment from your computer (`npm run setup`): creates the sheet and its script, pushes the bundle, creates the web app, and stores the IDs, the credential and the Pages setting in GitHub. |
@@ -311,7 +314,7 @@ backend file into `dist/Code.gs`: `platform/` first, then `features/`, then
 
 ## Structure rules
 
-`scripts/checks/check-structure.js` checks these on the whole tree; the
+`scripts/checks/tree/check-structure.js` checks these on the whole tree; the
 paths and limits are under `structure` in `scripts/checks/config.json`.
 
 | Rule | What it means |

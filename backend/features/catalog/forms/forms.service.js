@@ -68,7 +68,7 @@ var FormsService = (function () {
   }
 
   function createForm(o, adjust) {
-    if (Constants.FORM_TYPES.indexOf(o.type) === -1)
+    if (Object.values(FormType).indexOf(o.type) === -1)
       ApiError.fail('unknown_type', 'Unknown form type.');
     var title = String(o.title || '').trim();
     if (!title) ApiError.fail('title_required', 'Give the form a title.');
@@ -121,7 +121,7 @@ var FormsService = (function () {
     FormMetadata.update(form, patch);
     PATCHABLE_.forEach(function (k) {
       if (patch[k] === undefined) return;
-      if (k === 'status' && Constants.FORM_STATUSES.indexOf(patch[k]) === -1)
+      if (k === 'status' && Object.values(FormStatus).indexOf(patch[k]) === -1)
         ApiError.fail(
           'bad_status',
           'Status must be draft, open, closed, or archived.'
@@ -196,7 +196,7 @@ var FormsService = (function () {
     }
     try {
       PropertiesService.getScriptProperties().deleteProperty(
-        'dirty:' + form.id
+        Constants.PROPS.DIRTY_PREFIX + form.id
       );
     } catch (e) {
       /* nothing to clean */

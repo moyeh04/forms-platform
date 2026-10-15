@@ -1,6 +1,8 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { checkSource } = require('../../../scripts/checks/check-jsdoc.js');
+const {
+  checkSource
+} = require('../../../../scripts/checks/code/check-jsdoc.js');
 
 const FORBIDDEN = ['author', 'date', 'version'];
 const problems = (source) =>

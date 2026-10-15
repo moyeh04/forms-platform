@@ -26,7 +26,7 @@ var SheetViewsScheduler = (function () {
 
   /** Marks a form's views as out of date, with the time, and makes sure a run is booked. */
   function refreshViews(form) {
-    Properties.setProp('dirty:' + form.id, Time.nowIso());
+    Properties.setProp(Constants.PROPS.DIRTY_PREFIX + form.id, Time.nowIso());
     bookViewRun_();
   }
 
@@ -39,7 +39,7 @@ var SheetViewsScheduler = (function () {
   /** Books one run of processDirtyViews. The cache note saves looking at the triggers on every change. */
   function bookViewRun_() {
     var cache = CacheService.getScriptCache();
-    if (cache.get('views_booked')) return;
+    if (cache.get(Constants.CACHE.VIEWS_BOOKED)) return;
     Lock.withLock(function () {
       if (!viewRunBooked_())
         ScriptApp.newTrigger('processDirtyViews')
@@ -47,7 +47,7 @@ var SheetViewsScheduler = (function () {
           .after(VIEW_DELAY_MS_)
           .create();
     });
-    cache.put('views_booked', '1', 300);
+    cache.put(Constants.CACHE.VIEWS_BOOKED, '1', 300);
   }
 
   /**
@@ -60,7 +60,7 @@ var SheetViewsScheduler = (function () {
       if (t.getHandlerFunction() === 'processDirtyViews')
         ScriptApp.deleteTrigger(t);
     });
-    CacheService.getScriptCache().remove('views_booked');
+    CacheService.getScriptCache().remove(Constants.CACHE.VIEWS_BOOKED);
     var store = PropertiesService.getScriptProperties();
     var marks = store.getProperties();
     var forms = {};
@@ -70,8 +70,8 @@ var SheetViewsScheduler = (function () {
     var started = Date.now(),
       again = false;
     Object.keys(marks).forEach(function (k) {
-      if (k.indexOf('dirty:') !== 0) return;
-      var form = forms[k.slice(6)];
+      if (k.indexOf(Constants.PROPS.DIRTY_PREFIX) !== 0) return;
+      var form = forms[k.slice(Constants.PROPS.DIRTY_PREFIX.length)];
       if (!form) {
         store.deleteProperty(k);
         return;

@@ -78,7 +78,9 @@ var ListsController = (function () {
     var info = ListsRepository.readListInfo();
     var name = freeListName_(req.name, lists, info);
     var kind =
-      ListsRepository.LIST_KINDS.indexOf(req.kind) === -1 ? 'plain' : req.kind;
+      Object.values(ListKind).indexOf(req.kind) === -1
+        ? ListKind.PLAIN
+        : req.kind;
     var base =
       name
         .toLowerCase()

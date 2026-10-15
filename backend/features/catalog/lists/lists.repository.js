@@ -8,16 +8,14 @@ var ListsRepository = (function () {
    */
   var LIST_INFO_KEY_ = '_info';
 
-  var LIST_KINDS_ = ['sections', 'numbers', 'named', 'plain'];
-
   /** The kind of each built-in list; a list an admin made has its kind in `_info`. */
   var BUILTIN_LIST_KINDS_ = {
-    levels: 'named',
-    curricula: 'plain',
-    majors: 'named',
-    sections: 'sections',
-    groups: 'plain',
-    wa_sections: 'numbers'
+    levels: ListKind.NAMED,
+    curricula: ListKind.PLAIN,
+    majors: ListKind.NAMED,
+    sections: ListKind.SECTIONS,
+    groups: ListKind.PLAIN,
+    wa_sections: ListKind.NUMBERS
   };
 
   var BUILTIN_LIST_NAMES_ = {
@@ -111,7 +109,6 @@ var ListsRepository = (function () {
     listKind: listKind_,
     BUILTIN_LIST_NAMES: BUILTIN_LIST_NAMES_,
     saveList,
-    LIST_KINDS: LIST_KINDS_,
     BUILTIN_LIST_KINDS: BUILTIN_LIST_KINDS_,
     saveListInfo: saveListInfo_,
     formsUsingList: formsUsingList_,

@@ -71,7 +71,19 @@
   "flags": {
     "include": ["web/js/", "backend/", "domain/"],
     "extensions": [".js"],
-    "exclude": []
+    "exclude": ["backend/platform/sheets/cell.js"]
+  },
+  "enums": {
+    "include": ["web/js/", "backend/", "domain/"],
+    "extensions": [".js"],
+    "exclude": ["domain/enums.js"],
+    "source": "domain/enums.js",
+    "properties": {
+      "type": "FormType",
+      "status": "FormStatus",
+      "review": "ReviewStatus",
+      "kind": "ListKind"
+    }
   },
   "structure": {
     "root": [

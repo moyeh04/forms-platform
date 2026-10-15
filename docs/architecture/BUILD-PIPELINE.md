@@ -86,8 +86,9 @@ flowchart TD
 
 ### Step by step
 
-1. **List the files.** `domain/rules.js` and `domain/form-metadata.js` go
-   first so the globals `Rules` and `FormMetadata` exist. Every `.js` file
+1. **List the files.** `domain/enums.js`, `domain/rules.js` and
+   `domain/form-metadata.js` go first (`DOMAIN_FIRST` in the bundler) so the
+   enums and the globals `Rules` and `FormMetadata` exist. Every `.js` file
    under `backend/` follows: `platform/` first, then `features/`, each in
    alphabetical order of its path, then `routes.js`, `entry-points.js` and
    `main.js` (`rankOf` in the bundler).
@@ -108,10 +109,10 @@ flowchart TD
 Typical output:
 
 ```
-Bundled 70 files into dist/Code.gs (253843 chars).
+Bundled 74 files into dist/Code.gs (278807 chars).
 ```
 
-70 = the two shared files + 68 backend files.
+74 = the three domain files + 71 backend files.
 
 ## Why joining files is safe
 

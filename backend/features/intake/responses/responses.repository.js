@@ -64,7 +64,7 @@ var ResponsesRepository = (function () {
       data: Json.parseJson(r.data, {}),
       keyHash: String(r.keyHash),
       keyExpires: String(r.keyExpires),
-      deleted: String(r.deleted) === '1',
+      deleted: Cell.readFlag(r.deleted, false),
       keySeal: String(r.keySeal || ''),
       number: parseInt(r.number, 10) || 0
     };
@@ -85,7 +85,7 @@ var ResponsesRepository = (function () {
     var o = Json.clone(r);
     o.review = JSON.stringify(r.review || {});
     o.data = JSON.stringify(r.data || {});
-    o.deleted = r.deleted ? '1' : '';
+    o.deleted = Cell.writeFlag(r.deleted, '');
     o.number = r.number ? String(r.number) : '';
     return o;
   }

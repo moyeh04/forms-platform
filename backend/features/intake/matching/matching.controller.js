@@ -55,7 +55,7 @@ var MatchingController = (function () {
               p.phone,
               label,
               Time.nowIso(),
-              'pending',
+              ReviewStatus.PENDING,
               ''
             ]);
             added++;
@@ -121,7 +121,7 @@ var MatchingController = (function () {
     var form = FormsRepository.requireForm(req.slug || req.id);
     requireMatching_(form);
     var decision = String(req.decision);
-    if (ResponsesReview.REVIEW_STATUSES.indexOf(decision) === -1)
+    if (Object.values(ReviewStatus).indexOf(decision) === -1)
       ApiError.fail(
         'bad_status',
         'Decision must be pending, approved, or rejected.'

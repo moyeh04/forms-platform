@@ -9,7 +9,7 @@ var PrintController = (function () {
    */
   function reservations(req) {
     var form = FormsRepository.requireForm(req.slug || req.id);
-    if (form.type !== 'reservation')
+    if (form.type !== FormType.RESERVATION)
       ApiError.fail('wrong_type', 'Only reservation forms have days to print.');
     return PrintService.printResult(
       form,

@@ -28,13 +28,13 @@ var ClientsRepository = (function () {
       tokenHash: String(r.tokenHash),
       forms: Json.parseJson(r.forms, []),
       hiddenColumns: Json.parseJson(r.hiddenColumns, []),
-      canReview: String(r.canReview) === '1',
-      active: String(r.active) !== '0',
+      canReview: Cell.readFlag(r.canReview, false),
+      active: Cell.readFlag(r.active, true),
       createdAt: String(r.createdAt),
       keyHash: String(r.keyHash || ''),
       keySeal: String(r.keySeal || ''),
       expires: String(r.expires || ''),
-      showSizeAlerts: String(r.showSizeAlerts) !== '0'
+      showSizeAlerts: Cell.readFlag(r.showSizeAlerts, true)
     };
   }
 
@@ -95,13 +95,13 @@ var ClientsRepository = (function () {
       tokenHash: c.tokenHash,
       forms: JSON.stringify(c.forms),
       hiddenColumns: JSON.stringify(c.hiddenColumns),
-      canReview: c.canReview ? '1' : '0',
-      active: c.active ? '1' : '0',
+      canReview: Cell.writeFlag(c.canReview, '0'),
+      active: Cell.writeFlag(c.active, '0'),
       createdAt: c.createdAt,
       keyHash: c.keyHash || '',
       keySeal: c.keySeal || '',
       expires: c.expires || '',
-      showSizeAlerts: c.showSizeAlerts === false ? '0' : '1'
+      showSizeAlerts: Cell.writeFlag(c.showSizeAlerts !== false, '0')
     };
   }
 

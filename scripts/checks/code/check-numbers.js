@@ -7,8 +7,8 @@
  * and their negatives) are allowed here too.
  */
 const walk = require('acorn-walk');
-const { select, read } = require('./lib/files.js');
-const { parse } = require('./lib/parse.js');
+const { select, read } = require('../lib/files.js');
+const { parse } = require('../lib/parse.js');
 
 const CONSTANT = /^[A-Z][A-Z0-9_]*$/;
 const IGNORE = 'biome-ignore lint/style/noMagicNumbers';

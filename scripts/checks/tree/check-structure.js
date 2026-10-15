@@ -8,7 +8,7 @@
  * its source path.
  */
 const path = require('node:path');
-const { select, read } = require('./lib/files.js');
+const { select, read } = require('../lib/files.js');
 
 const ASSET = /<(?:script|link)\b[^>]*\b(?:src|href)="([^"]+\.(?:js|css))"/g;
 

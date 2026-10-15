@@ -479,7 +479,7 @@
    */
   A.formTabs = function (form, active, pick, alerts) {
     var ids = A.FORM_TABS.filter(function (id) {
-      return id !== 'timetable' || form.type === 'reservation';
+      return id !== 'timetable' || form.type === FormType.RESERVATION;
     });
     return h(
       'nav',
@@ -1011,7 +1011,7 @@
         { class: 'actions' },
         A.badge(A.STATUS_LABEL[f.status] || f.status, f.status),
         h('span', { class: 'muted-note' }, t.label),
-        f.type === 'reservation' ? daysNote(f) : null
+        f.type === FormType.RESERVATION ? daysNote(f) : null
       ),
       h(
         'div',
@@ -1051,14 +1051,21 @@
 
   /** A form that gives its students a key can have bookings that are opened with that key. */
   function issuesKeys(f) {
-    return f.type !== 'reservation' && !!(f.editKey && f.editKey.enabled);
+    return (
+      f.type !== FormType.RESERVATION && !!(f.editKey && f.editKey.enabled)
+    );
   }
   /** The first booking is offered where teams are: a team or a task form. */
   function hasTeams(f) {
-    return f.type === 'team_registration' || f.type === 'task_submission';
+    return (
+      f.type === FormType.TEAM_REGISTRATION ||
+      f.type === FormType.TASK_SUBMISSION
+    );
   }
   function bookedBy(f) {
-    return f.type === 'reservation' && f.keyBooking && f.keyBooking.enabled
+    return f.type === FormType.RESERVATION &&
+      f.keyBooking &&
+      f.keyBooking.enabled
       ? f.keyBooking.source
       : '';
   }

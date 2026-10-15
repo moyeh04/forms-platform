@@ -15,7 +15,7 @@ var KeyBookingService = (function () {
     var enabled = !!(next && next.enabled);
     var source = String((next && next.source) || '');
     if (!enabled) return { enabled: false, source: source };
-    if (form.type !== 'reservation')
+    if (form.type !== FormType.RESERVATION)
       ApiError.fail(
         'bad_key_booking',
         'Only a reservation form can be booked with a key.'
@@ -34,7 +34,7 @@ var KeyBookingService = (function () {
   /** The form whose keys open this reservation, or null when it is filled in by hand. */
   function keyBookingSource_(form) {
     var kb = form.keyBooking;
-    if (form.type !== 'reservation' || !kb || !kb.enabled || !kb.source)
+    if (form.type !== FormType.RESERVATION || !kb || !kb.enabled || !kb.source)
       return null;
     var source = FormsRepository.findForm(kb.source);
     return source && source.id !== form.id ? source : null;
@@ -117,7 +117,7 @@ var KeyBookingService = (function () {
   /** True for a form whose keys can book: it issues keys and asks for a code. */
   function issuesKeys_(f) {
     return (
-      f.type !== 'reservation' &&
+      f.type !== FormType.RESERVATION &&
       !!(f.editKey && f.editKey.enabled) &&
       !!Rules.fieldByRole(f, 'code')
     );
@@ -128,7 +128,7 @@ var KeyBookingService = (function () {
     return FormsRepository.readForms()
       .filter(function (f) {
         return (
-          f.type === 'reservation' &&
+          f.type === FormType.RESERVATION &&
           f.keyBooking &&
           f.keyBooking.enabled &&
           f.keyBooking.source === source.id

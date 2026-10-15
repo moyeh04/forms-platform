@@ -1,6 +1,8 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { checkSource } = require('../../../scripts/checks/check-flags.js');
+const {
+  checkSource
+} = require('../../../../scripts/checks/code/check-flags.js');
 
 const problems = (source) =>
   checkSource('a.js', source).map((f) => `${f.line} ${f.message}`);
@@ -11,7 +13,7 @@ const a = String(row.done) === '1';
 const b = '0' !== row.active;
 const c = { done: item.done ? '1' : '0', gone: item.gone ? '1' : '' };
 `;
-  const rest = "; only a row codec may read or write '1'/'0'";
+  const rest = '; use Cell.readFlag or Cell.writeFlag';
   assert.deepEqual(problems(source), [
     `2 a field compared with a flag string${rest}`,
     `3 a field compared with a flag string${rest}`,

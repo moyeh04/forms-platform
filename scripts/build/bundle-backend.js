@@ -31,6 +31,16 @@ const BACKEND_ORDER = ['platform/', 'features/'];
 const BACKEND_LAST = ['routes.js', 'entry-points.js', 'main.js'];
 
 /**
+ * The domain files, which the browser loads too, in the order they come
+ * before the backend: the enums first, since the others read them.
+ */
+const DOMAIN_FIRST = [
+  'domain/enums.js',
+  'domain/rules.js',
+  'domain/form-metadata.js'
+];
+
+/**
  * Ranks a backend file for the bundle: platform code first, then the
  * features, then any other file at the top of backend/, then the action
  * table, the entry points and main.js.
@@ -62,11 +72,7 @@ function listBackend() {
 }
 
 function bundleSource() {
-  const files = [];
-  if (fs.existsSync(path.join(root, 'domain', 'rules.js')))
-    files.push('domain/rules.js');
-  if (fs.existsSync(path.join(root, 'domain', 'form-metadata.js')))
-    files.push('domain/form-metadata.js');
+  const files = DOMAIN_FIRST.filter((f) => fs.existsSync(path.join(root, f)));
   files.push(...listBackend());
 
   const parts = files.map(

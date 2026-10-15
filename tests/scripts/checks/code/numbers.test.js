@@ -1,6 +1,8 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { checkSource } = require('../../../scripts/checks/check-numbers.js');
+const {
+  checkSource
+} = require('../../../../scripts/checks/code/check-numbers.js');
 
 const ALLOWED = [0, 1, 2, 10, 24, 60];
 const problems = (source) =>

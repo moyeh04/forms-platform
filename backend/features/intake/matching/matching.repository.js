@@ -29,7 +29,7 @@ var MatchingRepository = (function () {
           phone: String(r.phone),
           label: String(r.label),
           added: String(r.added),
-          decision: String(r.decision || 'pending'),
+          decision: String(r.decision || ReviewStatus.PENDING),
           note: String(r.note)
         };
       }

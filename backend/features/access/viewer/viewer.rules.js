@@ -34,9 +34,9 @@ var ViewerRules = (function () {
   };
 
   function viewKind_(form) {
-    return form.type === 'reservation'
+    return form.type === FormType.RESERVATION
       ? 'reservation'
-      : form.type === 'whatsapp_registration'
+      : form.type === FormType.WHATSAPP_REGISTRATION
         ? 'whatsapp'
         : 'team';
   }
@@ -63,8 +63,8 @@ var ViewerRules = (function () {
   function viewerForms_(client) {
     return FormsRepository.readForms().filter(function (f) {
       return (
-        f.status !== 'draft' &&
-        f.status !== 'archived' &&
+        f.status !== FormStatus.DRAFT &&
+        f.status !== FormStatus.ARCHIVED &&
         ClientsAccess.clientAllows(client, f)
       );
     });

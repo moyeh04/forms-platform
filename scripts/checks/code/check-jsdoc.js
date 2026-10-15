@@ -6,9 +6,9 @@
  * so is one in an object literal passed straight to a call.
  */
 const walk = require('acorn-walk');
-const { select, read } = require('./lib/files.js');
-const { parse } = require('./lib/parse.js');
-const { readDoc } = require('./lib/jsdoc.js');
+const { select, read } = require('../lib/files.js');
+const { parse } = require('../lib/parse.js');
+const { readDoc } = require('../lib/jsdoc.js');
 
 const FUNCTION = /^(FunctionDeclaration|FunctionExpression|Arrow)/;
 

@@ -98,7 +98,9 @@ var ClientsController = (function () {
     var key = req.on === false ? '' : ClientsService.newClientKey();
     return ClientsRepository.changeClient(req.id, function (c) {
       ClientsService.setClientKey(c, key);
-      CacheService.getScriptCache().remove('client_key:' + c.id);
+      CacheService.getScriptCache().remove(
+        Constants.CACHE.CLIENT_KEY_PREFIX + c.id
+      );
       return { client: ClientsService.publicClient(c), accessKey: key };
     });
   }
