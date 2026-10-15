@@ -5,6 +5,23 @@
     "api": "docs/backend/API.md",
     "testing": "docs/process/TESTING.md",
     "tests": "tests",
-    "backend": { "include": ["backend/"], "extensions": [".gs", ".js"] }
+    "backend": {
+      "include": ["backend/"],
+      "extensions": [".gs", ".js"]
+    }
+  },
+  "biome": {
+    "include": [
+      "assets/js/",
+      "assets/css/",
+      "backend/",
+      "shared/",
+      "scripts/",
+      "tests/",
+      "package.json",
+      "biome.json"
+    ],
+    "extensions": [".js", ".css", ".json"],
+    "exclude": ["tests/fixtures/"]
   }
 }

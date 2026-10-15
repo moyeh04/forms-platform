@@ -27,11 +27,12 @@ The git hook `.githooks/pre-commit` runs the staged form before every commit.
    never raises a count; a higher count can only come from editing the file
    by hand, which a reviewer sees.
 
-All paths, limits and lists of the checks are in `scripts/checks/config.json`,
-not in the code.
+Every path a check covers and every limit a rule sets is in
+`scripts/checks/config.json`, not in the code.
 
 ## The checks
 
 | Check | Refuses | Fix |
 |---|---|---|
+| `check-biome.js` | anything Biome reports above "info" on the JavaScript, CSS and JSON files: layout (`biome/format`), lint rules, the size limits and unnamed numbers of [CODING_STYLE.md](CODING_STYLE.md) | `npx biome format --write <file>` for layout; otherwise change the code, or silence one line with `// biome-ignore <rule>: <reason>` |
 | `check-docs.js` | an action of the backend with no row in [API.md](../backend/API.md), or a row with no action; a total or a row of [TESTING.md](../process/TESTING.md) that does not match the tests in `tests/` and its sub-folders; a Markdown link to a file that does not exist | correct the document in the same commit as the code |
