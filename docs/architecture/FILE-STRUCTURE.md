@@ -183,9 +183,10 @@ no validation.
 | `scripts/bundle-backend.js` | The bundler. |
 | `scripts/checks/run-checks.js`, `.githooks/pre-commit` | Runs every check, on the staged files before each commit (`--staged`) or on the whole tree (`--all`, `npm run check`), and the git hook that calls it. `npm install` points git at `.githooks`. [CHECKS.md](../standards/CHECKS.md) lists the checks. |
 | `scripts/checks/config.json`, `baseline.json`, `exceptions.json` | What each check covers and its limits; the findings old files may still have, which may only go down; and the paths allowed to break a structure rule, each with its reason. |
-| `scripts/checks/lib/` | `files.js` (which files a run looks at), `parse.js` (acorn with comments), `baseline.js`, `exceptions.js`, `report.js`. |
+| `scripts/checks/lib/` | `files.js` (which files a run looks at), `parse.js` (acorn with comments), `jsdoc.js` (reads a JSDoc comment into its summary and tags), `baseline.js`, `exceptions.js`, `report.js`. |
 | `scripts/checks/check-biome.js` | Runs Biome on the files of a run and turns what it reports into findings. |
 | `scripts/checks/check-lines.js` | No line wider than 80 columns, URLs not counted. |
+| `scripts/checks/check-jsdoc.js` | Every named function has a Google-style JSDoc comment whose tags match its parameters and return, with no metadata tags. |
 | `scripts/checks/check-docs.js` | [API.md](../backend/API.md) names exactly the actions the backend has, [TESTING.md](../process/TESTING.md) gives the real number of tests, and no Markdown link points at a file that is gone. |
 | `scripts/backend-changed.js` | Tells the workflow whether a push changed a backend file, so a push of pages or documents alone does not deploy the backend. |
 | `scripts/setup-deployment.js` | First deployment from your computer (`npm run setup`): creates the sheet and its script, pushes the bundle, creates the web app, and stores the IDs, the credential and the Pages setting in GitHub. |

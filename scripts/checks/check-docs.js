@@ -66,6 +66,30 @@ function apiFindings(root, files, config) {
 }
 
 /**
+ * Makes a stand-in for node:test that counts calls to it and runs nothing.
+ *
+ * @param {function()} count Called once for each test.
+ * @return {!Function} The stand-in.
+ */
+function standInForTest(count) {
+  return new Proxy(count, { get: () => () => {} });
+}
+
+/**
+ * Wraps Node's module loader so one module name loads a given value instead.
+ *
+ * @param {!Function} load Node's own `Module._load`.
+ * @param {string} name The module to replace.
+ * @param {*} value What `require(name)` returns.
+ * @return {!Function} The wrapped loader.
+ */
+function loaderWith(load, name, value) {
+  return function (request, ...rest) {
+    return request === name ? value : load.call(this, request, ...rest);
+  };
+}
+
+/**
  * Counts the tests each test file defines. The files are loaded with a
  * stand-in for node:test that counts calls and runs nothing, so a test made
  * in a loop counts too.
@@ -82,17 +106,10 @@ function testCounts(dir) {
   const counts = {};
   const load = Module._load;
   let current = '';
-  const counter = new Proxy(
-    () => {
-      counts[current]++;
-    },
-    { get: () => () => {} }
-  );
-  Module._load = function (request, ...rest) {
-    return request === 'node:test'
-      ? counter
-      : load.call(this, request, ...rest);
-  };
+  const counter = standInForTest(() => {
+    counts[current]++;
+  });
+  Module._load = loaderWith(load, 'node:test', counter);
   try {
     for (const file of files) {
       current = file;

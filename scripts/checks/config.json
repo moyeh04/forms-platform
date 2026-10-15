@@ -42,5 +42,22 @@
     ],
     "extensions": [".js", ".gs", ".css", ".html", ".sh", ".yml", ".json", ""],
     "exclude": ["tests/fixtures/", "package-lock.json"]
+  },
+  "jsdoc": {
+    "include": ["assets/js/", "backend/", "shared/", "scripts/"],
+    "extensions": [".js", ".gs"],
+    "exclude": ["assets/js/config.js"],
+    "forbiddenTags": [
+      "author",
+      "date",
+      "since",
+      "version",
+      "copyright",
+      "license",
+      "created",
+      "modified",
+      "file",
+      "fileoverview"
+    ]
   }
 }

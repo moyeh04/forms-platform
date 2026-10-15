@@ -20,6 +20,7 @@ const CONFIG = require('./config.json');
 const CHECKS = [
   require('./check-biome.js'),
   require('./check-lines.js'),
+  require('./check-jsdoc.js'),
   require('./check-docs.js')
 ];
 
