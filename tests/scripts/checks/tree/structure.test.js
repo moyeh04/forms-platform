@@ -7,12 +7,13 @@ const structure = require('../../../../scripts/checks/tree/check-structure.js');
 
 const CONFIG = {
   structure: {
-    root: ['README.md', 'web', 'docs'],
+    root: ['README.md', 'web', 'docs', 'tests'],
     catchAllNames: ['utils', 'helpers'],
     pages: ['web/index.html'],
     loaded: { include: ['web/js/'], extensions: ['.js'] },
     fileStructure: 'docs/FILES.md',
-    documented: { include: ['web/js/'], extensions: ['.js'] }
+    documented: { include: ['web/js/'], extensions: ['.js'] },
+    tests: { root: 'tests/', own: ['harness/'] }
   }
 };
 
@@ -36,7 +37,10 @@ test('Structure check: a tree that keeps every rule passes', () => {
     'README.md': '',
     'web/index.html': '<script src="js/app.js"></script>\n',
     'web/js/app.js': '',
-    'docs/FILES.md': '| `web/js/app.js` | The app. |'
+    'docs/FILES.md': '| `web/js/app.js` | The app. |',
+    'tests/web/js/app.test.js': '',
+    'tests/system.test.js': '',
+    'tests/harness/world.js': ''
   });
   assert.deepEqual(found(tree), []);
 });
@@ -50,10 +54,12 @@ test('Structure check: each broken rule is found where it is', () => {
     'web/js/b.js': '',
     'web/js/utils.js': '',
     'web/helpers/c.js': '',
-    'docs/FILES.md': 'Names `a.js`, `b.js` and `utils.js`.'
+    'docs/FILES.md': 'Names `a.js`, `b.js` and `utils.js`.',
+    'tests/pages/app.test.js': ''
   });
   assert.deepEqual(found(tree).sort(), [
     'notes.txt:0 structure/root',
+    'tests/pages/:0 structure/tests',
     'web/helpers/:0 structure/name',
     'web/index.html:2 structure/pages',
     'web/js/a.js:0 structure/pages',

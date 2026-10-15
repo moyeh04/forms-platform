@@ -378,34 +378,30 @@
     "lines": 12,
     "numbers": 4
   },
-  "tests/admin-ui.test.js": {
+  "tests/web/admin.test.js": {
     "lines": 65
   },
-  "tests/contrast.test.js": {
+  "tests/web/css/theme.test.js": {
     "lines": 3
   },
-  "tests/core.test.js": {
-    "lines": 7
+  "tests/backend/features/catalog/forms/forms.test.js": {
+    "lines": 5
   },
-  "tests/deployment.test.js": {
-    "biome/lint/correctness/noUnusedFunctionParameters": 1,
-    "lines": 15
-  },
-  "tests/download.test.js": {
+  "tests/backend/features/outputs/downloads/downloads.test.js": {
     "biome/lint/suspicious/noAssignInExpressions": 1,
     "lines": 7
   },
-  "tests/form-ui.test.js": {
+  "tests/web/index.test.js": {
     "lines": 40
   },
-  "tests/fresh.test.js": {
+  "tests/web/js/fresh.test.js": {
     "lines": 6
   },
   "tests/golden.test.js": {
     "biome/lint/suspicious/useIterableCallbackReturn": 1,
     "lines": 7
   },
-  "tests/harness.test.js": {
+  "tests/harness/appsscript-mock.test.js": {
     "lines": 1
   },
   "tests/harness/appsscript-mock.js": {
@@ -417,46 +413,46 @@
   "tests/harness/dom.js": {
     "biome/lint/correctness/noUnusedFunctionParameters": 1
   },
-  "tests/key-expiry.test.js": {
+  "tests/backend/features/intake/keys/key-expiry.test.js": {
     "lines": 3
   },
-  "tests/keybooking.test.js": {
-    "lines": 17
+  "tests/backend/features/intake/reservations/key-booking.test.js": {
+    "lines": 11
   },
-  "tests/matching.test.js": {
+  "tests/backend/features/intake/matching/matching.test.js": {
     "lines": 7
   },
-  "tests/print.test.js": {
+  "tests/backend/features/outputs/print/print.test.js": {
+    "lines": 3
+  },
+  "tests/backend/features/catalog/registry/registry-writes.test.js": {
     "lines": 4
   },
-  "tests/registry-writes.test.js": {
+  "tests/backend/features/intake/reservations/reservations.test.js": {
     "lines": 4
   },
-  "tests/reservations.test.js": {
-    "lines": 4
-  },
-  "tests/rules.test.js": {
+  "tests/domain/rules.test.js": {
     "biome/lint/suspicious/useIterableCallbackReturn": 1,
     "lines": 6
   },
-  "tests/submissions.test.js": {
-    "lines": 10
+  "tests/backend/features/intake/submissions/submissions.test.js": {
+    "lines": 4
   },
-  "tests/teamsize.test.js": {
+  "tests/backend/features/intake/teams/team-size.test.js": {
     "lines": 14
   },
-  "tests/transfers.test.js": {
+  "tests/backend/features/intake/transfers/transfers.test.js": {
     "biome/lint/style/useConst": 1,
-    "lines": 15
+    "lines": 12
   },
-  "tests/viewer-ui.test.js": {
+  "tests/web/viewer.test.js": {
     "lines": 13
   },
-  "tests/viewer.test.js": {
-    "lines": 6
+  "tests/backend/features/access/viewer/viewer.test.js": {
+    "lines": 5
   },
-  "tests/views.test.js": {
-    "lines": 12
+  "tests/backend/features/outputs/sheet-views/sheet-views.test.js": {
+    "lines": 10
   },
   "web/admin.html": {
     "lines": 5
@@ -698,6 +694,52 @@
     "lines": 5
   },
   "web/viewer.html": {
+    "lines": 4
+  },
+  "tests/scripts/deploy/backend-changed.test.js": {
+    "biome/lint/correctness/noUnusedFunctionParameters": 1,
+    "lines": 1
+  },
+  "tests/backend/features/access/auth/auth.test.js": {
+    "lines": 1
+  },
+  "tests/backend/features/access/clients/clients.test.js": {
+    "lines": 1
+  },
+  "tests/backend/features/catalog/registry/registry.setup.test.js": {
+    "lines": 1
+  },
+  "tests/backend/features/intake/keys/keys.test.js": {
+    "lines": 3
+  },
+  "tests/backend/features/intake/teams/team-numbers.test.js": {
+    "lines": 2
+  },
+  "tests/backend/features/outputs/menu/menu.test.js": {
+    "lines": 1
+  },
+  "tests/backend/platform/sheets/sheet-style.test.js": {
+    "lines": 2
+  },
+  "tests/backend/platform/sheets/table.test.js": {
+    "lines": 1
+  },
+  "tests/scripts/build/build-site.test.js": {
+    "lines": 5
+  },
+  "tests/scripts/deploy/prepare-clasp.test.js": {
+    "lines": 2
+  },
+  "tests/scripts/deploy/setup-deployment.test.js": {
+    "lines": 7
+  },
+  "tests/web/admin.key-booking.test.js": {
+    "lines": 2
+  },
+  "tests/web/admin.transfers.test.js": {
+    "lines": 3
+  },
+  "tests/web/index.key-booking.test.js": {
     "lines": 4
   }
 }

@@ -150,6 +150,7 @@
       ],
       "extensions": [".js", ".css", ".sh", ""]
     },
-    "siteMap": "scripts/build/site-map.js"
+    "siteMap": "scripts/build/site-map.js",
+    "tests": { "root": "tests/", "own": ["harness/", "fixtures/"] }
   }
 }

@@ -136,7 +136,7 @@ The site is published at the paths it has always had: the pages at the root,
 | `web/index.html` | The page students use. Shows any form from its saved definition (`?f=name`). |
 | `web/admin.html` | The admin dashboard (PIN). |
 | `web/viewer.html` | The read-only instructor and client page (`?t=private-token`). |
-| `web/css/theme.css` | Colors, fonts, and the type scale as variables. Change the look here; the contrast standard is in its header and enforced by `tests/contrast.test.js`. |
+| `web/css/theme.css` | Colors, fonts, and the type scale as variables. Change the look here; the contrast standard is in its header and enforced by `tests/web/css/theme.test.js`. |
 | `web/css/app.css` | Components of the student page. |
 | `web/css/admin.css` | Dashboard and instructor layout, including the team cards (a coloured band per team, header strip, leader tag). |
 | `web/img/` | The tab icon (`favicon.svg`), PNG sizes for phones and older browsers, and `site.webmanifest`. The pirate and the parrot of the ticket picture (`pirate.webp`, `parrot.webp`), with clear backgrounds; `ticket.js` draws the clock and the calendar around them. The pictures of the route: the ship (`ship.svg`), an island (`island.svg`), the treasure chest (`treasure.svg`), the waves (`sea.svg`), the sky by day and by night (`sky-day.svg`, `sky-night.svg`) and the sun and moon (`sun.svg`, `moon.svg`). They have their own colours; the sea and sky behind them take theirs from the theme. |
@@ -314,7 +314,7 @@ the file name says the role:
 | `scripts/dev/dev-server.js` | `npm run dev`: serves the site and answers its API calls from the in-memory Google, with sample forms, so pages can be opened in a real browser. |
 | `tests/harness/appsscript-mock.js` | An in-memory Sheets, Drive, Mail, Cache, and clock, so the real backend code runs in tests. |
 | `tests/harness/dom.js` | Opens the real pages in jsdom wired to that backend. |
-| `tests/*.test.js`, `tests/scripts/` | The tests, one file per area, and the tests of the scripts under the same path; [TESTING.md](../process/TESTING.md) lists them. |
+| `tests/<source path>/` | The tests, at the path of the code they check: `tests/backend/features/intake/transfers/transfers.test.js` checks that feature, `tests/web/admin.test.js` the admin page. A test of the whole system, such as `tests/golden.test.js`, sits at the root of `tests/`. [TESTING.md](../process/TESTING.md) lists them. |
 
 ## Structure rules
 
@@ -329,7 +329,7 @@ paths and limits are under `structure` in `scripts/checks/config.json`.
 | Pages and assets | Every script and stylesheet a page loads exists, and every file under `web/js/` and `web/css/` is loaded by a page. |
 | Every file named here | Each source file has a row on this page, by its path or its name. A pattern such as `admin*.js` does not count. |
 | Layers | Code under `backend/platform/` reads no feature, and a `*.controller.js` reads no `*.repository.js`: it asks the service, which reads the repository. `scripts/checks/code/check-layers.js` checks it. |
-| Tests mirror the source | The tests of `scripts/checks/lib/baseline.js` are in `tests/scripts/checks/lib/baseline.test.js`. This rule is not checked yet; the reviewer holds it. |
+| Tests mirror the source | Node's test runner sets no layout, so `tests/` mirrors the source: the tests of `scripts/checks/lib/baseline.js` are in `tests/scripts/checks/lib/baseline.test.js`. Only `tests/harness/` and `tests/fixtures/` exist in tests alone, and a test of the whole system sits at the root of `tests/`. `scripts/checks/tree/check-structure.js` checks that every other folder under `tests/` is a source folder. |
 
 ## Data model in one paragraph
 
