@@ -59,7 +59,7 @@
    */
   function card(p, k) {
     var current = k === p.key && !p.creating;
-    var values = current ? L.fromRows(p.rows) : p.lists[k] || [];
+    var values = current ? L.fromRows(p.rows, L.kindOf(p)) : p.lists[k] || [];
     var users = L.formsUsing(p.forms, k).length;
     return h(
       'button',
@@ -86,7 +86,9 @@
       h(
         'span',
         { class: 'list-card-meta' },
-        A.plural(values.length, 'choice', 'choices') +
+        (L.kindOf(p, k) === ListKind.MILESTONES
+          ? A.plural(values.length, 'milestone', 'milestones')
+          : A.plural(values.length, 'choice', 'choices')) +
           ' · ' +
           (users ? A.plural(users, 'form', 'forms') : 'no form yet')
       )

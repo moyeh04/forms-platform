@@ -65,6 +65,7 @@ erDiagram
         string keyHash
         string keyExpires
         string deleted
+        json progress
     }
     CLIENT {
         string id
@@ -79,6 +80,7 @@ erDiagram
         string keySeal
         string expires
         string showSizeAlerts
+        string progress
     }
     REQUEST {
         string id
@@ -140,6 +142,7 @@ The `config` cell is the reason new forms need no code:
 | `slots` | Reservation days (id, label, date, times), `capacity`, and `pattern { start, end, length, gap }`: the session hours new days start with |
 | `keyBooking` | Reservations only: `enabled` and `source` (the id of the registration form whose keys book this one) |
 | `review` | Review steps and whether they are sequential |
+| `progress` | Team registrations only: `{ from, milestones: [{ id, label: { en, ar } }], students }`, the milestones copied from the milestones list `from` when the admin picked it. The copy changes only when the admin updates it from the list. `students` (on unless `false`) shows each team its own progress with its key. `null` when the form follows no progress |
 | `matching` | WhatsApp matching switch |
 | `notifications` | `confirmEmail`, `alertEmail` |
 | `messages` | Custom text for closed, not-yet, and draft states |
@@ -154,7 +157,10 @@ The `config` cell is the reason new forms need no code:
 The row with the key `_info` is not a list. Its `values` is a JSON object with
 the name and the kind of each list an admin made:
 `{ "third_year": { "name": "Third year", "kind": "sections" } }`. The kinds are
-`sections`, `numbers`, `named` and `plain`; a built-in list has its kind by key.
+`sections`, `numbers`, `named`, `plain` and `milestones`; a built-in list has
+its kind by key. The value of a milestone is a random id (`m_` and eight
+letters or digits), never shown and never reused, because the marks of every
+team are kept by it; a missing Arabic name repeats the English one.
 
 A form's dropdown stores only the list **key** (`field.list`), and the admin
 picks it in the Questions tab. The options are filled in when the form is read,
@@ -176,6 +182,7 @@ whichever list of the kind `sections` a question reads.
 | `keySeal` | The access key sealed for the admin: `S` plus six digits, each shifted by a pad from `sha256(pepper + ':clientseal:' + id)`. Empty for a link without a key, and for keys made before this column existed. |
 | `expires` | ISO time the link stops working, or empty for no end |
 | `showSizeAlerts` | `0` when the link does not show the warnings about small teams; empty or `1` shows them |
+| `progress` | What the link may do with the progress of teams: `hidden`, `see` or `mark`. Empty, or a value it does not know, reads as `see` |
 
 `keyHash`, `keySeal` and `expires` were added after the first release. A Clients
 tab without them gets the headers the next time a link is saved; until then the
@@ -205,6 +212,7 @@ trash, where it can be restored for 30 days; the registry row is removed. Named 
 | `deleted` | `1` for a cancelled registration; the row stays |
 | `keySeal` | The key sealed for the admin: `S` plus five digits, each shifted by a pad from `sha256(pepper + ':seal:' + form id + ':' + row id)`. Empty after deletion, and on rows saved before this column existed (the header is added on the next save). |
 | `number` | Team and task forms only: the team's number, given once when it registers and kept after it is cancelled, so the teams after it do not move up. Rows saved before this column existed get the numbers they showed, in the order they registered, the first time a team is added or cancelled. Empty for bookings and WhatsApp registrations. |
+| `progress` | Team registrations only: the marks of the team as JSON, by milestone id: `{ "m_x": { "s": "submitted", "t": "note for the team", "p": "private note", "at": "ISO", "by": "a" } }`. `s` is `not_yet`, `submitted` or `discussed`; `at` changes only with `s`; `by` is `a` for the admin or `c:` and the id of a link. A mark writes only this cell, so `updated` keeps the team's own last change. A milestone with no mark is Not yet; marks on a milestone the form no longer has stay in the cell. Empty when the team has no mark. |
 
 The readable columns are derived from `data` every time a row is saved
 (`applyDerived_`). If they ever disagree, `data` wins.

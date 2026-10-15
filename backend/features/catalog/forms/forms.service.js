@@ -220,7 +220,8 @@ var FormsService = (function () {
   /**
    * Shows a form to the admin editor, with the lists, the bookings of the
    * timetable, the forms whose keys can book, and the counts of saved
-   * answers that a new team size range would leave outside.
+   * answers that a new team size range would leave outside, and for a team
+   * registration how many teams have marks on each milestone.
    *
    * @param {string} id The id of the form.
    * @return {!Object} The form and what its editor needs.
@@ -246,6 +247,9 @@ var FormsService = (function () {
     }
     if (reservation && Rules.fieldByRole(form, 'members')) {
       out.teammateCounts = ResponsesRules.teammateCounts(form);
+    }
+    if (form.type === FormType.TEAM_REGISTRATION) {
+      out.progressMarks = ProgressService.markCounts(form);
     }
     return out;
   }

@@ -169,10 +169,20 @@
     ) {
       tools = tools.concat(teamTools(p));
     }
+    if (Rules.progressOn(form)) {
+      tools.unshift(
+        App.progress.viewSwitch(form.slug, p.state.view, function (v) {
+          p.state.view = v;
+          p.toolbar.replaceWith(R.toolbar(p));
+          p.paint();
+        })
+      );
+    }
     // A day sheet needs a day: a reservation with no days has nothing to print.
     if (form.type === FormType.RESERVATION && days.length) {
       tools.push(daySheet(days));
     }
-    return h('div', { class: 'toolbar' }, tools);
+    p.toolbar = h('div', { class: 'toolbar' }, tools);
+    return p.toolbar;
   };
 })(window.App);

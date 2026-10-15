@@ -46,7 +46,11 @@
     ui.toast(
       '"' +
         L.nameOf(p, out.key) +
-        '" is ready. Pick it for a question in the Questions tab of a form.',
+        (L.kindOf(p, out.key) === ListKind.MILESTONES
+          ? '" is ready. Pick it in Setup, Progress of a team registration' +
+            ' form.'
+          : '" is ready. Pick it for a question in the Questions tab of a' +
+            ' form.'),
       'ok'
     );
     p.paint();

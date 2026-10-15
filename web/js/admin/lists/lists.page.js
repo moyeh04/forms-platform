@@ -188,8 +188,11 @@
       h(
         'p',
         { class: 'muted-note' },
-        'A save reaches every form that asks this list. Answers already' +
-          ' given are not changed.'
+        L.kindOf(p) === ListKind.MILESTONES
+          ? 'A form keeps its copy until it is updated from the list in' +
+              ' Setup, Progress. Marks already given stay with their teams.'
+          : 'A save reaches every form that asks this list. Answers already' +
+              ' given are not changed.'
       )
     );
   }

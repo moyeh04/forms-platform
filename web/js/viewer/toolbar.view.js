@@ -1,7 +1,7 @@
 /**
  * The toolbar of the instructor page: the form picker when the link shows
- * more than one form, the views of a booking form, the search, Refresh and
- * Print.
+ * more than one form, the views of a booking form, Teams or Progress when
+ * the link sees progress, the search, Refresh and Print.
  */
 (function (App) {
   'use strict';
@@ -159,6 +159,14 @@
     var tools = [];
     if (S.me.forms.length > 1) tools.push(formPicker());
     if (d.kind === 'reservation') tools.push(...reservationTools(d));
+    if (d.milestones) {
+      tools.push(
+        App.progress.viewSwitch(S.slug, V.view(), function (v) {
+          S.views[S.slug] = v;
+          V.render();
+        })
+      );
+    }
     tools.push(
       h('input', {
         class: 'input',

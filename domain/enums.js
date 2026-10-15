@@ -44,13 +44,30 @@
     SECTIONS: 'sections',
     NUMBERS: 'numbers',
     NAMED: 'named',
-    PLAIN: 'plain'
+    PLAIN: 'plain',
+    MILESTONES: 'milestones'
+  });
+
+  /** Where a team stands on one milestone of its project. */
+  var ProgressState = Object.freeze({
+    NOT_YET: 'not_yet',
+    SUBMITTED: 'submitted',
+    DISCUSSED: 'discussed'
+  });
+
+  /** What an instructor link may do with the progress of teams. */
+  var ProgressAccess = Object.freeze({
+    HIDDEN: 'hidden',
+    SEE: 'see',
+    MARK: 'mark'
   });
 
   return {
     FormType: FormType,
     FormStatus: FormStatus,
     ReviewStatus: ReviewStatus,
-    ListKind: ListKind
+    ListKind: ListKind,
+    ProgressState: ProgressState,
+    ProgressAccess: ProgressAccess
   };
 });

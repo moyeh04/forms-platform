@@ -147,6 +147,7 @@ The site is published at the paths it has always had: the pages at the root,
 | `web/css/app/dialogs.css` | Dialogs, toasts and the strip that says a newer site is published. |
 | `web/css/app/print.css` | Print: only the ticket, on plain paper. |
 | `web/css/app/notes.css` | Lists inside summaries, the note of a chosen team size and the requests to move a member. |
+| `web/css/app/progress.css` | The words of the progress states and the notes of a mark, and a team's own progress on its registration. |
 | `web/css/admin/layout.css` | The dashboard layout classes, the tabs of a form and the settings sections. The dashboard and the instructor page load the `admin/` files in the order of these rows, so the cascade is the one the single file had. |
 | `web/css/admin/questions.css` | The Questions tab: a row per question under its page. |
 | `web/css/admin/forms-list.css` | The header of a form and the forms list grouped by status. |
@@ -163,6 +164,7 @@ The site is published at the paths it has always had: the pages at the root,
 | `web/css/admin/phone.css` | The phone layout of team members, the page header and bookings. |
 | `web/css/admin/phone-tables.css` | The phone layout of wide tables: one card per row. |
 | `web/css/admin/keys.css` | Client links, the until picker of keys and links, and Download all. |
+| `web/css/admin/progress.css` | Team progress on the dashboard and the instructor page: the board, its phone view, the mark box and the Progress panel. |
 | `web/img/` | The tab icon (`favicon.svg`), PNG sizes for phones and older browsers, and `site.webmanifest`. The pirate and the parrot of the ticket picture (`pirate.webp`, `parrot.webp`), with clear backgrounds; `web/js/form/ticket/` draws the clock and the calendar around them. The pictures of the route: the ship (`ship.svg`), an island (`island.svg`), the treasure chest (`treasure.svg`), the waves (`sea.svg`), the sky by day and by night (`sky-day.svg`, `sky-night.svg`) the sun and moon (`sun.svg`, `moon.svg`) and the red flag of an explored island (`crew-flag.svg`). The arrow of a select (`select-arrow.svg`). They have their own colours; the sea and sky behind them take theirs from the theme. |
 | `web/js/config.js` | Source placeholder; `scripts/build/build-site.js` generates its published copy from the Actions `API_URL` variable, with the version of the site. |
 | `web/js/app/fresh.js` | Keeps an open page on the published version: compares the version in `config.js` with `version.json`, reloads an older page when nothing would be lost, and offers **Reload** otherwise. |
@@ -184,6 +186,7 @@ The site is published at the paths it has always had: the pages at the root,
 | `web/js/form/navigation.page.js` | Moving between steps and showing their errors. |
 | `web/js/form/submit.page.js` | Sending the registration and showing its ticket. |
 | `web/js/form/submit-errors.page.js` | What the page does with each error the server gives back when a registration is sent. |
+| `web/js/form/progress.view.js` | A team's own progress on its registration, read only, and on the key page once its key has ended. |
 | `web/js/form/key-entry.page.js` | Opening a registration with its key. |
 | `web/js/form/edit.page.js` | A registration opened with its key: read only, Close, cancel, start again. |
 | `web/js/form/success.view.js` | The page with the ticket after sending. |
@@ -232,6 +235,7 @@ The site is published at the paths it has always had: the pages at the root,
 | `web/js/admin/settings/limits.view.js` | The Limits and checks panel: most submissions, Drive check, one team per student with transfer requests, folder names. |
 | `web/js/admin/settings/emails.view.js` | The Emails panel: the confirmation to students and the note to the admin. |
 | `web/js/admin/settings/review.view.js` | The Review steps panel, and matching to pasted WhatsApp requests. |
+| `web/js/admin/settings/progress.view.js` | The Progress panel: the milestones list a team registration copies, Update from list, and whether teams see their progress. |
 | `web/js/admin/settings/settings.model.js` | What the settings page saves, and the first thing that stops a save with its panel. |
 | `web/js/admin/settings/savebar.view.js` | The save bar: shown while something changed, sends only what changed, shows why a save was refused. |
 | `web/js/admin/questions/questions.model.js` | The questions and pages of a form as the Questions tab changes them: kinds, moves, adding and removing, choices, what stops a save. |
@@ -272,6 +276,7 @@ The site is published at the paths it has always had: the pages at the root,
 | `web/js/admin/responses/download.view.js` | The Download all dialog: what it saves, its progress, and Start again when it stops. |
 | `web/js/admin/people/access.view.js` | The dialog that shows a private link and its access key apart. |
 | `web/js/admin/people/link-end.view.js` | How long a private link works: the picker of its end and the dialog that moves it. |
+| `web/js/admin/people/link-progress.view.js` | What a private link may do with the progress of teams: the select of its dialog and the word in the table. |
 | `web/js/admin/people/client-row.view.js` | A private link in the Clients table, with its key and its actions. |
 | `web/js/admin/people/client-dialog.view.js` | The dialog that makes a private link or edits one. |
 | `web/js/admin/people/people.page.js` | The Clients page: its head and the table of links. |
@@ -294,6 +299,8 @@ The site is published at the paths it has always had: the pages at the root,
 | `web/js/admin/lists/list-head.view.js` | The head of the open list: name, Rename, Delete, what it is for and the forms that ask it. |
 | `web/js/admin/lists/lists.page.js` | The Lists page: its page object, opening a list, and drawing the pane and the editor of each kind. |
 | `web/js/teams/size-alerts.view.js` | The warnings about small teams as they are drawn: a line for each level and a mark on the card of a small team. Used by the dashboard and the instructor page. |
+| `web/js/teams/progress-mark.view.js` | The mark of one team on one milestone: the box with the three states and two notes, and the queue that saves the changes of a cell in order. Used by the dashboard and the instructor page. |
+| `web/js/teams/progress-board.view.js` | The progress board: a table of teams and milestones, one milestone at a time on a phone, and the Teams or Progress switch. Used by the dashboard and the instructor page. |
 | `web/js/viewer/viewer.model.js` | The state of the instructor page and its calls: the link and form in the address, the access key kept for the tab, loading the open form and matching the search. Loaded first of the instructor page parts; creates `App.viewer`. |
 | `web/js/viewer/login.view.js` | The screens before a link opens: the access key it asks for, and why a link cannot be opened. |
 | `web/js/viewer/toolbar.view.js` | The toolbar: the form picker, the views of a booking form, the search, Refresh and Print. |
@@ -315,6 +322,8 @@ The site is published at the paths it has always had: the pages at the root,
 | `domain/rules/slots.js` | Reservation slots: the times of a day, the key and the room left in a slot, the names of dated days, and the check of a chosen slot. |
 | `domain/rules/form.js` | Reading a form and its responses: a field by its role, the people on a submission, how many people a form holds, and whether it is open. |
 | `domain/rules/team-size.js` | Team size: the sizes a form allows, the notes a student sees for a size, and the warnings about small teams. |
+| `domain/rules/progress.js` | The milestones of a form: copied from a milestones list into `form.progress`, cleaned on a save, and compared with the list. |
+| `domain/rules/progress-marks.js` | The marks of a team on each milestone: a change and why it is refused, counts, and what a team or a link may see. |
 | `domain/rules/submission.js` | A whole submission: each field checked by its type, the member forms of a team, and nobody named twice. |
 
 ## Backend (`backend/`, becomes one `Code.gs`)
@@ -388,6 +397,8 @@ the file name says the role:
 | `backend/features/intake/responses/responses.notify.js` | What follows a saved submission: the emails and the repaint of the sheet views. |
 | `backend/features/intake/keys/keys.service.js` | Edit keys: issuing, sealing, expiring and finding a submission by its key, and listing and extending the keys of a form. |
 | `backend/features/intake/keys/keys.controller.js` | The key actions of the admin: list keys and extend their end dates. |
+| `backend/features/intake/progress/progress.service.js` | Team progress: a mark on one milestone of one team saved in its own cell inside the lock, the marks per milestone, and a team's own progress by key. |
+| `backend/features/intake/progress/progress.controller.js` | The progress actions: a mark by the admin or by a link that may mark, and `progress.mine`. |
 | `backend/features/intake/submissions/submissions.controller.js` | The student actions: submit, look up, update and cancel a submission. |
 | `backend/features/intake/submissions/admin-submissions.controller.js` | The admin actions on submissions: list, edit, delete and reset or show a key. |
 | `backend/features/intake/submissions/submissions.service.js` | Submissions: checking the answers, saving a new one, changing and cancelling one, and what the student sees of it. |

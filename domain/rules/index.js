@@ -20,6 +20,8 @@
         require('./slots.js'),
         require('./form.js'),
         require('./team-size.js'),
+        require('./progress.js'),
+        require('./progress-marks.js'),
         require('./submission.js')
       ]
     : [
@@ -30,6 +32,8 @@
         root.RulesSlots,
         root.RulesForm,
         root.RulesTeamSize,
+        root.RulesProgress,
+        root.RulesProgressMarks,
         root.RulesSubmission
       ];
 

@@ -62,7 +62,7 @@ is silenced on its own line with the reason, and both checks honour it:
 
 | Owner | Holds |
 |---|---|
-| `domain/enums.js` | `FormType`, `FormStatus`, `ReviewStatus`, `ListKind` |
+| `domain/enums.js` | `FormType`, `FormStatus`, `ReviewStatus`, `ListKind`, `ProgressState`, `ProgressAccess` |
 | `backend/platform/config/constants.js` | The app name, the registry tab names, the script property names (`PROPS`) and the cache keys (`CACHE`) |
 | `backend/platform/config/access.js` | `Access`, who may call an action |
 | each `*.repository.js` | The column list of its tab (`FORM_COLS`, `RESPONSE_COLS`, `CLIENT_COLS_`, `TRANSFER_COLS`, `REQUEST_COLS_`) |
@@ -76,6 +76,7 @@ is silenced on its own line with the reason, and both checks honour it:
 | `domain/rules/phone.js`, `codes.js`, `drive-link.js` | The Egyptian country code and number lengths, the digits of a student code, a registration key and an access key, the Drive hosts and link kinds, the parts of a folder name |
 | `domain/rules/slots.js` | Week day and month names, the minutes of an hour and the hours of a clock face |
 | `domain/rules/team-size.js` | `SIZE_ALERT_LEVELS`, the biggest team when a form does not say, the smallest number a warning can ask for |
+| `domain/rules/progress.js`, `progress-marks.js` | The longest milestone id and name (`MILESTONE_ID_MAX`, `MILESTONE_NAME_MAX`), the longest note of a mark (`PROGRESS_NOTE_MAX`) |
 | `domain/rules/submission.js` | The longest answer of a short and of a long text field |
 | `domain/form-metadata/*.js` | The longest subject code, how many academic years are offered ahead and back |
 | `web/js/ui/icons.js`, `dialogs.js`, `theme-button.js` | The icon paths, their default size and stroke, the icons a form may use, how long a toast stays |
@@ -83,11 +84,12 @@ is silenced on its own line with the reason, and both checks honour it:
 | `web/js/app/fresh.js`, `api.js`, `theme.js` | How often an open page checks its version and the shortest gap between checks, the storage keys of the theme, the admin PIN and the tried version |
 | `web/js/form/ticket/*.js` | The colours of the ticket picture, the place and size of each of its shapes (`CALENDAR`, `RING`, `WOOD`, `RIM`, `HAND`, `SLOT`), the degrees of the dial (`DIAL`), the scale and torn edges of the saved image |
 | `web/js/teams/size-alerts.view.js` | The name of each warning level and the sizes of its icons |
+| `web/js/teams/progress-*.view.js` | The size of the note icon in a cell (`NOTE_ICON`), the storage key of Teams or Progress (`VIEW_KEY`) |
 | `web/js/admin/settings/*.view.js`, `web/js/admin/questions/*.js` | The defaults and bounds of the settings: the team size (`TEAM_SIZE`), the teammates of a booking (`TEAMMATES`), the days a new edit key works (`KEY_DAYS`), the name parts (`NAME_PARTS`), the shape of a new question or page id (`ID`), and the questions that are always asked or fixed to their page |
 | `web/js/admin/people/link-end.view.js` | The periods a new link can work for (`LINK_PERIODS`) |
 | `web/js/admin/responses/*.js` | The sizes of the link and leader icons of a team, where the key rows go in Details (`KEY_ROWS_AT`), how long the address of a saved CSV file or zip part is kept (`REVOKE_AFTER_MS`, `KEEP_URL_MS`), the bytes of a KB and an MB |
 | `web/js/viewer/*.js` | The storage key of the access key (`fp_viewer_key_`), the errors that ask for the key, the review states, the icon sizes |
-| `web/js/admin/lists/*.js` | The built-in lists (`BUILTIN`) and the kinds a list can be (`KINDS`), the years a new year group offers, the most sections of a kind, the longest run of numbers, the letters of a kind and a department, the longest list name, the choices a card shows |
+| `web/js/admin/lists/*.js` | The built-in lists (`BUILTIN`) and the kinds a list can be (`KINDS`), the years a new year group offers, the most sections of a kind, the longest run of numbers, the letters of a kind and a department, the longest list name, the choices a card shows, the shape of a new milestone id (`ID`) |
 | `web/js/admin/settings/timetable*.js` | The default general hours, the bounds of the bookings per slot and of the minutes of a slot and its break |
 | `web/js/*.js` | Each page module's own labels, choices and browser storage keys (`fp_*`) at the top of its wrapper |
 | `web/js/config.js` | The backend URL, written by the deploy workflow |

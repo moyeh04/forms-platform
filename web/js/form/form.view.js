@@ -238,6 +238,7 @@
         heading
       ),
       help ? h('p', { class: 'step-help' }, help) : null,
+      step.review && hub() ? P.progressBlock(S.progress) : null,
       stepBody(step),
       h('div', { class: 'nav' }, backButton(last), primaryButton(step, last))
     );

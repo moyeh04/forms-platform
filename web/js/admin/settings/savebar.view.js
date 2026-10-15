@@ -133,6 +133,7 @@
     function refresh(e) {
       if (!(e && bar.contains(e.target))) say(note, UNSAVED);
       s.sections.forEach(function (n) {
+        if (n.refresh) n.refresh();
         n.paintSummary();
       });
       A.unsaved = JSON.stringify(A.settingsPatch(s)) !== s.saved;

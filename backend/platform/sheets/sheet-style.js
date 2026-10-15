@@ -55,6 +55,7 @@ var SheetStyle = (function () {
     members: 320,
     data: 320,
     review: 200,
+    progress: 320,
     config: 320,
     key: 180,
     values: 520,

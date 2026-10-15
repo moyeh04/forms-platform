@@ -530,6 +530,50 @@ size, so the panel is drawn again when the range changes in the other tab.
 Whether an instructor sees them belongs to the person, not the form, so it is
 a setting of their link, next to whether they may review.
 
+### Team progress
+
+A team registration can follow its teams through the milestones of a project.
+Each team has one of three states on each milestone, Not yet, Submitted or
+Discussed, with a note for the team and a private note. This is not a review
+step: review steps accept or reject the registration itself, while a mark
+says how far an accepted team has come.
+
+| Responsibility | Owner |
+|---|---|
+| The milestones a form copies from a list, cleaning `form.progress` on a save, comparing a copy with its list, and the marks a change would hide | `domain/rules/progress.js` |
+| A mark and why it is refused, stale marks, counts, and what a team or a link may read | `domain/rules/progress-marks.js` |
+| The `ProgressState` and `ProgressAccess` enums | `domain/enums.js` |
+| Saving one mark in the `progress` cell of its row, inside the lock | `progress.service.js`, through `ResponsesRepository.writeProgress` |
+| The marks on the instructor page and what a link may do | `viewer.service.js`, from the `progress` of each link in `clients.repository.js` |
+| The Progress panel of Setup | `admin/settings/progress.view.js` |
+| The board, its phone view and the mark box | `web/js/teams/progress-board.view.js` and `progress-mark.view.js`, used by the dashboard and the instructor page, each with its own save action |
+| The student's own progress | `web/js/form/progress.view.js`, from `lookup` or, once the key has ended, `progress.mine` |
+
+**A copy, not a reference.** Picking a milestones list copies its milestones
+into `form.progress.milestones`, each with the id of its list row. A later
+change to the list does not reach the form by itself: the panel shows Update
+from list only while the two differ, and says what it would add, rename,
+remove or reorder. Marks are keyed by milestone id, so a renamed or moved
+milestone keeps its marks. A milestone that is taken off hides its marks,
+which stay in the sheet, and the panel names it with its number of teams
+(`progressMarks` from `admin.forms.get`) before the save.
+
+**One cell per team.** The marks of a team are JSON in the `progress` column
+of its row, `{ <milestone>: { s, t, p, at, by } }`. A mark writes only that
+cell, and every whole-row save carries the column through, so a status
+change, an edit or a transfer keeps the marks. `at` and `by` change only with
+the state. A mark sends the `at` its page saw; when another page changed the
+state meanwhile, it is refused with `changed_meanwhile` and the fresh marks,
+which the page shows. The page draws a change at once and sends the changes
+of one cell in order.
+
+**Who sees what.** The dashboard reads and marks everything. A private link
+has a `progress` setting: Hidden, Can see (the default) or Can mark; a link
+that sees reads both notes. A team sees its states and the note for the team,
+never the private note, only when `form.progress.students` is on and edit
+keys are on. A key that has ended still shows the progress, read only, through
+`progress.mine`; the answers stay behind a working key.
+
 ## Reviews and WhatsApp matching
 
 WhatsApp does not let a website read pending join requests. So the reviewer
@@ -1150,7 +1194,10 @@ are in the `*.model.js` files, so each editor only draws.
   cannot give back exactly (a gap, a leading zero) is kept under Other
   sections. A list of `numbers` is two steppers. A `named`
   list is rows; a `plain` list is chips, with one link to the rows because
-  chips cannot rename or reorder. Typing is needed only for names.
+  chips cannot rename or reorder. A `milestones` list is the rows of a named
+  list without the value column: a milestone is added by its name and gets a
+  random id (`L.newMilestoneId`), which stays when it is renamed or moved.
+  Typing is needed only for names.
 - **Lists are made, not only edited.** New list asks for a name, a kind and a
   copy to start from (`admin.lists.create`). An admin's own list can be renamed,
   and deleted while no form asks it; Delete is shown only then. A question

@@ -1,11 +1,11 @@
 # Testing
 
-375 automated tests run without a Google account, a browser, or a network.
+397 automated tests run without a Google account, a browser, or a network.
 They run the **real** backend and the **real** pages. This page explains how
 that works and what it can and cannot prove.
 
 ```
-npm test    # 375 tests
+npm test    # 397 tests
 ```
 
 ## The layers
@@ -153,6 +153,7 @@ says something else.
 | Rules: Drive links | `domain/rules/drive-link.test.js` | 2 | Files, folders and slides, other hosts refused; folder names |
 | Rules: slots | `domain/rules/slots.test.js` | 2 | The generated times of a day, and the room left in a slot |
 | Rules: forms | `domain/rules/form.test.js` | 2 | Members list, role lookup and form state; counting the people of a form with a code counted once |
+| Rules: progress | `domain/rules/progress.test.js` | 7 | The milestones of a team registration copied from a list and cleaned, a mark whose time changes only with its state, a refused milestone, state or note, counts per team and per milestone, what a team and a link see, a copy compared with its list by id, and the marks a change of milestones would hide |
 | Rules: team size | `domain/rules/team-size.test.js` | 4 | The two warnings about small teams: the levels and their order, starting numbers, the level of a team, a wrong number or order, the numbers a level can ask for |
 | Form metadata: terms | `domain/form-metadata/read.test.js` | 2 | A season term read into its season and the academic year that starts in its year, a term in another shape kept as written, and the batch year of an older WhatsApp form read the same way |
 | Rules: submission | `domain/rules/submission.test.js` | 5 | Cleaned data, field and member errors, the same code twice, too many members, slot choices, disabled fields |
@@ -170,6 +171,7 @@ says something else.
 | Viewer API | `backend/features/access/viewer/viewer.test.js` | 13 | Tokens, hidden columns, the level of a small team sent only to a link that shows the warnings, today and by day, review rights, revoked links, access keys with the lock after wrong tries, reading a lost key again, links that end on a date and open again when it moves |
 | Student page | `web/index.form.test.js` | 20 | Steps, the title and its tags, the Arabic name and code fields, errors on an empty step, a draft kept over a reload, a duplicate code that offers the key flow, a full registration ending on a ticket with its email notice, a closed form and an unknown link, Arabic and a locked language, themes, descriptions, the subject tag, the batch year of a WhatsApp form, who can register, the folder rule example, and the ship over the current step |
 | Student page: edit | `web/index.edit.test.js` | 3 | Editing by key and registering again, a task locked after its deadline, Close out of a registration opened with a key |
+| Form page: progress | `web/index.progress.test.js` | 3 | A key that opens the summary shows the team's progress with its note but never the private one, no block when teams do not see it, and an ended key that still shows the progress read only |
 | Student page: booking | `web/index.reservation.test.js` | 3 | Teammates added to a booking and checked, taken slots, and the note for a number of teammates |
 | Student page: team size | `web/index.team-size.test.js` | 8 | The size picker and the member forms it shows, the range and a fixed size, sizes kept when changed, remove and add a member with Undo, a team of three saved, and the note of a size |
 | Student page: transfers | `web/index.transfer.test.js` | 6 | Asking for a member of another team, the leader who is asked approving or rejecting, a leader who is asked for naming the new leader and passing the key on, the phone of the other leader with Copy and as a WhatsApp link, a leader alone in a team not offered |
@@ -179,8 +181,10 @@ says something else.
 | Admin page: questions | `web/admin.questions.test.js` | 3 | Descriptions, added questions moved between pages, and pages added, renamed and reordered |
 | Admin page: responses | `web/admin.responses.test.js` | 12 | Team cards with their stored numbers, small teams listed by level, the people count, search and status, details with a key reset or shown, matching, column names on list rows for the phone layout, the day sheet group, one registration's key extended, Download all with what was not downloaded and the saved zip |
 | Admin page: clients | `web/admin.people.test.js` | 3 | A link shown once with the key apart, a lost key shown again, and a link end picked and moved |
-| Admin page: lists | `web/admin.lists.test.js` | 8 | Lists as chips or rows, the reason for a refused save, a year group added from its own card, a section kind added or removed, number runs with steppers, a new list picked for a question, lists the server refuses, and a new department letter kept as a chip |
+| Admin page: lists | `web/admin.lists.test.js` | 9 | Lists as chips or rows, the reason for a refused save, a year group added from its own card, a section kind added or removed, number runs with steppers, a new list picked for a question, lists the server refuses, a new department letter kept as a chip, and milestones as named rows whose hidden ids survive a rename or a move |
+| Admin page: progress | `web/admin.progress.test.js` | 3 | A team registration that copies a milestones list and keeps its copy until Update from list, no student switch while keys are off, and a team marked on the board with its note and the count on its card |
 | Instructor page | `web/viewer.test.js` | 13 | Small teams listed by level and marked on their card, team numbers with a gap where a team cancelled, today, by day, hidden columns, review rights, invalid links, member values named for the phone layout, phone as a call link, the key screen and its theme switch |
+| Instructor page: progress | `web/viewer.progress.test.js` | 3 | A link that may mark sets a state on the board and the mark names the link, a link that may see reads notes with no states to pick, and a hidden link sees no progress until its dialog sets Can mark |
 | Registry writes | `backend/features/catalog/registry/registry-writes.test.js` | 6 | Every change to forms, lists and links written inside the lock, a save that keeps its row while another form is deleted, a save over a newer copy refused, a busy lock, a link that keeps a renamed form, list names that stay unique |
 | Flag cells | `backend/platform/sheets/cell.test.js` | 2 | A stored flag read as yes, no or its column's default (empty, missing and legacy text), and written as `1` or the column's own cell for no |
 | Golden copies | `golden.test.js` | 5 | What the live system depends on, compared with saved copies in `tests/fixtures/golden/`: every function Apps Script calls by name, the salted hashes and seals for a fixed pepper, the error code of every action for five kinds of request, legacy flag cells read and written back, and every sheet, property, cache entry, mail and trigger after one scripted run. `GOLDEN_UPDATE=1` writes the copies again, only for a change meant to alter them |
@@ -205,6 +209,7 @@ says something else.
 | Registry setup | `backend/features/catalog/registry/registry.setup.test.js` | 1 | Setup creates the registry tabs and default lists and is safe to repeat |
 | Lists | `backend/features/catalog/lists/lists.test.js` | 1 | The admin replaces a list and the options of its questions follow |
 | Private links | `backend/features/access/clients/clients.test.js` | 1 | A link is created once and the token itself is never stored |
+| Team progress | `backend/features/intake/progress/progress.test.js` | 5 | Milestones kept and cleaned on team forms only and copied with the form, a mark in its own cell that whole-row saves keep and that leaves `updated` alone, a stale state and bad input refused, a link that sees, marks or hides progress, and a team that sees its own with an expired key |
 | Edit keys | `backend/features/intake/keys/keys.test.js` | 9 | Lookup and throttling, expiry, editing and deleting by key, a key that cannot take another team code, per-form switches, unique keys, a key the admin reads back from its sealed copy, registrations from before sealing |
 | Team numbers | `backend/features/intake/teams/team-numbers.test.js` | 3 | A team keeps its number when another cancels, older rows keep the numbers they showed, a booking or a WhatsApp registration gets none |
 | Sheet rows | `backend/platform/sheets/table.test.js` | 1 | A new row is written as plain text, also past the rows the sheet was made with |

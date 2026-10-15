@@ -247,6 +247,10 @@
   .choice-ar {
     grid-column: 2 / -1;
   }
+  .milestones > .choice .choice-en {
+    grid-column: 2;
+    grid-row: 1;
+  }
   .choice-add {
     grid-template-columns: 1fr;
   }

@@ -54,6 +54,7 @@ var ViewerController = (function () {
     } else if (kind === 'team') {
       out.groups = ViewerService.teamGroups(vform, client);
       out.sizeAlerts = ViewerService.viewerSizeAlerts(form, client);
+      Object.assign(out, ViewerService.progressOf(form, client));
     } else {
       out.rows = ViewerService.whatsappRows(vform, client);
     }

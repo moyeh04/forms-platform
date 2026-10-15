@@ -151,6 +151,41 @@
   }
 
   /**
+   * Draws the progress board of the teams shown. The admin marks every
+   * team.
+   *
+   * @param {!Object} p The page.
+   * @param {!Array<!Object>} rows The teams shown.
+   * @return {!Element} The board.
+   */
+  function progressBoard(p, rows) {
+    return App.progress.board({
+      milestones: Rules.milestonesOf(p.form),
+      teams: rows.slice().sort(function (a, b) {
+        return a.number - b.number;
+      }),
+      canMark: true,
+      view: p.boardView,
+      save: function (team, id, change, baseAt) {
+        return A.call(
+          'admin.progress.mark',
+          Object.assign(
+            {
+              slug: p.form.slug,
+              submissionId: team.id,
+              milestone: id,
+              baseAt: baseAt
+            },
+            change
+          )
+        ).then(function (out) {
+          return out.progress;
+        });
+      }
+    });
+  }
+
+  /**
    * Draws the submissions shown, the way the form type lists them.
    *
    * @param {!Object} p The page.
@@ -172,6 +207,9 @@
     }
     if (p.form.type === FormType.WHATSAPP_REGISTRATION) {
       return R.registrations(p.form, rows, p.reload);
+    }
+    if (p.state.view === 'progress' && Rules.progressOn(p.form)) {
+      return progressBoard(p, rows);
     }
     return R.teams(p.form, rows, p.reload);
   }
@@ -233,12 +271,14 @@
       transfers: both[1].transfers || [],
       content: h('div'),
       stats: h('div', { class: 'stats' }),
+      boardView: {},
       reload: reload
     };
     p.state = {
       q: '',
       status: 'all',
-      tab: R.hasMatching(p.form) ? 'matching' : 'list'
+      tab: R.hasMatching(p.form) ? 'matching' : 'list',
+      view: App.progress.savedView(p.form.slug)
     };
     p.paint = paint.bind(null, p);
     p.filtered = R.filtered.bind(null, p.form, p.all, p.state);

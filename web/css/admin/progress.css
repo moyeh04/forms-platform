@@ -1,0 +1,193 @@
+/* Team progress: the board of teams and milestones, its phone view, the
+   mark box, and the Progress panel of the settings. */
+.seg {
+  display: inline-flex;
+  gap: 4px;
+}
+.progress-scroll {
+  overflow-x: auto;
+  border: 1.5px solid var(--line);
+  border-radius: 10px;
+  background: var(--sheet);
+}
+.progress-table {
+  border-collapse: collapse;
+  width: 100%;
+}
+.progress-table th,
+.progress-table td {
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--line);
+  text-align: center;
+  vertical-align: middle;
+}
+.progress-table thead th {
+  background: var(--sheet-2);
+  font-size: var(--fs-label);
+  white-space: nowrap;
+}
+.progress-table th .muted-note {
+  display: block;
+  font-weight: 400;
+}
+.progress-table tbody th {
+  text-align: start;
+  white-space: nowrap;
+}
+.progress-table tbody tr:last-child > * {
+  border-bottom: 0;
+}
+.pcount {
+  font-weight: 700;
+  white-space: nowrap;
+}
+.pcell {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  min-width: 40px;
+  min-height: 34px;
+  padding: 0 8px;
+  border: 1.5px solid var(--line);
+  border-radius: 999px;
+  background: var(--sheet);
+  color: var(--mute);
+  font: inherit;
+}
+button.pcell {
+  cursor: pointer;
+}
+button.pcell:hover {
+  border-color: var(--ink);
+}
+.pdot {
+  width: 12px;
+  height: 12px;
+  border: 2px solid currentColor;
+  border-radius: 50%;
+}
+.pcell.is-submitted {
+  color: var(--gold);
+  border-color: var(--gold);
+}
+.pcell.is-submitted .pdot {
+  border-style: solid;
+  background: linear-gradient(90deg, currentColor 50%, var(--mask-clear) 50%);
+}
+.pcell.is-discussed {
+  color: var(--on-sea);
+  background: var(--sea);
+  border-color: var(--sea);
+}
+.pcell.is-discussed .pdot {
+  background: currentColor;
+}
+.progress-states {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.progress-states .toggle-chip[aria-checked="true"] {
+  background: var(--sea);
+  border-color: var(--sea);
+  color: var(--on-sea);
+}
+.progress-states .toggle-chip.state-submitted[aria-checked="true"] {
+  background: var(--gold);
+  border-color: var(--gold);
+  color: var(--sheet);
+}
+.progress-states .toggle-chip.state-not_yet[aria-checked="true"] {
+  background: var(--sheet-2);
+  border-color: var(--ink);
+  color: var(--ink);
+}
+.progress-states .toggle-chip:disabled {
+  cursor: default;
+}
+.progress-phone {
+  display: none;
+}
+.progress-phone > .select {
+  width: 100%;
+  margin-bottom: 10px;
+}
+.progress-lines {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+.progress-line {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 6px 10px;
+  align-items: center;
+  padding: 10px 12px;
+  border: 1.5px solid var(--line);
+  border-radius: 10px;
+  background: var(--sheet);
+}
+.progress-line-head {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+  align-items: baseline;
+}
+.progress-line > .progress-note {
+  grid-column: 1 / -1;
+}
+.mark-box {
+  max-width: 520px;
+}
+.mark-box .field-row {
+  display: grid;
+  gap: 6px;
+  margin-top: 12px;
+}
+.mark-box .field-row > .btn {
+  justify-self: start;
+}
+.progress-count {
+  color: var(--mute);
+  font-weight: 400;
+}
+.progress-copy {
+  margin: 8px 0 12px;
+  padding-inline-start: 22px;
+}
+.progress-copy li {
+  margin: 2px 0;
+}
+.progress-update {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  align-items: center;
+  margin: 0 0 12px;
+  padding: 10px 12px;
+  border: 1.5px dashed var(--line);
+  border-radius: 10px;
+}
+.progress-update p {
+  margin: 0;
+}
+@media (max-width: 940px) {
+  .progress-scroll {
+    display: none;
+  }
+  .progress-phone {
+    display: block;
+  }
+}
+@media print {
+  .progress-phone {
+    display: none;
+  }
+  .progress-scroll {
+    display: block;
+  }
+}

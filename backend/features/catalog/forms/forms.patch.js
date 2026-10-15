@@ -22,7 +22,8 @@ var FormsPatch = (function () {
     'editKey',
     'notifications',
     'messages',
-    'keyBooking'
+    'keyBooking',
+    'progress'
   ];
 
   /**
@@ -75,6 +76,8 @@ var FormsPatch = (function () {
         form,
         patch.keyBooking
       );
+    } else if (k === 'progress') {
+      form.progress = FormsRules.normalizeProgress(form, patch.progress);
     } else if (k === 'slug') {
       setSlug_(form, patch.slug);
     } else {

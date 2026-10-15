@@ -550,3 +550,75 @@ test(
     );
   }
 );
+
+test(
+  'Lists: a list of milestones is named rows with hidden ids that stay ' +
+    'when a milestone is renamed or moved',
+  async () => {
+    const w = boot();
+    const p = await openAdmin(w, '#/lists');
+    p.click('[name="new-list"]');
+    await settle(2);
+    p.type('[name="list-name"]', 'Project milestones');
+    p.click('[name="kind-milestones"]');
+    p.click('[name="create-list"]');
+    await settle(8);
+    assert.equal(p.win.location.hash, '#/lists/project_milestones');
+    assert.ok(p.text().includes('A form copies these milestones'));
+    assert.equal(p.$('[name="new-en"]'), null, 'a milestone is its name');
+    for (const name of ['Task 1', 'Task 2']) {
+      p.type('[name="new-value"]', name);
+      p.click('[name="add-choice"]');
+    }
+    assert.equal(p.$('[name="value-0"]'), null, 'the id is never shown');
+    assert.ok(p.$('[name="ar-0"]'), 'a milestone has an Arabic name');
+    p.type('[name="ar-1"]', 'المهمة 2');
+    p.click('[name="save-list"]');
+    await settle(8);
+    const saved = () =>
+      w.admin({ action: 'admin.lists.get' }).lists.project_milestones;
+    const first = saved();
+    assert.deepEqual(
+      first.map((o) => [o.label.en, o.label.ar]),
+      [
+        ['Task 1', 'Task 1'],
+        ['Task 2', 'المهمة 2']
+      ],
+      'a missing Arabic name repeats the English one, not the id'
+    );
+    assert.ok(first.every((o) => /^m_[a-z0-9]+$/.test(o.value)));
+    assert.notEqual(first[0].value, first[1].value);
+
+    p.type('[name="en-0"]', 'Proposal');
+    p.click('.choice[data-i="1"] [aria-label="Move up"]');
+    p.type('[name="en-1"]', '');
+    p.click('[name="save-list"]');
+    await settle(4);
+    assert.ok(
+      p.text().includes('Milestone 2 has no English name.'),
+      'a milestone with no name is refused'
+    );
+    assert.equal(p.$('[name="ar-1"]').value, '', 'the row stays as typed');
+    p.type('[name="en-1"]', 'Proposal');
+    p.click('[name="save-list"]');
+    await settle(8);
+    assert.deepEqual(
+      saved().map((o) => [o.value, o.label.en]),
+      [
+        [first[1].value, 'Task 2'],
+        [first[0].value, 'Proposal']
+      ],
+      'renamed and moved, each keeps its id'
+    );
+
+    const paste = p.$('[name="paste-list"]');
+    paste.value = 'Task 3 | المهمة 3\nTask 4';
+    p.fire(paste, 'input');
+    p.click('[name="paste-add"]');
+    assert.equal(p.$('[name="en-2"]').value, 'Task 3');
+    assert.equal(p.$('[name="ar-2"]').value, 'المهمة 3');
+    p.click('[name="remove-3"]');
+    p.click('[name="remove-2"]');
+    assert.ok(p.$('.savebar').hidden, 'back to the saved milestones');
+  }
+);

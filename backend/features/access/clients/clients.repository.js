@@ -14,7 +14,8 @@ var ClientsRepository = (function () {
     'keyHash',
     'keySeal',
     'expires',
-    'showSizeAlerts'
+    'showSizeAlerts',
+    'progress'
   ];
 
   /**
@@ -24,6 +25,19 @@ var ClientsRepository = (function () {
    */
   function clientsSheet_() {
     return RegistryRepository.registry().getSheetByName(Constants.TABS.clients);
+  }
+
+  /**
+   * Reads what a link may do with the progress of teams. A link made
+   * before the setting existed, or with a value it does not know, can see.
+   *
+   * @param {*} v The value as stored or sent.
+   * @return {string} A ProgressAccess member.
+   */
+  function progressAccess_(v) {
+    return Object.values(ProgressAccess).indexOf(v) === -1
+      ? ProgressAccess.SEE
+      : v;
   }
 
   /**
@@ -46,7 +60,8 @@ var ClientsRepository = (function () {
       keyHash: String(r.keyHash || ''),
       keySeal: String(r.keySeal || ''),
       expires: String(r.expires || ''),
-      showSizeAlerts: Cell.readFlag(r.showSizeAlerts, true)
+      showSizeAlerts: Cell.readFlag(r.showSizeAlerts, true),
+      progress: progressAccess_(r.progress)
     };
   }
 
@@ -143,7 +158,8 @@ var ClientsRepository = (function () {
       keyHash: c.keyHash || '',
       keySeal: c.keySeal || '',
       expires: c.expires || '',
-      showSizeAlerts: Cell.writeFlag(c.showSizeAlerts !== false, '0')
+      showSizeAlerts: Cell.writeFlag(c.showSizeAlerts !== false, '0'),
+      progress: progressAccess_(c.progress)
     };
   }
 
@@ -182,6 +198,7 @@ var ClientsRepository = (function () {
     readClients: readClients_,
     saveClient: saveClient_,
     changeClient: changeClient_,
-    keepClientForms: keepClientForms_
+    keepClientForms: keepClientForms_,
+    progressAccess: progressAccess_
   };
 })();

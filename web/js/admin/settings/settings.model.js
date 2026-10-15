@@ -81,6 +81,7 @@
     if (f.steps) patch.steps = f.steps;
     Object.assign(patch, s.metadata);
     if (f.matching) patch.matching = f.matching;
+    if (f.type === FormType.TEAM_REGISTRATION) patch.progress = f.progress;
     if (s.size) patch.rules = rulesWithSize(f.rules);
     if (s.isReservation) addReservation(s, patch);
     return patch;

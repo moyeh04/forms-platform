@@ -1,0 +1,39 @@
+/* The words of the progress states and the notes of a mark, on every
+   page, and the progress of a team on the page of its registration. */
+.pstate.is-not_yet {
+  color: var(--mute);
+}
+.pstate.is-submitted {
+  color: var(--gold);
+  font-weight: 700;
+}
+.pstate.is-discussed {
+  color: var(--sea);
+  font-weight: 700;
+}
+.progress-note {
+  margin: 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.progress-mine {
+  margin: 0 0 20px;
+}
+.progress-mine-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid var(--line);
+}
+.progress-mine-list > li {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 4px 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--line);
+}
+.progress-mine-list .progress-note {
+  flex-basis: 100%;
+  color: var(--mute);
+}

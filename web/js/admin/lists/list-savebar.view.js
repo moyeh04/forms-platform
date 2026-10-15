@@ -27,13 +27,16 @@
     }
     var out = await A.call('admin.lists.set', {
       key: p.key,
-      values: L.fromRows(p.rows)
+      values: L.fromRows(p.rows, L.kindOf(p))
     });
     p.lists = out.lists;
     p.info = out.info || p.info;
     L.load(p, p.key);
     ui.toast(
-      L.nameOf(p) + ' saved. Every form that uses it shows the new choices.',
+      L.kindOf(p) === ListKind.MILESTONES
+        ? L.nameOf(p) + ' saved. A form picks the change up in Setup.'
+        : L.nameOf(p) +
+            ' saved. Every form that uses it shows the new choices.',
       'ok'
     );
     p.paint();

@@ -90,12 +90,12 @@ test(
     });
     assert.deepEqual(looks(w.registry.getSheetByName('Forms'), 13), tinted(13));
     assert.deepEqual(
-      looks(w.registry.getSheetByName('Clients'), 12),
-      tinted(12)
+      looks(w.registry.getSheetByName('Clients'), 13),
+      tinted(13)
     );
     assert.deepEqual(looks(w.registry.getSheetByName('Lists'), 2), tinted(2));
     const responses = w.sheet(w.form.sheetId, 'Responses');
-    assert.deepEqual(looks(responses, 20), tinted(20));
+    assert.deepEqual(looks(responses, 21), tinted(21));
     assert.equal(responses.widths.get(8), 240, 'the name column is wide');
     assert.equal(responses.widths.get(20), 80, 'the number column is narrow');
     assert.deepEqual(
@@ -142,7 +142,7 @@ test(
     ]);
 
     w.admin({ action: 'admin.views.rebuild', slug: w.form.slug });
-    assert.equal(looks(responses, 20).head, true);
+    assert.equal(looks(responses, 21).head, true);
     assert.deepEqual(
       looks(requests, 7),
       { head: true, frozen: 1, bands: [[1000, 7, INK, '#FFFFFF', '#F8F1DE']] },
@@ -161,13 +161,13 @@ test(
     const band = responses.bandings[0];
     w.admin({ action: 'admin.views.rebuild', slug: w.form.slug });
     assert.equal(responses.bandings[0], band, 'a dressed tab is left alone');
-    responses.backgrounds.delete('1,20');
+    responses.backgrounds.delete('1,21');
     w.admin({ action: 'admin.views.rebuild', slug: w.form.slug });
     assert.deepEqual(
       [
         responses.bandings.length,
         responses.bandings[0] === band,
-        looks(responses, 20).head
+        looks(responses, 21).head
       ],
       [1, false, true],
       'a column added later is dressed with the rest'

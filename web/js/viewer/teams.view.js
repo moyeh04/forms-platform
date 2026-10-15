@@ -1,7 +1,8 @@
 /**
  * The teams of a team or task form on the instructor page: the warnings
  * about small teams, then each team as a block with its members in a
- * table. Only the columns the link shows are drawn.
+ * table, or the progress board when the link sees progress and asks for
+ * it. Only the columns the link shows are drawn.
  */
 (function (App) {
   'use strict';
@@ -152,7 +153,14 @@
           'span',
           { class: 'block-meta' },
           g.members.length === 1 ? 'Solo' : g.members.length + ' members',
-          App.sizeAlerts.tag(d.sizeAlerts, g.alert)
+          App.sizeAlerts.tag(d.sizeAlerts, g.alert),
+          d.milestones
+            ? h(
+                'span',
+                { class: 'progress-count' },
+                ' · ' + App.progress.countText(d.milestones, g.progress)
+              )
+            : null
         )
       ),
       h(
@@ -169,6 +177,39 @@
   }
 
   /**
+   * Draws the progress board of the teams shown. Only a link that may mark
+   * opens the states; any other sees the marks and their notes.
+   *
+   * @param {!Object} d The data of the form.
+   * @param {!Array<!Object>} groups The teams shown.
+   * @return {!Element} The board.
+   */
+  function board(d, groups) {
+    return App.progress.board({
+      milestones: d.milestones,
+      teams: groups,
+      canMark: d.progressAccess === ProgressAccess.MARK,
+      view: V.state.board,
+      save: function (team, id, change, baseAt) {
+        return V.call(
+          'viewer.progress.mark',
+          Object.assign(
+            {
+              slug: d.form.slug,
+              submissionId: team.id,
+              milestone: id,
+              baseAt: baseAt
+            },
+            change
+          )
+        ).then(function (out) {
+          return out.progress;
+        });
+      }
+    });
+  }
+
+  /**
    * Draws the teams that hold the search, after the warnings about small
    * teams.
    *
@@ -177,6 +218,11 @@
    */
   V.teams = function (d) {
     var groups = d.groups.filter(V.matches);
+    if (d.milestones && V.view() === 'progress') {
+      return groups.length
+        ? board(d, groups)
+        : h('div', { class: 'empty' }, 'No teams to show.');
+    }
     var show = shownColumns(d);
     // The small teams are counted over the whole form, whatever the search
     // shows.
