@@ -286,7 +286,14 @@ The site is published at the paths it has always had: the pages at the root,
 | `web/js/admin/lists/list-head.view.js` | The head of the open list: name, Rename, Delete, what it is for and the forms that ask it. |
 | `web/js/admin/lists/lists.page.js` | The Lists page: its page object, opening a list, and drawing the pane and the editor of each kind. |
 | `web/js/teams/size-alerts.view.js` | The warnings about small teams as they are drawn: a line for each level and a mark on the card of a small team. Used by the dashboard and the instructor page. |
-| `web/js/viewer/viewer.page.js` | The instructor page. |
+| `web/js/viewer/viewer.model.js` | The state of the instructor page and its calls: the link and form in the address, the access key kept for the tab, loading the open form and matching the search. Loaded first of the instructor page parts; creates `App.viewer`. |
+| `web/js/viewer/login.view.js` | The screens before a link opens: the access key it asks for, and why a link cannot be opened. |
+| `web/js/viewer/toolbar.view.js` | The toolbar: the form picker, the views of a booking form, the search, Refresh and Print. |
+| `web/js/viewer/cells.view.js` | The cells of the instructor page tables, each column drawn the way its values read best. |
+| `web/js/viewer/bookings.view.js` | The bookings of a booking form, a block for each day. |
+| `web/js/viewer/teams.view.js` | The teams of a team or task form, after the warnings about small teams; only the columns the link shows. |
+| `web/js/viewer/registrations.view.js` | The registrations of a WhatsApp form and the review of each step, which a link with review rights can change. |
+| `web/js/viewer/viewer.page.js` | The instructor page: opening the link, asking for its key, and drawing the open form by its kind. |
 | `domain/enums.js` | The words the pages and the backend share, as frozen enums of stored values: `FormType`, `FormStatus`, `ReviewStatus` and `ListKind`. Loaded before the other domain files. |
 | `domain/form-metadata/index.js` | What each form type shows beside its title (term, subject code, batch year) and how it is read, saved and copied. Used by the pages and the backend. It picks the part of the form type; the pages and the bundle load the parts before it. |
 | `domain/form-metadata/read.js` | How the metadata reads what it is given: text, own keys, a field of a form that may be missing, and academic years from years and terms. |
