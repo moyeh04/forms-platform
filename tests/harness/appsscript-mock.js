@@ -135,6 +135,18 @@ class MockSpreadsheet {
 
 /* ── World ───────────────────────────────────────────────────── */
 
+/** A small repeatable random source (mulberry32): the same seed gives the same numbers. */
+function seededRandom(seed) {
+  let a = seed >>> 0;
+  return () => {
+    a = (a + 0x6d2b79f5) >>> 0;
+    let t = a;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
 function createWorld(options = {}) {
   const world = {
     nowMs: options.now || Date.parse('2027-09-01T10:00:00Z'),
@@ -148,7 +160,16 @@ function createWorld(options = {}) {
     drive: { access: new Map(), missing: new Set(), folders: new Map(), files: new Map(), trashed: new Set() },
     logs: []
   };
-  const uid = () => crypto.randomBytes(16).toString('hex');
+  // With `options.seed`, ids, uuids and Math.random repeat from run to run, so stored data can be compared whole.
+  const seeded = options.seed === undefined ? null : seededRandom(options.seed);
+  const randomBytes = (n) => (seeded ? Buffer.from(Array.from({ length: n }, () => Math.floor(seeded() * 256))) : crypto.randomBytes(n));
+  if (seeded) world.random = seeded;
+  const uid = () => randomBytes(16).toString('hex');
+  const uuidOf = () => {
+    if (!seeded) return crypto.randomUUID();
+    const hex = randomBytes(16).toString('hex');
+    return [hex.slice(0, 8), hex.slice(8, 12), hex.slice(12, 16), hex.slice(16, 20), hex.slice(20)].join('-');
+  };
 
   const createSs = (name) => { const ss = new MockSpreadsheet(world, uid(), name); world.spreadsheets.set(ss.id, ss); world.drive.files.set(ss.id, { name, isSheet: true }); return ss; };
   world.registry = createSs('Forms Registry');
@@ -305,7 +326,7 @@ function createWorld(options = {}) {
     HtmlService: { createHtmlOutput: (h) => ({ html: h, setWidth() { return this; }, setHeight() { return this; } }) },
     Utilities: {
       DigestAlgorithm: { SHA_256: 'sha256', MD5: 'md5' },
-      getUuid: () => crypto.randomUUID(),
+      getUuid: uuidOf,
       computeDigest: (algo, value) => Array.from(crypto.createHash(algo).update(String(value), 'utf8').digest()).map((b) => (b > 127 ? b - 256 : b)),
       base64Encode: (v) => toBuf(v).toString('base64'),
       formatDate: (date, tz, pattern) => {

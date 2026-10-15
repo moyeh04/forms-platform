@@ -1,0 +1,80 @@
+{
+ "read": [
+  [
+   "c1",
+   true,
+   false,
+   true
+  ],
+  [
+   "c2",
+   false,
+   true,
+   false
+  ],
+  [
+   "c3",
+   false,
+   true,
+   true
+  ]
+ ],
+ "written": [
+  [
+   "id",
+   "name",
+   "tokenHash",
+   "forms",
+   "hiddenColumns",
+   "canReview",
+   "active",
+   "createdAt",
+   "keyHash",
+   "keySeal",
+   "expires",
+   "showSizeAlerts"
+  ],
+  [
+   "c1",
+   "Client 1",
+   "",
+   "[]",
+   "[]",
+   "1",
+   "0",
+   "",
+   "",
+   "",
+   "",
+   "1"
+  ],
+  [
+   "c2",
+   "Client 2",
+   "",
+   "[]",
+   "[]",
+   "0",
+   "1",
+   "",
+   "",
+   "",
+   "",
+   "0"
+  ],
+  [
+   "c3",
+   "Client 3",
+   "",
+   "[]",
+   "[]",
+   "0",
+   "1",
+   "",
+   "",
+   "",
+   "",
+   "1"
+  ]
+ ]
+}
