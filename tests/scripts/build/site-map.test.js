@@ -25,19 +25,23 @@ test('Site map: paths outside the site, or leaving it, have no source', () => {
   assert.equal(sourceOf('/.git/config'), null);
 });
 
-test('Site map: every rules loader reads the parts in one order', () => {
+test('Site map: a split script loads its parts in one order', () => {
   const { JOINED } = require('../../../scripts/build/site-map.js');
   const { bundleSource } = require('../../../scripts/build/bundle-backend.js');
-  const parts = JOINED.find((j) => j.published === 'shared/rules.js').sources;
-  for (const page of ['web/index.html', 'web/admin.html']) {
-    const html = fs.readFileSync(path.join(root, page), 'utf8');
-    const loaded = [
-      ...html.matchAll(/<script src="(shared\/rules\/[^"]+)"/g)
-    ].map((m) => sourceOf(m[1]));
-    assert.deepEqual(loaded, parts, page);
+  const bundled = bundleSource().files;
+  for (const { published, sources } of JOINED) {
+    const folder = sources[0].replace(/[^/]+$/, '');
+    for (const page of PAGES) {
+      const html = fs.readFileSync(path.join(root, sourceOf(page)), 'utf8');
+      const loaded = [...html.matchAll(/<script src="([^"]+)"/g)]
+        .map((m) => sourceOf(m[1]))
+        .filter((file) => file?.startsWith(folder));
+      if (loaded.length) assert.deepEqual(loaded, sources, page);
+    }
+    assert.deepEqual(
+      bundled.filter((file) => file.startsWith(folder)),
+      sources,
+      published + ' in the bundle'
+    );
   }
-  const bundled = bundleSource().files.filter((f) =>
-    f.startsWith('domain/rules/')
-  );
-  assert.deepEqual(bundled, parts, 'bundle');
 });

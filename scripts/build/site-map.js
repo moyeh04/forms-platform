@@ -43,7 +43,12 @@ const JOINED = [
   },
   {
     published: 'shared/form-metadata.js',
-    sources: ['domain/form-metadata/index.js']
+    sources: [
+      'domain/form-metadata/read.js',
+      'domain/form-metadata/subject.js',
+      'domain/form-metadata/batch.js',
+      'domain/form-metadata/index.js'
+    ]
   }
 ];
 

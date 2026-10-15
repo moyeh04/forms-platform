@@ -2,14 +2,6 @@
   ".github/workflows/pages.yml": {
     "lines": 8
   },
-  "domain/form-metadata/index.js": {
-    "biome/lint/complexity/useOptionalChain": 13,
-    "biome/lint/correctness/noInnerDeclarations": 3,
-    "biome/lint/correctness/noUnusedVariables": 1,
-    "biome/lint/style/noMagicNumbers": 3,
-    "biome/lint/suspicious/noPrototypeBuiltins": 1,
-    "jsdoc": 41
-  },
   "package.json": {
     "lines": 1
   },

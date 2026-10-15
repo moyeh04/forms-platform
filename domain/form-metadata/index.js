@@ -1,233 +1,200 @@
-var FormMetadata = (function () {
+/**
+ * What each form type shows beside its title, and how it is read, saved and
+ * copied: a term and a subject code for most forms, a batch year for a
+ * WhatsApp registration. The pages, the Node tests and the Apps Script
+ * backend all load it, as the global FormMetadata, after its parts.
+ */
+(function (root) {
   'use strict';
 
-  function own(object, key) {
-    return Object.prototype.hasOwnProperty.call(object || {}, key);
-  }
+  var node = typeof module === 'object' && module.exports;
+  var reading = node ? require('./read.js') : root.FormMetadataRead;
+  var subjectAdapter = node
+    ? require('./subject.js')
+    : root.FormMetadataSubject;
+  var batchAdapter = node ? require('./batch.js') : root.FormMetadataBatch;
+  var own = reading.own;
+  var fieldOf = reading.fieldOf;
 
-  function text(value) {
-    return String(value == null ? '' : value).trim();
-  }
-
-  function yearFromTerm(term) {
-    var value = text(term);
-    var academicYear = value.match(/(?:^|\s)(\d{4})\/(\d{4})$/);
-    if (academicYear) return academicYear[1] + '/' + academicYear[2];
-    var season = value.match(/^(fall|spring|summer)\s+(\d{4})$/i);
-    if (season) {
-      var start =
-        parseInt(season[2], 10) +
-        (/^(spring|summer)$/i.test(season[1]) ? -1 : 0);
-      return String(start) + '/' + String(start + 1);
-    }
-    var match = value.match(/(?:^|\s)(\d{4})$/);
-    return match ? match[1] + '/' + (parseInt(match[1], 10) + 1) : '';
-  }
-
-  function academicYears(current) {
-    var year = new Date().getFullYear(),
-      years = [
-        String(year) + '/' + String(year + 1),
-        String(year - 1) + '/' + String(year)
-      ];
-    for (var y = year + 1; y <= year + 4; y++)
-      years.push(String(y) + '/' + String(y + 1));
-    for (var past = year - 2; past >= year - 6; past--)
-      years.push(String(past) + '/' + String(past + 1));
-    if (current && years.indexOf(String(current)) === -1)
-      years.unshift(String(current));
-    return years;
-  }
-
-  function academicYear(value) {
-    var year = text(value).match(/^(\d{4})$/);
-    return year
-      ? year[1] + '/' + (parseInt(year[1], 10) + 1)
-      : yearFromTerm(value);
-  }
-
-  function legacyAcademicYear(term) {
-    var match = text(term).match(/^(fall|spring|summer)\s+(\d{4})$/i);
-    if (!match) return academicYear(term);
-    var year =
-      parseInt(match[2], 10) + (match[1].toLowerCase() === 'fall' ? 0 : -1);
-    return String(year) + '/' + String(year + 1);
-  }
-
-  function subjectCode(value) {
-    return text(value)
-      .replace(/\s+/g, '')
-      .replace(/[^A-Za-z0-9\-]/g, '')
-      .slice(0, 20);
-  }
-
-  function subjectTerm(form) {
-    return {
-      term: text(form && form.term),
-      subject: text(form && form.subject)
-    };
-  }
-
-  var subjectAdapter = {
-    editor: 'term-subject',
-    duplicateAction: 'Duplicate for a new term',
-    fields: ['term', 'subject'],
-    legacyFields: [],
-    defaults: function () {
-      return { term: 'Fall ' + academicYears()[0], subject: '' };
-    },
-    read: subjectTerm,
-    create: function (values) {
-      return { term: text(values.term), subject: subjectCode(values.subject) };
-    },
-    duplicate: function (form, values) {
-      return {
-        term: own(values, 'term') ? text(values.term) : text(form.term),
-        subject: own(values, 'subject')
-          ? subjectCode(values.subject)
-          : text(form.subject)
-      };
-    },
-    update: function (form, patch) {
-      if (own(patch, 'term')) form.term = text(patch.term);
-      if (own(patch, 'subject')) form.subject = subjectCode(patch.subject);
-    },
-    applyUpdate: function (form, patch) {
-      this.update(form, patch);
-    },
-    public: subjectTerm,
-    display: function (form) {
-      var metadata = subjectTerm(form);
-      return [
-        metadata.subject
-          ? { key: 'subject', value: metadata.subject, variant: 'subject' }
-          : null,
-        metadata.term
-          ? { key: 'term', value: metadata.term, variant: 'term' }
-          : null
-      ].filter(Boolean);
-    },
-    caption: function (form) {
-      return subjectTerm(form).term;
-    },
-    slug: function (form) {
-      return subjectTerm(form).term;
-    },
-    sheet: function (form) {
-      return subjectTerm(form).term;
-    }
-  };
-
-  function batchYear(form) {
-    return (
-      academicYear(form && form.batchYear) ||
-      legacyAcademicYear(form && form.term)
-    );
-  }
-
-  var batchAdapter = {
-    editor: 'batch-year',
-    fields: ['batchYear'],
-    legacyFields: ['term', 'subject'],
-    defaults: function () {
-      return { batchYear: academicYears()[0] };
-    },
-    read: function (form) {
-      return { batchYear: batchYear(form) };
-    },
-    create: function (values) {
-      return {
-        term: '',
-        batchYear:
-          academicYear(values.batchYear) || legacyAcademicYear(values.term)
-      };
-    },
-    duplicate: function (form, values) {
-      return {
-        term: '',
-        batchYear: academicYear(values.batchYear) || batchYear(form)
-      };
-    },
-    update: function (form, patch) {
-      if (own(patch, 'batchYear'))
-        form.batchYear = academicYear(patch.batchYear);
-      else if (own(patch, 'term'))
-        form.batchYear = legacyAcademicYear(patch.term);
-    },
-    public: function (form) {
-      return { batchYear: batchYear(form) };
-    },
-    display: function (form) {
-      var year = batchYear(form);
-      return year
-        ? [{ key: 'batchYear', value: 'Batch ' + year, variant: 'term' }]
-        : [];
-    },
-    caption: function (form) {
-      var year = batchYear(form);
-      return year ? 'Batch ' + year : '';
-    },
-    slug: batchYear,
-    sheet: function (form) {
-      var year = batchYear(form);
-      return year ? 'Batch ' + year : '';
-    }
-  };
-
-  var types = {
+  /** The metadata of each form type. */
+  var TYPES = {
     team_registration: subjectAdapter,
     task_submission: subjectAdapter,
     reservation: subjectAdapter,
     whatsapp_registration: batchAdapter
   };
 
+  /**
+   * Gives the metadata of a form type; a type it does not know has a term
+   * and a subject.
+   *
+   * @param {*} type The form type.
+   * @return {!Object} The metadata.
+   */
   function forType(type) {
-    return types[type] || subjectAdapter;
+    return own(TYPES, type) ? TYPES[type] : subjectAdapter;
   }
 
-  return {
+  /**
+   * Gives the metadata of a form's type.
+   *
+   * @param {?Object} form The form.
+   * @return {!Object} The metadata.
+   */
+  function forForm(form) {
+    return forType(fieldOf(form, 'type'));
+  }
+
+  /**
+   * Gives the metadata fields of a new form.
+   *
+   * @param {*} type The form type.
+   * @param {?Object=} values What the admin typed.
+   * @return {!Object} The cleaned fields.
+   */
+  function create(type, values) {
+    return forType(type).create(values || {});
+  }
+
+  /**
+   * Gives the metadata fields of a copy of a form.
+   *
+   * @param {?Object} form The form copied.
+   * @param {?Object=} values What the admin typed.
+   * @return {!Object} The fields of the copy.
+   */
+  function duplicate(form, values) {
+    return forForm(form).duplicate(form || {}, values || {});
+  }
+
+  /**
+   * Gives the metadata a new form of a type starts with.
+   *
+   * @param {*} type The form type.
+   * @return {!Object} The fields.
+   */
+  function defaults(type) {
+    return forType(type).defaults();
+  }
+
+  /**
+   * Lists the metadata fields of a form type.
+   *
+   * @param {*} type The form type.
+   * @return {!Array<string>} The fields.
+   */
+  function fields(type) {
+    return forType(type).fields.slice();
+  }
+
+  /**
+   * Lists the fields an older form of a type kept its metadata in.
+   *
+   * @param {*} type The form type.
+   * @return {!Array<string>} The fields.
+   */
+  function legacyFields(type) {
+    return forType(type).legacyFields.slice();
+  }
+
+  /**
+   * Reads the metadata of a form.
+   *
+   * @param {?Object} form The form.
+   * @return {!Object} The fields.
+   */
+  function read(form) {
+    return forForm(form).read(form || {});
+  }
+
+  /**
+   * Writes the metadata a form reads onto it, for an older form.
+   *
+   * @param {!Object} form The form; it changes.
+   * @return {!Object} The same form.
+   */
+  function hydrate(form) {
+    Object.assign(form, read(form));
+    return form;
+  }
+
+  /**
+   * Saves changed metadata on a form.
+   *
+   * @param {!Object} form The form; it changes.
+   * @param {?Object=} patch The changes.
+   */
+  function update(form, patch) {
+    forForm(form).update(form, patch || {});
+  }
+
+  /**
+   * Gives the metadata a student sees.
+   *
+   * @param {?Object} form The form.
+   * @return {!Object} The fields.
+   */
+  function publicOf(form) {
+    return forForm(form).public(form || {});
+  }
+
+  /**
+   * Lists what a form shows beside its title.
+   *
+   * @param {?Object} form The form.
+   * @return {!Array<!Object>} The labels.
+   */
+  function display(form) {
+    return forForm(form).display(form || {});
+  }
+
+  /**
+   * Gives the caption of a form.
+   *
+   * @param {?Object} form The form.
+   * @return {string} The caption.
+   */
+  function caption(form) {
+    return forForm(form).caption(form || {});
+  }
+
+  /**
+   * Gives the part of a form's link name its metadata adds.
+   *
+   * @param {?Object} form The form.
+   * @return {string} The part.
+   */
+  function slug(form) {
+    return forForm(form).slug(form || {});
+  }
+
+  /**
+   * Gives the part of a form's sheet name its metadata adds.
+   *
+   * @param {?Object} form The form.
+   * @return {string} The part.
+   */
+  function sheet(form) {
+    return forForm(form).sheet(form || {});
+  }
+
+  var api = {
     forType: forType,
-    create: function (type, values) {
-      return forType(type).create(values || {});
-    },
-    duplicate: function (form, values) {
-      var adapter = forType(form && form.type);
-      return adapter.duplicate(form || {}, values || {});
-    },
-    defaults: function (type) {
-      return forType(type).defaults();
-    },
-    fields: function (type) {
-      return forType(type).fields.slice();
-    },
-    academicYears: academicYears,
-    legacyFields: function (type) {
-      return forType(type).legacyFields.slice();
-    },
-    read: function (form) {
-      return forType(form && form.type).read(form || {});
-    },
-    hydrate: function (form) {
-      Object.assign(form, forType(form && form.type).read(form || {}));
-      return form;
-    },
-    update: function (form, patch) {
-      return forType(form && form.type).update(form, patch || {});
-    },
-    public: function (form) {
-      return forType(form && form.type).public(form || {});
-    },
-    display: function (form) {
-      return forType(form && form.type).display(form || {});
-    },
-    caption: function (form) {
-      return forType(form && form.type).caption(form || {});
-    },
-    slug: function (form) {
-      return forType(form && form.type).slug(form || {});
-    },
-    sheet: function (form) {
-      return forType(form && form.type).sheet(form || {});
-    }
+    create: create,
+    duplicate: duplicate,
+    defaults: defaults,
+    fields: fields,
+    academicYears: reading.academicYears,
+    legacyFields: legacyFields,
+    read: read,
+    hydrate: hydrate,
+    update: update,
+    public: publicOf,
+    display: display,
+    caption: caption,
+    slug: slug,
+    sheet: sheet
   };
-})();
+  if (node) module.exports = api;
+  root.FormMetadata = api;
+})(typeof globalThis !== 'undefined' ? globalThis : this);
