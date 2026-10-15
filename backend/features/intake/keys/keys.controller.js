@@ -33,7 +33,7 @@ function extendedExpiry_(current, days, until) {
   return new Date(from + days * 86400000).toISOString();
 }
 
-API['admin.keys.list'] = admin(function (req) {
+API['admin.keys.list'] = AuthService.admin(function (req) {
   var form = requireForm(req.slug || req.id);
   return { keys: keyedRows_(form).map(keyRow_) };
 });
@@ -42,7 +42,7 @@ API['admin.keys.list'] = admin(function (req) {
  * req: slug, which ('all', 'expired' or 'chosen'), ids (for 'chosen'), and either days
  * (1 to 365) or until (an ISO time in the future).
  */
-API['admin.keys.extend'] = admin(function (req) {
+API['admin.keys.extend'] = AuthService.admin(function (req) {
   var form = requireForm(req.slug || req.id);
   requireKeyEnabled_(form);
   var days = 0,

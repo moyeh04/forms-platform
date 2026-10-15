@@ -11,7 +11,7 @@ function requireMatching_(form) {
     ApiError.fail('no_matching', 'Matching is not turned on for this form.');
 }
 
-API['admin.matching.import'] = admin(function (req) {
+API['admin.matching.import'] = AuthService.admin(function (req) {
   var form = requireForm(req.slug || req.id);
   requireMatching_(form);
   return Lock.withLock(function () {
@@ -60,7 +60,7 @@ API['admin.matching.import'] = admin(function (req) {
   });
 });
 
-API['admin.matching.list'] = admin(function (req) {
+API['admin.matching.list'] = AuthService.admin(function (req) {
   var form = requireForm(req.slug || req.id);
   requireMatching_(form);
   var subs = readResponses(form);
@@ -100,7 +100,7 @@ API['admin.matching.list'] = admin(function (req) {
   };
 });
 
-API['admin.matching.decide'] = admin(function (req) {
+API['admin.matching.decide'] = AuthService.admin(function (req) {
   var form = requireForm(req.slug || req.id);
   requireMatching_(form);
   var decision = String(req.decision);
@@ -133,7 +133,7 @@ API['admin.matching.decide'] = admin(function (req) {
   return { decided: true, submissionId: linked };
 });
 
-API['admin.matching.remove'] = admin(function (req) {
+API['admin.matching.remove'] = AuthService.admin(function (req) {
   var form = requireForm(req.slug || req.id);
   requireMatching_(form);
   var ids = {};

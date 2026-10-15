@@ -3,6 +3,7 @@
  * guess counts toward a temporary lock, so the PIN cannot be brute forced.
  */
 
+var AuthService = (function () {
 var ADMIN_MAX_FAILS = 8;
 
 var ADMIN_LOCK_SECONDS = 600;
@@ -58,3 +59,6 @@ function admin(fn) {
     return fn(req);
   };
 }
+
+return { admin, setAdminPin, unlockAdmin, pinHash: pinHash_ };
+})();

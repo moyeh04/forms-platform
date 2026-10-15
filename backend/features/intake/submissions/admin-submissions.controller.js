@@ -13,7 +13,7 @@ function adminView_(r) {
   return o;
 }
 
-API['admin.submissions'] = admin(function (req) {
+API['admin.submissions'] = AuthService.admin(function (req) {
   var form = requireForm(req.slug || req.id);
   var rows = numberedResponses_(form, !!req.includeDeleted).map(function (r) {
     var view = adminView_(r);
@@ -29,7 +29,7 @@ API['admin.submissions'] = admin(function (req) {
   return { submissions: rows, transfers: adminTransfers_(form) };
 });
 
-API['admin.submission.update'] = admin(function (req) {
+API['admin.submission.update'] = AuthService.admin(function (req) {
   var form = requireForm(req.slug || req.id);
   var vform = validationForm(form);
   var patch = req.patch || {};
@@ -74,7 +74,7 @@ API['admin.submission.update'] = admin(function (req) {
   return { updated: true, dataChanged: changedData };
 });
 
-API['admin.submission.delete'] = admin(function (req) {
+API['admin.submission.delete'] = AuthService.admin(function (req) {
   var form = requireForm(req.slug || req.id);
   Lock.withLock(function () {
     if (!cancelResponse_(form, req.submissionId))
@@ -84,7 +84,7 @@ API['admin.submission.delete'] = admin(function (req) {
   return { deleted: true };
 });
 
-API['admin.submission.resetKey'] = admin(function (req) {
+API['admin.submission.resetKey'] = AuthService.admin(function (req) {
   var form = requireForm(req.slug || req.id);
   var vform = validationForm(form);
   return Lock.withLock(function () {
@@ -103,7 +103,7 @@ API['admin.submission.resetKey'] = admin(function (req) {
 });
 
 /** The admin reads a student's current key, for example when the student lost it. */
-API['admin.submission.key'] = admin(function (req) {
+API['admin.submission.key'] = AuthService.admin(function (req) {
   var form = requireForm(req.slug || req.id);
   var r = readResponses(form).filter(function (x) {
     return x.id === req.submissionId;

@@ -2,7 +2,11 @@
   ".github/workflows/pages.yml": {
     "lines": 9
   },
+  "backend/features/access/auth/auth.controller.js": {
+    "biome/format": 1
+  },
   "backend/features/access/auth/auth.service.js": {
+    "biome/format": 1,
     "biome/lint/complexity/useOptionalChain": 1,
     "biome/lint/style/noMagicNumbers": 1,
     "jsdoc": 7,

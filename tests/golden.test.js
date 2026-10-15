@@ -87,7 +87,7 @@ test('Golden: the salted hashes and seals are the same for the same pepper', () 
   const form = { id: 'form-1' };
   const client = { id: 'client-1' };
   const hashes = {
-    pin: w.call('pinHash_', '1234'),
+    pin: w.call('AuthService.pinHash', '1234'),
     clientToken: w.call('clientToken_', 'token-1'),
     clientKey: w.call('clientKeyHash_', client, '12345'),
     clientPad: w.call('clientKeyPad_', client),

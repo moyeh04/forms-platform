@@ -2,7 +2,7 @@
 
 var API = API || {};
 
-API['admin.views.rebuild'] = admin(function (req) {
+API['admin.views.rebuild'] = AuthService.admin(function (req) {
   var form = requireForm(req.slug || req.id);
   rebuildViews(form);
   return { rebuilt: true, sheetUrl: form.sheetUrl };

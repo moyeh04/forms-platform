@@ -15,7 +15,7 @@
 var API = API || {};
 
 /** Starts a download: a fresh work folder (the form's older ones go to the trash) and the list of teams. */
-API['admin.download.start'] = admin(function (req) {
+API['admin.download.start'] = AuthService.admin(function (req) {
   var form = requireForm(req.slug || req.id);
   if (!isTeamForm_(form))
     ApiError.fail('wrong_type', 'Only team and task forms can be downloaded.');
@@ -56,7 +56,7 @@ API['admin.download.start'] = admin(function (req) {
  * Saves one team's file, or its folder with every subfolder. A big folder is saved over several
  * requests: `done` is false until every file is in, and a repeated request skips what is saved.
  */
-API['admin.download.team'] = admin(function (req) {
+API['admin.download.team'] = AuthService.admin(function (req) {
   var x = dlJob_(req),
     form = x.form,
     job = x.job;
@@ -157,7 +157,7 @@ API['admin.download.team'] = admin(function (req) {
 });
 
 /** Writes the workbook and splits the saved files into zip parts. Returns how many parts there are. */
-API['admin.download.finish'] = admin(function (req) {
+API['admin.download.finish'] = AuthService.admin(function (req) {
   var x = dlJob_(req),
     form = x.form,
     job = x.job;
@@ -194,7 +194,7 @@ API['admin.download.finish'] = admin(function (req) {
 });
 
 /** Packs one zip part, keeps it in the work folder, and moves its loose files to the trash. */
-API['admin.download.pack'] = admin(function (req) {
+API['admin.download.pack'] = AuthService.admin(function (req) {
   var x = dlJob_(req),
     form = x.form,
     job = x.job;
@@ -227,7 +227,7 @@ API['admin.download.pack'] = admin(function (req) {
  * A piece of a packed zip, as base64, so the page can save it without sharing anything. Only
  * the piece is read from Drive (a ranged request), not the whole zip each time.
  */
-API['admin.download.chunk'] = admin(function (req) {
+API['admin.download.chunk'] = AuthService.admin(function (req) {
   var job = dlJob_(req).job;
   if (job.zips.indexOf(req.file) === -1)
     ApiError.fail('bad_part', 'That part does not exist.');

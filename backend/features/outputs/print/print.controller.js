@@ -2,7 +2,7 @@
 
 var API = API || {};
 
-API['admin.print.reservations'] = admin(function (req) {
+API['admin.print.reservations'] = AuthService.admin(function (req) {
   var form = requireForm(req.slug || req.id);
   if (form.type !== 'reservation')
     ApiError.fail('wrong_type', 'Only reservation forms have days to print.');
@@ -12,7 +12,7 @@ API['admin.print.reservations'] = admin(function (req) {
   );
 });
 
-API['admin.print.teamList'] = admin(function (req) {
+API['admin.print.teamList'] = AuthService.admin(function (req) {
   var form = requireForm(req.slug || req.id);
   if (!isTeamForm_(form))
     ApiError.fail('wrong_type', 'Only team and task forms have a team list.');

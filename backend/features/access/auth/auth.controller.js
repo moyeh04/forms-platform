@@ -1,7 +1,14 @@
 /** The admin login action. */
 
-var API = API || {};
-
-API['admin.login'] = admin(function () {
+var AuthController = (function () {
+/**
+ * Answers the `admin.login` action.
+ *
+ * @return {*} The answer, sent back as JSON.
+ */
+function login() {
   return { admin: true };
-});
+}
+
+return { login };
+})();

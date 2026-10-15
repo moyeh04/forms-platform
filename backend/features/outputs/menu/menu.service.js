@@ -39,7 +39,7 @@ function menuSetPin() {
   );
   if (res.getSelectedButton() !== ui.Button.OK) return;
   try {
-    setAdminPin(res.getResponseText());
+    AuthService.setAdminPin(res.getResponseText());
     ui.alert('Done', 'The admin PIN was saved.', ui.ButtonSet.OK);
   } catch (e) {
     ui.alert('Not saved', e.message, ui.ButtonSet.OK);
@@ -48,7 +48,7 @@ function menuSetPin() {
 
 function menuUnlockAdmin() {
   var ui = SpreadsheetApp.getUi();
-  if (unlockAdmin())
+  if (AuthService.unlockAdmin())
     ui.alert(
       'Unlocked',
       'The admin page takes the PIN again. The PIN is the same.',

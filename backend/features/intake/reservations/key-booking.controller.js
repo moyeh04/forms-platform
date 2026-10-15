@@ -31,7 +31,7 @@ API.bookingTeam = function (req) {
  * books with the keys of that form. Each later one is a copy of the newest: same questions,
  * rules and hours, the days one week later, no bookings, and its own sheet. It is a draft.
  */
-API['admin.bookings.next'] = admin(function (req) {
+API['admin.bookings.next'] = AuthService.admin(function (req) {
   var source = requireForm(req.source);
   if (!issuesKeys_(source))
     ApiError.fail(

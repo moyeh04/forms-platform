@@ -69,7 +69,7 @@ function adminTransfers_(form) {
   });
 }
 
-API['admin.transfer.decide'] = admin(function (req) {
+API['admin.transfer.decide'] = AuthService.admin(function (req) {
   var form = requireForm(req.slug || req.id);
   var vform = validationForm(form);
   var out = Lock.withLock(function () {

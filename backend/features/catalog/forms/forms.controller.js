@@ -22,11 +22,11 @@ API.getForm = function (req) {
   return out;
 };
 
-API['admin.forms.list'] = admin(function () {
+API['admin.forms.list'] = AuthService.admin(function () {
   return { forms: readForms() };
 });
 
-API['admin.forms.get'] = admin(function (req) {
+API['admin.forms.get'] = AuthService.admin(function (req) {
   var form = requireForm(req.id);
   var out = { form: form, lists: readLists(), listInfo: readListInfo() };
   // The timetable editor marks slots that already have bookings.
@@ -43,20 +43,20 @@ API['admin.forms.get'] = admin(function (req) {
   return out;
 });
 
-API['admin.forms.create'] = admin(function (req) {
+API['admin.forms.create'] = AuthService.admin(function (req) {
   return { form: createForm(req) };
 });
 
 /** req: id, patch, and base (the `updatedAt` of the copy the page showed, so a newer save is not overwritten). */
-API['admin.forms.update'] = admin(function (req) {
+API['admin.forms.update'] = AuthService.admin(function (req) {
   return { form: updateForm(req.id, req.patch || {}, req.base) };
 });
 
-API['admin.forms.duplicate'] = admin(function (req) {
+API['admin.forms.duplicate'] = AuthService.admin(function (req) {
   return { form: duplicateForm(req.id, req) };
 });
 
-API['admin.forms.delete'] = admin(function (req) {
+API['admin.forms.delete'] = AuthService.admin(function (req) {
   var form = requireForm(req.id);
   // The page sends the link name back as a deliberate second key, so a stray call cannot delete a form.
   if (String(req.confirm || '') !== form.slug)

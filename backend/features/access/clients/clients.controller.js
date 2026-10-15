@@ -5,11 +5,11 @@
 
 var API = API || {};
 
-API['admin.clients.list'] = admin(function () {
+API['admin.clients.list'] = AuthService.admin(function () {
   return { clients: readClients_().map(publicClient_) };
 });
 
-API['admin.clients.create'] = admin(function (req) {
+API['admin.clients.create'] = AuthService.admin(function (req) {
   var name = String(req.name || '').trim();
   if (!name) ApiError.fail('name_required', 'Give this person or group a name.');
   var token = newToken_();
@@ -33,7 +33,7 @@ API['admin.clients.create'] = admin(function (req) {
   return { client: publicClient_(c), token: token, accessKey: key };
 });
 
-API['admin.clients.update'] = admin(function (req) {
+API['admin.clients.update'] = AuthService.admin(function (req) {
   var p = req.patch || {};
   return changeClient_(req.id, function (c) {
     if (p.name !== undefined) c.name = String(p.name).trim() || c.name;
@@ -48,7 +48,7 @@ API['admin.clients.update'] = admin(function (req) {
   });
 });
 
-API['admin.clients.regenerate'] = admin(function (req) {
+API['admin.clients.regenerate'] = AuthService.admin(function (req) {
   var token = newToken_();
   return changeClient_(req.id, function (c) {
     c.tokenHash = clientToken_(token);
@@ -58,7 +58,7 @@ API['admin.clients.regenerate'] = admin(function (req) {
 });
 
 /** Gives a link a new access key (`on`), or removes its key so the link alone opens it. */
-API['admin.clients.key'] = admin(function (req) {
+API['admin.clients.key'] = AuthService.admin(function (req) {
   var key = req.on === false ? '' : newClientKey_();
   return changeClient_(req.id, function (c) {
     setClientKey_(c, key);
@@ -68,7 +68,7 @@ API['admin.clients.key'] = admin(function (req) {
 });
 
 /** The admin reads a link's current key, for example when the client lost it. */
-API['admin.clients.showKey'] = admin(function (req) {
+API['admin.clients.showKey'] = AuthService.admin(function (req) {
   var c = readClients_().filter(function (x) {
     return x.id === req.id;
   })[0];
@@ -83,7 +83,7 @@ API['admin.clients.showKey'] = admin(function (req) {
   return { accessKey: key };
 });
 
-API['admin.clients.remove'] = admin(function (req) {
+API['admin.clients.remove'] = AuthService.admin(function (req) {
   return Lock.withLock(function () {
     var c = readClients_().filter(function (x) {
       return x.id === req.id;
