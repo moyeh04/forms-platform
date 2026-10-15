@@ -95,18 +95,18 @@ flowchart LR
     end
     subgraph admin["admin.html: the dashboard"]
         r2["domain/rules/"]
-        a1["admin.js"]
-        a2["admin-settings.js"]
-        a5["admin-timetable.js"]
-        a9["admin-range.js"]
-        a10["admin-size-alerts.js"]
-        a7["admin-keys.js"]
-        a8["admin-download.js"]
+        a1["admin/shell/admin.page.js"]
+        a2["admin/settings/settings.page.js"]
+        a5["admin/settings/timetable.view.js"]
+        a9["admin/settings/range.view.js"]
+        a10["admin/settings/size-alerts.view.js"]
+        a7["admin/keys/keys.view.js"]
+        a8["admin/responses/download.view.js"]
         h2["handover.js"]
         s2["size-alerts.js"]
-        a3["admin-data.js"]
-        a4["admin-people.js"]
-        a6["admin-lists.js"]
+        a3["admin/responses/responses.page.js"]
+        a4["admin/people/people.page.js"]
+        a6["admin/lists/lists.page.js"]
     end
     subgraph viewer["viewer.html: instructor page"]
         v1["viewer.js"]
@@ -184,16 +184,16 @@ The site is published at the paths it has always had: the pages at the root,
 | `web/js/ui/dialogs.js` | The toast and the confirmation dialog. |
 | `web/js/ui/clipboard.js` | Copies text, with a fallback for browsers without the clipboard API. |
 | `web/js/ui/theme-button.js` | The light and dark switch every page has. |
-| `web/js/admin.js` | Dashboard core: login with the PIN, navigation, the widgets the dashboard modules share, and the forms list. |
-| `web/js/admin-settings.js` | Form settings: everything an admin can change without touching code. |
-| `web/js/admin-timetable.js` | The timetable of a reservation form: dates on a calendar, the hours, and the slots of each day. |
-| `web/js/admin-range.js` | The range control of the team size and the teammates. |
-| `web/js/admin-size-alerts.js` | The two warnings about small teams. |
-| `web/js/admin-keys.js` | Key and link end dates. |
-| `web/js/admin-data.js` | Responses, each team, day or registration in its own block as in the sheet, and WhatsApp matching. |
-| `web/js/admin-download.js` | Download all. |
-| `web/js/admin-people.js` | Instructor and client links. |
-| `web/js/admin-lists.js` | The lists behind dropdown questions, each edited the way its kind needs. |
+| `web/js/admin/shell/admin.page.js` | Dashboard core: login with the PIN, navigation, the widgets the dashboard modules share, and the forms list. |
+| `web/js/admin/settings/settings.page.js` | Form settings: everything an admin can change without touching code. |
+| `web/js/admin/settings/timetable.view.js` | The timetable of a reservation form: dates on a calendar, the hours, and the slots of each day. |
+| `web/js/admin/settings/range.view.js` | The range control of the team size and the teammates. |
+| `web/js/admin/settings/size-alerts.view.js` | The two warnings about small teams. |
+| `web/js/admin/keys/keys.view.js` | Key and link end dates. |
+| `web/js/admin/responses/responses.page.js` | Responses, each team, day or registration in its own block as in the sheet, and WhatsApp matching. |
+| `web/js/admin/responses/download.view.js` | Download all. |
+| `web/js/admin/people/people.page.js` | Instructor and client links. |
+| `web/js/admin/lists/lists.page.js` | The lists behind dropdown questions, each edited the way its kind needs. |
 | `web/js/teams/size-alerts.view.js` | The warnings about small teams as they are drawn: a line for each level and a mark on the card of a small team. Used by the dashboard and the instructor page. |
 | `web/js/viewer.js` | The instructor page. |
 | `domain/enums.js` | The words the pages and the backend share, as frozen enums of stored values: `FormType`, `FormStatus`, `ReviewStatus` and `ListKind`. Loaded before the other domain files. |

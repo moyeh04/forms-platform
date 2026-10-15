@@ -119,6 +119,46 @@ const JOINED = [
       'domain/form-metadata/batch.js',
       'domain/form-metadata/index.js'
     ]
+  },
+  {
+    published: 'assets/js/admin.js',
+    sources: ['web/js/admin/shell/admin.page.js']
+  },
+  {
+    published: 'assets/js/admin-timetable.js',
+    sources: ['web/js/admin/settings/timetable.view.js']
+  },
+  {
+    published: 'assets/js/admin-keys.js',
+    sources: ['web/js/admin/keys/keys.view.js']
+  },
+  {
+    published: 'assets/js/admin-range.js',
+    sources: ['web/js/admin/settings/range.view.js']
+  },
+  {
+    published: 'assets/js/admin-size-alerts.js',
+    sources: ['web/js/admin/settings/size-alerts.view.js']
+  },
+  {
+    published: 'assets/js/admin-settings.js',
+    sources: ['web/js/admin/settings/settings.page.js']
+  },
+  {
+    published: 'assets/js/admin-data.js',
+    sources: ['web/js/admin/responses/responses.page.js']
+  },
+  {
+    published: 'assets/js/admin-download.js',
+    sources: ['web/js/admin/responses/download.view.js']
+  },
+  {
+    published: 'assets/js/admin-people.js',
+    sources: ['web/js/admin/people/people.page.js']
+  },
+  {
+    published: 'assets/js/admin-lists.js',
+    sources: ['web/js/admin/lists/lists.page.js']
   }
 ];
 

@@ -134,7 +134,7 @@
   "web/index.html": {
     "lines": 4
   },
-  "web/js/admin-data.js": {
+  "web/js/admin/responses/responses.page.js": {
     "biome/lint/complexity/noExcessiveCognitiveComplexity": 8,
     "biome/lint/complexity/noExcessiveLinesPerFunction": 14,
     "biome/lint/complexity/useOptionalChain": 9,
@@ -146,7 +146,7 @@
     "jsdoc": 37,
     "lines": 15
   },
-  "web/js/admin-download.js": {
+  "web/js/admin/responses/download.view.js": {
     "biome/lint/complexity/noExcessiveCognitiveComplexity": 1,
     "biome/lint/complexity/noExcessiveLinesPerFunction": 3,
     "biome/lint/complexity/useOptionalChain": 1,
@@ -158,7 +158,7 @@
     "jsdoc": 9,
     "lines": 10
   },
-  "web/js/admin-keys.js": {
+  "web/js/admin/keys/keys.view.js": {
     "biome/lint/complexity/noExcessiveCognitiveComplexity": 2,
     "biome/lint/complexity/noExcessiveLinesPerFunction": 3,
     "biome/lint/complexity/useOptionalChain": 2,
@@ -171,7 +171,7 @@
     "lines": 12,
     "numbers": 1
   },
-  "web/js/admin-lists.js": {
+  "web/js/admin/lists/lists.page.js": {
     "biome/lint/complexity/noExcessiveCognitiveComplexity": 7,
     "biome/lint/complexity/noExcessiveLinesPerFunction": 12,
     "biome/lint/complexity/useMaxParams": 1,
@@ -185,7 +185,7 @@
     "jsdoc": 88,
     "lines": 44
   },
-  "web/js/admin-people.js": {
+  "web/js/admin/people/people.page.js": {
     "biome/lint/complexity/noExcessiveCognitiveComplexity": 3,
     "biome/lint/complexity/noExcessiveLinesPerFunction": 3,
     "biome/lint/correctness/noInnerDeclarations": 1,
@@ -195,7 +195,7 @@
     "jsdoc": 13,
     "lines": 10
   },
-  "web/js/admin-range.js": {
+  "web/js/admin/settings/range.view.js": {
     "biome/lint/complexity/noExcessiveCognitiveComplexity": 2,
     "biome/lint/complexity/noExcessiveLinesPerFunction": 2,
     "biome/lint/correctness/noInnerDeclarations": 1,
@@ -204,7 +204,7 @@
     "jsdoc": 10,
     "lines": 9
   },
-  "web/js/admin-settings.js": {
+  "web/js/admin/settings/settings.page.js": {
     "biome/lint/complexity/noArguments": 1,
     "biome/lint/complexity/noExcessiveCognitiveComplexity": 5,
     "biome/lint/complexity/noExcessiveLinesPerFunction": 8,
@@ -219,13 +219,13 @@
     "lines": 70,
     "numbers": 4
   },
-  "web/js/admin-size-alerts.js": {
+  "web/js/admin/settings/size-alerts.view.js": {
     "biome/lint/complexity/noExcessiveLinesPerFunction": 1,
     "biome/lint/suspicious/noAssignInExpressions": 1,
     "jsdoc": 9,
     "lines": 8
   },
-  "web/js/admin-timetable.js": {
+  "web/js/admin/settings/timetable.view.js": {
     "biome/lint/complexity/noExcessiveCognitiveComplexity": 3,
     "biome/lint/complexity/noExcessiveLinesPerFunction": 4,
     "biome/lint/complexity/useMaxParams": 1,
@@ -239,7 +239,7 @@
     "lines": 15,
     "numbers": 2
   },
-  "web/js/admin.js": {
+  "web/js/admin/shell/admin.page.js": {
     "biome/lint/complexity/noExcessiveCognitiveComplexity": 1,
     "biome/lint/complexity/noExcessiveLinesPerFunction": 8,
     "biome/lint/complexity/useMaxParams": 1,

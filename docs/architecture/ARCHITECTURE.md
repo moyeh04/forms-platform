@@ -264,7 +264,7 @@ Opening the form again, or moving its close date, lifts the lock. Team
 registrations are not locked this way.
 
 A key works for the number of days set in **Setup, Edit key**, counted from
-when it is given. The admin moves that date in `admin-keys.js`, backed by
+when it is given. The admin moves that date in `admin/keys/keys.view.js`, backed by
 `keys.controller.js`: **Extend** in a registration's details changes one key, and
 **Extend keys** in Setup changes all keys, the expired ones, the ones ending in
 three days, or teams picked from a list. A period is added to the later of
@@ -489,7 +489,7 @@ range (`min - 1` to `max - 1`), so older form definitions keep working.
 The teammates of a booking are the same kind of range, counted without the
 leader: the `min` and `max` of the members question, from 0 (a leader books
 alone) to 19, and its own `notice`. The admin sets both ranges with one
-control, `A.sizeRange` in `admin-range.js`: the lowest and the highest, the
+control, `A.sizeRange` in `admin/settings/range.view.js`: the lowest and the highest, the
 numbers students will see, the saved answers outside a new range (`teamSizes`
 or `teammateCounts` from `admin.forms.get`, both counted by `countResponses_`),
 and the note with its preview. `Rules.sizeNotice` fills in both notes, and the
@@ -510,8 +510,8 @@ person under it).
 |---|---|
 | The levels, their starting numbers, the level of a team, and why a setting cannot be saved | `Rules.sizeAlerts`, `Rules.sizeAlertLevels`, `Rules.sizeAlertOf`, `Rules.sizeAlertsProblem` in `domain/rules/team-size.js` |
 | Checking and cleaning the setting on a save | `normalizeRules_` in `forms.rules.js`, with the same `Rules` functions (`bad_size_alerts`) |
-| The control in the Small teams panel of Setup | `A.sizeAlerts` in `admin-size-alerts.js`; it returns `{ node, refresh(), problem(), summary() }` like the range control |
-| Whether an instructor sees them | `showSizeAlerts` of each link in `clients.repository.js`, set in the link dialog (`admin-people.js`) |
+| The control in the Small teams panel of Setup | `A.sizeAlerts` in `admin/settings/size-alerts.view.js`; it returns `{ node, refresh(), problem(), summary() }` like the range control |
+| Whether an instructor sees them | `showSizeAlerts` of each link in `clients.repository.js`, set in the link dialog (`admin/people/people.page.js`) |
 | The lines above the teams and the mark on a card | `App.sizeAlerts` in `size-alerts.js`, used by the dashboard and the instructor page |
 
 The dashboard loads `domain/rules/` and asks it for the level of each team.
@@ -730,15 +730,15 @@ flowchart LR
         fm["form/<br/>steps, members, slots, review"]
     end
     subgraph adminp["admin.html"]
-        a1["admin.js<br/>shell, login, forms list"]
-        a2["admin-settings.js"]
-        a7["admin-size-alerts.js<br/>warnings about small teams"]
+        a1["admin/shell/admin.page.js<br/>shell, login, forms list"]
+        a2["admin/settings/settings.page.js"]
+        a7["admin/settings/size-alerts.view.js<br/>warnings about small teams"]
         h2["handover.js<br/>who leads a team next"]
         s2["size-alerts.js<br/>small teams, drawn"]
-        a3["admin-data.js<br/>blocks, matching, print"]
-        a4["admin-people.js<br/>clients"]
-        a5["admin-keys.js<br/>key and link end dates"]
-        a6["admin-download.js<br/>Download all"]
+        a3["admin/responses/responses.page.js<br/>blocks, matching, print"]
+        a4["admin/people/people.page.js<br/>clients"]
+        a5["admin/keys/keys.view.js<br/>key and link end dates"]
+        a6["admin/responses/download.view.js<br/>Download all"]
     end
     subgraph viewerp["viewer.html"]
         v1["viewer.js"]
@@ -984,17 +984,17 @@ no new record:
 
 ## The pages of one form
 
-A form has one header and one tab bar, built by `A.formTabs` in `admin.js` and
+A form has one header and one tab bar, built by `A.formTabs` in `admin/shell/admin.page.js` and
 used by both the responses page and the settings page:
 
 | Tab | Address | What it holds |
 |---|---|---|
-| Responses | `#/f/<slug>` | The answers (`admin-data.js`) |
+| Responses | `#/f/<slug>` | The answers (`admin/responses/responses.page.js`) |
 | Questions | `#/f/<slug>/questions` | The questions under the page of the form that shows them, then team size and teammates |
 | Timetable | `#/f/<slug>/timetable` | Reservations only: the calendar of days, the hours and bookings per slot, the slots of each day, booking with a key |
 | Setup | `#/f/<slug>/settings` | Name and dates, who can register, edit key, emails, limits, review steps, delete |
 
-Questions, Timetable and Setup are one view (`admin-settings.js`) over one
+Questions, Timetable and Setup are one view (`admin/settings/settings.page.js`) over one
 form object, so a tab change only hides and shows sections and changes the
 address with `A.setHash`; it never loads the form again and never loses an edit.
 Status is in the header because it is the setting that changes most often.
@@ -1036,7 +1036,7 @@ Rules for this page, to keep when a setting is added:
 - **No sideways scrolling.** Questions are rows of a grid that stack at 760px,
   not a table.
 - **A work area that is large is its own file.** The timetable is
-  `admin-timetable.js`: `A.timetable(form, taken)` returns `{ node, summary(),
+  `admin/settings/timetable.view.js`: `A.timetable(form, taken)` returns `{ node, summary(),
   problem(), slots() }`, and the settings view only places the node in a
   section and asks it for its part of the patch. The saved shape stays
   `slots.days` (`id`, `label`, `date`, `times`) with `slots.pattern` as the
@@ -1119,7 +1119,7 @@ Rules of the move:
 
 ## The Lists page
 
-`admin-lists.js` draws `#/lists` and `#/lists/<key>`: the lists at the side
+`admin/lists/lists.page.js` draws `#/lists` and `#/lists/<key>`: the lists at the side
 (`.l-side`) and the choices of the picked one in the main part (`.l-main`).
 
 - **The kind picks the editor.** A list of `sections` is built from year group
@@ -1196,7 +1196,7 @@ labels of the current tables.
 | Change a colour, font, or size | `web/css/theme.css` (variables only); `npm test` checks the contrast |
 | Reword a message or translate | `web/js/i18n/en.js` and `ar.js` |
 | Add a question to a form | Admin dashboard, or `template-fields.js` for new forms by default |
-| Add a new form type | A new function in `templates.service.js`, a label in `web/js/admin.js` |
+| Add a new form type | A new function in `templates.service.js`, a label in `web/js/admin/shell/admin.page.js` |
 | Change a validation rule | its part in `domain/rules/` (browser, server, and tests all follow) |
 | Add a backend action | A named function in the feature's `*.controller.js`, returned by its namespace; a row in `backend/routes.js` with its `Access`; a row in the section of that access in [API.md](../backend/API.md) |
 | Change sheet colours | `PALETTE` in `sheet-style.js` |

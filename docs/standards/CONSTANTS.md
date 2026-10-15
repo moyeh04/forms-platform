@@ -80,4 +80,4 @@ is silenced on its own line with the reason, and both checks honour it:
 Known gaps, counted in the check baseline until they are fixed:
 
 - Month names are declared in both `domain/rules/slots.js` and
-  `web/js/admin-timetable.js`.
+  `web/js/admin/settings/timetable.view.js`.
