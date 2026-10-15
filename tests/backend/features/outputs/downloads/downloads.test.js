@@ -100,17 +100,18 @@ function download(w, slug) {
   assert.equal(start.ok, true, JSON.stringify(start.error));
   let calls = 0;
   start.teams.forEach((t) => {
-    for (
-      let r;
-      !(r = w.admin({
+    const step = () =>
+      w.admin({
         action: 'admin.download.team',
         slug,
         job: start.job,
         ref: t.ref
-      })).done;
-    ) {
+      });
+    let r = step();
+    while (!r.done) {
       calls++;
       assert.equal(r.ok, true);
+      r = step();
     }
   });
   const fin = w.admin({

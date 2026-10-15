@@ -222,7 +222,7 @@ test(
       send(w, { action: 'transfer.decide', key: a.key, id, approve: false }).ok,
       true
     );
-    let all = rows(w);
+    const all = rows(w);
     assert.deepEqual(
       [codesOf(all.submissions[0]), codesOf(all.submissions[1])],
       [['4230002', '4230003'], ['4230004']]

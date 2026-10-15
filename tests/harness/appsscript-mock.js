@@ -26,7 +26,7 @@ class MockRange {
           ? typeof t[p] === 'function'
             ? t[p].bind(t)
             : t[p]
-          : (...a) => t.proxy
+          : (..._a) => t.proxy
     });
   }
   getValues() {
@@ -140,7 +140,7 @@ class MockSheet {
           ? typeof t[p] === 'function'
             ? t[p].bind(t)
             : t[p]
-          : (...a) => t.proxy
+          : (..._a) => t.proxy
     });
   }
   get(r, c) {
@@ -215,7 +215,9 @@ class MockSheet {
   }
   appendRow(arr) {
     const r = this.getLastRow() + 1;
-    arr.forEach((v, j) => this.set(r, j + 1, v));
+    arr.forEach((v, j) => {
+      this.set(r, j + 1, v);
+    });
     return this.proxy;
   }
   deleteRow(n) {
@@ -262,7 +264,7 @@ class MockSpreadsheet {
           ? typeof t[p] === 'function'
             ? t[p].bind(t)
             : t[p]
-          : (...a) => t.proxy
+          : (..._a) => t.proxy
     });
     this.insertSheet('Sheet1');
   }
@@ -478,11 +480,10 @@ function createWorld(options = {}) {
 
   const fileObj = (id) => ({
     getId: () => id,
-    getName: () => (world.drive.files.get(id) || {}).name || id,
+    getName: () => world.drive.files.get(id)?.name || id,
     getMimeType: () =>
-      (world.drive.files.get(id) || {}).mime || 'application/octet-stream',
-    getSize: () =>
-      ((world.drive.files.get(id) || {}).buf || Buffer.alloc(0)).length,
+      world.drive.files.get(id)?.mime || 'application/octet-stream',
+    getSize: () => (world.drive.files.get(id)?.buf || Buffer.alloc(0)).length,
     getUrl: () => `https://drive.google.com/file/d/${id}/view`,
     getSharingAccess: () => world.drive.access.get(id) || 'ANYONE_WITH_LINK',
     moveTo: () => fileObj(id),
@@ -543,7 +544,7 @@ function createWorld(options = {}) {
       const nid = uid();
       const blob = blobOrName instanceof MockBlob ? blobOrName : null;
       world.drive.files.set(nid, {
-        name: (blobOrName && blobOrName.name) || String(blobOrName),
+        name: blobOrName?.name || String(blobOrName),
         mime: blob ? blob.type : '',
         buf: blob ? blob.buf : Buffer.alloc(0),
         parent: id
@@ -605,7 +606,9 @@ function createWorld(options = {}) {
           return this;
         },
         setProperties(o) {
-          Object.keys(o).forEach((k) => world.props.set(k, String(o[k])));
+          Object.keys(o).forEach((k) => {
+            world.props.set(k, String(o[k]));
+          });
           return this;
         },
         deleteProperty(k) {
@@ -684,7 +687,7 @@ function createWorld(options = {}) {
         const chain = new Proxy(
           {},
           {
-            get: (t, p) =>
+            get: (_t, p) =>
               p === 'create'
                 ? () => {
                     world.triggers.push(made);
@@ -799,7 +802,9 @@ function createWorld(options = {}) {
    */
   world.runTriggers = () => {
     const due = world.triggers.slice();
-    due.forEach((t) => world.call(t.fn));
+    due.forEach((t) => {
+      world.call(t.fn);
+    });
     return due.length;
   };
   world.sheet = (ssId, name) => {

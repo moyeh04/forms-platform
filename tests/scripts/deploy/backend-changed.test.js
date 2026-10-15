@@ -42,7 +42,7 @@ test(
     );
 
     const before = 'a'.repeat(40);
-    const git = (files) => (cmd, args) =>
+    const git = (files) => (_cmd, args) =>
       args[0] === 'diff' ? files.join('\n') + '\n' : '';
     const push = { GITHUB_EVENT_NAME: 'push', BEFORE: before };
     assert.equal(

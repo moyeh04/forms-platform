@@ -40,23 +40,6 @@
     "lines": 12,
     "numbers": 4
   },
-  "tests/backend/features/outputs/downloads/downloads.test.js": {
-    "biome/lint/suspicious/noAssignInExpressions": 1
-  },
-  "tests/golden.test.js": {
-    "biome/lint/suspicious/useIterableCallbackReturn": 1
-  },
-  "tests/harness/appsscript-mock.js": {
-    "biome/lint/complexity/useOptionalChain": 4,
-    "biome/lint/correctness/noUnusedFunctionParameters": 4,
-    "biome/lint/suspicious/useIterableCallbackReturn": 3
-  },
-  "tests/harness/dom.js": {
-    "biome/lint/correctness/noUnusedFunctionParameters": 1
-  },
-  "tests/backend/features/intake/transfers/transfers.test.js": {
-    "biome/lint/style/useConst": 1
-  },
   "web/css/admin/bookings.css": {
     "biome/lint/style/noDescendingSpecificity": 1
   },
@@ -95,8 +78,5 @@
   },
   "web/index.html": {
     "lines": 4
-  },
-  "tests/scripts/deploy/backend-changed.test.js": {
-    "biome/lint/correctness/noUnusedFunctionParameters": 1
   }
 }
