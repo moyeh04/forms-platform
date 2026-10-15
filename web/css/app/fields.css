@@ -1,4 +1,5 @@
-/* The title of a step takes the focus when the step changes, for a screen reader. It is not a control, so it has no ring. */
+/* The title of a step takes the focus when the step changes, for a screen reader. It is not a control, so it has no
+   ring. */
 .step-title:focus {
   outline: none;
 }

@@ -4,19 +4,16 @@
   },
   "web/css/app/fields.css": {
     "biome/lint/style/noDescendingSpecificity": 1,
-    "lines": 2
+    "lines": 1
   },
   "web/css/app/print.css": {
     "biome/lint/complexity/noImportantStyles": 4
   },
   "web/css/app/route.css": {
     "biome/lint/style/noDescendingSpecificity": 4,
-    "lines": 2
+    "lines": 1
   },
   "web/css/app/slots.css": {
     "biome/lint/style/noDescendingSpecificity": 1
-  },
-  "web/css/app/ticket.css": {
-    "lines": 1
   }
 }

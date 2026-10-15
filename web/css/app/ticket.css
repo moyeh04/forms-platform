@@ -158,7 +158,8 @@
 .still .when .slice {
   animation: none;
 }
-/* The month is centred on the red band below the rings (x 306 to 422, y 30 to 47); the day on the front page (x 306 to 416, y 53 to 137). */
+/* The month is centred on the red band below the rings (x 306 to 422, y 30 to 47); the day on the front page (x 306 to
+   416, y 53 to 137). */
 .when-head {
   position: absolute;
   top: 13.7%;
