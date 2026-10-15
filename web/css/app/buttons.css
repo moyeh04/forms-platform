@@ -1,0 +1,106 @@
+/* Buttons. */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 6px 22px;
+  border: 1.5px solid transparent;
+  border-radius: 4px;
+  font-size: var(--fs-btn);
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: none;
+}
+.btn-primary {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+.btn-primary:hover {
+  filter: brightness(1.07);
+}
+.btn-quiet {
+  background: transparent;
+  border-color: var(--line);
+  color: var(--ink);
+}
+.btn-quiet:hover {
+  background: var(--sheet-2);
+}
+.btn-danger {
+  background: var(--err);
+  color: var(--on-accent);
+}
+.btn[disabled] {
+  opacity: 0.55;
+  cursor: wait;
+}
+.link-btn {
+  background: none;
+  border: 0;
+  padding: 6px 0;
+  color: var(--sea);
+  font-size: var(--fs-body);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-top: 30px;
+}
+.nav .btn-primary {
+  margin-inline-start: auto;
+}
+.foot {
+  margin-top: 26px;
+  text-align: center;
+}
+
+.banner {
+  margin: 0 0 20px;
+  padding: 12px 14px;
+  border: 1.5px solid var(--err);
+  border-radius: 4px;
+  color: var(--err);
+  font-weight: 700;
+  font-size: var(--fs-label);
+}
+.banner.info {
+  border-color: var(--sea);
+  color: var(--sea);
+}
+.banner .link-btn {
+  color: inherit;
+  font-weight: 700;
+}
+
+/* Review summary and ticket detail lists. */
+.summary {
+  display: grid;
+  grid-template-columns: minmax(110px, 36%) 1fr;
+  gap: 0;
+  margin: 0;
+}
+.summary dt,
+.summary dd {
+  margin: 0;
+  padding: 9px 0;
+  border-bottom: 1px dashed var(--line);
+}
+.summary dt {
+  font-size: var(--fs-label);
+  font-weight: 700;
+  color: var(--mute);
+  padding-inline-end: 12px;
+}
+.summary dd {
+  overflow-wrap: anywhere;
+}
+.summary .row-edit {
+  grid-column: 1 / -1;
+}

@@ -138,7 +138,15 @@ The site is published at the paths it has always had: the pages at the root,
 | `web/admin.html` | The admin dashboard (PIN). |
 | `web/viewer.html` | The read-only instructor and client page (`?t=private-token`). |
 | `web/css/theme.css` | Colors, fonts, and the type scale as variables. Change the look here; the contrast standard is in its header and enforced by `tests/web/css/theme.test.js`. |
-| `web/css/app.css` | Components of the student page. |
+| `web/css/app/page.css` | The page, its top bar and icon buttons, and the sheet. Every page loads the `app/` files in the order of these rows, so the cascade is the one the single file had. |
+| `web/css/app/route.css` | The route of the steps: the sea, the islands, the treasure island and the ship. |
+| `web/css/app/fields.css` | The title of a step, the fields, the chips of small lists and the team members. |
+| `web/css/app/slots.css` | The booking slots, and the torn ticket of a full slot. |
+| `web/css/app/buttons.css` | The buttons, and the lists of the review summary and of a ticket. |
+| `web/css/app/ticket.css` | The ticket, and the clock and calendar that show the time of a booking. |
+| `web/css/app/dialogs.css` | Dialogs, toasts and the strip that says a newer site is published. |
+| `web/css/app/print.css` | Print: only the ticket, on plain paper. |
+| `web/css/app/notes.css` | Lists inside summaries, the note of a chosen team size and the requests to move a member. |
 | `web/css/admin/layout.css` | The dashboard layout classes, the tabs of a form and the settings sections. The dashboard and the instructor page load the `admin/` files in the order of these rows, so the cascade is the one the single file had. |
 | `web/css/admin/questions.css` | The Questions tab: a row per question under its page. |
 | `web/css/admin/forms-list.css` | The header of a form and the forms list grouped by status. |
