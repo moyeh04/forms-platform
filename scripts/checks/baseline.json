@@ -118,6 +118,7 @@
     "jsdoc": 2
   },
   "backend/features/catalog/registry/registry.repository.js": {
+    "biome/format": 1,
     "jsdoc": 2
   },
   "backend/features/catalog/registry/registry.setup.js": {

@@ -17,7 +17,7 @@ var CLIENT_COLS_ = [
 ];
 
 function clientsSheet_() {
-  return registry().getSheetByName(Constants.TABS.clients);
+  return RegistryRepository.registry().getSheetByName(Constants.TABS.clients);
 }
 
 function rowToClient_(r) {

@@ -32,7 +32,7 @@ var FORM_BASE_ = [
 ];
 
 function formsSheet() {
-  return registry().getSheetByName(Constants.TABS.forms);
+  return RegistryRepository.registry().getSheetByName(Constants.TABS.forms);
 }
 
 function rowToForm_(row) {

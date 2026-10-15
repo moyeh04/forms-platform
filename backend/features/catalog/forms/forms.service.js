@@ -29,7 +29,7 @@ function attachSheet_(form) {
     .setNumberFormat('@');
   first.setFrozenRows(1);
   SheetStyle.styleDataTab(first, RESPONSE_COLS);
-  DriveApp.getFileById(ss.getId()).moveTo(rootFolder());
+  DriveApp.getFileById(ss.getId()).moveTo(RegistryRepository.rootFolder());
   form.sheetId = ss.getId();
   form.sheetUrl = ss.getUrl();
 }

@@ -21,7 +21,7 @@ function onOpen() {
 
 function menuSetup() {
   var ui = SpreadsheetApp.getUi();
-  var r = setup();
+  var r = RegistrySetup.setup();
   ui.alert(
     'Setup finished',
     'The registry is ready. Next, set the admin PIN from the same menu.\n\nForm files will be saved in your Drive folder "Forms Platform".',

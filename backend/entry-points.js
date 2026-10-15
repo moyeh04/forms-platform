@@ -22,3 +22,12 @@ function setAdminPin(pin) {
 function unlockAdmin() {
   return AuthService.unlockAdmin();
 }
+
+/**
+ * First-time setup of the registry. Safe to run again.
+ *
+ * @return {!Object} The registry address and the id of its folder.
+ */
+function setup() {
+  return RegistrySetup.setup();
+}

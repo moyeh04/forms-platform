@@ -231,7 +231,7 @@ function printTeamList_(form) {
 }
 
 function exportsFolder_() {
-  var root = rootFolder();
+  var root = RegistryRepository.rootFolder();
   var it = root.getFoldersByName('Exports');
   return it.hasNext() ? it.next() : root.createFolder('Exports');
 }

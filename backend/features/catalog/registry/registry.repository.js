@@ -3,6 +3,7 @@
  * Each form also owns a separate spreadsheet for its responses.
  */
 
+var RegistryRepository = (function () {
 function registry() {
   var id = Properties.getProp('REGISTRY_ID');
   return id ? SpreadsheetApp.openById(id) : SpreadsheetApp.getActive();
@@ -21,3 +22,6 @@ function rootFolder() {
   Properties.setProp('ROOT_FOLDER_ID', f.getId());
   return f;
 }
+
+return { registry, rootFolder };
+})();

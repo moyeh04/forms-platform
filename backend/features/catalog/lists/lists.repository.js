@@ -29,7 +29,7 @@ var BUILTIN_LIST_NAMES_ = {
 };
 
 function listRows_() {
-  var sh = registry().getSheetByName(Constants.TABS.lists);
+  var sh = RegistryRepository.registry().getSheetByName(Constants.TABS.lists);
   return sh ? Table.readTable(sh, ['key', 'values']) : [];
 }
 
@@ -56,7 +56,7 @@ function listKind_(key, info) {
 }
 
 function writeListRow_(key, json) {
-  var sh = registry().getSheetByName(Constants.TABS.lists);
+  var sh = RegistryRepository.registry().getSheetByName(Constants.TABS.lists);
   var rows = Table.readTable(sh, ['key', 'values']);
   for (var i = 0; i < rows.length; i++) {
     if (rows[i].key === key) {
@@ -76,7 +76,7 @@ function saveListInfo_(info) {
 }
 
 function deleteList_(key) {
-  var sh = registry().getSheetByName(Constants.TABS.lists);
+  var sh = RegistryRepository.registry().getSheetByName(Constants.TABS.lists);
   var row = Table.readTable(sh, ['key', 'values']).filter(function (r) {
     return r.key === key;
   })[0];
