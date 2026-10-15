@@ -94,18 +94,6 @@
     "jsdoc": 4,
     "lines": 1
   },
-  "backend/features/outputs/print/print.controller.js": {
-    "layers": 2
-  },
-  "backend/features/outputs/print/print.service.js": {
-    "biome/lint/complexity/noExcessiveLinesPerFunction": 2,
-    "biome/lint/complexity/useOptionalChain": 1,
-    "biome/lint/correctness/noInnerDeclarations": 3,
-    "biome/lint/style/noMagicNumbers": 46,
-    "biome/lint/suspicious/noAssignInExpressions": 1,
-    "jsdoc": 11,
-    "lines": 2
-  },
   "backend/features/outputs/sheet-views/sheet-views.builder.js": {
     "biome/lint/complexity/noExcessiveLinesPerFunction": 3,
     "biome/lint/complexity/useOptionalChain": 2,

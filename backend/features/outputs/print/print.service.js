@@ -1,294 +1,128 @@
 /**
- * Print-ready tabs and PDF export.
- * The tabs are rebuilt on demand, so they always show the latest data.
+ * Print-ready tabs and their PDF export. The tabs are rebuilt on demand, so
+ * they always show the latest data; `PrintReservations` and `PrintTeamList`
+ * build them.
  */
 
 var PrintService = (function () {
-  function printSheetName_(label) {
-    return ('Print - ' + String(label).replace(/[\[\]*?:\/\\]/g, '-')).slice(
-      0,
-      90
-    );
+  /** The status of a PDF export that worked. */
+  var HTTP_OK_ = 200;
+
+  /** The Drive folder the PDFs go to. */
+  var EXPORTS_FOLDER_ = 'Exports';
+
+  /** The PDF layout of a print tab, as export URL parameters. */
+  var PDF_OPTIONS_ = [
+    'size=A4',
+    'fitw=true',
+    'gridlines=false',
+    'printtitle=false',
+    'sheetnames=false',
+    'pagenumbers=true',
+    'attachment=false'
+  ];
+
+  /**
+   * Makes the link to the start of a spreadsheet's file.
+   *
+   * @param {!Object} form The form whose spreadsheet it is.
+   * @return {string} The link, without a page.
+   */
+  function sheetBase_(form) {
+    return 'https://docs.google.com/spreadsheets/d/' + form.sheetId;
   }
 
-  function sheetLink_(form, gid) {
-    return (
-      'https://docs.google.com/spreadsheets/d/' +
-      form.sheetId +
-      '/edit#gid=' +
-      gid
-    );
-  }
-
-  function paintPrintHeader_(sh, title, headers) {
-    var cols = headers.length;
-    sh.getRange(1, 1, 1, cols)
-      .merge()
-      .setValue(title)
-      .setFontFamily(SheetStyle.PALETTE.font)
-      .setFontSize(16)
-      .setFontWeight('bold')
-      .setHorizontalAlignment('center')
-      .setVerticalAlignment('middle');
-    sh.setRowHeight(1, 44);
-    sh.getRange(3, 1, 1, cols)
-      .setValues([headers])
-      .setFontFamily(SheetStyle.PALETTE.font)
-      .setFontSize(12)
-      .setFontWeight('bold')
-      .setBackground('#E9DFC4')
-      .setHorizontalAlignment('center')
-      .setVerticalAlignment('middle');
-    sh.setRowHeight(3, 34);
-  }
-
-  /** One day of reservations, in timetable order, with a signature column. */
-  function printReservations_(form, dayId, includeEmpty) {
-    var vform = FormsPublic.validationForm(form);
-    var days = (vform.slots && vform.slots.days) || [];
-    var day = days.filter(function (d) {
-      return d.id === dayId;
-    })[0];
-    if (!day)
-      ApiError.fail('day_not_found', 'That day is not in the timetable.');
-
-    var byTime = {};
-    ResponsesRepository.readResponses(form).forEach(function (r) {
-      var p = SlotsRules.slotParts(vform, r.slot);
-      if (p.dayId !== dayId) return;
-      (byTime[p.time] = byTime[p.time] || []).push(r);
-    });
-
-    var includeMembers = Rules.fieldByRole(vform, 'members').enabled !== false;
-    var values = [];
-    day.times.forEach(function (t) {
-      var list = byTime[t] || [];
-      if (!list.length && includeEmpty)
-        values.push(
-          includeMembers ? ['', t, '', '', '', '', ''] : ['', t, '', '', '', '']
-        );
-      list.forEach(function (r) {
-        var row = ['', t, r.name, r.code, r.title];
-        if (includeMembers)
-          row.push(
-            (r.data.members || [])
-              .map(function (m) {
-                return m.name;
-              })
-              .filter(Boolean)
-              .join(', ')
-          );
-        row.push('');
-        values.push(row);
-      });
-    });
-    values.forEach(function (v, i) {
-      v[0] = i + 1;
-    });
-
-    var ss = SpreadsheetApp.openById(form.sheetId);
-    var sh = SheetViewsLayout.freshView(ss, printSheetName_(day.label));
-    var headers = ['No.', 'Time', 'Team leader', 'Code', 'Project'];
-    if (includeMembers) headers.push('Teammates');
-    headers.push('Signature');
-    paintPrintHeader_(
-      sh,
-      form.title +
-        '  -  ' +
-        day.label +
-        (day.date ? '  (' + day.date + ')' : ''),
-      headers
-    );
-    [60, 150, 300, 110, 260]
-      .concat(includeMembers ? [240, 160] : [160])
-      .forEach(function (w, i) {
-        sh.setColumnWidth(i + 1, w);
-      });
-    if (values.length) {
-      sh.getRange(4, 1, values.length, headers.length)
-        .setValues(values)
-        .setFontFamily(SheetStyle.PALETTE.font)
-        .setFontSize(12)
-        .setVerticalAlignment('middle');
-      sh.getRange(4, 1, values.length, 2).setHorizontalAlignment('center');
-      sh.getRange(4, 4, values.length, 1).setHorizontalAlignment('center');
-      sh.setRowHeights(4, values.length, 38);
-      sh.getRange(3, 1, values.length + 1, headers.length).setBorder(
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        '#000000',
-        SpreadsheetApp.BorderStyle.SOLID
-      );
-    } else {
-      sh.getRange(4, 1, 1, headers.length)
-        .merge()
-        .setValue('No bookings for this day.')
-        .setHorizontalAlignment('center');
-    }
-    return {
-      sheetName: sh.getName(),
-      gid: sh.getSheetId(),
-      count: values.length,
-      landscape: false
-    };
-  }
-
-  /** Everyone, team by team, with the team number and task merged. */
-  function printTeamList_(form) {
-    var vform = FormsPublic.validationForm(form);
-    var ss = SpreadsheetApp.openById(form.sheetId);
-    var sh = SheetViewsLayout.freshView(ss, 'Print - Team list');
-    var headers = [
-      'Team',
-      'Team member name',
-      'Code',
-      TeamsService.teamThing(form)
-    ];
-    var metadata = FormMetadata.caption(vform);
-    paintPrintHeader_(
-      sh,
-      vform.title + (metadata ? '  -  ' + metadata : '') + '  -  Team list',
-      headers
-    );
-    [70, 330, 120, 300].forEach(function (w, i) {
-      sh.setColumnWidth(i + 1, w);
-    });
-
-    var values = [],
-      shades = [],
-      blocks = [];
-    TeamsService.teamBlocks(form).forEach(function (t, g) {
-      var style = SheetStyle.PALETTE.groups[g % 2];
-      var start = values.length + 4;
-      t.members.forEach(function (m, i) {
-        values.push([
-          '',
-          i + 1 + '.  ' + m.name + (m.leader ? '  \u2605' : ''),
-          m.code,
-          ''
-        ]);
-        shades.push([
-          style.shades[0],
-          style.shades[i % 2],
-          style.shades[i % 2],
-          style.shades[0]
-        ]);
-      });
-      blocks.push({
-        start: start,
-        length: t.members.length,
-        number: t.number,
-        response: t.response
-      });
-    });
-    if (!values.length) {
-      sh.getRange(4, 1, 1, 4)
-        .merge()
-        .setValue('No registrations yet.')
-        .setHorizontalAlignment('center');
-      return {
-        sheetName: sh.getName(),
-        gid: sh.getSheetId(),
-        count: 0,
-        landscape: false
-      };
-    }
-    sh.getRange(4, 1, values.length, 4)
-      .setValues(values)
-      .setBackgrounds(shades)
-      .setFontFamily(SheetStyle.PALETTE.font)
-      .setFontSize(12)
-      .setVerticalAlignment('middle');
-    sh.getRange(4, 2, values.length, 1).setFontWeight('bold');
-    sh.getRange(4, 3, values.length, 1).setHorizontalAlignment('center');
-    sh.setRowHeights(4, values.length, 30);
-    blocks.forEach(function (b) {
-      var title = b.response.title || '\u2014';
-      SheetViewsLayout.mergedLabel(
-        sh,
-        b.start,
-        1,
-        b.length,
-        b.number,
-        '',
-        '#E9DFC4'
-      );
-      sh.getRange(b.start, 1).setFontColor('#000000');
-      SheetViewsLayout.mergedLabel(
-        sh,
-        b.start,
-        4,
-        b.length,
-        title,
-        b.response.link
-          ? SheetViewsLayout.hyperlink(b.response.link, title)
-          : '',
-        '#E9DFC4'
-      );
-      sh.getRange(b.start, 4).setFontColor('#000000');
-    });
-    SheetViewsLayout.frameBlocks(sh, 4, 4, values.length + 3, blocks);
-    sh.getRange(3, 1, 1, 4).setBorder(
-      true,
-      true,
-      true,
-      true,
-      true,
-      true,
-      SheetStyle.PALETTE.ink,
-      SpreadsheetApp.BorderStyle.SOLID
-    );
-    return {
-      sheetName: sh.getName(),
-      gid: sh.getSheetId(),
-      count: blocks.length,
-      landscape: false
-    };
-  }
-
+  /**
+   * Finds the Drive folder of the PDFs, making it when it is missing.
+   *
+   * @return {!DriveApp.Folder} The folder.
+   */
   function exportsFolder_() {
     var root = RegistryRepository.rootFolder();
-    var it = root.getFoldersByName('Exports');
-    return it.hasNext() ? it.next() : root.createFolder('Exports');
+    var it = root.getFoldersByName(EXPORTS_FOLDER_);
+    return it.hasNext() ? it.next() : root.createFolder(EXPORTS_FOLDER_);
   }
 
-  /** Saves the tab as a PDF in Drive. Returns its link, or null when Google refuses. */
+  /**
+   * Makes the PDF export link of a print tab.
+   *
+   * @param {!Object} form The form.
+   * @param {{gid: number, landscape: boolean}} printed The tab.
+   * @return {string} The link.
+   */
+  function pdfLink_(form, printed) {
+    var params = [
+      'format=pdf',
+      'gid=' + printed.gid,
+      PDF_OPTIONS_[0],
+      'portrait=' + (printed.landscape ? 'false' : 'true')
+    ].concat(PDF_OPTIONS_.slice(1));
+    return sheetBase_(form) + '/export?' + params.join('&');
+  }
+
+  /**
+   * Saves a print tab as a PDF in Drive.
+   *
+   * @param {!Object} form The form.
+   * @param {{sheetName: string, gid: number, landscape: boolean}} printed
+   *     The tab.
+   * @return {?string} The link of the PDF, or null when Google refuses.
+   */
   function exportPdf_(form, printed) {
+    var resp;
+    var name;
     try {
-      var url =
-        'https://docs.google.com/spreadsheets/d/' +
-        form.sheetId +
-        '/export?format=pdf&gid=' +
-        printed.gid +
-        '&size=A4&portrait=' +
-        (printed.landscape ? 'false' : 'true') +
-        '&fitw=true&gridlines=false&printtitle=false&sheetnames=false&pagenumbers=true&attachment=false';
-      var resp = UrlFetchApp.fetch(url, {
+      resp = UrlFetchApp.fetch(pdfLink_(form, printed), {
         headers: { Authorization: 'Bearer ' + ScriptApp.getOAuthToken() },
         muteHttpExceptions: true
       });
-      if (resp.getResponseCode() !== 200) return null;
-      var blob = resp
-        .getBlob()
-        .setName(printed.sheetName.replace(/^Print - /, '') + '.pdf');
-      return exportsFolder_().createFile(blob).getUrl();
+      if (resp.getResponseCode() !== HTTP_OK_) return null;
+      name = printed.sheetName.replace(/^Print - /, '') + '.pdf';
+      return exportsFolder_().createFile(resp.getBlob().setName(name)).getUrl();
     } catch (e) {
       Logger.log('PDF export failed: ' + e.message);
       return null;
     }
   }
 
+  /**
+   * Describes a printed tab with its links, exporting it as a PDF.
+   *
+   * @param {!Object} form The form.
+   * @param {{sheetName: string, gid: number, count: number,
+   *     landscape: boolean}} printed The tab.
+   * @return {{count: number, sheetName: string, sheetUrl: string,
+   *     pdfUrl: ?string}} The result.
+   */
   function printResult_(form, printed) {
     return {
       count: printed.count,
       sheetName: printed.sheetName,
-      sheetUrl: sheetLink_(form, printed.gid),
+      sheetUrl: sheetBase_(form) + '/edit#gid=' + printed.gid,
       pdfUrl: exportPdf_(form, printed)
     };
+  }
+
+  /**
+   * Rebuilds the print tab of one day of reservations.
+   *
+   * @param {!Object} form The form.
+   * @param {string} dayId The id of the day.
+   * @param {boolean} includeEmpty Whether free times get an empty row.
+   * @return {!Object} The tab, for `printResult`.
+   */
+  function printReservations_(form, dayId, includeEmpty) {
+    return PrintReservations.printDay(form, dayId, includeEmpty);
+  }
+
+  /**
+   * Rebuilds the print tab of the team list.
+   *
+   * @param {!Object} form The form.
+   * @return {!Object} The tab, for `printResult`.
+   */
+  function printTeamList_(form) {
+    return PrintTeamList.printList(form);
   }
 
   return {

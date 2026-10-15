@@ -8,7 +8,7 @@ var PrintController = (function () {
    * @return {*} The answer, sent back as JSON.
    */
   function reservations(req) {
-    var form = FormsRepository.requireForm(req.slug || req.id);
+    var form = FormsService.requireForm(req.slug || req.id);
     if (form.type !== FormType.RESERVATION)
       ApiError.fail('wrong_type', 'Only reservation forms have days to print.');
     return PrintService.printResult(
@@ -28,7 +28,7 @@ var PrintController = (function () {
    * @return {*} The answer, sent back as JSON.
    */
   function teamList(req) {
-    var form = FormsRepository.requireForm(req.slug || req.id);
+    var form = FormsService.requireForm(req.slug || req.id);
     if (!TeamsService.isTeamForm(form))
       ApiError.fail('wrong_type', 'Only team and task forms have a team list.');
     return PrintService.printResult(form, PrintService.printTeamList(form));

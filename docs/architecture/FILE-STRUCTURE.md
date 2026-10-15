@@ -277,7 +277,10 @@ the file name says the role:
 | `backend/features/outputs/downloads/downloads.jobs.js` | A Download all job: its folder, its saved parts, retries and file names. |
 | `backend/features/outputs/downloads/downloads.workbook.js` | The Excel workbook a Download all job puts beside the files. |
 | `backend/features/outputs/downloads/downloads.controller.js` | The Download all actions: start, one team, finish, pack and send in chunks. |
-| `backend/features/outputs/print/print.service.js` | The printable sheets of bookings and teams, exported as PDF. |
+| `backend/features/outputs/print/print.service.js` | The print actions behind one door, and the PDF export of a print tab to Drive. |
+| `backend/features/outputs/print/print.layout.js` | The layout every print tab shares: its name, title and header rows, widths, frame and empty note. |
+| `backend/features/outputs/print/print.reservations.js` | The print tab of one day of reservations, in timetable order with a signature column. |
+| `backend/features/outputs/print/print.team-list.js` | The print tab of everyone, team by team, with the team number and task merged. |
 | `backend/features/outputs/print/print.controller.js` | The print actions of the admin. |
 | `backend/features/outputs/menu/menu.service.js` | The Forms Platform menu of the registry sheet and what each item does. |
 | `backend/features/outputs/menu/print-dialog.js` | The dialog the print menu items open in the sheet. |
