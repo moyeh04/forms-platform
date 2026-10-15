@@ -1,11 +1,11 @@
 # Testing
 
-382 automated tests run without a Google account, a browser, or a network.
+387 automated tests run without a Google account, a browser, or a network.
 They run the **real** backend and the **real** pages. This page explains how
 that works and what it can and cannot prove.
 
 ```
-npm test    # 382 tests
+npm test    # 387 tests
 ```
 
 ## The layers
@@ -206,6 +206,7 @@ says something else.
 | Registry setup | `backend/features/catalog/registry/registry.setup.test.js` | 1 | Setup creates the registry tabs and default lists and is safe to repeat |
 | Lists | `backend/features/catalog/lists/lists.test.js` | 1 | The admin replaces a list and the options of its questions follow |
 | Private links | `backend/features/access/clients/clients.test.js` | 1 | A link is created once and the token itself is never stored |
+| Team progress | `backend/features/intake/progress/progress.test.js` | 5 | Milestones kept and cleaned on team forms only and copied with the form, a mark in its own cell that whole-row saves keep and that leaves `updated` alone, a stale state and bad input refused, a link that sees, marks or hides progress, and a team that sees its own with an expired key |
 | Edit keys | `backend/features/intake/keys/keys.test.js` | 9 | Lookup and throttling, expiry, editing and deleting by key, a key that cannot take another team code, per-form switches, unique keys, a key the admin reads back from its sealed copy, registrations from before sealing |
 | Team numbers | `backend/features/intake/teams/team-numbers.test.js` | 3 | A team keeps its number when another cancels, older rows keep the numbers they showed, a booking or a WhatsApp registration gets none |
 | Sheet rows | `backend/platform/sheets/table.test.js` | 1 | A new row is written as plain text, also past the rows the sheet was made with |

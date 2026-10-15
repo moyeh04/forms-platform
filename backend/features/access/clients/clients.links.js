@@ -27,7 +27,8 @@ var ClientsLinks = (function () {
    * Makes a new link.
    *
    * @param {!Object} req The request body: name, forms, hidden columns,
-   *     review and size alert switches, end date and whether to add a key.
+   *     review and size alert switches, what it may do with progress, end
+   *     date and whether to add a key.
    * @return {{client: !Object, token: string, accessKey: string}} The link,
    *     its token and its key, which are shown only now.
    * @throws {ApiError} `name_required` when it has no name.
@@ -45,6 +46,7 @@ var ClientsLinks = (function () {
       hiddenColumns: hiddenColumnsOf_(req.hiddenColumns),
       canReview: !!req.canReview,
       showSizeAlerts: req.showSizeAlerts !== false,
+      progress: ClientsRepository.progressAccess(req.progress),
       active: true,
       createdAt: Time.nowIso(),
       expires: ClientsService.cleanExpiry(req.expires)
@@ -79,6 +81,8 @@ var ClientsLinks = (function () {
     });
     if (p.expires !== undefined)
       c.expires = ClientsService.cleanExpiry(p.expires);
+    if (p.progress !== undefined)
+      c.progress = ClientsRepository.progressAccess(p.progress);
   }
 
   /**

@@ -230,6 +230,13 @@
   "form_not_found",
   "bad_pin"
  ],
+ "admin.progress.mark": [
+  "bad_pin",
+  "bad_pin",
+  "bad_pin",
+  "form_not_found",
+  "bad_pin"
+ ],
  "admin.submission.delete": [
   "bad_pin",
   "bad_pin",
@@ -300,6 +307,13 @@
   "form_not_found",
   "bad_key"
  ],
+ "progress.mine": [
+  "form_not_found",
+  "form_not_found",
+  "form_not_found",
+  "form_not_found",
+  "bad_key"
+ ],
  "remove": [
   "form_not_found",
   "form_not_found",
@@ -343,6 +357,13 @@
   "bad_token"
  ],
  "viewer.me": [
+  "bad_token",
+  "bad_token",
+  "bad_token",
+  "bad_token",
+  "bad_token"
+ ],
+ "viewer.progress.mark": [
   "bad_token",
   "bad_token",
   "bad_token",

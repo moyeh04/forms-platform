@@ -51,7 +51,10 @@ var SubmissionsController = (function () {
       canEdit: !!scope,
       slotOnly: scope === 'slot',
       canDelete: !!form.editKey.allowDelete && !locked,
-      locked: locked
+      locked: locked,
+      progress: Rules.progressForStudents(form)
+        ? Rules.studentProgress(form, r.progress)
+        : null
     };
   }
 

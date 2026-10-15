@@ -159,6 +159,9 @@ var ViewerService = (function () {
           ? Rules.sizeAlertOf(alerts, g.members.length)
           : '';
         if (alert) g.alert = alert;
+        if (seesProgress_(form, client)) {
+          g.progress = Rules.linkProgress(form, r.progress);
+        }
         var hidden = client.hiddenColumns;
         if (hidden.indexOf('title') !== -1) delete g.title;
         if (hidden.indexOf('link') !== -1) delete g.link;
@@ -178,6 +181,34 @@ var ViewerService = (function () {
         });
         return g;
       });
+  }
+
+  /**
+   * Whether a link sees the progress of the teams of a form.
+   *
+   * @param {!Object} form The form.
+   * @param {!Object} client The private link.
+   * @return {boolean} True when the form has milestones and the link does
+   *     not hide them.
+   */
+  function seesProgress_(form, client) {
+    return Rules.progressOn(form) && client.progress !== ProgressAccess.HIDDEN;
+  }
+
+  /**
+   * Gives the instructor page the milestones of a form and what the link
+   * may do with them, or nothing when it does not see them.
+   *
+   * @param {!Object} form The form.
+   * @param {!Object} client The private link.
+   * @return {!Object} `milestones` and `progressAccess`, or empty.
+   */
+  function progressOf_(form, client) {
+    if (!seesProgress_(form, client)) return {};
+    return {
+      milestones: Rules.milestonesOf(form),
+      progressAccess: client.progress
+    };
   }
 
   /**
@@ -239,6 +270,7 @@ var ViewerService = (function () {
     reviewSubmission: reviewSubmission_,
     reservationRows: reservationRows_,
     teamGroups: teamGroups_,
+    progressOf: progressOf_,
     viewerSizeAlerts: viewerSizeAlerts_,
     whatsappRows: whatsappRows_
   };

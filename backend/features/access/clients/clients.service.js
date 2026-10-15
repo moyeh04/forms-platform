@@ -141,6 +141,7 @@ var ClientsService = (function () {
       hiddenColumns: c.hiddenColumns,
       canReview: c.canReview,
       showSizeAlerts: c.showSizeAlerts !== false,
+      progress: c.progress || ProgressAccess.SEE,
       active: c.active,
       createdAt: c.createdAt,
       hasKey: !!c.keyHash,

@@ -125,8 +125,31 @@ var FormsRules = (function () {
     };
   }
 
+  /**
+   * Checks and cleans the milestones a form copied, `form.progress`. Only a
+   * team registration follows the progress of its teams.
+   *
+   * @param {!Object} form The form.
+   * @param {*} next The progress the patch sends.
+   * @return {?Object} The cleaned progress, or null when it is off.
+   * @throws {ApiError} `bad_progress`.
+   */
+  function normalizeProgress_(form, next) {
+    if (form.type !== FormType.TEAM_REGISTRATION) return null;
+    var out = Rules.cleanProgress(next);
+    if (!out.ok) {
+      ApiError.fail(
+        'bad_progress',
+        'Each milestone needs an English name, and no milestone may be in' +
+          ' the list twice.'
+      );
+    }
+    return out.value;
+  }
+
   return {
     normalizeRules: normalizeRules_,
-    normalizeSizeNotice: normalizeSizeNotice_
+    normalizeSizeNotice: normalizeSizeNotice_,
+    normalizeProgress: normalizeProgress_
   };
 })();

@@ -22,7 +22,8 @@ var ResponsesRepository = (function () {
     'keyExpires',
     'deleted',
     'keySeal',
-    'number'
+    'number',
+    'progress'
   ];
 
   /** The statuses a submission can have. */
@@ -84,7 +85,8 @@ var ResponsesRepository = (function () {
       keyExpires: String(r.keyExpires),
       deleted: Cell.readFlag(r.deleted, false),
       keySeal: String(r.keySeal || ''),
-      number: parseInt(r.number, 10) || 0
+      number: parseInt(r.number, 10) || 0,
+      progress: Rules.readProgress(r.progress)
     };
   }
 
@@ -107,6 +109,16 @@ var ResponsesRepository = (function () {
   }
 
   /**
+   * Gives the marks of a team as its progress cell keeps them.
+   *
+   * @param {?Object} progress The marks, by milestone id.
+   * @return {string} JSON, or '' when there is none.
+   */
+  function progressCell_(progress) {
+    return Object.keys(progress || {}).length ? JSON.stringify(progress) : '';
+  }
+
+  /**
    * Turns a response into the values of its row.
    *
    * @param {!Object} r The response.
@@ -118,6 +130,7 @@ var ResponsesRepository = (function () {
     o.data = JSON.stringify(r.data || {});
     o.deleted = Cell.writeFlag(r.deleted, '');
     o.number = r.number ? String(r.number) : '';
+    o.progress = progressCell_(r.progress);
     return o;
   }
 
@@ -139,6 +152,21 @@ var ResponsesRepository = (function () {
         Table.rowValues(RESPONSE_COLS, responseToRow_(r))
       );
     return r;
+  }
+
+  /**
+   * Saves only the progress cell of a response. A mark is not an edit of
+   * the team, so its time of change and the other cells stay.
+   *
+   * @param {!Object} form The form.
+   * @param {!Object} r The response, with its `_row` and `progress`.
+   */
+  function writeProgress_(form, r) {
+    var sh = responsesSheet(form);
+    Table.ensureHeaders(sh, RESPONSE_COLS);
+    sh.getRange(r._row, RESPONSE_COLS.indexOf('progress') + 1).setValue(
+      progressCell_(r.progress)
+    );
   }
 
   /**
@@ -195,6 +223,7 @@ var ResponsesRepository = (function () {
     RESPONSE_COLS,
     readResponses,
     saveResponse: saveResponse_,
+    writeProgress: writeProgress_,
     SUBMISSION_STATUSES,
     applyDerived: applyDerived_,
     nextRef: nextRef_,

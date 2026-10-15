@@ -62,6 +62,11 @@ var Routes = Router.create(
       handler: ViewerController.review
     },
     {
+      action: 'viewer.progress.mark',
+      access: Access.CLIENT,
+      handler: ProgressController.viewerMark
+    },
+    {
       action: 'getForm',
       access: Access.PUBLIC,
       handler: FormsController.getForm
@@ -182,6 +187,11 @@ var Routes = Router.create(
       handler: AdminSubmissionsController.submissionKey
     },
     {
+      action: 'admin.progress.mark',
+      access: Access.ADMIN,
+      handler: ProgressController.adminMark
+    },
+    {
       action: 'submit',
       access: Access.PUBLIC,
       handler: SubmissionsController.submit
@@ -190,6 +200,11 @@ var Routes = Router.create(
       action: 'lookup',
       access: Access.KEY,
       handler: SubmissionsController.lookup
+    },
+    {
+      action: 'progress.mine',
+      access: Access.KEY,
+      handler: ProgressController.mine
     },
     {
       action: 'update',

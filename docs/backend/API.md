@@ -52,7 +52,8 @@ Who may call an action is decided by the secret the request carries:
 
 | Action | Lock | Writes |
 |---|---|---|
-| `lookup` | no | Nothing. Returns the registration, its member requests (each waiting one with the `phone` of the other team's leader when the form shows it, and `whatsapp` when the number opens in WhatsApp), and what the key may do: `canEdit`, `slotOnly` (only the time of a booking can change) and `canDelete` |
+| `lookup` | no | Nothing. Returns the registration, its member requests (each waiting one with the `phone` of the other team's leader when the form shows it, and `whatsapp` when the number opens in WhatsApp), and what the key may do: `canEdit`, `slotOnly` (only the time of a booking can change) and `canDelete`. When the form shows teams their progress, `progress` lists each milestone with its `label`, `state` and the `note` for the team; otherwise it is `null` |
+| `progress.mine` | no | Nothing. Takes a key, an expired one too, and returns only the team's `progress` as `lookup` does, so a team whose key ended still sees it; `null` when the form does not show it |
 | `update` | yes | The registration's row; a Transfers row for each member newly asked for. Marks the views. When only the time may change (`slotOnly`), the slot is taken from the request and every other answer is kept as saved |
 | `remove` | yes | Marks the row deleted and clears its key; closes its member requests. The row and its team number stay. Marks the views |
 | `bookingTeam` | no | Nothing. Takes a key of the registration form that a reservation books with (an expired key too) and returns the team to confirm: leader, code, project, size and the names of the teammates. A team that has booked also gets its `slot`, and `canMove` when its booking may move to another time |
@@ -64,8 +65,9 @@ Who may call an action is decided by the secret the request carries:
 | Action | Lock | Writes |
 |---|---|---|
 | `viewer.me` | no | Nothing. Returns the name of the link and the forms it may read |
-| `viewer.data` | no | Nothing. Returns the teams, bookings or registrations of one form, without the columns hidden from the link. For teams it also returns `sizeAlerts`, the warnings about small teams that are on as `[{ level, below }]`, and a small team carries `alert` (`critical` or `warning`); both are empty when the link does not show the warnings (`showSizeAlerts` off) |
+| `viewer.data` | no | Nothing. Returns the teams, bookings or registrations of one form, without the columns hidden from the link. For teams it also returns `sizeAlerts`, the warnings about small teams that are on as `[{ level, below }]`, and a small team carries `alert` (`critical` or `warning`); both are empty when the link does not show the warnings (`showSizeAlerts` off). A team form with milestones adds `milestones`, `progressAccess` (`see` or `mark`) and on each team `progress`, its marks by milestone id with the state, both notes and the time, never who marked; none of them when the link's `progress` is `hidden` |
 | `viewer.review` | yes | One review step of one registration, only for a link that was given review rights. Marks the views |
+| `viewer.progress.mark` | yes | The progress cell of one team, as `admin.progress.mark`, only for a link whose `progress` is `mark`; `forbidden` otherwise |
 
 ## Admin PIN
 
@@ -83,7 +85,7 @@ the lock.
 | Action | Lock | Writes |
 |---|---|---|
 | `admin.forms.list` | no | Nothing |
-| `admin.forms.get` | no | Nothing. Returns one form with the lists; for a reservation, the bookings in each slot; for a form with a team size, how many saved teams have each size (`teamSizes`); for a reservation that asks for teammates, how many saved bookings have each number of teammates (`teammateCounts`) |
+| `admin.forms.get` | no | Nothing. Returns one form with the lists; for a reservation, the bookings in each slot; for a form with a team size, how many saved teams have each size (`teamSizes`); for a reservation that asks for teammates, how many saved bookings have each number of teammates (`teammateCounts`); for a team registration, how many teams have a mark on each milestone id (`progressMarks`) |
 | `admin.forms.create` | yes | A new spreadsheet in the platform's Drive folder (before the lock) and a row in the Forms tab |
 | `admin.forms.update` | yes | The form's row in the Forms tab. Refuses `stale` when `base` is older than the saved copy. Rewrites Clients rows that still hold link names before a link name changes |
 | `admin.forms.duplicate` | yes | A new spreadsheet and a row in the Forms tab |
@@ -104,10 +106,11 @@ the lock.
 
 | Action | Lock | Writes |
 |---|---|---|
-| `admin.submissions` | no | Nothing. Returns the registrations with their team numbers, and the member requests that wait |
+| `admin.submissions` | no | Nothing. Returns the registrations with their team numbers and their `progress`, and the member requests that wait |
 | `admin.submission.update` | yes | The status, the review steps or the answers of one registration. Marks the views |
 | `admin.submission.delete` | yes | Marks the row deleted and clears its key; closes its member requests. Marks the views |
 | `admin.submission.key` | no | Nothing. Opens the sealed copy of a student's key |
+| `admin.progress.mark` | yes | Only the progress cell of one team: `{ slug, submissionId, milestone, state, teamNote, privateNote, baseAt }`, each of the last four optional. Returns the team's `progress`. The row's `updated` and status stay, and the views are not marked. `baseAt` is the time of the mark the page saw; when the state changed since, the mark is refused with `changed_meanwhile` and the marks as they are now in `details.progress`. Other refusals: `bad_milestone`, `bad_state`, `note_too_long` (over 500 characters), `submission_not_found` |
 | `admin.submission.resetKey` | yes | A new key hash, sealed copy and end date on one row |
 | `admin.keys.list` | no | Nothing. Returns when each key ends |
 | `admin.keys.extend` | yes | The end date of the keys of all, the expired, or the chosen registrations |
@@ -118,7 +121,7 @@ the lock.
 | Action | Lock | Writes |
 |---|---|---|
 | `admin.clients.list` | no | Nothing |
-| `admin.clients.create` | yes | A new row in the Clients tab, with `showSizeAlerts` on unless sent `false`. The token and the access key are returned once; only their hashes and a sealed copy of the key are stored |
+| `admin.clients.create` | yes | A new row in the Clients tab, with `showSizeAlerts` on unless sent `false` and `progress` (`hidden`, `see` or `mark`) `see` unless sent. The token and the access key are returned once; only their hashes and a sealed copy of the key are stored |
 | `admin.clients.update` | yes | The name, forms, hidden columns, review rights, whether it shows the warnings about small teams (`showSizeAlerts`), end date or on/off state of a link |
 | `admin.clients.regenerate` | yes | A new token for a link; the old address stops working |
 | `admin.clients.key` | yes | A new access key for a link, or none |

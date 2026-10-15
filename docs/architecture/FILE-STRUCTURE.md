@@ -390,6 +390,8 @@ the file name says the role:
 | `backend/features/intake/responses/responses.notify.js` | What follows a saved submission: the emails and the repaint of the sheet views. |
 | `backend/features/intake/keys/keys.service.js` | Edit keys: issuing, sealing, expiring and finding a submission by its key, and listing and extending the keys of a form. |
 | `backend/features/intake/keys/keys.controller.js` | The key actions of the admin: list keys and extend their end dates. |
+| `backend/features/intake/progress/progress.service.js` | Team progress: a mark on one milestone of one team saved in its own cell inside the lock, the marks per milestone, and a team's own progress by key. |
+| `backend/features/intake/progress/progress.controller.js` | The progress actions: a mark by the admin or by a link that may mark, and `progress.mine`. |
 | `backend/features/intake/submissions/submissions.controller.js` | The student actions: submit, look up, update and cancel a submission. |
 | `backend/features/intake/submissions/admin-submissions.controller.js` | The admin actions on submissions: list, edit, delete and reset or show a key. |
 | `backend/features/intake/submissions/submissions.service.js` | Submissions: checking the answers, saving a new one, changing and cancelling one, and what the student sees of it. |
