@@ -134,18 +134,6 @@
   "web/index.html": {
     "lines": 4
   },
-  "web/js/admin/responses/download.view.js": {
-    "biome/lint/complexity/noExcessiveCognitiveComplexity": 1,
-    "biome/lint/complexity/noExcessiveLinesPerFunction": 3,
-    "biome/lint/complexity/useOptionalChain": 1,
-    "biome/lint/correctness/noInnerDeclarations": 12,
-    "biome/lint/correctness/noUnusedVariables": 1,
-    "biome/lint/style/noExcessiveLinesPerFile": 1,
-    "biome/lint/style/noMagicNumbers": 7,
-    "biome/lint/suspicious/noAssignInExpressions": 1,
-    "jsdoc": 9,
-    "lines": 10
-  },
   "web/js/admin/lists/lists.page.js": {
     "biome/lint/complexity/noExcessiveCognitiveComplexity": 7,
     "biome/lint/complexity/noExcessiveLinesPerFunction": 12,

@@ -740,7 +740,7 @@ flowchart LR
         a3["admin/responses/<br/>blocks, matching, print"]
         a4["admin/people/<br/>clients"]
         a5["admin/keys/<br/>key and link end dates"]
-        a6["admin/responses/download.view.js<br/>Download all"]
+        a6["admin/responses/download*.js<br/>Download all"]
     end
     subgraph viewerp["viewer.html"]
         v1["viewer.js"]
