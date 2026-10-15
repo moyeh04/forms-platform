@@ -1,11 +1,11 @@
 # Testing
 
-376 automated tests run without a Google account, a browser, or a network.
+382 automated tests run without a Google account, a browser, or a network.
 They run the **real** backend and the **real** pages. This page explains how
 that works and what it can and cannot prove.
 
 ```
-npm test    # 376 tests
+npm test    # 382 tests
 ```
 
 ## The layers
@@ -153,6 +153,7 @@ says something else.
 | Rules: Drive links | `domain/rules/drive-link.test.js` | 2 | Files, folders and slides, other hosts refused; folder names |
 | Rules: slots | `domain/rules/slots.test.js` | 2 | The generated times of a day, and the room left in a slot |
 | Rules: forms | `domain/rules/form.test.js` | 2 | Members list, role lookup and form state; counting the people of a form with a code counted once |
+| Rules: progress | `domain/rules/progress.test.js` | 6 | The milestones of a team registration copied from a list and cleaned, a mark whose time changes only with its state, a refused milestone, state or note, counts per team and per milestone, what a team and a link see, and a copy compared with its list by id |
 | Rules: team size | `domain/rules/team-size.test.js` | 4 | The two warnings about small teams: the levels and their order, starting numbers, the level of a team, a wrong number or order, the numbers a level can ask for |
 | Form metadata: terms | `domain/form-metadata/read.test.js` | 2 | A season term read into its season and the academic year that starts in its year, a term in another shape kept as written, and the batch year of an older WhatsApp form read the same way |
 | Rules: submission | `domain/rules/submission.test.js` | 5 | Cleaned data, field and member errors, the same code twice, too many members, slot choices, disabled fields |

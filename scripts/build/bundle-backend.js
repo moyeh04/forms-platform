@@ -50,6 +50,8 @@ const DOMAIN_FIRST = [
   'domain/rules/slots.js',
   'domain/rules/form.js',
   'domain/rules/team-size.js',
+  'domain/rules/progress.js',
+  'domain/rules/progress-marks.js',
   'domain/rules/submission.js',
   'domain/rules/index.js',
   'domain/form-metadata/read.js',

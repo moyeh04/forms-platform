@@ -91,7 +91,8 @@
       "type": "FormType",
       "status": "FormStatus",
       "review": "ReviewStatus",
-      "kind": "ListKind"
+      "kind": "ListKind",
+      "progress": "ProgressAccess"
     }
   },
   "layers": {

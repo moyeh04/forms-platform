@@ -315,6 +315,8 @@ The site is published at the paths it has always had: the pages at the root,
 | `domain/rules/slots.js` | Reservation slots: the times of a day, the key and the room left in a slot, the names of dated days, and the check of a chosen slot. |
 | `domain/rules/form.js` | Reading a form and its responses: a field by its role, the people on a submission, how many people a form holds, and whether it is open. |
 | `domain/rules/team-size.js` | Team size: the sizes a form allows, the notes a student sees for a size, and the warnings about small teams. |
+| `domain/rules/progress.js` | The milestones of a form: copied from a milestones list into `form.progress`, cleaned on a save, and compared with the list. |
+| `domain/rules/progress-marks.js` | The marks of a team on each milestone: a change and why it is refused, counts, and what a team or a link may see. |
 | `domain/rules/submission.js` | A whole submission: each field checked by its type, the member forms of a team, and nobody named twice. |
 
 ## Backend (`backend/`, becomes one `Code.gs`)
