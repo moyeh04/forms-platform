@@ -30,9 +30,5 @@
     "biome/lint/style/noDescendingSpecificity": 12,
     "biome/lint/style/noExcessiveLinesPerFile": 1,
     "lines": 22
-  },
-  "web/css/theme.css": {
-    "biome/lint/complexity/noImportantStyles": 3,
-    "lines": 3
   }
 }

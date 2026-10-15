@@ -1,6 +1,7 @@
 /*
  * Theme tokens: aged map paper, kept light for contrast and easy reading.
- * Light is the default; dark ("candlelit cabin") follows the device or the toggle.
+ * Light is the default; dark ("candlelit cabin") follows the device or the
+ * toggle.
  * No orange, no pure white, no logo.
  *
  * Contrast standard: WCAG 2.1 AA in both themes. Text needs 4.5:1 against
@@ -32,9 +33,10 @@
   --focus: #3f6b66;
   --shadow: rgba(47, 36, 24, 0.16);
 
-  /* Type scale. Latin and Arabic share it; Arabic gets a little more size and air. */
-  --font-title:
-    "IM Fell English", "Aref Ruqaa", Georgia, serif; /* Latin from IM Fell, Arabic falls through to Aref Ruqaa */
+  /* Type scale. Latin and Arabic share it; Arabic gets a little more size
+     and air. */
+  /* Latin from IM Fell, Arabic falls through to Aref Ruqaa. */
+  --font-title: "IM Fell English", "Aref Ruqaa", Georgia, serif;
   --font-body: "Amiri", "IM Fell English", Georgia, serif;
   --font-code: "Special Elite", "Courier New", monospace;
   --fs-title: 2.125rem;
@@ -178,8 +180,12 @@ textarea {
 }
 @media (prefers-reduced-motion: reduce) {
   * {
+    /* biome-ignore-start lint/complexity/noImportantStyles: a reduced-motion
+       setting must beat the motion of every component, whatever its
+       specificity. */
     animation: none !important;
     transition: none !important;
     scroll-behavior: auto !important;
+    /* biome-ignore-end lint/complexity/noImportantStyles: see above. */
   }
 }
