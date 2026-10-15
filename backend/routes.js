@@ -34,3 +34,9 @@ API['admin.lists.delete'] = AuthService.admin(ListsController.remove);
 
 API['admin.keys.list'] = AuthService.admin(KeysController.list);
 API['admin.keys.extend'] = AuthService.admin(KeysController.extend);
+
+API['transfer.decide'] = TransfersController.transferDecide;
+API['transfer.cancel'] = TransfersController.cancel;
+API['admin.transfer.decide'] = AuthService.admin(
+  TransfersController.adminTransferDecide
+);

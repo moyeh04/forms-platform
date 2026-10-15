@@ -26,7 +26,7 @@ API['admin.submissions'] = AuthService.admin(function (req) {
     }
     return view;
   });
-  return { submissions: rows, transfers: adminTransfers_(form) };
+  return { submissions: rows, transfers: TransfersController.adminTransfers(form) };
 });
 
 API['admin.submission.update'] = AuthService.admin(function (req) {

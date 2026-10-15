@@ -1,5 +1,6 @@
 /** The Transfers tab of a form: reading and saving move requests. */
 
+var TransfersRepository = (function () {
 var TRANSFER_COLS = [
   'id',
   'created',
@@ -62,3 +63,6 @@ function saveTransfer_(form, t) {
   else t._row = Table.appendPlain(sh, Table.rowValues(TRANSFER_COLS, o));
   return t;
 }
+
+return { TRANSFER_TAB: TRANSFER_TAB_, TRANSFER_COLS, readTransfers: readTransfers_, saveTransfer: saveTransfer_, transfersOn: transfersOn_ };
+})();

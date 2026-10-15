@@ -1,13 +1,18 @@
 /** The transfer actions of the team leader and of the admin. */
 
-var API = API || {};
-
-API['transfer.decide'] = function (req) {
+var TransfersController = (function () {
+/**
+ * Answers the `transfer.decide` action.
+ *
+ * @param {!Object} req The request body.
+ * @return {*} The answer, sent back as JSON.
+ */
+function transferDecide(req) {
   var form = FormsRepository.requireForm(String(req.slug || ''));
   var vform = FormsPublic.validationForm(form);
   var found = KeysService.findByKey(form, req.key);
   var out = Lock.withLock(function () {
-    return decideTransfer_(
+    return TransfersService.decideTransfer(
       vform,
       req.id,
       !!req.approve,
@@ -17,37 +22,43 @@ API['transfer.decide'] = function (req) {
     );
   });
   ResponsesNotify.afterChange(form);
-  mailDecision_(vform, out);
+  TransfersMail.mailDecision(vform, out);
   var fresh = ResponsesRepository.readResponses(form).filter(function (r) {
     return r.id === found.id;
   })[0];
   return {
     submission: publicSubmission_(fresh),
-    transfers: teamTransfers_(vform, fresh),
+    transfers: TransfersService.teamTransfers(vform, fresh),
     underMin: out.underMin
   };
-};
+}
 
-API['transfer.cancel'] = function (req) {
+/**
+ * Answers the `transfer.cancel` action.
+ *
+ * @param {!Object} req The request body.
+ * @return {*} The answer, sent back as JSON.
+ */
+function cancel(req) {
   var form = FormsRepository.requireForm(String(req.slug || ''));
   var vform = FormsPublic.validationForm(form);
   var found = KeysService.findByKey(form, req.key);
   Lock.withLock(function () {
-    var t = readTransfers_(form).filter(function (x) {
+    var t = TransfersRepository.readTransfers(form).filter(function (x) {
       return (
         x.id === String(req.id) && x.status === 'pending' && x.toId === found.id
       );
     })[0];
     if (!t) ApiError.fail('transfer_gone', 'This request was already answered.');
     t.status = 'cancelled';
-    saveTransfer_(form, t);
+    TransfersRepository.saveTransfer(form, t);
   });
-  return { transfers: teamTransfers_(vform, found) };
-};
+  return { transfers: TransfersService.teamTransfers(vform, found) };
+}
 
 /** The waiting requests, with the names the dashboard shows and, for a leader, who can lead next. */
 function adminTransfers_(form) {
-  var waiting = readTransfers_(form).filter(function (t) {
+  var waiting = TransfersRepository.readTransfers(form).filter(function (t) {
     return t.status === 'pending';
   });
   var rows = waiting.length ? ResponsesRepository.readResponses(form) : [];
@@ -64,16 +75,22 @@ function adminTransfers_(form) {
         from: t.fromRef,
         to: t.toRef
       },
-      leaderAsked_(form, from, t.code)
+      TransfersService.leaderAsked(form, from, t.code)
     );
   });
 }
 
-API['admin.transfer.decide'] = AuthService.admin(function (req) {
+/**
+ * Answers the `admin.transfer.decide` action.
+ *
+ * @param {!Object} req The request body.
+ * @return {*} The answer, sent back as JSON.
+ */
+function adminTransferDecide(req) {
   var form = FormsRepository.requireForm(req.slug || req.id);
   var vform = FormsPublic.validationForm(form);
   var out = Lock.withLock(function () {
-    return decideTransfer_(
+    return TransfersService.decideTransfer(
       vform,
       req.transfer,
       !!req.approve,
@@ -83,6 +100,9 @@ API['admin.transfer.decide'] = AuthService.admin(function (req) {
     );
   });
   ResponsesNotify.afterChange(form);
-  mailDecision_(vform, out);
+  TransfersMail.mailDecision(vform, out);
   return { transfers: adminTransfers_(form), underMin: out.underMin };
-});
+}
+
+return { adminTransfers: adminTransfers_, transferDecide, cancel, adminTransferDecide };
+})();

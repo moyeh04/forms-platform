@@ -1,5 +1,6 @@
 /** The emails of a transfer request and of its answer. */
 
+var TransfersMail = (function () {
 /** Tells the leader who must answer, or the leader who asked, by email. Never stops the request. */
 function mailTransfer_(form, t, kind) {
   try {
@@ -76,3 +77,6 @@ function mailDecision_(form, out) {
   mailTransfer_(form, out.transfer, out.transfer.status);
   if (out.handed) mailTransfer_(form, out.transfer, 'leads');
 }
+
+return { mailTransfer: mailTransfer_, mailDecision: mailDecision_ };
+})();

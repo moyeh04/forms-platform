@@ -241,7 +241,7 @@
     "biome/lint/complexity/useOptionalChain": 1,
     "biome/lint/correctness/noInnerDeclarations": 2,
     "jsdoc": 1,
-    "lines": 7
+    "lines": 8
   },
   "backend/features/intake/submissions/submissions.controller.js": {
     "biome/format": 1,
@@ -249,7 +249,7 @@
     "biome/lint/complexity/useOptionalChain": 1,
     "biome/lint/correctness/noInnerDeclarations": 1,
     "jsdoc": 14,
-    "lines": 11
+    "lines": 13
   },
   "backend/features/intake/teams/team-numbers.js": {
     "biome/format": 1,
@@ -263,10 +263,11 @@
   },
   "backend/features/intake/transfers/transfers.controller.js": {
     "biome/format": 1,
-    "jsdoc": 4,
-    "lines": 2
+    "jsdoc": 2,
+    "lines": 3
   },
   "backend/features/intake/transfers/transfers.mail.js": {
+    "biome/format": 1,
     "biome/lint/complexity/noExcessiveCognitiveComplexity": 1,
     "biome/lint/complexity/noExcessiveLinesPerFunction": 1,
     "biome/lint/complexity/useOptionalChain": 1,
@@ -275,17 +276,20 @@
     "lines": 4
   },
   "backend/features/intake/transfers/transfers.repository.js": {
-    "jsdoc": 4
+    "biome/format": 1,
+    "jsdoc": 4,
+    "lines": 1
   },
   "backend/features/intake/transfers/transfers.service.js": {
     "biome/format": 1,
+    "biome/lint/complexity/noExcessiveCognitiveComplexity": 1,
     "biome/lint/complexity/noExcessiveLinesPerFunction": 1,
     "biome/lint/complexity/useMaxParams": 2,
     "biome/lint/complexity/useOptionalChain": 1,
     "biome/lint/correctness/noInnerDeclarations": 1,
     "biome/lint/style/noExcessiveLinesPerFile": 1,
     "jsdoc": 17,
-    "lines": 25
+    "lines": 27
   },
   "backend/features/outputs/downloads/downloads.controller.js": {
     "biome/format": 1,
@@ -396,7 +400,7 @@
     "biome/format": 1,
     "biome/lint/style/noMagicNumbers": 1,
     "jsdoc": 6,
-    "lines": 13
+    "lines": 14
   },
   "backend/platform/sheets/table.js": {
     "biome/format": 1,

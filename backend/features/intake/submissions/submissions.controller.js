@@ -47,7 +47,7 @@ API.submit = function (req) {
     // Members that another team holds are asked for, not saved with this team.
     var wants = source
       ? []
-      : takeOutTransfers_(vform, v.data, live, null, req.transfer);
+      : TransfersService.takeOutTransfers(vform, v.data, live, null, req.transfer);
     try {
       ResponsesRules.checkLimits(vform, v.data, live, null);
     } catch (e) {
@@ -77,7 +77,7 @@ API.submit = function (req) {
     rows.push(r);
     TeamNumbers.keepTeamNumbers(form, rows);
     ResponsesRepository.saveResponse(form, r);
-    var asked = recordTransfers_(form, r, wants);
+    var asked = TransfersService.recordTransfers(form, r, wants);
     return {
       id: r.id,
       ref: r.ref,
@@ -129,7 +129,7 @@ API.lookup = function (req) {
   var scope = editScope_(form);
   return {
     submission: publicSubmission_(r),
-    transfers: teamTransfers_(FormsPublic.validationForm(form), r),
+    transfers: TransfersService.teamTransfers(FormsPublic.validationForm(form), r),
     keyExpires: r.keyExpires,
     canEdit: !!scope,
     slotOnly: scope === 'slot',
@@ -160,7 +160,7 @@ API.update = function (req) {
       return r.id === found.id;
     })[0];
     if (!current) ApiError.fail('bad_key', 'That key is not right.');
-    var wants = takeOutTransfers_(
+    var wants = TransfersService.takeOutTransfers(
       vform,
       v.data,
       live,
@@ -171,7 +171,7 @@ API.update = function (req) {
     current.data = v.data;
     ResponsesRepository.applyDerived(vform, current);
     ResponsesRepository.saveResponse(form, current);
-    return recordTransfers_(form, current, wants);
+    return TransfersService.recordTransfers(form, current, wants);
   });
 
   ResponsesNotify.afterChange(form);
@@ -201,9 +201,9 @@ function transferResult_(form, result, data) {
   delete result.asked;
   if (!asked.length) return result;
   asked.forEach(function (t) {
-    mailTransfer_(form, t, 'asked');
+    TransfersMail.mailTransfer(form, t, 'asked');
   });
-  var contact = leaderContacts_(form);
+  var contact = TransfersService.leaderContacts(form);
   result.data = data;
   result.transfers = asked.map(function (t) {
     return Object.assign(
@@ -230,6 +230,6 @@ function cancelResponse_(form, id) {
   r.keyHash = '';
   r.keySeal = '';
   ResponsesRepository.saveResponse(form, r);
-  closeTransfersOf_(form, r.id);
+  TransfersService.closeTransfersOf(form, r.id);
   return r;
 }

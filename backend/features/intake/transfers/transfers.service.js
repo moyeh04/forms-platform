@@ -18,6 +18,7 @@
  * first request, so a form that never has one keeps its sheet as it is.
  */
 
+var TransfersService = (function () {
 function memberCodeId_(form) {
   var mf = Rules.fieldByRole(form, 'members');
   var sub = ((mf && mf.fields) || []).filter(function (sf) {
@@ -132,7 +133,7 @@ function handOver_(form, data, next) {
  * cannot be: nobody would be left to lead it.
  */
 function takeOutTransfers_(form, data, rows, selfId, asked) {
-  if (!transfersOn_(form)) return [];
+  if (!TransfersRepository.transfersOn(form)) return [];
   var mf = Rules.fieldByRole(form, 'members');
   var codeId = memberCodeId_(form);
   var list = Array.isArray(data[mf.id]) ? data[mf.id] : [];
@@ -197,7 +198,7 @@ function takeOutTransfers_(form, data, rows, selfId, asked) {
 /** Records one request for each wanted member, unless the same one is already waiting. */
 function recordTransfers_(form, team, wants) {
   if (!wants.length) return [];
-  var waiting = readTransfers_(form).filter(function (t) {
+  var waiting = TransfersRepository.readTransfers(form).filter(function (t) {
     return t.status === 'pending' && t.toId === team.id;
   });
   return wants
@@ -207,7 +208,7 @@ function recordTransfers_(form, team, wants) {
       });
     })
     .map(function (w) {
-      return saveTransfer_(form, {
+      return TransfersRepository.saveTransfer(form, {
         id: Crypto.uuid(),
         created: Time.nowIso(),
         status: 'pending',
@@ -224,10 +225,10 @@ function recordTransfers_(form, team, wants) {
 
 /** Closes the waiting requests of a team that no longer exists. */
 function closeTransfersOf_(form, teamId) {
-  readTransfers_(form).forEach(function (t) {
+  TransfersRepository.readTransfers(form).forEach(function (t) {
     if (t.status === 'pending' && (t.toId === teamId || t.fromId === teamId)) {
       t.status = 'closed';
-      saveTransfer_(form, t);
+      TransfersRepository.saveTransfer(form, t);
     }
   });
 }
@@ -238,7 +239,7 @@ function closeTransfersOf_(form, teamId) {
  * that moves. Returns { transfer, underMin, handed }; `handed` is true when a leader moved.
  */
 function decideTransfer_(form, id, approve, by, fromId, next) {
-  var all = readTransfers_(form);
+  var all = TransfersRepository.readTransfers(form);
   var t = all.filter(function (x) {
     return x.id === String(id) && x.status === 'pending';
   })[0];
@@ -247,7 +248,7 @@ function decideTransfer_(form, id, approve, by, fromId, next) {
   if (!approve) {
     t.status = 'rejected';
     t.decidedBy = by;
-    return { transfer: saveTransfer_(form, t), underMin: false, handed: false };
+    return { transfer: TransfersRepository.saveTransfer(form, t), underMin: false, handed: false };
   }
   var rows = ResponsesRepository.readResponses(form);
   var mf = Rules.fieldByRole(form, 'members');
@@ -258,7 +259,7 @@ function decideTransfer_(form, id, approve, by, fromId, next) {
   })[0];
   if (!to) {
     t.status = 'closed';
-    saveTransfer_(form, t);
+    TransfersRepository.saveTransfer(form, t);
     ApiError.fail('transfer_gone', 'The team that asked no longer exists.');
   }
   var toList = Array.isArray(to.data[mf.id]) ? to.data[mf.id] : [];
@@ -299,12 +300,12 @@ function decideTransfer_(form, id, approve, by, fromId, next) {
   }
   t.status = 'approved';
   t.decidedBy = by;
-  saveTransfer_(form, t);
+  TransfersRepository.saveTransfer(form, t);
   // The student moved, so nobody else can be given the same student.
   all.forEach(function (x) {
     if (x.id !== t.id && x.status === 'pending' && x.code === t.code) {
       x.status = 'closed';
-      saveTransfer_(form, x);
+      TransfersRepository.saveTransfer(form, x);
     }
   });
   return { transfer: t, underMin: underMin, handed: handed };
@@ -312,7 +313,7 @@ function decideTransfer_(form, id, approve, by, fromId, next) {
 
 /** What a team sees about transfers: requests for its members, and its own requests. */
 function teamTransfers_(form, team) {
-  var all = readTransfers_(form);
+  var all = TransfersRepository.readTransfers(form);
   if (!all.length) return { incoming: [], outgoing: [] };
   var range = Rules.teamSizeRange(form);
   var people = Rules.membersOf(form, team.data);
@@ -358,3 +359,6 @@ function teamTransfers_(form, team) {
       })
   };
 }
+
+return { takeOutTransfers: takeOutTransfers_, recordTransfers: recordTransfers_, teamTransfers: teamTransfers_, leaderContacts: leaderContacts_, closeTransfersOf: closeTransfersOf_, decideTransfer: decideTransfer_, leaderAsked: leaderAsked_ };
+})();
