@@ -97,5 +97,7 @@
   direction: ltr;
 }
 [hidden] {
+  /* biome-ignore-start lint/complexity/noImportantStyles: the hidden attribute must beat every component display */
   display: none !important;
+  /* biome-ignore-end lint/complexity/noImportantStyles: the hidden attribute must beat every component display */
 }
