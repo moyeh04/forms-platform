@@ -164,32 +164,118 @@ The site is published at the paths it has always had: the pages at the root,
 
 ## Backend (`backend/`, becomes one `Code.gs`)
 
+Apps Script runs every file in one global scope, so the folders give the
+structure. `platform/<concern>/` holds code no feature owns, named by what it
+does. `features/<area>/<feature>/` holds one feature, with the business area
+above it. Inside a feature the file name says the role:
+
+| Role | What it holds |
+|---|---|
+| `*.repository.js` | reading and writing the feature's tab |
+| `*.rules.js` | business rules |
+| `*.access.js` | who may act |
+| `*.service.js` | the feature's work: loads data, applies the rules, saves |
+| `*.controller.js` | the API actions of the feature |
+
+### Platform: code no feature owns
+
 | File | What it does |
 |---|---|
-| `Code.js` | Entry point. Routes each request to its handler. |
-| `Config.js` | Constants and small helpers. |
-| `Auth.js` | Admin PIN (salted hash, lockout). |
-| `Registry.js` | The registry sheet: setup, reading and writing forms and lists, and creating, updating, duplicating and deleting a form under the lock. |
-| `Templates.js` | The four form types and the default lists, all as data. |
-| `FormsApi.js` | The API of forms and lists: the public form definition, the admin's form actions, and making, renaming, filling and deleting lists. |
-| `Responses.js` | Reading and writing rows, edit keys, limits, Drive checks, emails. |
-| `Submissions.js` | Student submit, lookup, update, cancel; admin edits and key reset. |
-| `Slots.js` | Reservation timetable checks and availability. |
-| `Questions.js` | Questions and pages an admin adds: allowed types, ids, labels and choices, and pages that list each existing question once. |
-| `KeyBooking.js` | Booking a reservation with a registration key from another form: the setting, the team preview, the copied answers, and the next booking of a series. |
-| `TeamList.js` | The teams of a team or task form with their members and their numbers, which a team keeps for good. Read by the sheet view, the printed list, the dashboard, the instructor page and the download. |
-| `Download.js` | Download all: each team's task file or project folder read as the owner, `Teams.xlsx`, zip parts, and the pieces the page saves. |
-| `Xlsx.js` | A small writer of Excel files: styles, merged cells, links to files next to the workbook, widths that fit the content. |
-| `KeyExpiry.js` | When registration edit keys stop working, and moving that date for one, some, or all registrations of a form. |
-| `Transfers.js` | Moving a member between two teams of a form: the rule, the requests tab, asking on submit and update, the answer of the leader or the admin, the move, and the emails. |
-| `Views.js` | Tinted block views inside each form's Google Sheet, and the booked run that repaints them a minute after a change. |
-| `SheetStyle.js` | How the data tabs look: the registry's Forms, Clients and Lists, and each form's Responses, Transfers and Requests get the dark header, a frozen first row, column widths and two row tints. It writes no value and no number format. |
-| `Print.js` | Print tabs and PDF export. |
-| `Menu.js` | The "Forms Platform" menu in the registry sheet: setup, the admin PIN, printing, rebuilding the views, and unlocking the admin page after wrong PINs. |
-| `Matching.js` | WhatsApp request matching. |
-| `Clients.js`, `Viewer.js` | Private instructor links, their access keys and end dates, and what they can see. |
+| `backend/platform/http/api-error.js` | The error every handler throws and the JSON reply the web app sends. |
+| `backend/platform/sheets/table.js` | Reading and writing the rows of a sheet tab by its header names. |
+| `backend/platform/sheets/lock.js` | The script lock every write runs under, safe to nest. |
+| `backend/platform/sheets/sheet-style.js` | The look of the data tabs and the registry tabs: row colours, widths and frozen headers. |
+| `backend/platform/security/crypto.js` | Ids, random digits, SHA-256 and the sealing of short digit strings. |
+| `backend/platform/security/properties.js` | Script properties, including the secret pepper of every hash. |
+| `backend/platform/format/text.js` | Turning text into link names and into safe HTML. |
+| `backend/platform/format/time.js` | The current time and date as ISO text. |
+| `backend/platform/format/json.js` | Copying values and reading JSON text safely. |
+| `backend/platform/config/constants.js` | The name of the app, the registry tab names, and the form types and statuses. |
+| `backend/platform/xlsx/xml.js` | The XML pieces of an Excel file: escaped text, column letters and colours. |
+| `backend/platform/xlsx/workbook.js` | An Excel workbook built by hand: styles, column widths, sheets and the zipped file. |
 
-`npm run build` joins `domain/rules.js`, `domain/form-metadata.js` and every backend file into `dist/Code.gs`.
+### Catalog: what the admin sets up
+
+| File | What it does |
+|---|---|
+| `backend/features/catalog/registry/registry.repository.js` | The registry spreadsheet and the Drive folder that holds every form. |
+| `backend/features/catalog/registry/registry.setup.js` | Creating the registry tabs and folder the first time. |
+| `backend/features/catalog/forms/forms.repository.js` | The Forms tab: reading, finding and saving form rows. |
+| `backend/features/catalog/forms/forms.service.js` | Creating, changing, copying and deleting forms with their sheets. |
+| `backend/features/catalog/forms/forms.rules.js` | The submission rules and the small-team notice of a form, cleaned to what is allowed. |
+| `backend/features/catalog/forms/forms.public.js` | What the public may read of a form, with its list options filled in. |
+| `backend/features/catalog/forms/forms.questions.js` | The questions and pages an admin adds to a form. |
+| `backend/features/catalog/forms/forms.controller.js` | The form actions: the public form definition and the admin form actions. |
+| `backend/features/catalog/lists/lists.repository.js` | The Lists tab: the values of each list and what kind of list it is. |
+| `backend/features/catalog/lists/lists.rules.js` | The lists a new registry starts with, and how list values are cleaned. |
+| `backend/features/catalog/lists/lists.controller.js` | The list actions of the admin: read, fill, make, rename and delete lists. |
+| `backend/features/catalog/templates/template-fields.js` | The fields every form template is built from: people, study, team size and members. |
+| `backend/features/catalog/templates/templates.service.js` | The starting definition of each form type. |
+
+### Intake: what students send and what happens to it
+
+| File | What it does |
+|---|---|
+| `backend/features/intake/responses/responses.repository.js` | The Responses tab of a form: reading and saving submissions. |
+| `backend/features/intake/responses/responses.review.js` | The review steps of a submission and its review status. |
+| `backend/features/intake/responses/responses.rules.js` | Whether a form takes submissions, and the limits on how many and how big. |
+| `backend/features/intake/responses/drive-links.js` | Checking the Drive links a submission names: shared, and named as the form asks. |
+| `backend/features/intake/responses/responses.notify.js` | What follows a saved submission: the emails and the repaint of the sheet views. |
+| `backend/features/intake/keys/keys.service.js` | Edit keys: issuing, sealing, expiring and finding a submission by its key. |
+| `backend/features/intake/keys/keys.controller.js` | The key actions of the admin: list keys and extend their end dates. |
+| `backend/features/intake/submissions/submissions.controller.js` | The student actions: submit, look up, update and cancel a submission. |
+| `backend/features/intake/submissions/admin-submissions.controller.js` | The admin actions on submissions: list, edit, delete and reset or show a key. |
+| `backend/features/intake/teams/team-numbers.js` | The number of each team, given once and kept. |
+| `backend/features/intake/teams/teams.service.js` | Which forms gather teams, and the teams as blocks of members. |
+| `backend/features/intake/transfers/transfers.repository.js` | The Transfers tab of a form: reading and saving move requests. |
+| `backend/features/intake/transfers/transfers.service.js` | Moving a member between two teams: asking, deciding, handing over the lead and moving. |
+| `backend/features/intake/transfers/transfers.mail.js` | The emails of a transfer request and of its answer. |
+| `backend/features/intake/transfers/transfers.controller.js` | The transfer actions of the team leader and of the admin. |
+| `backend/features/intake/reservations/slots.rules.js` | The slots of a reservation form: cleaned, labelled and counted. |
+| `backend/features/intake/reservations/key-booking.service.js` | Booking a slot with the key of a registration, and the next week of slots. |
+| `backend/features/intake/reservations/key-booking.controller.js` | The booking actions: the team behind a key, and the next week of bookings. |
+| `backend/features/intake/matching/matching.repository.js` | The WhatsApp requests tab of a form. |
+| `backend/features/intake/matching/matching.controller.js` | The WhatsApp matching actions of the admin: import, list, decide and remove. |
+
+### Access: who may see what
+
+| File | What it does |
+|---|---|
+| `backend/features/access/auth/auth.service.js` | The admin PIN: setting it, checking it, and locking out wrong guesses. |
+| `backend/features/access/auth/auth.controller.js` | The admin login action. |
+| `backend/features/access/clients/clients.repository.js` | The Clients tab: the private links of instructors and clients. |
+| `backend/features/access/clients/clients.service.js` | A link token, its access key and its end date, and what the admin sees of a link. |
+| `backend/features/access/clients/clients.access.js` | Who may use a link: its token, its key, its end date and the lock-out after wrong keys. |
+| `backend/features/access/clients/clients.controller.js` | The link actions of the admin: list, make, change, renew, key, show and remove. |
+| `backend/features/access/viewer/viewer.rules.js` | What a private link may see: the forms, the kind of view and the columns. |
+| `backend/features/access/viewer/viewer.service.js` | The rows a private link reads: bookings, teams and WhatsApp registrations. |
+| `backend/features/access/viewer/viewer.controller.js` | The actions of the instructor page: who the link is, its data and its reviews. |
+
+### Outputs: what the platform produces in Sheets and Drive
+
+| File | What it does |
+|---|---|
+| `backend/features/outputs/sheet-views/sheet-views.layout.js` | The look of the sheet views: headers, frames, merged labels and links. |
+| `backend/features/outputs/sheet-views/sheet-views.builder.js` | Styled views inside each form's own spreadsheet: the team list, the bookings and the registrations. Every team (or day, or registration) is a block with its own tint and a heavy border around it, so the eye can match a name to its task, code or slot at a glance. |
+| `backend/features/outputs/sheet-views/sheet-views.scheduler.js` | When the sheet views are rebuilt. A change only marks the form's views as out of date and books one run a minute later. The run repaints every marked form and removes itself, so students never wait for formatting and nothing runs while nothing changes. |
+| `backend/features/outputs/sheet-views/sheet-views.controller.js` | The admin action that rebuilds the sheet views. |
+| `backend/features/outputs/downloads/downloads.jobs.js` | A Download all job: its folder, its saved parts, retries and file names. |
+| `backend/features/outputs/downloads/downloads.workbook.js` | The Excel workbook a Download all job puts beside the files. |
+| `backend/features/outputs/downloads/downloads.controller.js` | The Download all actions: start, one team, finish, pack and send in chunks. |
+| `backend/features/outputs/print/print.service.js` | The printable sheets of bookings and teams, exported as PDF. |
+| `backend/features/outputs/print/print.controller.js` | The print actions of the admin. |
+| `backend/features/outputs/menu/menu.service.js` | The Forms Platform menu of the registry sheet and what each item does. |
+| `backend/features/outputs/menu/print-dialog.js` | The dialog the print menu items open in the sheet. |
+
+### The web app
+
+| File | What it does |
+|---|---|
+| `backend/main.js` | The web app: every request arrives here and goes to its handler. |
+
+`npm run build` joins `domain/rules.js`, `domain/form-metadata.js` and every
+backend file into `dist/Code.gs`: `platform/` first, then `features/`, with
+`main.js` last.
 
 ## Tools and tests
 

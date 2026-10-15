@@ -13,6 +13,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const { createWorld } = require('./harness/appsscript-mock.js');
+const { bundleSource } = require('../scripts/build/bundle-backend.js');
 
 const FIXTURES = path.join(__dirname, 'fixtures', 'golden');
 const PIN = '4321';
@@ -71,10 +72,7 @@ test('Golden: every function Apps Script calls by name exists in the bundle', ()
   for (const name of names) {
     assert.equal(typeof w.ctx[name], 'function', name);
   }
-  const menu = fs.readFileSync(
-    path.join(__dirname, '..', 'backend', 'Menu.js'),
-    'utf8'
-  );
+  const menu = bundleSource().code;
   const named = [...menu.matchAll(/addItem\('[^']*', '(\w+)'\)/g)].map(
     (m) => m[1]
   );
