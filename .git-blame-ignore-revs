@@ -15,3 +15,6 @@ e5be497e4ba2dcb23b05a6e7f376df51a0faf427
 
 # style(tests): Format with Biome
 a6ba6299ae5743d440aedae6383d4b8fc820330d
+
+# style(backend): Indent the namespace bodies
+28b1f3fca079189ffa0de393eaff2e91d0213202
