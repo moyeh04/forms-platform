@@ -49,16 +49,16 @@
   .data-table.cards td:last-child {
     margin-top: 6px;
   }
-  .data-table.cards .actions .btn {
-    flex: 1 1 auto;
-    justify-content: center;
-  }
   .dialog-actions {
     flex-wrap: wrap;
   }
   .dialog-actions .btn {
     flex: 1 1 auto;
     white-space: nowrap;
+    justify-content: center;
+  }
+  .data-table.cards .actions .btn {
+    flex: 1 1 auto;
     justify-content: center;
   }
 }
