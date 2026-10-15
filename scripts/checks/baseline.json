@@ -86,36 +86,6 @@
     "jsdoc": 6,
     "lines": 1
   },
-  "backend/features/intake/responses/drive-links.js": {
-    "biome/lint/complexity/noExcessiveCognitiveComplexity": 1,
-    "biome/lint/complexity/useOptionalChain": 2,
-    "biome/lint/correctness/noInnerDeclarations": 2,
-    "jsdoc": 4
-  },
-  "backend/features/intake/responses/responses.notify.js": {
-    "biome/lint/complexity/noExcessiveCognitiveComplexity": 1,
-    "biome/lint/complexity/useOptionalChain": 1,
-    "biome/lint/correctness/noInnerDeclarations": 5,
-    "jsdoc": 4,
-    "lines": 2
-  },
-  "backend/features/intake/responses/responses.repository.js": {
-    "biome/lint/style/noMagicNumbers": 1,
-    "jsdoc": 8
-  },
-  "backend/features/intake/responses/responses.review.js": {
-    "biome/lint/complexity/noExcessiveCognitiveComplexity": 1,
-    "biome/lint/complexity/useOptionalChain": 2,
-    "biome/lint/correctness/noInnerDeclarations": 1,
-    "jsdoc": 4,
-    "lines": 1
-  },
-  "backend/features/intake/responses/responses.rules.js": {
-    "biome/lint/complexity/noExcessiveCognitiveComplexity": 1,
-    "biome/lint/correctness/noInnerDeclarations": 4,
-    "jsdoc": 8,
-    "lines": 2
-  },
   "backend/features/intake/submissions/admin-submissions.controller.js": {
     "biome/lint/complexity/noExcessiveCognitiveComplexity": 1,
     "biome/lint/complexity/useOptionalChain": 1,

@@ -1,6 +1,7 @@
 /** The Responses tab of a form: reading and saving submissions. */
 
 var ResponsesRepository = (function () {
+  /** The columns of the Responses tab, in sheet order. */
   var RESPONSE_COLS = [
     'id',
     'ref',
@@ -24,6 +25,7 @@ var ResponsesRepository = (function () {
     'number'
   ];
 
+  /** The statuses a submission can have. */
   var SUBMISSION_STATUSES = [
     'new',
     'in_review',
@@ -32,6 +34,10 @@ var ResponsesRepository = (function () {
     'done'
   ];
 
+  /** How many digits the count at the end of a reference has. */
+  var REF_DIGITS_ = 4;
+
+  /** The letters a reference starts with, by form type. */
   var REF_PREFIX_ = {
     team_registration: 'TR',
     task_submission: 'TK',
@@ -39,11 +45,23 @@ var ResponsesRepository = (function () {
     whatsapp_registration: 'WA'
   };
 
+  /**
+   * Opens the Responses tab of a form.
+   *
+   * @param {!Object} form The form.
+   * @return {?SpreadsheetApp.Sheet} The tab.
+   */
   function responsesSheet(form) {
     var ss = SpreadsheetApp.openById(form.sheetId);
     return ss.getSheetByName('Responses');
   }
 
+  /**
+   * Turns a row of the tab into a response.
+   *
+   * @param {!Object} r The row, by column name.
+   * @return {!Object} The response, with its `_row`.
+   */
   function rowToResponse_(r) {
     return {
       _row: r._row,
@@ -70,6 +88,13 @@ var ResponsesRepository = (function () {
     };
   }
 
+  /**
+   * Reads the responses of a form.
+   *
+   * @param {!Object} form The form.
+   * @param {boolean=} includeDeleted True to keep cancelled ones.
+   * @return {!Array<!Object>} The responses.
+   */
   function readResponses(form, includeDeleted) {
     var rows = Table.readTable(responsesSheet(form), RESPONSE_COLS).map(
       rowToResponse_
@@ -81,6 +106,12 @@ var ResponsesRepository = (function () {
         });
   }
 
+  /**
+   * Turns a response into the values of its row.
+   *
+   * @param {!Object} r The response.
+   * @return {!Object} The row, by column name.
+   */
   function responseToRow_(r) {
     var o = Json.clone(r);
     o.review = JSON.stringify(r.review || {});
@@ -90,6 +121,13 @@ var ResponsesRepository = (function () {
     return o;
   }
 
+  /**
+   * Saves a response to its row, or adds a row for a new one.
+   *
+   * @param {!Object} form The form.
+   * @param {!Object} r The response; its time of change and `_row` are set.
+   * @return {!Object} The same response.
+   */
   function saveResponse_(form, r) {
     r.updated = Time.nowIso();
     var sh = responsesSheet(form);
@@ -103,7 +141,13 @@ var ResponsesRepository = (function () {
     return r;
   }
 
-  /** Fills the readable columns from the validated data. */
+  /**
+   * Fills the readable columns from the validated data.
+   *
+   * @param {!Object} form The form.
+   * @param {!Object} r The response, changed in place.
+   * @return {!Object} The same response.
+   */
   function applyDerived_(form, r) {
     var d = r.data;
     var slotField = Rules.fieldByRole(form, 'slot');
@@ -128,6 +172,13 @@ var ResponsesRepository = (function () {
     return r;
   }
 
+  /**
+   * Makes the reference of the next response: the prefix of the form type,
+   * the year and the count.
+   *
+   * @param {!Object} form The form.
+   * @return {string} The reference, such as `TR-2026-0007`.
+   */
   function nextRef_(form) {
     var count = Math.max(0, responsesSheet(form).getLastRow() - 1);
     var year = new Date().getUTCFullYear();
@@ -136,7 +187,7 @@ var ResponsesRepository = (function () {
       '-' +
       year +
       '-' +
-      ('000' + (count + 1)).slice(-4)
+      ('0'.repeat(REF_DIGITS_ - 1) + (count + 1)).slice(-REF_DIGITS_)
     );
   }
 
