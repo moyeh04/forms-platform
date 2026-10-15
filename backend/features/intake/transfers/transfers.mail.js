@@ -105,7 +105,7 @@ var TransfersMail = (function () {
   function mailTransfer_(form, t, kind) {
     var to;
     try {
-      if ((form.rules || {}).transferEmails !== true) return;
+      if (form.rules?.transferEmails !== true) return;
       to = recipient_(form, t, kind);
       if (!to) return;
       MailApp.sendEmail({

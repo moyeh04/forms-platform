@@ -97,12 +97,25 @@ var KeyBookingService = (function () {
    */
   function sharedField_(source, f) {
     var fields = source.fields || [];
-    var same = function (key) {
-      return fields.filter(function (s) {
-        return s[key] === f[key] && s.type === f.type;
-      })[0];
-    };
-    return same('id') || (f.role ? same('role') : null) || null;
+    return (
+      sameBy_(fields, f, 'id') ||
+      (f.role ? sameBy_(fields, f, 'role') : null) ||
+      null
+    );
+  }
+
+  /**
+   * Finds the question of the same type that matches on one key.
+   *
+   * @param {!Array<!Object>} fields The questions of the registration form.
+   * @param {!Object} f The question of the booking form.
+   * @param {string} key `id` or `role`.
+   * @return {!Object|undefined} The question.
+   */
+  function sameBy_(fields, f, key) {
+    return fields.filter(function (s) {
+      return s[key] === f[key] && s.type === f.type;
+    })[0];
   }
 
   /**
