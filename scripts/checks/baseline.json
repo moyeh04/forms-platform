@@ -253,17 +253,6 @@
     "jsdoc": 70,
     "lines": 31
   },
-  "web/js/form/chrome.view.js": {
-    "biome/lint/complexity/useOptionalChain": 3,
-    "biome/lint/style/noMagicNumbers": 2,
-    "jsdoc": 3
-  },
-  "web/js/form/route.view.js": {
-    "biome/lint/complexity/noArguments": 1,
-    "biome/lint/style/noMagicNumbers": 4,
-    "jsdoc": 5,
-    "lines": 2
-  },
   "web/js/form/fields.view.js": {
     "biome/lint/complexity/noExcessiveCognitiveComplexity": 1,
     "biome/lint/complexity/useOptionalChain": 4,
@@ -278,12 +267,6 @@
     "biome/lint/style/noMagicNumbers": 2,
     "jsdoc": 2,
     "lines": 2
-  },
-  "web/js/form/select.view.js": {
-    "biome/lint/complexity/noExcessiveLinesPerFunction": 1,
-    "biome/lint/style/noMagicNumbers": 1,
-    "jsdoc": 2,
-    "lines": 1
   },
   "web/js/form/team-size.view.js": {
     "biome/lint/complexity/noExcessiveLinesPerFunction": 1,
@@ -364,11 +347,6 @@
   "web/js/form/edit.page.js": {
     "biome/lint/style/noMagicNumbers": 1,
     "jsdoc": 5,
-    "lines": 1
-  },
-  "web/js/form/success.view.js": {
-    "biome/lint/complexity/useOptionalChain": 1,
-    "jsdoc": 2,
     "lines": 1
   },
   "web/js/form/contacts.view.js": {
