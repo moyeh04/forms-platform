@@ -2,7 +2,7 @@
  * Admin: the shared lists behind dropdown questions.
  *
  * A list has a kind, and the kind decides how it is edited, so most lists need no typing:
- *   sections  built from year groups (4C, 3L) and how many of each kind (TH, T, O) they have
+ *   sections  built from year groups (4C, 3L) and how many sections of each kind (TH, T …) they have
  *   numbers   a run from one number to another
  *   named     choices with an English name (majors, levels), as rows
  *   plain     short choices (groups, bylaws), as chips
@@ -28,8 +28,8 @@
     named: { label: 'Choices with names', example: 'حاسبات · Computers', about: 'Each choice with its English name, as rows.' },
     plain: { label: 'Short choices', example: 'A, B, 2020', about: 'Short values shown as chips.' }
   };
-  var SECTION_CODES = ['TH', 'T', 'O'];
-  // A student is in year 1 to 5. (A level counts from 0, but a section is named by the year.)
+  // The years offered for a new year group: 1 to 5, and any higher year a section list already uses.
+  // (A level counts from 0, but a section is named by the year.) The kinds and the letters come from the lists.
   var YEARS = ['1', '2', '3', '4', '5'];
   var PEEK = 4;
 
@@ -89,7 +89,8 @@
     var groups = [], extras = [], seen = {};
     values.forEach(function (v) {
       var m = /^([^-\s]+)-([A-Za-z]+)(\d+)$/.exec(v);
-      if (!m) { extras.push(v); return; }
+      // "4C-TH01" is kept as written: a card would write it back as "4C-TH1".
+      if (!m || String(+m[3]) !== m[3]) { extras.push(v); return; }
       var g = groups.filter(function (x) { return x.name === m[1]; })[0];
       if (!g) groups.push(g = { name: m[1], kinds: [] });
       var k = g.kinds.filter(function (x) { return x.code === m[2]; })[0];
@@ -144,6 +145,19 @@
     return h('span', { class: 'stepper' }, down, input, up);
   }
 
+  /** Where a new year group goes: before the first group with a higher year, or the same year and a later letter. */
+  function groupSlot(groups, name) {
+    var p = groupParts(name);
+    for (var i = 0; p && i < groups.length; i++) {
+      var q = groupParts(groups[i].name);
+      if (q && (+q.year > +p.year || (q.year === p.year && q.letter > p.letter))) return i;
+    }
+    return groups.length;
+  }
+
+  /** A kind or a department letter as it is typed: letters only, upper case. */
+  function cleanCode(v, max) { return String(v || '').replace(/[^A-Za-z]/g, '').toUpperCase().slice(0, max); }
+
   A.views.lists = async function (mount, picked) {
     var data = await Promise.all([A.call('admin.lists.get'), A.call('admin.forms.list')]);
     var lists = data[0].lists, info = data[0].info || {};
@@ -166,7 +180,7 @@
     var kind = function (k) { return A.listKind(k || st.key, info); };
     var name = function (k) { return A.listName(k || st.key, info); };
     function load(key) {
-      st.key = key; st.rows = toRows(lists[key]); st.order = false; st.renaming = false;
+      st.key = key; st.rows = toRows(lists[key]); st.order = false; st.renaming = false; st.draft = null;
       st.sections = kind() === 'sections' ? readSections(st.rows.map(function (r) { return r.value; })) : null;
     }
     function dirty() { return !st.creating && (JSON.stringify(fromRows(st.rows)) !== JSON.stringify(fromRows(toRows(lists[st.key]))) || st.rows.some(function (r) { return !r.value.trim() && (r.en.trim() || r.ar.trim()); })); }
@@ -267,39 +281,108 @@
       });
     }
 
-    function setRows(rows) { st.rows = rows; paintRows(); changed(); }
+    /** `keep`: the editor already shows the change (a stepper), so only the list of every section is drawn again. */
+    function setRows(rows, keep) { st.rows = rows; if (keep) paintPreview(); else paintRows(); changed(); }
     function removeRow(i) { st.rows.splice(i, 1); if (st.sections) st.sections = readSections(st.rows.map(function (r) { return r.value; })); paintRows(); changed(); }
 
     /* Editors -------------------------------------------------------- */
 
+    /**
+     * The kinds, letters and years the section lists use, in the order they first appear (the groups
+     * being edited first, then the saved lists). Nothing typed is kept apart from a group that uses it, so a
+     * typo leaves no chip behind.
+     */
+    function sectionParts(s) {
+      var out = { kinds: [], letters: [], years: YEARS.slice() };
+      var know = function (arr, v) { if (v && arr.indexOf(v) === -1) arr.push(v); };
+      var take = function (groups) {
+        groups.forEach(function (g) {
+          var p = groupParts(g.name);
+          if (p) { know(out.letters, p.letter); know(out.years, String(+p.year)); }
+          g.kinds.forEach(function (k) { know(out.kinds, k.code); });
+        });
+      };
+      take(s.groups);
+      keys().forEach(function (k) {
+        // The saved copy of this list counts too, so a kind removed in this edit can be added back.
+        if (kind(k) === 'sections') take(readSections((lists[k] || []).map(function (o) { return String(o.value); })).groups);
+      });
+      out.years.sort(function (x, y) { return x - y; });
+      return out;
+    }
+
+    /** A kind typed for a card or the draft: refused when it is empty or already known, in any case. */
+    function newKindProblem(code, known) {
+      if (!code) return 'Type the letters of the kind, such as TH.';
+      return known.some(function (k) { return k.toUpperCase() === code; }) ? code + ' is already a kind.' : '';
+    }
+
+    /** "+ New kind": a chip that turns into a field; Enter or Add takes the kind, Escape gives up. */
+    function newKindChip(name, known, take) {
+      var box = h('span', { class: 'sec-new' });
+      var paint = function (typing) {
+        ui.clear(box);
+        if (!typing) return box.appendChild(h('button', { type: 'button', class: 'toggle-chip sm add', name: name + '-add', onclick: function () { paint(true); var el = box.querySelector('input'); if (el && el.focus) el.focus(); } }, '+ New kind'));
+        var err = h('span', { class: 'error', id: name + '-err', role: 'alert' });
+        var input = h('input', { class: 'input sec-letter', name: name + '-new', maxlength: '3', placeholder: 'L', 'aria-label': 'New kind', 'aria-describedby': name + '-err', autocomplete: 'off',
+          oninput: function (e) { e.target.value = cleanCode(e.target.value, 3); err.textContent = ''; },
+          onkeydown: function (e) { if (e.key === 'Enter') { e.preventDefault(); go(); } else if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); paint(false); } } });
+        var go = function () {
+          var code = cleanCode(input.value, 3), why = newKindProblem(code, known);
+          if (why) { err.textContent = why; return input.focus && input.focus(); }
+          take(code);
+        };
+        box.appendChild(input);
+        box.appendChild(h('button', { type: 'button', class: 'btn btn-quiet sm', name: name + '-take', onclick: go }, 'Add'));
+        box.appendChild(err);
+      };
+      paint(false);
+      return box;
+    }
+
     function sectionsEditor() {
       var s = st.sections;
+      var parts = sectionParts(s);
       var apply = function () { setRows(plainRows(writeSections(s))); };
       var box = h('div', { class: 'sec-editor l-stack' });
+      var count = s.groups.length;
+      box.appendChild(h('div', { class: 'sec-top' },
+        h('span', { class: 'muted-note' }, count ? plural(count, 'year group', 'year groups') : 'No year groups yet.'),
+        st.draft ? null : h('button', { type: 'button', class: 'btn sm ' + (count ? 'btn-quiet' : 'btn-primary'), name: 'add-group-open', onclick: function () {
+          st.draft = { year: '', letter: '', typing: false, counts: {}, kinds: [] };
+          paintRows();
+          var first = rowsBox.querySelector('[name^="group-year-"]'); if (first && first.focus) first.focus();
+        } }, icon('plus', 16), 'Add a year group')));
+      if (st.draft) box.appendChild(groupDraft(s, parts));
       s.groups.forEach(function (g, gi) {
         var used = g.kinds.map(function (k) { return k.code; });
-        var more = SECTION_CODES.filter(function (c) { return used.indexOf(c) === -1; });
-        var count = g.kinds.reduce(function (n, k) { return n + k.count; }, 0);
+        var more = parts.kinds.filter(function (c) { return used.indexOf(c) === -1; });
+        var total = function () { return g.kinds.reduce(function (n, k) { return n + k.count; }, 0); };
+        var sum = h('span', { class: 'muted-note' }, plural(total(), 'section', 'sections'));
+        var addKind = function (code) { g.kinds.push({ code: code, count: 1 }); apply(); };
         box.appendChild(h('div', { class: 'sec-group', dataset: { group: g.name } },
           h('div', { class: 'sec-group-head' },
-            h('strong', { class: 'sec-group-name' }, g.name),
-            h('span', { class: 'muted-note' }, plural(count, 'section', 'sections')),
+            h('strong', { class: 'sec-group-name', tabindex: '-1' }, g.name), sum,
             h('button', { type: 'button', class: 'icon-btn sm danger', name: 'remove-group-' + g.name, 'aria-label': 'Remove the group ' + g.name, onclick: function () { s.groups.splice(gi, 1); apply(); } }, icon('trash', 16))),
           h('div', { class: 'sec-kinds' }, g.kinds.map(function (k, ki) {
-            return h('div', { class: 'sec-kind' },
+            var range = h('span', { class: 'sec-range muted-note' });
+            var paintRange = function () { range.textContent = g.name + '-' + k.code + '1' + (k.count > 1 ? ' to ' + k.code + k.count : ''); };
+            paintRange();
+            return h('div', { class: 'sec-kind' + (g.kinds.length > 1 ? ' removable' : '') },
               h('span', { class: 'sec-code' }, k.code),
-              stepper('count-' + g.name + '-' + k.code, k.code + ' sections of ' + g.name, k.count, 0, 40, function (v) {
-                if (v === 0) g.kinds.splice(ki, 1); else k.count = v;
-                if (!g.kinds.length) s.groups.splice(gi, 1);
-                apply();
+              // At least one: a kind leaves the group with its own button, never by counting down.
+              stepper('count-' + g.name + '-' + k.code, k.code + ' sections of ' + g.name, k.count, 1, 99, function (v) {
+                k.count = v; paintRange(); sum.textContent = plural(total(), 'section', 'sections');
+                setRows(plainRows(writeSections(s)), true);
               }),
-              h('span', { class: 'sec-range muted-note' }, k.count ? g.name + '-' + k.code + '1' + (k.count > 1 ? ' to ' + k.code + k.count : '') : ''));
+              range,
+              // The last kind goes with the group, so a group never empties by itself.
+              g.kinds.length > 1 ? h('button', { type: 'button', class: 'icon-btn sm danger', name: 'remove-kind-' + g.name + '-' + k.code, 'aria-label': 'Remove ' + k.code + ' from ' + g.name, onclick: function () { g.kinds.splice(ki, 1); apply(); } }, icon('trash', 16)) : null);
           })),
-          more.length ? h('div', { class: 'sec-more' }, h('span', { class: 'muted-note' }, 'Add a kind:'), more.map(function (c) {
-            return h('button', { type: 'button', class: 'toggle-chip sm', name: 'add-kind-' + g.name + '-' + c, onclick: function () { g.kinds.push({ code: c, count: 1 }); apply(); } }, '+ ' + c);
-          })) : null));
+          h('div', { class: 'sec-more' }, h('span', { class: 'muted-note' }, 'Add a kind:'), more.map(function (c) {
+            return h('button', { type: 'button', class: 'toggle-chip sm', name: 'add-kind-' + g.name + '-' + c, onclick: function () { addKind(c); } }, '+ ' + c);
+          }), newKindChip('kind-' + g.name, parts.kinds, addKind))));
       });
-      box.appendChild(groupAdder(s, apply));
       if (s.extras.length) {
         box.appendChild(h('div', { class: 'sec-extras' }, h('span', { class: 'label' }, 'Other sections'),
           h('p', { class: 'help' }, 'These do not follow the year-kind-number pattern, so they are kept as they are.'),
@@ -311,68 +394,74 @@
     }
 
     /**
-     * A new group is a year and a department letter picked from chips. The letters are the ones the
-     * section lists already use, so nothing about a department is written in the code: a letter is
-     * added here once, and it is a chip from then on. Add appears once both are picked; until then
-     * the line under the chips says what is missing.
+     * A new year group, drawn as a card where it is added: a year, a department letter, and how many
+     * sections of each kind. Every kind starts at 0, meaning "not in this group"; nothing is taken from
+     * another group. Add appears, named after the group, once the group can be added; until then the
+     * line under the counts says what is missing.
      */
-    function groupAdder(s, apply) {
-      var pick = st.groupPick = st.groupPick || { year: '', letter: '', typing: false };
-      var letters = [];
-      var know = function (l) { if (l && letters.indexOf(l) === -1) letters.push(l); };
-      keys().forEach(function (k) {
-        if (kind(k) !== 'sections') return;
-        readSections((lists[k] || []).map(function (o) { return String(o.value); })).groups.forEach(function (g) { var p = groupParts(g.name); if (p) know(p.letter); });
-      });
-      s.groups.forEach(function (g) { var p = groupParts(g.name); if (p) know(p.letter); });
-      (st.newLetters = st.newLetters || []).forEach(know);
-      var box = h('div', { class: 'sec-adder' });
-      var paintAdder = function () {
-        ui.clear(box);
-        var nameNow = pick.year && pick.letter ? pick.year + pick.letter : '';
-        var exists = nameNow && s.groups.some(function (g) { return g.name === nameNow; });
-        // A typed letter is remembered when its field is left, and is a chip the next time the chips are drawn.
-        var remember = function () { if (pick.typing && pick.letter && st.newLetters.indexOf(pick.letter) === -1) { st.newLetters.push(pick.letter); know(pick.letter); } };
-        var chip = function (key, v) {
-          return h('button', { type: 'button', class: 'toggle-chip sm', name: 'group-' + key + '-' + v, 'aria-pressed': pick[key] === v ? 'true' : 'false', onclick: function () {
-            remember();
-            if (key === 'letter' || pick.letter) pick.typing = false;
-            pick[key] = pick[key] === v ? '' : v;
-            paintAdder();
-          } }, v);
-        };
-        var typed = h('input', { class: 'input sec-letter', name: 'group-letter-new', maxlength: '2', placeholder: 'M', 'aria-label': 'New department letter', autocomplete: 'off', value: pick.typing ? pick.letter : '',
-          oninput: function (e) { e.target.value = pick.letter = e.target.value.replace(/[^A-Za-z]/g, '').toUpperCase(); paintFoot(); },
-          onkeydown: function (e) { if (e.key === 'Enter') { e.preventDefault(); remember(); pick.typing = false; paintAdder(); } },
-          onblur: remember });
-        var newLetter = pick.typing
-          ? h('label', { class: 'sec-new' }, h('span', { class: 'tool-label' }, 'New letter'), typed)
-          : h('button', { type: 'button', class: 'toggle-chip sm add', name: 'group-letter-add', onclick: function () { pick.letter = ''; pick.typing = true; paintAdder(); var el = box.querySelector('[name="group-letter-new"]'); if (el && el.focus) el.focus(); } }, '+ New letter');
-        var foot = h('div', { class: 'sec-foot' });
-        var paintFoot = function () {
-          ui.clear(foot);
-          nameNow = pick.year && pick.letter ? pick.year + pick.letter : '';
-          exists = nameNow && s.groups.some(function (g) { return g.name === nameNow; });
-          if (exists) return foot.appendChild(h('p', { class: 'muted-note' }, nameNow + ' is already in this list.'));
-          if (!nameNow) return foot.appendChild(h('p', { class: 'muted-note', name: 'group-missing' }, !pick.year && !pick.letter ? 'Pick a year and a department letter.' : pick.year ? 'Now pick a department letter.' : 'Now pick a year.'));
-          var add = function () {
-            remember();
-            var last = s.groups[s.groups.length - 1];
-            s.groups.push({ name: nameNow, kinds: last ? last.kinds.map(function (k) { return { code: k.code, count: k.count }; }) : [{ code: 'TH', count: 1 }] });
-            st.groupPick = { year: '', letter: '', typing: false };
-            apply();
-          };
-          foot.appendChild(h('button', { type: 'button', class: 'btn btn-primary sm', name: 'add-group', onclick: add }, icon('plus', 16), 'Add ' + nameNow + (s.groups.length ? ' with the same kinds as ' + s.groups[s.groups.length - 1].name : '')));
-        };
-        box.appendChild(h('h3', null, 'Add a year group'));
-        box.appendChild(h('p', { class: 'help' }, 'A group is a year and a department letter, such as 4C. Its sections are numbered for you.'));
-        box.appendChild(h('div', { class: 'sec-pick' }, h('span', { class: 'label' }, 'Year'), h('div', { class: 'toggle-chips' }, YEARS.map(function (v) { return chip('year', v); }))));
-        box.appendChild(h('div', { class: 'sec-pick' }, h('span', { class: 'label' }, 'Department letter'), h('div', { class: 'toggle-chips' }, letters.map(function (v) { return chip('letter', v); }), newLetter)));
-        box.appendChild(foot);
-        paintFoot();
+    function groupDraft(s, parts) {
+      var d = st.draft;
+      var kinds = parts.kinds.concat(d.kinds.filter(function (k) { return parts.kinds.indexOf(k) === -1; }));
+      var letters = parts.letters.concat(d.typing || !d.letter || parts.letters.indexOf(d.letter) !== -1 ? [] : [d.letter]);
+      var card = h('div', { class: 'sec-group sec-draft', name: 'group-draft', role: 'group', 'aria-label': 'New year group' });
+      var foot = h('div', { class: 'sec-foot' });
+      var groupName = function () { return d.year && d.letter ? d.year + d.letter : ''; };
+      var total = function () { return kinds.reduce(function (n, k) { return n + (d.counts[k] || 0); }, 0); };
+      var exists = function () { return s.groups.some(function (g) { return g.name === groupName(); }); };
+      var ready = function () { return groupName() && !exists() && total() > 0; };
+      var redraw = function (focusName) {
+        paintRows();
+        var el = focusName && rowsBox.querySelector('[name="' + focusName + '"]');
+        if (el && el.focus) el.focus();
       };
-      paintAdder();
-      return box;
+      var add = function () {
+        if (!ready()) return;
+        var name = groupName();
+        s.groups.splice(groupSlot(s.groups, name), 0, { name: name, kinds: kinds.filter(function (k) { return d.counts[k] > 0; }).map(function (k) { return { code: k, count: d.counts[k] }; }) });
+        st.draft = null;
+        setRows(plainRows(writeSections(s)));
+        var head = rowsBox.querySelector('[data-group="' + name + '"] .sec-group-name');
+        if (head) { if (head.scrollIntoView) head.scrollIntoView({ block: 'center' }); if (head.focus) head.focus(); }
+      };
+      var paintFoot = function () {
+        ui.clear(foot);
+        var name = groupName();
+        var why = !d.year && !d.letter ? 'Pick a year and a department letter.' : !d.year ? 'Pick a year.' : !d.letter ? 'Pick a department letter.'
+          : exists() ? name + ' is already in this list.' : !total() ? 'Set at least one kind above 0.' : '';
+        if (!kinds.length && !why) why = 'Add a kind, such as TH.';
+        foot.appendChild(h('p', { class: 'muted-note', name: 'group-missing', role: 'status' }, why));
+        foot.appendChild(h('div', { class: 'actions' },
+          h('button', { type: 'button', class: 'btn btn-quiet sm', name: 'add-group-cancel', onclick: function () { st.draft = null; redraw('add-group-open'); } }, 'Cancel'),
+          ready() ? h('button', { type: 'button', class: 'btn btn-primary sm', name: 'add-group', onclick: add }, icon('plus', 16), 'Add ' + name) : null));
+      };
+      var chip = function (key, v) {
+        return h('button', { type: 'button', class: 'toggle-chip sm', name: 'group-' + key + '-' + v, 'aria-pressed': d[key] === v ? 'true' : 'false', onclick: function () {
+          if (key === 'letter') d.typing = false;
+          d[key] = d[key] === v ? '' : v;
+          redraw('group-' + key + '-' + v);
+        } }, v);
+      };
+      var letterBox = d.typing
+        ? h('label', { class: 'sec-new' }, h('span', { class: 'tool-label' }, 'New letter'), h('input', { class: 'input sec-letter', name: 'group-letter-new', maxlength: '2', placeholder: 'M', 'aria-label': 'New department letter', autocomplete: 'off', value: d.letter,
+          oninput: function (e) { e.target.value = d.letter = cleanCode(e.target.value, 2); paintFoot(); },
+          onkeydown: function (e) { if (e.key === 'Enter') { e.preventDefault(); var first = card.querySelector('.stepper-input'); if (first && first.focus) first.focus(); } } }))
+        : h('button', { type: 'button', class: 'toggle-chip sm add', name: 'group-letter-add', onclick: function () { d.letter = ''; d.typing = true; redraw('group-letter-new'); } }, '+ New letter');
+      card.appendChild(h('h3', null, 'New year group'));
+      card.appendChild(h('div', { class: 'sec-pick' }, h('span', { class: 'label' }, 'Year'), h('div', { class: 'toggle-chips' }, parts.years.map(function (v) { return chip('year', v); }))));
+      card.appendChild(h('div', { class: 'sec-pick' }, h('span', { class: 'label' }, 'Department letter'), h('div', { class: 'toggle-chips' }, letters.map(function (v) { return chip('letter', v); }), letterBox)));
+      card.appendChild(h('div', { class: 'sec-kinds' }, kinds.map(function (k) {
+        var range = h('span', { class: 'sec-range muted-note' });
+        var paintRange = function () { var n = d.counts[k] || 0, name = groupName() || 'The group'; range.textContent = n ? name + '-' + k + '1' + (n > 1 ? ' to ' + k + n : '') : 'None'; };
+        paintRange();
+        return h('div', { class: 'sec-kind' },
+          h('span', { class: 'sec-code' }, k),
+          stepper('draft-count-' + k, k + ' sections of the new group', d.counts[k] || 0, 0, 99, function (v) { d.counts[k] = v; paintRange(); paintFoot(); }, { enter: add }),
+          range);
+      })));
+      card.appendChild(h('div', { class: 'sec-more' }, newKindChip('draft-kind', kinds, function (code) { d.kinds.push(code); d.counts[code] = 1; redraw('draft-count-' + code); })));
+      card.appendChild(foot);
+      paintFoot();
+      return card;
     }
 
     function numbersEditor() {
@@ -456,8 +545,17 @@
       ui.clear(rowsBox);
       var k = kind();
       var ed = k === 'sections' ? sectionsEditor() : k === 'numbers' ? numbersEditor() : null;
+      st.preview = null;
       rowsBox.appendChild(ed || choicesEditor());
-      if (k === 'sections' && st.rows.length) rowsBox.appendChild(h('details', { class: 'list-many sec-preview' }, h('summary', null, 'See all ' + plural(st.rows.length, 'section', 'sections')),
+      if (k === 'sections') { st.preview = h('div'); rowsBox.appendChild(st.preview); paintPreview(); }
+    }
+
+    /** Every section of the list, folded: the values a save would store. */
+    function paintPreview() {
+      if (!st.preview) return;
+      var open = st.preview.firstChild && st.preview.firstChild.open;
+      ui.clear(st.preview);
+      if (st.rows.length) st.preview.appendChild(h('details', { class: 'list-many sec-preview', open: open || null }, h('summary', null, 'See all ' + plural(st.rows.length, 'section', 'sections')),
         h('ul', { class: 'value-chips' }, st.rows.map(function (r) { return h('li', { class: 'value-chip plain' }, r.value); }))));
     }
 
