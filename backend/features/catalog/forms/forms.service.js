@@ -123,11 +123,11 @@ function applyFormPatch_(form, patch, base) {
       return;
     }
     if (k === 'slots') {
-      form.slots = normalizeSlots_(patch.slots);
+      form.slots = SlotsRules.normalizeSlots(patch.slots);
       return;
     }
     if (k === 'keyBooking') {
-      form.keyBooking = normalizeKeyBooking_(form, patch.keyBooking);
+      form.keyBooking = KeyBookingService.normalizeKeyBooking(form, patch.keyBooking);
       return;
     }
     if (k === 'slug') {

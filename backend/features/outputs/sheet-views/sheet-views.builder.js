@@ -94,7 +94,7 @@ function buildBookings_(form, ss) {
 
   var days = (form.slots && form.slots.days) || [];
   function order(r) {
-    var p = slotParts_(form, r.slot);
+    var p = SlotsRules.slotParts(form, r.slot);
     var di = days.indexOf(p.day);
     var ti = p.day ? p.day.times.indexOf(p.time) : 0;
     return (di < 0 ? 999 : di) * 1000 + (ti < 0 ? 999 : ti);
@@ -113,7 +113,7 @@ function buildBookings_(form, ss) {
     blocks = [],
     current = null;
   rows.forEach(function (r) {
-    var p = slotParts_(form, r.slot);
+    var p = SlotsRules.slotParts(form, r.slot);
     if (!current || current.dayId !== p.dayId) {
       var g = blocks.length;
       current = {

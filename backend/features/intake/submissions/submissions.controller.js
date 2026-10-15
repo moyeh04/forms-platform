@@ -16,16 +16,16 @@ API.submit = function (req) {
   var form = FormsRepository.requireForm(String(req.slug || ''));
   ResponsesRules.assertAcceptingSubmissions(form);
   var vform = FormsPublic.validationForm(form);
-  var source = keyBookingSource_(form);
+  var source = KeyBookingService.keyBookingSource(form);
   var v,
     registration = null;
   if (source) {
     // The answers come from the registration the key opens; the student only picks the slot.
-    registration = registrationByKey_(source, req.sourceKey);
+    registration = KeyBookingService.registrationByKey(source, req.sourceKey);
     var slotField = Rules.fieldByRole(vform, 'slot');
     v = {
       ok: true,
-      data: bookingData_(
+      data: KeyBookingService.bookingData(
         vform,
         source,
         registration,
@@ -117,7 +117,7 @@ function editScope_(form) {
   if (taskLocked_(form)) return '';
   var edit = !!form.editKey.allowEdit;
   if (form.type !== 'reservation') return edit ? 'all' : '';
-  if (keyBookingSource_(form))
+  if (KeyBookingService.keyBookingSource(form))
     return edit || form.editKey.allowDelete ? 'slot' : '';
   return edit ? 'all' : form.editKey.allowDelete ? 'slot' : '';
 }
@@ -147,7 +147,7 @@ API.update = function (req) {
   if (!scope) ApiError.fail('edit_disabled', 'Editing is turned off for this form.');
   var v;
   if (scope === 'slot') {
-    v = { ok: true, data: movedBooking_(vform, found.data, req.data || {}) };
+    v = { ok: true, data: KeyBookingService.movedBooking(vform, found.data, req.data || {}) };
   } else {
     v = Rules.validateSubmission(vform, req.data || {});
     if (!v.ok) ApiError.fail('invalid', 'Some answers need fixing.', v.errors);

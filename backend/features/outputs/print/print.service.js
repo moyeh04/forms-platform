@@ -52,7 +52,7 @@ function printReservations_(form, dayId, includeEmpty) {
 
   var byTime = {};
   ResponsesRepository.readResponses(form).forEach(function (r) {
-    var p = slotParts_(vform, r.slot);
+    var p = SlotsRules.slotParts(vform, r.slot);
     if (p.dayId !== dayId) return;
     (byTime[p.time] = byTime[p.time] || []).push(r);
   });

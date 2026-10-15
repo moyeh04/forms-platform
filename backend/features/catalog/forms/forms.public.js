@@ -78,7 +78,7 @@ function publicForm(form) {
   if (full.rules && full.rules.teamSize)
     out.rules.teamSize = full.rules.teamSize;
   if (allowedMajors_(full).length) out.rules.majors = allowedMajors_(full);
-  var source = keyBookingSource_(form);
+  var source = KeyBookingService.keyBookingSource(form);
   if (source) out.keyBooking = { title: source.title };
   if (full.rules && full.rules.folderName && full.rules.folderName.enabled) {
     out.rules.folderName = {

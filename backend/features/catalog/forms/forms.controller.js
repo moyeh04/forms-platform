@@ -23,7 +23,7 @@ function getForm(req) {
     return { state: state, form: draft };
   }
   var out = { state: state, form: FormsPublic.publicForm(form), serverTime: Time.nowIso() };
-  if (form.type === 'reservation') out.taken = slotAvailability_(form);
+  if (form.type === 'reservation') out.taken = SlotsRules.slotAvailability(form);
   return out;
 }
 
@@ -47,8 +47,8 @@ function get(req) {
   var out = { form: form, lists: ListsRepository.readLists(), listInfo: ListsRepository.readListInfo() };
   // The timetable editor marks slots that already have bookings.
   if (form.type === 'reservation') {
-    out.taken = slotAvailability_(form);
-    out.keySources = keyBookingSources_(form).map(function (s) {
+    out.taken = SlotsRules.slotAvailability(form);
+    out.keySources = KeyBookingService.keyBookingSources(form).map(function (s) {
       return { id: s.id, title: s.title, term: FormMetadata.slug(s) };
     });
   }

@@ -40,3 +40,6 @@ API['transfer.cancel'] = TransfersController.cancel;
 API['admin.transfer.decide'] = AuthService.admin(
   TransfersController.adminTransferDecide
 );
+
+API['bookingTeam'] = KeyBookingController.bookingTeam;
+API['admin.bookings.next'] = AuthService.admin(KeyBookingController.next);

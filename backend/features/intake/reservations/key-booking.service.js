@@ -2,6 +2,7 @@
  * Booking a slot with the key of a registration, and the next week of slots.
  */
 
+var KeyBookingService = (function () {
 /** Forms a reservation may take keys from: any other form that gives its students a key. */
 function keyBookingSources_(form) {
   return FormsRepository.readForms().filter(function (f) {
@@ -159,9 +160,12 @@ function nextWeekSlots_(slots) {
           });
     return { label: label, date: date, times: d.times.slice() };
   });
-  return normalizeSlots_({
+  return SlotsRules.normalizeSlots({
     days: days,
     capacity: slots && slots.capacity,
     pattern: slots && slots.pattern
   });
 }
+
+return { keyBookingSources: keyBookingSources_, keyBookingSource: keyBookingSource_, normalizeKeyBooking: normalizeKeyBooking_, requireKeyBookingSource: requireKeyBookingSource_, registrationByKey: registrationByKey_, teamPreview: teamPreview_, issuesKeys: issuesKeys_, bookingsOf: bookingsOf_, nextTitle: nextTitle_, nextWeekSlots: nextWeekSlots_, bookingData: bookingData_, movedBooking: movedBooking_ };
+})();

@@ -1,5 +1,6 @@
 /** The slots of a reservation form: cleaned, labelled and counted. */
 
+var SlotsRules = (function () {
 /** Cleans the slot configuration an admin saves. */
 function normalizeSlots_(slots) {
   var days = (slots && slots.days) || [];
@@ -68,3 +69,6 @@ function slotLabel_(form, key) {
   var p = slotParts_(form, key);
   return (p.day ? p.day.label : p.dayId) + '  -  ' + p.time;
 }
+
+return { slotParts: slotParts_, slotAvailability: slotAvailability_, normalizeSlots: normalizeSlots_ };
+})();

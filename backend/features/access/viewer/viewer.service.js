@@ -24,7 +24,7 @@ function reservationRows_(form, client, mode, dayId) {
       return r.slot;
     })
     .map(function (r) {
-      var p = slotParts_(form, r.slot);
+      var p = SlotsRules.slotParts(form, r.slot);
       var di = days.indexOf(p.day);
       return {
         _order:
