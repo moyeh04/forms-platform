@@ -953,7 +953,7 @@ toggle is on). The standard is **WCAG 2.1 AA in both themes**:
 | Focus ring | 3:1 | `focus` |
 | Decorative dividers and card borders | none | `line` |
 
-`tests/contrast.test.js` reads the tokens from `theme.css` and checks every
+`tests/web/css/theme.test.js` reads the tokens from `theme.css` and checks every
 pair above, so a colour change that breaks the standard fails CI and is never
 published. It also checks that the device dark theme and the dark toggle use
 identical colours.
@@ -1186,7 +1186,7 @@ query is for a thing that changes what it is on a phone (a table that becomes
 cards), not for a thing that only needs fewer columns.
 
 A new list table must set `data-label` on its cells and use one of these
-classes; `tests/admin-ui.test.js` and `tests/viewer-ui.test.js` check the
+classes; `tests/web/admin.test.js` and `tests/web/viewer.test.js` check the
 labels of the current tables.
 
 ## Where to change what

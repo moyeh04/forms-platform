@@ -6,7 +6,7 @@
  * Contrast standard: WCAG 2.1 AA in both themes. Text needs 4.5:1 against
  * its background; outlines that show where a field is (--field-line) and the
  * focus ring need 3:1. --line is for decorative dividers only.
- * tests/contrast.test.js checks every pair the pages use, so CI refuses a
+ * tests/web/css/theme.test.js checks every pair the pages use, so CI refuses a
  * colour change that breaks this.
  */
 :root {

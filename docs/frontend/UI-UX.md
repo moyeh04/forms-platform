@@ -38,7 +38,7 @@ the instructor page (`viewer.html`).
 | Check | How |
 |---|---|
 | Phone and desktop | Every page is read at 390 px and at 1280 px. Nothing scrolls sideways |
-| Light and dark | Both themes are looked at, not assumed. Colours come from the tokens in `web/css/theme.css`, and `tests/contrast.test.js` holds every pair the pages use to WCAG 2.1 AA |
+| Light and dark | Both themes are looked at, not assumed. Colours come from the tokens in `web/css/theme.css`, and `tests/web/css/theme.test.js` holds every pair the pages use to WCAG 2.1 AA |
 | Arabic | The student form is read right to left as well; a name, a code, a phone number or a time keeps its own direction. A time inside an Arabic sentence is wrapped in direction isolates. The ticket picture is the same in both languages, since a clock or a calendar read backwards would be wrong |
 | Keyboard and screen reader | A field has a label, an error is tied to its field (`aria-describedby`) and announced (`role="alert"`), the current tab and trail step carry `aria-current`. The digits of a key are read one by one from hidden text; the drawn boxes are hidden from the reader |
 
