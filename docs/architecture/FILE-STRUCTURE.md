@@ -148,6 +148,7 @@ The site is published at the paths it has always had: the pages at the root,
 | `web/css/app/print.css` | Print: only the ticket, on plain paper. |
 | `web/css/app/notes.css` | Lists inside summaries, the note of a chosen team size and the requests to move a member. |
 | `web/css/app/progress.css` | The words of the progress states and the notes of a mark, and a team's own progress on its registration. |
+| `web/css/app/print-sheet.css` | The printed list of the instructor page: the only thing on paper, in the print colours of the theme. |
 | `web/css/admin/layout.css` | The dashboard layout classes, the tabs of a form and the settings sections. The dashboard and the instructor page load the `admin/` files in the order of these rows, so the cascade is the one the single file had. |
 | `web/css/admin/questions.css` | The Questions tab: a row per question under its page. |
 | `web/css/admin/forms-list.css` | The header of a form and the forms list grouped by status. |
@@ -308,6 +309,7 @@ The site is published at the paths it has always had: the pages at the root,
 | `web/js/viewer/bookings.view.js` | The bookings of a booking form, a block for each day. |
 | `web/js/viewer/teams.view.js` | The teams of a team or task form, after the warnings about small teams; only the columns the link shows. |
 | `web/js/viewer/registrations.view.js` | The registrations of a WhatsApp form and the review of each step, which a link with review rights can change. |
+| `web/js/viewer/print.view.js` | The printed list of the instructor page: a heading and plain tables of the teams, bookings or registrations shown, drawn for Print and for Ctrl+P. |
 | `web/js/viewer/viewer.page.js` | The instructor page: opening the link, asking for its key, and drawing the open form by its kind. |
 | `domain/enums.js` | The words the pages and the backend share, as frozen enums of stored values: `FormType`, `FormStatus`, `ReviewStatus` and `ListKind`. Loaded before the other domain files. |
 | `domain/form-metadata/index.js` | What each form type shows beside its title (term, subject code, batch year) and how it is read, saved and copied. Used by the pages and the backend. It picks the part of the form type; the pages and the bundle load the parts before it. |

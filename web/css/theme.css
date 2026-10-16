@@ -57,6 +57,16 @@
   --print-ink: #000;
   --print-line: #999;
   --print-band: #f2f2f2;
+  /* The printed list of the instructor page. Every colour sits inside the
+     CMYK range of an office printer: text is plain black, one muted teal
+     marks the structure, and fills are light tints that save toner. */
+  --print-accent: #2e5e58;
+  --print-mute: #505050;
+  --print-rule: #c4ccc9;
+  --print-head: #e8efed;
+  --print-zebra: #f5f8f7;
+  --print-ok: #2f6b3a;
+  --print-bad: #9b2a1f;
 
   /* Type scale. Latin and Arabic share it; Arabic gets a little more size
      and air. */
