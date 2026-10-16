@@ -1,11 +1,11 @@
 # Testing
 
-397 automated tests run without a Google account, a browser, or a network.
+400 automated tests run without a Google account, a browser, or a network.
 They run the **real** backend and the **real** pages. This page explains how
 that works and what it can and cannot prove.
 
 ```
-npm test    # 397 tests
+npm test    # 400 tests
 ```
 
 ## The layers
@@ -185,6 +185,7 @@ says something else.
 | Admin page: progress | `web/admin.progress.test.js` | 3 | A team registration that copies a milestones list and keeps its copy until Update from list, no student switch while keys are off, and a team marked on the board with its note and the count on its card |
 | Instructor page | `web/viewer.test.js` | 13 | Small teams listed by level and marked on their card, team numbers with a gap where a team cancelled, today, by day, hidden columns, review rights, invalid links, member values named for the phone layout, phone as a call link, the key screen and its theme switch |
 | Instructor page: progress | `web/viewer.progress.test.js` | 3 | A link that may mark sets a state on the board and the mark names the link, a link that may see reads notes with no states to pick, and a hidden link sees no progress until its dialog sets Can mark |
+| Instructor page: print | `web/viewer.print.test.js` | 3 | Print makes a sheet of plain tables instead of printing the page: teams with only the columns the link sees, bookings by day for the view picked, and registrations with each review step as a word and the timetable as a link |
 | Registry writes | `backend/features/catalog/registry/registry-writes.test.js` | 6 | Every change to forms, lists and links written inside the lock, a save that keeps its row while another form is deleted, a save over a newer copy refused, a busy lock, a link that keeps a renamed form, list names that stay unique |
 | Flag cells | `backend/platform/sheets/cell.test.js` | 2 | A stored flag read as yes, no or its column's default (empty, missing and legacy text), and written as `1` or the column's own cell for no |
 | Golden copies | `golden.test.js` | 5 | What the live system depends on, compared with saved copies in `tests/fixtures/golden/`: every function Apps Script calls by name, the salted hashes and seals for a fixed pepper, the error code of every action for five kinds of request, legacy flag cells read and written back, and every sheet, property, cache entry, mail and trigger after one scripted run. `GOLDEN_UPDATE=1` writes the copies again, only for a change meant to alter them |

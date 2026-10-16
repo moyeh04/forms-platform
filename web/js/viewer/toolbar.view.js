@@ -183,9 +183,7 @@
       toolButton('refresh', 'refresh', 'Refresh', function () {
         V.reload('Updated');
       }),
-      toolButton('print', 'printer', 'Print or save as PDF', function () {
-        window.print();
-      })
+      toolButton('print', 'printer', 'Print or save as PDF', V.print)
     );
     return h('div', { class: 'toolbar' }, tools);
   };
