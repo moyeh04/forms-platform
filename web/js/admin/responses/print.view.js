@@ -34,11 +34,12 @@
    *
    * @param {!Element} btn The button, busy while it waits.
    * @param {string} action The server action.
-   * @param {!Object} extra What the action takes.
+   * @param {!Object} form The form to print; the server finds it by slug.
+   * @param {!Object=} extra What else the action takes.
    */
-  R.printOut = function (btn, action, extra) {
+  R.printOut = function (btn, action, form, extra) {
     A.busy(btn, async function () {
-      var r = await A.call(action, Object.assign({}, extra));
+      var r = await A.call(action, Object.assign({ slug: form.slug }, extra));
       var body = h(
         'div',
         null,

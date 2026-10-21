@@ -83,7 +83,7 @@
         'printer',
         'Print team list',
         function (e) {
-          R.printOut(e.currentTarget, 'admin.print.teamList', {});
+          R.printOut(e.currentTarget, 'admin.print.teamList', form);
         },
         'printTeams'
       )
@@ -110,10 +110,11 @@
    * are printed, and the button. One labelled group, so the day and the
    * option stay next to the button they belong to.
    *
+   * @param {!Object} form The form.
    * @param {!Array<!Object>} days The days of the timetable.
    * @return {!Element} The group.
    */
-  function daySheet(days) {
+  function daySheet(form, days) {
     var choice = { dayId: days[0].id, includeEmpty: false };
     var daySel = A.select(
       choice.dayId,
@@ -137,7 +138,7 @@
         'printer',
         'Print this day',
         function (e) {
-          R.printOut(e.currentTarget, 'admin.print.reservations', {
+          R.printOut(e.currentTarget, 'admin.print.reservations', form, {
             dayId: choice.dayId,
             includeEmpty: choice.includeEmpty
           });
@@ -180,7 +181,7 @@
     }
     // A day sheet needs a day: a reservation with no days has nothing to print.
     if (form.type === FormType.RESERVATION && days.length) {
-      tools.push(daySheet(days));
+      tools.push(daySheet(form, days));
     }
     p.toolbar = h('div', { class: 'toolbar' }, tools);
     return p.toolbar;
