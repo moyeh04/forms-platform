@@ -106,8 +106,7 @@
   }
 
   /**
-   * Draws the card of the days: the calendar and the link that adds a day
-   * with no date.
+   * Draws the card of the days: the calendar.
    *
    * @param {!Object} t The timetable.
    * @return {!Element} The card.
@@ -121,21 +120,7 @@
         'Days',
         'Click a date to offer it. Click it again to remove it.'
       ),
-      t.calBox,
-      h(
-        'button',
-        {
-          type: 'button',
-          class: 'link-btn',
-          name: 'add-undated',
-          onclick: function () {
-            TT.addUndated(t);
-            t.paint();
-            TT.focusName(t, t.days.length - 1);
-          }
-        },
-        'Add a day that has no date yet'
-      )
+      t.calBox
     );
   }
 

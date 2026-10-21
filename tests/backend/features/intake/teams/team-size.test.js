@@ -219,7 +219,12 @@ test(
     const settings = w.get();
     const base = { ...leader, slot: { day: 'day-one', time: '12:30 - 12:50' } };
     settings.slots.days = [
-      { id: 'day-one', label: 'Sunday', times: ['12:30 - 12:50'] }
+      {
+        id: 'day-one',
+        label: 'Sunday',
+        date: '2027-11-14',
+        times: ['12:30 - 12:50']
+      }
     ];
     settings.slots.capacity = 3;
     w.admin({

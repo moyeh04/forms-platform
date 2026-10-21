@@ -34,7 +34,7 @@ var SlotsRules = (function () {
    *     place.
    * @return {{id: string, label: string, date: string, times: !Array}} The
    *     day.
-   * @throws {ApiError} `bad_slots` for a day with no name, a bad date or no
+   * @throws {ApiError} `bad_slots` for a day with no name, no date or no
    *     times.
    */
   function cleanDay_(d, seen) {
@@ -50,8 +50,11 @@ var SlotsRules = (function () {
     while (seen[id]) id = base + '-' + n++;
     seen[id] = true;
     var date = String(d.date || '').trim();
-    if (date && !ISO_DATE_.test(date))
-      ApiError.fail('bad_slots', 'Dates must look like 2027-11-14.');
+    if (!ISO_DATE_.test(date))
+      ApiError.fail(
+        'bad_slots',
+        '"' + label + '" needs a date that looks like 2027-11-14.'
+      );
     var times = cleanTimes_(d.times);
     if (!times.length)
       ApiError.fail('bad_slots', '"' + label + '" has no time slots.');

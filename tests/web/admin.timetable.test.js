@@ -19,18 +19,21 @@ const slotTexts = (p, row) =>
   );
 
 test(
-  'Timetable: a day with no date gets a name and the general hours, ' +
+  'Timetable: a day needs a name, gets the general hours, ' +
     'and bookings appear grouped by day',
   async () => {
     const w = boot();
     const f = w.make('reservation', 'Seminar');
     const p = await openAdmin(w, `#/f/${f.slug}/settings`);
     assert.ok(p.text().includes('No days yet.'));
-    p.click('[name="add-undated"]');
+    showMonth(p, 'March 2028');
+    p.click('[name="cal-2028-03-12"]');
+    p.click('[name="rename-day-0"]');
+    p.type('[name="day-name-0"]', ' ');
     p.click('[name="save"]');
     await settle(8);
     assert.ok(
-      p.text().includes('Give every day a date or a name.'),
+      p.text().includes('Give every day a name.'),
       'a day without a name is refused'
     );
     p.type('[name="day-name-0"]', 'Week 11 - Sunday');
@@ -232,6 +235,7 @@ test(
             {
               id: 'one',
               label: 'Sunday',
+              date: '2027-11-14',
               times: ['12:30 - 12:50', '12:55 - 1:15']
             }
           ],
@@ -296,6 +300,7 @@ test(
             {
               id: 'one',
               label: 'Sunday',
+              date: '2027-11-16',
               times: ['9:00 - 9:30', '11:30 - 11:45']
             }
           ],

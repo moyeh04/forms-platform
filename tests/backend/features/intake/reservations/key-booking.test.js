@@ -67,7 +67,13 @@ function boot(patch = {}) {
   w.update({
     status: 'open',
     slots: {
-      days: [{ label: 'Sunday', times: ['12:30 - 12:50', '12:55 - 1:15'] }],
+      days: [
+        {
+          label: 'Sunday',
+          date: '2027-11-14',
+          times: ['12:30 - 12:50', '12:55 - 1:15']
+        }
+      ],
       capacity: 1
     },
     keyBooking: { enabled: true, source: w.teams.id },
@@ -406,8 +412,7 @@ test(
             label: 'Week 11 - Tuesday',
             date: '2027-11-16',
             times: ['12:30 - 12:50']
-          },
-          { label: 'Any day', times: ['2:00 - 2:20'] }
+          }
         ],
         capacity: 2
       }
@@ -439,8 +444,7 @@ test(
       second.form.slots.days.map((d) => [d.label, d.date]),
       [
         ['Sunday 21 Nov', '2027-11-21'],
-        ['Week 12 - Tuesday', '2027-11-23'],
-        ['Any day', '']
+        ['Week 12 - Tuesday', '2027-11-23']
       ]
     );
     assert.equal(second.form.slots.capacity, 2);

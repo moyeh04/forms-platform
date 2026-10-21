@@ -62,7 +62,13 @@ function boot(patch = {}) {
   w.update({
     status: 'open',
     slots: {
-      days: [{ label: 'Sunday', times: ['12:30 - 12:50', '12:55 - 1:15'] }],
+      days: [
+        {
+          label: 'Sunday',
+          date: '2027-11-14',
+          times: ['12:30 - 12:50', '12:55 - 1:15']
+        }
+      ],
       capacity: 1
     },
     keyBooking: { enabled: true, source: w.teams.id },

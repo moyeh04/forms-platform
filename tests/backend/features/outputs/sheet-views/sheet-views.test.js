@@ -140,9 +140,14 @@ test(
         days: [
           {
             label: 'Week 11 - Sunday',
+            date: '2027-11-14',
             times: ['12:30 - 12:50', '12:55 - 1:15']
           },
-          { label: 'Week 11 - Tuesday', times: ['12:30 - 12:50'] }
+          {
+            label: 'Week 11 - Tuesday',
+            date: '2027-11-16',
+            times: ['12:30 - 12:50']
+          }
         ],
         capacity: 1
       }
@@ -181,7 +186,9 @@ test(
   () => {
     const w = boot('reservation', {
       slots: {
-        days: [{ label: 'Sunday', times: ['12:30 - 12:50'] }],
+        days: [
+          { label: 'Sunday', date: '2027-11-18', times: ['12:30 - 12:50'] }
+        ],
         capacity: 2
       }
     });
@@ -231,7 +238,14 @@ test(
   () => {
     const w = boot('reservation', {
       slots: {
-        days: [{ id: 'sunday', label: 'Sunday', times: ['12:30 - 12:50'] }],
+        days: [
+          {
+            id: 'sunday',
+            label: 'Sunday',
+            date: '2027-11-20',
+            times: ['12:30 - 12:50']
+          }
+        ],
         capacity: 1
       }
     });

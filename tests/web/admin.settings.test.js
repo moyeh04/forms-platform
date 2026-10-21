@@ -297,7 +297,14 @@ test(
       id: f.id,
       patch: {
         slots: {
-          days: [{ id: 'one', label: 'Sunday', times: ['12:30 - 12:50'] }],
+          days: [
+            {
+              id: 'one',
+              label: 'Sunday',
+              date: '2027-11-14',
+              times: ['12:30 - 12:50']
+            }
+          ],
           capacity: 1
         }
       }
@@ -351,6 +358,7 @@ test(
           {
             id: 'one',
             label: 'Sunday',
+            date: '2027-11-16',
             times: ['12:30 - 12:50', '12:55 - 1:15']
           }
         ],

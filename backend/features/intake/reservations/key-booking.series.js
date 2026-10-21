@@ -56,14 +56,13 @@ var KeyBookingSeries = (function () {
   }
 
   /**
-   * Gives the same timetable one week later. A day with no date is kept.
+   * Gives the same timetable one week later.
    *
    * @param {?Object} slots The timetable.
    * @return {!Object} The new timetable, cleaned.
    */
   function nextWeekSlots_(slots) {
     var days = (slots?.days || []).map(function (d) {
-      if (!d.date) return { label: d.label, date: '', times: d.times.slice() };
       var date = Rules.shiftDate(d.date, WEEK_DAYS_);
       return {
         label: nextDayLabel_(d, date),
