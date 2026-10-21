@@ -1,11 +1,11 @@
 # Testing
 
-400 automated tests run without a Google account, a browser, or a network.
+402 automated tests run without a Google account, a browser, or a network.
 They run the **real** backend and the **real** pages. This page explains how
 that works and what it can and cannot prove.
 
 ```
-npm test    # 400 tests
+npm test    # 402 tests
 ```
 
 ## The layers
@@ -181,6 +181,7 @@ says something else.
 | Admin page: timetable | `web/admin.timetable.test.js` | 5 | The calendar, the general hours, a day with its own hours and name, booked slots, and times saved by hand |
 | Admin page: questions | `web/admin.questions.test.js` | 3 | Descriptions, added questions moved between pages, and pages added, renamed and reordered |
 | Admin page: responses | `web/admin.responses.test.js` | 12 | Team cards with their stored numbers, small teams listed by level, the people count, search and status, details with a key reset or shown, matching, column names on list rows for the phone layout, the day sheet group, one registration's key extended, Download all with what was not downloaded and the saved zip |
+| Admin page: print | `web/admin.print.test.js` | 2 | The day sheet of a booking form and the team list of a team form print the form they are on and show where to open it |
 | Admin page: clients | `web/admin.people.test.js` | 3 | A link shown once with the key apart, a lost key shown again, and a link end picked and moved |
 | Admin page: lists | `web/admin.lists.test.js` | 9 | Lists as chips or rows, the reason for a refused save, a year group added from its own card, a section kind added or removed, number runs with steppers, a new list picked for a question, lists the server refuses, a new department letter kept as a chip, and milestones as named rows whose hidden ids survive a rename or a move |
 | Admin page: progress | `web/admin.progress.test.js` | 3 | A team registration that copies a milestones list and keeps its copy until Update from list, no student switch while keys are off, and a team marked on the board with its note and the count on its card |
