@@ -231,17 +231,6 @@
   };
 
   /**
-   * Adds a day with no date, to be named.
-   *
-   * @param {!Object} t The timetable.
-   */
-  TT.addUndated = function (t) {
-    var d = { label: '', date: '', times: [], _off: [], _named: true };
-    TT.settle(t, d);
-    t.days.push(d);
-  };
-
-  /**
    * Gives the folded line of the panel.
    *
    * @param {!Object} t The timetable.
@@ -269,7 +258,7 @@
     var unnamed = t.days.some(function (d) {
       return !String(d.label || '').trim();
     });
-    if (unnamed) return 'Give every day a date or a name.';
+    if (unnamed) return 'Give every day a name.';
     var empty = t.days.filter(function (d) {
       return !d.times.length;
     })[0];

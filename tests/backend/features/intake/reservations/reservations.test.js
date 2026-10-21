@@ -70,9 +70,10 @@ test('Slots: configuration is cleaned and gets stable day ids', () => {
     days: [
       {
         label: 'Week 11 - Sunday',
+        date: '2027-11-14',
         times: ['1:00 - 1:10', ' 1:00 - 1:10 ', '1:15 - 1:25']
       },
-      { label: 'Week 11 - Sunday', times: ['2:00 - 2:10'] }
+      { label: 'Week 11 - Sunday', date: '2027-11-16', times: ['2:00 - 2:10'] }
     ],
     capacity: 0
   });
@@ -90,11 +91,12 @@ test('Slots: bad configuration is rejected with a clear message', () => {
   const patch = (slots) =>
     w.admin({ action: 'admin.forms.update', id: w.form.id, patch: { slots } });
   assert.equal(
-    patch({ days: [{ label: '', times: ['1:00 - 1:10'] }] }).error.code,
+    patch({ days: [{ label: '', date: '2027-11-18', times: ['1:00 - 1:10'] }] })
+      .error.code,
     'bad_slots'
   );
   assert.equal(
-    patch({ days: [{ label: 'D', times: [] }] }).error.code,
+    patch({ days: [{ label: 'D', date: '2027-11-20', times: [] }] }).error.code,
     'bad_slots'
   );
   assert.equal(
@@ -102,6 +104,11 @@ test('Slots: bad configuration is rejected with a clear message', () => {
       days: [{ label: 'D', date: '14/11/2027', times: ['1:00 - 1:10'] }]
     }).error.code,
     'bad_slots'
+  );
+  assert.equal(
+    patch({ days: [{ label: 'D', times: ['1:00 - 1:10'] }] }).error.code,
+    'bad_slots',
+    'a day without a date is refused'
   );
 });
 
@@ -141,7 +148,7 @@ test('Booking: a slot that is not on the timetable is refused', () => {
 
 test('Booking: capacity above one allows that many teams per slot', () => {
   const w = boot({
-    days: [{ label: 'Lab day', times: ['1:00 - 1:10'] }],
+    days: [{ label: 'Lab day', date: '2027-11-22', times: ['1:00 - 1:10'] }],
     capacity: 2
   });
   const s = { day: 'lab-day', time: '1:00 - 1:10' };
@@ -277,7 +284,13 @@ test(
       id: w.form.id,
       patch: {
         slots: {
-          days: [{ label: 'Week 11 - Sunday', times: ['12:55 - 1:15'] }],
+          days: [
+            {
+              label: 'Week 11 - Sunday',
+              date: '2027-11-24',
+              times: ['12:55 - 1:15']
+            }
+          ],
           capacity: 1
         }
       }

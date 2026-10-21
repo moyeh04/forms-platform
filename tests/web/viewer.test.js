@@ -220,32 +220,6 @@ test(
 );
 
 test(
-  'Instructor link: a date-less timetable has no Today button and ' +
-    'opens on all',
-  async () => {
-    const w = boot();
-    const f = w.make('reservation', 'Seminar', {
-      slots: {
-        days: [{ label: 'Week 11 - Sunday', times: ['12:30 - 12:50'] }],
-        capacity: 1
-      }
-    });
-    w.api({
-      action: 'submit',
-      slug: f.slug,
-      data: person({
-        title: 'First',
-        slot: { day: 'week-11-sunday', time: '12:30 - 12:50' }
-      })
-    });
-    const p = await openViewer(w, w.client());
-    assert.equal(p.$('[data-mode="today"]'), null);
-    assert.equal(p.$('[data-mode="all"]').getAttribute('aria-pressed'), 'true');
-    assert.equal(p.$$('.block').length, 1);
-  }
-);
-
-test(
   'Instructor link: teams are tinted blocks with a star and a linked ' +
     'task, and hidden columns vanish',
   async () => {

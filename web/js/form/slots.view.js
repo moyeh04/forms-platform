@@ -1,6 +1,7 @@
 /**
- * The slots of a reservation: the days, the times with the places left in each,
- * and the text of a booked slot.
+ * The slots of a reservation: the days on a calendar (slot-calendar.view.js),
+ * the times of the picked
+ * day with the places left in each, and the text of a booked slot.
  */
 (function (App) {
   'use strict';
@@ -47,37 +48,6 @@
     return d.times.reduce(function (n, tm) {
       return n + roomIn(d.id, tm);
     }, 0);
-  }
-
-  /**
-   * Makes the chip of a day, with the places it has left.
-   *
-   * @param {!Object} d The day.
-   * @param {!Object} cur The slot picked now.
-   * @param {function(!Object)} choose Keeps a picked slot.
-   * @return {!Element} The chip.
-   */
-  function dayChip(d, cur, choose) {
-    var left = dayRoom(d);
-    return h(
-      'button',
-      {
-        type: 'button',
-        class: 'slot-chip' + (left ? '' : ' is-full'),
-        disabled: !left,
-        'aria-pressed': cur.day === d.id ? 'true' : 'false',
-        onclick: function () {
-          choose({ day: d.id, time: '' });
-        }
-      },
-      d.label,
-      d.date ? h('small', null, d.date) : null,
-      h(
-        'small',
-        { class: 'slot-left' },
-        left ? t('slotsLeft', { n: left }) : t('slotFull')
-      )
-    );
   }
 
   /**
@@ -141,10 +111,19 @@
     if (!open.length) return h('p', { class: 'help' }, t('slotNone'));
     return h(
       'div',
-      { class: 'slot-times', role: 'group', 'aria-label': t('slotTime') },
-      day.times.map(function (tm) {
-        return timeChip(day, tm, cur, choose);
-      })
+      { class: 'slot-times-box' },
+      h(
+        'span',
+        { class: 'label', dir: 'auto' },
+        t('slotTime') + ' · ' + day.label
+      ),
+      h(
+        'div',
+        { class: 'slot-times', role: 'group', 'aria-label': t('slotTime') },
+        day.times.map(function (tm) {
+          return timeChip(day, tm, cur, choose);
+        })
+      )
     );
   }
 
@@ -197,13 +176,13 @@
     })[0];
     App.ui.clear(wrap);
     wrap.append(
-      h(
-        'div',
-        { class: 'slot-days', role: 'group', 'aria-label': t('slotDay') },
-        days.map(function (d) {
-          return dayChip(d, cur, choose);
-        })
-      ),
+      P.slotCalendar({
+        days: days,
+        cur: cur,
+        roomOf: dayRoom,
+        choose: choose,
+        view: wrap.calendarView
+      }),
       timesOf(day, cur, choose)
     );
     var note = day ? moveNote(cur) : null;
@@ -220,6 +199,7 @@
    */
   function slotControl(_field, path, id) {
     var wrap = h('div', { class: 'slot', id: id });
+    wrap.calendarView = {};
     paintSlots(wrap, path);
     return wrap;
   }

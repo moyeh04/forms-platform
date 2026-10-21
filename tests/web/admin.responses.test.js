@@ -460,7 +460,9 @@ test(
       id: seminar.id,
       patch: {
         slots: {
-          days: [{ label: 'Sunday', times: ['12:30 - 12:50'] }],
+          days: [
+            { label: 'Sunday', date: '2027-11-14', times: ['12:30 - 12:50'] }
+          ],
           capacity: 1
         }
       }
