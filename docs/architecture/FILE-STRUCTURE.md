@@ -141,7 +141,7 @@ The site is published at the paths it has always had: the pages at the root,
 | `web/css/app/page.css` | The page, its top bar and icon buttons, and the sheet. Every page loads the `app/` files in the order of these rows, so the cascade is the one the single file had. |
 | `web/css/app/route.css` | The route of the steps: the sea, the islands, the treasure island and the ship. |
 | `web/css/app/fields.css` | The title of a step, the fields, the chips of small lists and the team members. |
-| `web/css/app/slots.css` | The booking slots, and the torn ticket of a full slot. |
+| `web/css/app/slots.css` | The booking slots: the calendar of days and the times of the picked day, each open one a ticket and a full time torn in two. |
 | `web/css/app/buttons.css` | The buttons, and the lists of the review summary and of a ticket. |
 | `web/css/app/ticket.css` | The ticket, and the clock and calendar that show the time of a booking. |
 | `web/css/app/dialogs.css` | Dialogs, toasts and the strip that says a newer site is published. |
@@ -180,6 +180,7 @@ The site is published at the paths it has always had: the pages at the root,
 | `web/js/form/select.view.js` | Chips and dropdowns. |
 | `web/js/form/team-size.view.js` | The team size chips and the note of a size. |
 | `web/js/form/members.view.js` | The member cards and the list that follows the team size. |
+| `web/js/form/slot-calendar.view.js` | The days of a reservation as a month calendar. |
 | `web/js/form/slots.view.js` | The days and times of a reservation. |
 | `web/js/form/review.view.js` | The review step and the ticket summary. |
 | `web/js/form/form.view.js` | The page of an open or closed form; with a key it opens on the summary. |

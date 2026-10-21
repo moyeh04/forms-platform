@@ -1,13 +1,133 @@
-/* Reservation slots. */
-.slot-days,
+/* Reservation slots: a calendar of the days, then the times of the picked one. */
+.slot-days {
+  margin-top: 8px;
+  max-width: 460px;
+}
+.slot-times-box {
+  margin-top: 16px;
+}
 .slot-times {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  margin-top: 8px;
+  margin-top: 6px;
 }
-.slot-times {
-  margin-top: 14px;
+.cal {
+  padding: 10px;
+  border: 1.5px solid var(--field-line);
+  border-radius: 6px;
+}
+.cal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.cal-month {
+  font-size: var(--fs-body);
+}
+.cal-nav {
+  width: 40px;
+  height: 40px;
+}
+.cal-prev .icon {
+  transform: scaleX(-1);
+}
+[dir="rtl"] .cal-prev .icon-arrow {
+  transform: none;
+}
+.cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 4px;
+}
+.cal-wd {
+  padding-bottom: 4px;
+  color: var(--mute);
+  font-size: var(--fs-help);
+  text-align: center;
+}
+.cal-date {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 2px;
+  border: 1.5px solid transparent;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--mute);
+  font-size: var(--fs-body);
+  line-height: 1.1;
+}
+/* A date or a time that can still be booked is a ticket: its top and bottom
+   edges are a zigzag, as the ticket a booking ends with. */
+.cal-date.is-day,
+.slot-chip.time:not(.is-full) {
+  border-color: transparent;
+  background: var(--tint-a);
+  color: var(--ink);
+  font-weight: 700;
+  cursor: pointer;
+  -webkit-mask:
+    conic-gradient(from 135deg at top, var(--mask-clear), var(--mask-solid) 1deg 89deg, var(--mask-clear) 90deg) top /
+    8px 51% repeat-x,
+    conic-gradient(from -45deg at bottom, var(--mask-clear), var(--mask-solid) 1deg 89deg, var(--mask-clear) 90deg)
+    bottom / 8px 51% repeat-x;
+  mask:
+    conic-gradient(from 135deg at top, var(--mask-clear), var(--mask-solid) 1deg 89deg, var(--mask-clear) 90deg) top /
+    8px 51% repeat-x,
+    conic-gradient(from -45deg at bottom, var(--mask-clear), var(--mask-solid) 1deg 89deg, var(--mask-clear) 90deg)
+    bottom / 8px 51% repeat-x;
+}
+.cal-left {
+  font-size: 0.7rem;
+  font-weight: 400;
+  white-space: nowrap;
+}
+.cal-date[aria-pressed="true"] {
+  border-color: var(--sea);
+  background: var(--sea);
+  color: var(--on-sea);
+}
+/* A date with no time left is crossed out with a red X; the cell is too
+   small for the word, so the X says it and the label reads it out. */
+.cal-date.is-day.is-full {
+  -webkit-mask: none;
+  mask: none;
+  position: relative;
+  border-color: transparent;
+  background: var(--sheet-2);
+  color: var(--mute);
+  font-weight: 400;
+  cursor: not-allowed;
+}
+.cal-date.is-day.is-full .cal-left {
+  display: none;
+}
+.cal-date.is-day.is-full::after {
+  content: "";
+  position: absolute;
+  inset: 4px;
+  pointer-events: none;
+  background:
+    linear-gradient(
+      to top right,
+      transparent calc(50% - 1.5px),
+      var(--err) calc(50% - 1.5px),
+      var(--err) calc(50% + 1.5px),
+      transparent calc(50% + 1.5px)
+    ),
+    linear-gradient(
+      to top left,
+      transparent calc(50% - 1.5px),
+      var(--err) calc(50% - 1.5px),
+      var(--err) calc(50% + 1.5px),
+      transparent calc(50% + 1.5px)
+    );
+  opacity: 0.7;
 }
 .slot-chip {
   min-height: 44px;
@@ -24,7 +144,8 @@
   font-size: var(--fs-help);
   line-height: 1.1;
 }
-.slot-chip[aria-pressed="true"] {
+.slot-chip[aria-pressed="true"],
+.slot-chip.time[aria-pressed="true"]:not(.is-full) {
   background: var(--sea);
   border-color: var(--sea);
   color: var(--on-sea);
@@ -33,70 +154,45 @@
 .slot-chip[aria-pressed="true"] small {
   color: inherit;
 }
-/* A slot that is full is a torn ticket: ragged top and bottom, a red cut across, and it says Full. */
+/* A time that is full is a ticket torn in two across the middle: the time
+   on the top half, Full on the bottom one. */
 .slot-chip.is-full {
-  position: relative;
   cursor: not-allowed;
   color: var(--mute);
   border-color: transparent;
   background: var(--sheet-2);
-  padding-block: 9px;
+  padding-block: 8px;
   clip-path: polygon(
-    0.0% 5px,
-    6.25% 0px,
-    12.5% 5px,
-    18.75% 0px,
-    25.0% 5px,
-    31.25% 0px,
-    37.5% 5px,
-    43.75% 0px,
-    50.0% 5px,
-    56.25% 0px,
-    62.5% 5px,
-    68.75% 0px,
-    75.0% 5px,
-    81.25% 0px,
-    87.5% 5px,
-    93.75% 0px,
-    100.0% 5px,
-    100.0% calc(100% - 5px),
-    93.75% calc(100% - 0px),
-    87.5% calc(100% - 5px),
-    81.25% calc(100% - 0px),
-    75.0% calc(100% - 5px),
-    68.75% calc(100% - 0px),
-    62.5% calc(100% - 5px),
-    56.25% calc(100% - 0px),
-    50.0% calc(100% - 5px),
-    43.75% calc(100% - 0px),
-    37.5% calc(100% - 5px),
-    31.25% calc(100% - 0px),
-    25.0% calc(100% - 5px),
-    18.75% calc(100% - 0px),
-    12.5% calc(100% - 5px),
-    6.25% calc(100% - 0px),
-    0.0% calc(100% - 5px)
+    0 0,
+    100% 0,
+    100% calc(50% - 2px),
+    87.5% calc(50% - 5px),
+    75% calc(50% - 2px),
+    62.5% calc(50% - 5px),
+    50% calc(50% - 2px),
+    37.5% calc(50% - 5px),
+    25% calc(50% - 2px),
+    12.5% calc(50% - 5px),
+    0% calc(50% - 2px),
+    0% calc(50% + 5px),
+    12.5% calc(50% + 2px),
+    25% calc(50% + 5px),
+    37.5% calc(50% + 2px),
+    50% calc(50% + 5px),
+    62.5% calc(50% + 2px),
+    75% calc(50% + 5px),
+    87.5% calc(50% + 2px),
+    100% calc(50% + 5px),
+    100% 100%,
+    0 100%
   );
-}
-.slot-chip.is-full::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background: linear-gradient(
-    to top right,
-    transparent calc(50% - 1px),
-    var(--err) calc(50% - 1px),
-    var(--err) calc(50% + 1px),
-    transparent calc(50% + 1px)
-  );
-  opacity: 0.55;
 }
 .slot-chip .slot-left {
   font-family: var(--font-body);
   letter-spacing: 0;
 }
 .slot-chip.is-full .slot-left {
+  margin-top: 10px;
   color: var(--err);
   font-weight: 700;
 }

@@ -1,11 +1,11 @@
 # Testing
 
-400 automated tests run without a Google account, a browser, or a network.
+401 automated tests run without a Google account, a browser, or a network.
 They run the **real** backend and the **real** pages. This page explains how
 that works and what it can and cannot prove.
 
 ```
-npm test    # 400 tests
+npm test    # 401 tests
 ```
 
 ## The layers
@@ -173,6 +173,7 @@ says something else.
 | Student page: edit | `web/index.edit.test.js` | 3 | Editing by key and registering again, a task locked after its deadline, Close out of a registration opened with a key |
 | Form page: progress | `web/index.progress.test.js` | 3 | A key that opens the summary shows the team's progress with its note but never the private one, no block when teams do not see it, and an ended key that still shows the progress read only |
 | Student page: booking | `web/index.reservation.test.js` | 3 | Teammates added to a booking and checked, taken slots, and the note for a number of teammates |
+| Student page: booking calendar | `web/index.slot-calendar.test.js` | 1 | A date picked on the month calendar before its times, a full day shut, and months in turn |
 | Student page: team size | `web/index.team-size.test.js` | 8 | The size picker and the member forms it shows, the range and a fixed size, sizes kept when changed, remove and add a member with Undo, a team of three saved, and the note of a size |
 | Student page: transfers | `web/index.transfer.test.js` | 6 | Asking for a member of another team, the leader who is asked approving or rejecting, a leader who is asked for naming the new leader and passing the key on, the phone of the other leader with Copy and as a WhatsApp link, a leader alone in a team not offered |
 | Admin page: shell | `web/admin.shell.test.js` | 14 | Login, a refused PIN kept in its field, a lock that leaves an open window signed in, the forms list grouped by status, create with its preview and title reason, switching types and the batch year, the term chips, delete, form tabs that keep edits, and the same header on every tab with a status saved at once |

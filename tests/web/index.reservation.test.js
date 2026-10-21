@@ -63,7 +63,7 @@ test(
     p.submitForm();
     await settle();
     assert.equal(p.$('.step-title').textContent, 'Time slot');
-    p.clickText('Week 11 - Sunday');
+    p.click(p.$('[name="day-week-11-sunday"]'));
     await settle();
     p.click(p.$('.slot-chip.time'));
     await settle();
@@ -137,10 +137,10 @@ test(
     assert.equal(p.$('.step-title').textContent, 'Time slot');
     assert.ok(p.text().includes('Pick a day'));
     assert.ok(
-      p.$('.slot-days .slot-chip').textContent.includes('1 left'),
+      p.$('.slot-days .cal-date.is-day').textContent.includes('1 left'),
       'a day says its places left before it is picked'
     );
-    p.clickText('Week 11 - Sunday');
+    p.click(p.$('[name="day-week-11-sunday"]'));
     await settle();
     const chips = p.$$('.slot-chip.time');
     assert.equal(chips.length, 2);
