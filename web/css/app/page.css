@@ -6,6 +6,22 @@
   padding: 18px 16px 90px;
 }
 
+/* The line under every page that says who built it. */
+.site-footer {
+  padding: 0 16px 28px;
+  color: var(--mute);
+  font-size: var(--fs-help);
+  text-align: center;
+}
+.site-footer a {
+  color: inherit;
+  font-weight: 700;
+}
+.site-footer a:hover,
+.site-footer a:focus-visible {
+  color: var(--sea);
+}
+
 .topbar {
   display: flex;
   justify-content: flex-end;
