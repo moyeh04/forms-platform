@@ -1,1 +1,12 @@
-[]
+[
+  {
+    "path": "backend/features/access/clients/clients.access.js",
+    "rule": "error-times",
+    "reason": "Link and key locks predate the rule; their own change"
+  },
+  {
+    "path": "backend/features/intake/keys/keys.service.js",
+    "rule": "error-times",
+    "reason": "The edit-key lock predates the rule; its own change"
+  }
+]

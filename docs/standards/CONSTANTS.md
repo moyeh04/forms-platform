@@ -28,6 +28,15 @@ change it.
   `Cell.readFlag(cell, whenAbsent)` and `Cell.writeFlag(value, falseCell)`.
   `cell.js` is the one file under `flags.exclude` in
   `scripts/checks/config.json`.
+- **A time left is a value, never a sentence.** An error with a deadline
+  sends it in `details` (seconds, or an ISO instant) read from the real
+  state, and the page counts it down. Its message never repeats a constant
+  (`Wait 30 minutes`): the constant can change and the wait has already
+  begun. `check-numbers.js` refuses a time in an `ApiError.fail` message.
+- **Wording the owner chooses is configuration.** A message the owner may
+  want to word (the admin lock's answer) lives in a script property set
+  from the sheet menu, with a plain default in code; the source never holds
+  the owner's text.
 - **No meaning-free names.** `FIVE = 5` names nothing; `MAX_TEAM_SIZE = 5`
   does.
 
