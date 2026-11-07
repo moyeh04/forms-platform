@@ -155,6 +155,29 @@ var KeysService = (function () {
    */
   function findByKey_(form, key, anyAge) {
     requireKeyEnabled_(form);
+    var hit = Lock.withLock(function () {
+      return matchKey_(form, key);
+    });
+    if (!anyAge && keyExpired_(hit))
+      ApiError.fail(
+        'key_expired',
+        'This key has expired. ' +
+          'Ask your instructor to extend it, or to make the change for you.'
+      );
+    return hit;
+  }
+
+  /**
+   * Finds the registration a key opens, against the form's count of wrong
+   * keys. Call it inside Lock.withLock, so keys sent at the same time are
+   * counted one after another.
+   *
+   * @param {!Object} form The form.
+   * @param {*} key The typed key.
+   * @return {!Object} The registration.
+   * @throws {ApiError} `too_many_attempts` or `bad_key`.
+   */
+  function matchKey_(form, key) {
     var cache = CacheService.getScriptCache();
     var tag = Constants.CACHE.BAD_KEY_PREFIX + form.id;
     var fails = parseInt(cache.get(tag) || '0', 10);
@@ -173,12 +196,6 @@ var KeysService = (function () {
       cache.put(tag, String(fails + 1), BAD_KEY_WINDOW_S_);
       ApiError.fail('bad_key', 'That key is not right.');
     }
-    if (!anyAge && keyExpired_(hit))
-      ApiError.fail(
-        'key_expired',
-        'This key has expired. ' +
-          'Ask your instructor to extend it, or to make the change for you.'
-      );
     return hit;
   }
 

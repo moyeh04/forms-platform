@@ -61,6 +61,15 @@ test(
   }
 );
 
+test('Admin: PINs sent at the same time are counted one by one', () => {
+  const w = boot();
+  const login = (pin) => w.api({ action: 'admin.login', admin: { pin } });
+  for (let i = 0; i < 7; i++) login('0000');
+  // Another request fills the count just as this one is checked.
+  w.beforeLock = () => login('0000');
+  assert.equal(login('4321').error?.code, 'locked');
+});
+
 test('Admin: actions need the PIN and PIN must be long enough', () => {
   const w = boot();
   assert.equal(w.api({ action: 'admin.forms.list' }).error.code, 'bad_pin');

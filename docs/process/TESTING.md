@@ -1,11 +1,11 @@
 # Testing
 
-407 automated tests run without a Google account, a browser, or a network.
+411 automated tests run without a Google account, a browser, or a network.
 They run the **real** backend and the **real** pages. This page explains how
 that works and what it can and cannot prove.
 
 ```
-npm test    # 407 tests
+npm test    # 411 tests
 ```
 
 ## The layers
@@ -168,7 +168,7 @@ says something else.
 | Key expiry | `backend/features/intake/keys/key-expiry.test.js` | 6 | Which keys are given and expired, extending the expired ones from today, all of them from their own end, one date for all, chosen teams only, bad requests change nothing, cancelled registrations left out |
 | Member transfers | `backend/features/intake/transfers/transfers.test.js` | 12 | Refusal that lists who can be asked for, the request and the team saved without the member, approval by the leader and by the admin, rejection, cancelling, a full team, two requests for one student, a removed team, a team deleted by the admin; a leader asked for and the team handed to the member named, by the leader and by the admin, an approval without a new leader or with a refused email, a leader alone in a team; the phone of the other leader on a waiting request and its two switches |
 | Matching | `backend/features/intake/matching/matching.test.js` | 6 | Paste, normalise, matched, none, duplicate, sequential review |
-| Viewer API | `backend/features/access/viewer/viewer.test.js` | 13 | Tokens, hidden columns, the level of a small team sent only to a link that shows the warnings, today and by day, review rights, revoked links, access keys with the lock after wrong tries, reading a lost key again, links that end on a date and open again when it moves |
+| Viewer API | `backend/features/access/viewer/viewer.test.js` | 15 | Tokens, bad tokens and access keys sent at the same time counted one by one, hidden columns, the level of a small team sent only to a link that shows the warnings, today and by day, review rights, revoked links, access keys with the lock after wrong tries, reading a lost key again, links that end on a date and open again when it moves |
 | Student page | `web/index.form.test.js` | 20 | Steps, the title and its tags, the Arabic name and code fields, errors on an empty step, a draft kept over a reload, a duplicate code that offers the key flow, a full registration ending on a ticket with its email notice, a closed form and an unknown link, Arabic and a locked language, themes, descriptions, the subject tag, the batch year of a WhatsApp form, who can register, the folder rule example, and the ship over the current step |
 | Student page: edit | `web/index.edit.test.js` | 3 | Editing by key and registering again, a task locked after its deadline, Close out of a registration opened with a key |
 | Form page: progress | `web/index.progress.test.js` | 3 | A key that opens the summary shows the team's progress with its note but never the private one, no block when teams do not see it, and an ended key that still shows the progress read only |
@@ -208,12 +208,12 @@ says something else.
 | Colour contrast | `web/css/theme.test.js` | 4 | Every text and outline pair meets WCAG AA in light, dark, and device-dark themes |
 | A page older than the site | `web/js/app/fresh.test.js` | 4 | An untouched page reloads once for a newer site and never in a loop, a page with typed text or an open dialog offers Reload instead, the bar in the language of the form, nothing in a preview or when the version cannot be read |
 | Router | `backend/platform/http/router.test.js` | 3 | Unknown actions and bad JSON answered with clean errors, a route table that could open an action refused at load, and the link and admin checks run before the handler |
-| Admin PIN | `backend/features/access/auth/auth.test.js` | 3 | A wrong PIN refused and repeated guesses locked out, unlocking from the sheet menu keeps the PIN, actions need the PIN and a PIN must be long enough |
+| Admin PIN | `backend/features/access/auth/auth.test.js` | 4 | A wrong PIN refused and repeated guesses locked out, PINs sent at the same time counted one by one, unlocking from the sheet menu keeps the PIN, actions need the PIN and a PIN must be long enough |
 | Registry setup | `backend/features/catalog/registry/registry.setup.test.js` | 1 | Setup creates the registry tabs and default lists and is safe to repeat |
 | Lists | `backend/features/catalog/lists/lists.test.js` | 1 | The admin replaces a list and the options of its questions follow |
 | Private links | `backend/features/access/clients/clients.test.js` | 1 | A link is created once and the token itself is never stored |
 | Team progress | `backend/features/intake/progress/progress.test.js` | 5 | Milestones kept and cleaned on team forms only and copied with the form, a mark in its own cell that whole-row saves keep and that leaves `updated` alone, a stale state and bad input refused, a link that sees, marks or hides progress, and a team that sees its own with an expired key |
-| Edit keys | `backend/features/intake/keys/keys.test.js` | 9 | Lookup and throttling, expiry, editing and deleting by key, a key that cannot take another team code, per-form switches, unique keys, a key the admin reads back from its sealed copy, registrations from before sealing |
+| Edit keys | `backend/features/intake/keys/keys.test.js` | 10 | Lookup and throttling, keys sent at the same time counted one by one, expiry, editing and deleting by key, a key that cannot take another team code, per-form switches, unique keys, a key the admin reads back from its sealed copy, registrations from before sealing |
 | Team numbers | `backend/features/intake/teams/team-numbers.test.js` | 3 | A team keeps its number when another cancels, older rows keep the numbers they showed, a booking or a WhatsApp registration gets none |
 | Sheet rows | `backend/platform/sheets/table.test.js` | 1 | A new row is written as plain text, also past the rows the sheet was made with |
 | Data tab look | `backend/platform/sheets/sheet-style.test.js` | 3 | The registry and a new form get the header, widths and row tints, an older sheet gets them on the next repaint with no value changed, a tab that refuses the look is still repainted |

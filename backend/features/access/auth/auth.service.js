@@ -67,6 +67,10 @@ var AuthService = (function () {
    * Lets a request through only with the admin PIN. A wrong PIN counts
    * toward the lock, and the right one forgets the wrong tries.
    *
+   * The count is read, checked and written under the script lock, so PINs
+   * sent at the same time are counted one after another: a burst of
+   * guesses cannot all read the same count and slip past the limit.
+   *
    * @param {?Object} req The request; `admin.pin` holds the PIN.
    * @return {boolean} True when the PIN is right; otherwise it throws.
    */
@@ -78,6 +82,21 @@ var AuthService = (function () {
         'Set the admin PIN from the Forms Platform menu first.'
       );
     }
+    return Lock.withLock(function () {
+      return checkPin_(req, stored);
+    });
+  }
+
+  /**
+   * Checks one PIN against the count of wrong tries: refuses it when the
+   * count is full, counts it when wrong, and forgets the count when right.
+   * Call it inside Lock.withLock.
+   *
+   * @param {?Object} req The request; `admin.pin` holds the PIN.
+   * @param {string} stored The stored PIN hash.
+   * @return {boolean} True when the PIN is right; otherwise it throws.
+   */
+  function checkPin_(req, stored) {
     var cache = CacheService.getScriptCache();
     var fails = failCount_(cache);
     if (fails >= ADMIN_MAX_FAILS) {

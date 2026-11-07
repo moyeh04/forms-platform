@@ -341,6 +341,30 @@ test('Viewer: repeated bad tokens are throttled', () => {
   );
 });
 
+test('Viewer: bad tokens sent at the same time are counted one by one', () => {
+  const w = boot();
+  const made = w.client({});
+  for (let i = 0; i < 29; i++) w.api({ action: 'viewer.me', token: 'x' + i });
+  // Another request fills the count just as this one is checked.
+  w.beforeLock = () => w.api({ action: 'viewer.me', token: 'late' });
+  assert.equal(
+    w.api({ action: 'viewer.me', token: made.token }).error?.code,
+    'too_many_attempts'
+  );
+});
+
+test('Viewer key: keys sent at the same time are counted one by one', () => {
+  const w = boot();
+  const made = w.client({ withKey: true });
+  const wrong = made.accessKey === '000000' ? '111111' : '000000';
+  const me = (accessKey) =>
+    w.api({ action: 'viewer.me', token: made.token, accessKey });
+  for (let i = 0; i < 4; i++) me(wrong);
+  // Another request fills the count just as this one is checked.
+  w.beforeLock = () => me(wrong);
+  assert.equal(me(made.accessKey).error?.code, 'key_locked');
+});
+
 test(
   'Viewer key: wrong keys lock the link for a while, and a link made ' +
     'before keys opens as before',
