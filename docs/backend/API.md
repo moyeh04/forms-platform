@@ -78,7 +78,7 @@ the lock.
 
 | Action | Lock | Writes |
 |---|---|---|
-| `admin.login` | no | Nothing. Says whether the PIN is right |
+| `admin.login` | no | Says whether the PIN is right. Answers `device`, the browser's trusted-device pass: the one `admin.device` carried when it is known, otherwise a new one stored as `admin_device:<hash>`. Every admin request may send `admin.device`; see [SECURITY.md](SECURITY.md) for the `locked` and `device_locked` answers |
 
 ### Forms
 

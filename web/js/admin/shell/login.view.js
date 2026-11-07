@@ -6,19 +6,19 @@
   var h = App.ui.h;
 
   /**
-   * Checks a PIN with the backend and signs this window in. A refused PIN
-   * stays in its field, selected, so typing replaces it.
+   * Checks a PIN with the backend and signs this window in, keeping the
+   * trusted-device pass it answers. A refused PIN stays in its field,
+   * selected, so typing replaces it.
    *
    * @param {!Object} v The screen: `pin`, `err`, `btn`.
    */
   async function signIn(v) {
+    var res;
     v.err.hidden = true;
     v.btn.disabled = true;
     try {
-      await App.api.call({
-        action: 'admin.login',
-        admin: { pin: v.pin.value }
-      });
+      res = await App.api.admin('admin.login', null, v.pin.value);
+      App.api.setDevice(res.device);
       App.api.setPin(v.pin.value);
       A.render();
     } catch (ex) {

@@ -68,7 +68,7 @@ is silenced on its own line with the reason, and both checks honour it:
 | each `*.repository.js` | The column list of its tab (`FORM_COLS`, `RESPONSE_COLS`, `CLIENT_COLS_`, `TRANSFER_COLS`, `REQUEST_COLS_`) |
 | `responses.repository.js` | `SUBMISSION_STATUSES`, the reference prefix of each form type |
 | `lists.repository.js`, `forms.service.js`, `forms.public.js` | The kind and name of each built-in list, the form fields a patch may change, the ones the public may read |
-| `auth.service.js` | `ADMIN_MAX_FAILS`, `ADMIN_LOCK_SECONDS` |
+| `auth.service.js`, `auth.devices.js` | `ADMIN_MAX_FAILS`, `ADMIN_LOCK_SECONDS`; how long a trusted-device pass lasts by default (`DEFAULT_DAYS_`) and its length |
 | `clients.access.js` | `CLIENT_KEY_TRIES_` |
 | `downloads.jobs.js` | The size, time and file limits of a download job |
 | `keys.controller.js`, `forms.questions.js`, `sheet-views.*.js`, `workbook.js`, `sheet-style.js` | The limits and sizes of their own feature |

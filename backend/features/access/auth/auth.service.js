@@ -1,6 +1,8 @@
 /**
  * Admin access. The PIN is stored only as a salted hash and every wrong
  * guess counts toward a temporary lock, so the PIN cannot be brute forced.
+ * Wrong guesses from unknown browsers share one count; a browser that holds
+ * a trusted-device pass (AuthDevices) has a count of its own.
  */
 
 var AuthService = (function () {
@@ -24,17 +26,31 @@ var AuthService = (function () {
   }
 
   /**
-   * Reads how many wrong PINs were entered in a row.
+   * The cache key that counts the wrong PINs of a request.
    *
-   * @param {!CacheService.Cache} cache The script cache.
-   * @return {number} The wrong tries remembered now.
+   * @param {?string} device The hash of the request's known pass, or null.
+   * @return {string} The device's own key, or the shared one.
    */
-  function failCount_(cache) {
-    return parseInt(cache.get(Constants.CACHE.ADMIN_FAILS) || '0', 10);
+  function failKey_(device) {
+    return device
+      ? Constants.CACHE.ADMIN_DEVICE_FAILS_PREFIX + device
+      : Constants.CACHE.ADMIN_FAILS;
   }
 
   /**
-   * Stores a new admin PIN. Called from the sheet menu.
+   * Reads how many wrong PINs a counter holds.
+   *
+   * @param {!CacheService.Cache} cache The script cache.
+   * @param {string} key The counter.
+   * @return {number} The wrong tries remembered now.
+   */
+  function failCount_(cache, key) {
+    return parseInt(cache.get(key) || '0', 10);
+  }
+
+  /**
+   * Stores a new admin PIN and forgets every trusted device. Called from the
+   * sheet menu.
    *
    * @param {*} pin The new PIN.
    * @return {boolean} True once it is stored.
@@ -48,30 +64,39 @@ var AuthService = (function () {
       );
     }
     Properties.setProp(Constants.PROPS.ADMIN_PIN_HASH, pinHash_(text));
+    AuthDevices.forgetAll();
     return true;
   }
 
   /**
-   * Forgets the wrong tries, which lifts a lock. Called from the sheet menu.
+   * Forgets the wrong tries, the shared ones and every device's, which lifts
+   * any lock. Called from the sheet menu.
    *
-   * @return {boolean} True when the admin page was locked.
+   * @return {boolean} True when something was locked.
    */
   function unlockAdmin() {
     var cache = CacheService.getScriptCache();
-    var locked = failCount_(cache) >= ADMIN_MAX_FAILS;
-    cache.remove(Constants.CACHE.ADMIN_FAILS);
+    var keys = [failKey_(null)].concat(AuthDevices.hashes().map(failKey_));
+    var locked = keys.some(function (k) {
+      return failCount_(cache, k) >= ADMIN_MAX_FAILS;
+    });
+    keys.forEach(function (k) {
+      cache.remove(k);
+    });
     return locked;
   }
 
   /**
    * Lets a request through only with the admin PIN. A wrong PIN counts
-   * toward the lock, and the right one forgets the wrong tries.
+   * toward the lock of its counter, and the right one forgets the wrong
+   * tries.
    *
    * The count is read, checked and written under the script lock, so PINs
    * sent at the same time are counted one after another: a burst of
    * guesses cannot all read the same count and slip past the limit.
    *
-   * @param {?Object} req The request; `admin.pin` holds the PIN.
+   * @param {?Object} req The request; `admin.pin` holds the PIN and
+   *     `admin.device` the pass of a trusted device.
    * @return {boolean} True when the PIN is right; otherwise it throws.
    */
   function requireAdmin(req) {
@@ -92,13 +117,22 @@ var AuthService = (function () {
    * count is full, counts it when wrong, and forgets the count when right.
    * Call it inside Lock.withLock.
    *
-   * @param {?Object} req The request; `admin.pin` holds the PIN.
+   * @param {?Object} req The request, as requireAdmin takes it.
    * @param {string} stored The stored PIN hash.
    * @return {boolean} True when the PIN is right; otherwise it throws.
    */
   function checkPin_(req, stored) {
+    var device = AuthDevices.known(req?.admin?.device);
+    var key = failKey_(device);
     var cache = CacheService.getScriptCache();
-    var fails = failCount_(cache);
+    var fails = failCount_(cache, key);
+    if (fails >= ADMIN_MAX_FAILS && device) {
+      ApiError.fail(
+        'device_locked',
+        'Too many wrong PINs on this device. Wait ten minutes, or unlock ' +
+          'the admin page from the Forms Platform menu in the sheet.'
+      );
+    }
     if (fails >= ADMIN_MAX_FAILS) {
       ApiError.fail(
         'locked',
@@ -108,14 +142,10 @@ var AuthService = (function () {
     }
     var pin = req?.admin?.pin;
     if (!pin || pinHash_(pin) !== stored) {
-      cache.put(
-        Constants.CACHE.ADMIN_FAILS,
-        String(fails + 1),
-        ADMIN_LOCK_SECONDS
-      );
+      cache.put(key, String(fails + 1), ADMIN_LOCK_SECONDS);
       ApiError.fail('bad_pin', 'That PIN is not correct.');
     }
-    cache.remove(Constants.CACHE.ADMIN_FAILS);
+    cache.remove(key);
     return true;
   }
 

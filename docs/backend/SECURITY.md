@@ -64,7 +64,8 @@ page's checks give instant feedback; the server repeats every one of them.
 
 | Secret | Who holds it | Stored as | Protected by | If it leaks |
 |---|---|---|---|---|
-| Admin PIN | The admin | `sha256(pepper:admin:pin)` in script properties | Lockout after 8 wrong tries for 10 minutes | Full admin access. Run **Set admin PIN** from the sheet menu to replace it. |
+| Admin PIN | The admin | `sha256(pepper:admin:pin)` in script properties | Lockout after 8 wrong tries for 10 minutes: one shared count for unknown browsers, a count of its own for each trusted device | Full admin access. Run **Set admin PIN** from the sheet menu to replace it. |
+| Trusted-device pass (64 hex digits) | A browser that signed in with the right PIN | `sha256(pepper:device:pass)` as the script property `admin_device:<hash>`, with when it was made; the browser keeps the pass in `localStorage` | Given only after the right PIN; ends after the days set with **Set trusted device days...** (30 when unset); **Forget trusted devices** or a new PIN forgets them all | Nothing on its own: every request still needs the PIN. The holder's wrong PINs are counted on that pass instead of the shared count. |
 | Edit key (5 digits) | One student, and the admin on request (who can also move its end date) | `sha256(pepper:key:formId:key)` plus a sealed copy (`keySeal`, digits shifted by `sha256(pepper:seal:formId:responseId)`) in the Responses row | Per-form throttle of 10 wrong tries a minute, expiry; only the backend can unseal, only for the PIN | One registration can be edited or cancelled. Admin: **Details, Reset key**. |
 | Viewer token (24 characters) | One instructor or client | `sha256(pepper:client:token)` in the Clients tab | Random, throttled at 30 wrong tries a minute, revocable, optional end date | Read access to the forms and columns of that link, unless the link also asks for an access key. Turn it off or make **New link**. |
 | Access key (6 digits) | One instructor or client, sent apart from the link; the admin on request | `sha256(pepper:clientkey:clientId:key)` plus a sealed copy (`keySeal`, digits shifted by `sha256(pepper:clientseal:clientId)`) in the Clients tab | Asked only together with the right token; 5 wrong keys lock that link for 10 minutes; only the backend can unseal, only for the PIN | Nothing on its own. With the link, read access as above. **Clients, New key**. |
@@ -175,13 +176,20 @@ flowchart LR
   dialog only the sheet owner opens.
 - **Admin PIN in the browser.** Kept in `sessionStorage` for the current tab only
   and sent with each admin request. Closing the tab forgets it.
+- **Trusted devices.** `admin.login` gives the browser a pass, kept in
+  `localStorage` and sent with every admin request as `admin.device`. A
+  request whose pass is known and not ended counts its wrong PINs on that
+  pass (`device_locked` when full); any other request, a made-up pass
+  included, counts on the shared one (`locked`). So wrong PINs from strangers
+  never lock a browser that already signed in.
 
 ## Honest weak spots
 
 | Weak spot | Why it exists | Mitigation |
 |---|---|---|
 | `admin.html` is public | Free static hosting has no private area | It holds no data; every action needs the PIN; lockout; `noindex` |
-| Anyone who opens the admin page can lock the dashboard for 10 minutes with 8 wrong PINs, and can do it again | Wrong tries are counted in one place for all visitors: there are no accounts to count by | **Unlock the admin page** in the sheet menu lifts the lock at once and keeps the PIN. A dashboard that is already open keeps its PIN and works again when the lock ends. The owner can always work directly in the sheets |
+| Anyone who opens the admin page can lock it for 10 minutes for every browser that is not trusted, with 8 wrong PINs, and can do it again | Apps Script does not tell the script the caller's IP address, and anything a browser says about itself (a fingerprint, a device id) can be made up, so unknown browsers share one count | A browser that signed in once holds a trusted-device pass and keeps working, signing in included. **Unlock the admin page** in the sheet menu lifts every lock at once and keeps the PIN. The owner can always work directly in the sheets |
+| A tab that was signed in before trusted devices existed, or a browser that refuses `localStorage`, has no pass | The pass lives in the browser | Such a tab meets the shared lock like a stranger; signing in again gives it a pass |
 | A 5-digit key is short, and a guess is tried against every live key of the form | Students must type it on a phone | 10 wrong tries a minute per form, expiry, shown once. This slows guessing and does not stop it: on a form with 200 live keys about 500 guesses reach one of them, which the limit spreads over about an hour. What a key opens is one team's registration. Accepted for a course form |
 | Ten wrong keys in a minute stop key lookups on that form for the rest of the minute, for everyone | The same counter is the limit above | It ends by itself within a minute; the admin can edit or cancel any registration from Responses meanwhile |
 | A registration key also books a slot | Teams should not retype their details | The lookup shares the same 10 tries a minute; the preview shows the leader's name, code, project and team size only, never phone or email; one booking per team; typed answers are ignored when the slot is booked and when it is changed later, so a key cannot book under another name |

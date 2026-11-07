@@ -70,6 +70,20 @@ function menuUnlockAdmin() {
 }
 
 /**
+ * Menu item: asks how many days a trusted device stays trusted.
+ */
+function menuSetDeviceDays() {
+  MenuService.menuSetDeviceDays();
+}
+
+/**
+ * Menu item: forgets every trusted device.
+ */
+function menuForgetDevices() {
+  MenuService.menuForgetDevices();
+}
+
+/**
  * Menu item: asks for the website address used in emails.
  */
 function menuSetSiteUrl() {

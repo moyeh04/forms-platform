@@ -271,13 +271,16 @@ Stored by Apps Script itself, not in any sheet:
 | `REGISTRY_ID` | The registry spreadsheet's id |
 | `ROOT_FOLDER_ID` | The `Forms Platform` Drive folder |
 | `SITE_URL` | Your website address, used in emails |
+| `ADMIN_DEVICE_DAYS` | How many days a trusted-device pass lasts, set from the sheet menu. Unset means 30 |
+| `admin_device:<pass hash>` | When a trusted-device pass was made. The hash is `sha256(pepper + ':device:' + pass)`. Ended passes are removed when they are next shown or a new one is made |
 | `dirty:<form id>` | The time of the last change whose sheet views are not repainted yet. The booked run of `processDirtyViews` clears it |
 
 ## Short-lived counters (CacheService)
 
 | Key | Purpose | Limit |
 |---|---|---|
-| `admin_fails` | Wrong admin PINs | 8 then locked 10 minutes |
+| `admin_fails` | Wrong admin PINs from browsers that are not trusted | 8 then locked 10 minutes |
+| `admin_device_fails:<pass hash>` | The same, for one trusted device | 8 then that device alone is locked 10 minutes |
 | `badkey:<form id>` | Wrong edit keys on a form | 10 per minute |
 | `bad_tokens` | Wrong viewer tokens | 30 per minute |
 | `client_key:<client id>` | Wrong access keys on one private link | 5 then locked 10 minutes |

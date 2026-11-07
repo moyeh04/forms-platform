@@ -32,27 +32,28 @@ test(
 );
 
 test(
-  'Login: a lock after wrong tries elsewhere does not sign an open ' +
-    'dashboard out',
+  'Login: a browser that signed in keeps working through a lock made ' +
+    'by wrong tries elsewhere',
   async () => {
     const w = boot();
     w.make('team_registration', 'Projects');
+    const p = await openAdmin(w, '', false);
+    p.type('#pin', '4321');
+    p.submitForm();
+    await settle(10);
+    assert.match(p.win.App.api.getDevice(), /^[0-9a-f]{64}$/);
     for (let i = 0; i < 8; i++)
       w.api({ action: 'admin.login', admin: { pin: '0000' } });
-    const p = await openAdmin(w);
-    assert.ok(
-      p.$('.banner').textContent.includes('Too many wrong PINs'),
-      'the page says to wait'
-    );
-    assert.equal(p.$('#pin'), null, 'and does not ask for the PIN again');
-    assert.equal(p.win.App.api.getPin(), '4321');
-    w.call('unlockAdmin');
     await p.win.App.admin.start();
     await settle(10);
-    assert.ok(
-      p.text().includes('Projects'),
-      'the same window works once the lock is lifted'
-    );
+    assert.ok(p.text().includes('Projects'), 'the open dashboard works');
+    p.win.App.api.setPin('');
+    await p.win.App.admin.start();
+    await settle(10);
+    p.type('#pin', '4321');
+    p.submitForm();
+    await settle(10);
+    assert.ok(p.text().includes('Projects'), 'and it can sign in again');
   }
 );
 

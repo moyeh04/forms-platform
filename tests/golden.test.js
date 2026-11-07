@@ -64,6 +64,8 @@ test(
       'menuSetPin',
       'menuSetSiteUrl',
       'menuUnlockAdmin',
+      'menuSetDeviceDays',
+      'menuForgetDevices',
       'menuPrintReservations',
       'menuPrintTeamList',
       'menuRebuildViews',

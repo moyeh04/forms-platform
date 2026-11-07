@@ -427,8 +427,9 @@ the file name says the role:
 
 | File | What it does |
 |---|---|
-| `backend/features/access/auth/auth.service.js` | The admin PIN: setting it, checking it, and locking out wrong guesses. |
-| `backend/features/access/auth/auth.controller.js` | The admin login action. |
+| `backend/features/access/auth/auth.service.js` | The admin PIN: setting it, checking it, and locking out wrong guesses, counted apart for a trusted device. |
+| `backend/features/access/auth/auth.devices.js` | Trusted devices: making, checking, ending and forgetting the pass of a browser that signed in, and how many days it lasts. |
+| `backend/features/access/auth/auth.controller.js` | The admin login action, which hands out the trusted-device pass. |
 | `backend/features/access/clients/clients.repository.js` | The Clients tab: the private links of instructors and clients. |
 | `backend/features/access/clients/clients.service.js` | A link token, its access key and its end date, and what the admin sees of a link. |
 | `backend/features/access/clients/clients.access.js` | Who may use a link: its token, its key, its end date and the lock-out after wrong keys. |
