@@ -10,10 +10,12 @@
    * trusted-device pass it answers. A refused PIN stays in its field,
    * selected, so typing replaces it.
    *
-   * @param {!Object} v The screen: `pin`, `err`, `btn`.
+   * @param {!Object} v The screen: `pin`, `err`, `btn`, and `stop`, which
+   *     stops the time left shown under the PIN.
    */
   async function signIn(v) {
     var res;
+    v.stop();
     v.err.hidden = true;
     v.btn.disabled = true;
     try {
@@ -22,7 +24,14 @@
       App.api.setPin(v.pin.value);
       A.render();
     } catch (ex) {
+      if (ex.code === 'locked') {
+        A.lockedView(ex, v.pin);
+        return;
+      }
       v.err.textContent = ex.message;
+      if (ex.code === 'device_locked') {
+        v.stop = A.countdown(v.err, A.lockEnd(ex), A.withClock(ex.message));
+      }
       v.err.hidden = false;
       v.pin.focus();
       v.pin.select();
@@ -57,7 +66,9 @@
         'button',
         { type: 'submit', class: 'btn btn-primary' },
         'Open dashboard'
-      )
+      ),
+      /** Stops the time left shown under the PIN; none runs yet. */
+      stop: function () {}
     };
     var form = h(
       'form',

@@ -80,6 +80,7 @@ is silenced on its own line with the reason, and both checks honour it:
 | `domain/rules/submission.js` | The longest answer of a short and of a long text field |
 | `domain/form-metadata/*.js` | The longest subject code, how many academic years are offered ahead and back |
 | `web/js/ui/icons.js`, `dialogs.js`, `theme-button.js` | The icon paths, their default size and stroke, the icons a form may use, how long a toast stays |
+| `web/js/admin/shell/locked.view.js` | The milliseconds of a countdown step, where the lock picture is published and how the console shows the lock message |
 | `web/js/i18n/i18n.js` | The storage key of the chosen language |
 | `web/js/app/fresh.js`, `api.js`, `theme.js` | How often an open page checks its version and the shortest gap between checks, the storage keys of the theme, the admin PIN and the tried version |
 | `web/js/form/ticket/*.js` | The colours of the ticket picture, the place and size of each of its shapes (`CALENDAR`, `RING`, `WOOD`, `RIM`, `HAND`, `SLOT`), the degrees of the dial (`DIAL`), the scale and torn edges of the saved image |

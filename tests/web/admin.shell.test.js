@@ -58,6 +58,47 @@ test(
 );
 
 test(
+  'Login: the PIN that locks the page opens the lock screen, never the ' +
+    'dashboard',
+  async () => {
+    const w = boot();
+    w.make('team_registration', 'Projects');
+    w.call('saveLockMessage', 'Line one\n\nLine two');
+    const p = await openAdmin(w, '', false);
+    const logged = [];
+    p.win.console.log = (...a) => logged.push(a.join(' '));
+    for (let i = 0; i < 8; i++) {
+      p.type('#pin', '0000');
+      p.submitForm();
+      await settle(8);
+    }
+    const box = p.$('.locked');
+    assert.equal(box.getAttribute('role'), 'dialog');
+    assert.equal(p.$('.locked h2').textContent, 'Welcome, funny kid');
+    assert.ok(logged.some((l) => l.includes('Line one\n\nLine two')));
+    p.clickText('Continue to the dashboard');
+    await settle(2);
+    assert.deepEqual(
+      p.$$('.locked p.locked-message').map((x) => x.textContent),
+      ['Line one', 'Line two']
+    );
+    assert.match(
+      p.$('.locked-time').textContent,
+      /^Time left 00:(29|30):\d\d$/
+    );
+    assert.deepEqual(
+      p.$$('.locked button').map((b) => b.textContent),
+      ['Sorry', 'Sorry']
+    );
+    assert.equal(p.text().includes('Projects'), false, 'no form is shown');
+    assert.equal(p.$('.admin-nav'), null);
+    p.click(p.$$('.locked button')[1]);
+    assert.equal(p.$('.locked'), null);
+    assert.equal(p.win.document.activeElement, p.$('#pin'));
+  }
+);
+
+test(
   'Forms: the list shows every form ' + 'with its type, status, and actions',
   async () => {
     const w = boot();

@@ -189,7 +189,9 @@ flowchart LR
   menu and kept in the `LOCKED_MESSAGE` script property, never in the
   source; unset, it is a plain sentence with the time left. Only a stranger
   meets it, since the admin's own browser holds a pass. It names no data and
-  opens nothing.
+  opens nothing: the dashboard shows it on a lock screen drawn over the PIN
+  screen, which loads no form and no answer, and whose picture is fetched only
+  when that screen opens.
 
 ## Honest weak spots
 

@@ -84,6 +84,15 @@
   --fs-error: 0.8125rem;
   --fs-btn: 1.0625rem;
   --lh-body: 1.6;
+  /* Motion: the transitions.dev token scale, only the steps in use. */
+  --duration-stagger: 40ms;
+  --duration-quick: 150ms;
+  --duration-fast: 250ms;
+  --duration-very-slow: 500ms;
+  --ease-smooth-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --distance-medium: 12px;
+  --scale-large: 0.96;
+  --blur-medium: 3px;
   color-scheme: light;
 }
 

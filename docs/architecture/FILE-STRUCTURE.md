@@ -137,7 +137,7 @@ The site is published at the paths it has always had: the pages at the root,
 | `web/index.html` | The page students use. Shows any form from its saved definition (`?f=name`). |
 | `web/admin.html` | The admin dashboard (PIN). |
 | `web/viewer.html` | The read-only instructor and client page (`?t=private-token`). |
-| `web/css/theme.css` | Every colour of the stylesheets, the fonts and the type scale, as named variables. Change the look here; the contrast standard is in its header and enforced by `tests/web/css/theme.test.js`. |
+| `web/css/theme.css` | Every colour of the stylesheets, the fonts, the type scale and the motion tokens (the transitions.dev scale), as named variables. Change the look here; the contrast standard is in its header and enforced by `tests/web/css/theme.test.js`. |
 | `web/css/app/page.css` | The page, its top bar and icon buttons, the sheet, and the footer that names who built it. Every page loads the `app/` files in the order of these rows, so the cascade is the one the single file had. |
 | `web/css/app/route.css` | The route of the steps: the sea, the islands, the treasure island and the ship. |
 | `web/css/app/fields.css` | The title of a step, the fields, the chips of small lists and the team members. |
@@ -166,7 +166,8 @@ The site is published at the paths it has always had: the pages at the root,
 | `web/css/admin/phone-tables.css` | The phone layout of wide tables: one card per row. |
 | `web/css/admin/keys.css` | Client links, the until picker of keys and links, and Download all. |
 | `web/css/admin/progress.css` | Team progress on the dashboard and the instructor page: the board, its phone view, the mark box and the Progress panel. |
-| `web/img/` | The tab icon (`favicon.svg`), PNG sizes for phones and older browsers, and `site.webmanifest`. The pirate and the parrot of the ticket picture (`pirate.webp`, `parrot.webp`), with clear backgrounds; `web/js/form/ticket/` draws the clock and the calendar around them. The pictures of the route: the ship (`ship.svg`), an island (`island.svg`), the treasure chest (`treasure.svg`), the waves (`sea.svg`), the sky by day and by night (`sky-day.svg`, `sky-night.svg`) the sun and moon (`sun.svg`, `moon.svg`) and the red flag of an explored island (`crew-flag.svg`). The arrow of a select (`select-arrow.svg`). They have their own colours; the sea and sky behind them take theirs from the theme. |
+| `web/css/admin/locked.css` | The lock screen: its modal and the reveal of its lines, the picture, the message and the time left. |
+| `web/img/` | The tab icon (`favicon.svg`), PNG sizes for phones and older browsers, and `site.webmanifest`. The pirate and the parrot of the ticket picture (`pirate.webp`, `parrot.webp`), with clear backgrounds; `web/js/form/ticket/` draws the clock and the calendar around them. The pictures of the route: the ship (`ship.svg`), an island (`island.svg`), the treasure chest (`treasure.svg`), the waves (`sea.svg`), the sky by day and by night (`sky-day.svg`, `sky-night.svg`) the sun and moon (`sun.svg`, `moon.svg`) and the red flag of an explored island (`crew-flag.svg`). The arrow of a select (`select-arrow.svg`). The lock screen's picture as base64 text (`locked-image.txt`), fetched only when that screen opens. They have their own colours; the sea and sky behind them take theirs from the theme. |
 | `web/js/config.js` | Source placeholder; `scripts/build/build-site.js` generates its published copy from the Actions `API_URL` variable, with the version of the site. |
 | `web/js/app/fresh.js` | Keeps an open page on the published version: compares the version in `config.js` with `version.json`, reloads an older page when nothing would be lost, and offers **Reload** otherwise. |
 | `web/js/app/api.js` | Sends requests to the backend as plain-text JSON (avoids browser CORS checks). |
@@ -224,6 +225,7 @@ The site is published at the paths it has always had: the pages at the root,
 | `web/js/admin/shell/series.view.js` | The bookings under a registration form and the button that makes the next one. |
 | `web/js/admin/shell/forms-list.view.js` | The forms list, grouped by status. |
 | `web/js/admin/shell/create.view.js` | The page that makes a new form. |
+| `web/js/admin/shell/locked.view.js` | The lock screen the PIN screen opens when the shared lock refuses a PIN, and the time left that counts down. |
 | `web/js/admin/shell/login.view.js` | The PIN screen. |
 | `web/js/admin/shell/router.page.js` | Reads the address, draws the bar and the page it names, and guards unsaved changes. Loaded last of the shell parts. |
 | `web/js/admin/settings/settings.page.js` | The settings page of a form: loads it, places the panels in the Questions, Timetable and Setup tabs, and keeps the open sections. |
