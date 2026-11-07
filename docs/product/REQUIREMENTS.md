@@ -67,7 +67,7 @@ step needs the real Google services (see "What could not be tested here").
 | A booking that may be cancelled may also move to another time, without cancelling first; picking another time names the time given up, which anyone can then book | Done |
 | Booking with a registration key: a reservation can take the 5-digit key of a team registration form, show the team to confirm, and ask only for the slot; the same key opens the booking, moves it to another slot and cancels it (a new key is given only when another booking of that form already holds the same digits) | Done |
 | Warning when a timetable change leaves existing bookings without a slot | Done |
-| A day that is over (before today), or a time of today that has started, cannot be booked: the calendar crosses it out as **Not available** and the server refuses it; a booking already on it stays editable. Times are written without am or pm, so a day's first time from 8 to 11 is the morning and from 12 to 7 the afternoon, and each later time follows it | Done |
+| A day that is over (before today), or a time of today that has started, cannot be booked: the calendar greys it out (**Passed** under a date, **Time has passed** under a time) and the server refuses it; a pick left over from a draft is let go, and a booking already on it stays editable. The calendar opens on the current month, or the month of the booking being edited, with nothing picked. Times are written without am or pm, so a day's first time from 8 to 11 is the morning and from 12 to 7 the afternoon, and each later time follows it | Done |
 
 ## Sheets, dashboards, and printing
 | Requirement | Status |
