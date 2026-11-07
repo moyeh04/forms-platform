@@ -1,7 +1,8 @@
 /**
  * What the student page does with each error the server gives back when a
  * registration is sent: the answers it refused, a registration that exists,
- * members of other teams, a slot that was taken, a form that closed.
+ * members of other teams, a slot that was taken or whose day is over, a
+ * form that closed.
  */
 (function (App) {
   'use strict';
@@ -17,6 +18,9 @@
     form_not_yet: 'not_yet',
     form_draft: 'draft'
   };
+
+  /** The errors of a slot that can no longer be booked: taken or over. */
+  var SLOT_REFUSED = /^slot_(taken|past)$/;
 
   /**
    * Shows the answers the server refused, each on its own path.
@@ -201,22 +205,25 @@
   }
 
   /**
-   * Shows that the slot was taken meanwhile, with the slots read again and
-   * the time cleared.
+   * Shows that the slot was taken meanwhile, or that its day is over, with
+   * the slots read again and the time cleared; a day that is over is
+   * cleared too.
    *
+   * @param {string} code `slot_taken` or `slot_past`.
    * @return {!Promise<void>} Settles when the page is drawn.
    */
-  async function onSlotTaken() {
+  async function onSlotTaken(code) {
     await P.refreshAvailability();
     var sf = P.slotField();
     var picked = (sf && S.data[sf.id]) || {};
+    var day = code === 'slot_past' ? '' : picked.day;
     if (sf) {
-      S.data[sf.id] = { day: picked.day, time: '' };
+      S.data[sf.id] = { day: day, time: '' };
       S.errors = {};
-      S.errors[sf.id] = { error: 'slot_taken' };
+      S.errors[sf.id] = { error: code };
       S.stepIndex = P.stepOfPath(sf.id);
     }
-    S.banner = { kind: 'err', text: t('errors.slot_taken') };
+    S.banner = { kind: 'err', text: t('errors.' + code) };
     P.render();
   }
 
@@ -244,7 +251,7 @@
     if (code === 'duplicate') return onDuplicate(d);
     if (code === 'already_booked') return onAlreadyBooked();
     if (code === 'duplicate_member') return onDuplicateMember(d);
-    if (code === 'slot_taken') return onSlotTaken();
+    if (SLOT_REFUSED.test(code)) return onSlotTaken(code);
     if (CLOSED_STATES[code]) return onClosed(code);
     S.banner = {
       kind: 'err',

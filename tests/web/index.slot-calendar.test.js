@@ -87,3 +87,20 @@ test('Slot calendar: a date is picked first, then a time', async () => {
   assert.equal(times.length, 1);
   assert.ok(times[0].textContent.includes('11:00 - 11:20'));
 });
+
+test('Slot calendar: a day that is over is crossed out and shut', async () => {
+  const w = boot('reservation', {
+    slots: {
+      days: [
+        { label: 'Day 1', date: '2020-01-05', times: ['10:00 - 10:20'] },
+        { label: 'Day 2', date: '2020-01-12', times: ['11:00 - 11:20'] }
+      ],
+      capacity: 1
+    }
+  });
+  const p = await atSlots(w);
+  const past = dayButton(p, 'Day 1');
+  assert.equal(past.disabled, true);
+  assert.ok(past.classList.contains('is-full'), 'it gets the red X');
+  assert.ok(past.getAttribute('aria-label').includes('Not available'));
+});

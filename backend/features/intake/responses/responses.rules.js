@@ -87,17 +87,40 @@ var ResponsesRules = (function () {
   }
 
   /**
-   * Refuses a slot that has no room left.
+   * Refuses a slot on a day that is over, unless it is the slot the
+   * booking already holds, so an old booking can still be edited.
+   *
+   * @param {!Object} form The form.
+   * @param {string} key The slot picked, as `day|time`.
+   * @param {string} dayId The day picked.
+   * @param {string} own The slot the booking holds now, or ''.
+   * @throws {ApiError} `slot_past`.
+   */
+  function checkPast_(form, key, dayId, own) {
+    if (key === own) return;
+    var day = (form.slots?.days || []).filter(function (d) {
+      return d.id === dayId;
+    })[0];
+    if (day && Rules.isPastDate(day.date, Time.todayIso()))
+      ApiError.fail('slot_past', 'That day is over. Pick another.', {
+        slot: key
+      });
+  }
+
+  /**
+   * Refuses a slot on a day that is over or with no room left.
    *
    * @param {!Object} form The form.
    * @param {!Object} data The answers.
    * @param {!Array<!Object>} others The other submissions.
-   * @throws {ApiError} `slot_taken`.
+   * @param {string} own The slot the booking holds now, or ''.
+   * @throws {ApiError} `slot_past` or `slot_taken`.
    */
-  function checkSlot_(form, data, others) {
+  function checkSlot_(form, data, others, own) {
     var slotField = Rules.fieldByRole(form, 'slot');
     if (!slotField || !data[slotField.id]) return;
     var key = Rules.slotKey(data[slotField.id].day, data[slotField.id].time);
+    checkPast_(form, key, data[slotField.id].day, own);
     var counts = {};
     others.forEach(function (r) {
       if (r.slot) counts[r.slot] = (counts[r.slot] || 0) + 1;
@@ -126,7 +149,10 @@ var ResponsesRules = (function () {
     checkFull_(rules, others, selfId);
     checkUnique_(rules, data, others);
     if (rules.uniqueAcrossForm) checkMembers_(form, data, others);
-    checkSlot_(form, data, others);
+    var self = rows.filter(function (r) {
+      return r.id === selfId;
+    })[0];
+    checkSlot_(form, data, others, self?.slot || '');
   }
 
   /**

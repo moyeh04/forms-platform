@@ -34,3 +34,10 @@ test('Slots: the room left is the capacity less the other bookings', () => {
     'one booking a slot when no capacity is set'
   );
 });
+
+test('Slots: a day before today is over; today and later are not', () => {
+  assert.equal(R.isPastDate('2026-11-04', '2026-11-05'), true);
+  assert.equal(R.isPastDate('2026-11-05', '2026-11-05'), false);
+  assert.equal(R.isPastDate('2026-11-06', '2026-11-05'), false);
+  assert.equal(R.isPastDate('', '2026-11-05'), false, 'no date is not over');
+});
