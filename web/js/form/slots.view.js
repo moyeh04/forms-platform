@@ -117,12 +117,14 @@
     var room = roomIn(day.id, tm);
     var over = Rules.isPastSlot(day, tm, now());
     var taken = (!room || over) && cur.time !== tm;
+    var shut = over ? 'Past' : 'Full';
+    if (!taken) shut = '';
     var slots = S.form.slots || {};
     return h(
       'button',
       {
         type: 'button',
-        class: 'slot-chip time' + (taken ? ' is-full' : ''),
+        class: 'slot-chip time' + (shut && ' is-' + shut.toLowerCase()),
         disabled: taken,
         'aria-pressed': cur.time === tm ? 'true' : 'false',
         onclick: function () {
@@ -131,7 +133,7 @@
       },
       h('span', { dir: 'ltr' }, tm),
       timeNote(
-        taken ? (over ? 'slotPast' : 'slotFull') : '',
+        shut && (over ? 'slotTimePast' : 'slotFull'),
         (slots.capacity || 1) > 1,
         room
       )
@@ -192,6 +194,26 @@
   }
 
   /**
+   * Lets go of a pick that is over, such as one kept in a draft: a day that
+   * has passed is unpicked, and a time of today that has started is
+   * cleared. The slot the student's booking holds is kept, so an old
+   * booking can still be edited.
+   *
+   * @param {?Object} day The picked day, or undefined.
+   * @param {!Object} cur The slot picked now.
+   * @return {!Object} The pick to keep: `cur` itself when nothing is over.
+   */
+  function dropPast(day, cur) {
+    if (!day) return cur;
+    if (cur.time && Rules.slotKey(day.id, cur.time) === S.ownSlot) return cur;
+    if (isPast(day)) return { day: '', time: '' };
+    if (cur.time && Rules.isPastSlot(day, cur.time, now())) {
+      return { day: cur.day, time: '' };
+    }
+    return cur;
+  }
+
+  /**
    * Draws the days and the times of the picked day into the slot box.
    *
    * @param {!Element} wrap The box.
@@ -218,6 +240,12 @@
     var day = days.filter(function (d) {
       return d.id === cur.day;
     })[0];
+    var kept = dropPast(day, cur);
+    if (kept !== cur) {
+      cur = kept;
+      P.setVal(path, cur);
+      if (!cur.day) day = undefined;
+    }
     App.ui.clear(wrap);
     wrap.append(
       P.slotCalendar({
@@ -225,6 +253,7 @@
         cur: cur,
         roomOf: dayRoom,
         isPast: isPast,
+        today: now().date,
         choose: choose,
         view: wrap.calendarView
       }),

@@ -65,7 +65,7 @@
 /* A date or a time that can still be booked is a ticket: its top and bottom
    edges are a zigzag, as the ticket a booking ends with. */
 .cal-date.is-day,
-.slot-chip.time:not(.is-full) {
+.slot-chip.time:not(.is-full):not(.is-past) {
   border-color: transparent;
   background: var(--tint-a);
   color: var(--ink);
@@ -220,4 +220,17 @@
   font-family: var(--font-code);
   letter-spacing: 0.04em;
   font-size: 1rem;
+}
+/* A date or a time that has passed is greyed out, not crossed: it was never
+   taken, it is only over. The date still reads Passed under its number. */
+.cal-date.is-day.is-past,
+.slot-chip.is-past {
+  -webkit-mask: none;
+  mask: none;
+  border-color: transparent;
+  background: transparent;
+  color: var(--mute);
+  font-weight: 400;
+  opacity: 0.6;
+  cursor: not-allowed;
 }

@@ -70,12 +70,10 @@ test('Slot calendar: a date is picked first, then a time', async () => {
   assert.equal(p.$$('.cal-wd').length, 7, 'a week has seven columns');
   assert.equal(p.$$('.slot-chip.time').length, 0, 'no times before a day');
   assert.ok(
-    p.$('.cal-month').textContent.includes('December'),
-    'it opens on the first month with a free day'
+    p.$('.cal-month').textContent.includes('November'),
+    'it opens on the month nearest today, with nothing picked'
   );
-  p.click(p.$('[name="month-prev"]'));
-  await settle();
-  assert.ok(p.$('.cal-month').textContent.includes('November'));
+  assert.equal(p.$$('.cal-date[aria-pressed="true"]').length, 0);
   assert.equal(dayButton(p, 'Day 1').disabled, true, 'a full day is shut');
   assert.equal(p.$$('.cal-grid .cal-date').length, 30);
   p.click(p.$('[name="month-next"]'));
@@ -88,7 +86,7 @@ test('Slot calendar: a date is picked first, then a time', async () => {
   assert.ok(times[0].textContent.includes('11:00 - 11:20'));
 });
 
-test('Slot calendar: a day that is over is crossed out and shut', async () => {
+test('Slot calendar: a day that is over is greyed out', async () => {
   const w = boot('reservation', {
     slots: {
       days: [
@@ -101,6 +99,10 @@ test('Slot calendar: a day that is over is crossed out and shut', async () => {
   const p = await atSlots(w);
   const past = dayButton(p, 'Day 1');
   assert.equal(past.disabled, true);
-  assert.ok(past.classList.contains('is-full'), 'it gets the red X');
-  assert.ok(past.getAttribute('aria-label').includes('Not available'));
+  assert.ok(past.classList.contains('is-past'), 'grey, not the red X');
+  assert.ok(past.getAttribute('aria-label').includes('The day has passed'));
+  assert.ok(
+    p.$('.cal-month').textContent.includes('January 2020'),
+    'today is after the timetable, so it opens on its last month'
+  );
 });

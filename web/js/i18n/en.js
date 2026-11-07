@@ -44,7 +44,9 @@
     slotDay: 'Day',
     slotTime: 'Time',
     slotFull: 'Fully booked',
-    slotPast: 'Not available',
+    slotPassed: 'Passed',
+    slotDayPast: 'The day has passed',
+    slotTimePast: 'Time has passed',
     slotsLeft: '{n} left',
     slotMove:
       'Your time now, {was}, is given up when you save, and anyone can book ' +

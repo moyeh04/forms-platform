@@ -149,17 +149,21 @@
   function dayButton(c, day, text) {
     var left = c.roomOf(day);
     var picked = c.cur.day === day.id;
+    var past = c.isPast(day);
     var note = left ? t('slotsLeft', { n: left }) : t('slotFull');
-    if (c.isPast(day)) note = t('slotPast');
+    var said = past ? t('slotDayPast') : note;
+    if (past) note = t('slotPassed');
+    var shut = '';
+    if (!(left || picked)) shut = past ? ' is-past' : ' is-full';
     return h(
       'button',
       {
         type: 'button',
-        class: 'cal-date is-day' + (left || picked ? '' : ' is-full'),
+        class: 'cal-date is-day' + shut,
         name: 'day-' + day.id,
         disabled: !(left || picked),
         'aria-pressed': picked ? 'true' : 'false',
-        'aria-label': day.label + ', ' + note,
+        'aria-label': day.label + ', ' + said,
         title: day.label,
         onclick: function () {
           c.choose({ day: day.id, time: '' });
@@ -235,7 +239,8 @@
 
   /**
    * Picks the month the calendar opens on: the month of the picked day,
-   * else of the first day with places left, else the first month.
+   * else the month of today, or the nearest month of the timetable when
+   * today is outside it.
    *
    * @param {!Object} c The calendar.
    * @return {string} The month.
@@ -245,10 +250,12 @@
     var picked = dates.filter(function (d) {
       return c.days[d].id === c.cur.day;
     })[0];
-    var free = dates.filter(function (d) {
-      return c.roomOf(c.days[d]);
-    })[0];
-    return monthOf(picked || free || dates[0]);
+    if (picked) return monthOf(picked);
+    var now = monthOf(c.today);
+    var first = c.months[0];
+    var last = c.months[c.months.length - 1];
+    if (now < first) return first;
+    return now > last ? last : now;
   }
 
   /**
@@ -295,8 +302,8 @@
    * @param {!Object} o `days` of the form, `cur` the slot picked now,
    *     `roomOf(day)` the places a day has left, `choose(slot)` keeps a
    *     pick, `isPast(day)` says the day is over (its places are then 0),
-   *     and `view`, an object kept between draws that holds the
-   *     month shown.
+   *     `today` is the date now, as YYYY-MM-DD, and `view`, an object
+   *     kept between draws that holds the month shown.
    * @return {!Element} The days.
    */
   P.slotCalendar = function (o) {
