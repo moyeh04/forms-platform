@@ -301,3 +301,21 @@ test(
     );
   }
 );
+
+test('Booking: a day that is over is refused; a booking on it stays', () => {
+  const w = boot();
+  const a = w.book('4230001', sun(0));
+  const days = w.admin({ action: 'admin.forms.get', id: w.form.id }).form.slots
+    .days;
+  days[0].date = '2020-01-05';
+  w.admin({
+    action: 'admin.forms.update',
+    id: w.form.id,
+    patch: { slots: { days, capacity: 1 } }
+  });
+  assert.equal(w.book('4230002', sun(1)).error.code, 'slot_past');
+  const edit = (slot) =>
+    w.api({ action: 'update', slug: w.form.slug, key: a.key, data: { slot } });
+  assert.equal(edit(sun(0)).ok, true, 'the slot it holds is kept');
+  assert.equal(edit(sun(2)).error.code, 'slot_past');
+});

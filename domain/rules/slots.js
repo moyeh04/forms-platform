@@ -185,6 +185,20 @@
   }
 
   /**
+   * Says whether a day is over: its date is before today, so it can no
+   * longer be booked.
+   *
+   * @param {*} date The date of the day, as YYYY-MM-DD.
+   * @param {string} today Today, as YYYY-MM-DD, in the time zone of the
+   *     students.
+   * @return {boolean} True when the date is before today; false when it
+   *     is today, later or not a date.
+   */
+  function isPastDate(date, today) {
+    return ISO_DATE.test(String(date || '')) && String(date) < today;
+  }
+
+  /**
    * Checks a chosen slot against the days and times of the form.
    *
    * @param {!Object} field The slot field.
@@ -214,6 +228,7 @@
     slotRoom: slotRoom,
     dayLabel: dayLabel,
     shiftDate: shiftDate,
+    isPastDate: isPastDate,
     validateSlot: validateSlot
   };
   if (node) module.exports = api;
