@@ -1,11 +1,11 @@
 # Testing
 
-408 automated tests run without a Google account, a browser, or a network.
+410 automated tests run without a Google account, a browser, or a network.
 They run the **real** backend and the **real** pages. This page explains how
 that works and what it can and cannot prove.
 
 ```
-npm test    # 408 tests
+npm test    # 410 tests
 ```
 
 ## The layers
@@ -168,7 +168,7 @@ says something else.
 | Key expiry | `backend/features/intake/keys/key-expiry.test.js` | 6 | Which keys are given and expired, extending the expired ones from today, all of them from their own end, one date for all, chosen teams only, bad requests change nothing, cancelled registrations left out |
 | Member transfers | `backend/features/intake/transfers/transfers.test.js` | 12 | Refusal that lists who can be asked for, the request and the team saved without the member, approval by the leader and by the admin, rejection, cancelling, a full team, two requests for one student, a removed team, a team deleted by the admin; a leader asked for and the team handed to the member named, by the leader and by the admin, an approval without a new leader or with a refused email, a leader alone in a team; the phone of the other leader on a waiting request and its two switches |
 | Matching | `backend/features/intake/matching/matching.test.js` | 6 | Paste, normalise, matched, none, duplicate, sequential review |
-| Viewer API | `backend/features/access/viewer/viewer.test.js` | 13 | Tokens, hidden columns, the level of a small team sent only to a link that shows the warnings, today and by day, review rights, revoked links, access keys with the lock after wrong tries, reading a lost key again, links that end on a date and open again when it moves |
+| Viewer API | `backend/features/access/viewer/viewer.test.js` | 15 | Tokens, bad tokens and access keys sent at the same time counted one by one, hidden columns, the level of a small team sent only to a link that shows the warnings, today and by day, review rights, revoked links, access keys with the lock after wrong tries, reading a lost key again, links that end on a date and open again when it moves |
 | Student page | `web/index.form.test.js` | 20 | Steps, the title and its tags, the Arabic name and code fields, errors on an empty step, a draft kept over a reload, a duplicate code that offers the key flow, a full registration ending on a ticket with its email notice, a closed form and an unknown link, Arabic and a locked language, themes, descriptions, the subject tag, the batch year of a WhatsApp form, who can register, the folder rule example, and the ship over the current step |
 | Student page: edit | `web/index.edit.test.js` | 3 | Editing by key and registering again, a task locked after its deadline, Close out of a registration opened with a key |
 | Form page: progress | `web/index.progress.test.js` | 3 | A key that opens the summary shows the team's progress with its note but never the private one, no block when teams do not see it, and an ended key that still shows the progress read only |

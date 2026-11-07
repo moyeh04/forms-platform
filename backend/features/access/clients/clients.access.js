@@ -80,6 +80,21 @@ var ClientsAccess = (function () {
    *     its key is wrong.
    */
   function requireClient_(req) {
+    return Lock.withLock(function () {
+      return checkClient_(req);
+    });
+  }
+
+  /**
+   * Checks the token and key of one request against their counts of wrong
+   * tries. Call it inside Lock.withLock, so tries sent at the same time are
+   * counted one after another.
+   *
+   * @param {?Object} req The request body, with `token` and `accessKey`.
+   * @return {!Object} The link.
+   * @throws {ApiError} As requireClient_.
+   */
+  function checkClient_(req) {
     var cache = CacheService.getScriptCache();
     var hit = linkByToken_(cache, String(req?.token || ''));
     if (!hit.active) ApiError.fail('revoked', 'This link was turned off.');
