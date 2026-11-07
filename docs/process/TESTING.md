@@ -1,11 +1,11 @@
 # Testing
 
-405 automated tests run without a Google account, a browser, or a network.
+407 automated tests run without a Google account, a browser, or a network.
 They run the **real** backend and the **real** pages. This page explains how
 that works and what it can and cannot prove.
 
 ```
-npm test    # 405 tests
+npm test    # 407 tests
 ```
 
 ## The layers
@@ -151,7 +151,7 @@ says something else.
 | Rules: phones | `domain/rules/phone.test.js` | 2 | Every Egyptian way of writing a mobile number, numbers found in pasted WhatsApp lines |
 | Rules: codes | `domain/rules/codes.test.js` | 4 | Seven digits by default, or the length the question gives; a registration key of five digits; an access key of six |
 | Rules: Drive links | `domain/rules/drive-link.test.js` | 2 | Files, folders and slides, other hosts refused; folder names |
-| Rules: slots | `domain/rules/slots.test.js` | 3 | The generated times of a day, the room left in a slot, and a day that is over |
+| Rules: slots | `domain/rules/slots.test.js` | 4 | The generated times of a day, the room left in a slot, a day that is over, and a time of today once it starts |
 | Rules: forms | `domain/rules/form.test.js` | 2 | Members list, role lookup and form state; counting the people of a form with a code counted once |
 | Rules: progress | `domain/rules/progress.test.js` | 7 | The milestones of a team registration copied from a list and cleaned, a mark whose time changes only with its state, a refused milestone, state or note, counts per team and per milestone, what a team and a link see, a copy compared with its list by id, and the marks a change of milestones would hide |
 | Rules: team size | `domain/rules/team-size.test.js` | 4 | The two warnings about small teams: the levels and their order, starting numbers, the level of a team, a wrong number or order, the numbers a level can ask for |
@@ -160,7 +160,7 @@ says something else.
 | Team size and audience | `backend/features/intake/teams/team-size.test.js` | 18 | Required question, range, exact member count, admin range, the warnings about small teams saved cleaned and refused when wrong, the sizes of the saved teams sent with the form, size notes, specialization limits, section limits |
 | Forms | `backend/features/catalog/forms/forms.test.js` | 8 | Every template created with its own spreadsheet, type and title checked, the public form of a draft and of an open form, open and close dates, unique link names, duplicate, delete, WhatsApp metadata kept on a copy |
 | Submissions | `backend/features/intake/submissions/submissions.test.js` | 13 | Submit, closed and draft forms, duplicates, a student in another team, capacity, Drive checks, folder names, the confirmation email on and off and without a key, WhatsApp registrations, the admin list, status, review, reset key and delete |
-| Reservations | `backend/features/intake/reservations/reservations.test.js` | 13 | Slots, capacity, one booking per leader, a key that moves a booking and changes nothing else, a booking on a removed slot still counted, a day that is over refused while a booking on it stays editable |
+| Reservations | `backend/features/intake/reservations/reservations.test.js` | 14 | Slots, capacity, one booking per leader, a key that moves a booking and changes nothing else, a booking on a removed slot still counted, a day that is over refused while a booking on it stays editable, a time of today refused once it has started |
 | Sheet views | `backend/features/outputs/sheet-views/sheet-views.test.js` | 11 | Tinted blocks, leader star, merged task cell, bookings by day, one booked repaint for many changes that removes its trigger, a change during the repaint booking another, a failed repaint keeping its mark, the rebuild the admin asks for |
 | Print | `backend/features/outputs/print/print.test.js` | 6 | Print tabs, signature column, PDF success and fallback |
 | Key booking | `backend/features/intake/reservations/key-booking.test.js` | 12 | Setting and its source form, team preview without contact details, copied answers, forged answers ignored, one booking per team, the same key cancels and moves the booking to another slot with nothing else changed, a booking that may be cancelled may move, expired keys still book, the switch, the next booking one week later |

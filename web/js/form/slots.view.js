@@ -38,26 +38,40 @@
   }
 
   /**
-   * Gives today on the student's own clock, as the dates of the days are
-   * written.
+   * Writes a part of a date or a time with two digits.
    *
-   * @return {string} Today, as YYYY-MM-DD.
+   * @param {number} n The number.
+   * @return {string} The number, with a 0 before one digit.
    */
-  function today() {
-    var d = new Date();
-    var mm = String(d.getMonth() + 1).padStart(2, '0');
-    var dd = String(d.getDate()).padStart(2, '0');
-    return d.getFullYear() + '-' + mm + '-' + dd;
+  function two(n) {
+    return String(n).padStart(2, '0');
   }
 
   /**
-   * Says whether a day is over, so it can no longer be booked.
+   * Gives today and the time on the student's own clock, as the days and
+   * times are written.
+   *
+   * @return {{date: string, time: string}} Today as YYYY-MM-DD and the
+   *     time as HH:MM.
+   */
+  function now() {
+    var d = new Date();
+    return {
+      date:
+        d.getFullYear() + '-' + two(d.getMonth() + 1) + '-' + two(d.getDate()),
+      time: two(d.getHours()) + ':' + two(d.getMinutes())
+    };
+  }
+
+  /**
+   * Says whether a day is over, or every time of it has started, so it
+   * can no longer be booked.
    *
    * @param {!Object} d The day.
-   * @return {boolean} True when its date is before today.
+   * @return {boolean} True when no time of it is left.
    */
   function isPast(d) {
-    return Rules.isPastDate(d.date, today());
+    return Rules.isPastDay(d, now());
   }
 
   /**
@@ -75,23 +89,23 @@
   }
 
   /**
-   * Writes the line under a time: full, or the places left when a slot
+   * Writes the line under a time: shut, or the places left when a slot
    * holds more than one team.
    *
-   * @param {boolean} taken True when it is full.
+   * @param {string} shut Why it cannot be picked, as a text key, or ''.
    * @param {boolean} many True when a slot holds more than one team.
    * @param {number} room The places left.
    * @return {?Element} The line, or null.
    */
-  function timeNote(taken, many, room) {
-    if (taken) return h('small', { class: 'slot-left' }, t('slotFull'));
+  function timeNote(shut, many, room) {
+    if (shut) return h('small', { class: 'slot-left' }, t(shut));
     if (!many) return null;
     return h('small', { class: 'slot-left' }, t('slotsLeft', { n: room }));
   }
 
   /**
    * Makes the chip of a time. The time the student holds stays open even
-   * when it is full or its day is over.
+   * when it is full or its time is over.
    *
    * @param {!Object} day The day.
    * @param {string} tm The time.
@@ -101,7 +115,8 @@
    */
   function timeChip(day, tm, cur, choose) {
     var room = roomIn(day.id, tm);
-    var taken = (!room || isPast(day)) && cur.time !== tm;
+    var over = Rules.isPastSlot(day, tm, now());
+    var taken = (!room || over) && cur.time !== tm;
     var slots = S.form.slots || {};
     return h(
       'button',
@@ -115,7 +130,11 @@
         }
       },
       h('span', { dir: 'ltr' }, tm),
-      timeNote(taken, (slots.capacity || 1) > 1, room)
+      timeNote(
+        taken ? (over ? 'slotPast' : 'slotFull') : '',
+        (slots.capacity || 1) > 1,
+        room
+      )
     );
   }
 
@@ -130,7 +149,8 @@
   function timesOf(day, cur, choose) {
     if (!day) return h('p', { class: 'help' }, t('slotPick'));
     var open = day.times.filter(function (tm) {
-      return roomIn(day.id, tm) || cur.time === tm;
+      var free = roomIn(day.id, tm) && !Rules.isPastSlot(day, tm, now());
+      return free || cur.time === tm;
     });
     if (!open.length) return h('p', { class: 'help' }, t('slotNone'));
     return h(
