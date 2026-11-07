@@ -39,7 +39,7 @@ Who may call an action is decided by the secret the request carries:
 | None | | | |
 | Edit key (5 digits) | `key` | `findByKey_` | 10 a minute for each form |
 | Private link | `token`, and `accessKey` when the link has one | the router, with `requireClient_` | 30 wrong tokens a minute; 5 wrong access keys lock that link for 10 minutes |
-| Admin PIN | `admin.pin` | the router, with `requireAdmin` | 8 wrong PINs lock the dashboard for 10 minutes |
+| Admin PIN | `admin.pin` | the router, with `requireAdmin` | 8 wrong PINs lock the dashboard for 30 minutes; the answer carries the seconds left |
 
 ## Anyone (no secret)
 
@@ -78,7 +78,7 @@ the lock.
 
 | Action | Lock | Writes |
 |---|---|---|
-| `admin.login` | no | Nothing. Says whether the PIN is right |
+| `admin.login` | no | Says whether the PIN is right. Answers `device`, the browser's trusted-device pass: the one `admin.device` carried when it is known, otherwise a new one stored as `admin_device:<hash>`. Every admin request may send `admin.device`; see [SECURITY.md](SECURITY.md) for the `locked` and `device_locked` answers |
 
 ### Forms
 

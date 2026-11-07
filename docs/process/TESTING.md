@@ -1,11 +1,11 @@
 # Testing
 
-411 automated tests run without a Google account, a browser, or a network.
+418 automated tests run without a Google account, a browser, or a network.
 They run the **real** backend and the **real** pages. This page explains how
 that works and what it can and cannot prove.
 
 ```
-npm test    # 411 tests
+npm test    # 418 tests
 ```
 
 ## The layers
@@ -176,7 +176,7 @@ says something else.
 | Student page: booking calendar | `web/index.slot-calendar.test.js` | 2 | A date picked on the month calendar before its times, a full day shut, and months in turn, a day that is over crossed out and shut |
 | Student page: team size | `web/index.team-size.test.js` | 8 | The size picker and the member forms it shows, the range and a fixed size, sizes kept when changed, remove and add a member with Undo, a team of three saved, and the note of a size |
 | Student page: transfers | `web/index.transfer.test.js` | 6 | Asking for a member of another team, the leader who is asked approving or rejecting, a leader who is asked for naming the new leader and passing the key on, the phone of the other leader with Copy and as a WhatsApp link, a leader alone in a team not offered |
-| Admin page: shell | `web/admin.shell.test.js` | 14 | Login, a refused PIN kept in its field, a lock that leaves an open window signed in, the forms list grouped by status, create with its preview and title reason, switching types and the batch year, the term chips, delete, form tabs that keep edits, and the same header on every tab with a status saved at once |
+| Admin page: shell | `web/admin.shell.test.js` | 15 | Login, a refused PIN kept in its field, the PIN that locks the page opening the lock screen (welcome, then the message from the sheet, the time left and two Sorry buttons, no form shown, back to the PIN), a signed-in browser that keeps working and signs in again through a lock made elsewhere, the forms list grouped by status, create with its preview and title reason, switching types and the batch year, the term chips, delete, form tabs that keep edits, and the same header on every tab with a status saved at once |
 | Admin page: settings | `web/admin.settings.test.js` | 15 | Team size and its notes, the count of teams outside a new size range, a save over a newer change refused, status, dates and labels, locked fields, the two warnings about small teams with a wrong order kept with its reason, teammates of a booking, who can register by section or year group, section summaries, the save bar only while there is a change, and Extend keys |
 | Admin page: timetable | `web/admin.timetable.test.js` | 5 | The calendar, the general hours, a day with its own hours and name, booked slots, and times saved by hand |
 | Admin page: questions | `web/admin.questions.test.js` | 3 | Descriptions, added questions moved between pages, and pages added, renamed and reordered |
@@ -208,7 +208,7 @@ says something else.
 | Colour contrast | `web/css/theme.test.js` | 4 | Every text and outline pair meets WCAG AA in light, dark, and device-dark themes |
 | A page older than the site | `web/js/app/fresh.test.js` | 4 | An untouched page reloads once for a newer site and never in a loop, a page with typed text or an open dialog offers Reload instead, the bar in the language of the form, nothing in a preview or when the version cannot be read |
 | Router | `backend/platform/http/router.test.js` | 3 | Unknown actions and bad JSON answered with clean errors, a route table that could open an action refused at load, and the link and admin checks run before the handler |
-| Admin PIN | `backend/features/access/auth/auth.test.js` | 4 | A wrong PIN refused and repeated guesses locked out, PINs sent at the same time counted one by one, unlocking from the sheet menu keeps the PIN, actions need the PIN and a PIN must be long enough |
+| Admin PIN | `backend/features/access/auth/auth.test.js` | 10 | The 8th wrong PIN locks every browser for 30 minutes and the answer counts the seconds left, tries further apart do not add up, the shared lock answers the message set from the sheet and empty brings back the plain one, the lock message dialog escapes what it shows, PINs sent at the same time counted one by one, unlocking from the sheet menu lifts every lock and keeps the PIN, a signed-in device is counted apart and a made-up pass is not, a pass ends after the days set and can be forgotten, a new PIN forgets every device, actions need the PIN and a PIN must be long enough |
 | Registry setup | `backend/features/catalog/registry/registry.setup.test.js` | 1 | Setup creates the registry tabs and default lists and is safe to repeat |
 | Lists | `backend/features/catalog/lists/lists.test.js` | 1 | The admin replaces a list and the options of its questions follow |
 | Private links | `backend/features/access/clients/clients.test.js` | 1 | A link is created once and the token itself is never stored |

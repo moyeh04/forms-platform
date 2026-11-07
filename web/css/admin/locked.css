@@ -1,0 +1,95 @@
+/* The lock screen: a welcome that opens like the dashboard, then the picture, the message and the time left.
+   Motion is the transitions.dev modal open / close and texts reveal, on the theme's motion tokens. */
+:root {
+  --modal-open-dur: var(--duration-fast);
+  --modal-close-dur: var(--duration-quick);
+  --modal-scale: var(--scale-large);
+  --modal-scale-close: var(--scale-large);
+  --modal-ease: var(--ease-smooth-out);
+  --stagger-dur: var(--duration-very-slow);
+  --stagger-distance: var(--distance-medium);
+  --stagger-stagger: var(--duration-stagger);
+  --stagger-blur: var(--blur-medium);
+  --stagger-ease: var(--ease-smooth-out);
+}
+.t-modal {
+  transform-origin: center;
+  transform: scale(var(--modal-scale));
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    transform var(--modal-open-dur) var(--modal-ease),
+    opacity var(--modal-open-dur) var(--modal-ease);
+  will-change: transform, opacity;
+}
+.t-modal.is-open {
+  transform: scale(1);
+  opacity: 1;
+  pointer-events: auto;
+}
+.t-modal.is-closing {
+  transform: scale(var(--modal-scale-close));
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    transform var(--modal-close-dur) var(--modal-ease),
+    opacity var(--modal-close-dur) var(--modal-ease);
+}
+/* Lines start lower, blurred and unseen; .is-shown on the parent brings them to rest, the second one a step later. */
+.t-stagger-line {
+  display: block;
+  opacity: 0;
+  transform: translateY(var(--stagger-distance));
+  filter: blur(var(--stagger-blur));
+  transition:
+    opacity var(--stagger-dur) var(--stagger-ease),
+    transform var(--stagger-dur) var(--stagger-ease),
+    filter var(--stagger-dur) var(--stagger-ease);
+  will-change: transform, opacity, filter;
+}
+.t-stagger-line--2 {
+  transition-delay: var(--stagger-stagger);
+}
+.t-stagger.is-shown .t-stagger-line {
+  opacity: 1;
+  transform: translateY(0);
+  filter: blur(0);
+}
+/* The buttons arrive once the words have settled, the way a dashboard's controls appear after it loads. */
+.t-stagger-line.locked-late {
+  transition-delay: var(--duration-very-slow);
+}
+@media (prefers-reduced-motion: reduce) {
+  .t-modal,
+  .t-stagger-line {
+    /* biome-ignore lint/complexity/noImportantStyles: the snippet's reduced-motion guard must beat its own states. */
+    transition: none !important;
+  }
+}
+.locked {
+  width: min(520px, 100%);
+  text-align: center;
+}
+.locked .dialog-actions {
+  justify-content: center;
+}
+.locked-image {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin-bottom: 12px;
+  border: 2px solid var(--ink);
+  border-radius: 4px;
+}
+.locked-image[hidden] {
+  display: none;
+}
+.locked-message {
+  margin-bottom: 8px;
+  white-space: pre-line;
+}
+.locked-time {
+  color: var(--mute);
+  font-family: var(--font-code);
+  font-variant-numeric: tabular-nums;
+}

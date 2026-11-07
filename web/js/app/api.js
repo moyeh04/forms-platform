@@ -8,6 +8,13 @@
   /** The session storage key of the admin PIN, kept for this tab only. */
   var PIN_KEY = 'fp_admin_pin';
 
+  /**
+   * The local storage key of the trusted-device pass the backend gave this
+   * browser after the right PIN. It outlives the tab, so wrong PINs typed
+   * elsewhere do not lock this browser out.
+   */
+  var DEVICE_KEY = 'fp_admin_device';
+
   /** The message when the site was published without the backend URL. */
   var NOT_CONFIGURED =
     'The website is not connected to the backend yet. Set the GitHub ' +
@@ -104,6 +111,32 @@
   }
 
   /**
+   * Reads the trusted-device pass of this browser.
+   *
+   * @return {string} The pass, or '' when there is none or storage is off.
+   */
+  function getDevice() {
+    try {
+      return window.localStorage.getItem(DEVICE_KEY) || '';
+    } catch {
+      return '';
+    }
+  }
+
+  /**
+   * Keeps the trusted-device pass the backend gave this browser.
+   *
+   * @param {string} pass The pass.
+   */
+  function setDevice(pass) {
+    try {
+      if (pass) window.localStorage.setItem(DEVICE_KEY, pass);
+    } catch {
+      /* a browser without storage is counted like any other */
+    }
+  }
+
+  /**
    * Reads the admin PIN kept in this tab.
    *
    * @return {string} The PIN, or ''.
@@ -126,14 +159,19 @@
   }
 
   /**
-   * Makes an admin call, with the PIN kept in this tab.
+   * Makes an admin call, with the PIN kept in this tab and the pass of
+   * this browser.
    *
    * @param {string} action The action.
    * @param {?Object=} extra The other fields of the request.
+   * @param {string=} pin The PIN to send instead of the one kept.
    * @return {!Promise<!Object>} The answer.
    */
-  function admin(action, extra) {
-    var base = { action: action, admin: { pin: getPin() } };
+  function admin(action, extra, pin) {
+    var base = {
+      action: action,
+      admin: { pin: pin ?? getPin(), device: getDevice() }
+    };
     return call(Object.assign(base, extra || {}));
   }
 
@@ -155,6 +193,8 @@
     viewer: viewer,
     getPin: getPin,
     setPin: setPin,
+    getDevice: getDevice,
+    setDevice: setDevice,
     error: apiError
   };
 })(window.App);

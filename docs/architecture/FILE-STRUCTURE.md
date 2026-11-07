@@ -137,7 +137,7 @@ The site is published at the paths it has always had: the pages at the root,
 | `web/index.html` | The page students use. Shows any form from its saved definition (`?f=name`). |
 | `web/admin.html` | The admin dashboard (PIN). |
 | `web/viewer.html` | The read-only instructor and client page (`?t=private-token`). |
-| `web/css/theme.css` | Every colour of the stylesheets, the fonts and the type scale, as named variables. Change the look here; the contrast standard is in its header and enforced by `tests/web/css/theme.test.js`. |
+| `web/css/theme.css` | Every colour of the stylesheets, the fonts, the type scale and the motion tokens (the transitions.dev scale), as named variables. Change the look here; the contrast standard is in its header and enforced by `tests/web/css/theme.test.js`. |
 | `web/css/app/page.css` | The page, its top bar and icon buttons, the sheet, and the footer that names who built it. Every page loads the `app/` files in the order of these rows, so the cascade is the one the single file had. |
 | `web/css/app/route.css` | The route of the steps: the sea, the islands, the treasure island and the ship. |
 | `web/css/app/fields.css` | The title of a step, the fields, the chips of small lists and the team members. |
@@ -166,7 +166,8 @@ The site is published at the paths it has always had: the pages at the root,
 | `web/css/admin/phone-tables.css` | The phone layout of wide tables: one card per row. |
 | `web/css/admin/keys.css` | Client links, the until picker of keys and links, and Download all. |
 | `web/css/admin/progress.css` | Team progress on the dashboard and the instructor page: the board, its phone view, the mark box and the Progress panel. |
-| `web/img/` | The tab icon (`favicon.svg`), PNG sizes for phones and older browsers, and `site.webmanifest`. The pirate and the parrot of the ticket picture (`pirate.webp`, `parrot.webp`), with clear backgrounds; `web/js/form/ticket/` draws the clock and the calendar around them. The pictures of the route: the ship (`ship.svg`), an island (`island.svg`), the treasure chest (`treasure.svg`), the waves (`sea.svg`), the sky by day and by night (`sky-day.svg`, `sky-night.svg`) the sun and moon (`sun.svg`, `moon.svg`) and the red flag of an explored island (`crew-flag.svg`). The arrow of a select (`select-arrow.svg`). They have their own colours; the sea and sky behind them take theirs from the theme. |
+| `web/css/admin/locked.css` | The lock screen: its modal and the reveal of its lines, the picture, the message and the time left. |
+| `web/img/` | The tab icon (`favicon.svg`), PNG sizes for phones and older browsers, and `site.webmanifest`. The pirate and the parrot of the ticket picture (`pirate.webp`, `parrot.webp`), with clear backgrounds; `web/js/form/ticket/` draws the clock and the calendar around them. The pictures of the route: the ship (`ship.svg`), an island (`island.svg`), the treasure chest (`treasure.svg`), the waves (`sea.svg`), the sky by day and by night (`sky-day.svg`, `sky-night.svg`) the sun and moon (`sun.svg`, `moon.svg`) and the red flag of an explored island (`crew-flag.svg`). The arrow of a select (`select-arrow.svg`). The lock screen's picture as base64 text (`locked-image.txt`), fetched only when that screen opens. They have their own colours; the sea and sky behind them take theirs from the theme. |
 | `web/js/config.js` | Source placeholder; `scripts/build/build-site.js` generates its published copy from the Actions `API_URL` variable, with the version of the site. |
 | `web/js/app/fresh.js` | Keeps an open page on the published version: compares the version in `config.js` with `version.json`, reloads an older page when nothing would be lost, and offers **Reload** otherwise. |
 | `web/js/app/api.js` | Sends requests to the backend as plain-text JSON (avoids browser CORS checks). |
@@ -224,6 +225,7 @@ The site is published at the paths it has always had: the pages at the root,
 | `web/js/admin/shell/series.view.js` | The bookings under a registration form and the button that makes the next one. |
 | `web/js/admin/shell/forms-list.view.js` | The forms list, grouped by status. |
 | `web/js/admin/shell/create.view.js` | The page that makes a new form. |
+| `web/js/admin/shell/locked.view.js` | The lock screen the PIN screen opens when the shared lock refuses a PIN, and the time left that counts down. |
 | `web/js/admin/shell/login.view.js` | The PIN screen. |
 | `web/js/admin/shell/router.page.js` | Reads the address, draws the bar and the page it names, and guards unsaved changes. Loaded last of the shell parts. |
 | `web/js/admin/settings/settings.page.js` | The settings page of a form: loads it, places the panels in the Questions, Timetable and Setup tabs, and keeps the open sections. |
@@ -360,7 +362,7 @@ the file name says the role:
 | `backend/platform/security/crypto.js` | Ids, random digits, SHA-256 and the sealing of short digit strings. |
 | `backend/platform/security/properties.js` | Script properties, including the secret pepper of every hash. |
 | `backend/platform/format/text.js` | Turning text into link names and into safe HTML. |
-| `backend/platform/format/time.js` | The current time and date as ISO text, and instants some days away. |
+| `backend/platform/format/time.js` | The current time and date as ISO text, instants some days away, and a length of time as a clock reads it. |
 | `backend/platform/format/json.js` | Copying values and reading JSON text safely. |
 | `backend/platform/config/constants.js` | The name of the app, the registry tab names, and the names of the script properties and cache keys. |
 | `backend/platform/config/access.js` | Who may call an action: the admin, a private link, the holder of a registration key, or anyone. |
@@ -427,8 +429,9 @@ the file name says the role:
 
 | File | What it does |
 |---|---|
-| `backend/features/access/auth/auth.service.js` | The admin PIN: setting it, checking it, and locking out wrong guesses. |
-| `backend/features/access/auth/auth.controller.js` | The admin login action. |
+| `backend/features/access/auth/auth.service.js` | The admin PIN: setting it, checking it, and locking out wrong guesses, counted apart for a trusted device. |
+| `backend/features/access/auth/auth.devices.js` | Trusted devices: making, checking, ending and forgetting the pass of a browser that signed in, and how many days it lasts. |
+| `backend/features/access/auth/auth.controller.js` | The admin login action, which hands out the trusted-device pass. |
 | `backend/features/access/clients/clients.repository.js` | The Clients tab: the private links of instructors and clients. |
 | `backend/features/access/clients/clients.service.js` | A link token, its access key and its end date, and what the admin sees of a link. |
 | `backend/features/access/clients/clients.access.js` | Who may use a link: its token, its key, its end date and the lock-out after wrong keys. |
@@ -462,6 +465,7 @@ the file name says the role:
 | `backend/features/outputs/print/print.controller.js` | The print actions of the admin. |
 | `backend/features/outputs/menu/menu.service.js` | The Forms Platform menu of the registry sheet and what each item does. |
 | `backend/features/outputs/menu/print-dialog.js` | The dialog the print menu items open in the sheet. |
+| `backend/features/outputs/menu/lock-message-dialog.js` | The dialog that sets what the shared admin lock answers. |
 
 ### The web app
 

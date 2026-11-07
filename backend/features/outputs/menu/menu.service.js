@@ -1,7 +1,8 @@
 /**
  * The "Forms Platform" menu inside the registry spreadsheet.
  * Everything an owner needs without touching code: first-time setup,
- * the admin PIN, one-click printing, and unlocking the admin page.
+ * the admin PIN, one-click printing, unlocking the admin page, the
+ * trusted devices of the admin, and what the admin lock answers.
  */
 
 var MenuService = (function () {
@@ -18,6 +19,9 @@ var MenuService = (function () {
       .addItem('Rebuild all views', 'menuRebuildViews')
       .addSeparator()
       .addItem('Unlock the admin page', 'menuUnlockAdmin')
+      .addItem('Set trusted device days...', 'menuSetDeviceDays')
+      .addItem('Forget trusted devices', 'menuForgetDevices')
+      .addItem('Set lock message...', 'menuSetLockMessage')
       .addToUi();
   }
 
@@ -72,6 +76,49 @@ var MenuService = (function () {
           'set a new one with "2. Set admin PIN...".',
         ui.ButtonSet.OK
       );
+  }
+
+  /** Asks how many days a trusted device stays trusted, and saves it. */
+  function menuSetDeviceDays() {
+    var ui = SpreadsheetApp.getUi();
+    var n;
+    var res = ui.prompt(
+      'Trusted device days',
+      'A browser that signed in with the PIN is trusted for this many days: ' +
+        'wrong PINs typed elsewhere do not lock it. Now: ' +
+        AuthDevices.days() +
+        ' days.',
+      ui.ButtonSet.OK_CANCEL
+    );
+    if (res.getSelectedButton() !== ui.Button.OK) return;
+    try {
+      n = AuthDevices.setDays(res.getResponseText());
+      ui.alert(
+        'Done',
+        'Trusted devices now last ' + n + ' days.',
+        ui.ButtonSet.OK
+      );
+    } catch (e) {
+      ui.alert('Not saved', e.message, ui.ButtonSet.OK);
+    }
+  }
+
+  /** Forgets every trusted device; each needs the PIN again. */
+  function menuForgetDevices() {
+    var ui = SpreadsheetApp.getUi();
+    var n = AuthDevices.forgetAll();
+    ui.alert(
+      'Trusted devices forgotten',
+      n +
+        ' device(s) forgotten. Each one is trusted again after the next ' +
+        'sign-in with the PIN. The PIN is the same.',
+      ui.ButtonSet.OK
+    );
+  }
+
+  /** Opens the dialog that sets what the shared admin lock answers. */
+  function menuSetLockMessage() {
+    LockMessageDialog.show();
   }
 
   /** Asks for the address of the forms website and saves it. */
@@ -141,6 +188,9 @@ var MenuService = (function () {
     menuSetPin,
     menuSetSiteUrl,
     menuUnlockAdmin,
+    menuSetDeviceDays,
+    menuForgetDevices,
+    menuSetLockMessage,
     menuPrintReservations,
     menuPrintTeamList,
     menuRebuildViews,

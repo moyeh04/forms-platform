@@ -68,7 +68,7 @@ is silenced on its own line with the reason, and both checks honour it:
 | each `*.repository.js` | The column list of its tab (`FORM_COLS`, `RESPONSE_COLS`, `CLIENT_COLS_`, `TRANSFER_COLS`, `REQUEST_COLS_`) |
 | `responses.repository.js` | `SUBMISSION_STATUSES`, the reference prefix of each form type |
 | `lists.repository.js`, `forms.service.js`, `forms.public.js` | The kind and name of each built-in list, the form fields a patch may change, the ones the public may read |
-| `auth.service.js` | `ADMIN_MAX_FAILS`, `ADMIN_LOCK_SECONDS` |
+| `auth.service.js`, `auth.devices.js` | `ADMIN_MAX_FAILS`, `ADMIN_LOCK_SECONDS`; how long a trusted-device pass lasts by default (`DEFAULT_DAYS_`) and its length |
 | `clients.access.js` | `CLIENT_KEY_TRIES_` |
 | `downloads.jobs.js` | The size, time and file limits of a download job |
 | `keys.controller.js`, `forms.questions.js`, `sheet-views.*.js`, `workbook.js`, `sheet-style.js` | The limits and sizes of their own feature |
@@ -80,6 +80,7 @@ is silenced on its own line with the reason, and both checks honour it:
 | `domain/rules/submission.js` | The longest answer of a short and of a long text field |
 | `domain/form-metadata/*.js` | The longest subject code, how many academic years are offered ahead and back |
 | `web/js/ui/icons.js`, `dialogs.js`, `theme-button.js` | The icon paths, their default size and stroke, the icons a form may use, how long a toast stays |
+| `web/js/admin/shell/locked.view.js` | The milliseconds of a countdown step, where the lock picture is published and how the console shows the lock message |
 | `web/js/i18n/i18n.js` | The storage key of the chosen language |
 | `web/js/app/fresh.js`, `api.js`, `theme.js` | How often an open page checks its version and the shortest gap between checks, the storage keys of the theme, the admin PIN and the tried version |
 | `web/js/form/ticket/*.js` | The colours of the ticket picture, the place and size of each of its shapes (`CALENDAR`, `RING`, `WOOD`, `RIM`, `HAND`, `SLOT`), the degrees of the dial (`DIAL`), the scale and torn edges of the saved image |

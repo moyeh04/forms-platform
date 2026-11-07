@@ -15,6 +15,12 @@ var Constants = (function () {
     REGISTRY_ID: 'REGISTRY_ID',
     ROOT_FOLDER_ID: 'ROOT_FOLDER_ID',
     SITE_URL: 'SITE_URL',
+    /** Followed by the hash of a pass: a device the admin signed in on. */
+    ADMIN_DEVICE_PREFIX: 'admin_device:',
+    /** How many days a trusted-device pass lasts; unset means 30. */
+    ADMIN_DEVICE_DAYS: 'ADMIN_DEVICE_DAYS',
+    /** What the shared admin lock answers; unset means a plain message. */
+    LOCKED_MESSAGE: 'LOCKED_MESSAGE',
     /** Followed by a form id: when the form's sheet views went out of date. */
     DIRTY_PREFIX: 'dirty:'
   });
@@ -22,6 +28,8 @@ var Constants = (function () {
   /** The keys of the script cache. A prefix is followed by an id. */
   var CACHE = Object.freeze({
     ADMIN_FAILS: 'admin_fails',
+    /** Followed by the hash of a pass: the wrong PINs of that device. */
+    ADMIN_DEVICE_FAILS_PREFIX: 'admin_device_fails:',
     BAD_TOKENS: 'bad_tokens',
     VIEWS_BOOKED: 'views_booked',
     /** Followed by a link id: the wrong access keys of the link. */

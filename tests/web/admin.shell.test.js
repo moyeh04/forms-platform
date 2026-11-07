@@ -32,27 +32,69 @@ test(
 );
 
 test(
-  'Login: a lock after wrong tries elsewhere does not sign an open ' +
-    'dashboard out',
+  'Login: a browser that signed in keeps working through a lock made ' +
+    'by wrong tries elsewhere',
   async () => {
     const w = boot();
     w.make('team_registration', 'Projects');
+    const p = await openAdmin(w, '', false);
+    p.type('#pin', '4321');
+    p.submitForm();
+    await settle(10);
+    assert.match(p.win.App.api.getDevice(), /^[0-9a-f]{64}$/);
     for (let i = 0; i < 8; i++)
       w.api({ action: 'admin.login', admin: { pin: '0000' } });
-    const p = await openAdmin(w);
-    assert.ok(
-      p.$('.banner').textContent.includes('Too many wrong PINs'),
-      'the page says to wait'
-    );
-    assert.equal(p.$('#pin'), null, 'and does not ask for the PIN again');
-    assert.equal(p.win.App.api.getPin(), '4321');
-    w.call('unlockAdmin');
     await p.win.App.admin.start();
     await settle(10);
-    assert.ok(
-      p.text().includes('Projects'),
-      'the same window works once the lock is lifted'
+    assert.ok(p.text().includes('Projects'), 'the open dashboard works');
+    p.win.App.api.setPin('');
+    await p.win.App.admin.start();
+    await settle(10);
+    p.type('#pin', '4321');
+    p.submitForm();
+    await settle(10);
+    assert.ok(p.text().includes('Projects'), 'and it can sign in again');
+  }
+);
+
+test(
+  'Login: the PIN that locks the page opens the lock screen, never the ' +
+    'dashboard',
+  async () => {
+    const w = boot();
+    w.make('team_registration', 'Projects');
+    w.call('saveLockMessage', 'Line one\n\nLine two');
+    const p = await openAdmin(w, '', false);
+    const logged = [];
+    p.win.console.log = (...a) => logged.push(a.join(' '));
+    for (let i = 0; i < 8; i++) {
+      p.type('#pin', '0000');
+      p.submitForm();
+      await settle(8);
+    }
+    const box = p.$('.locked');
+    assert.equal(box.getAttribute('role'), 'dialog');
+    assert.equal(p.$('.locked h2').textContent, 'Welcome, funny kid');
+    assert.ok(logged.some((l) => l.includes('Line one\n\nLine two')));
+    p.clickText('Continue to the dashboard');
+    await settle(2);
+    assert.deepEqual(
+      p.$$('.locked p.locked-message').map((x) => x.textContent),
+      ['Line one', 'Line two']
     );
+    assert.match(
+      p.$('.locked-time').textContent,
+      /^Time left 00:(29|30):\d\d$/
+    );
+    assert.deepEqual(
+      p.$$('.locked button').map((b) => b.textContent),
+      ['Sorry', 'Sorry']
+    );
+    assert.equal(p.text().includes('Projects'), false, 'no form is shown');
+    assert.equal(p.$('.admin-nav'), null);
+    p.click(p.$$('.locked button')[1]);
+    assert.equal(p.$('.locked'), null);
+    assert.equal(p.win.document.activeElement, p.$('#pin'));
   }
 );
 

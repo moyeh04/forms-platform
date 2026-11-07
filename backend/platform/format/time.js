@@ -1,8 +1,14 @@
-/** The current time and date as ISO text, and instants some days away. */
+/**
+ * The current time and date as ISO text, instants some days away, and a
+ * length of time as a clock reads it.
+ */
 
 var Time = (function () {
   /** The milliseconds in a day. */
   var DAY_MS_ = 86400000;
+
+  /** Pads a clock part to two digits. */
+  var TWO_DIGITS_ = '00';
 
   /**
    * Gives the current instant.
@@ -50,8 +56,24 @@ var Time = (function () {
     return new Date(fromMs + days * DAY_MS_).toISOString();
   }
 
+  /**
+   * Writes a length of time as a clock reads it.
+   *
+   * @param {number} seconds The time, in whole seconds.
+   * @return {string} The time as `HH:mm:ss`, such as `00:29:58`.
+   */
+  function clockText_(seconds) {
+    var s = Math.max(0, Math.floor(seconds));
+    return [Math.floor(s / 60 / 60), Math.floor(s / 60) % 60, s % 60]
+      .map(function (n) {
+        return (TWO_DIGITS_ + n).slice(-2);
+      })
+      .join(':');
+  }
+
   return {
     nowIso,
+    clockText: clockText_,
     todayIso: todayIso_,
     clockNow: clockNow_,
     isoAfterDays: isoAfterDays_
