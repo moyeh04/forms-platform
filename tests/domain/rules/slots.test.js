@@ -41,3 +41,27 @@ test('Slots: a day before today is over; today and later are not', () => {
   assert.equal(R.isPastDate('2026-11-06', '2026-11-05'), false);
   assert.equal(R.isPastDate('', '2026-11-05'), false, 'no date is not over');
 });
+
+test('Slots: a time of today is past once it starts', () => {
+  const day = {
+    date: '2026-11-07',
+    times: ['12:30 - 12:50', '12:55 - 1:15', '1:20 - 1:40']
+  };
+  assert.deepEqual(R.slotStarts(day.times), [750, 775, 800], 'afternoon');
+  assert.deepEqual(
+    R.slotStarts(['9:00 - 9:20', '11:40 - 12:00', '12:00 - 12:20']),
+    [540, 700, 720],
+    'a morning that runs past noon'
+  );
+  const at = (time) => ({ date: '2026-11-07', time });
+  assert.equal(R.isPastSlot(day, '12:30 - 12:50', at('12:30')), true);
+  assert.equal(R.isPastSlot(day, '12:55 - 1:15', at('12:30')), false);
+  assert.equal(R.isPastSlot(day, '1:20 - 1:40', at('13:19')), false);
+  assert.equal(R.isPastDay(day, at('13:19')), false);
+  assert.equal(R.isPastDay(day, at('13:20')), true);
+  assert.equal(
+    R.isPastSlot(day, '12:30 - 12:50', { date: '2026-11-06', time: '23:00' }),
+    false,
+    'a later day is open'
+  );
+});

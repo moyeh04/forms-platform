@@ -16,6 +16,12 @@
   /** A time of day as typed: H:MM or HH:MM. */
   var CLOCK_TIME = /^(\d{1,2}):(\d{2})$/;
 
+  /** The first hour of the university day: 8 to 11 is the morning. */
+  var MORNING_HOUR = 8;
+
+  /** The start of a slot such as "12:55 - 1:15": its hour and minutes. */
+  var SLOT_START = /^\s*(\d{1,2}):(\d{2})/;
+
   /** A date as stored: YYYY-MM-DD. */
   var ISO_DATE = /^(\d{4})-(\d{2})-(\d{2})$/;
 
@@ -199,6 +205,81 @@
   }
 
   /**
+   * Reads the first slot of a day on a 24-hour clock. The times are written
+   * on a 12-hour clock without am or pm, so 8 to 11 is the morning and 12
+   * to 7 the afternoon, as the university day runs; an hour of 0 or above
+   * 12 is already on a 24-hour clock.
+   *
+   * @param {number} hour The hour, as written.
+   * @param {number} minutes The minutes after the hour.
+   * @return {number} The minutes after midnight.
+   */
+  function firstStart(hour, minutes) {
+    var afternoon = hour === CLOCK_HOURS || (hour > 0 && hour < MORNING_HOUR);
+    return (
+      (hour + (afternoon && hour < CLOCK_HOURS ? CLOCK_HOURS : 0)) *
+        MINUTES_PER_HOUR +
+      minutes
+    );
+  }
+
+  /**
+   * Gives the start of each time of a day as minutes after midnight. A time
+   * comes after the one before it, so "12:55 - 1:15" then "1:20 - 1:40"
+   * starts at 12:55 and 13:20.
+   *
+   * @param {!Array<string>} times The times of the day, in order.
+   * @return {!Array<number>} The starts, NaN for a time with no clock time.
+   */
+  function slotStarts(times) {
+    var prev = NaN;
+    return times.map(function (time) {
+      var m = SLOT_START.exec(String(time));
+      if (!m) return NaN;
+      var hour = +m[1];
+      var minutes = +m[2];
+      var at = firstStart(hour, minutes);
+      if (!Number.isNaN(prev) && hour <= CLOCK_HOURS) {
+        at = (hour % CLOCK_HOURS) * MINUTES_PER_HOUR + minutes;
+        while (at < prev) at += CLOCK_HOURS * MINUTES_PER_HOUR;
+      }
+      prev = at;
+      return at;
+    });
+  }
+
+  /**
+   * Says whether a slot can no longer be booked: its day is over, or it is
+   * today and its time has started.
+   *
+   * @param {!Object} day The day, with its `date` and `times`.
+   * @param {string} time The time of the slot.
+   * @param {{date: string, time: string}} now Today as YYYY-MM-DD and the
+   *     time as HH:MM, in the time zone of the students.
+   * @return {boolean} True when the slot is past.
+   */
+  function isPastSlot(day, time, now) {
+    if (isPastDate(day.date, now.date)) return true;
+    if (day.date !== now.date) return false;
+    var times = day.times || [];
+    var start = slotStarts(times)[times.indexOf(time)];
+    return start <= toMinutes(now.time);
+  }
+
+  /**
+   * Says whether every time of a day is past, so the whole day is shut.
+   *
+   * @param {!Object} day The day, with its `date` and `times`.
+   * @param {{date: string, time: string}} now As isPastSlot takes it.
+   * @return {boolean} True when no time of the day is left.
+   */
+  function isPastDay(day, now) {
+    return (day.times || []).every(function (time) {
+      return isPastSlot(day, time, now);
+    });
+  }
+
+  /**
    * Checks a chosen slot against the days and times of the form.
    *
    * @param {!Object} field The slot field.
@@ -229,6 +310,9 @@
     dayLabel: dayLabel,
     shiftDate: shiftDate,
     isPastDate: isPastDate,
+    slotStarts: slotStarts,
+    isPastSlot: isPastSlot,
+    isPastDay: isPastDay,
     validateSlot: validateSlot
   };
   if (node) module.exports = api;

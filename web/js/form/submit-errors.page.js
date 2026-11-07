@@ -1,7 +1,7 @@
 /**
  * What the student page does with each error the server gives back when a
  * registration is sent: the answers it refused, a registration that exists,
- * members of other teams, a slot that was taken or whose day is over, a
+ * members of other teams, a slot that was taken or whose time is over, a
  * form that closed.
  */
 (function (App) {
@@ -205,9 +205,8 @@
   }
 
   /**
-   * Shows that the slot was taken meanwhile, or that its day is over, with
-   * the slots read again and the time cleared; a day that is over is
-   * cleared too.
+   * Shows that the slot was taken meanwhile, or that its time is over, with
+   * the slots read again and the time cleared.
    *
    * @param {string} code `slot_taken` or `slot_past`.
    * @return {!Promise<void>} Settles when the page is drawn.
@@ -216,9 +215,8 @@
     await P.refreshAvailability();
     var sf = P.slotField();
     var picked = (sf && S.data[sf.id]) || {};
-    var day = code === 'slot_past' ? '' : picked.day;
     if (sf) {
-      S.data[sf.id] = { day: day, time: '' };
+      S.data[sf.id] = { day: picked.day, time: '' };
       S.errors = {};
       S.errors[sf.id] = { error: code };
       S.stepIndex = P.stepOfPath(sf.id);

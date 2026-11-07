@@ -240,7 +240,7 @@
       transfer_heir: 'Choose who leads the team after this student.',
       transfer_email: 'Write the email of the new leader.',
       slot_taken: 'That time was just taken. Pick another.',
-      slot_past: 'That day is over. Pick another.',
+      slot_past: 'That time is over. Pick another.',
       form_full: 'This form is full.',
       already_booked:
         'Your team already has a booking. Open it with your key to change ' +

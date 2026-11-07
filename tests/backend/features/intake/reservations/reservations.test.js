@@ -319,3 +319,10 @@ test('Booking: a day that is over is refused; a booking on it stays', () => {
   assert.equal(edit(sun(0)).ok, true, 'the slot it holds is kept');
   assert.equal(edit(sun(2)).error.code, 'slot_past');
 });
+
+test('Booking: a time of today is refused once it has started', () => {
+  const w = boot();
+  w.setNow('2027-11-14T10:40:00Z');
+  assert.equal(w.book('4230001', sun(0)).error.code, 'slot_past', '12:30');
+  assert.equal(w.book('4230001', sun(1)).ok, true, '12:55 is still open');
+});
