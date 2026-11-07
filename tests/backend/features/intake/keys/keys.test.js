@@ -79,6 +79,17 @@ test(
   }
 );
 
+test('Key: keys sent at the same time are counted one by one', () => {
+  const w = boot();
+  const r = w.submit(team());
+  const wrong = r.key === '00000' ? '11111' : '00000';
+  const lookup = (key) => w.api({ action: 'lookup', slug: w.form.slug, key });
+  for (let i = 0; i < 9; i++) lookup(wrong);
+  // Another request fills the count just as this one is checked.
+  w.beforeLock = () => lookup(wrong);
+  assert.equal(lookup(r.key).error?.code, 'too_many_attempts');
+});
+
 test('Key: expires after the configured number of days', () => {
   const w = boot();
   const r = w.submit(team());

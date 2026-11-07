@@ -145,7 +145,8 @@ flowchart LR
   tries, checks the guess and writes the count back under the script lock
   (`Lock.withLock`). Without it, guesses sent at the same moment all read the
   same count, so a burst could try many more than the limit. Throttled now: the
-  admin PIN, the viewer link token and the link's access key.
+  admin PIN, the viewer link token, the link's access key and
+  the student edit key.
 - **Key throttling is per form.** After ten wrong keys in a minute on one form,
   every key lookup on that form answers `too_many_attempts` until the minute
   ends, also for a student with the right key.
