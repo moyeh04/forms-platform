@@ -45,3 +45,19 @@ const list = [5, 6];
 `;
   assert.deepEqual(problems(source), []);
 });
+
+test('Number check: an error message never spells out a time', () => {
+  const source = `
+ApiError.fail('locked', 'Wait 30 minutes, ' + 'or 2 hours.');
+ApiError.fail('locked', 'Try again later.', { seconds: left });
+ApiError.fail('key_locked', 'Wait ten minutes, or a minute.');
+ApiError.fail('gone', \`Kept for \${n} days.\`);
+toast('Kept for 30 days.');
+`;
+  assert.deepEqual(problems(source), [
+    '2 the error message gives a time ("30 minutes"); send it in details',
+    '2 the error message gives a time ("2 hours"); send it in details',
+    '4 the error message gives a time ("ten minutes"); send it in details',
+    '4 the error message gives a time ("a minute"); send it in details'
+  ]);
+});

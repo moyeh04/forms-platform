@@ -5,6 +5,11 @@
  * named in CONSTANT_CASE: by its variable, by its property, or by a constant
  * object or array it sits in. The numbers Biome allows (0, 1, 2, 10, 24, 60
  * and their negatives) are allowed here too.
+ *
+ * It also refuses a time written into an error message (`Wait 30 minutes`,
+ * `Wait ten minutes`), as the rule `error-times`:
+ * the message would repeat a constant the code can change, and a page could
+ * not count it down. The time goes in the details instead.
  */
 const walk = require('acorn-walk');
 const { select, read } = require('../lib/files.js');
@@ -13,6 +18,55 @@ const { parse } = require('../lib/parse.js');
 const CONSTANT = /^[A-Z][A-Z0-9_]*$/;
 const IGNORE = 'biome-ignore lint/style/noMagicNumbers';
 const CONTAINERS = ['ObjectExpression', 'ArrayExpression', 'Property'];
+const TIME_AMOUNT =
+  '\\d+|an?|one|two|three|four|five|six|seven|eight|nine|ten|fifteen|' +
+  'twenty|thirty|sixty';
+const TIME_TEXT = new RegExp(
+  `\\b(?:${TIME_AMOUNT}) ?(?:second|minute|hour|day|week)s?\\b`,
+  'gi'
+);
+
+/**
+ * Says whether a call is `ApiError.fail(...)`.
+ *
+ * @param {!Object} node A call expression.
+ * @return {boolean} True for the call that sends an error to the page.
+ */
+function isErrorCall(node) {
+  const callee = node.callee;
+  return (
+    callee?.type === 'MemberExpression' &&
+    callee.object.name === 'ApiError' &&
+    callee.property.name === 'fail'
+  );
+}
+
+/**
+ * Finds the times spelled out in the message of an error call.
+ *
+ * @param {string} file The path of the file.
+ * @param {!Object} call The `ApiError.fail` call.
+ * @return {!Array<!Object>} One finding for each time.
+ */
+function timesInMessage(file, call) {
+  const out = [];
+  if (!call.arguments[1]) return out;
+  walk.full(call.arguments[1], (node) => {
+    const text =
+      node.type === 'TemplateElement' ? node.value.cooked : node.value;
+    if (typeof text !== 'string') return;
+    for (const m of text.matchAll(TIME_TEXT)) {
+      out.push({
+        file,
+        line: node.loc.start.line,
+        rule: 'error-times',
+        message:
+          `the error message gives a time ("${m[0]}"); ` + 'send it in details'
+      });
+    }
+  });
+  return out;
+}
 
 /**
  * Gives the name a node declares or assigns to, when it has one.
@@ -90,6 +144,9 @@ function checkSource(file, source, allowed) {
   const ignored = ignoredLines(comments);
   const out = [];
   walk.fullAncestor(ast, (node, _state, ancestors) => {
+    if (node.type === 'CallExpression' && isErrorCall(node)) {
+      out.push(...timesInMessage(file, node));
+    }
     if (typeof node.value !== 'number' || node.type !== 'Literal') return;
     if (allowed.includes(node.value)) return;
     const holders = holdersOf(ancestors);
