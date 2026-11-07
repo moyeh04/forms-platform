@@ -39,7 +39,7 @@ Who may call an action is decided by the secret the request carries:
 | None | | | |
 | Edit key (5 digits) | `key` | `findByKey_` | 10 a minute for each form |
 | Private link | `token`, and `accessKey` when the link has one | the router, with `requireClient_` | 30 wrong tokens a minute; 5 wrong access keys lock that link for 10 minutes |
-| Admin PIN | `admin.pin` | the router, with `requireAdmin` | 8 wrong PINs lock the dashboard for 10 minutes |
+| Admin PIN | `admin.pin` | the router, with `requireAdmin` | 8 wrong PINs lock the dashboard for 30 minutes; the answer carries the seconds left |
 
 ## Anyone (no secret)
 

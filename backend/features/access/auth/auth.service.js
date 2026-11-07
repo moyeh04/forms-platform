@@ -10,10 +10,13 @@ var AuthService = (function () {
   var ADMIN_MAX_FAILS = 8;
 
   /** How long the wrong tries are remembered, and so the lock lasts. */
-  var ADMIN_LOCK_SECONDS = 600;
+  var ADMIN_LOCK_SECONDS = 1800;
 
   /** The shortest PIN the admin may set. */
   var MIN_PIN_LENGTH_ = 4;
+
+  /** The milliseconds in a second. */
+  var MS_PER_SECOND_ = 1000;
 
   /**
    * Hashes a PIN with the secret pepper.
@@ -38,14 +41,63 @@ var AuthService = (function () {
   }
 
   /**
-   * Reads how many wrong PINs a counter holds.
+   * Reads a counter of wrong PINs. It is kept as `count|untilMs`: the cache
+   * cannot say when an entry ends, so the counter carries that instant.
    *
    * @param {!CacheService.Cache} cache The script cache.
    * @param {string} key The counter.
-   * @return {number} The wrong tries remembered now.
+   * @return {{count: number, untilMs: number}} The wrong tries remembered
+   *     now, and when they are forgotten.
    */
-  function failCount_(cache, key) {
-    return parseInt(cache.get(key) || '0', 10);
+  function readFails_(cache, key) {
+    var parts = (cache.get(key) || '0').split('|');
+    return { count: parseInt(parts[0], 10), untilMs: Number(parts[1]) || 0 };
+  }
+
+  /**
+   * Counts one more wrong PIN, which starts the lock time again.
+   *
+   * @param {!CacheService.Cache} cache The script cache.
+   * @param {string} key The counter.
+   * @param {number} count The wrong tries, this one included.
+   * @return {{count: number, untilMs: number}} The counter as stored.
+   */
+  function countFail_(cache, key, count) {
+    var untilMs = Date.now() + ADMIN_LOCK_SECONDS * MS_PER_SECOND_;
+    cache.put(key, count + '|' + untilMs, ADMIN_LOCK_SECONDS);
+    return { count, untilMs };
+  }
+
+  /**
+   * Refuses a request because its counter is full. The details carry the
+   * time left, so the page counts it down and a script reads it.
+   *
+   * @param {?string} device The hash of the request's known pass, or null.
+   * @param {number} untilMs When the counter is forgotten.
+   * @throws {ApiError} `device_locked` for a trusted device, else `locked`.
+   */
+  function failLocked_(device, untilMs) {
+    var seconds = Math.max(
+      0,
+      Math.ceil((untilMs - Date.now()) / MS_PER_SECOND_)
+    );
+    var details = { seconds, until: new Date(untilMs).toISOString() };
+    var left = Time.clockText(seconds);
+    if (device) {
+      ApiError.fail(
+        'device_locked',
+        'Too many wrong PINs on this device. Try again in ' +
+          left +
+          ', or unlock the admin page from the Forms Platform menu in the ' +
+          'sheet.',
+        details
+      );
+    }
+    ApiError.fail(
+      'locked',
+      'Too many wrong PINs. Try again in ' + left + '.',
+      details
+    );
   }
 
   /**
@@ -78,7 +130,7 @@ var AuthService = (function () {
     var cache = CacheService.getScriptCache();
     var keys = [failKey_(null)].concat(AuthDevices.hashes().map(failKey_));
     var locked = keys.some(function (k) {
-      return failCount_(cache, k) >= ADMIN_MAX_FAILS;
+      return readFails_(cache, k).count >= ADMIN_MAX_FAILS;
     });
     keys.forEach(function (k) {
       cache.remove(k);
@@ -88,8 +140,8 @@ var AuthService = (function () {
 
   /**
    * Lets a request through only with the admin PIN. A wrong PIN counts
-   * toward the lock of its counter, and the right one forgets the wrong
-   * tries.
+   * toward the lock of its counter, and the one that fills it is already
+   * refused as locked; the right PIN forgets the wrong tries.
    *
    * The count is read, checked and written under the script lock, so PINs
    * sent at the same time are counted one after another: a burst of
@@ -125,24 +177,12 @@ var AuthService = (function () {
     var device = AuthDevices.known(req?.admin?.device);
     var key = failKey_(device);
     var cache = CacheService.getScriptCache();
-    var fails = failCount_(cache, key);
-    if (fails >= ADMIN_MAX_FAILS && device) {
-      ApiError.fail(
-        'device_locked',
-        'Too many wrong PINs on this device. Wait ten minutes, or unlock ' +
-          'the admin page from the Forms Platform menu in the sheet.'
-      );
-    }
-    if (fails >= ADMIN_MAX_FAILS) {
-      ApiError.fail(
-        'locked',
-        'Too many wrong PINs. Wait ten minutes, or unlock the admin page ' +
-          'from the Forms Platform menu in the sheet.'
-      );
-    }
+    var fails = readFails_(cache, key);
+    if (fails.count >= ADMIN_MAX_FAILS) failLocked_(device, fails.untilMs);
     var pin = req?.admin?.pin;
     if (!pin || pinHash_(pin) !== stored) {
-      cache.put(key, String(fails + 1), ADMIN_LOCK_SECONDS);
+      fails = countFail_(cache, key, fails.count + 1);
+      if (fails.count >= ADMIN_MAX_FAILS) failLocked_(device, fails.untilMs);
       ApiError.fail('bad_pin', 'That PIN is not correct.');
     }
     cache.remove(key);

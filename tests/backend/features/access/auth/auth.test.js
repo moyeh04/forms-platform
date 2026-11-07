@@ -2,6 +2,8 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const { createWorld } = require('../../../../harness/appsscript-mock.js');
 
+const MINUTE = 1 / 1440;
+
 function boot() {
   const w = createWorld();
   w.call('setup');
@@ -18,13 +20,30 @@ function wrongTries(w, n, device) {
   return codes;
 }
 
-test('Admin: wrong PIN is rejected and repeated guesses lock out', () => {
+test('Admin: the 8th wrong PIN locks every browser for 30 minutes', () => {
   const w = boot();
   assert.equal(w.login('4321').ok, true);
-  assert.deepEqual(wrongTries(w, 8), Array(8).fill('bad_pin'));
-  assert.equal(w.login('4321').error.code, 'locked');
-  w.advanceDays(1);
+  const codes = wrongTries(w, 8);
+  assert.deepEqual(codes.slice(0, 7), Array(7).fill('bad_pin'));
+  assert.equal(codes[7], 'locked', 'the try that fills the count is refused');
+  const locked = w.login('4321').error;
+  assert.equal(locked.code, 'locked', 'the right PIN waits too');
+  assert.equal(locked.details.seconds, 30 * 60, 'the time left comes too');
+  assert.match(locked.message, /00:30:00/);
+  w.advanceDays(29 * MINUTE);
+  const later = w.login('4321').error;
+  assert.equal(later.code, 'locked');
+  assert.equal(later.details.seconds, 60, 'and counts down');
+  assert.match(later.message, /00:01:00/);
+  w.advanceDays(2 * MINUTE);
   assert.equal(w.login('4321').ok, true);
+});
+
+test('Admin: wrong PINs more than 30 minutes apart do not add up', () => {
+  const w = boot();
+  wrongTries(w, 7);
+  w.advanceDays(31 * MINUTE);
+  assert.equal(wrongTries(w, 1)[0], 'bad_pin');
 });
 
 test('Admin: unlocking from the sheet menu lifts every lock', () => {
@@ -33,12 +52,6 @@ test('Admin: unlocking from the sheet menu lifts every lock', () => {
   assert.equal(w.call('unlockAdmin'), false, 'nothing to unlock');
   wrongTries(w, 8);
   wrongTries(w, 8, pass);
-  const locked = w.login('4321').error;
-  assert.equal(locked.code, 'locked');
-  assert.match(
-    locked.message,
-    /unlock the admin page from the Forms Platform menu/
-  );
   assert.equal(w.call('unlockAdmin'), true);
   assert.equal(w.login('4321').ok, true);
   assert.equal(w.login('4321', pass).ok, true);
@@ -75,10 +88,11 @@ test('Admin: a signed-in device is counted apart from strangers', () => {
     'locked',
     'a made-up pass counts as a stranger'
   );
-  wrongTries(w, 8, pass);
-  const own = w.login('4321', pass).error;
-  assert.equal(own.code, 'device_locked', 'its own wrong PINs lock only it');
-  assert.match(own.message, /on this device/);
+  const own = wrongTries(w, 8, pass);
+  assert.equal(own[7], 'device_locked', 'its own wrong PINs lock only it');
+  const own8 = w.login('4321', pass).error;
+  assert.match(own8.message, /on this device/);
+  assert.equal(own8.details.seconds, 30 * 60);
 });
 
 test('Admin: a pass ends after the days set, and can be forgotten', () => {
