@@ -38,13 +38,37 @@
   }
 
   /**
+   * Gives today on the student's own clock, as the dates of the days are
+   * written.
+   *
+   * @return {string} Today, as YYYY-MM-DD.
+   */
+  function today() {
+    var d = new Date();
+    var mm = String(d.getMonth() + 1).padStart(2, '0');
+    var dd = String(d.getDate()).padStart(2, '0');
+    return d.getFullYear() + '-' + mm + '-' + dd;
+  }
+
+  /**
+   * Says whether a day is over, so it can no longer be booked.
+   *
+   * @param {!Object} d The day.
+   * @return {boolean} True when its date is before today.
+   */
+  function isPast(d) {
+    return Rules.isPastDate(d.date, today());
+  }
+
+  /**
    * Counts the places a day still has, so a student sees a full day before
-   * choosing it.
+   * choosing it; a day that is over has none.
    *
    * @param {!Object} d The day.
    * @return {number} The places left.
    */
   function dayRoom(d) {
+    if (isPast(d)) return 0;
     return d.times.reduce(function (n, tm) {
       return n + roomIn(d.id, tm);
     }, 0);
@@ -67,7 +91,7 @@
 
   /**
    * Makes the chip of a time. The time the student holds stays open even
-   * when it is full.
+   * when it is full or its day is over.
    *
    * @param {!Object} day The day.
    * @param {string} tm The time.
@@ -77,7 +101,7 @@
    */
   function timeChip(day, tm, cur, choose) {
     var room = roomIn(day.id, tm);
-    var taken = !room && cur.time !== tm;
+    var taken = (!room || isPast(day)) && cur.time !== tm;
     var slots = S.form.slots || {};
     return h(
       'button',
@@ -180,6 +204,7 @@
         days: days,
         cur: cur,
         roomOf: dayRoom,
+        isPast: isPast,
         choose: choose,
         view: wrap.calendarView
       }),

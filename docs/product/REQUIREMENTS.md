@@ -67,6 +67,7 @@ step needs the real Google services (see "What could not be tested here").
 | A booking that may be cancelled may also move to another time, without cancelling first; picking another time names the time given up, which anyone can then book | Done |
 | Booking with a registration key: a reservation can take the 5-digit key of a team registration form, show the team to confirm, and ask only for the slot; the same key opens the booking, moves it to another slot and cancels it (a new key is given only when another booking of that form already holds the same digits) | Done |
 | Warning when a timetable change leaves existing bookings without a slot | Done |
+| A day that is over (before today) cannot be booked: the calendar crosses it out as **Not available** and the server refuses it; a booking already on it stays editable | Done |
 
 ## Sheets, dashboards, and printing
 | Requirement | Status |

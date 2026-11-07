@@ -138,9 +138,10 @@
 
   /**
    * Draws a booking day the student can pick, with the places it has
-   * left; a full day cannot be picked unless it is the one picked.
+   * left; a full day, or one that is over, cannot be picked unless it is
+   * the one picked.
    *
-   * @param {!Object} c The calendar: `cur`, `roomOf`, `choose`.
+   * @param {!Object} c The calendar: `cur`, `roomOf`, `isPast`, `choose`.
    * @param {!Object} day The day.
    * @param {string} text The number of the date.
    * @return {!Element} The button.
@@ -149,6 +150,7 @@
     var left = c.roomOf(day);
     var picked = c.cur.day === day.id;
     var note = left ? t('slotsLeft', { n: left }) : t('slotFull');
+    if (c.isPast(day)) note = t('slotPast');
     return h(
       'button',
       {
@@ -292,7 +294,8 @@
    *
    * @param {!Object} o `days` of the form, `cur` the slot picked now,
    *     `roomOf(day)` the places a day has left, `choose(slot)` keeps a
-   *     pick, and `view`, an object kept between draws that holds the
+   *     pick, `isPast(day)` says the day is over (its places are then 0),
+   *     and `view`, an object kept between draws that holds the
    *     month shown.
    * @return {!Element} The days.
    */
