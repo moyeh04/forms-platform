@@ -744,7 +744,10 @@ function createWorld(options = {}) {
             timeZone: tz,
             year: 'numeric',
             month: '2-digit',
-            day: '2-digit'
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            hourCycle: 'h23'
           })
             .formatToParts(date)
             .map((x) => [x.type, x.value])
@@ -752,7 +755,9 @@ function createWorld(options = {}) {
         return pattern
           .replace('yyyy', p.year)
           .replace('MM', p.month)
-          .replace('dd', p.day);
+          .replace('dd', p.day)
+          .replace('HH', p.hour)
+          .replace('mm', p.minute);
       },
       newBlob: (data, type, name) => new MockBlob(toBuf(data), type, name),
       zip: (blobs, name) => zipOf(blobs, name),

@@ -27,6 +27,19 @@ var Time = (function () {
   }
 
   /**
+   * Gives the time of day in the time zone of the script.
+   *
+   * @return {string} The time as `HH:mm`, on a 24-hour clock.
+   */
+  function clockNow_() {
+    return Utilities.formatDate(
+      new Date(),
+      Session.getScriptTimeZone(),
+      'HH:mm'
+    );
+  }
+
+  /**
    * Gives the instant some whole days after another.
    *
    * @param {number} fromMs The first instant, in milliseconds.
@@ -37,5 +50,10 @@ var Time = (function () {
     return new Date(fromMs + days * DAY_MS_).toISOString();
   }
 
-  return { nowIso, todayIso: todayIso_, isoAfterDays: isoAfterDays_ };
+  return {
+    nowIso,
+    todayIso: todayIso_,
+    clockNow: clockNow_,
+    isoAfterDays: isoAfterDays_
+  };
 })();

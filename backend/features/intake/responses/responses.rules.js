@@ -87,22 +87,24 @@ var ResponsesRules = (function () {
   }
 
   /**
-   * Refuses a slot on a day that is over, unless it is the slot the
-   * booking already holds, so an old booking can still be edited.
+   * Refuses a slot whose day is over or whose time has started, unless it
+   * is the slot the booking already holds, so an old booking can still be
+   * edited.
    *
    * @param {!Object} form The form.
    * @param {string} key The slot picked, as `day|time`.
-   * @param {string} dayId The day picked.
+   * @param {!Object} pick The slot picked, as `{day, time}`.
    * @param {string} own The slot the booking holds now, or ''.
    * @throws {ApiError} `slot_past`.
    */
-  function checkPast_(form, key, dayId, own) {
+  function checkPast_(form, key, pick, own) {
     if (key === own) return;
     var day = (form.slots?.days || []).filter(function (d) {
-      return d.id === dayId;
+      return d.id === pick.day;
     })[0];
-    if (day && Rules.isPastDate(day.date, Time.todayIso()))
-      ApiError.fail('slot_past', 'That day is over. Pick another.', {
+    var now = { date: Time.todayIso(), time: Time.clockNow() };
+    if (day && Rules.isPastSlot(day, pick.time, now))
+      ApiError.fail('slot_past', 'That time is over. Pick another.', {
         slot: key
       });
   }
@@ -120,7 +122,7 @@ var ResponsesRules = (function () {
     var slotField = Rules.fieldByRole(form, 'slot');
     if (!slotField || !data[slotField.id]) return;
     var key = Rules.slotKey(data[slotField.id].day, data[slotField.id].time);
-    checkPast_(form, key, data[slotField.id].day, own);
+    checkPast_(form, key, data[slotField.id], own);
     var counts = {};
     others.forEach(function (r) {
       if (r.slot) counts[r.slot] = (counts[r.slot] || 0) + 1;
