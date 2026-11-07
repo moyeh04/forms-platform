@@ -463,6 +463,7 @@ the file name says the role:
 | `backend/features/outputs/print/print.controller.js` | The print actions of the admin. |
 | `backend/features/outputs/menu/menu.service.js` | The Forms Platform menu of the registry sheet and what each item does. |
 | `backend/features/outputs/menu/print-dialog.js` | The dialog the print menu items open in the sheet. |
+| `backend/features/outputs/menu/lock-message-dialog.js` | The dialog that sets what the shared admin lock answers. |
 
 ### The web app
 

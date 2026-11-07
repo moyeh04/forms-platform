@@ -39,6 +39,27 @@ test('Admin: the 8th wrong PIN locks every browser for 30 minutes', () => {
   assert.equal(w.login('4321').ok, true);
 });
 
+test('Admin: the shared lock answers the message set from the sheet', () => {
+  const w = boot();
+  wrongTries(w, 8);
+  assert.match(w.login('4321').error.message, /^Too many wrong PINs/);
+  assert.equal(w.call('saveLockMessage', 'One\r\n\r\nTwo  '), true);
+  const locked = w.login('4321').error;
+  assert.equal(locked.message, 'One\n\nTwo', 'kept as typed, trimmed');
+  assert.equal(locked.details.seconds > 0, true, 'the time left still comes');
+  assert.equal(w.call('AuthService.lockMessage'), 'One\n\nTwo');
+  assert.equal(w.call('saveLockMessage', '   '), false);
+  assert.match(w.login('4321').error.message, /^Too many wrong PINs/);
+});
+
+test('Admin: the lock message dialog escapes what it shows', () => {
+  const w = boot();
+  w.call('saveLockMessage', '</textarea><b>hi</b>');
+  const html = w.call('LockMessageDialog.dialogHtml');
+  assert.ok(html.includes('&lt;/textarea&gt;&lt;b&gt;hi&lt;/b&gt;'));
+  assert.equal(html.includes('<b>hi</b>'), false);
+});
+
 test('Admin: wrong PINs more than 30 minutes apart do not add up', () => {
   const w = boot();
   wrongTries(w, 7);

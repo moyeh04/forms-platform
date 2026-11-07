@@ -66,6 +66,8 @@ test(
       'menuUnlockAdmin',
       'menuSetDeviceDays',
       'menuForgetDevices',
+      'menuSetLockMessage',
+      'saveLockMessage',
       'menuPrintReservations',
       'menuPrintTeamList',
       'menuRebuildViews',

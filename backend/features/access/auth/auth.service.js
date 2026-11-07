@@ -19,6 +19,38 @@ var AuthService = (function () {
   var MS_PER_SECOND_ = 1000;
 
   /**
+   * Reads the message set from the sheet menu, kept in a script property so
+   * it lives with the owner and not in the source.
+   *
+   * @return {string} The message, or '' when none is set.
+   */
+  function lockMessage() {
+    return Properties.getProp(Constants.PROPS.LOCKED_MESSAGE) || '';
+  }
+
+  /**
+   * Sets what the shared lock answers, from the sheet menu. Only a stranger
+   * meets it: the admin's own browser holds a pass and is counted apart.
+   * Empty goes back to the plain message, which gives the time left.
+   *
+   * @param {*} text The message; paragraphs are separated by an empty line.
+   * @return {boolean} True when a message of its own is set.
+   */
+  function setLockMessage(text) {
+    var t = String(text ?? '')
+      .replace(/\r\n?/g, '\n')
+      .trim();
+    if (!t) {
+      PropertiesService.getScriptProperties().deleteProperty(
+        Constants.PROPS.LOCKED_MESSAGE
+      );
+      return false;
+    }
+    Properties.setProp(Constants.PROPS.LOCKED_MESSAGE, t);
+    return true;
+  }
+
+  /**
    * Hashes a PIN with the secret pepper.
    *
    * @param {*} pin The PIN.
@@ -95,7 +127,7 @@ var AuthService = (function () {
     }
     ApiError.fail(
       'locked',
-      'Too many wrong PINs. Try again in ' + left + '.',
+      lockMessage() || 'Too many wrong PINs. Try again in ' + left + '.',
       details
     );
   }
@@ -189,5 +221,12 @@ var AuthService = (function () {
     return true;
   }
 
-  return { requireAdmin, setAdminPin, unlockAdmin, pinHash: pinHash_ };
+  return {
+    requireAdmin,
+    setAdminPin,
+    unlockAdmin,
+    lockMessage,
+    setLockMessage,
+    pinHash: pinHash_
+  };
 })();

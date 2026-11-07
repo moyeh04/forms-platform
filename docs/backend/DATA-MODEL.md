@@ -272,6 +272,7 @@ Stored by Apps Script itself, not in any sheet:
 | `ROOT_FOLDER_ID` | The `Forms Platform` Drive folder |
 | `SITE_URL` | Your website address, used in emails |
 | `ADMIN_DEVICE_DAYS` | How many days a trusted-device pass lasts, set from the sheet menu. Unset means 30 |
+| `LOCKED_MESSAGE` | What the shared admin lock answers, set with **Set lock message...** in the sheet menu. Unset means a plain sentence with the time left |
 | `admin_device:<pass hash>` | When a trusted-device pass was made. The hash is `sha256(pepper + ':device:' + pass)`. Ended passes are removed when they are next shown or a new one is made |
 | `dirty:<form id>` | The time of the last change whose sheet views are not repainted yet. The booked run of `processDirtyViews` clears it |
 

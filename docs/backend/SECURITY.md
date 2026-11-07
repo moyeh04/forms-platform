@@ -184,7 +184,12 @@ flowchart LR
   never lock a browser that already signed in.
 - **The lock's answer.** `locked` and `device_locked` carry the time left
   in `details` (`seconds`, and `until` as an ISO instant), read from the
-  counter itself, so the page can count it down to the second.
+  counter itself, so the page can count it down to the second. The text of
+  `locked` is the owner's, set with **Set lock message...** in the sheet
+  menu and kept in the `LOCKED_MESSAGE` script property, never in the
+  source; unset, it is a plain sentence with the time left. Only a stranger
+  meets it, since the admin's own browser holds a pass. It names no data and
+  opens nothing.
 
 ## Honest weak spots
 

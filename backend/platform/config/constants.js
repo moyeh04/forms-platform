@@ -19,6 +19,8 @@ var Constants = (function () {
     ADMIN_DEVICE_PREFIX: 'admin_device:',
     /** How many days a trusted-device pass lasts; unset means 30. */
     ADMIN_DEVICE_DAYS: 'ADMIN_DEVICE_DAYS',
+    /** What the shared admin lock answers; unset means a plain message. */
+    LOCKED_MESSAGE: 'LOCKED_MESSAGE',
     /** Followed by a form id: when the form's sheet views went out of date. */
     DIRTY_PREFIX: 'dirty:'
   });

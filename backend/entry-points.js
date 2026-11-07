@@ -84,6 +84,23 @@ function menuForgetDevices() {
 }
 
 /**
+ * Menu item: opens the dialog that sets what the admin lock answers.
+ */
+function menuSetLockMessage() {
+  MenuService.menuSetLockMessage();
+}
+
+/**
+ * Called by the lock message dialog: saves the text, or clears it.
+ *
+ * @param {string} text The message; empty means the plain one.
+ * @return {boolean} True when a message of its own is set.
+ */
+function saveLockMessage(text) {
+  return AuthService.setLockMessage(text);
+}
+
+/**
  * Menu item: asks for the website address used in emails.
  */
 function menuSetSiteUrl() {

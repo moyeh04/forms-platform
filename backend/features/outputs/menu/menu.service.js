@@ -1,8 +1,8 @@
 /**
  * The "Forms Platform" menu inside the registry spreadsheet.
  * Everything an owner needs without touching code: first-time setup,
- * the admin PIN, one-click printing, unlocking the admin page, and the
- * trusted devices of the admin.
+ * the admin PIN, one-click printing, unlocking the admin page, the
+ * trusted devices of the admin, and what the admin lock answers.
  */
 
 var MenuService = (function () {
@@ -21,6 +21,7 @@ var MenuService = (function () {
       .addItem('Unlock the admin page', 'menuUnlockAdmin')
       .addItem('Set trusted device days...', 'menuSetDeviceDays')
       .addItem('Forget trusted devices', 'menuForgetDevices')
+      .addItem('Set lock message...', 'menuSetLockMessage')
       .addToUi();
   }
 
@@ -115,6 +116,11 @@ var MenuService = (function () {
     );
   }
 
+  /** Opens the dialog that sets what the shared admin lock answers. */
+  function menuSetLockMessage() {
+    LockMessageDialog.show();
+  }
+
   /** Asks for the address of the forms website and saves it. */
   function menuSetSiteUrl() {
     var ui = SpreadsheetApp.getUi();
@@ -184,6 +190,7 @@ var MenuService = (function () {
     menuUnlockAdmin,
     menuSetDeviceDays,
     menuForgetDevices,
+    menuSetLockMessage,
     menuPrintReservations,
     menuPrintTeamList,
     menuRebuildViews,
