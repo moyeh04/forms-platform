@@ -4,7 +4,7 @@
  * also gives `redraw` and `paintFoot`.
  */
 (function (App) {
-  'use strict';
+  "use strict";
 
   var A = App.admin;
   var L = A.lists;
@@ -24,19 +24,19 @@
   function chip(dr, key, v) {
     var d = dr.d;
     return h(
-      'button',
+      "button",
       {
-        type: 'button',
-        class: 'toggle-chip sm',
-        name: 'group-' + key + '-' + v,
-        'aria-pressed': d[key] === v ? 'true' : 'false',
+        type: "button",
+        class: "toggle-chip sm",
+        name: "group-" + key + "-" + v,
+        "aria-pressed": d[key] === v ? "true" : "false",
         onclick: function () {
-          if (key === 'letter') d.typing = false;
-          d[key] = d[key] === v ? '' : v;
-          dr.redraw('group-' + key + '-' + v);
-        }
+          if (key === "letter") d.typing = false;
+          d[key] = d[key] === v ? "" : v;
+          dr.redraw("group-" + key + "-" + v);
+        },
       },
-      v
+      v,
     );
   }
 
@@ -49,16 +49,16 @@
   function letterField(dr) {
     var d = dr.d;
     return h(
-      'label',
-      { class: 'sec-new' },
-      h('span', { class: 'tool-label' }, 'New letter'),
-      h('input', {
-        class: 'input sec-letter',
-        name: 'group-letter-new',
+      "label",
+      { class: "sec-new" },
+      h("span", { class: "tool-label" }, "New letter"),
+      h("input", {
+        class: "input sec-letter",
+        name: "group-letter-new",
         maxlength: String(LETTER_LETTERS),
-        placeholder: 'M',
-        'aria-label': 'New department letter',
-        autocomplete: 'off',
+        placeholder: "M",
+        "aria-label": "New department letter",
+        autocomplete: "off",
         value: d.letter,
         oninput: function (e) {
           d.letter = L.cleanCode(e.target.value, LETTER_LETTERS);
@@ -66,12 +66,12 @@
           dr.paintFoot();
         },
         onkeydown: function (e) {
-          if (e.key !== 'Enter') return;
+          if (e.key !== "Enter") return;
           e.preventDefault();
-          var first = dr.card.querySelector('.stepper-input');
+          var first = dr.card.querySelector(".stepper-input");
           if (first?.focus) first.focus();
-        }
-      })
+        },
+      }),
     );
   }
 
@@ -84,18 +84,18 @@
   function letterBox(dr) {
     if (dr.d.typing) return letterField(dr);
     return h(
-      'button',
+      "button",
       {
-        type: 'button',
-        class: 'toggle-chip sm add',
-        name: 'group-letter-add',
+        type: "button",
+        class: "toggle-chip sm add",
+        name: "group-letter-add",
         onclick: function () {
-          dr.d.letter = '';
+          dr.d.letter = "";
           dr.d.typing = true;
-          dr.redraw('group-letter-new');
-        }
+          dr.redraw("group-letter-new");
+        },
       },
-      '+ New letter'
+      "+ New letter",
     );
   }
 
@@ -108,10 +108,10 @@
    */
   function pickRow(label, chips) {
     return h(
-      'div',
-      { class: 'sec-pick' },
-      h('span', { class: 'label' }, label),
-      h('div', { class: 'toggle-chips' }, chips)
+      "div",
+      { class: "sec-pick" },
+      h("span", { class: "label" }, label),
+      h("div", { class: "toggle-chips" }, chips),
     );
   }
 
@@ -126,16 +126,14 @@
   L.draftPicks = function (dr, parts) {
     var d = dr.d;
     var letters = parts.letters.concat(
-      d.typing || !d.letter || parts.letters.indexOf(d.letter) !== -1
-        ? []
-        : [d.letter]
+      d.typing || !d.letter || parts.letters.indexOf(d.letter) !== -1 ? [] : [d.letter],
     );
     return [
-      pickRow('Year', parts.years.map(chip.bind(null, dr, 'year'))),
+      pickRow("Year", parts.years.map(chip.bind(null, dr, "year"))),
       pickRow(
-        'Department letter',
-        letters.map(chip.bind(null, dr, 'letter')).concat(letterBox(dr))
-      )
+        "Department letter",
+        letters.map(chip.bind(null, dr, "letter")).concat(letterBox(dr)),
+      ),
     ];
   };
 })(window.App);

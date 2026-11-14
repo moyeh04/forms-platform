@@ -6,8 +6,8 @@
  * line above it that says why it exists or why it runs when it does
  * ([DOCUMENTATION.md](../../../docs/standards/DOCUMENTATION.md)).
  */
-const path = require('node:path');
-const { select, read } = require('../lib/files.js');
+const path = require("node:path");
+const { select, read } = require("../lib/files.js");
 
 /** A job of a workflow: a key indented one level under `jobs:`. */
 const JOB = /^ {2}([\w-]+):\s*$/;
@@ -19,7 +19,7 @@ const JOB = /^ {2}([\w-]+):\s*$/;
  * @return {boolean} True for a `#` comment.
  */
 function isComment(line) {
-  return Boolean(line?.trim().startsWith('#'));
+  return Boolean(line?.trim().startsWith("#"));
 }
 
 /**
@@ -31,7 +31,7 @@ function isComment(line) {
  * @return {!Object} The finding.
  */
 function finding(file, line, message) {
-  return { file, line, rule: 'comments', message };
+  return { file, line, rule: "comments", message };
 }
 
 /**
@@ -42,15 +42,9 @@ function finding(file, line, message) {
  * @return {!Array<!Object>} A finding when it has no header comment.
  */
 function checkShell(file, lines) {
-  const first = lines[0].startsWith('#!') ? 1 : 0;
-  if (isComment(lines[first]) && !lines[first].startsWith('#!')) return [];
-  return [
-    finding(
-      file,
-      first + 1,
-      'no comment saying what the script does and when it runs'
-    )
-  ];
+  const first = lines[0].startsWith("#!") ? 1 : 0;
+  if (isComment(lines[first]) && !lines[first].startsWith("#!")) return [];
+  return [finding(file, first + 1, "no comment saying what the script does and when it runs")];
 }
 
 /**
@@ -63,13 +57,11 @@ function checkShell(file, lines) {
 function checkWorkflow(file, lines) {
   const out = [];
   if (!isComment(lines[0])) {
-    out.push(
-      finding(file, 1, 'no comment saying what the workflow runs and when')
-    );
+    out.push(finding(file, 1, "no comment saying what the workflow runs and when"));
   }
   let inJobs = false;
   lines.forEach((line, i) => {
-    if (/^\S/.test(line)) inJobs = line.startsWith('jobs:');
+    if (/^\S/.test(line)) inJobs = line.startsWith("jobs:");
     const job = inJobs && JOB.exec(line);
     if (job && !isComment(lines[i - 1])) {
       const why = `job ${job[1]} has no comment saying why it runs`;
@@ -87,9 +79,9 @@ function checkWorkflow(file, lines) {
  * @return {!Array<!Object>} One finding for each missing comment.
  */
 function checkSource(file, source) {
-  const lines = source.split('\n');
+  const lines = source.split("\n");
   const ext = path.extname(file);
-  if (ext === '.yml' || ext === '.yaml') return checkWorkflow(file, lines);
+  if (ext === ".yml" || ext === ".yaml") return checkWorkflow(file, lines);
   return checkShell(file, lines);
 }
 
@@ -102,9 +94,7 @@ function checkSource(file, source) {
  * @return {!Array<!Object>} One finding for each missing comment.
  */
 function check(root, files, config) {
-  return select(files, config.comments).flatMap((file) =>
-    checkSource(file, read(root, file))
-  );
+  return select(files, config.comments).flatMap((file) => checkSource(file, read(root, file)));
 }
 
 module.exports = { check, checkSource };

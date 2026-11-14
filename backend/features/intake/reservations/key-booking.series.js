@@ -37,7 +37,7 @@ var KeyBookingSeries = (function () {
    */
   function nextTitle_(title) {
     var m = /^(.*?)(\d+)(\D*)$/.exec(String(title));
-    return m ? m[1] + (parseInt(m[2], 10) + 1) + m[3] : String(title) + ' 2';
+    return m ? m[1] + (parseInt(m[2], 10) + 1) + m[3] : String(title) + " 2";
   }
 
   /**
@@ -67,19 +67,19 @@ var KeyBookingSeries = (function () {
       return {
         label: nextDayLabel_(d, date),
         date: date,
-        times: d.times.slice()
+        times: d.times.slice(),
       };
     });
     return SlotsRules.normalizeSlots({
       days: days,
       capacity: slots?.capacity,
-      pattern: slots?.pattern
+      pattern: slots?.pattern,
     });
   }
 
   return {
     bookingsOf: bookingsOf_,
     nextTitle: nextTitle_,
-    nextWeekSlots: nextWeekSlots_
+    nextWeekSlots: nextWeekSlots_,
   };
 })();

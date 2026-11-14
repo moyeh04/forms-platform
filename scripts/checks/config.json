@@ -15,23 +15,19 @@
       "extensions": [".js"]
     }
   },
-  "biome": {
-    "include": [
-      "web/js/",
-      "web/css/",
-      "backend/",
-      "domain/",
-      "scripts/",
-      "tests/",
-      "package.json",
-      "biome.json"
-    ],
-    "extensions": [".js", ".css", ".json"],
+  "oxfmt": {
+    "include": [""],
+    "extensions": [".js", ".mjs", ".json", ".css", ".html", ".md", ".yml", ".yaml"],
+    "exclude": ["tests/fixtures/", "pnpm-lock.yaml"]
+  },
+  "oxlint": {
+    "include": ["web/js/", "backend/", "domain/", "scripts/", "tests/"],
+    "extensions": [".js"],
     "exclude": ["tests/fixtures/"]
   },
+  "stylelint": { "include": ["web/css/"], "extensions": [".css"] },
   "lines": {
-    "limit": 80,
-    "byExtension": { ".css": 120 },
+    "limit": 100,
     "include": [
       "web/",
       "backend/",
@@ -40,11 +36,13 @@
       "tests/",
       ".githooks/",
       ".github/",
-      "biome.json",
+      ".oxlintrc.json",
+      ".oxfmtrc.json",
+      "stylelint.config.mjs",
       "package.json"
     ],
     "extensions": [".js", ".css", ".html", ".sh", ".yml", ".json", ""],
-    "exclude": ["tests/fixtures/", "package-lock.json"]
+    "exclude": ["tests/fixtures/", "pnpm-lock.yaml"]
   },
   "jsdoc": {
     "include": ["web/js/", "backend/", "domain/", "scripts/"],
@@ -115,11 +113,15 @@
     "root": [
       "README.md",
       "package.json",
-      "package-lock.json",
-      "biome.json",
+      "pnpm-lock.yaml",
+      "pnpm-workspace.yaml",
+      ".oxfmtrc.json",
+      ".oxlintrc.json",
+      "stylelint.config.mjs",
       ".gitignore",
       ".git-blame-ignore-revs",
       ".githooks",
+      ".vscode",
       ".github",
       "backend",
       "web",
@@ -146,14 +148,7 @@
     },
     "fileStructure": "docs/architecture/FILE-STRUCTURE.md",
     "documented": {
-      "include": [
-        "web/js/",
-        "web/css/",
-        "backend/",
-        "domain/",
-        "scripts/",
-        ".githooks/"
-      ],
+      "include": ["web/js/", "web/css/", "backend/", "domain/", "scripts/", ".githooks/"],
       "extensions": [".js", ".css", ".sh", ""]
     },
     "siteMap": "scripts/build/site-map.js",

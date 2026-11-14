@@ -3,9 +3,9 @@
  * Arabic names, English-only titles and email addresses.
  */
 (function (root) {
-  'use strict';
+  "use strict";
 
-  var node = typeof module === 'object' && module.exports;
+  var node = typeof module === "object" && module.exports;
 
   /** The Arabic diacritics and the tatweel, removed without a word. */
   var DIACRITICS = /[ً-ٰٟـ]/g;
@@ -21,16 +21,16 @@
 
   /** Each Arabic-Indic digit and the Latin digit it stands for. */
   var ARABIC_DIGITS = {
-    '٠': '0',
-    '١': '1',
-    '٢': '2',
-    '٣': '3',
-    '٤': '4',
-    '٥': '5',
-    '٦': '6',
-    '٧': '7',
-    '٨': '8',
-    '٩': '9'
+    "٠": "0",
+    "١": "1",
+    "٢": "2",
+    "٣": "3",
+    "٤": "4",
+    "٥": "5",
+    "٦": "6",
+    "٧": "7",
+    "٨": "8",
+    "٩": "9",
   };
 
   /** The parts an Arabic name needs when the field does not say. */
@@ -58,7 +58,7 @@
    * @return {string} The text with Latin digits.
    */
   function latinDigits(s) {
-    return String(s == null ? '' : s).replace(/[٠-٩]/g, function (d) {
+    return String(s == null ? "" : s).replace(/[٠-٩]/g, function (d) {
       return ARABIC_DIGITS[d];
     });
   }
@@ -74,7 +74,7 @@
     return (
       v === undefined ||
       v === null ||
-      (typeof v === 'string' && v.trim() === '') ||
+      (typeof v === "string" && v.trim() === "") ||
       (Array.isArray(v) && v.length === 0)
     );
   }
@@ -86,8 +86,8 @@
    * @return {string} The squashed text.
    */
   function squash(s) {
-    return String(s == null ? '' : s)
-      .replace(/\s+/g, ' ')
+    return String(s == null ? "" : s)
+      .replace(/\s+/g, " ")
       .trim();
   }
 
@@ -102,10 +102,10 @@
    *     whether something other than diacritics was taken out.
    */
   function cleanArabicName(raw, final) {
-    var s = String(raw == null ? '' : raw).replace(DIACRITICS, '');
-    var cleaned = s.replace(NOT_ARABIC_LETTER_OR_SPACE, '');
+    var s = String(raw == null ? "" : raw).replace(DIACRITICS, "");
+    var cleaned = s.replace(NOT_ARABIC_LETTER_OR_SPACE, "");
     var blocked = cleaned.length !== s.length;
-    cleaned = cleaned.replace(/^\s+/, '').replace(/\s+/g, ' ');
+    cleaned = cleaned.replace(/^\s+/, "").replace(/\s+/g, " ");
     if (final) cleaned = cleaned.trim();
     return { value: cleaned, blocked: blocked };
   }
@@ -119,7 +119,7 @@
    */
   function arabicNameParts(value, minPartLength) {
     var min = minPartLength || MIN_PART_LENGTH;
-    return String(value || '')
+    return String(value || "")
       .trim()
       .split(/\s+/)
       .filter(function (p) {
@@ -139,17 +139,17 @@
     var o = opts || {};
     var minParts = o.minParts == null ? MIN_NAME_PARTS : o.minParts;
     var c = cleanArabicName(raw, true);
-    if (isEmpty(raw)) return { ok: false, error: 'required' };
-    if (c.blocked) return { ok: false, error: 'arabic_only' };
-    if (!c.value) return { ok: false, error: 'required' };
+    if (isEmpty(raw)) return { ok: false, error: "required" };
+    if (c.blocked) return { ok: false, error: "arabic_only" };
+    if (!c.value) return { ok: false, error: "required" };
     if (arabicNameParts(c.value) < minParts) {
-      return { ok: false, error: 'arabic_parts', params: { min: minParts } };
+      return { ok: false, error: "arabic_parts", params: { min: minParts } };
     }
     if (c.value.length > MAX_NAME_LENGTH) {
       return {
         ok: false,
-        error: 'too_long',
-        params: { max: MAX_NAME_LENGTH }
+        error: "too_long",
+        params: { max: MAX_NAME_LENGTH },
       };
     }
     return { ok: true, value: c.value };
@@ -167,15 +167,15 @@
   function validateEnglishText(raw, opts) {
     var o = opts || {};
     var v = squash(raw);
-    if (!v) return { ok: false, error: 'required' };
-    if (HAS_ARABIC.test(v)) return { ok: false, error: 'english_only' };
+    if (!v) return { ok: false, error: "required" };
+    if (HAS_ARABIC.test(v)) return { ok: false, error: "english_only" };
     var min = o.min || MIN_TEXT_LENGTH;
     var max = o.max || MAX_TEXT_LENGTH;
     if (v.length < min) {
-      return { ok: false, error: 'too_short', params: { min: min } };
+      return { ok: false, error: "too_short", params: { min: min } };
     }
     if (v.length > max) {
-      return { ok: false, error: 'too_long', params: { max: max } };
+      return { ok: false, error: "too_long", params: { max: max } };
     }
     return { ok: true, value: v };
   }
@@ -188,9 +188,9 @@
    */
   function validateEmail(raw) {
     var v = squash(raw).toLowerCase();
-    if (!v) return { ok: false, error: 'required' };
+    if (!v) return { ok: false, error: "required" };
     if (v.length > MAX_EMAIL_LENGTH || !EMAIL.test(v)) {
-      return { ok: false, error: 'invalid_email' };
+      return { ok: false, error: "invalid_email" };
     }
     return { ok: true, value: v };
   }
@@ -203,8 +203,8 @@
     arabicNameParts: arabicNameParts,
     validateArabicName: validateArabicName,
     validateEnglishText: validateEnglishText,
-    validateEmail: validateEmail
+    validateEmail: validateEmail,
   };
   if (node) module.exports = api;
   root.RulesText = api;
-})(typeof globalThis !== 'undefined' ? globalThis : this);
+})(typeof globalThis !== "undefined" ? globalThis : this);

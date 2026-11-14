@@ -13,7 +13,7 @@ function doGet() {
   return ApiError.json({
     ok: true,
     service: Constants.APP.name,
-    version: Constants.APP.version
+    version: Constants.APP.version,
   });
 }
 
@@ -31,7 +31,7 @@ function doPost(e) {
   } catch (err) {
     return ApiError.json({
       ok: false,
-      error: { code: 'bad_json', message: 'The request body must be JSON.' }
+      error: { code: "bad_json", message: "The request body must be JSON." },
     });
   }
   return ApiError.json(Routes.reply(req));

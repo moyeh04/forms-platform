@@ -3,7 +3,7 @@
  * itself, and a confirmation dialog that waits for an answer.
  */
 (function (App) {
-  'use strict';
+  "use strict";
 
   var h = App.ui.h;
 
@@ -16,13 +16,13 @@
    * @return {!Element} The box, read aloud politely by screen readers.
    */
   function toastHost() {
-    var host = document.getElementById('toasts');
+    var host = document.getElementById("toasts");
     if (host) return host;
-    host = h('div', {
-      id: 'toasts',
-      class: 'toasts',
-      role: 'status',
-      'aria-live': 'polite'
+    host = h("div", {
+      id: "toasts",
+      class: "toasts",
+      role: "status",
+      "aria-live": "polite",
     });
     document.body.appendChild(host);
     return host;
@@ -35,11 +35,7 @@
    * @param {string=} kind Its look, such as 'error' or 'success'.
    */
   function toast(message, kind) {
-    var t = h(
-      'div',
-      { class: 'toast' + (kind ? ' toast-' + kind : '') },
-      message
-    );
+    var t = h("div", { class: "toast" + (kind ? " toast-" + kind : "") }, message);
     toastHost().appendChild(t);
     setTimeout(function () {
       if (t.parentNode) t.parentNode.removeChild(t);
@@ -55,27 +51,27 @@
    */
   function dialogButtons(o, done) {
     var yes = h(
-      'button',
+      "button",
       {
-        type: 'button',
-        class: 'btn ' + (o.danger ? 'btn-danger' : 'btn-primary'),
-        name: 'confirm-yes',
+        type: "button",
+        class: "btn " + (o.danger ? "btn-danger" : "btn-primary"),
+        name: "confirm-yes",
         onclick: function () {
           if (!o.ready || o.ready()) done(true);
-        }
+        },
       },
-      o.confirmText || 'OK'
+      o.confirmText || "OK",
     );
     var no = h(
-      'button',
+      "button",
       {
-        type: 'button',
-        class: 'btn btn-quiet',
+        type: "button",
+        class: "btn btn-quiet",
         onclick: function () {
           done(false);
-        }
+        },
       },
-      o.cancelText || 'Cancel'
+      o.cancelText || "Cancel",
     );
     return { yes: yes, no: no };
   }
@@ -90,17 +86,17 @@
    */
   function dialogBox(o, buttons) {
     return h(
-      'div',
+      "div",
       {
-        class: 'dialog',
-        role: 'dialog',
-        'aria-modal': 'true',
-        'aria-label': o.title
+        class: "dialog",
+        role: "dialog",
+        "aria-modal": "true",
+        "aria-label": o.title,
       },
-      h('h2', { class: 'dialog-title' }, o.title),
-      o.body ? h('p', null, o.body) : null,
+      h("h2", { class: "dialog-title" }, o.title),
+      o.body ? h("p", null, o.body) : null,
       o.content || null,
-      h('div', { class: 'dialog-actions' }, buttons.no, buttons.yes)
+      h("div", { class: "dialog-actions" }, buttons.no, buttons.yes),
     );
   }
 
@@ -120,7 +116,7 @@
      * @param {boolean} answer True when confirmed.
      */
     function done(answer) {
-      document.removeEventListener('keydown', onKey);
+      document.removeEventListener("keydown", onKey);
       if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
       resolve(answer);
     }
@@ -131,22 +127,22 @@
      * @param {!KeyboardEvent} e The key pressed.
      */
     function onKey(e) {
-      if (e.key === 'Escape') done(false);
+      if (e.key === "Escape") done(false);
     }
 
     var buttons = dialogButtons(o, done);
     overlay = h(
-      'div',
+      "div",
       {
-        class: 'overlay',
+        class: "overlay",
         onclick: function (e) {
           if (e.target === overlay) done(false);
-        }
+        },
       },
-      dialogBox(o, buttons)
+      dialogBox(o, buttons),
     );
     document.body.appendChild(overlay);
-    document.addEventListener('keydown', onKey);
+    document.addEventListener("keydown", onKey);
     buttons.no.focus();
   }
 

@@ -3,7 +3,7 @@
  * move. Moving a leader first asks who leads the team next.
  */
 (function (App) {
-  'use strict';
+  "use strict";
 
   var A = App.admin;
   var R = A.responses;
@@ -18,9 +18,9 @@
    * @return {string} The reason.
    */
   function emailError(code) {
-    return code === 'required'
-      ? 'Write the email of the new leader.'
-      : 'Enter a valid email address.';
+    return code === "required"
+      ? "Write the email of the new leader."
+      : "Enter a valid email address.";
   }
 
   /**
@@ -32,16 +32,16 @@
    * @return {!Object} The handover control.
    */
   function askNext(form, t) {
-    var emailField = Rules.fieldByRole(form, 'email');
+    var emailField = Rules.fieldByRole(form, "email");
     return App.handover({
       heirs: t.heirs,
       email: emailField && emailField.enabled !== false ? emailField : null,
       words: {
-        who: 'New leader of ' + t.from,
-        email: 'Email of the new leader',
-        choose: 'Choose the new leader.',
-        error: emailError
-      }
+        who: "New leader of " + t.from,
+        email: "Email of the new leader",
+        choose: "Choose the new leader.",
+        error: emailError,
+      },
     });
   }
 
@@ -56,18 +56,14 @@
    */
   function doneText(t, approve, heir, out) {
     var who = t.name || t.code;
-    if (!approve) return 'Rejected. ' + who + ' stays in ' + t.from + '.';
+    if (!approve) return "Rejected. " + who + " stays in " + t.from + ".";
     return (
       who +
-      ' moved to ' +
+      " moved to " +
       t.to +
-      '.' +
-      (heir
-        ? ' ' + (heir.name || heir.code) + ' leads ' + t.from + ' now.'
-        : '') +
-      (out.underMin
-        ? ' ' + t.from + ' is now under the minimum team size.'
-        : '')
+      "." +
+      (heir ? " " + (heir.name || heir.code) + " leads " + t.from + " now." : "") +
+      (out.underMin ? " " + t.from + " is now under the minimum team size." : "")
     );
   }
 
@@ -80,19 +76,19 @@
    */
   function confirmHandover(t, next) {
     return ui.confirm({
-      title: 'Who leads ' + t.from + ' next?',
+      title: "Who leads " + t.from + " next?",
       body:
         (t.name || t.code) +
-        ' leads ' +
+        " leads " +
         t.from +
-        '. Moving them to ' +
+        ". Moving them to " +
         t.to +
-        ' hands that team to one of its members.',
+        " hands that team to one of its members.",
       content: next.node,
       ready: function () {
         return !next.problem();
       },
-      confirmText: 'Hand over and move'
+      confirmText: "Hand over and move",
     });
   }
 
@@ -110,18 +106,18 @@
     var next = approve && t.leader ? askNext(p.form, t) : null;
     if (next && !(await confirmHandover(t, next))) return;
     A.busy(button, async function () {
-      var out = await A.call('admin.transfer.decide', {
+      var out = await A.call("admin.transfer.decide", {
         slug: p.form.slug,
         transfer: t.id,
         approve: approve,
-        handover: next ? next.value() : undefined
+        handover: next ? next.value() : undefined,
       });
       var heir = next
-        ? t.heirs.filter(function (m) {
+        ? t.heirs.find(function (m) {
             return m.code === next.value().leader;
-          })[0]
+          })
         : null;
-      ui.toast(doneText(t, approve, heir, out), 'ok');
+      ui.toast(doneText(t, approve, heir, out), "ok");
       p.reload();
     });
   }
@@ -134,7 +130,7 @@
    * @return {!Element} The part.
    */
   function muted(text, name) {
-    return h('span', { class: 'muted-note', name: name }, text);
+    return h("span", { class: "muted-note", name: name }, text);
   }
 
   /**
@@ -146,24 +142,19 @@
    */
   function requestText(t, alone) {
     return h(
-      'span',
-      { class: 'request-text' },
-      h('strong', { dir: 'auto' }, t.name || t.code),
-      ' ',
-      h('span', { class: 'mono' }, t.code),
-      muted(' from '),
-      h('strong', null, t.from),
+      "span",
+      { class: "request-text" },
+      h("strong", { dir: "auto" }, t.name || t.code),
+      " ",
+      h("span", { class: "mono" }, t.code),
+      muted(" from "),
+      h("strong", null, t.from),
       t.leader
-        ? muted(
-            alone ? ', which they lead alone,' : ', which they lead,',
-            'transfer-leads'
-          )
+        ? muted(alone ? ", which they lead alone," : ", which they lead,", "transfer-leads")
         : null,
-      muted(' to '),
-      h('strong', null, t.to),
-      alone
-        ? muted('. Nobody is left to lead ' + t.from + ', so they cannot move.')
-        : null
+      muted(" to "),
+      h("strong", null, t.to),
+      alone ? muted(". Nobody is left to lead " + t.from + ", so they cannot move.") : null,
     );
   }
 
@@ -178,35 +169,35 @@
   function transferRow(p, t) {
     var alone = t.leader && !t.heirs.length;
     return h(
-      'div',
-      { class: 'request-row', dataset: { transfer: t.id } },
+      "div",
+      { class: "request-row", dataset: { transfer: t.id } },
       requestText(t, alone),
       h(
-        'span',
-        { class: 'actions' },
+        "span",
+        { class: "actions" },
         h(
-          'button',
+          "button",
           {
-            type: 'button',
-            class: 'btn btn-quiet sm',
-            name: 'transfer-reject',
-            onclick: decide.bind(null, p, t, false)
+            type: "button",
+            class: "btn btn-quiet sm",
+            name: "transfer-reject",
+            onclick: decide.bind(null, p, t, false),
           },
-          'Reject'
+          "Reject",
         ),
         alone
           ? null
           : h(
-              'button',
+              "button",
               {
-                type: 'button',
-                class: 'btn btn-primary sm',
-                name: 'transfer-approve',
-                onclick: decide.bind(null, p, t, true)
+                type: "button",
+                class: "btn btn-primary sm",
+                name: "transfer-approve",
+                onclick: decide.bind(null, p, t, true),
               },
-              'Approve and move'
-            )
-      )
+              "Approve and move",
+            ),
+      ),
     );
   }
 
@@ -221,18 +212,18 @@
     if (!n) return [];
     return [
       h(
-        'h3',
+        "h3",
         null,
         n === 1
-          ? 'One student asked for by another team'
-          : n + ' students asked for by another team'
+          ? "One student asked for by another team"
+          : n + " students asked for by another team",
       ),
       h(
-        'p',
-        { class: 'help' },
-        'The leader of the team that holds the student can answer with the' +
-          ' edit key. You can answer here as well; the first answer counts.'
-      )
+        "p",
+        { class: "help" },
+        "The leader of the team that holds the student can answer with the" +
+          " edit key. You can answer here as well; the first answer counts.",
+      ),
     ].concat(p.transfers.map(transferRow.bind(null, p)));
   };
 })(window.App);

@@ -4,7 +4,7 @@
  * the link sees progress, the search, Refresh and Print.
  */
 (function (App) {
-  'use strict';
+  "use strict";
 
   var V = App.viewer;
   var S = V.state;
@@ -25,20 +25,16 @@
    */
   V.select = function (value, options, onchange) {
     return h(
-      'select',
+      "select",
       {
-        class: 'select',
+        class: "select",
         onchange: function (e) {
           onchange(e.target.value);
-        }
+        },
       },
       options.map(function (o) {
-        return h(
-          'option',
-          { value: o[0], selected: String(o[0]) === String(value) },
-          o[1]
-        );
-      })
+        return h("option", { value: o[0], selected: String(o[0]) === String(value) }, o[1]);
+      }),
     );
   };
 
@@ -52,17 +48,17 @@
       S.slug,
       S.me.forms.map(function (f) {
         var caption = FormMetadata.caption(f);
-        return [f.slug, f.title + (caption ? ' (' + caption + ')' : '')];
+        return [f.slug, f.title + (caption ? " (" + caption + ")" : "")];
       }),
       function (v) {
         S.slug = v;
-        S.mode = 'auto';
-        S.dayId = '';
-        S.q = '';
+        S.mode = "auto";
+        S.dayId = "";
+        S.q = "";
         V.reload();
-      }
+      },
     );
-    sel.setAttribute('aria-label', 'Form');
+    sel.setAttribute("aria-label", "Form");
     return sel;
   }
 
@@ -75,19 +71,19 @@
    */
   function modeButton(d, m) {
     return h(
-      'button',
+      "button",
       {
-        type: 'button',
-        class: 'btn sm ' + (S.mode === m[0] ? 'btn-primary' : 'btn-quiet'),
+        type: "button",
+        class: "btn sm " + (S.mode === m[0] ? "btn-primary" : "btn-quiet"),
         dataset: { mode: m[0] },
-        'aria-pressed': S.mode === m[0] ? 'true' : 'false',
+        "aria-pressed": S.mode === m[0] ? "true" : "false",
         onclick: function () {
           S.mode = m[0];
-          if (m[0] === 'day' && !S.dayId && d.days[0]) S.dayId = d.days[0].id;
+          if (m[0] === "day" && !S.dayId && d.days[0]) S.dayId = d.days[0].id;
           V.reload();
-        }
+        },
       },
-      m[1]
+      m[1],
     );
   }
 
@@ -103,13 +99,13 @@
       return x.date;
     });
     var modes = [];
-    if (dated) modes.push(['today', 'Today']);
-    modes.push(['day', 'By day'], ['all', 'All']);
+    if (dated) modes.push(["today", "Today"]);
+    modes.push(["day", "By day"], ["all", "All"]);
     var sel;
     var out = modes.map(function (m) {
       return modeButton(d, m);
     });
-    if (S.mode === 'day') {
+    if (S.mode === "day") {
       sel = V.select(
         S.dayId,
         d.days.map(function (x) {
@@ -118,9 +114,9 @@
         function (v) {
           S.dayId = v;
           V.reload();
-        }
+        },
       );
-      sel.setAttribute('aria-label', 'Day');
+      sel.setAttribute("aria-label", "Day");
       out.push(sel);
     }
     return out;
@@ -137,15 +133,15 @@
    */
   function toolButton(name, glyph, label, onclick) {
     return h(
-      'button',
+      "button",
       {
-        type: 'button',
-        class: 'btn btn-quiet sm',
+        type: "button",
+        class: "btn btn-quiet sm",
         name: name,
-        onclick: onclick
+        onclick: onclick,
       },
       icon(glyph, TOOL_ICON),
-      label
+      label,
     );
   }
 
@@ -158,33 +154,33 @@
   V.toolbar = function (d) {
     var tools = [];
     if (S.me.forms.length > 1) tools.push(formPicker());
-    if (d.kind === 'reservation') tools.push(...reservationTools(d));
+    if (d.kind === "reservation") tools.push(...reservationTools(d));
     if (d.milestones) {
       tools.push(
         App.progress.viewSwitch(S.slug, V.view(), function (v) {
           S.views[S.slug] = v;
           V.render();
-        })
+        }),
       );
     }
     tools.push(
-      h('input', {
-        class: 'input',
-        type: 'search',
-        name: 'search',
-        placeholder: 'Search',
-        'aria-label': 'Search',
+      h("input", {
+        class: "input",
+        type: "search",
+        name: "search",
+        placeholder: "Search",
+        "aria-label": "Search",
         value: S.q,
         oninput: function (e) {
           S.q = e.target.value;
           V.paintBody();
-        }
+        },
       }),
-      toolButton('refresh', 'refresh', 'Refresh', function () {
-        V.reload('Updated');
+      toolButton("refresh", "refresh", "Refresh", function () {
+        V.reload("Updated");
       }),
-      toolButton('print', 'printer', 'Print or save as PDF', V.print)
+      toolButton("print", "printer", "Print or save as PDF", V.print),
     );
-    return h('div', { class: 'toolbar' }, tools);
+    return h("div", { class: "toolbar" }, tools);
   };
 })(window.App);

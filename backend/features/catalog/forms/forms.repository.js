@@ -3,35 +3,35 @@
 var FormsRepository = (function () {
   /** The columns of the Forms tab, in order. */
   var FORM_COLS = [
-    'id',
-    'slug',
-    'type',
-    'title',
-    'term',
-    'status',
-    'opensAt',
-    'closesAt',
-    'sheetId',
-    'sheetUrl',
-    'config',
-    'createdAt',
-    'updatedAt'
+    "id",
+    "slug",
+    "type",
+    "title",
+    "term",
+    "status",
+    "opensAt",
+    "closesAt",
+    "sheetId",
+    "sheetUrl",
+    "config",
+    "createdAt",
+    "updatedAt",
   ];
 
   /** The columns kept as they are; every other setting goes in `config`. */
   var FORM_BASE_ = [
-    'id',
-    'slug',
-    'type',
-    'title',
-    'term',
-    'status',
-    'opensAt',
-    'closesAt',
-    'sheetId',
-    'sheetUrl',
-    'createdAt',
-    'updatedAt'
+    "id",
+    "slug",
+    "type",
+    "title",
+    "term",
+    "status",
+    "opensAt",
+    "closesAt",
+    "sheetId",
+    "sheetUrl",
+    "createdAt",
+    "updatedAt",
   ];
 
   /** The first row of data, under the header. */
@@ -55,7 +55,7 @@ var FormsRepository = (function () {
   function rowToForm_(row) {
     var form = Json.parseJson(row.config, {});
     FORM_BASE_.forEach(function (k) {
-      form[k] = row[k] === undefined ? '' : String(row[k]);
+      form[k] = row[k] === undefined ? "" : String(row[k]);
     });
     Object.assign(form, FormMetadata.read(form));
     TemplateFields.normalizeReservationMembers(form);
@@ -97,9 +97,9 @@ var FormsRepository = (function () {
    * @return {?Object} The form, or null.
    */
   function findForm(slugOrId) {
-    var hit = readForms().filter(function (f) {
+    var hit = readForms().find(function (f) {
       return f.slug === slugOrId || f.id === slugOrId;
-    })[0];
+    });
     return hit || null;
   }
 
@@ -112,7 +112,7 @@ var FormsRepository = (function () {
    */
   function requireForm(slugOrId) {
     var f = findForm(slugOrId);
-    if (!f) ApiError.fail('form_not_found', 'That form does not exist.');
+    if (!f) ApiError.fail("form_not_found", "That form does not exist.");
     return f;
   }
 
@@ -168,6 +168,6 @@ var FormsRepository = (function () {
     findForm,
     requireForm,
     saveForm,
-    deleteForm
+    deleteForm,
   };
 })();

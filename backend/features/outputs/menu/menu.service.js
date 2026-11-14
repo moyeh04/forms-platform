@@ -9,19 +9,19 @@ var MenuService = (function () {
   /** Adds the menu to the spreadsheet when it opens. */
   function onOpen() {
     SpreadsheetApp.getUi()
-      .createMenu('Forms Platform')
-      .addItem('1. First-time setup', 'menuSetup')
-      .addItem('2. Set admin PIN...', 'menuSetPin')
-      .addItem('3. Set website address (for emails)...', 'menuSetSiteUrl')
+      .createMenu("Forms Platform")
+      .addItem("1. First-time setup", "menuSetup")
+      .addItem("2. Set admin PIN...", "menuSetPin")
+      .addItem("3. Set website address (for emails)...", "menuSetSiteUrl")
       .addSeparator()
-      .addItem('Print reservations for a day...', 'menuPrintReservations')
-      .addItem('Print team list...', 'menuPrintTeamList')
-      .addItem('Rebuild all views', 'menuRebuildViews')
+      .addItem("Print reservations for a day...", "menuPrintReservations")
+      .addItem("Print team list...", "menuPrintTeamList")
+      .addItem("Rebuild all views", "menuRebuildViews")
       .addSeparator()
-      .addItem('Unlock the admin page', 'menuUnlockAdmin')
-      .addItem('Set trusted device days...', 'menuSetDeviceDays')
-      .addItem('Forget trusted devices', 'menuForgetDevices')
-      .addItem('Set lock message...', 'menuSetLockMessage')
+      .addItem("Unlock the admin page", "menuUnlockAdmin")
+      .addItem("Set trusted device days...", "menuSetDeviceDays")
+      .addItem("Forget trusted devices", "menuForgetDevices")
+      .addItem("Set lock message...", "menuSetLockMessage")
       .addToUi();
   }
 
@@ -34,10 +34,10 @@ var MenuService = (function () {
     var ui = SpreadsheetApp.getUi();
     var r = RegistrySetup.setup();
     ui.alert(
-      'Setup finished',
-      'The registry is ready. Next, set the admin PIN from the same menu.' +
+      "Setup finished",
+      "The registry is ready. Next, set the admin PIN from the same menu." +
         '\n\nForm files will be saved in your Drive folder "Forms Platform".',
-      ui.ButtonSet.OK
+      ui.ButtonSet.OK,
     );
     return r;
   }
@@ -46,17 +46,16 @@ var MenuService = (function () {
   function menuSetPin() {
     var ui = SpreadsheetApp.getUi();
     var res = ui.prompt(
-      'Admin PIN',
-      'Choose a PIN with at least 4 characters. ' +
-        'You will type it on the admin page.',
-      ui.ButtonSet.OK_CANCEL
+      "Admin PIN",
+      "Choose a PIN with at least 4 characters. You will type it on the admin page.",
+      ui.ButtonSet.OK_CANCEL,
     );
     if (res.getSelectedButton() !== ui.Button.OK) return;
     try {
       AuthService.setAdminPin(res.getResponseText());
-      ui.alert('Done', 'The admin PIN was saved.', ui.ButtonSet.OK);
+      ui.alert("Done", "The admin PIN was saved.", ui.ButtonSet.OK);
     } catch (e) {
-      ui.alert('Not saved', e.message, ui.ButtonSet.OK);
+      ui.alert("Not saved", e.message, ui.ButtonSet.OK);
     }
   }
 
@@ -65,16 +64,16 @@ var MenuService = (function () {
     var ui = SpreadsheetApp.getUi();
     if (AuthService.unlockAdmin())
       ui.alert(
-        'Unlocked',
-        'The admin page takes the PIN again. The PIN is the same.',
-        ui.ButtonSet.OK
+        "Unlocked",
+        "The admin page takes the PIN again. The PIN is the same.",
+        ui.ButtonSet.OK,
       );
     else
       ui.alert(
-        'Not locked',
-        'The admin page was not locked. If the PIN is refused, ' +
+        "Not locked",
+        "The admin page was not locked. If the PIN is refused, " +
           'set a new one with "2. Set admin PIN...".',
-        ui.ButtonSet.OK
+        ui.ButtonSet.OK,
       );
   }
 
@@ -83,23 +82,19 @@ var MenuService = (function () {
     var ui = SpreadsheetApp.getUi();
     var n;
     var res = ui.prompt(
-      'Trusted device days',
-      'A browser that signed in with the PIN is trusted for this many days: ' +
-        'wrong PINs typed elsewhere do not lock it. Now: ' +
+      "Trusted device days",
+      "A browser that signed in with the PIN is trusted for this many days: " +
+        "wrong PINs typed elsewhere do not lock it. Now: " +
         AuthDevices.days() +
-        ' days.',
-      ui.ButtonSet.OK_CANCEL
+        " days.",
+      ui.ButtonSet.OK_CANCEL,
     );
     if (res.getSelectedButton() !== ui.Button.OK) return;
     try {
       n = AuthDevices.setDays(res.getResponseText());
-      ui.alert(
-        'Done',
-        'Trusted devices now last ' + n + ' days.',
-        ui.ButtonSet.OK
-      );
+      ui.alert("Done", "Trusted devices now last " + n + " days.", ui.ButtonSet.OK);
     } catch (e) {
-      ui.alert('Not saved', e.message, ui.ButtonSet.OK);
+      ui.alert("Not saved", e.message, ui.ButtonSet.OK);
     }
   }
 
@@ -108,11 +103,11 @@ var MenuService = (function () {
     var ui = SpreadsheetApp.getUi();
     var n = AuthDevices.forgetAll();
     ui.alert(
-      'Trusted devices forgotten',
+      "Trusted devices forgotten",
       n +
-        ' device(s) forgotten. Each one is trusted again after the next ' +
-        'sign-in with the PIN. The PIN is the same.',
-      ui.ButtonSet.OK
+        " device(s) forgotten. Each one is trusted again after the next " +
+        "sign-in with the PIN. The PIN is the same.",
+      ui.ButtonSet.OK,
     );
   }
 
@@ -125,26 +120,23 @@ var MenuService = (function () {
   function menuSetSiteUrl() {
     var ui = SpreadsheetApp.getUi();
     var res = ui.prompt(
-      'Website address',
-      'Paste the address of your forms website, for example ' +
-        'https://name.github.io/forms. Confirmation emails will link to it.',
-      ui.ButtonSet.OK_CANCEL
+      "Website address",
+      "Paste the address of your forms website, for example " +
+        "https://name.github.io/forms. Confirmation emails will link to it.",
+      ui.ButtonSet.OK_CANCEL,
     );
     if (res.getSelectedButton() !== ui.Button.OK) return;
-    Properties.setProp(
-      Constants.PROPS.SITE_URL,
-      String(res.getResponseText()).trim()
-    );
+    Properties.setProp(Constants.PROPS.SITE_URL, String(res.getResponseText()).trim());
   }
 
   /** Opens the dialog that prints the reservations of a day. */
   function menuPrintReservations() {
-    PrintDialog.showPrintDialog('reservations', 'Print reservations for a day');
+    PrintDialog.showPrintDialog("reservations", "Print reservations for a day");
   }
 
   /** Opens the dialog that prints a team list. */
   function menuPrintTeamList() {
-    PrintDialog.showPrintDialog('teams', 'Print team list');
+    PrintDialog.showPrintDialog("teams", "Print team list");
   }
 
   /**
@@ -159,7 +151,7 @@ var MenuService = (function () {
   function menuPrint(kind, slug, dayId, includeEmpty) {
     var form = FormsRepository.requireForm(slug);
     var printed =
-      kind === 'reservations'
+      kind === "reservations"
         ? PrintService.printReservations(form, dayId, includeEmpty)
         : PrintService.printTeamList(form);
     return PrintService.printResult(form, printed);
@@ -174,11 +166,9 @@ var MenuService = (function () {
       if (SheetViewsScheduler.rebuildViews(f)) n++;
     });
     ui.alert(
-      'Views rebuilt',
-      n +
-        ' form(s) updated. ' +
-        'Every data tab has its header, widths and row tints.',
-      ui.ButtonSet.OK
+      "Views rebuilt",
+      n + " form(s) updated. Every data tab has its header, widths and row tints.",
+      ui.ButtonSet.OK,
     );
   }
 
@@ -194,6 +184,6 @@ var MenuService = (function () {
     menuPrintReservations,
     menuPrintTeamList,
     menuRebuildViews,
-    menuPrint
+    menuPrint,
   };
 })();

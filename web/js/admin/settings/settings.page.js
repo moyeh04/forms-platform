@@ -5,7 +5,7 @@
  * this page loads the form, places the panels and keeps the save bar.
  */
 (function (App) {
-  'use strict';
+  "use strict";
 
   var A = App.admin;
   var ui = App.ui;
@@ -27,24 +27,22 @@
    *     `hasSize`, `hasDrive`, `members`).
    */
   async function load(slug) {
-    var res = await A.call('admin.forms.get', { id: slug });
+    var res = await A.call("admin.forms.get", { id: slug });
     var f = res.form;
-    f.lang = f.lang || { default: 'en', allowSwitch: true };
+    f.lang = f.lang || { default: "en", allowSwitch: true };
     f.rules = f.rules || {};
     return {
       f: f,
       res: res,
       slug: slug,
       metadata: FormMetadata.read(f),
-      hasSize: !!Rules.fieldByRole(f, 'team_size'),
+      hasSize: !!Rules.fieldByRole(f, "team_size"),
       hasDrive: (f.fields || []).some(function (x) {
-        return x.type === 'drive_link';
+        return x.type === "drive_link";
       }),
-      isTeam:
-        f.type === FormType.TEAM_REGISTRATION ||
-        f.type === FormType.TASK_SUBMISSION,
+      isTeam: f.type === FormType.TEAM_REGISTRATION || f.type === FormType.TASK_SUBMISSION,
       isReservation: f.type === FormType.RESERVATION,
-      members: Rules.fieldByRole(f, 'members')
+      members: Rules.fieldByRole(f, "members"),
     };
   }
 
@@ -78,28 +76,28 @@
    */
   function dangerPanel(f) {
     var panel = A.panel(
-      'Delete this form',
-      'The link stops working and the form leaves the dashboard. Its Google' +
-        ' Sheet moves to the Drive trash for 30 days. To stop new' +
-        ' registrations but keep everything, set the status to Closed or' +
-        ' Archived instead.',
+      "Delete this form",
+      "The link stops working and the form leaves the dashboard. Its Google" +
+        " Sheet moves to the Drive trash for 30 days. To stop new" +
+        " registrations but keep everything, set the status to Closed or" +
+        " Archived instead.",
       h(
-        'button',
+        "button",
         {
-          type: 'button',
-          class: 'btn btn-danger',
-          name: 'delete-form',
+          type: "button",
+          class: "btn btn-danger",
+          name: "delete-form",
           onclick: function () {
             A.deleteForm(f, function () {
-              window.location.hash = '#/';
+              window.location.hash = "#/";
             });
-          }
+          },
         },
-        icon('trash', A.ICON_SIZE.LINE),
-        'Delete form'
-      )
+        icon("trash", A.ICON_SIZE.LINE),
+        "Delete form",
+      ),
     );
-    panel.classList.add('danger-zone');
+    panel.classList.add("danger-zone");
     return panel;
   }
 
@@ -112,10 +110,10 @@
     if (s.members) s.teammates = A.teammatesPanel(s);
     s.timetable = A.timetable(s.f, s.res.taken);
     s.timetablePanel = A.panel(
-      'Timetable',
-      'Choose the days, set the hours once, and check the result. Students' +
-        ' see taken slots crossed out.',
-      s.timetable.node
+      "Timetable",
+      "Choose the days, set the hours once, and check the result. Students" +
+        " see taken slots crossed out.",
+      s.timetable.node,
     );
     s.timetablePanel.summary = s.timetable.summary;
   }
@@ -142,25 +140,24 @@
     s.questionsPanel = A.questionsPanel(s);
     if (s.isReservation) reservationPanels(s);
     var review = A.reviewPanel(s);
-    var progress =
-      s.f.type === FormType.TEAM_REGISTRATION ? A.progressPanel(s) : null;
+    var progress = s.f.type === FormType.TEAM_REGISTRATION ? A.progressPanel(s) : null;
     var questions = [s.questionsPanel, size.sizePanel, s.teammates?.panel];
     var setup = [general, who, editKey, emails, limits, size.alertsPanel];
     return [
-      { id: 'questions', label: 'Questions', panels: questions },
+      { id: "questions", label: "Questions", panels: questions },
       s.timetablePanel
         ? {
-            id: 'timetable',
-            label: 'Timetable',
+            id: "timetable",
+            label: "Timetable",
             panels: [s.timetablePanel, keyBooking],
-            alert: noDays.bind(null, s.f)
+            alert: noDays.bind(null, s.f),
           }
         : null,
       {
-        id: 'settings',
-        label: 'Setup',
-        panels: setup.concat([review, progress, dangerPanel(s.f)])
-      }
+        id: "settings",
+        label: "Setup",
+        panels: setup.concat([review, progress, dangerPanel(s.f)]),
+      },
     ].filter(Boolean);
   }
 
@@ -215,16 +212,16 @@
         s.f,
         tab.id,
         function (id) {
-          var next = s.tabs.filter(function (x) {
+          var next = s.tabs.find(function (x) {
             return x.id === id;
-          })[0];
+          });
           if (!next) return false;
-          A.setHash('#/f/' + encodeURIComponent(s.slug) + '/' + id);
+          A.setHash("#/f/" + encodeURIComponent(s.slug) + "/" + id);
           show(s, next);
           return true;
         },
-        alerts
-      )
+        alerts,
+      ),
     );
   }
 
@@ -242,12 +239,12 @@
     mount.appendChild(A.formHead(s.f));
     s.tabs = buildTabs(s);
     placePanels(s);
-    s.tabBar = h('div');
+    s.tabBar = h("div");
     s.show = show.bind(null, s);
     var bar = A.saveBar(s);
     // Controls change the form object in their own handlers; these run
     // after them, as the event reaches the page.
-    ['input', 'change', 'click'].forEach(function (type) {
+    ["input", "change", "click"].forEach(function (type) {
       mount.addEventListener(type, bar.refresh);
     });
     mount.appendChild(s.tabBar);
@@ -256,9 +253,9 @@
     });
     mount.appendChild(bar.node);
     s.show(
-      s.tabs.filter(function (tab) {
+      s.tabs.find(function (tab) {
         return tab.id === startTab;
-      })[0] || s.tabs[s.tabs.length - 1]
+      }) || s.tabs[s.tabs.length - 1],
     );
     bar.refresh();
   };

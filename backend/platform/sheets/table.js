@@ -37,7 +37,7 @@ var Table = (function () {
    */
   function rowValues(cols, obj) {
     return cols.map(function (c) {
-      return obj[c] === undefined || obj[c] === null ? '' : obj[c];
+      return obj[c] === undefined || obj[c] === null ? "" : obj[c];
     });
   }
 
@@ -50,9 +50,7 @@ var Table = (function () {
    * @param {!Object} obj The row as an object.
    */
   function writeRow(sheet, rowIndex, cols, obj) {
-    sheet
-      .getRange(rowIndex, 1, 1, cols.length)
-      .setValues([rowValues(cols, obj)]);
+    sheet.getRange(rowIndex, 1, 1, cols.length).setValues([rowValues(cols, obj)]);
   }
 
   /**
@@ -69,10 +67,7 @@ var Table = (function () {
     if (at > sheet.getMaxRows()) {
       sheet.insertRowsAfter(sheet.getMaxRows(), GROW_ROWS_);
     }
-    sheet
-      .getRange(at, 1, 1, values.length)
-      .setNumberFormat('@')
-      .setValues([values]);
+    sheet.getRange(at, 1, 1, values.length).setNumberFormat("@").setValues([values]);
     return at;
   }
 
@@ -90,7 +85,7 @@ var Table = (function () {
         sheet
           .getRange(1, i + 1)
           .setValue(name)
-          .setFontWeight('bold');
+          .setFontWeight("bold");
     });
   }
 
@@ -106,10 +101,8 @@ var Table = (function () {
   function ensureTab(ss, name, headers) {
     var sh = ss.getSheetByName(name) || ss.insertSheet(name);
     if (sh.getLastRow() === 0)
-      sh.getRange(1, 1, 1, headers.length)
-        .setValues([headers])
-        .setFontWeight('bold');
-    sh.getRange(1, 1, sh.getMaxRows(), headers.length).setNumberFormat('@');
+      sh.getRange(1, 1, 1, headers.length).setValues([headers]).setFontWeight("bold");
+    sh.getRange(1, 1, sh.getMaxRows(), headers.length).setNumberFormat("@");
     sh.setFrozenRows(1);
     return sh;
   }
@@ -120,6 +113,6 @@ var Table = (function () {
     writeRow,
     appendPlain: appendPlain_,
     rowValues,
-    ensureTab
+    ensureTab,
   };
 })();

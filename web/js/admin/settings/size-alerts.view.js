@@ -4,7 +4,7 @@
  * instructor sees them is set on each instructor link.
  */
 (function (App) {
-  'use strict';
+  "use strict";
 
   var ui = App.ui,
     h = ui.h,
@@ -13,15 +13,15 @@
   /** The words of each warning level. */
   var TEXT = {
     critical: {
-      name: 'The critical warning',
-      check: 'Critical warning for very small teams',
-      field: 'Critical when a team has fewer people than'
+      name: "The critical warning",
+      check: "Critical warning for very small teams",
+      field: "Critical when a team has fewer people than",
     },
     warning: {
-      name: 'The warning',
-      check: 'Warning for small teams',
-      field: 'Warning when a team has fewer people than'
-    }
+      name: "The warning",
+      check: "Warning for small teams",
+      field: "Warning when a team has fewer people than",
+    },
   };
 
   /** The levels the rules know, in their order, each with its words. */
@@ -38,7 +38,7 @@
    */
   function sizes(a, b) {
     if (a === b) return String(a);
-    return b === a + 1 ? a + ' or ' + b : a + ' to ' + b;
+    return b === a + 1 ? a + " or " + b : a + " to " + b;
   }
 
   /**
@@ -48,23 +48,16 @@
    * @return {string} The reason.
    */
   function reason(stop) {
-    var level = LEVELS.filter(function (l) {
+    var level = LEVELS.find(function (l) {
       return l.id === stop.level;
-    })[0];
-    if (stop.error === 'order') {
+    });
+    if (stop.error === "order") {
       return (
-        'The warning must be for a higher number than the critical' +
-        ' warning, or no team gets it.'
+        "The warning must be for a higher number than the critical" +
+        " warning, or no team gets it."
       );
     }
-    return (
-      level.name +
-      ' needs a whole number from ' +
-      stop.min +
-      ' to ' +
-      stop.max +
-      '.'
-    );
+    return level.name + " needs a whole number from " + stop.min + " to " + stop.max + ".";
   }
 
   /**
@@ -86,21 +79,16 @@
         paint();
       },
       {
-        name: l.id + 'Below',
-        'aria-describedby': 'size-alert-' + l.id + '-err'
-      }
+        name: l.id + "Below",
+        "aria-describedby": "size-alert-" + l.id + "-err",
+      },
     );
-    var error = h('p', {
-      class: 'error',
-      id: 'size-alert-' + l.id + '-err',
-      role: 'alert'
+    var error = h("p", {
+      class: "error",
+      id: "size-alert-" + l.id + "-err",
+      role: "alert",
     });
-    var sub = h(
-      'div',
-      { class: 'sub-setting' },
-      A.field(l.field, input),
-      error
-    );
+    var sub = h("div", { class: "sub-setting" }, A.field(l.field, input), error);
     var check = A.check(
       l.check,
       alerts[l.id].on,
@@ -108,14 +96,14 @@
         alerts[l.id].on = v;
         paint();
       },
-      { name: l.id + 'Alert' }
+      { name: l.id + "Alert" },
     );
     return {
       id: l.id,
       input: input,
       error: error,
       sub: sub,
-      node: h('div', null, check, sub)
+      node: h("div", null, check, sub),
     };
   }
 
@@ -128,19 +116,19 @@
    *     is on.
    */
   function words(form, alerts) {
-    if (Rules.sizeAlertsProblem(form)) return '';
+    if (Rules.sizeAlertsProblem(form)) return "";
     var from = 1;
     return Rules.sizeAlertLevels(alerts)
       .map(function (x) {
         var text =
-          (x.level === 'critical' ? 'Critical' : 'Warning') +
-          ': teams of ' +
+          (x.level === "critical" ? "Critical" : "Warning") +
+          ": teams of " +
           sizes(from, x.below - 1) +
-          '.';
+          ".";
         from = x.below;
         return text;
       })
-      .join(' ');
+      .join(" ");
   }
 
   /**
@@ -159,7 +147,7 @@
       r.sub.hidden = !alerts[r.id].on;
       r.input.min = String(bounds.min);
       r.input.max = String(bounds.max);
-      r.error.textContent = stop && stop.level === r.id ? reason(stop) : '';
+      r.error.textContent = stop && stop.level === r.id ? reason(stop) : "";
     });
     preview.textContent = words(form, alerts);
     preview.hidden = !preview.textContent;
@@ -173,7 +161,7 @@
    */
   function problemOf(form) {
     var stop = Rules.sizeAlertsProblem(form);
-    return stop ? reason(stop) : '';
+    return stop ? reason(stop) : "";
   }
 
   /**
@@ -185,8 +173,8 @@
   function summaryOf(form) {
     var alerts = form.rules.sizeAlerts;
     return Rules.sizeAlertLevels(alerts).length
-      ? words(form, alerts) || 'A number needs fixing'
-      : 'Off';
+      ? words(form, alerts) || "A number needs fixing"
+      : "Off";
   }
 
   /**
@@ -201,10 +189,10 @@
   A.sizeAlerts = function (form) {
     var alerts = Rules.sizeAlerts(form);
     form.rules.sizeAlerts = alerts;
-    var preview = h('p', {
-      class: 'muted-note',
-      name: 'size-alerts-preview',
-      'aria-live': 'polite'
+    var preview = h("p", {
+      class: "muted-note",
+      name: "size-alerts-preview",
+      "aria-live": "polite",
     });
     var rows = LEVELS.map(function (l) {
       return alertRow(alerts, l, paint);
@@ -218,16 +206,16 @@
 
     return {
       node: h(
-        'div',
-        { class: 'size-alert-settings' },
+        "div",
+        { class: "size-alert-settings" },
         rows.map(function (r) {
           return r.node;
         }),
-        preview
+        preview,
       ),
       refresh: paint,
       problem: problemOf.bind(null, form),
-      summary: summaryOf.bind(null, form)
+      summary: summaryOf.bind(null, form),
     };
   };
 })(window.App);

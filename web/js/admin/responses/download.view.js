@@ -6,7 +6,7 @@
  * is still open.
  */
 (function (App) {
-  'use strict';
+  "use strict";
 
   var A = App.admin;
   var R = A.responses;
@@ -23,19 +23,19 @@
    */
   function startRow(d, text, withIcon) {
     return h(
-      'div',
-      { class: 'actions' },
+      "div",
+      { class: "actions" },
       h(
-        'button',
+        "button",
         {
-          type: 'button',
-          class: 'btn btn-primary',
-          name: 'download-start',
-          onclick: d.run
+          type: "button",
+          class: "btn btn-primary",
+          name: "download-start",
+          onclick: d.run,
         },
-        withIcon ? ui.icon('download', A.ICON_SIZE.LINE) : null,
-        text
-      )
+        withIcon ? ui.icon("download", A.ICON_SIZE.LINE) : null,
+        text,
+      ),
     );
   }
 
@@ -48,28 +48,28 @@
     ui.clear(d.body);
     d.body.appendChild(
       h(
-        'p',
+        "p",
         null,
         d.tasks
           ? "Every team's task file is saved, and Teams.xlsx lists the teams" +
-              ' with a link from each task to its file. Google Slides come as' +
-              ' PowerPoint.'
+              " with a link from each task to its file. Google Slides come as" +
+              " PowerPoint."
           : "Every team's project folder is saved with its subfolders, and" +
-              ' Teams.xlsx lists the teams with a link from each project to' +
-              ' its folder. Google Docs, Sheets and Slides come as Office' +
-              ' files.'
-      )
+              " Teams.xlsx lists the teams with a link from each project to" +
+              " its folder. Google Docs, Sheets and Slides come as Office" +
+              " files.",
+      ),
     );
     d.body.appendChild(
       h(
-        'p',
-        { class: 'help' },
-        'The files are read in your Google Drive, one team at a time, so it' +
-          ' can take a few minutes. Keep this window open. Anything that' +
-          ' cannot be saved is listed with the reason and its Drive link.'
-      )
+        "p",
+        { class: "help" },
+        "The files are read in your Google Drive, one team at a time, so it" +
+          " can take a few minutes. Keep this window open. Anything that" +
+          " cannot be saved is listed with the reason and its Drive link.",
+      ),
     );
-    d.body.appendChild(startRow(d, 'Start', true));
+    d.body.appendChild(startRow(d, "Start", true));
   }
 
   /**
@@ -93,13 +93,13 @@
    */
   function team(pg, t, n, files) {
     pg.line.textContent =
-      'Team ' +
+      "Team " +
       t.number +
-      ' of ' +
+      " of " +
       n +
-      ': ' +
+      ": " +
       (t.title || t.ref) +
-      (files ? ' · ' + A.plural(files, 'file', 'files') + ' saved' : '');
+      (files ? " · " + A.plural(files, "file", "files") + " saved" : "");
   }
 
   /**
@@ -118,7 +118,7 @@
    * @param {!Object} pg The bar and the line.
    */
   function writing(pg) {
-    pg.line.textContent = 'Writing Teams.xlsx…';
+    pg.line.textContent = "Writing Teams.xlsx…";
   }
 
   /**
@@ -130,9 +130,7 @@
    */
   function pack(pg, p, count) {
     pg.line.textContent =
-      count > 1
-        ? 'Packing part ' + (p + 1) + ' of ' + count + '…'
-        : 'Packing the zip…';
+      count > 1 ? "Packing part " + (p + 1) + " of " + count + "…" : "Packing the zip…";
   }
 
   /**
@@ -153,13 +151,13 @@
    */
   function progressOf(body) {
     var pg = {
-      bar: h('progress', {
-        class: 'download-bar',
-        max: '1',
-        value: '0',
-        'aria-label': 'Progress'
+      bar: h("progress", {
+        class: "download-bar",
+        max: "1",
+        value: "0",
+        "aria-label": "Progress",
       }),
-      line: h('p', { class: 'download-line', role: 'status' }, 'Getting ready…')
+      line: h("p", { class: "download-line", role: "status" }, "Getting ready…"),
     };
     body.appendChild(pg.bar);
     body.appendChild(pg.line);
@@ -169,7 +167,7 @@
       step: step.bind(null, pg),
       writing: writing.bind(null, pg),
       pack: pack.bind(null, pg),
-      done: done.bind(null, pg)
+      done: done.bind(null, pg),
     };
   }
 
@@ -182,13 +180,9 @@
   function stopped(d, e) {
     ui.clear(d.body);
     d.body.appendChild(
-      h(
-        'p',
-        { class: 'error', role: 'alert' },
-        e?.message || 'The download stopped.'
-      )
+      h("p", { class: "error", role: "alert" }, e?.message || "The download stopped."),
     );
-    d.body.appendChild(startRow(d, 'Start again', false));
+    d.body.appendChild(startRow(d, "Start again", false));
   }
 
   /**
@@ -232,13 +226,11 @@
     var d = {
       form: form,
       tasks: tasks,
-      body: h('div', { class: 'l-stack download' })
+      body: h("div", { class: "l-stack download" }),
     };
-    var dialog = A.modal(
-      tasks ? 'Download all tasks' : 'Download all projects',
-      d.body,
-      [{ text: 'Close', kind: 'quiet' }]
-    );
+    var dialog = A.modal(tasks ? "Download all tasks" : "Download all projects", d.body, [
+      { text: "Close", kind: "quiet" },
+    ]);
     d.open = isOpen.bind(null, dialog);
     d.run = run.bind(null, d);
     intro(d);

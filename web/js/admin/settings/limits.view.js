@@ -5,14 +5,14 @@
  * above it and hides with it.
  */
 (function (App) {
-  'use strict';
+  "use strict";
 
   var A = App.admin;
   var h = App.ui.h;
 
   var DRIVE_CHECKS = [
-    ['strict', 'Must open and be shared with anyone who has the link'],
-    ['off', 'Do not check']
+    ["strict", "Must open and be shared with anyone who has the link"],
+    ["off", "Do not check"],
   ];
 
   /**
@@ -32,7 +32,7 @@
         rules[name] = v;
         if (after) after(v);
       },
-      { name: name }
+      { name: name },
     );
   }
 
@@ -45,34 +45,34 @@
    */
   function transferOptions(rules) {
     var whatsapp = h(
-      'div',
-      { class: 'sub-setting', hidden: rules.transferPhones !== true },
-      ruleSwitch(rules, 'transferWhatsapp', 'Open the number in WhatsApp')
+      "div",
+      { class: "sub-setting", hidden: rules.transferPhones !== true },
+      ruleSwitch(rules, "transferWhatsapp", "Open the number in WhatsApp"),
     );
     return h(
-      'div',
-      { class: 'sub-setting', hidden: !rules.transfers },
+      "div",
+      { class: "sub-setting", hidden: !rules.transfers },
       ruleSwitch(
         rules,
-        'transferEmails',
-        'Also email both leaders about each request and its answer'
+        "transferEmails",
+        "Also email both leaders about each request and its answer",
       ),
       ruleSwitch(
         rules,
-        'transferPhones',
-        'Show each leader the phone number of the other leader',
+        "transferPhones",
+        "Show each leader the phone number of the other leader",
         function (v) {
           whatsapp.hidden = !v;
-        }
+        },
       ),
       h(
-        'p',
-        { class: 'help' },
-        'So the two leaders can talk. The number shows next to a request' +
-          ' while it waits, with a button that copies it. A leader sees it' +
-          ' only after their team has asked or been asked.'
+        "p",
+        { class: "help" },
+        "So the two leaders can talk. The number shows next to a request" +
+          " while it waits, with a button that copies it. A leader sees it" +
+          " only after their team has asked or been asked.",
       ),
-      whatsapp
+      whatsapp,
     );
   }
 
@@ -86,26 +86,26 @@
   function transferRow(rules) {
     var options = transferOptions(rules);
     return h(
-      'div',
-      { class: 'sub-setting', hidden: !rules.uniqueAcrossForm },
+      "div",
+      { class: "sub-setting", hidden: !rules.uniqueAcrossForm },
       A.check(
-        'A leader may ask for a student who is in another team',
+        "A leader may ask for a student who is in another team",
         !!rules.transfers,
         function (v) {
           rules.transfers = v;
           options.hidden = !v;
         },
-        { name: 'transfers' }
+        { name: "transfers" },
       ),
       h(
-        'p',
-        { class: 'help' },
-        'The team registers without that student. The leader of the other' +
-          ' team sees the request when opening the form with the edit key,' +
-          ' and the student moves on approval. You can approve under' +
-          ' Responses as well.'
+        "p",
+        { class: "help" },
+        "The team registers without that student. The leader of the other" +
+          " team sees the request when opening the form with the edit key," +
+          " and the student moves on approval. You can approve under" +
+          " Responses as well.",
       ),
-      options
+      options,
     );
   }
 
@@ -118,41 +118,41 @@
   function folderBox(rules) {
     var folder = rules.folderName;
     return h(
-      'div',
-      { class: 'subpanel' },
-      h('h3', null, 'Drive folder name'),
+      "div",
+      { class: "subpanel" },
+      h("h3", null, "Drive folder name"),
       h(
-        'p',
-        { class: 'help' },
-        'When the Drive check is on, the folder name is read and must look' +
-          ' like Team_Leader_Name_Project_Name_Subject_Name, for example' +
-          ' Ahmed_Mohamed_Library_System_Software_Engineering: no spaces,' +
-          ' parts joined by underscores, ending with the subject name.' +
-          ' Students see the rule with an example.'
+        "p",
+        { class: "help" },
+        "When the Drive check is on, the folder name is read and must look" +
+          " like Team_Leader_Name_Project_Name_Subject_Name, for example" +
+          " Ahmed_Mohamed_Library_System_Software_Engineering: no spaces," +
+          " parts joined by underscores, ending with the subject name." +
+          " Students see the rule with an example.",
       ),
       A.check(
-        'Folder names must follow Team_Leader_Name_Project_Name_Subject_Name',
+        "Folder names must follow Team_Leader_Name_Project_Name_Subject_Name",
         folder.enabled,
         function (v) {
           folder.enabled = v;
-        }
+        },
       ),
       A.field(
-        'Subject name at the end',
+        "Subject name at the end",
         A.text(
-          folder.subject || '',
+          folder.subject || "",
           function (v) {
             folder.subject = Rules.folderPart(v);
           },
           {
-            name: 'folderSubject',
-            dir: 'ltr',
-            placeholder: 'Software_Engineering'
-          }
+            name: "folderSubject",
+            dir: "ltr",
+            placeholder: "Software_Engineering",
+          },
         ),
-        'The subject name, not the code. Spaces become underscores. Leave' +
-          ' empty to accept any subject name.'
-      )
+        "The subject name, not the code. Spaces become underscores. Leave" +
+          " empty to accept any subject name.",
+      ),
     );
   }
 
@@ -164,10 +164,7 @@
    */
   function hasFolder(f) {
     return (f.fields || []).some(function (x) {
-      return (
-        x.type === 'drive_link' &&
-        (!x.kinds || x.kinds.indexOf('folder') !== -1)
-      );
+      return x.type === "drive_link" && (!x.kinds || x.kinds.indexOf("folder") !== -1);
     });
   }
 
@@ -180,27 +177,27 @@
   function countsRow(s) {
     var rules = s.f.rules;
     return h(
-      'div',
-      { class: 'row' },
+      "div",
+      { class: "row" },
       A.field(
-        'Maximum submissions',
+        "Maximum submissions",
         A.number(
-          rules.maxSubmissions == null ? '' : rules.maxSubmissions,
+          rules.maxSubmissions == null ? "" : rules.maxSubmissions,
           function (v) {
-            rules.maxSubmissions = v === '' ? null : parseInt(v, 10);
+            rules.maxSubmissions = v === "" ? null : parseInt(v, 10);
           },
-          { name: 'maxSubmissions', min: '1' }
+          { name: "maxSubmissions", min: "1" },
         ),
-        'Leave empty for no limit.'
+        "Leave empty for no limit.",
       ),
       s.hasDrive
         ? A.field(
-            'Google Drive links',
-            A.select(rules.driveCheck || 'strict', DRIVE_CHECKS, function (v) {
+            "Google Drive links",
+            A.select(rules.driveCheck || "strict", DRIVE_CHECKS, function (v) {
               rules.driveCheck = v;
-            })
+            }),
           )
-        : null
+        : null,
     );
   }
 
@@ -213,14 +210,13 @@
   function summary(s) {
     var rules = s.f.rules;
     return [
-      rules.maxSubmissions ? 'At most ' + rules.maxSubmissions : 'No limit',
+      rules.maxSubmissions ? "At most " + rules.maxSubmissions : "No limit",
       s.isTeam && rules.uniqueAcrossForm
-        ? 'one team per student' +
-          (rules.transfers ? ', leaders may ask for a student' : '')
-        : ''
+        ? "one team per student" + (rules.transfers ? ", leaders may ask for a student" : "")
+        : "",
     ]
       .filter(Boolean)
-      .join(' · ');
+      .join(" · ");
   }
 
   /**
@@ -231,25 +227,25 @@
    */
   A.limitsPanel = function (s) {
     var rules = s.f.rules;
-    rules.folderName = rules.folderName || { enabled: false, subject: '' };
+    rules.folderName = rules.folderName || { enabled: false, subject: "" };
     var transfers = s.isTeam ? transferRow(rules) : null;
     var panel = A.panel(
-      'Limits and checks',
+      "Limits and checks",
       null,
       countsRow(s),
       s.isTeam
         ? A.check(
-            'A student may appear in only one team of this form',
+            "A student may appear in only one team of this form",
             rules.uniqueAcrossForm,
             function (v) {
               rules.uniqueAcrossForm = v;
               transfers.hidden = !v;
             },
-            { name: 'uniqueAcrossForm' }
+            { name: "uniqueAcrossForm" },
           )
         : null,
       transfers,
-      hasFolder(s.f) ? folderBox(rules) : null
+      hasFolder(s.f) ? folderBox(rules) : null,
     );
     panel.summary = summary.bind(null, s);
     return panel;

@@ -3,10 +3,10 @@
  * the term an older form kept it in.
  */
 (function (root) {
-  'use strict';
+  "use strict";
 
-  var node = typeof module === 'object' && module.exports;
-  var read = node ? require('./read.js') : root.FormMetadataRead;
+  var node = typeof module === "object" && module.exports;
+  var read = node ? require("./read.js") : root.FormMetadataRead;
   var own = read.own;
   var fieldOf = read.fieldOf;
   var academicYears = read.academicYears;
@@ -19,10 +19,7 @@
    * @return {string} The academic year, or ''.
    */
   function batchYear(form) {
-    return (
-      academicYear(fieldOf(form, 'batchYear')) ||
-      academicYear(fieldOf(form, 'term'))
-    );
+    return academicYear(fieldOf(form, "batchYear")) || academicYear(fieldOf(form, "term"));
   }
 
   /**
@@ -52,8 +49,8 @@
    */
   function batchCreate(values) {
     return {
-      term: '',
-      batchYear: academicYear(values.batchYear) || academicYear(values.term)
+      term: "",
+      batchYear: academicYear(values.batchYear) || academicYear(values.term),
     };
   }
 
@@ -66,8 +63,8 @@
    */
   function batchDuplicate(form, values) {
     return {
-      term: '',
-      batchYear: academicYear(values.batchYear) || batchYear(form)
+      term: "",
+      batchYear: academicYear(values.batchYear) || batchYear(form),
     };
   }
 
@@ -78,9 +75,9 @@
    * @param {!Object} patch The changes.
    */
   function batchUpdate(form, patch) {
-    if (own(patch, 'batchYear')) {
+    if (own(patch, "batchYear")) {
       form.batchYear = academicYear(patch.batchYear);
-    } else if (own(patch, 'term')) {
+    } else if (own(patch, "term")) {
       form.batchYear = academicYear(patch.term);
     }
   }
@@ -94,7 +91,7 @@
    */
   function batchLabel(form) {
     var year = batchYear(form);
-    return year ? 'Batch ' + year : '';
+    return year ? "Batch " + year : "";
   }
 
   /**
@@ -106,14 +103,14 @@
    */
   function batchDisplay(form) {
     var label = batchLabel(form);
-    return label ? [{ key: 'batchYear', value: label, variant: 'term' }] : [];
+    return label ? [{ key: "batchYear", value: label, variant: "term" }] : [];
   }
 
   /** The metadata of a WhatsApp registration: its batch year. */
   var batchAdapter = {
-    editor: 'batch-year',
-    fields: ['batchYear'],
-    legacyFields: ['term', 'subject'],
+    editor: "batch-year",
+    fields: ["batchYear"],
+    legacyFields: ["term", "subject"],
     defaults: batchDefaults,
     read: batchRead,
     create: batchCreate,
@@ -123,10 +120,10 @@
     display: batchDisplay,
     caption: batchLabel,
     slug: batchYear,
-    sheet: batchLabel
+    sheet: batchLabel,
   };
 
   var api = batchAdapter;
   if (node) module.exports = api;
   root.FormMetadataBatch = api;
-})(typeof globalThis !== 'undefined' ? globalThis : this);
+})(typeof globalThis !== "undefined" ? globalThis : this);

@@ -8,7 +8,7 @@ var FormsController = (function () {
    * @return {*} The answer, sent back as JSON.
    */
   function getForm(req) {
-    var form = FormsService.requireForm(String(req.slug || ''));
+    var form = FormsService.requireForm(String(req.slug || ""));
     return FormsPublic.publicState(form);
   }
 

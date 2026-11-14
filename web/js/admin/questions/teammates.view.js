@@ -3,7 +3,7 @@
  * students read, and what is asked about each one.
  */
 (function (App) {
-  'use strict';
+  "use strict";
 
   var A = App.admin;
   var Q = A.questions;
@@ -13,26 +13,26 @@
   var TEAMMATES = { MIN: 1, MAX: 5, FLOOR: 0, CEILING: 19 };
 
   var WORDS = {
-    name: 'The number of teammates',
-    min: 'Fewest teammates',
-    max: 'Most teammates',
-    choose: 'A leader can bring',
-    unit: 'teammates',
-    who: 'A leader who brings',
-    one: 'saved booking',
-    many: 'saved bookings',
-    stay: 'booked',
-    fix: 'to change their teammates',
-    note: 'Note for some numbers of teammates',
-    noteFor: 'Show the note for bookings with',
+    name: "The number of teammates",
+    min: "Fewest teammates",
+    max: "Most teammates",
+    choose: "A leader can bring",
+    unit: "teammates",
+    who: "A leader who brings",
+    one: "saved booking",
+    many: "saved bookings",
+    stay: "booked",
+    fix: "to change their teammates",
+    note: "Note for some numbers of teammates",
+    noteFor: "Show the note for bookings with",
     noteHelp:
-      'Show a short note when a leader adds one of the numbers of teammates' +
-      ' you switch on, for example to say that other students may join a' +
-      ' small team.',
+      "Show a short note when a leader adds one of the numbers of teammates" +
+      " you switch on, for example to say that other students may join a" +
+      " small team.",
     placeholder: {
-      en: 'Other students may join your team, up to {max} teammates.',
-      ar: 'ممكن طلاب تانيين ينضموا لفريقك، لحد {max}.'
-    }
+      en: "Other students may join your team, up to {max} teammates.",
+      ar: "ممكن طلاب تانيين ينضموا لفريقك، لحد {max}.",
+    },
   };
 
   /**
@@ -45,8 +45,8 @@
     tm.min = tm.min == null ? TEAMMATES.MIN : parseInt(tm.min, 10) || 0;
     var max = tm.max == null ? TEAMMATES.MAX : parseInt(tm.max, 10) || 1;
     tm.max = Math.max(max, tm.min, 1);
-    tm.label = tm.label || { en: 'Teammates', ar: 'أعضاء الفريق' };
-    tm.help = tm.help || { en: '', ar: '' };
+    tm.label = tm.label || { en: "Teammates", ar: "أعضاء الفريق" };
+    tm.help = tm.help || { en: "", ar: "" };
   }
 
   /**
@@ -59,11 +59,11 @@
    * @return {!Element} The input.
    */
   function textIn(text, lang, name, long) {
-    var ar = lang === 'ar';
+    var ar = lang === "ar";
     var attrs = {
       name: name,
-      dir: ar ? 'rtl' : null,
-      lang: ar ? 'ar' : null
+      dir: ar ? "rtl" : null,
+      lang: ar ? "ar" : null,
     };
     if (!long) {
       return A.text(
@@ -71,19 +71,19 @@
         function (v) {
           text[lang] = v;
         },
-        attrs
+        attrs,
       );
     }
     return h(
-      'textarea',
+      "textarea",
       Object.assign(attrs, {
-        class: 'textarea',
-        rows: '2',
+        class: "textarea",
+        rows: "2",
         oninput: function (e) {
           text[lang] = e.target.value;
-        }
+        },
       }),
-      text[lang] || ''
+      text[lang] || "",
     );
   }
 
@@ -95,38 +95,22 @@
    */
   function wordsBox(tm) {
     return h(
-      'div',
-      { class: 'subpanel' },
-      h('h3', null, 'What students read'),
+      "div",
+      { class: "subpanel" },
+      h("h3", null, "What students read"),
+      h("p", { class: "help" }, "The title above the teammates and the line under it."),
       h(
-        'p',
-        { class: 'help' },
-        'The title above the teammates and the line under it.'
+        "div",
+        { class: "desc-pair" },
+        A.field("Title in English", textIn(tm.label, "en", "teammates-title-en", false)),
+        A.field("Title in Arabic", textIn(tm.label, "ar", "teammates-title-ar", false)),
       ),
       h(
-        'div',
-        { class: 'desc-pair' },
-        A.field(
-          'Title in English',
-          textIn(tm.label, 'en', 'teammates-title-en', false)
-        ),
-        A.field(
-          'Title in Arabic',
-          textIn(tm.label, 'ar', 'teammates-title-ar', false)
-        )
+        "div",
+        { class: "desc-pair" },
+        A.field("Line under it, in English", textIn(tm.help, "en", "teammates-help-en", true)),
+        A.field("Line under it, in Arabic", textIn(tm.help, "ar", "teammates-help-ar", true)),
       ),
-      h(
-        'div',
-        { class: 'desc-pair' },
-        A.field(
-          'Line under it, in English',
-          textIn(tm.help, 'en', 'teammates-help-en', true)
-        ),
-        A.field(
-          'Line under it, in Arabic',
-          textIn(tm.help, 'ar', 'teammates-help-ar', true)
-        )
-      )
     );
   }
 
@@ -144,17 +128,17 @@
       rows = rows.concat(Q.rows(s, sf, true));
     });
     return h(
-      'div',
-      { class: 'subpanel' },
-      h('h3', null, 'Asked about each teammate'),
+      "div",
+      { class: "subpanel" },
+      h("h3", null, "Asked about each teammate"),
       h(
-        'p',
-        { class: 'help' },
-        'Hide what you do not need, or make it optional. The name and the' +
-          ' code are always asked, because the lists and the duplicate check' +
-          ' use them.'
+        "p",
+        { class: "help" },
+        "Hide what you do not need, or make it optional. The name and the" +
+          " code are always asked, because the lists and the duplicate check" +
+          " use them.",
       ),
-      h('div', { class: 'q-list tm-questions' }, rows.filter(Boolean))
+      h("div", { class: "q-list tm-questions" }, rows.filter(Boolean)),
     );
   }
 
@@ -165,20 +149,12 @@
    * @return {string} How many come and how much is asked about each.
    */
   function summary(tm) {
-    if (tm.enabled === false) return 'Not asked';
+    if (tm.enabled === false) return "Not asked";
     var asked = (tm.fields || []).filter(function (sf) {
       return sf.enabled !== false;
     }).length;
-    var count =
-      String(tm.min) === String(tm.max)
-        ? String(tm.max)
-        : tm.min + ' to ' + tm.max;
-    return (
-      count +
-      ' with the leader, ' +
-      A.plural(asked, 'detail', 'details') +
-      ' each'
-    );
+    var count = String(tm.min) === String(tm.max) ? String(tm.max) : tm.min + " to " + tm.max;
+    return count + " with the leader, " + A.plural(asked, "detail", "details") + " each";
   }
 
   /**
@@ -199,40 +175,39 @@
       ceiling: TEAMMATES.CEILING,
       counts: s.res.teammateCounts,
       names: {
-        min: 'teammatesMin',
-        max: 'teammatesMax',
-        outside: 'teammates-conflicts',
-        note: 'teammates-'
+        min: "teammatesMin",
+        max: "teammatesMax",
+        outside: "teammates-conflicts",
+        note: "teammates-",
       },
-      words: WORDS
+      words: WORDS,
     });
     var body = h(
-      'div',
-      { class: 'tm-body l-stack', hidden: tm.enabled === false },
+      "div",
+      { class: "tm-body l-stack", hidden: tm.enabled === false },
       h(
-        'p',
-        { class: 'help' },
-        'Teammates do not count the leader. Set the fewest to 0 when a leader' +
-          ' may book alone.'
+        "p",
+        { class: "help" },
+        "Teammates do not count the leader. Set the fewest to 0 when a leader may book alone.",
       ),
       range.node,
       wordsBox(tm),
-      askedBox(s, tm)
+      askedBox(s, tm),
     );
     var panel = A.panel(
-      'Teammates',
-      'The other people who come with the team leader. Decide whether a' +
-        ' booking asks for them, how many, and what is asked about each one.',
+      "Teammates",
+      "The other people who come with the team leader. Decide whether a" +
+        " booking asks for them, how many, and what is asked about each one.",
       A.check(
-        'Ask for teammates',
+        "Ask for teammates",
         tm.enabled !== false,
         function (enabled) {
           tm.enabled = enabled;
           body.hidden = enabled === false;
         },
-        { name: 'reservation-members' }
+        { name: "reservation-members" },
       ),
-      body
+      body,
     );
     panel.summary = summary.bind(null, tm);
     return { panel: panel, range: range };

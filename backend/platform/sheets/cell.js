@@ -5,8 +5,8 @@
  */
 
 var Cell = (function () {
-  var YES_ = '1';
-  var NO_ = '0';
+  var YES_ = "1";
+  var NO_ = "0";
 
   /**
    * Reads a flag cell. A cell that holds neither yes nor no, because it is

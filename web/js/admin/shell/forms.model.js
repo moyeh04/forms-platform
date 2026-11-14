@@ -3,7 +3,7 @@
  * can start a series of bookings, and which form a booking belongs to.
  */
 (function (App) {
-  'use strict';
+  "use strict";
 
   var A = App.admin;
 
@@ -26,10 +26,7 @@
    * @return {boolean} True when it has.
    */
   A.hasTeams = function (f) {
-    return (
-      f.type === FormType.TEAM_REGISTRATION ||
-      f.type === FormType.TASK_SUBMISSION
-    );
+    return f.type === FormType.TEAM_REGISTRATION || f.type === FormType.TASK_SUBMISSION;
   };
 
   /**
@@ -40,8 +37,6 @@
    *     booking.
    */
   A.bookedBy = function (f) {
-    return f.type === FormType.RESERVATION && f.keyBooking?.enabled
-      ? f.keyBooking.source
-      : '';
+    return f.type === FormType.RESERVATION && f.keyBooking?.enabled ? f.keyBooking.source : "";
   };
 })(window.App);

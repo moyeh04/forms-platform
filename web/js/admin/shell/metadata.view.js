@@ -4,7 +4,7 @@
  * editor a kind of form uses.
  */
 (function (App) {
-  'use strict';
+  "use strict";
 
   var A = App.admin;
   var h = App.ui.h;
@@ -36,22 +36,22 @@
       var on = st.season === s;
       chips.appendChild(
         h(
-          'button',
+          "button",
           {
-            type: 'button',
-            class: 'toggle-chip',
-            role: 'radio',
-            name: 'season-' + s.toLowerCase(),
-            'aria-checked': on ? 'true' : 'false',
-            'aria-pressed': on ? 'true' : 'false',
+            type: "button",
+            class: "toggle-chip",
+            role: "radio",
+            name: "season-" + s.toLowerCase(),
+            "aria-checked": on ? "true" : "false",
+            "aria-pressed": on ? "true" : "false",
             onclick: function () {
-              st.season = on ? '' : s;
-              st.custom = '';
+              st.season = on ? "" : s;
+              st.custom = "";
               changed();
-            }
+            },
           },
-          s
-        )
+          s,
+        ),
       );
     });
   }
@@ -67,26 +67,22 @@
     var box = A.text(
       subject,
       function (v) {
-        onchange(v.replace(/\s+/g, ''));
+        onchange(v.replace(/\s+/g, ""));
       },
       {
-        name: 'subject',
-        placeholder: 'CS101',
-        dir: 'ltr',
-        autocomplete: 'off',
-        spellcheck: 'false'
-      }
+        name: "subject",
+        placeholder: "CS101",
+        dir: "ltr",
+        autocomplete: "off",
+        spellcheck: "false",
+      },
     );
     return h(
-      'label',
-      { class: 'field-row term-subject' },
-      h('span', { class: 'label' }, 'Subject code'),
+      "label",
+      { class: "field-row term-subject" },
+      h("span", { class: "label" }, "Subject code"),
       box,
-      h(
-        'span',
-        { class: 'help' },
-        'Optional. A short code shown beside the title. No spaces.'
-      )
+      h("span", { class: "help" }, "Optional. A short code shown beside the title. No spaces."),
     );
   }
 
@@ -98,29 +94,29 @@
    * @param {function(!Object)} onchange Called with `{term, subject}`.
    * @return {!Element} The editor.
    */
-  A.METADATA_EDITORS['term-subject'] = function (o, onchange) {
+  A.METADATA_EDITORS["term-subject"] = function (o, onchange) {
     var st = FormMetadata.termParts(o.term);
-    var subject = o.subject || '';
+    var subject = o.subject || "";
     if (!st.year) st.year = yearOptions()[0];
 
     /** Reports the term and the subject. */
     function emit() {
-      var term = st.season ? st.season + ' ' + st.year : st.custom;
+      var term = st.season ? st.season + " " + st.year : st.custom;
       onchange({ term: term, subject: subject });
     }
 
-    var chips = h('div', {
-      class: 'toggle-chips season-chips',
-      role: 'radiogroup',
-      'aria-label': 'Term'
+    var chips = h("div", {
+      class: "toggle-chips season-chips",
+      role: "radiogroup",
+      "aria-label": "Term",
     });
-    var custom = h('p', { class: 'muted-note' });
+    var custom = h("p", { class: "muted-note" });
     var yearSel = A.select(st.year, yearOptions(st.year), function (v) {
       st.year = v;
       emit();
     });
-    yearSel.name = 'termYear';
-    yearSel.setAttribute('aria-label', 'Year');
+    yearSel.name = "termYear";
+    yearSel.setAttribute("aria-label", "Year");
 
     /** Draws the seasons, the term in another shape, and the year. */
     function paint() {
@@ -131,33 +127,46 @@
       custom.textContent =
         !st.season && st.custom
           ? 'Current term: "' + st.custom + '". Pick a season to replace it.'
-          : '';
+          : "";
       yearSel.disabled = !st.season;
     }
 
     paint();
-    return h(
-      'div',
-      { class: 'term-picker' },
-      h(
-        'div',
-        { class: 'field-row term-season' },
-        h('span', { class: 'label' }, 'Term'),
-        chips,
-        custom
-      ),
-      h(
-        'label',
-        { class: 'field-row term-year' },
-        h('span', { class: 'label' }, 'Year'),
-        yearSel
-      ),
+    return termPicker(
+      chips,
+      custom,
+      yearSel,
       subjectField(subject, function (v) {
         subject = v;
         emit();
-      })
+      }),
     );
   };
+
+  /**
+   * Lays out the term editor: the seasons, the year and the subject.
+   *
+   * @param {!Element} chips The seasons.
+   * @param {!Element} custom The note on a term in another shape.
+   * @param {!Element} yearSel The year.
+   * @param {!Element} subject The subject field.
+   * @return {!Element} The editor.
+   */
+  function termPicker(chips, custom, yearSel, subject) {
+    return h(
+      "div",
+      { class: "term-picker" },
+      h(
+        "div",
+        { class: "field-row term-season" },
+        h("span", { class: "label" }, "Term"),
+        chips,
+        custom,
+      ),
+      h("label", { class: "field-row term-year" }, h("span", { class: "label" }, "Year"), yearSel),
+      subject,
+    );
+  }
 
   /**
    * Edits the batch year of a form.
@@ -166,21 +175,13 @@
    * @param {function(!Object)} onchange Called with `{batchYear}`.
    * @return {!Element} The editor.
    */
-  A.METADATA_EDITORS['batch-year'] = function (o, onchange) {
-    var select = A.select(
-      o.batchYear || yearOptions()[0],
-      yearOptions(o.batchYear),
-      function (v) {
-        onchange({ batchYear: v });
-      }
-    );
-    select.name = 'batchYear';
-    select.setAttribute('aria-label', 'Batch year');
-    return h(
-      'div',
-      { class: 'metadata-picker batch-year-picker' },
-      A.field('Batch year', select)
-    );
+  A.METADATA_EDITORS["batch-year"] = function (o, onchange) {
+    var select = A.select(o.batchYear || yearOptions()[0], yearOptions(o.batchYear), function (v) {
+      onchange({ batchYear: v });
+    });
+    select.name = "batchYear";
+    select.setAttribute("aria-label", "Batch year");
+    return h("div", { class: "metadata-picker batch-year-picker" }, A.field("Batch year", select));
   };
 
   /**
@@ -207,11 +208,11 @@
   A.termTags = function (f) {
     return FormMetadata.display(f).map(function (item) {
       return h(
-        'span',
+        "span",
         {
-          class: 'tag-sm' + (item.variant === 'subject' ? ' tag-subject' : '')
+          class: "tag-sm" + (item.variant === "subject" ? " tag-subject" : ""),
         },
-        item.value
+        item.value,
       );
     });
   };

@@ -19,13 +19,13 @@ var ViewerService = (function () {
    *     draft or archived.
    */
   function requireClientForm_(client, slug) {
-    var form = FormsRepository.requireForm(String(slug || ''));
+    var form = FormsRepository.requireForm(String(slug || ""));
     if (
       !ClientsAccess.clientAllows(client, form) ||
       form.status === FormStatus.DRAFT ||
       form.status === FormStatus.ARCHIVED
     )
-      ApiError.fail('forbidden', 'You do not have access to this form.');
+      ApiError.fail("forbidden", "You do not have access to this form.");
     return form;
   }
 
@@ -44,7 +44,7 @@ var ViewerService = (function () {
       .map(function (m) {
         return m.name;
       })
-      .join(', ');
+      .join(", ");
   }
 
   /**
@@ -59,11 +59,9 @@ var ViewerService = (function () {
   function reservationRow_(form, r, days, includeMembers) {
     var p = SlotsRules.slotParts(form, r.slot);
     var di = days.indexOf(p.day);
-    var day = p.day || { label: p.dayId, date: '', times: [] };
+    var day = p.day || { label: p.dayId, date: "", times: [] };
     return {
-      _order:
-        (di < 0 ? UNKNOWN_DAY_ : di) * DAY_WEIGHT_ +
-        (p.day ? day.times.indexOf(p.time) : 0),
+      _order: (di < 0 ? UNKNOWN_DAY_ : di) * DAY_WEIGHT_ + (p.day ? day.times.indexOf(p.time) : 0),
       id: r.id,
       dayId: p.dayId,
       dayLabel: day.label,
@@ -74,9 +72,9 @@ var ViewerService = (function () {
       phone: r.phone,
       email: r.email,
       title: r.title,
-      level: r.data.level || '',
-      section: r.data.section || '',
-      members: includeMembers ? teammates_(form, r) : ''
+      level: r.data.level || "",
+      section: r.data.section || "",
+      members: includeMembers ? teammates_(form, r) : "",
     };
   }
 
@@ -93,7 +91,7 @@ var ViewerService = (function () {
   function reservationRows_(form, client, mode, dayId) {
     var days = form.slots?.days || [];
     var today = Time.todayIso();
-    var membersField = Rules.fieldByRole(form, 'members');
+    var membersField = Rules.fieldByRole(form, "members");
     var includeMembers = !!membersField && membersField.enabled !== false;
     var rows = ResponsesRepository.readResponses(form)
       .filter(function (r) {
@@ -102,11 +100,11 @@ var ViewerService = (function () {
       .map(function (r) {
         return reservationRow_(form, r, days, includeMembers);
       });
-    if (mode === 'today')
+    if (mode === "today")
       rows = rows.filter(function (r) {
         return r.date && r.date === today;
       });
-    if (mode === 'day')
+    if (mode === "day")
       rows = rows.filter(function (r) {
         return r.dayId === dayId;
       });
@@ -128,9 +126,7 @@ var ViewerService = (function () {
    *     does not show them.
    */
   function viewerSizeAlerts_(form, client) {
-    return client.showSizeAlerts
-      ? Rules.sizeAlertLevels(Rules.sizeAlerts(form))
-      : [];
+    return client.showSizeAlerts ? Rules.sizeAlertLevels(Rules.sizeAlerts(form)) : [];
   }
 
   /**
@@ -153,18 +149,16 @@ var ViewerService = (function () {
           status: r.status,
           title: r.title,
           link: r.link,
-          members: Rules.membersOf(form, r.data)
+          members: Rules.membersOf(form, r.data),
         };
-        var alert = client.showSizeAlerts
-          ? Rules.sizeAlertOf(alerts, g.members.length)
-          : '';
+        var alert = client.showSizeAlerts ? Rules.sizeAlertOf(alerts, g.members.length) : "";
         if (alert) g.alert = alert;
         if (seesProgress_(form, client)) {
           g.progress = Rules.linkProgress(form, r.progress);
         }
         var hidden = client.hiddenColumns;
-        if (hidden.indexOf('title') !== -1) delete g.title;
-        if (hidden.indexOf('link') !== -1) delete g.link;
+        if (hidden.indexOf("title") !== -1) delete g.title;
+        if (hidden.indexOf("link") !== -1) delete g.link;
         g.members = g.members.map(function (m) {
           return ViewerRules.stripHidden(
             {
@@ -172,11 +166,11 @@ var ViewerService = (function () {
               section: m.section,
               code: m.code,
               phone: m.phone,
-              leader: m.leader
+              leader: m.leader,
             },
-            ['name', 'section', 'code', 'phone'].filter(function (k) {
+            ["name", "section", "code", "phone"].filter(function (k) {
               return hidden.indexOf(k) !== -1;
-            })
+            }),
           );
         });
         return g;
@@ -207,7 +201,7 @@ var ViewerService = (function () {
     if (!seesProgress_(form, client)) return {};
     return {
       milestones: Rules.milestonesOf(form),
-      progressAccess: client.progress
+      progressAccess: client.progress,
     };
   }
 
@@ -228,14 +222,14 @@ var ViewerService = (function () {
             name: r.name,
             code: r.code,
             phone: r.phone,
-            level: r.data.level || '',
-            group: r.data.group || '',
-            section: r.data.section || '',
+            level: r.data.level || "",
+            group: r.data.group || "",
+            section: r.data.section || "",
             link: r.link,
             review: r.review,
-            status: r.status
+            status: r.status,
           },
-          client.hiddenColumns
+          client.hiddenColumns,
         );
       });
   }
@@ -252,14 +246,10 @@ var ViewerService = (function () {
    */
   function reviewSubmission_(form, submissionId, stepId, status) {
     Lock.withLock(function () {
-      var r = ResponsesRepository.readResponses(form).filter(function (x) {
+      var r = ResponsesRepository.readResponses(form).find(function (x) {
         return x.id === submissionId;
-      })[0];
-      if (!r)
-        ApiError.fail(
-          'submission_not_found',
-          'That submission does not exist.'
-        );
+      });
+      if (!r) ApiError.fail("submission_not_found", "That submission does not exist.");
       ResponsesReview.setReviewStep(form, r, stepId, status);
       ResponsesRepository.saveResponse(form, r);
     });
@@ -272,6 +262,6 @@ var ViewerService = (function () {
     teamGroups: teamGroups_,
     progressOf: progressOf_,
     viewerSizeAlerts: viewerSizeAlerts_,
-    whatsappRows: whatsappRows_
+    whatsappRows: whatsappRows_,
   };
 })();

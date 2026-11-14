@@ -7,7 +7,7 @@
  * shares one object, `dr`: the page, the draft, its kinds and its parts.
  */
 (function (App) {
-  'use strict';
+  "use strict";
 
   var A = App.admin;
   var L = A.lists;
@@ -26,8 +26,7 @@
    */
   function redraw(dr, focusName) {
     dr.p.paintRows();
-    var el =
-      focusName && dr.p.rowsBox.querySelector('[name="' + focusName + '"]');
+    var el = focusName && dr.p.rowsBox.querySelector('[name="' + focusName + '"]');
     if (el?.focus) el.focus();
   }
 
@@ -50,14 +49,12 @@
         })
         .map(function (k) {
           return { code: k, count: d.counts[k] };
-        })
+        }),
     });
     p.draft = null;
     p.setRows(L.plainRows(L.writeSections(s)));
-    var head = p.rowsBox.querySelector(
-      '[data-group="' + name + '"] .sec-group-name'
-    );
-    if (head?.scrollIntoView) head.scrollIntoView({ block: 'center' });
+    var head = p.rowsBox.querySelector('[data-group="' + name + '"] .sec-group-name');
+    if (head?.scrollIntoView) head.scrollIntoView({ block: "center" });
     if (head?.focus) head.focus();
   }
 
@@ -70,43 +67,39 @@
     var foot = dr.foot;
     ui.clear(foot);
     foot.appendChild(
-      h(
-        'p',
-        { class: 'muted-note', name: 'group-missing', role: 'status' },
-        L.draftMissing(dr)
-      )
+      h("p", { class: "muted-note", name: "group-missing", role: "status" }, L.draftMissing(dr)),
     );
     foot.appendChild(
       h(
-        'div',
-        { class: 'actions' },
+        "div",
+        { class: "actions" },
         h(
-          'button',
+          "button",
           {
-            type: 'button',
-            class: 'btn btn-quiet sm',
-            name: 'add-group-cancel',
+            type: "button",
+            class: "btn btn-quiet sm",
+            name: "add-group-cancel",
             onclick: function () {
               dr.p.draft = null;
-              redraw(dr, 'add-group-open');
-            }
+              redraw(dr, "add-group-open");
+            },
           },
-          'Cancel'
+          "Cancel",
         ),
         L.draftReady(dr)
           ? h(
-              'button',
+              "button",
               {
-                type: 'button',
-                class: 'btn btn-primary sm',
-                name: 'add-group',
-                onclick: add.bind(null, dr)
+                type: "button",
+                class: "btn btn-primary sm",
+                name: "add-group",
+                onclick: add.bind(null, dr),
               },
-              icon('plus', A.ICON_SIZE.MENU),
-              'Add ' + L.draftName(dr)
+              icon("plus", A.ICON_SIZE.MENU),
+              "Add " + L.draftName(dr),
             )
-          : null
-      )
+          : null,
+      ),
     );
   }
 
@@ -119,8 +112,8 @@
    */
   function rangeText(dr, k) {
     var n = dr.d.counts[k] || 0;
-    var name = L.draftName(dr) || 'The group';
-    return n ? name + '-' + k + '1' + (n > 1 ? ' to ' + k + n : '') : 'None';
+    var name = L.draftName(dr) || "The group";
+    return n ? name + "-" + k + "1" + (n > 1 ? " to " + k + n : "") : "None";
   }
 
   /**
@@ -133,14 +126,14 @@
    */
   function kindRow(dr, k) {
     var d = dr.d;
-    var range = h('span', { class: 'sec-range muted-note' }, rangeText(dr, k));
+    var range = h("span", { class: "sec-range muted-note" }, rangeText(dr, k));
     return h(
-      'div',
-      { class: 'sec-kind' },
-      h('span', { class: 'sec-code' }, k),
+      "div",
+      { class: "sec-kind" },
+      h("span", { class: "sec-code" }, k),
       L.stepper({
-        name: 'draft-count-' + k,
-        label: k + ' sections of the new group',
+        name: "draft-count-" + k,
+        label: k + " sections of the new group",
         value: d.counts[k] || 0,
         lo: 0,
         hi: MAX_COUNT,
@@ -149,9 +142,9 @@
           range.textContent = rangeText(dr, k);
           paintFoot(dr);
         },
-        enter: add.bind(null, dr)
+        enter: add.bind(null, dr),
       }),
-      range
+      range,
     );
   }
 
@@ -170,36 +163,34 @@
       kinds: parts.kinds.concat(
         d.kinds.filter(function (k) {
           return parts.kinds.indexOf(k) === -1;
-        })
+        }),
       ),
-      card: h('div', {
-        class: 'sec-group sec-draft',
-        name: 'group-draft',
-        role: 'group',
-        'aria-label': 'New year group'
+      card: h("div", {
+        class: "sec-group sec-draft",
+        name: "group-draft",
+        role: "group",
+        "aria-label": "New year group",
       }),
-      foot: h('div', { class: 'sec-foot' })
+      foot: h("div", { class: "sec-foot" }),
     };
     var card = dr.card;
     dr.redraw = redraw.bind(null, dr);
     dr.paintFoot = paintFoot.bind(null, dr);
-    card.appendChild(h('h3', null, 'New year group'));
+    card.appendChild(h("h3", null, "New year group"));
     L.draftPicks(dr, parts).forEach(function (row) {
       card.appendChild(row);
     });
-    card.appendChild(
-      h('div', { class: 'sec-kinds' }, dr.kinds.map(kindRow.bind(null, dr)))
-    );
+    card.appendChild(h("div", { class: "sec-kinds" }, dr.kinds.map(kindRow.bind(null, dr))));
     card.appendChild(
       h(
-        'div',
-        { class: 'sec-more' },
-        L.newKindChip('draft-kind', dr.kinds, function (code) {
+        "div",
+        { class: "sec-more" },
+        L.newKindChip("draft-kind", dr.kinds, function (code) {
           d.kinds.push(code);
           d.counts[code] = 1;
-          redraw(dr, 'draft-count-' + code);
-        })
-      )
+          redraw(dr, "draft-count-" + code);
+        }),
+      ),
     );
     card.appendChild(dr.foot);
     paintFoot(dr);

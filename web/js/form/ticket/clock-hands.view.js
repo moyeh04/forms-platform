@@ -5,7 +5,7 @@
  * end.
  */
 (function (App) {
-  'use strict';
+  "use strict";
 
   var T = App.ticket;
   var C = T.COLORS;
@@ -20,7 +20,7 @@
     NECK: 0.55,
     BARB: 2.4,
     BARB_BACK: 6,
-    LINE: 1.1
+    LINE: 1.1,
   };
 
   /** The length and half width of each hand. */
@@ -30,11 +30,11 @@
   /** The shaded slice of the slot and the arrow along it. */
   var SLOT = {
     RADIUS: 45,
-    OPACITY: '.16',
+    OPACITY: ".16",
     HEAD: 7,
     WING: 4.6,
     LINE: 2.4,
-    HEAD_LINE: 1.2
+    HEAD_LINE: 1.2,
   };
 
   /**
@@ -54,12 +54,12 @@
       [cx + w + HAND.BARB, cy - len + HAND.BARB_BACK],
       [cx, cy - len - 1],
       [cx - w - HAND.BARB, cy - len + HAND.BARB_BACK],
-      [cx - w * HAND.NECK, cy - len + HAND.TAIL]
+      [cx - w * HAND.NECK, cy - len + HAND.TAIL],
     ];
     var list = points.map(function (p) {
-      return p[0] + ' ' + p[1];
+      return p[0] + " " + p[1];
     });
-    return 'M' + list.join('L') + 'z';
+    return "M" + list.join("L") + "z";
   }
 
   /**
@@ -71,18 +71,18 @@
    * @return {string} The markup.
    */
   function hand(deg, size) {
-    var turn = 'rotate(' + deg + ' ' + CENTRE.X + ' ' + CENTRE.Y + ')';
+    var turn = "rotate(" + deg + " " + CENTRE.X + " " + CENTRE.Y + ")";
     return (
       '<g class="sweep" style="--from: ' +
       -deg +
       'deg">' +
       T.path(handOutline(size.LENGTH, size.HALF_WIDTH), C.hand, {
         stroke: C.handLine,
-        'stroke-width': HAND.LINE,
-        'stroke-linejoin': 'round',
-        transform: turn
+        "stroke-width": HAND.LINE,
+        "stroke-linejoin": "round",
+        transform: turn,
       }) +
-      '</g>'
+      "</g>"
     );
   }
 
@@ -93,7 +93,7 @@
    * @return {string} The markup, or '' when there is no time.
    */
   function handsArt(hands) {
-    if (!hands) return '';
+    if (!hands) return "";
     return hand(hands[0], HOUR_HAND) + hand(hands[1], MINUTE_HAND);
   }
 
@@ -115,31 +115,31 @@
    * @return {string} The markup, or '' when there is no slot.
    */
   function sliceArt(arc) {
-    if (!arc) return '';
+    if (!arc) return "";
     var r = SLOT.RADIUS;
     var s0 = T.polar(CENTRE.X, CENTRE.Y, r, arc[0]);
     var s1 = T.polar(CENTRE.X, CENTRE.Y, r, arc[1]);
     var d =
-      'M' +
+      "M" +
       CENTRE.X +
-      ' ' +
+      " " +
       CENTRE.Y +
-      'L' +
+      "L" +
       s0[0] +
-      ' ' +
+      " " +
       s0[1] +
-      'A' +
+      "A" +
       r +
-      ' ' +
+      " " +
       r +
-      ' 0 ' +
+      " 0 " +
       largeArc(arc[0], arc[1]) +
-      ' 1 ' +
+      " 1 " +
       s1[0] +
-      ' ' +
+      " " +
       s1[1] +
-      'z';
-    return T.path(d, C.arrow, { 'fill-opacity': SLOT.OPACITY, class: 'slice' });
+      "z";
+    return T.path(d, C.arrow, { "fill-opacity": SLOT.OPACITY, class: "slice" });
   }
 
   /**
@@ -165,12 +165,12 @@
     function wing(k) {
       return (
         (+base[0] + nx * SLOT.WING * k).toFixed(1) +
-        ' ' +
+        " " +
         (+base[1] + ny * SLOT.WING * k).toFixed(1)
       );
     }
 
-    return 'M' + tip[0] + ' ' + tip[1] + 'L' + wing(1) + 'L' + wing(-1) + 'z';
+    return "M" + tip[0] + " " + tip[1] + "L" + wing(1) + "L" + wing(-1) + "z";
   }
 
   /**
@@ -181,40 +181,40 @@
    * @return {string} The markup, or '' when there is no slot.
    */
   function arrowArt(arc) {
-    if (!arc) return '';
+    if (!arc) return "";
     var r = MINUTE_HAND.LENGTH;
     var stop = arc[1] - ((SLOT.HEAD / r) * DIAL.HALF_TURN) / Math.PI;
     var p0 = T.polar(CENTRE.X, CENTRE.Y, r, arc[0]);
     var p1 = T.polar(CENTRE.X, CENTRE.Y, r, stop);
     var tip = T.polar(CENTRE.X, CENTRE.Y, r, arc[1]);
     var line =
-      'M' +
+      "M" +
       p0[0] +
-      ' ' +
+      " " +
       p0[1] +
-      'A' +
+      "A" +
       r +
-      ' ' +
+      " " +
       r +
-      ' 0 ' +
+      " 0 " +
       largeArc(arc[0], stop) +
-      ' 1 ' +
+      " 1 " +
       p1[0] +
-      ' ' +
+      " " +
       p1[1];
     return (
       '<g class="slice">' +
-      T.path(line, 'none', {
+      T.path(line, "none", {
         stroke: C.arrow,
-        'stroke-width': SLOT.LINE,
-        'stroke-linecap': 'round'
+        "stroke-width": SLOT.LINE,
+        "stroke-linecap": "round",
       }) +
       T.path(arrowHead(tip, p1, stop), C.arrow, {
         stroke: C.arrow,
-        'stroke-width': SLOT.HEAD_LINE,
-        'stroke-linejoin': 'round'
+        "stroke-width": SLOT.HEAD_LINE,
+        "stroke-linejoin": "round",
       }) +
-      '</g>'
+      "</g>"
     );
   }
 

@@ -6,7 +6,7 @@
  * never shows the sheet.
  */
 (function (App) {
-  'use strict';
+  "use strict";
 
   var V = App.viewer;
   var S = V.state;
@@ -14,20 +14,20 @@
 
   /** The member columns of a team, in the order they are printed. */
   var MEMBER_COLS = [
-    ['name', 'Name'],
-    ['section', 'Section'],
-    ['code', 'Code'],
-    ['phone', 'Phone']
+    ["name", "Name"],
+    ["section", "Section"],
+    ["code", "Code"],
+    ["phone", "Phone"],
   ];
 
   /** The columns printed in a fixed-width font. */
-  var MONO = ['code', 'phone', 'time'];
+  var MONO = ["code", "phone", "time"];
 
   /** The word for each review state. */
   var REVIEW_WORD = {
-    pending: 'Pending',
-    approved: 'Approved',
-    rejected: 'Rejected'
+    pending: "Pending",
+    approved: "Approved",
+    rejected: "Rejected",
   };
 
   /**
@@ -37,7 +37,7 @@
    * @return {?Element} The link, or null when there is none.
    */
   function linkTo(url) {
-    return url ? h('a', { href: url }, 'Link') : null;
+    return url ? h("a", { href: url }, "Link") : null;
   }
 
   /**
@@ -48,12 +48,12 @@
    * @return {!Element} The cell.
    */
   function cell(col, v) {
-    var text = v === undefined || v === null ? '' : String(v);
-    if (col === 'name') {
-      return h('td', { class: 'nm' }, h('bdi', { lang: 'ar' }, text));
+    var text = v === undefined || v === null ? "" : String(v);
+    if (col === "name") {
+      return h("td", { class: "nm" }, h("bdi", { lang: "ar" }, text));
     }
-    if (col === 'link') return h('td', null, linkTo(text));
-    return h('td', { class: MONO.indexOf(col) !== -1 ? 'mono' : null }, text);
+    if (col === "link") return h("td", null, linkTo(text));
+    return h("td", { class: MONO.indexOf(col) !== -1 ? "mono" : null }, text);
   }
 
   /**
@@ -64,15 +64,15 @@
    */
   function head(cols) {
     return h(
-      'thead',
+      "thead",
       null,
       h(
-        'tr',
+        "tr",
         null,
         cols.map(function (c) {
-          return h('th', { scope: 'col' }, c[1]);
-        })
-      )
+          return h("th", { scope: "col" }, c[1]);
+        }),
+      ),
     );
   }
 
@@ -104,35 +104,35 @@
     });
     var bodies = shown(d).map(function (g) {
       return h(
-        'tbody',
-        { class: 'keep' },
+        "tbody",
+        { class: "keep" },
         g.members.map(function (m, i) {
           return h(
-            'tr',
-            { class: i ? null : 'first' },
+            "tr",
+            { class: i ? null : "first" },
             i ? null : teamCell(d, g),
-            h('td', { class: 'num' }, String(i + 1)),
+            h("td", { class: "num" }, String(i + 1)),
             cols.map(function (c) {
               var td = cell(c[0], m[c[0]]);
-              if (c[0] === 'name' && m.leader) {
-                td.appendChild(h('span', { class: 'lead' }, '★ Leader'));
+              if (c[0] === "name" && m.leader) {
+                td.appendChild(h("span", { class: "lead" }, "★ Leader"));
               }
               return td;
-            })
+            }),
           );
-        })
+        }),
       );
     });
     return h(
-      'table',
-      { class: 'print-table' },
+      "table",
+      { class: "print-table" },
       head(
         [
-          ['team', 'Team'],
-          ['num', '#']
-        ].concat(cols)
+          ["team", "Team"],
+          ["num", "#"],
+        ].concat(cols),
       ),
-      bodies
+      bodies,
     );
   }
 
@@ -146,18 +146,14 @@
    */
   function teamCell(d, g) {
     return h(
-      'th',
-      { scope: 'rowgroup', rowspan: String(g.members.length || 1) },
-      h('strong', null, 'Team ' + g.number),
-      g.title ? h('div', { dir: 'auto' }, g.title) : null,
-      g.link ? h('div', null, linkTo(g.link)) : null,
+      "th",
+      { scope: "rowgroup", rowspan: String(g.members.length || 1) },
+      h("strong", null, "Team " + g.number),
+      g.title ? h("div", { dir: "auto" }, g.title) : null,
+      g.link ? h("div", null, linkTo(g.link)) : null,
       d.milestones
-        ? h(
-            'div',
-            { class: 'note' },
-            App.progress.countText(d.milestones, g.progress)
-          )
-        : null
+        ? h("div", { class: "note" }, App.progress.countText(d.milestones, g.progress))
+        : null,
     );
   }
 
@@ -171,9 +167,9 @@
     var cols = columnsOf(d);
     var days = [];
     shown(d).forEach(function (r) {
-      var day = days.filter(function (x) {
+      var day = days.find(function (x) {
         return x.id === r.dayId;
-      })[0];
+      });
       if (!day) {
         day = { id: r.dayId, label: r.dayLabel, date: r.date, rows: [] };
         days.push(day);
@@ -182,15 +178,15 @@
     });
     return days.map(function (day) {
       return h(
-        'section',
-        { class: 'keep' },
+        "section",
+        { class: "keep" },
         h(
-          'h2',
+          "h2",
           null,
-          h('span', null, day.label + (day.date ? ' (' + day.date + ')' : '')),
-          h('span', { class: 'note' }, day.rows.length + ' booked')
+          h("span", null, day.label + (day.date ? " (" + day.date + ")" : "")),
+          h("span", { class: "note" }, day.rows.length + " booked"),
         ),
-        rowTable(cols, day.rows, null)
+        rowTable(cols, day.rows, null),
       );
     });
   }
@@ -206,24 +202,24 @@
    */
   function rowTable(cols, rows, review) {
     return h(
-      'table',
-      { class: 'print-table' },
+      "table",
+      { class: "print-table" },
       head(cols),
       h(
-        'tbody',
+        "tbody",
         null,
         rows.map(function (r) {
           return h(
-            'tr',
+            "tr",
             null,
             cols.map(function (c) {
-              return c[0] === 'review' && review
-                ? h('td', { class: 'review' }, review(r))
+              return c[0] === "review" && review
+                ? h("td", { class: "review" }, review(r))
                 : cell(c[0], r[c[0]]);
-            })
+            }),
           );
-        })
-      )
+        }),
+      ),
     );
   }
 
@@ -236,12 +232,12 @@
    */
   function reviewLines(d, r) {
     return d.steps.map(function (st) {
-      var s = r.review?.[st.id] || 'pending';
+      var s = r.review?.[st.id] || "pending";
       return h(
-        'div',
+        "div",
         null,
-        st.label.en + ': ',
-        h('span', { class: 'is-' + s }, REVIEW_WORD[s] || s)
+        st.label.en + ": ",
+        h("span", { class: "is-" + s }, REVIEW_WORD[s] || s),
       );
     });
   }
@@ -253,7 +249,7 @@
    * @return {!Array<!Object>} What is printed.
    */
   function shown(d) {
-    return (d.kind === 'team' ? d.groups : d.rows).filter(V.matches);
+    return (d.kind === "team" ? d.groups : d.rows).filter(V.matches);
   }
 
   /**
@@ -264,8 +260,8 @@
    */
   function countText(d) {
     var n = shown(d).length;
-    var word = { team: 'team', reservation: 'booking' }[d.kind];
-    return n + ' ' + (word || 'registration') + (n === 1 ? '' : 's');
+    var word = { team: "team", reservation: "booking" }[d.kind];
+    return n + " " + (word || "registration") + (n === 1 ? "" : "s");
   }
 
   /**
@@ -275,12 +271,12 @@
    * @return {string} The view, or '' for other forms.
    */
   function viewText(d) {
-    if (d.kind !== 'reservation') return '';
-    if (S.mode === 'today') return 'Today';
-    var day = (d.days || []).filter(function (x) {
+    if (d.kind !== "reservation") return "";
+    if (S.mode === "today") return "Today";
+    var day = (d.days || []).find(function (x) {
       return x.id === S.dayId;
-    })[0];
-    return S.mode === 'day' && day ? day.label : 'All days';
+    });
+    return S.mode === "day" && day ? day.label : "All days";
   }
 
   /**
@@ -290,12 +286,12 @@
    * @return {!Element} The heading.
    */
   function heading(d) {
-    var printed = new Date().toLocaleString('en-GB', {
-      day: 'numeric',
-      month: 'short',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
+    var printed = new Date().toLocaleString("en-GB", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
     });
     var facts = FormMetadata.display(d.form)
       .map(function (x) {
@@ -304,17 +300,15 @@
       .concat([viewText(d), countText(d)])
       .filter(Boolean);
     return h(
-      'header',
+      "header",
       null,
-      h('h1', null, d.form.title),
-      h('p', { class: 'facts' }, facts.join(' · ')),
+      h("h1", null, d.form.title),
+      h("p", { class: "facts" }, facts.join(" · ")),
       h(
-        'p',
-        { class: 'note' },
-        'Printed ' +
-          printed +
-          (S.q.trim() ? ' · only rows with "' + S.q.trim() + '"' : '')
-      )
+        "p",
+        { class: "note" },
+        "Printed " + printed + (S.q.trim() ? ' · only rows with "' + S.q.trim() + '"' : ""),
+      ),
     );
   }
 
@@ -325,9 +319,9 @@
    * @return {*} The tables.
    */
   function body(d) {
-    if (!shown(d).length) return h('p', null, 'Nothing to print.');
-    if (d.kind === 'team') return teamTable(d);
-    if (d.kind === 'reservation') return bookingTables(d);
+    if (!shown(d).length) return h("p", null, "Nothing to print.");
+    if (d.kind === "team") return teamTable(d);
+    if (d.kind === "reservation") return bookingTables(d);
     return rowTable(columnsOf(d), shown(d), reviewLines.bind(null, d));
   }
 
@@ -336,13 +330,11 @@
    * now. Nothing happens before a form is open.
    */
   V.preparePrint = function () {
-    var old = document.querySelector('.print-sheet');
+    var old = document.querySelector(".print-sheet");
     if (old) old.remove();
     var d = S.data;
     if (!d || S.error || S.askKey) return;
-    document.body.appendChild(
-      h('div', { class: 'print-sheet' }, heading(d), body(d))
-    );
+    document.body.appendChild(h("div", { class: "print-sheet" }, heading(d), body(d)));
   };
 
   /** Prints the sheet of the open form. */
@@ -351,5 +343,5 @@
     window.print();
   };
 
-  window.addEventListener('beforeprint', V.preparePrint);
+  window.addEventListener("beforeprint", V.preparePrint);
 })(window.App);

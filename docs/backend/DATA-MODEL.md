@@ -115,44 +115,44 @@ Rebuild all views**. A column the platform adds later is dressed the same way.
 
 ### Forms tab (one row per form)
 
-| Column | Meaning |
-|---|---|
-| `id` | Internal id, never changes |
-| `slug` | The link name used in `?f=` |
-| `type` | `team_registration`, `task_submission`, `reservation`, or `whatsapp_registration` |
-| `title`, `term` | Heading and the small tag beside it. The dashboard writes the term as a season and a year, for example `Fall 2027` |
-| `status` | `draft`, `open`, `closed`, `archived` |
-| `opensAt`, `closesAt` | Optional ISO dates |
-| `sheetId`, `sheetUrl` | The form's own spreadsheet |
-| `config` | **Everything else about the form, as JSON** (see below) |
-| `createdAt`, `updatedAt` | ISO timestamps |
+| Column                   | Meaning                                                                                                            |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------ |
+| `id`                     | Internal id, never changes                                                                                         |
+| `slug`                   | The link name used in `?f=`                                                                                        |
+| `type`                   | `team_registration`, `task_submission`, `reservation`, or `whatsapp_registration`                                  |
+| `title`, `term`          | Heading and the small tag beside it. The dashboard writes the term as a season and a year, for example `Fall 2027` |
+| `status`                 | `draft`, `open`, `closed`, `archived`                                                                              |
+| `opensAt`, `closesAt`    | Optional ISO dates                                                                                                 |
+| `sheetId`, `sheetUrl`    | The form's own spreadsheet                                                                                         |
+| `config`                 | **Everything else about the form, as JSON** (see below)                                                            |
+| `createdAt`, `updatedAt` | ISO timestamps                                                                                                     |
 
 The `config` cell is the reason new forms need no code:
 
-| Key | Holds |
-|---|---|
-| `batchYear` | WhatsApp forms only: the academic year of the batch, such as `2027/2028`. These forms keep `term` empty |
-| `subject` | Subject code shown beside the title, such as `CMPn323` (letters, digits, dashes, no spaces) |
-| `lang` | Default language and whether students see the switch |
-| `icon` | `team`, `calendar`, `task`, `chat`, or `none` |
-| `fields` | The questions: id, type, role, labels and an optional description (`help`) in English and Arabic, required, enabled, list name, name parts. A question added by the admin has `custom: true`, an id that starts with `q_`, the type `text`, `textarea` or `select`, and for `select` its own `options`. On a reservation the teammates question (`role: members`) also has `min` and `max` (0 to 19, not counting the leader) and an optional `notice` of the same shape as the team size note, shown for those numbers of teammates |
-| `steps` | The pages of the form in order: id, `title` in English and Arabic, and the ids of its questions in order. The admin can add, rename and reorder pages |
-| `rules` | `uniqueBy`, `uniqueAcrossForm`, `driveCheck`, `maxSubmissions`, `majors` (specializations allowed to register; empty means all), `sections` (sections offered and accepted; empty means all), `folderName { enabled, subject }` (Drive folder names must be `Team_Leader_Name_Project_Name_Subject_Name`; the subject name, for example `Software_Engineering`; empty accepts any subject name), `transfers` (a leader may ask for a student of another team), with `transferEmails` (email both leaders), `transferPhones` (show the two leaders of a waiting request each other's phone) and `transferWhatsapp` (the phone is a WhatsApp link), all off unless ticked, `sizeAlerts { critical { on, below }, warning { on, below } }` (the two warnings about small teams: a level that is on marks the teams with fewer people than `below`, a whole number from 2 to the biggest team size, and the warning must be above the critical one; whether an instructor sees them is `showSizeAlerts` of their link), **`teamSize { min, max, notice }`**. `notice` is optional: `{ sizes: [3, 4], text: { en, ar } }`, a note shown to students who pick one of those sizes; `{n}` and `{max}` are filled in |
-| `editKey` | `enabled`, `days`, `allowEdit`, `allowDelete`. On a reservation, a booking that may be cancelled may also move to another time, since cancelling and booking again does the same; with `allowEdit` off only its time changes. A booking made with a team's key only ever changes its time |
-| `slots` | Reservation days (id, label, date, times), `capacity`, and `pattern { start, end, length, gap }`: the session hours new days start with |
-| `keyBooking` | Reservations only: `enabled` and `source` (the id of the registration form whose keys book this one) |
-| `review` | Review steps and whether they are sequential |
-| `progress` | Team registrations only: `{ from, milestones: [{ id, label: { en, ar } }], students }`, the milestones copied from the milestones list `from` when the admin picked it. The copy changes only when the admin updates it from the list. `students` (on unless `false`) shows each team its own progress with its key. `null` when the form follows no progress |
-| `matching` | WhatsApp matching switch |
-| `notifications` | `confirmEmail`, `alertEmail` |
-| `messages` | Custom text for closed, not-yet, and draft states |
+| Key             | Holds                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| --------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `batchYear`     | WhatsApp forms only: the academic year of the batch, such as `2027/2028`. These forms keep `term` empty                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| `subject`       | Subject code shown beside the title, such as `CMPn323` (letters, digits, dashes, no spaces)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| `lang`          | Default language and whether students see the switch                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| `icon`          | `team`, `calendar`, `task`, `chat`, or `none`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| `fields`        | The questions: id, type, role, labels and an optional description (`help`) in English and Arabic, required, enabled, list name, name parts. A question added by the admin has `custom: true`, an id that starts with `q_`, the type `text`, `textarea` or `select`, and for `select` its own `options`. On a reservation the teammates question (`role: members`) also has `min` and `max` (0 to 19, not counting the leader) and an optional `notice` of the same shape as the team size note, shown for those numbers of teammates                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| `steps`         | The pages of the form in order: id, `title` in English and Arabic, and the ids of its questions in order. The admin can add, rename and reorder pages                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| `rules`         | `uniqueBy`, `uniqueAcrossForm`, `driveCheck`, `maxSubmissions`, `majors` (specializations allowed to register; empty means all), `sections` (sections offered and accepted; empty means all), `folderName { enabled, subject }` (Drive folder names must be `Team_Leader_Name_Project_Name_Subject_Name`; the subject name, for example `Software_Engineering`; empty accepts any subject name), `transfers` (a leader may ask for a student of another team), with `transferEmails` (email both leaders), `transferPhones` (show the two leaders of a waiting request each other's phone) and `transferWhatsapp` (the phone is a WhatsApp link), all off unless ticked, `sizeAlerts { critical { on, below }, warning { on, below } }` (the two warnings about small teams: a level that is on marks the teams with fewer people than `below`, a whole number from 2 to the biggest team size, and the warning must be above the critical one; whether an instructor sees them is `showSizeAlerts` of their link), **`teamSize { min, max, notice }`**. `notice` is optional: `{ sizes: [3, 4], text: { en, ar } }`, a note shown to students who pick one of those sizes; `{n}` and `{max}` are filled in |
+| `editKey`       | `enabled`, `days`, `allowEdit`, `allowDelete`. On a reservation, a booking that may be cancelled may also move to another time, since cancelling and booking again does the same; with `allowEdit` off only its time changes. A booking made with a team's key only ever changes its time                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| `slots`         | Reservation days (id, label, date, times), `capacity`, and `pattern { start, end, length, gap }`: the session hours new days start with                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| `keyBooking`    | Reservations only: `enabled` and `source` (the id of the registration form whose keys book this one)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| `review`        | Review steps and whether they are sequential                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| `progress`      | Team registrations only: `{ from, milestones: [{ id, label: { en, ar } }], students }`, the milestones copied from the milestones list `from` when the admin picked it. The copy changes only when the admin updates it from the list. `students` (on unless `false`) shows each team its own progress with its key. `null` when the form follows no progress                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| `matching`      | WhatsApp matching switch                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| `notifications` | `confirmEmail`, `alertEmail`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| `messages`      | Custom text for closed, not-yet, and draft states                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
 
 ### Lists tab
 
-| Column | Meaning |
-|---|---|
-| `key` | List key: the built-in `levels`, `curricula`, `majors`, `sections`, `groups`, `wa_sections`, or the key of a list an admin made (from its name, such as `third_year`) |
-| `values` | JSON array of `{ value, label: { en, ar } }` |
+| Column   | Meaning                                                                                                                                                               |
+| -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `key`    | List key: the built-in `levels`, `curricula`, `majors`, `sections`, `groups`, `wa_sections`, or the key of a list an admin made (from its name, such as `third_year`) |
+| `values` | JSON array of `{ value, label: { en, ar } }`                                                                                                                          |
 
 The row with the key `_info` is not a list. Its `values` is a JSON object with
 the name and the kind of each list an admin made:
@@ -169,20 +169,20 @@ whichever list of the kind `sections` a question reads.
 
 ### Clients tab (instructor and client links)
 
-| Column | Meaning |
-|---|---|
-| `id`, `name` | Internal id and the admin's label |
-| `tokenHash` | `sha256(pepper + ':client:' + token)`. The token itself is never stored. |
-| `forms` | JSON array of form ids, or `["*"]` for all forms. A row saved before ids were stored holds link names; it is read as ids and rewritten as ids on its next save, and before any form's link name changes. |
-| `hiddenColumns` | JSON array, for example `["phone","email"]` |
-| `canReview` | `1` if the link may mark review steps |
-| `active` | `0` when the link is turned off |
-| `createdAt` | ISO timestamp |
-| `keyHash` | `sha256(pepper + ':clientkey:' + id + ':' + key)` for the six-digit access key, or empty when the link asks for none |
-| `keySeal` | The access key sealed for the admin: `S` plus six digits, each shifted by a pad from `sha256(pepper + ':clientseal:' + id)`. Empty for a link without a key, and for keys made before this column existed. |
-| `expires` | ISO time the link stops working, or empty for no end |
-| `showSizeAlerts` | `0` when the link does not show the warnings about small teams; empty or `1` shows them |
-| `progress` | What the link may do with the progress of teams: `hidden`, `see` or `mark`. Empty, or a value it does not know, reads as `see` |
+| Column           | Meaning                                                                                                                                                                                                    |
+| ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `id`, `name`     | Internal id and the admin's label                                                                                                                                                                          |
+| `tokenHash`      | `sha256(pepper + ':client:' + token)`. The token itself is never stored.                                                                                                                                   |
+| `forms`          | JSON array of form ids, or `["*"]` for all forms. A row saved before ids were stored holds link names; it is read as ids and rewritten as ids on its next save, and before any form's link name changes.   |
+| `hiddenColumns`  | JSON array, for example `["phone","email"]`                                                                                                                                                                |
+| `canReview`      | `1` if the link may mark review steps                                                                                                                                                                      |
+| `active`         | `0` when the link is turned off                                                                                                                                                                            |
+| `createdAt`      | ISO timestamp                                                                                                                                                                                              |
+| `keyHash`        | `sha256(pepper + ':clientkey:' + id + ':' + key)` for the six-digit access key, or empty when the link asks for none                                                                                       |
+| `keySeal`        | The access key sealed for the admin: `S` plus six digits, each shifted by a pad from `sha256(pepper + ':clientseal:' + id)`. Empty for a link without a key, and for keys made before this column existed. |
+| `expires`        | ISO time the link stops working, or empty for no end                                                                                                                                                       |
+| `showSizeAlerts` | `0` when the link does not show the warnings about small teams; empty or `1` shows them                                                                                                                    |
+| `progress`       | What the link may do with the progress of teams: `hidden`, `see` or `mark`. Empty, or a value it does not know, reads as `see`                                                                             |
 
 `keyHash`, `keySeal` and `expires` were added after the first release. A Clients
 tab without them gets the headers the next time a link is saved; until then the
@@ -196,23 +196,23 @@ trash, where it can be restored for 30 days; the registry row is removed. Named 
 
 ### Responses tab (the raw data; do not edit by hand)
 
-| Column | Meaning |
-|---|---|
-| `id` | Internal id |
-| `ref` | Reference shown to the student, such as `TR-2027-0001`. Prefix by type: `TR`, `TK`, `RS`, `WA`. Numbered by row count, so a reference is never reused. |
-| `created`, `updated` | ISO timestamps |
-| `status` | `new`, `in_review`, `approved`, `rejected`, `done` |
-| `review` | JSON: each review step to `pending`, `approved`, or `rejected` |
-| `email`, `name`, `code`, `phone`, `title`, `link` | Copies of the answers found by **role**, so the sheet is readable and filterable |
-| `slot` | `day-id|time` for reservations |
-| `members` | Readable text: `name (code); name (code)` for team forms |
-| `data` | **The full validated answers as JSON**: the source of truth |
-| `keyHash` | `sha256(pepper + ':key:' + form id + ':' + key)`. Empty after deletion. |
-| `keyExpires` | ISO expiry of the key |
-| `deleted` | `1` for a cancelled registration; the row stays |
-| `keySeal` | The key sealed for the admin: `S` plus five digits, each shifted by a pad from `sha256(pepper + ':seal:' + form id + ':' + row id)`. Empty after deletion, and on rows saved before this column existed (the header is added on the next save). |
-| `number` | Team and task forms only: the team's number, given once when it registers and kept after it is cancelled, so the teams after it do not move up. Rows saved before this column existed get the numbers they showed, in the order they registered, the first time a team is added or cancelled. Empty for bookings and WhatsApp registrations. |
-| `progress` | Team registrations only: the marks of the team as JSON, by milestone id: `{ "m_x": { "s": "submitted", "t": "note for the team", "p": "private note", "at": "ISO", "by": "a" } }`. `s` is `not_yet`, `submitted` or `discussed`; `at` changes only with `s`; `by` is `a` for the admin or `c:` and the id of a link. A mark writes only this cell, so `updated` keeps the team's own last change. A milestone with no mark is Not yet; marks on a milestone the form no longer has stay in the cell. Empty when the team has no mark. |
+| Column                                            | Meaning                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| ------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `id`                                              | Internal id                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| `ref`                                             | Reference shown to the student, such as `TR-2027-0001`. Prefix by type: `TR`, `TK`, `RS`, `WA`. Numbered by row count, so a reference is never reused.                                                                                                                                                                                                                                                                                                                                                                                |
+| `created`, `updated`                              | ISO timestamps                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| `status`                                          | `new`, `in_review`, `approved`, `rejected`, `done`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| `review`                                          | JSON: each review step to `pending`, `approved`, or `rejected`                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| `email`, `name`, `code`, `phone`, `title`, `link` | Copies of the answers found by **role**, so the sheet is readable and filterable                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| `slot`                                            | `day-id                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               | time` for reservations |
+| `members`                                         | Readable text: `name (code); name (code)` for team forms                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| `data`                                            | **The full validated answers as JSON**: the source of truth                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| `keyHash`                                         | `sha256(pepper + ':key:' + form id + ':' + key)`. Empty after deletion.                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| `keyExpires`                                      | ISO expiry of the key                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| `deleted`                                         | `1` for a cancelled registration; the row stays                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| `keySeal`                                         | The key sealed for the admin: `S` plus five digits, each shifted by a pad from `sha256(pepper + ':seal:' + form id + ':' + row id)`. Empty after deletion, and on rows saved before this column existed (the header is added on the next save).                                                                                                                                                                                                                                                                                       |
+| `number`                                          | Team and task forms only: the team's number, given once when it registers and kept after it is cancelled, so the teams after it do not move up. Rows saved before this column existed get the numbers they showed, in the order they registered, the first time a team is added or cancelled. Empty for bookings and WhatsApp registrations.                                                                                                                                                                                          |
+| `progress`                                        | Team registrations only: the marks of the team as JSON, by milestone id: `{ "m_x": { "s": "submitted", "t": "note for the team", "p": "private note", "at": "ISO", "by": "a" } }`. `s` is `not_yet`, `submitted` or `discussed`; `at` changes only with `s`; `by` is `a` for the admin or `c:` and the id of a link. A mark writes only this cell, so `updated` keeps the team's own last change. A milestone with no mark is Not yet; marks on a milestone the form no longer has stay in the cell. Empty when the team has no mark. |
 
 The readable columns are derived from `data` every time a row is saved
 (`applyDerived_`). If they ever disagree, `data` wins.
@@ -228,65 +228,65 @@ and Requests tabs and the registry tabs are written the same way.
 One row for each member that a team asked for from another team of the same
 form (`rules.transfers`). A form that never has a request has no such tab.
 
-| Column | Meaning |
-|---|---|
-| `id` | Unique id of the request |
-| `created`, `updated` | ISO timestamps |
-| `status` | `pending`, `approved`, `rejected`, `cancelled` (by the team that asked) or `closed` (the student moved elsewhere, or one of the two teams was cancelled by its leader or deleted by the admin) |
-| `code` | Code of the student, a member or the leader of the team that holds them. Which of the two is read from that team when the request is shown or answered |
-| `member` | The member as the asking team typed it (JSON); this is what joins the team on approval |
-| `fromId`, `fromRef` | The team that holds the student |
-| `toId`, `toRef` | The team that asked |
-| `decidedBy` | `leader` or `admin` |
+| Column               | Meaning                                                                                                                                                                                        |
+| -------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `id`                 | Unique id of the request                                                                                                                                                                       |
+| `created`, `updated` | ISO timestamps                                                                                                                                                                                 |
+| `status`             | `pending`, `approved`, `rejected`, `cancelled` (by the team that asked) or `closed` (the student moved elsewhere, or one of the two teams was cancelled by its leader or deleted by the admin) |
+| `code`               | Code of the student, a member or the leader of the team that holds them. Which of the two is read from that team when the request is shown or answered                                         |
+| `member`             | The member as the asking team typed it (JSON); this is what joins the team on approval                                                                                                         |
+| `fromId`, `fromRef`  | The team that holds the student                                                                                                                                                                |
+| `toId`, `toRef`      | The team that asked                                                                                                                                                                            |
+| `decidedBy`          | `leader` or `admin`                                                                                                                                                                            |
 
 ### Requests tab (WhatsApp forms only)
 
-| Column | Meaning |
-|---|---|
-| `id` | Internal id |
-| `raw` | The original pasted line |
-| `phone` | Normalised phone found in it |
-| `label` | The rest of the line, usually the name |
-| `added` | ISO timestamp |
-| `decision` | `pending`, `approved`, `rejected` |
-| `note` | Reviewer's note |
+| Column     | Meaning                                |
+| ---------- | -------------------------------------- |
+| `id`       | Internal id                            |
+| `raw`      | The original pasted line               |
+| `phone`    | Normalised phone found in it           |
+| `label`    | The rest of the line, usually the name |
+| `added`    | ISO timestamp                          |
+| `decision` | `pending`, `approved`, `rejected`      |
+| `note`     | Reviewer's note                        |
 
 ### View tabs (generated; safe to delete, they are rebuilt)
 
-| Tab | For | Layout |
-|---|---|---|
+| Tab                 | For                 | Layout                                                                                                                                                   |
+| ------------------- | ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `Team Members List` | Team and task forms | One block per team: heavy border, alternating tint family, member name, section, code, star on the leader, one merged project or task cell with its link |
-| `Bookings` | Reservations | One block per day in timetable order |
-| `Registrations` | WhatsApp forms | Sorted by group and section with review status and a timetable link |
-| `Print - ...` | Printing | A tab per printed day or the team list, with a signature column where relevant |
+| `Bookings`          | Reservations        | One block per day in timetable order                                                                                                                     |
+| `Registrations`     | WhatsApp forms      | Sorted by group and section with review status and a timetable link                                                                                      |
+| `Print - ...`       | Printing            | A tab per printed day or the team list, with a signature column where relevant                                                                           |
 
 ## Script properties (private settings)
 
 Stored by Apps Script itself, not in any sheet:
 
-| Property | Holds |
-|---|---|
-| `PEPPER` | A long random value created once. It salts every stored hash. |
-| `ADMIN_PIN_HASH` | `sha256(pepper + ':admin:' + pin)` |
-| `REGISTRY_ID` | The registry spreadsheet's id |
-| `ROOT_FOLDER_ID` | The `Forms Platform` Drive folder |
-| `SITE_URL` | Your website address, used in emails |
-| `ADMIN_DEVICE_DAYS` | How many days a trusted-device pass lasts, set from the sheet menu. Unset means 30 |
-| `LOCKED_MESSAGE` | What the shared admin lock answers, set with **Set lock message...** in the sheet menu. Unset means a plain sentence with the time left |
+| Property                   | Holds                                                                                                                                                         |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `PEPPER`                   | A long random value created once. It salts every stored hash.                                                                                                 |
+| `ADMIN_PIN_HASH`           | `sha256(pepper + ':admin:' + pin)`                                                                                                                            |
+| `REGISTRY_ID`              | The registry spreadsheet's id                                                                                                                                 |
+| `ROOT_FOLDER_ID`           | The `Forms Platform` Drive folder                                                                                                                             |
+| `SITE_URL`                 | Your website address, used in emails                                                                                                                          |
+| `ADMIN_DEVICE_DAYS`        | How many days a trusted-device pass lasts, set from the sheet menu. Unset means 30                                                                            |
+| `LOCKED_MESSAGE`           | What the shared admin lock answers, set with **Set lock message...** in the sheet menu. Unset means a plain sentence with the time left                       |
 | `admin_device:<pass hash>` | When a trusted-device pass was made. The hash is `sha256(pepper + ':device:' + pass)`. Ended passes are removed when they are next shown or a new one is made |
-| `dirty:<form id>` | The time of the last change whose sheet views are not repainted yet. The booked run of `processDirtyViews` clears it |
+| `dirty:<form id>`          | The time of the last change whose sheet views are not repainted yet. The booked run of `processDirtyViews` clears it                                          |
 
 ## Short-lived counters (CacheService)
 
-| Key | Purpose | Limit |
-|---|---|---|
-| `admin_fails` | Wrong admin PINs from browsers that are not trusted, as `count\|untilMs`: the cache cannot say when an entry ends, so the counter carries it for the countdown | The 8th within `ADMIN_LOCK_SECONDS` (30 minutes) locks for that long |
-| `admin_device_fails:<pass hash>` | The same, for one trusted device | The 8th locks that device alone |
-| `badkey:<form id>` | Wrong edit keys on a form | 10 per minute |
-| `bad_tokens` | Wrong viewer tokens | 30 per minute |
-| `client_key:<client id>` | Wrong access keys on one private link | 5 then locked 10 minutes |
-| `views_booked` | A note that a repaint of the sheet views is booked, so a change does not look at the triggers again | 5 minutes |
-| `dl_job:<folder id>` | A Download all in progress: its form, its work folder, what could not be saved, its zip parts | 6 hours |
+| Key                              | Purpose                                                                                                                                                        | Limit                                                                |
+| -------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------- |
+| `admin_fails`                    | Wrong admin PINs from browsers that are not trusted, as `count\|untilMs`: the cache cannot say when an entry ends, so the counter carries it for the countdown | The 8th within `ADMIN_LOCK_SECONDS` (30 minutes) locks for that long |
+| `admin_device_fails:<pass hash>` | The same, for one trusted device                                                                                                                               | The 8th locks that device alone                                      |
+| `badkey:<form id>`               | Wrong edit keys on a form                                                                                                                                      | 10 per minute                                                        |
+| `bad_tokens`                     | Wrong viewer tokens                                                                                                                                            | 30 per minute                                                        |
+| `client_key:<client id>`         | Wrong access keys on one private link                                                                                                                          | 5 then locked 10 minutes                                             |
+| `views_booked`                   | A note that a repaint of the sheet views is booked, so a change does not look at the triggers again                                                            | 5 minutes                                                            |
+| `dl_job:<folder id>`             | A Download all in progress: its form, its work folder, what could not be saved, its zip parts                                                                  | 6 hours                                                              |
 
 Download all works in the owner's Drive, in `Forms Platform / Exports / Downloads`,
 one folder per download named after the form. Starting a new download of the
@@ -297,12 +297,12 @@ writes and cannot be reset from the browser.
 
 ## Browser storage
 
-| Where | Key | Holds | Lasts |
-|---|---|---|---|
-| `sessionStorage` | `fp_draft_<slug>` | The student's unsent answers | Until the tab closes |
-| `sessionStorage` | `fp_admin_pin` | The admin PIN for this tab | Until the tab closes |
-| `localStorage` | `fp_theme` | Light, dark, or follow the device | Until cleared |
-| `localStorage` | `fp_lang` | English or Arabic | Until cleared |
+| Where            | Key               | Holds                             | Lasts                |
+| ---------------- | ----------------- | --------------------------------- | -------------------- |
+| `sessionStorage` | `fp_draft_<slug>` | The student's unsent answers      | Until the tab closes |
+| `sessionStorage` | `fp_admin_pin`    | The admin PIN for this tab        | Until the tab closes |
+| `localStorage`   | `fp_theme`        | Light, dark, or follow the device | Until cleared        |
+| `localStorage`   | `fp_lang`         | English or Arabic                 | Until cleared        |
 
 ## How a registration is shaped
 
@@ -320,8 +320,22 @@ Example for a team of three (`team_size` is the total, including the leader):
   "curriculum": "2020",
   "team_size": "3",
   "members": [
-    { "name": "سارة خالد حسن علي", "phone": "01112345678", "code": "4230998", "level": "صفر / الأولى", "curriculum": "2020", "section": "4C-TH1" },
-    { "name": "منى أشرف كمال فؤاد", "phone": "01212345678", "code": "4230997", "level": "صفر / الأولى", "curriculum": "2020", "section": "4C-TH1" }
+    {
+      "name": "سارة خالد حسن علي",
+      "phone": "01112345678",
+      "code": "4230998",
+      "level": "صفر / الأولى",
+      "curriculum": "2020",
+      "section": "4C-TH1"
+    },
+    {
+      "name": "منى أشرف كمال فؤاد",
+      "phone": "01212345678",
+      "code": "4230997",
+      "level": "صفر / الأولى",
+      "curriculum": "2020",
+      "section": "4C-TH1"
+    }
   ],
   "title": "Library System"
 }

@@ -3,7 +3,7 @@
  * state and end, its access key, and what can be done to it.
  */
 (function (App) {
-  'use strict';
+  "use strict";
 
   var A = App.admin;
   var ui = App.ui;
@@ -21,16 +21,16 @@
    */
   function actButton(name, cls, text, act) {
     return h(
-      'button',
+      "button",
       {
-        type: 'button',
+        type: "button",
         class: cls,
         name: name,
         onclick: function (e) {
           A.busy(e.currentTarget, act);
-        }
+        },
       },
-      text
+      text,
     );
   }
 
@@ -42,15 +42,15 @@
    * @return {string} The titles, or 'All forms'.
    */
   function accessText(c, forms) {
-    if (c.forms.indexOf('*') !== -1) return 'All forms';
+    if (c.forms.indexOf("*") !== -1) return "All forms";
     return c.forms
       .map(function (id) {
-        var f = forms.filter(function (x) {
+        var f = forms.find(function (x) {
           return x.id === id;
-        })[0];
+        });
         return f ? f.title : id;
       })
-      .join(', ');
+      .join(", ");
   }
 
   /**
@@ -60,28 +60,28 @@
    * @return {!Element} The cell content.
    */
   function linkCell(c) {
-    var badge = A.badge('On', 'open');
-    if (!c.active) badge = A.badge('Off', 'closed');
-    else if (c.expired) badge = A.badge('Ended', 'closed');
+    var badge = A.badge("On", "open");
+    if (!c.active) badge = A.badge("Off", "closed");
+    else if (c.expired) badge = A.badge("Ended", "closed");
     return h(
-      'div',
-      { class: 'client-key' },
+      "div",
+      { class: "client-key" },
       badge,
       c.active ? A.untilText(c.expires) : null,
       c.active
         ? h(
-            'button',
+            "button",
             {
-              type: 'button',
-              class: 'link-btn',
-              name: 'change-end',
+              type: "button",
+              class: "link-btn",
+              name: "change-end",
               onclick: function () {
                 A.linkEndDialog(c);
-              }
+              },
             },
-            c.expired ? 'Extend' : 'Change'
+            c.expired ? "Extend" : "Change",
           )
-        : null
+        : null,
     );
   }
 
@@ -92,8 +92,8 @@
    * @return {!Promise} Settles once it is shown.
    */
   async function showKey(c) {
-    var r = await A.call('admin.clients.showKey', { id: c.id });
-    A.revealAccess('Access key for ' + c.name, '', r.accessKey);
+    var r = await A.call("admin.clients.showKey", { id: c.id });
+    A.revealAccess("Access key for " + c.name, "", r.accessKey);
   }
 
   /**
@@ -106,18 +106,18 @@
     if (
       c.hasKey &&
       !(await ui.confirm({
-        title: 'Make a new key for ' + c.name + '?',
-        body: 'The old key stops working right away. Send them the new one.',
-        confirmText: 'Make new key'
+        title: "Make a new key for " + c.name + "?",
+        body: "The old key stops working right away. Send them the new one.",
+        confirmText: "Make new key",
       }))
     ) {
       return;
     }
-    var r = await A.call('admin.clients.key', { id: c.id, on: true });
+    var r = await A.call("admin.clients.key", { id: c.id, on: true });
     A.revealAccess(
-      (c.hasKey ? 'New access key for ' : 'Access key for ') + c.name,
-      '',
-      r.accessKey
+      (c.hasKey ? "New access key for " : "Access key for ") + c.name,
+      "",
+      r.accessKey,
     );
     A.render();
   }
@@ -130,14 +130,14 @@
    */
   async function removeKey(c) {
     var ok = await ui.confirm({
-      title: 'Remove the key of ' + c.name + '?',
-      body: 'The link alone will open their view again.',
-      confirmText: 'Remove key',
-      danger: true
+      title: "Remove the key of " + c.name + "?",
+      body: "The link alone will open their view again.",
+      confirmText: "Remove key",
+      danger: true,
     });
     if (!ok) return;
-    await A.call('admin.clients.key', { id: c.id, on: false });
-    toast('The link no longer asks for a key.', 'ok');
+    await A.call("admin.clients.key", { id: c.id, on: false });
+    toast("The link no longer asks for a key.", "ok");
     A.render();
   }
 
@@ -149,21 +149,12 @@
    */
   function keyCell(c) {
     return h(
-      'div',
-      { class: 'client-key' },
-      c.hasKey ? 'Asked' : h('span', { class: 'warn-text' }, 'Not asked'),
-      c.keyKnown
-        ? actButton('show-key', 'link-btn', 'Show', showKey.bind(null, c))
-        : null,
-      actButton(
-        'new-key',
-        'link-btn',
-        c.hasKey ? 'New key' : 'Add a key',
-        newKey.bind(null, c)
-      ),
-      c.hasKey
-        ? actButton('remove-key', 'link-btn', 'Remove', removeKey.bind(null, c))
-        : null
+      "div",
+      { class: "client-key" },
+      c.hasKey ? "Asked" : h("span", { class: "warn-text" }, "Not asked"),
+      c.keyKnown ? actButton("show-key", "link-btn", "Show", showKey.bind(null, c)) : null,
+      actButton("new-key", "link-btn", c.hasKey ? "New key" : "Add a key", newKey.bind(null, c)),
+      c.hasKey ? actButton("remove-key", "link-btn", "Remove", removeKey.bind(null, c)) : null,
     );
   }
 
@@ -175,13 +166,13 @@
    */
   async function newLink(c) {
     var ok = await ui.confirm({
-      title: 'Make a new link for ' + c.name + '?',
-      body: 'The old link stops working right away.',
-      confirmText: 'Make new link'
+      title: "Make a new link for " + c.name + "?",
+      body: "The old link stops working right away.",
+      confirmText: "Make new link",
     });
     if (!ok) return;
-    var r = await A.call('admin.clients.regenerate', { id: c.id });
-    A.revealAccess('New link for ' + c.name, r.token, '');
+    var r = await A.call("admin.clients.regenerate", { id: c.id });
+    A.revealAccess("New link for " + c.name, r.token, "");
     A.render();
   }
 
@@ -192,11 +183,11 @@
    * @return {!Promise} Settles once it is saved.
    */
   async function toggle(c) {
-    await A.call('admin.clients.update', {
+    await A.call("admin.clients.update", {
       id: c.id,
-      patch: { active: !c.active }
+      patch: { active: !c.active },
     });
-    toast(c.active ? 'Link turned off' : 'Link turned on', 'ok');
+    toast(c.active ? "Link turned off" : "Link turned on", "ok");
     A.render();
   }
 
@@ -208,14 +199,14 @@
    */
   async function remove(c) {
     var ok = await ui.confirm({
-      title: 'Delete ' + c.name + '?',
-      body: 'Their link stops working and cannot be restored.',
-      confirmText: 'Delete',
-      danger: true
+      title: "Delete " + c.name + "?",
+      body: "Their link stops working and cannot be restored.",
+      confirmText: "Delete",
+      danger: true,
     });
     if (!ok) return;
-    await A.call('admin.clients.remove', { id: c.id });
-    toast('Deleted', 'ok');
+    await A.call("admin.clients.remove", { id: c.id });
+    toast("Deleted", "ok");
     A.render();
   }
 
@@ -227,35 +218,25 @@
    * @return {!Element} The cell content.
    */
   function actions(c, forms) {
-    var quiet = 'btn btn-quiet sm';
+    var quiet = "btn btn-quiet sm";
     return h(
-      'div',
-      { class: 'actions' },
+      "div",
+      { class: "actions" },
       h(
-        'button',
+        "button",
         {
-          type: 'button',
+          type: "button",
           class: quiet,
-          name: 'edit',
+          name: "edit",
           onclick: function () {
             A.clientDialog(c, forms);
-          }
+          },
         },
-        'Edit'
+        "Edit",
       ),
-      actButton('regenerate', quiet, 'New link', newLink.bind(null, c)),
-      actButton(
-        'toggle',
-        quiet,
-        c.active ? 'Turn off' : 'Turn on',
-        toggle.bind(null, c)
-      ),
-      actButton(
-        'delete',
-        quiet,
-        ui.icon('trash', A.ICON_SIZE.LINE),
-        remove.bind(null, c)
-      )
+      actButton("regenerate", quiet, "New link", newLink.bind(null, c)),
+      actButton("toggle", quiet, c.active ? "Turn off" : "Turn on", toggle.bind(null, c)),
+      actButton("delete", quiet, ui.icon("trash", A.ICON_SIZE.LINE), remove.bind(null, c)),
     );
   }
 
@@ -267,7 +248,7 @@
    * @return {!Element} The cell.
    */
   function cell(label, content) {
-    return h('td', { dataset: { label: label } }, content);
+    return h("td", { dataset: { label: label } }, content);
   }
 
   /**
@@ -279,20 +260,17 @@
    */
   A.clientRow = function (c, forms) {
     return h(
-      'tr',
+      "tr",
       { dataset: { client: c.id } },
-      h('td', { class: 'nm' }, h('strong', null, c.name)),
-      cell('Can see', accessText(c, forms) || 'No forms'),
-      cell(
-        'Hidden columns',
-        c.hiddenColumns.length ? c.hiddenColumns.join(', ') : 'None'
-      ),
-      cell('Can review', c.canReview ? 'Yes' : 'No'),
-      cell('Small teams', c.showSizeAlerts ? 'Shown' : 'Hidden'),
-      cell('Progress', A.progressWord(c.progress)),
-      cell('Link', linkCell(c)),
-      cell('Access key', keyCell(c)),
-      h('td', null, actions(c, forms))
+      h("td", { class: "nm" }, h("strong", null, c.name)),
+      cell("Can see", accessText(c, forms) || "No forms"),
+      cell("Hidden columns", c.hiddenColumns.length ? c.hiddenColumns.join(", ") : "None"),
+      cell("Can review", c.canReview ? "Yes" : "No"),
+      cell("Small teams", c.showSizeAlerts ? "Shown" : "Hidden"),
+      cell("Progress", A.progressWord(c.progress)),
+      cell("Link", linkCell(c)),
+      cell("Access key", keyCell(c)),
+      h("td", null, actions(c, forms)),
     );
   };
 })(window.App);

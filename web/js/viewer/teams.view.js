@@ -5,7 +5,7 @@
  * it. Only the columns the link shows are drawn.
  */
 (function (App) {
-  'use strict';
+  "use strict";
 
   var V = App.viewer;
   var ui = App.ui;
@@ -29,10 +29,10 @@
       return c.id;
     });
     return {
-      name: ids.indexOf('name') !== -1,
-      section: ids.indexOf('section') !== -1,
-      code: ids.indexOf('code') !== -1,
-      phone: ids.indexOf('phone') !== -1
+      name: ids.indexOf("name") !== -1,
+      section: ids.indexOf("section") !== -1,
+      code: ids.indexOf("code") !== -1,
+      phone: ids.indexOf("phone") !== -1,
     };
   }
 
@@ -44,13 +44,13 @@
    */
   function headRow(show) {
     return h(
-      'tr',
+      "tr",
       null,
-      h('th', null, '#'),
-      show.name ? h('th', null, 'Team member') : null,
-      show.section ? h('th', null, 'Section') : null,
-      show.code ? h('th', null, 'Code') : null,
-      show.phone ? h('th', null, 'Phone') : null
+      h("th", null, "#"),
+      show.name ? h("th", null, "Team member") : null,
+      show.section ? h("th", null, "Section") : null,
+      show.code ? h("th", null, "Code") : null,
+      show.phone ? h("th", null, "Phone") : null,
     );
   }
 
@@ -62,12 +62,10 @@
    */
   function nameCell(m) {
     return h(
-      'td',
-      { class: 'nm' },
+      "td",
+      { class: "nm" },
       V.bdi(m.name),
-      m.leader
-        ? h('span', { class: 'lead-tag' }, icon('star', LEADER_ICON), 'Leader')
-        : null
+      m.leader ? h("span", { class: "lead-tag" }, icon("star", LEADER_ICON), "Leader") : null,
     );
   }
 
@@ -81,23 +79,19 @@
    */
   function memberRow(show, m, k) {
     return h(
-      'tr',
-      { class: m.leader ? 'leader' : null },
-      h('td', { class: 'num' }, String(k + 1)),
+      "tr",
+      { class: m.leader ? "leader" : null },
+      h("td", { class: "num" }, String(k + 1)),
       show.name ? nameCell(m) : null,
-      show.section
-        ? h('td', { dataset: { label: 'Section' } }, m.section || '-')
-        : null,
-      show.code
-        ? h('td', { class: 'mono', dataset: { label: 'Code' } }, m.code)
-        : null,
+      show.section ? h("td", { dataset: { label: "Section" } }, m.section || "-") : null,
+      show.code ? h("td", { class: "mono", dataset: { label: "Code" } }, m.code) : null,
       show.phone
         ? h(
-            'td',
-            { class: 'mono tel', dataset: { label: 'Phone' } },
-            m.phone ? h('a', { href: 'tel:' + m.phone }, m.phone) : '-'
+            "td",
+            { class: "mono tel", dataset: { label: "Phone" } },
+            m.phone ? h("a", { href: "tel:" + m.phone }, m.phone) : "-",
           )
-        : null
+        : null,
     );
   }
 
@@ -110,21 +104,21 @@
    */
   function teamTitle(d, g) {
     if (g.title === undefined && g.link === undefined) {
-      return h('div', { class: 'block-title' });
+      return h("div", { class: "block-title" });
     }
-    var third = d.form.type === FormType.TASK_SUBMISSION ? 'Task' : 'Project';
+    var third = d.form.type === FormType.TASK_SUBMISSION ? "Task" : "Project";
     return h(
-      'div',
-      { class: 'block-side block-title' },
-      h('span', { class: 'kicker' }, third),
+      "div",
+      { class: "block-side block-title" },
+      h("span", { class: "kicker" }, third),
       g.link
         ? h(
-            'a',
-            { href: g.link, target: '_blank', rel: 'noopener' },
-            g.title || 'Open',
-            icon('link', LINK_ICON)
+            "a",
+            { href: g.link, target: "_blank", rel: "noopener" },
+            g.title || "Open",
+            icon("link", LINK_ICON),
           )
-        : h('span', null, g.title || '-')
+        : h("span", null, g.title || "-"),
     );
   }
 
@@ -139,40 +133,40 @@
    */
   function teamCard(d, show, g, i) {
     return h(
-      'article',
+      "article",
       {
-        class: 'block team-card ' + (i % 2 ? 'tint-b' : 'tint-a'),
-        dataset: { ref: g.ref }
+        class: "block team-card " + (i % 2 ? "tint-b" : "tint-a"),
+        dataset: { ref: g.ref },
       },
       h(
-        'header',
-        { class: 'block-head' },
-        h('span', { class: 'team-no' }, 'Team ' + g.number),
+        "header",
+        { class: "block-head" },
+        h("span", { class: "team-no" }, "Team " + g.number),
         teamTitle(d, g),
         h(
-          'span',
-          { class: 'block-meta' },
-          g.members.length === 1 ? 'Solo' : g.members.length + ' members',
+          "span",
+          { class: "block-meta" },
+          g.members.length === 1 ? "Solo" : g.members.length + " members",
           App.sizeAlerts.tag(d.sizeAlerts, g.alert),
           d.milestones
             ? h(
-                'span',
-                { class: 'progress-count' },
-                ' · ' + App.progress.countText(d.milestones, g.progress)
+                "span",
+                { class: "progress-count" },
+                " · " + App.progress.countText(d.milestones, g.progress),
               )
-            : null
-        )
+            : null,
+        ),
       ),
       h(
-        'div',
-        { class: 'scroll-x' },
+        "div",
+        { class: "scroll-x" },
         h(
-          'table',
-          { class: 'mini' },
-          h('thead', null, headRow(show)),
-          h('tbody', null, g.members.map(memberRow.bind(null, show)))
-        )
-      )
+          "table",
+          { class: "mini" },
+          h("thead", null, headRow(show)),
+          h("tbody", null, g.members.map(memberRow.bind(null, show))),
+        ),
+      ),
     );
   }
 
@@ -192,20 +186,20 @@
       view: V.state.board,
       save: function (team, id, change, baseAt) {
         return V.call(
-          'viewer.progress.mark',
+          "viewer.progress.mark",
           Object.assign(
             {
               slug: d.form.slug,
               submissionId: team.id,
               milestone: id,
-              baseAt: baseAt
+              baseAt: baseAt,
             },
-            change
-          )
+            change,
+          ),
         ).then(function (out) {
           return out.progress;
         });
-      }
+      },
     });
   }
 
@@ -218,10 +212,8 @@
    */
   V.teams = function (d) {
     var groups = d.groups.filter(V.matches);
-    if (d.milestones && V.view() === 'progress') {
-      return groups.length
-        ? board(d, groups)
-        : h('div', { class: 'empty' }, 'No teams to show.');
+    if (d.milestones && V.view() === "progress") {
+      return groups.length ? board(d, groups) : h("div", { class: "empty" }, "No teams to show.");
     }
     var show = shownColumns(d);
     // The small teams are counted over the whole form, whatever the search
@@ -229,22 +221,22 @@
     var warned = App.sizeAlerts.summary(
       d.sizeAlerts,
       d.groups.map(function (g) {
-        return { label: 'Team ' + g.number, alert: g.alert };
-      })
+        return { label: "Team " + g.number, alert: g.alert };
+      }),
     );
     return h(
-      'div',
+      "div",
       null,
       warned,
       groups.length
         ? h(
-            'div',
-            { class: 'team-list' },
+            "div",
+            { class: "team-list" },
             groups.map(function (g, i) {
               return teamCard(d, show, g, i);
-            })
+            }),
           )
-        : h('div', { class: 'empty' }, 'No teams to show.')
+        : h("div", { class: "empty" }, "No teams to show."),
     );
   };
 })(window.App);

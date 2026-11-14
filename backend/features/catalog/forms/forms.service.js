@@ -18,7 +18,7 @@ var FormsService = (function () {
     var base = Text.slugify(wanted);
     var slug = base;
     var n = FIRST_SUFFIX_;
-    while (taken[slug]) slug = base + '-' + n++;
+    while (taken[slug]) slug = base + "-" + n++;
     return slug;
   }
 
@@ -30,16 +30,11 @@ var FormsService = (function () {
   function attachSheet_(form) {
     var cols = ResponsesRepository.RESPONSE_COLS;
     var metadata = FormMetadata.sheet(form);
-    var ss = SpreadsheetApp.create(
-      form.title + (metadata ? ' - ' + metadata : '')
-    );
+    var ss = SpreadsheetApp.create(form.title + (metadata ? " - " + metadata : ""));
     var first = ss.getSheets()[0];
-    first.setName('Responses');
-    first
-      .getRange(1, 1, 1, cols.length)
-      .setValues([cols])
-      .setFontWeight('bold');
-    first.getRange(1, 1, first.getMaxRows(), cols.length).setNumberFormat('@');
+    first.setName("Responses");
+    first.getRange(1, 1, 1, cols.length).setValues([cols]).setFontWeight("bold");
+    first.getRange(1, 1, first.getMaxRows(), cols.length).setNumberFormat("@");
     first.setFrozenRows(1);
     SheetStyle.styleDataTab(first, cols);
     DriveApp.getFileById(ss.getId()).moveTo(RegistryRepository.rootFolder());
@@ -59,14 +54,12 @@ var FormsService = (function () {
    * @return {!Object} The saved form.
    */
   function addForm_(form, wantedSlug, adjust) {
-    form.id = Crypto.shortId('f_');
-    form.status = 'draft';
+    form.id = Crypto.shortId("f_");
+    form.status = "draft";
     form.createdAt = Time.nowIso();
     attachSheet_(form);
     return Lock.withLock(function () {
-      form.slug = uniqueSlug_(
-        wantedSlug || form.title + ' ' + FormMetadata.slug(form)
-      );
+      form.slug = uniqueSlug_(wantedSlug || form.title + " " + FormMetadata.slug(form));
       if (adjust) adjust(form);
       return FormsRepository.saveForm(form);
     });
@@ -84,16 +77,16 @@ var FormsService = (function () {
    */
   function createForm(o, adjust) {
     if (Object.values(FormType).indexOf(o.type) === -1) {
-      ApiError.fail('unknown_type', 'Unknown form type.');
+      ApiError.fail("unknown_type", "Unknown form type.");
     }
-    var title = String(o.title || '').trim();
-    if (!title) ApiError.fail('title_required', 'Give the form a title.');
+    var title = String(o.title || "").trim();
+    if (!title) ApiError.fail("title_required", "Give the form a title.");
     var form = TemplatesService.templateFor(o.type);
     form.type = o.type;
     form.title = title;
     Object.assign(form, FormMetadata.create(form.type, o));
-    form.opensAt = '';
-    form.closesAt = '';
+    form.opensAt = "";
+    form.closesAt = "";
     return addForm_(form, o.slug, adjust);
   }
 
@@ -130,7 +123,7 @@ var FormsService = (function () {
       DriveApp.getFileById(form.sheetId).setTrashed(true);
       return true;
     } catch (e) {
-      Logger.log('Sheet not trashed: ' + e.message);
+      Logger.log("Sheet not trashed: " + e.message);
       return false;
     }
   }
@@ -143,7 +136,7 @@ var FormsService = (function () {
   function forgetForm_(form) {
     try {
       PropertiesService.getScriptProperties().deleteProperty(
-        Constants.PROPS.DIRTY_PREFIX + form.id
+        Constants.PROPS.DIRTY_PREFIX + form.id,
       );
     } catch (e) {
       /* nothing to clean */
@@ -188,11 +181,8 @@ var FormsService = (function () {
    */
   function deleteConfirmed(id, confirm) {
     var form = FormsRepository.requireForm(id);
-    if (String(confirm || '') !== form.slug) {
-      ApiError.fail(
-        'confirm_required',
-        'Confirm by sending the form link name.'
-      );
+    if (String(confirm || "") !== form.slug) {
+      ApiError.fail("confirm_required", "Confirm by sending the form link name.");
     }
     return deleteForm(form.id);
   }
@@ -231,21 +221,19 @@ var FormsService = (function () {
     var out = {
       form: form,
       lists: ListsRepository.readLists(),
-      listInfo: ListsRepository.readListInfo()
+      listInfo: ListsRepository.readListInfo(),
     };
     var reservation = form.type === FormType.RESERVATION;
     if (reservation) {
       out.taken = SlotsRules.slotAvailability(form);
-      out.keySources = KeyBookingService.keyBookingSources(form).map(
-        function (s) {
-          return { id: s.id, title: s.title, term: FormMetadata.slug(s) };
-        }
-      );
+      out.keySources = KeyBookingService.keyBookingSources(form).map(function (s) {
+        return { id: s.id, title: s.title, term: FormMetadata.slug(s) };
+      });
     }
-    if (Rules.fieldByRole(form, 'team_size')) {
+    if (Rules.fieldByRole(form, "team_size")) {
       out.teamSizes = ResponsesRules.teamSizes(form);
     }
-    if (reservation && Rules.fieldByRole(form, 'members')) {
+    if (reservation && Rules.fieldByRole(form, "members")) {
       out.teammateCounts = ResponsesRules.teammateCounts(form);
     }
     if (form.type === FormType.TEAM_REGISTRATION) {
@@ -261,6 +249,6 @@ var FormsService = (function () {
     deleteConfirmed,
     listForms,
     requireForm,
-    adminForm
+    adminForm,
   };
 })();

@@ -11,14 +11,10 @@ var ResponsesRules = (function () {
    */
   function assertAcceptingSubmissions_(form) {
     var state = Rules.formState(form);
-    if (state !== 'open')
-      ApiError.fail(
-        'form_' + state,
-        'This form is not accepting submissions.',
-        {
-          state: state
-        }
-      );
+    if (state !== "open")
+      ApiError.fail("form_" + state, "This form is not accepting submissions.", {
+        state: state,
+      });
   }
 
   /**
@@ -30,12 +26,8 @@ var ResponsesRules = (function () {
    * @throws {ApiError} `form_full`.
    */
   function checkFull_(rules, others, selfId) {
-    if (
-      rules.maxSubmissions &&
-      !selfId &&
-      others.length >= rules.maxSubmissions
-    )
-      ApiError.fail('form_full', 'This form is full.');
+    if (rules.maxSubmissions && !selfId && others.length >= rules.maxSubmissions)
+      ApiError.fail("form_full", "This form is full.");
   }
 
   /**
@@ -51,11 +43,9 @@ var ResponsesRules = (function () {
     if (!field || !data[field]) return;
     others.forEach(function (r) {
       if (String(r.data[field]) === String(data[field]))
-        ApiError.fail(
-          'duplicate',
-          'This code is already registered. Use your key to edit it.',
-          { field: field }
-        );
+        ApiError.fail("duplicate", "This code is already registered. Use your key to edit it.", {
+          field: field,
+        });
     });
   }
 
@@ -80,9 +70,9 @@ var ResponsesRules = (function () {
     });
     if (clash.length)
       ApiError.fail(
-        'duplicate_member',
-        'Someone on this team is already registered in another team.',
-        { codes: clash }
+        "duplicate_member",
+        "Someone on this team is already registered in another team.",
+        { codes: clash },
       );
   }
 
@@ -99,13 +89,13 @@ var ResponsesRules = (function () {
    */
   function checkPast_(form, key, pick, own) {
     if (key === own) return;
-    var day = (form.slots?.days || []).filter(function (d) {
+    var day = (form.slots?.days || []).find(function (d) {
       return d.id === pick.day;
-    })[0];
+    });
     var now = { date: Time.todayIso(), time: Time.clockNow() };
     if (day && Rules.isPastSlot(day, pick.time, now))
-      ApiError.fail('slot_past', 'That time is over. Pick another.', {
-        slot: key
+      ApiError.fail("slot_past", "That time is over. Pick another.", {
+        slot: key,
       });
   }
 
@@ -119,7 +109,7 @@ var ResponsesRules = (function () {
    * @throws {ApiError} `slot_past` or `slot_taken`.
    */
   function checkSlot_(form, data, others, own) {
-    var slotField = Rules.fieldByRole(form, 'slot');
+    var slotField = Rules.fieldByRole(form, "slot");
     if (!slotField || !data[slotField.id]) return;
     var key = Rules.slotKey(data[slotField.id].day, data[slotField.id].time);
     checkPast_(form, key, data[slotField.id], own);
@@ -128,8 +118,8 @@ var ResponsesRules = (function () {
       if (r.slot) counts[r.slot] = (counts[r.slot] || 0) + 1;
     });
     if (!Rules.slotRoom(form, counts, key))
-      ApiError.fail('slot_taken', 'That slot was just taken. Pick another.', {
-        slot: key
+      ApiError.fail("slot_taken", "That slot was just taken. Pick another.", {
+        slot: key,
       });
   }
 
@@ -151,10 +141,10 @@ var ResponsesRules = (function () {
     checkFull_(rules, others, selfId);
     checkUnique_(rules, data, others);
     if (rules.uniqueAcrossForm) checkMembers_(form, data, others);
-    var self = rows.filter(function (r) {
+    var self = rows.find(function (r) {
       return r.id === selfId;
-    })[0];
-    checkSlot_(form, data, others, self?.slot || '');
+    });
+    checkSlot_(form, data, others, self?.slot || "");
   }
 
   /**
@@ -182,7 +172,7 @@ var ResponsesRules = (function () {
    * @return {!Object<string, number>} The count of each size.
    */
   function teamSizes_(form) {
-    var field = Rules.fieldByRole(form, 'team_size');
+    var field = Rules.fieldByRole(form, "team_size");
     return countResponses_(form, function (r) {
       return parseInt(r.data[field.id], 10) || 0;
     });
@@ -195,7 +185,7 @@ var ResponsesRules = (function () {
    * @return {!Object<string, number>} The count of each number.
    */
   function teammateCounts_(form) {
-    var field = Rules.fieldByRole(form, 'members');
+    var field = Rules.fieldByRole(form, "members");
     return countResponses_(form, function (r) {
       var list = r.data[field.id];
       return Array.isArray(list) ? list.length : 0;
@@ -206,6 +196,6 @@ var ResponsesRules = (function () {
     teamSizes: teamSizes_,
     teammateCounts: teammateCounts_,
     assertAcceptingSubmissions: assertAcceptingSubmissions_,
-    checkLimits: checkLimits_
+    checkLimits: checkLimits_,
   };
 })();

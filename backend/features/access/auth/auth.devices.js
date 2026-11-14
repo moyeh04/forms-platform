@@ -20,7 +20,7 @@ var AuthDevices = (function () {
    * @return {string} The hash the script stores.
    */
   function passHash_(pass) {
-    return Crypto.sha256Hex(Properties.pepper() + ':device:' + pass);
+    return Crypto.sha256Hex(Properties.pepper() + ":device:" + pass);
   }
 
   /**
@@ -29,10 +29,7 @@ var AuthDevices = (function () {
    * @return {number} The days.
    */
   function days() {
-    var set = parseInt(
-      Properties.getProp(Constants.PROPS.ADMIN_DEVICE_DAYS),
-      10
-    );
+    var set = parseInt(Properties.getProp(Constants.PROPS.ADMIN_DEVICE_DAYS), 10);
     return set > 0 ? set : DEFAULT_DAYS_;
   }
 
@@ -45,9 +42,9 @@ var AuthDevices = (function () {
    * @throws {ApiError} `invalid` when it is not such a number.
    */
   function setDays(n) {
-    var text = String(n ?? '').trim();
+    var text = String(n ?? "").trim();
     if (!/^\d+$/.test(text) || Number(text) < 1) {
-      ApiError.fail('invalid', 'Type a whole number of days, 1 or more.');
+      ApiError.fail("invalid", "Type a whole number of days, 1 or more.");
     }
     Properties.setProp(Constants.PROPS.ADMIN_DEVICE_DAYS, text);
     return Number(text);
@@ -60,7 +57,7 @@ var AuthDevices = (function () {
    * @return {boolean} True when it is older than the days a pass lasts.
    */
   function expired_(made) {
-    var t = Date.parse(made || '');
+    var t = Date.parse(made || "");
     return !(t > 0) || Time.nowIso() > Time.isoAfterDays(t, days());
   }
 
@@ -86,7 +83,7 @@ var AuthDevices = (function () {
    */
   function forget_(hash) {
     PropertiesService.getScriptProperties().deleteProperty(
-      Constants.PROPS.ADMIN_DEVICE_PREFIX + hash
+      Constants.PROPS.ADMIN_DEVICE_PREFIX + hash,
     );
   }
 
@@ -98,7 +95,7 @@ var AuthDevices = (function () {
    *     otherwise null.
    */
   function known(pass) {
-    if (typeof pass !== 'string' || pass.length !== PASS_LENGTH_) return null;
+    if (typeof pass !== "string" || pass.length !== PASS_LENGTH_) return null;
     var hash = passHash_(pass);
     var made = Properties.getProp(Constants.PROPS.ADMIN_DEVICE_PREFIX + hash);
     if (!made) return null;
@@ -118,11 +115,8 @@ var AuthDevices = (function () {
     Object.keys(all).forEach(function (h) {
       if (expired_(all[h])) forget_(h);
     });
-    var pass = (Crypto.uuid() + Crypto.uuid()).replace(/-/g, '');
-    Properties.setProp(
-      Constants.PROPS.ADMIN_DEVICE_PREFIX + passHash_(pass),
-      Time.nowIso()
-    );
+    var pass = (Crypto.uuid() + Crypto.uuid()).replace(/-/g, "");
+    Properties.setProp(Constants.PROPS.ADMIN_DEVICE_PREFIX + passHash_(pass), Time.nowIso());
     return pass;
   }
 

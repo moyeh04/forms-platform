@@ -23,39 +23,40 @@ This document defines the commit message style for this project, based on
 type(scope): Subject with capital first letter
 ```
 
-| Rule | Example |
-|------|---------|
-| Capitalize first word | `feat(auth): Add login validation` ✅ |
-| Imperative mood | `Fix bug` ✅ not `Fixed bug` ❌ |
-| No period at end | `Add feature` ✅ not `Add feature.` ❌ |
+| Rule                           | Example                                |
+| ------------------------------ | -------------------------------------- |
+| Capitalize first word          | `feat(auth): Add login validation` ✅  |
+| Imperative mood                | `Fix bug` ✅ not `Fixed bug` ❌        |
+| No period at end               | `Add feature` ✅ not `Add feature.` ❌ |
 | Max 50 chars (standard target) | Keep the subject concise and scannable |
-| Max 72 chars (hard limit) | Never exceed this boundary |
+| Max 72 chars (hard limit)      | Never exceed this boundary             |
 
 ---
 
 ## Types
 
-| Type | Description |
-|------|-------------|
-| `feat` | New feature |
-| `fix` | Bug fix |
-| `refactor` | Code change that neither fixes a bug nor adds a feature |
-| `docs` | Documentation only |
-| `test` | Adding or updating tests |
-| `chore` | Maintenance (deps, config, build) |
-| `style` | Formatting, whitespace (no code change) |
-| `perf` | Performance improvement |
-| `solve` | Complete an exercise, assignment, or project task |
-| `learn` | Add or update learning material (captures, notes, curricula) |
-| `drill` | Practice exercises, katas, or repetition-based work |
-| `audit` | Review, verify, or quality-check existing content |
-| `build` | Build system or tooling changes (scripts, runners, Makefiles) |
-| `init` | Initialize a new project, module, or repository |
-| `deploy` | Deployment-related changes |
-| `revert` | Revert a previous commit |
-| `ci` | CI/CD pipeline changes |
+| Type       | Description                                                   |
+| ---------- | ------------------------------------------------------------- |
+| `feat`     | New feature                                                   |
+| `fix`      | Bug fix                                                       |
+| `refactor` | Code change that neither fixes a bug nor adds a feature       |
+| `docs`     | Documentation only                                            |
+| `test`     | Adding or updating tests                                      |
+| `chore`    | Maintenance (deps, config, build)                             |
+| `style`    | Formatting, whitespace (no code change)                       |
+| `perf`     | Performance improvement                                       |
+| `solve`    | Complete an exercise, assignment, or project task             |
+| `learn`    | Add or update learning material (captures, notes, curricula)  |
+| `drill`    | Practice exercises, katas, or repetition-based work           |
+| `audit`    | Review, verify, or quality-check existing content             |
+| `build`    | Build system or tooling changes (scripts, runners, Makefiles) |
+| `init`     | Initialize a new project, module, or repository               |
+| `deploy`   | Deployment-related changes                                    |
+| `revert`   | Revert a previous commit                                      |
+| `ci`       | CI/CD pipeline changes                                        |
 
 > The very first commit of any repository is always:
+>
 > ```
 > init(repo): Ready, Set... Go!
 > ```
@@ -67,11 +68,13 @@ type(scope): Subject with capital first letter
 The scope provides context about what part of the codebase is affected.
 
 **Why use scope?**
+
 - Instantly know which area changed without reading the body
 - Makes `git log --oneline` scannable
 - Helps when filtering commits (e.g., `git log --grep="(auth)"`)
 
 **Examples:**
+
 - `feat(auth):` - Authentication module
 - `fix(api):` - API layer
 - `refactor(users):` - Users module
@@ -134,19 +137,19 @@ Mix and match freely; most large commits benefit from both.
 
 Pick the headers that fit your change:
 
-| Header type | Header | Use when… |
-|-------------|--------|-----------|
-| Thematic | `## Key Features` | Listing user-facing capabilities added |
-| Thematic | `## Architecture` | Explaining structural/design decisions |
-| Thematic | `## Benefits` | Clarifying why this approach was chosen |
-| Thematic | `## Deployment` / `## DevOps` | Infrastructure or pipeline changes |
-| Thematic | `## Backward Compatibility` | Confirming what still works unchanged |
-| Thematic | `## Migration Notes` | Steps others must take after pulling |
-| Thematic | `## Trade-offs` | Acknowledging known limitations |
-| Component | `## Service Layer` | Changes to business logic layer |
-| Component | `## Repository Layer` | Changes to data access layer |
-| Component | `## API Layer` | Changes to controllers or routes |
-| Component | `## Config` / `## Build` | Build system or configuration changes |
+| Header type | Header                        | Use when…                               |
+| ----------- | ----------------------------- | --------------------------------------- |
+| Thematic    | `## Key Features`             | Listing user-facing capabilities added  |
+| Thematic    | `## Architecture`             | Explaining structural/design decisions  |
+| Thematic    | `## Benefits`                 | Clarifying why this approach was chosen |
+| Thematic    | `## Deployment` / `## DevOps` | Infrastructure or pipeline changes      |
+| Thematic    | `## Backward Compatibility`   | Confirming what still works unchanged   |
+| Thematic    | `## Migration Notes`          | Steps others must take after pulling    |
+| Thematic    | `## Trade-offs`               | Acknowledging known limitations         |
+| Component   | `## Service Layer`            | Changes to business logic layer         |
+| Component   | `## Repository Layer`         | Changes to data access layer            |
+| Component   | `## API Layer`                | Changes to controllers or routes        |
+| Component   | `## Config` / `## Build`      | Build system or configuration changes   |
 
 These are suggestions — invent headers that fit the change. The goal
 is **scannable structure**, not rigid categories.
@@ -282,12 +285,12 @@ config.
 
 ### When to Use Headers
 
-| Commit size | Structure |
-|-------------|-----------|
-| ≤ 5 bullet points, single concern | Plain bullets, no headers |
-| 6+ bullets OR multiple concerns | `##` headers to organize |
-| Touches multiple layers for one feature | Mix thematic + component |
-| Painful debug or deceptively simple fix | Debrief (opt-in) |
+| Commit size                             | Structure                 |
+| --------------------------------------- | ------------------------- |
+| ≤ 5 bullet points, single concern       | Plain bullets, no headers |
+| 6+ bullets OR multiple concerns         | `##` headers to organize  |
+| Touches multiple layers for one feature | Mix thematic + component  |
+| Painful debug or deceptively simple fix | Debrief (opt-in)          |
 
 ## Footer
 
@@ -361,18 +364,18 @@ FEAT(AUTH): ADD LOGIN   # All caps
 
 Each commit should do **one thing**. If you changed two unrelated things, make two commits.
 
-| Situation | Split or Combine? |
-|-----------|-------------------|
-| Fixed a bug AND added a feature | **Split** — `fix` + `feat` |
-| Changed config AND updated docs | **Split** — different scopes |
-| Renamed a variable across 5 files | **Combine** — one logical refactor |
-| Added a test AND the code it tests | **Combine** — they belong together |
-| Fixed typo while working on a feature | **Split** — `style` + `feat` |
+| Situation                                 | Split or Combine?                                                      |
+| ----------------------------------------- | ---------------------------------------------------------------------- |
+| Fixed a bug AND added a feature           | **Split** — `fix` + `feat`                                             |
+| Changed config AND updated docs           | **Split** — different scopes                                           |
+| Renamed a variable across 5 files         | **Combine** — one logical refactor                                     |
+| Added a test AND the code it tests        | **Combine** — they belong together                                     |
+| Fixed typo while working on a feature     | **Split** — `style` + `feat`                                           |
 | Added a feature AND docs that describe it | **Combine** — docs are part of the deliverable, not a separate concern |
 
 > **Code + its own docs = one concern.**
-> The distinction is whether the docs *describe what you just built* (combine)
-> or are a *separate documentation task* unrelated to the current code change
+> The distinction is whether the docs _describe what you just built_ (combine)
+> or are a _separate documentation task_ unrelated to the current code change
 > (split). If reverting the code would make the docs wrong, they belong together.
 
 ### Plan the Commit Series
@@ -432,44 +435,44 @@ Never `git add .` unless every changed file belongs to the same logical commit.
 
 ### Branch Types
 
-| Prefix | Purpose | Base | Merges into | Example |
-|--------|---------|------|-------------|---------|
-| `main` | Stable, production-ready | — | — | `main` |
-| `feat/` | New features | `main` | `main` | `feat/auth-login` |
-| `fix/` | Bug fixes | `main` | `main` | `fix/token-expiry` |
-| `hotfix/` | Urgent production fixes | `main` | `main` | `hotfix/crash-on-start` |
-| `refactor/` | Code restructuring | `main` | `main` | `refactor/user-module` |
-| `build/` | Build system changes | `main` | `main` | `build/cmake-migration` |
-| `test/` | Adding or updating tests | `main` | `main` | `test/auth-coverage` |
-| `release/` | Release prep (optional) | `main` | `main` | `release/v1.0.0` |
+| Prefix      | Purpose                  | Base   | Merges into | Example                 |
+| ----------- | ------------------------ | ------ | ----------- | ----------------------- |
+| `main`      | Stable, production-ready | —      | —           | `main`                  |
+| `feat/`     | New features             | `main` | `main`      | `feat/auth-login`       |
+| `fix/`      | Bug fixes                | `main` | `main`      | `fix/token-expiry`      |
+| `hotfix/`   | Urgent production fixes  | `main` | `main`      | `hotfix/crash-on-start` |
+| `refactor/` | Code restructuring       | `main` | `main`      | `refactor/user-module`  |
+| `build/`    | Build system changes     | `main` | `main`      | `build/cmake-migration` |
+| `test/`     | Adding or updating tests | `main` | `main`      | `test/auth-coverage`    |
+| `release/`  | Release prep (optional)  | `main` | `main`      | `release/v1.0.0`        |
 
 ### Direct Commits on `main`
 
 These types are small enough to commit directly on `main` without a
 branch:
 
-| Type | Directly on `main`? | Reason |
-|------|---------------------|--------|
-| `chore` | ✅ Yes | Deps, config — low risk |
-| `docs` | ✅ Yes | Documentation only — zero code risk |
-| `style` | ✅ Yes | Formatting, whitespace — no logic change |
-| `solve` | ✅ Yes | Completed task — no ongoing work to isolate |
-| `learn` | ✅ Yes | Notes and material — no logic risk |
-| `drill` | ✅ Yes | Practice exercises — no logic risk |
-| `audit` | ✅ Yes | Review only — no code change |
-| Everything else | ❌ No — use a branch | Code changes need isolation |
+| Type            | Directly on `main`?  | Reason                                      |
+| --------------- | -------------------- | ------------------------------------------- |
+| `chore`         | ✅ Yes               | Deps, config — low risk                     |
+| `docs`          | ✅ Yes               | Documentation only — zero code risk         |
+| `style`         | ✅ Yes               | Formatting, whitespace — no logic change    |
+| `solve`         | ✅ Yes               | Completed task — no ongoing work to isolate |
+| `learn`         | ✅ Yes               | Notes and material — no logic risk          |
+| `drill`         | ✅ Yes               | Practice exercises — no logic risk          |
+| `audit`         | ✅ Yes               | Review only — no code change                |
+| Everything else | ❌ No — use a branch | Code changes need isolation                 |
 
 > If it touches logic, it gets a branch. No exceptions.
 
 ### Naming Rules
 
-| Rule | Good | Bad |
-|------|------|-----|
-| All lowercase | `feat/user-search` | `feat/UserSearch` |
-| Hyphens between words | `fix/null-pointer` | `fix/null_pointer` |
-| Short (2–4 words after prefix) | `feat/csv-export` | `feat/add-the-new-csv-export-feature` |
-| Descriptive, not just numbers | `fix/null-pointer-crash` | `fix/123` |
-| Optional issue suffix | `feat/auth-login-42` | — |
+| Rule                           | Good                     | Bad                                   |
+| ------------------------------ | ------------------------ | ------------------------------------- |
+| All lowercase                  | `feat/user-search`       | `feat/UserSearch`                     |
+| Hyphens between words          | `fix/null-pointer`       | `fix/null_pointer`                    |
+| Short (2–4 words after prefix) | `feat/csv-export`        | `feat/add-the-new-csv-export-feature` |
+| Descriptive, not just numbers  | `fix/null-pointer-crash` | `fix/123`                             |
+| Optional issue suffix          | `feat/auth-login-42`     | —                                     |
 
 ### Branch Lifecycle
 
@@ -499,12 +502,12 @@ git merge --no-ff feat/auth-login
 
 **Why `--no-ff`?**
 
-| With `--no-ff` | Without (fast-forward) |
-|----------------|------------------------|
-| Merge commit marks where a feature started and ended | Commits look like they were made directly on `main` |
-| `git log --graph` shows clear branch structure | Flat history — no way to tell what belonged together |
-| Revert one merge commit = undo entire feature | Must revert each commit individually |
-| History tells the *story* of the project | History is a flat list |
+| With `--no-ff`                                       | Without (fast-forward)                               |
+| ---------------------------------------------------- | ---------------------------------------------------- |
+| Merge commit marks where a feature started and ended | Commits look like they were made directly on `main`  |
+| `git log --graph` shows clear branch structure       | Flat history — no way to tell what belonged together |
+| Revert one merge commit = undo entire feature        | Must revert each commit individually                 |
+| History tells the _story_ of the project             | History is a flat list                               |
 
 ### Pre-Merge History Audit
 
@@ -637,18 +640,22 @@ git tag -a submission/milestone-1 -m "Milestone 1 submission"
 Bookmarking is only useful if you know how to use it when things go wrong:
 
 #### 1. Inspecting a Checkpoint (Read-Only)
+
 To check out the code at a checkpoint to run tests or inspect files:
 
 ```sh
 git checkout checkpoint/before-auth-rewrite
 ```
-*Note: This puts you in a "detached HEAD" state. Do not make new commits here.*
+
+_Note: This puts you in a "detached HEAD" state. Do not make new commits here._
 To return to your current work:
+
 ```sh
 git checkout main
 ```
 
 #### 2. Starting a New Path from a Checkpoint
+
 If your rewrite failed and you want to start over from the checkpoint:
 
 ```sh
@@ -656,6 +663,7 @@ git checkout -b auth-rewrite-attempt-2 checkpoint/before-auth-rewrite
 ```
 
 #### 3. Restoring a Single File from a Checkpoint
+
 If you messed up just one file and want to revert it to the checkpoint state:
 
 ```sh
@@ -666,13 +674,14 @@ git restore --source=checkpoint/before-auth-rewrite path/to/file.cpp
 
 ### Lifecycle and Sharing Rules
 
-| Tag Type | Push to Remote? | Deleting |
-|----------|-----------------|----------|
-| **Release** (`v*`) | **Always** (`git push origin <tag>`) | **Never delete** once pushed. |
-| **Submission** (`submission/*`) | **Always** | **Never delete** (provides proof of deadline). |
-| **Checkpoint** (`checkpoint/*`) | **No** (keep local to avoid clutter) | **Delete** when the refactor is successful. |
+| Tag Type                        | Push to Remote?                      | Deleting                                       |
+| ------------------------------- | ------------------------------------ | ---------------------------------------------- |
+| **Release** (`v*`)              | **Always** (`git push origin <tag>`) | **Never delete** once pushed.                  |
+| **Submission** (`submission/*`) | **Always**                           | **Never delete** (provides proof of deadline). |
+| **Checkpoint** (`checkpoint/*`) | **No** (keep local to avoid clutter) | **Delete** when the refactor is successful.    |
 
 **To delete a temporary local checkpoint:**
+
 ```sh
 git tag -d checkpoint/before-auth-rewrite
 ```
@@ -715,11 +724,11 @@ This gives you:
 
 ### When to Use Each Method
 
-| Situation | Method | Example |
-|-----------|--------|---------|
-| Subject-only commit | `-m` is fine | `git commit -m "chore(deps): Bump Qt to 6.7"` |
-| Commit with body | `-F` with a temp file | Write message → `git commit -F /tmp/msg.txt` |
-| Large structured commit (headers, bullets) | `-F` always | Format `##` headers and bullets in the file |
+| Situation                                  | Method                | Example                                       |
+| ------------------------------------------ | --------------------- | --------------------------------------------- |
+| Subject-only commit                        | `-m` is fine          | `git commit -m "chore(deps): Bump Qt to 6.7"` |
+| Commit with body                           | `-F` with a temp file | Write message → `git commit -F /tmp/msg.txt`  |
+| Large structured commit (headers, bullets) | `-F` always           | Format `##` headers and bullets in the file   |
 
 ### Template for the Temp File
 

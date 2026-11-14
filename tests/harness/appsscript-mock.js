@@ -6,10 +6,10 @@
  * MailApp, Utilities and friends, so the whole platform can be exercised
  * (create form, submit, edit with key, book slots, print views) without Google.
  */
-const vm = require('node:vm');
-const crypto = require('node:crypto');
-const zlib = require('node:zlib');
-const { bundleSource } = require('../../scripts/build/bundle-backend.js');
+const vm = require("node:vm");
+const crypto = require("node:crypto");
+const zlib = require("node:zlib");
+const { bundleSource } = require("../../scripts/build/bundle-backend.js");
 
 /* ── Spreadsheet ─────────────────────────────────────────────── */
 
@@ -22,19 +22,14 @@ class MockRange {
     this.nc = nc;
     this.proxy = new Proxy(this, {
       get: (t, p) =>
-        p in t
-          ? typeof t[p] === 'function'
-            ? t[p].bind(t)
-            : t[p]
-          : (..._a) => t.proxy
+        p in t ? (typeof t[p] === "function" ? t[p].bind(t) : t[p]) : (..._a) => t.proxy,
     });
   }
   getValues() {
     const out = [];
     for (let i = 0; i < this.nr; i++) {
       const row = [];
-      for (let j = 0; j < this.nc; j++)
-        row.push(this.sheet.get(this.r + i, this.c + j));
+      for (let j = 0; j < this.nc; j++) row.push(this.sheet.get(this.r + i, this.c + j));
       out.push(row);
     }
     return out;
@@ -47,14 +42,12 @@ class MockRange {
   }
   setValues(vals) {
     for (let i = 0; i < vals.length; i++)
-      for (let j = 0; j < vals[i].length; j++)
-        this.sheet.set(this.r + i, this.c + j, vals[i][j]);
+      for (let j = 0; j < vals[i].length; j++) this.sheet.set(this.r + i, this.c + j, vals[i][j]);
     return this.proxy;
   }
   setValue(v) {
     for (let i = 0; i < this.nr; i++)
-      for (let j = 0; j < this.nc; j++)
-        this.sheet.set(this.r + i, this.c + j, v);
+      for (let j = 0; j < this.nc; j++) this.sheet.set(this.r + i, this.c + j, v);
     return this.proxy;
   }
   setFormula(f) {
@@ -67,7 +60,7 @@ class MockRange {
     return this.proxy;
   }
   getBackground() {
-    return this.sheet.backgrounds.get(`${this.r},${this.c}`) || '#ffffff';
+    return this.sheet.backgrounds.get(`${this.r},${this.c}`) || "#ffffff";
   }
   /**
    * Alternating colours over this range. The colours are kept so a test can
@@ -80,10 +73,10 @@ class MockRange {
       getRange: () => range,
       remove: () => {
         sheet.bandings = sheet.bandings.filter((b) => b !== band);
-      }
+      },
     };
-    for (const part of ['HeaderRow', 'FirstRow', 'SecondRow'])
-      band['set' + part + 'Color'] = (color) => {
+    for (const part of ["HeaderRow", "FirstRow", "SecondRow"])
+      band["set" + part + "Color"] = (color) => {
         band[part] = color;
         return band;
       };
@@ -92,8 +85,7 @@ class MockRange {
   }
   setNumberFormat(f) {
     for (let i = 0; i < this.nr; i++)
-      for (let j = 0; j < this.nc; j++)
-        this.sheet.formats.set(`${this.r + i},${this.c + j}`, f);
+      for (let j = 0; j < this.nc; j++) this.sheet.formats.set(`${this.r + i},${this.c + j}`, f);
     return this.proxy;
   }
   clear() {
@@ -101,8 +93,7 @@ class MockRange {
   }
   clearContent() {
     for (let i = 0; i < this.nr; i++)
-      for (let j = 0; j < this.nc; j++)
-        this.sheet.cells.delete(`${this.r + i},${this.c + j}`);
+      for (let j = 0; j < this.nc; j++) this.sheet.cells.delete(`${this.r + i},${this.c + j}`);
     return this.proxy;
   }
   getRow() {
@@ -136,21 +127,16 @@ class MockSheet {
     this.frozenRows = 0;
     this.proxy = new Proxy(this, {
       get: (t, p) =>
-        p in t
-          ? typeof t[p] === 'function'
-            ? t[p].bind(t)
-            : t[p]
-          : (..._a) => t.proxy
+        p in t ? (typeof t[p] === "function" ? t[p].bind(t) : t[p]) : (..._a) => t.proxy,
     });
   }
   get(r, c) {
     const v = this.cells.get(`${r},${c}`);
-    return v === undefined ? '' : v;
+    return v === undefined ? "" : v;
   }
   set(r, c, v) {
     this.noteWrite();
-    if (v === '' || v === null || v === undefined)
-      this.cells.delete(`${r},${c}`);
+    if (v === "" || v === null || v === undefined) this.cells.delete(`${r},${c}`);
     else this.cells.set(`${r},${c}`, v);
   }
   /**
@@ -159,8 +145,7 @@ class MockSheet {
    */
   noteWrite() {
     const w = this.ss.world;
-    if (w.watchLocks && this.ss === w.registry && !w.lock.held)
-      w.unlockedWrites.push(this.name);
+    if (w.watchLocks && this.ss === w.registry && !w.lock.held) w.unlockedWrites.push(this.name);
   }
   getBandings() {
     return this.bandings.slice();
@@ -188,12 +173,12 @@ class MockSheet {
   }
   getLastRow() {
     let m = 0;
-    for (const k of this.cells.keys()) m = Math.max(m, +k.split(',')[0]);
+    for (const k of this.cells.keys()) m = Math.max(m, +k.split(",")[0]);
     return m;
   }
   getLastColumn() {
     let m = 0;
-    for (const k of this.cells.keys()) m = Math.max(m, +k.split(',')[1]);
+    for (const k of this.cells.keys()) m = Math.max(m, +k.split(",")[1]);
     return m;
   }
   getMaxRows() {
@@ -206,12 +191,7 @@ class MockSheet {
     return new MockRange(this, r, c, nr || 1, nc || 1).proxy;
   }
   getDataRange() {
-    return this.getRange(
-      1,
-      1,
-      Math.max(1, this.getLastRow()),
-      Math.max(1, this.getLastColumn())
-    );
+    return this.getRange(1, 1, Math.max(1, this.getLastRow()), Math.max(1, this.getLastColumn()));
   }
   appendRow(arr) {
     const r = this.getLastRow() + 1;
@@ -224,7 +204,7 @@ class MockSheet {
     this.noteWrite();
     const next = new Map();
     for (const [k, v] of this.cells) {
-      const [r, c] = k.split(',').map(Number);
+      const [r, c] = k.split(",").map(Number);
       if (r === n) continue;
       next.set(`${r > n ? r - 1 : r},${c}`, v);
     }
@@ -260,13 +240,9 @@ class MockSpreadsheet {
     this.nextSheetId = 1;
     this.proxy = new Proxy(this, {
       get: (t, p) =>
-        p in t
-          ? typeof t[p] === 'function'
-            ? t[p].bind(t)
-            : t[p]
-          : (..._a) => t.proxy
+        p in t ? (typeof t[p] === "function" ? t[p].bind(t) : t[p]) : (..._a) => t.proxy,
     });
-    this.insertSheet('Sheet1');
+    this.insertSheet("Sheet1");
   }
   getId() {
     return this.id;
@@ -319,7 +295,7 @@ function seededRandom(seed) {
 
 function createWorld(options = {}) {
   const world = {
-    nowMs: options.now || Date.parse('2027-09-01T10:00:00Z'),
+    nowMs: options.now || Date.parse("2027-09-01T10:00:00Z"),
     spreadsheets: new Map(),
     props: new Map(),
     cache: new Map(),
@@ -336,9 +312,9 @@ function createWorld(options = {}) {
       missing: new Set(),
       folders: new Map(),
       files: new Map(),
-      trashed: new Set()
+      trashed: new Set(),
     },
-    logs: []
+    logs: [],
   };
   // With `options.seed`, ids, uuids and Math.random repeat from run to run, so
   // stored data can be compared whole.
@@ -348,17 +324,17 @@ function createWorld(options = {}) {
       ? Buffer.from(Array.from({ length: n }, () => Math.floor(seeded() * 256)))
       : crypto.randomBytes(n);
   if (seeded) world.random = seeded;
-  const uid = () => randomBytes(16).toString('hex');
+  const uid = () => randomBytes(16).toString("hex");
   const uuidOf = () => {
     if (!seeded) return crypto.randomUUID();
-    const hex = randomBytes(16).toString('hex');
+    const hex = randomBytes(16).toString("hex");
     return [
       hex.slice(0, 8),
       hex.slice(8, 12),
       hex.slice(12, 16),
       hex.slice(16, 20),
-      hex.slice(20)
-    ].join('-');
+      hex.slice(20),
+    ].join("-");
   };
 
   const createSs = (name) => {
@@ -367,15 +343,15 @@ function createWorld(options = {}) {
     world.drive.files.set(ss.id, { name, isSheet: true });
     return ss;
   };
-  world.registry = createSs('Forms Registry');
+  world.registry = createSs("Forms Registry");
 
   // Blobs hold real bytes, so a zip or a workbook the backend builds can be
   // opened in a test.
   class MockBlob {
     constructor(bytes, type, name) {
-      this.buf = Buffer.from(bytes == null ? '' : bytes);
-      this.type = type || '';
-      this.name = name || '';
+      this.buf = Buffer.from(bytes == null ? "" : bytes);
+      this.type = type || "";
+      this.name = name || "";
       this.data = bytes;
     }
     getBytes() {
@@ -396,7 +372,7 @@ function createWorld(options = {}) {
       return this;
     }
     getDataAsString() {
-      return this.buf.toString('utf8');
+      return this.buf.toString("utf8");
     }
     copyBlob() {
       return new MockBlob(this.buf, this.type, this.name);
@@ -407,7 +383,7 @@ function createWorld(options = {}) {
       ? v
       : Array.isArray(v)
         ? Buffer.from(v.map((b) => (b + 256) % 256))
-        : Buffer.from(String(v == null ? '' : v), 'utf8');
+        : Buffer.from(String(v == null ? "" : v), "utf8");
   /** A plain zip (stored, not compressed) with UTF-8 names. */
   function zipOf(blobs, name) {
     const parts = [],
@@ -415,7 +391,7 @@ function createWorld(options = {}) {
     let offset = 0;
     blobs.forEach((b) => {
       const data = b.buf,
-        fname = Buffer.from(b.name, 'utf8'),
+        fname = Buffer.from(b.name, "utf8"),
         crc = zlib.crc32(data);
       const head = Buffer.alloc(30);
       head.writeUInt32LE(0x04034b50, 0);
@@ -449,8 +425,8 @@ function createWorld(options = {}) {
     end.writeUInt32LE(offset, 16);
     return new MockBlob(
       Buffer.concat(parts.concat([cd, end])),
-      'application/zip',
-      name || 'archive.zip'
+      "application/zip",
+      name || "archive.zip",
     );
   }
   world.MockBlob = MockBlob;
@@ -462,9 +438,9 @@ function createWorld(options = {}) {
     const id = o.id || uid();
     world.drive.files.set(id, {
       name: o.name,
-      mime: o.mime || 'application/octet-stream',
-      buf: toBuf(o.bytes || ''),
-      parent: o.parent
+      mime: o.mime || "application/octet-stream",
+      buf: toBuf(o.bytes || ""),
+      parent: o.parent,
     });
     return id;
   };
@@ -481,11 +457,10 @@ function createWorld(options = {}) {
   const fileObj = (id) => ({
     getId: () => id,
     getName: () => world.drive.files.get(id)?.name || id,
-    getMimeType: () =>
-      world.drive.files.get(id)?.mime || 'application/octet-stream',
+    getMimeType: () => world.drive.files.get(id)?.mime || "application/octet-stream",
     getSize: () => (world.drive.files.get(id)?.buf || Buffer.alloc(0)).length,
     getUrl: () => `https://drive.google.com/file/d/${id}/view`,
-    getSharingAccess: () => world.drive.access.get(id) || 'ANYONE_WITH_LINK',
+    getSharingAccess: () => world.drive.access.get(id) || "ANYONE_WITH_LINK",
     moveTo: () => fileObj(id),
     setTrashed: (v) => {
       if (v) world.drive.trashed.add(id);
@@ -496,12 +471,12 @@ function createWorld(options = {}) {
     getBlob: () => {
       const f = world.drive.files.get(id) || {};
       return new MockBlob(f.buf || Buffer.alloc(0), f.mime, f.name || id);
-    }
+    },
   });
   const folderObj = (id) => ({
     getId: () => id,
     getName: () => world.drive.folders.get(id).name,
-    getSharingAccess: () => world.drive.access.get(id) || 'ANYONE_WITH_LINK',
+    getSharingAccess: () => world.drive.access.get(id) || "ANYONE_WITH_LINK",
     getUrl: () => `https://drive.google.com/drive/folders/${id}`,
     setTrashed: (v) => {
       if (v) world.drive.trashed.add(id);
@@ -520,37 +495,33 @@ function createWorld(options = {}) {
             ([fid, f]) =>
               f.name === name &&
               (f.parent === undefined || f.parent === id) &&
-              !world.drive.trashed.has(fid)
+              !world.drive.trashed.has(fid),
           )
-          .map(([fid]) => folderObj(fid))
+          .map(([fid]) => folderObj(fid)),
       ),
     getFolders: () =>
       iter(
         [...world.drive.folders]
-          .filter(
-            ([fid, f]) => f.parent === id && !world.drive.trashed.has(fid)
-          )
-          .map(([fid]) => folderObj(fid))
+          .filter(([fid, f]) => f.parent === id && !world.drive.trashed.has(fid))
+          .map(([fid]) => folderObj(fid)),
       ),
     getFiles: () =>
       iter(
         [...world.drive.files]
-          .filter(
-            ([fid, f]) => f.parent === id && !world.drive.trashed.has(fid)
-          )
-          .map(([fid]) => fileObj(fid))
+          .filter(([fid, f]) => f.parent === id && !world.drive.trashed.has(fid))
+          .map(([fid]) => fileObj(fid)),
       ),
     createFile: (blobOrName) => {
       const nid = uid();
       const blob = blobOrName instanceof MockBlob ? blobOrName : null;
       world.drive.files.set(nid, {
         name: blobOrName?.name || String(blobOrName),
-        mime: blob ? blob.type : '',
+        mime: blob ? blob.type : "",
         buf: blob ? blob.buf : Buffer.alloc(0),
-        parent: id
+        parent: id,
       });
       return fileObj(nid);
-    }
+    },
   });
 
   const sandbox = {
@@ -561,42 +532,41 @@ function createWorld(options = {}) {
       getActiveSpreadsheet: () => world.registry.proxy,
       openById: (id) => {
         const s = world.spreadsheets.get(id);
-        if (!s) throw new Error('No spreadsheet ' + id);
+        if (!s) throw new Error("No spreadsheet " + id);
         return s.proxy;
       },
       create: (name) => createSs(name).proxy,
       BorderStyle: {
-        SOLID: 'SOLID',
-        SOLID_MEDIUM: 'SOLID_MEDIUM',
-        SOLID_THICK: 'SOLID_THICK'
+        SOLID: "SOLID",
+        SOLID_MEDIUM: "SOLID_MEDIUM",
+        SOLID_THICK: "SOLID_THICK",
       },
-      BandingTheme: { LIGHT_GREY: 'LIGHT_GREY' },
-      WrapStrategy: { CLIP: 'CLIP', WRAP: 'WRAP', OVERFLOW: 'OVERFLOW' },
+      BandingTheme: { LIGHT_GREY: "LIGHT_GREY" },
+      WrapStrategy: { CLIP: "CLIP", WRAP: "WRAP", OVERFLOW: "OVERFLOW" },
       getUi: () => {
-        throw new Error('UI not available in tests');
-      }
+        throw new Error("UI not available in tests");
+      },
     },
     DriveApp: {
-      getRootFolder: () => folderObj('root'),
+      getRootFolder: () => folderObj("root"),
       createFolder: (name) => {
         const id = uid();
         world.drive.folders.set(id, { name });
         return folderObj(id);
       },
-      getFoldersByName: (name) => folderObj('root').getFoldersByName(name),
+      getFoldersByName: (name) => folderObj("root").getFoldersByName(name),
       getFolderById: (id) => {
         if (world.drive.missing.has(id))
-          throw new Error('No item with the given ID could be found');
-        if (!world.drive.folders.has(id))
-          world.drive.folders.set(id, { name: id });
+          throw new Error("No item with the given ID could be found");
+        if (!world.drive.folders.has(id)) world.drive.folders.set(id, { name: id });
         return folderObj(id);
       },
       getFileById: (id) => {
         if (world.drive.missing.has(id))
-          throw new Error('No item with the given ID could be found');
+          throw new Error("No item with the given ID could be found");
         if (!world.drive.files.has(id)) world.drive.files.set(id, { name: id });
         return fileObj(id);
-      }
+      },
     },
     PropertiesService: {
       getScriptProperties: () => ({
@@ -615,8 +585,8 @@ function createWorld(options = {}) {
           world.props.delete(k);
           return this;
         },
-        getProperties: () => Object.fromEntries(world.props)
-      })
+        getProperties: () => Object.fromEntries(world.props),
+      }),
     },
     CacheService: {
       getScriptCache: () => ({
@@ -627,10 +597,10 @@ function createWorld(options = {}) {
         put: (k, v, ttl) =>
           world.cache.set(k, {
             v: String(v),
-            until: world.nowMs + (ttl || 600) * 1000
+            until: world.nowMs + (ttl || 600) * 1000,
           }),
-        remove: (k) => world.cache.delete(k)
-      })
+        remove: (k) => world.cache.delete(k),
+      }),
     },
     LockService: {
       getScriptLock: () => ({
@@ -641,9 +611,7 @@ function createWorld(options = {}) {
             between();
           }
           if (world.lock.busy)
-            throw new Error(
-              'Lock timeout: another process was holding the lock for too long.'
-            );
+            throw new Error("Lock timeout: another process was holding the lock for too long.");
           world.lock.held = true;
         },
         tryLock: () => {
@@ -654,32 +622,28 @@ function createWorld(options = {}) {
         releaseLock: () => {
           world.lock.held = false;
         },
-        hasLock: () => world.lock.held
-      })
+        hasLock: () => world.lock.held,
+      }),
     },
     MailApp: {
       sendEmail: (a, b, c) =>
-        world.mail.push(
-          typeof a === 'object' ? a : { to: a, subject: b, body: c }
-        )
+        world.mail.push(typeof a === "object" ? a : { to: a, subject: b, body: c }),
     },
     Session: {
-      getScriptTimeZone: () => 'Africa/Cairo',
-      getEffectiveUser: () => ({ getEmail: () => 'owner@example.com' }),
-      getActiveUser: () => ({ getEmail: () => 'owner@example.com' })
+      getScriptTimeZone: () => "Africa/Cairo",
+      getEffectiveUser: () => ({ getEmail: () => "owner@example.com" }),
+      getActiveUser: () => ({ getEmail: () => "owner@example.com" }),
     },
     ScriptApp: {
       getProjectTriggers: () =>
         world.triggers.map((t) => ({
           getHandlerFunction: () => t.fn,
-          getUniqueId: () => t.id
+          getUniqueId: () => t.id,
         })),
       deleteTrigger: (trigger) => {
-        world.triggers = world.triggers.filter(
-          (t) => t.id !== trigger.getUniqueId()
-        );
+        world.triggers = world.triggers.filter((t) => t.id !== trigger.getUniqueId());
       },
-      getOAuthToken: () => 'test-token',
+      getOAuthToken: () => "test-token",
       newTrigger: (fn) => {
         // { fn, id, kind: 'after' or 'everyMinutes', arg: the delay or the
         // interval }
@@ -688,36 +652,36 @@ function createWorld(options = {}) {
           {},
           {
             get: (_t, p) =>
-              p === 'create'
+              p === "create"
                 ? () => {
                     world.triggers.push(made);
                   }
                 : (...a) => {
-                    if (p !== 'timeBased') {
+                    if (p !== "timeBased") {
                       made.kind = p;
                       made.arg = a[0];
                     }
                     return chain;
-                  }
-          }
+                  },
+          },
         );
         return chain;
-      }
+      },
     },
     UrlFetchApp: {
       fetch: (...a) => {
-        if (!world.fetch) throw new Error('Network is not available in tests');
+        if (!world.fetch) throw new Error("Network is not available in tests");
         return world.fetch(...a);
-      }
+      },
     },
     ContentService: {
-      MimeType: { JSON: 'JSON' },
+      MimeType: { JSON: "JSON" },
       createTextOutput: (text) => ({
         getContent: () => text,
         setMimeType() {
           return this;
-        }
-      })
+        },
+      }),
     },
     HtmlService: {
       createHtmlOutput: (h) => ({
@@ -727,42 +691,42 @@ function createWorld(options = {}) {
         },
         setHeight() {
           return this;
-        }
-      })
+        },
+      }),
     },
     Utilities: {
-      DigestAlgorithm: { SHA_256: 'sha256', MD5: 'md5' },
+      DigestAlgorithm: { SHA_256: "sha256", MD5: "md5" },
       getUuid: uuidOf,
       computeDigest: (algo, value) =>
-        Array.from(
-          crypto.createHash(algo).update(String(value), 'utf8').digest()
-        ).map((b) => (b > 127 ? b - 256 : b)),
-      base64Encode: (v) => toBuf(v).toString('base64'),
+        Array.from(crypto.createHash(algo).update(String(value), "utf8").digest()).map((b) =>
+          b > 127 ? b - 256 : b,
+        ),
+      base64Encode: (v) => toBuf(v).toString("base64"),
       formatDate: (date, tz, pattern) => {
         const p = Object.fromEntries(
-          new Intl.DateTimeFormat('en-CA', {
+          new Intl.DateTimeFormat("en-CA", {
             timeZone: tz,
-            year: 'numeric',
-            month: '2-digit',
-            day: '2-digit',
-            hour: '2-digit',
-            minute: '2-digit',
-            hourCycle: 'h23'
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit",
+            hour: "2-digit",
+            minute: "2-digit",
+            hourCycle: "h23",
           })
             .formatToParts(date)
-            .map((x) => [x.type, x.value])
+            .map((x) => [x.type, x.value]),
         );
         return pattern
-          .replace('yyyy', p.year)
-          .replace('MM', p.month)
-          .replace('dd', p.day)
-          .replace('HH', p.hour)
-          .replace('mm', p.minute);
+          .replace("yyyy", p.year)
+          .replace("MM", p.month)
+          .replace("dd", p.day)
+          .replace("HH", p.hour)
+          .replace("mm", p.minute);
       },
       newBlob: (data, type, name) => new MockBlob(toBuf(data), type, name),
       zip: (blobs, name) => zipOf(blobs, name),
-      sleep: () => {}
-    }
+      sleep: () => {},
+    },
   };
 
   // A controllable clock for everything inside the backend.
@@ -782,11 +746,11 @@ function createWorld(options = {}) {
 
   const ctx = vm.createContext(sandbox);
   const { code } = bundleSource();
-  vm.runInContext(code, ctx, { filename: 'Code.gs' });
+  vm.runInContext(code, ctx, { filename: "Code.gs" });
 
   world.ctx = ctx;
   world.setNow = (ms) => {
-    world.nowMs = typeof ms === 'string' ? Date.parse(ms) : ms;
+    world.nowMs = typeof ms === "string" ? Date.parse(ms) : ms;
   };
   world.advanceDays = (d) => {
     world.nowMs += d * 86400000;
@@ -795,9 +759,9 @@ function createWorld(options = {}) {
   /** Calls the web app entry point exactly like the browser does. */
   world.api = (body) => {
     const out = vm.runInContext(
-      'doPost',
-      ctx
-    )({ postData: { contents: JSON.stringify(body), type: 'text/plain' } });
+      "doPost",
+      ctx,
+    )({ postData: { contents: JSON.stringify(body), type: "text/plain" } });
     return JSON.parse(out.getContent());
   };
   world.call = (name, ...args) => vm.runInContext(name, ctx)(...args);
@@ -817,8 +781,7 @@ function createWorld(options = {}) {
     return s;
   };
   world.drive.setAccess = (id, a) => world.drive.access.set(id, a);
-  world.drive.setFolderName = (id, name) =>
-    world.drive.folders.set(id, { name });
+  world.drive.setFolderName = (id, name) => world.drive.folders.set(id, { name });
   return world;
 }
 

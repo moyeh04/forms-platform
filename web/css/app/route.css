@@ -1,24 +1,24 @@
-/* The route is a sea under the sky: an island for each step, joined by a dashed course, and the treasure island at the
-   end. */
+/* The route is a sea under the sky: an island for each step, joined by a dashed course, and the
+   treasure island at the end. */
 .trail-sea {
   --sea-h: 112px;
   --horizon: 40px;
   --course: calc(var(--sea-h) - 26px);
   --dock: 22px;
-  --sky-art: url(../../img/sky-day.svg);
-  --sky-light: url(../../img/sun.svg);
+  --sky-art: url("../../img/sky-day.svg");
+  --sky-light: url("../../img/sun.svg");
   position: relative;
   margin: 8px 0 26px;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) .trail-sea {
-    --sky-art: url(../../img/sky-night.svg);
-    --sky-light: url(../../img/moon.svg);
+    --sky-art: url("../../img/sky-night.svg");
+    --sky-light: url("../../img/moon.svg");
   }
 }
 :root[data-theme="dark"] .trail-sea {
-  --sky-art: url(../../img/sky-night.svg);
-  --sky-light: url(../../img/moon.svg);
+  --sky-art: url("../../img/sky-night.svg");
+  --sky-light: url("../../img/moon.svg");
 }
 .trail-sea::before {
   content: "";
@@ -30,7 +30,7 @@
   background:
     var(--sky-light) right 6% top 2px / calc(var(--horizon) - 4px) auto no-repeat,
     var(--sky-art) 0 0 / auto var(--horizon) repeat-x,
-    url(../../img/sea.svg) 0 calc(var(--horizon) + 4px) / 160px 72px repeat-x,
+    url("../../img/sea.svg") 0 calc(var(--horizon) + 4px) / 160px 72px repeat-x,
     linear-gradient(
       180deg,
       var(--sky) 0,
@@ -51,7 +51,8 @@
       0 0;
   }
 }
-/* The ship waits beside the island of the current step, and sails there from the island it was at. */
+/* The ship waits beside the island of the current step, and sails there from the island it was at.
+   */
 .trail-ship {
   position: absolute;
   z-index: 2;
@@ -138,7 +139,7 @@
   left: calc(50% - 23px);
   width: 14px;
   height: 18px;
-  background: url(../../img/crew-flag.svg) no-repeat;
+  background: url("../../img/crew-flag.svg") no-repeat;
 }
 .trail-label {
   font-size: var(--fs-help);

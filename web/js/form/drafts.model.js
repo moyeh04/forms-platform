@@ -3,7 +3,7 @@
  * not wipe a half-filled form.
  */
 (function (App) {
-  'use strict';
+  "use strict";
 
   var P = App.formPage;
   var S = P.S;
@@ -14,7 +14,7 @@
    * @return {string} The key.
    */
   function draftKey() {
-    return 'fp_draft_' + S.slug;
+    return "fp_draft_" + S.slug;
   }
 
   /**
@@ -33,7 +33,7 @@
   /** Keeps the answers and the step of a new registration. */
   function saveDraft() {
     var s = sess();
-    if (!s || S.mode !== 'new') return;
+    if (!s || S.mode !== "new") return;
     s.setItem(draftKey(), JSON.stringify({ data: S.data, step: S.stepIndex }));
   }
 

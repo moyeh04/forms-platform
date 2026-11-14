@@ -1,5 +1,6 @@
-/* The lock screen: a welcome that opens like the dashboard, then the picture, the message and the time left.
-   Motion is the transitions.dev modal open / close and texts reveal, on the theme's motion tokens. */
+/* The lock screen: a welcome that opens like the dashboard, then the picture, the message and the
+   time left. Motion is the transitions.dev modal open / close and texts reveal, on the theme's
+   motion tokens. */
 :root {
   --modal-open-dur: var(--duration-fast);
   --modal-close-dur: var(--duration-quick);
@@ -35,7 +36,8 @@
     transform var(--modal-close-dur) var(--modal-ease),
     opacity var(--modal-close-dur) var(--modal-ease);
 }
-/* Lines start lower, blurred and unseen; .is-shown on the parent brings them to rest, the second one a step later. */
+/* Lines start lower, blurred and unseen; .is-shown on the parent brings them to rest, the second
+   one a step later. */
 .t-stagger-line {
   display: block;
   opacity: 0;
@@ -55,14 +57,15 @@
   transform: translateY(0);
   filter: blur(0);
 }
-/* The buttons arrive once the words have settled, the way a dashboard's controls appear after it loads. */
+/* The buttons arrive once the words have settled, the way a dashboard's controls appear after it
+   loads. */
 .t-stagger-line.locked-late {
   transition-delay: var(--duration-very-slow);
 }
 @media (prefers-reduced-motion: reduce) {
   .t-modal,
   .t-stagger-line {
-    /* biome-ignore lint/complexity/noImportantStyles: the snippet's reduced-motion guard must beat its own states. */
+    /* the snippet's reduced-motion guard must beat its own states. */
     transition: none !important;
   }
 }

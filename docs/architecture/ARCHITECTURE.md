@@ -17,14 +17,14 @@ sheet, not code.
 
 ## Design principles
 
-| Principle | What it means here |
-|---|---|
-| **No server, no bill** | GitHub Pages serves files; Apps Script runs the logic; Sheets and Drive store the data. All free for classroom scale. |
-| **Visitors never log in** | The script runs as the owner. Students get an edit key; instructors get a private link; the admin gets a PIN. Each is its own small, hashed secret. |
-| **One source of truth for rules** | `domain/rules/` is used by the browser, the backend, and the tests. They cannot disagree. |
-| **Forms are data** | A form is a JSON definition in one cell. New questions and new form types need no code. |
-| **Boring technology** | Plain JavaScript, no framework, no bundler for the website, one concatenation script for the backend. Easy to read, easy to fix later. |
-| **Testable without Google** | An in-memory copy of Google's services runs the real backend code, so the tests cover it without touching a real account. |
+| Principle                         | What it means here                                                                                                                                  |
+| --------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **No server, no bill**            | GitHub Pages serves files; Apps Script runs the logic; Sheets and Drive store the data. All free for classroom scale.                               |
+| **Visitors never log in**         | The script runs as the owner. Students get an edit key; instructors get a private link; the admin gets a PIN. Each is its own small, hashed secret. |
+| **One source of truth for rules** | `domain/rules/` is used by the browser, the backend, and the tests. They cannot disagree.                                                           |
+| **Forms are data**                | A form is a JSON definition in one cell. New questions and new form types need no code.                                                             |
+| **Boring technology**             | Plain JavaScript, no framework, no bundler for the website, one concatenation script for the backend. Easy to read, easy to fix later.              |
+| **Testable without Google**       | An in-memory copy of Google's services runs the real backend code, so the tests cover it without touching a real account.                           |
 
 ## System context
 
@@ -101,14 +101,14 @@ flowchart LR
 
 ## What runs where
 
-| Place | What runs there | Who pays | What it must never do |
-|---|---|---|---|
-| Visitor's browser | The page, live input filtering, draft saving, ticket image/PDF | Nobody | Be trusted. Every rule is checked again on the server. |
-| GitHub Pages | Serves static files over HTTPS | Free | Run code or keep secrets. |
-| Apps Script | All logic: validation, limits, keys, locking, emails, views | Free quotas | Hold state in memory. Every request starts fresh. |
-| Google Sheets | The only database | Free | Be edited by hand in the Responses tab (the platform owns it). |
-| Drive | Print PDFs, form sheets, student-shared files | Free | Be written by students. They only share links. |
-| Admin laptop | Builds `dist/` and runs the first deployment | Nobody | Be required for students to use the forms. |
+| Place             | What runs there                                                | Who pays    | What it must never do                                          |
+| ----------------- | -------------------------------------------------------------- | ----------- | -------------------------------------------------------------- |
+| Visitor's browser | The page, live input filtering, draft saving, ticket image/PDF | Nobody      | Be trusted. Every rule is checked again on the server.         |
+| GitHub Pages      | Serves static files over HTTPS                                 | Free        | Run code or keep secrets.                                      |
+| Apps Script       | All logic: validation, limits, keys, locking, emails, views    | Free quotas | Hold state in memory. Every request starts fresh.              |
+| Google Sheets     | The only database                                              | Free        | Be edited by hand in the Responses tab (the platform owns it). |
+| Drive             | Print PDFs, form sheets, student-shared files                  | Free        | Be written by students. They only share links.                 |
+| Admin laptop      | Builds `dist/` and runs the first deployment                   | Nobody      | Be required for students to use the forms.                     |
 
 ## Request lifecycle
 
@@ -238,7 +238,7 @@ Two details worth knowing:
   touch the sheet. The lock is held only for the read-check-write sequence, so
   students are not queued behind network calls.
 - The key is returned to the student **once**. The sheet stores a salted hash
-  (used to find the row) and a *sealed* copy: each digit shifted by a pad derived
+  (used to find the row) and a _sealed_ copy: each digit shifted by a pad derived
   from the private pepper, the form, and the registration. The sheet alone reveals
   no key, but the backend can unseal it for an admin with the PIN (**Details,
   Show key**), so a student who lost it can be helped without a reset.
@@ -417,13 +417,13 @@ flowchart LR
     class op cOk
 ```
 
-| Computed state | Students see |
-|---|---|
-| `draft` | "This form is not available yet." (its questions are not sent to the browser) |
-| `not_yet` | "This form has not opened yet." |
-| `open` | The form |
-| `closed` | "This form is closed." (a message you can customise per form) |
-| `archived` | Treated like closed for students; hidden from instructors |
+| Computed state | Students see                                                                  |
+| -------------- | ----------------------------------------------------------------------------- |
+| `draft`        | "This form is not available yet." (its questions are not sent to the browser) |
+| `not_yet`      | "This form has not opened yet."                                               |
+| `open`         | The form                                                                      |
+| `closed`       | "This form is closed." (a message you can customise per form)                 |
+| `archived`     | Treated like closed for students; hidden from instructors                     |
 
 ## Team size: how "members are not optional" works
 
@@ -507,13 +507,13 @@ code: `rules.sizeAlerts` holds the switches and the numbers, and a level that
 was never set starts from the biggest team size (about half of it, and one
 person under it).
 
-| Responsibility | Owner |
-|---|---|
+| Responsibility                                                                                                              | Owner                                                                                                                                                                          |
+| --------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | The levels, their starting numbers, the level of a team, and why a setting cannot be saved, the numbers a level can ask for | `Rules.sizeAlerts`, `Rules.sizeAlertLevels`, `Rules.sizeAlertOf`, `Rules.sizeAlertsProblem`, `Rules.sizeAlertBounds`, `Rules.sizeAlertLevelIds` in `domain/rules/team-size.js` |
-| Checking and cleaning the setting on a save | `normalizeRules_` in `forms.rules.js`, with the same `Rules` functions (`bad_size_alerts`) |
-| The control in the Small teams panel of Setup | `A.sizeAlerts` in `admin/settings/size-alerts.view.js`; it returns `{ node, refresh(), problem(), summary() }` like the range control |
-| Whether an instructor sees them | `showSizeAlerts` of each link in `clients.repository.js`, set in the link dialog (`admin/people/client-dialog.view.js`) |
-| The lines above the teams and the mark on a card | `App.sizeAlerts` in `size-alerts.js`, used by the dashboard and the instructor page |
+| Checking and cleaning the setting on a save                                                                                 | `normalizeRules_` in `forms.rules.js`, with the same `Rules` functions (`bad_size_alerts`)                                                                                     |
+| The control in the Small teams panel of Setup                                                                               | `A.sizeAlerts` in `admin/settings/size-alerts.view.js`; it returns `{ node, refresh(), problem(), summary() }` like the range control                                          |
+| Whether an instructor sees them                                                                                             | `showSizeAlerts` of each link in `clients.repository.js`, set in the link dialog (`admin/people/client-dialog.view.js`)                                                        |
+| The lines above the teams and the mark on a card                                                                            | `App.sizeAlerts` in `size-alerts.js`, used by the dashboard and the instructor page                                                                                            |
 
 The dashboard loads `domain/rules/` and asks it for the level of each team.
 The instructor page does not, so `viewer.data` sends the levels that are on
@@ -538,16 +538,16 @@ Discussed, with a note for the team and a private note. This is not a review
 step: review steps accept or reject the registration itself, while a mark
 says how far an accepted team has come.
 
-| Responsibility | Owner |
-|---|---|
-| The milestones a form copies from a list, cleaning `form.progress` on a save, comparing a copy with its list, and the marks a change would hide | `domain/rules/progress.js` |
-| A mark and why it is refused, stale marks, counts, and what a team or a link may read | `domain/rules/progress-marks.js` |
-| The `ProgressState` and `ProgressAccess` enums | `domain/enums.js` |
-| Saving one mark in the `progress` cell of its row, inside the lock | `progress.service.js`, through `ResponsesRepository.writeProgress` |
-| The marks on the instructor page and what a link may do | `viewer.service.js`, from the `progress` of each link in `clients.repository.js` |
-| The Progress panel of Setup | `admin/settings/progress.view.js` |
-| The board, its phone view and the mark box | `web/js/teams/progress-board.view.js` and `progress-mark.view.js`, used by the dashboard and the instructor page, each with its own save action |
-| The student's own progress | `web/js/form/progress.view.js`, from `lookup` or, once the key has ended, `progress.mine` |
+| Responsibility                                                                                                                                  | Owner                                                                                                                                           |
+| ----------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| The milestones a form copies from a list, cleaning `form.progress` on a save, comparing a copy with its list, and the marks a change would hide | `domain/rules/progress.js`                                                                                                                      |
+| A mark and why it is refused, stale marks, counts, and what a team or a link may read                                                           | `domain/rules/progress-marks.js`                                                                                                                |
+| The `ProgressState` and `ProgressAccess` enums                                                                                                  | `domain/enums.js`                                                                                                                               |
+| Saving one mark in the `progress` cell of its row, inside the lock                                                                              | `progress.service.js`, through `ResponsesRepository.writeProgress`                                                                              |
+| The marks on the instructor page and what a link may do                                                                                         | `viewer.service.js`, from the `progress` of each link in `clients.repository.js`                                                                |
+| The Progress panel of Setup                                                                                                                     | `admin/settings/progress.view.js`                                                                                                               |
+| The board, its phone view and the mark box                                                                                                      | `web/js/teams/progress-board.view.js` and `progress-mark.view.js`, used by the dashboard and the instructor page, each with its own save action |
+| The student's own progress                                                                                                                      | `web/js/form/progress.view.js`, from `lookup` or, once the key has ended, `progress.mine`                                                       |
 
 **A copy, not a reference.** Picking a milestones list copies its milestones
 into `form.progress.milestones`, each with the id of its list row. A later
@@ -905,12 +905,12 @@ and it breaks whenever Drive changes its pages.
 
 What is left are Apps Script's own limits, and the design follows them:
 
-| Limit | How the download stays inside it |
-|---|---|
-| Six minutes a request | The page asks for one team at a time. A big folder is fetched over several requests (40 files or 25 seconds each); a repeated request skips what is already saved. |
-| About 50 MB a file | A file over 45 MB is not packed. It is listed with its Drive link. |
-| About 50 MB a zip | The files are split into zip parts of up to 40 MB. `Teams.xlsx` is in part 1; unzipping every part into one folder makes all its links work. |
-| "Slow down" answers from Google | Each read waits and tries again, up to three times, doubling the wait. |
+| Limit                           | How the download stays inside it                                                                                                                                   |
+| ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Six minutes a request           | The page asks for one team at a time. A big folder is fetched over several requests (40 files or 25 seconds each); a repeated request skips what is already saved. |
+| About 50 MB a file              | A file over 45 MB is not packed. It is listed with its Drive link.                                                                                                 |
+| About 50 MB a zip               | The files are split into zip parts of up to 40 MB. `Teams.xlsx` is in part 1; unzipping every part into one folder makes all its links work.                       |
+| "Slow down" answers from Google | Each read waits and tries again, up to three times, doubling the wait.                                                                                             |
 
 The work happens in the owner's Drive, in `Forms Platform / Exports / Downloads`,
 in a folder per download; starting a new download of the same form moves the
@@ -978,13 +978,13 @@ flowchart LR
 The design is right for a class, a department, or a few hundred registrations
 per form. It is not meant for tens of thousands.
 
-| Limit | Why | What to do if you hit it |
-|---|---|---|
-| Every request re-reads the rows it needs | Sheets is the database; there is no index | Fine up to low thousands of rows per form. Beyond that, move the heavy reads to a cache or a real database. Not implemented. |
-| One script lock for all writes | Guarantees no two students take one slot | Writes queue briefly. A 20 second wait fails with "busy, try again". |
-| Apps Script daily quotas (mail, runtime, URL fetch) | Google applies quotas to free accounts and Workspace differently | Check Google's current quota page. Confirmation emails are the quota most likely to matter. |
-| A 5-digit key has 100,000 values | Chosen so students can type it | Safe because it is salted per form, throttled to 10 wrong tries a minute, and expires. |
-| Real Google behaviour is untested locally | Tests use a faithful copy, not Google | Run the first-run checklist in [DEPLOY.md](../operations/DEPLOY.md) once. |
+| Limit                                               | Why                                                              | What to do if you hit it                                                                                                     |
+| --------------------------------------------------- | ---------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| Every request re-reads the rows it needs            | Sheets is the database; there is no index                        | Fine up to low thousands of rows per form. Beyond that, move the heavy reads to a cache or a real database. Not implemented. |
+| One script lock for all writes                      | Guarantees no two students take one slot                         | Writes queue briefly. A 20 second wait fails with "busy, try again".                                                         |
+| Apps Script daily quotas (mail, runtime, URL fetch) | Google applies quotas to free accounts and Workspace differently | Check Google's current quota page. Confirmation emails are the quota most likely to matter.                                  |
+| A 5-digit key has 100,000 values                    | Chosen so students can type it                                   | Safe because it is salted per form, throttled to 10 wrong tries a minute, and expires.                                       |
+| Real Google behaviour is untested locally           | Tests use a faithful copy, not Google                            | Run the first-run checklist in [DEPLOY.md](../operations/DEPLOY.md) once.                                                    |
 
 ## Colours and contrast
 
@@ -992,12 +992,12 @@ All colours are variables in `web/css/theme.css`, defined once for the light
 theme and once for dark (used both when the device prefers dark and when the
 toggle is on). The standard is **WCAG 2.1 AA in both themes**:
 
-| What | Minimum | Tokens |
-|---|---|---|
-| Text, including small bold labels, tags, and pills | 4.5:1 | `ink`, `mute`, `accent`, `sea`, `err`, `gold` on `sheet`, `sheet-2`, `desk`, tints; `on-accent` and `on-sea` on their buttons |
-| Outlines that show where a field or choice is | 3:1 | `field-line` on every background |
-| Focus ring | 3:1 | `focus` |
-| Decorative dividers and card borders | none | `line` |
+| What                                               | Minimum | Tokens                                                                                                                        |
+| -------------------------------------------------- | ------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| Text, including small bold labels, tags, and pills | 4.5:1   | `ink`, `mute`, `accent`, `sea`, `err`, `gold` on `sheet`, `sheet-2`, `desk`, tints; `on-accent` and `on-sea` on their buttons |
+| Outlines that show where a field or choice is      | 3:1     | `field-line` on every background                                                                                              |
+| Focus ring                                         | 3:1     | `focus`                                                                                                                       |
+| Decorative dividers and card borders               | none    | `line`                                                                                                                        |
 
 `tests/web/css/theme.test.js` reads the tokens from `theme.css` and checks every
 pair above, so a colour change that breaks the standard fails CI and is never
@@ -1033,12 +1033,12 @@ no new record:
 A form has one header and one tab bar, built by `A.formTabs` in `admin/shell/form-head.view.js` and
 used by both the responses page and the settings page:
 
-| Tab | Address | What it holds |
-|---|---|---|
-| Responses | `#/f/<slug>` | The answers (`admin/responses/`) |
-| Questions | `#/f/<slug>/questions` | The questions under the page of the form that shows them, then team size and teammates |
+| Tab       | Address                | What it holds                                                                                                       |
+| --------- | ---------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| Responses | `#/f/<slug>`           | The answers (`admin/responses/`)                                                                                    |
+| Questions | `#/f/<slug>/questions` | The questions under the page of the form that shows them, then team size and teammates                              |
 | Timetable | `#/f/<slug>/timetable` | Reservations only: the calendar of days, the hours and bookings per slot, the slots of each day, booking with a key |
-| Setup | `#/f/<slug>/settings` | Name and dates, who can register, edit key, emails, limits, review steps, delete |
+| Setup     | `#/f/<slug>/settings`  | Name and dates, who can register, edit key, emails, limits, review steps, delete                                    |
 
 Questions, Timetable and Setup are one view (`admin/settings/settings.page.js`)
 over one form object, so a tab change only hides and shows sections and changes
@@ -1237,11 +1237,11 @@ A new page is built from the layout classes in `admin/layout.css`, which
 change shape from the width they are given, so the page has no media query of
 its own:
 
-| Class | What it does |
-|---|---|
+| Class                                   | What it does                                                                             |
+| --------------------------------------- | ---------------------------------------------------------------------------------------- |
 | `.l-split` with `.l-main` and `.l-side` | A main part and a narrower side. The side goes under the main part when both do not fit. |
-| `.l-grid` | Equal columns, as many as fit. `--l-min` is the narrowest a column may be. |
-| `.l-stack` | Children under each other with one gap (`--l-gap`). |
+| `.l-grid`                               | Equal columns, as many as fit. `--l-min` is the narrowest a column may be.               |
+| `.l-stack`                              | Children under each other with one gap (`--l-gap`).                                      |
 
 The new form page uses all three and nothing else for its layout. A media
 query is for a thing that changes what it is on a phone (a table that becomes
@@ -1253,30 +1253,30 @@ labels of the current tables.
 
 ## Where to change what
 
-| I want to... | Edit |
-|---|---|
-| Change a colour, font, or size | `web/css/theme.css` (variables only); `npm test` checks the contrast |
-| Reword a message or translate | `web/js/i18n/en.js` and `ar.js` |
-| Add a question to a form | Admin dashboard, or `template-fields.js` for new forms by default |
-| Add a new form type | A new function in `templates.service.js`, a label in `web/js/admin/shell/admin.model.js` |
-| Change a validation rule | its part in `domain/rules/` (browser, server, and tests all follow) |
-| Add a backend action | A named function in the feature's `*.controller.js`, returned by its namespace; a row in `backend/routes.js` with its `Access`; a row in the section of that access in [API.md](../backend/API.md) |
-| Change sheet colours | `PALETTE` in `sheet-style.js` |
-| Change the downloaded Excel list | `DownloadsWorkbook.build` in `downloads.workbook.js` (the file format is in `backend/platform/xlsx/`) |
-| Change the Drive folder name rule | `Rules.checkFolderName` in `domain/rules/drive-link.js` |
-| Change the tab icon | `web/img/favicon.svg`, then regenerate the PNGs in `web/img/` |
-| See a change in a real browser before deploying | `npm run dev` (`scripts/dev/dev-server.js`) |
-| Change what CI runs or publishes | `.github/workflows/pages.yml` |
+| I want to...                                    | Edit                                                                                                                                                                                               |
+| ----------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Change a colour, font, or size                  | `web/css/theme.css` (variables only); `pnpm test` checks the contrast                                                                                                                              |
+| Reword a message or translate                   | `web/js/i18n/en.js` and `ar.js`                                                                                                                                                                    |
+| Add a question to a form                        | Admin dashboard, or `template-fields.js` for new forms by default                                                                                                                                  |
+| Add a new form type                             | A new function in `templates.service.js`, a label in `web/js/admin/shell/admin.model.js`                                                                                                           |
+| Change a validation rule                        | its part in `domain/rules/` (browser, server, and tests all follow)                                                                                                                                |
+| Add a backend action                            | A named function in the feature's `*.controller.js`, returned by its namespace; a row in `backend/routes.js` with its `Access`; a row in the section of that access in [API.md](../backend/API.md) |
+| Change sheet colours                            | `PALETTE` in `sheet-style.js`                                                                                                                                                                      |
+| Change the downloaded Excel list                | `DownloadsWorkbook.build` in `downloads.workbook.js` (the file format is in `backend/platform/xlsx/`)                                                                                              |
+| Change the Drive folder name rule               | `Rules.checkFolderName` in `domain/rules/drive-link.js`                                                                                                                                            |
+| Change the tab icon                             | `web/img/favicon.svg`, then regenerate the PNGs in `web/img/`                                                                                                                                      |
+| See a change in a real browser before deploying | `pnpm run dev` (`scripts/dev/dev-server.js`)                                                                                                                                                       |
+| Change what CI runs or publishes                | `.github/workflows/pages.yml`                                                                                                                                                                      |
 
 ## Documents
 
-| File | Read it for |
-|---|---|
-| [WORKAROUNDS.md](WORKAROUNDS.md) | The clever solutions to each hosting constraint, and why |
-| [BUILD-PIPELINE.md](BUILD-PIPELINE.md) | What produces `dist/`, step by step |
-| [HOSTING.md](HOSTING.md) | What GitHub does, what Google does, and how they fit |
-| [DATA-MODEL.md](../backend/DATA-MODEL.md) | Every sheet, column, and stored property |
-| [SECURITY.md](../backend/SECURITY.md) | The secrets, who holds them, and what a leak would mean |
-| [TESTING.md](../process/TESTING.md) | How the tests run without Google |
-| [DEPLOY.md](../operations/DEPLOY.md) | Click-by-click setup |
-| [FILE-STRUCTURE.md](FILE-STRUCTURE.md) | Where every file lives and what it does |
+| File                                      | Read it for                                              |
+| ----------------------------------------- | -------------------------------------------------------- |
+| [WORKAROUNDS.md](WORKAROUNDS.md)          | The clever solutions to each hosting constraint, and why |
+| [BUILD-PIPELINE.md](BUILD-PIPELINE.md)    | What produces `dist/`, step by step                      |
+| [HOSTING.md](HOSTING.md)                  | What GitHub does, what Google does, and how they fit     |
+| [DATA-MODEL.md](../backend/DATA-MODEL.md) | Every sheet, column, and stored property                 |
+| [SECURITY.md](../backend/SECURITY.md)     | The secrets, who holds them, and what a leak would mean  |
+| [TESTING.md](../process/TESTING.md)       | How the tests run without Google                         |
+| [DEPLOY.md](../operations/DEPLOY.md)      | Click-by-click setup                                     |
+| [FILE-STRUCTURE.md](FILE-STRUCTURE.md)    | Where every file lives and what it does                  |

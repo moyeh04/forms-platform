@@ -72,15 +72,35 @@
   font-weight: 700;
   cursor: pointer;
   -webkit-mask:
-    conic-gradient(from 135deg at top, var(--mask-clear), var(--mask-solid) 1deg 89deg, var(--mask-clear) 90deg) top /
-    8px 51% repeat-x,
-    conic-gradient(from -45deg at bottom, var(--mask-clear), var(--mask-solid) 1deg 89deg, var(--mask-clear) 90deg)
-    bottom / 8px 51% repeat-x;
+    conic-gradient(
+        from 135deg at top,
+        var(--mask-clear),
+        var(--mask-solid) 1deg 89deg,
+        var(--mask-clear) 90deg
+      )
+      top / 8px 51% repeat-x,
+    conic-gradient(
+        from -45deg at bottom,
+        var(--mask-clear),
+        var(--mask-solid) 1deg 89deg,
+        var(--mask-clear) 90deg
+      )
+      bottom / 8px 51% repeat-x;
   mask:
-    conic-gradient(from 135deg at top, var(--mask-clear), var(--mask-solid) 1deg 89deg, var(--mask-clear) 90deg) top /
-    8px 51% repeat-x,
-    conic-gradient(from -45deg at bottom, var(--mask-clear), var(--mask-solid) 1deg 89deg, var(--mask-clear) 90deg)
-    bottom / 8px 51% repeat-x;
+    conic-gradient(
+        from 135deg at top,
+        var(--mask-clear),
+        var(--mask-solid) 1deg 89deg,
+        var(--mask-clear) 90deg
+      )
+      top / 8px 51% repeat-x,
+    conic-gradient(
+        from -45deg at bottom,
+        var(--mask-clear),
+        var(--mask-solid) 1deg 89deg,
+        var(--mask-clear) 90deg
+      )
+      bottom / 8px 51% repeat-x;
 }
 .cal-left {
   font-size: 0.7rem;

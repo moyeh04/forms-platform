@@ -3,7 +3,7 @@
  * end with its stepper.
  */
 (function (App) {
-  'use strict';
+  "use strict";
 
   var A = App.admin;
   var L = A.lists;
@@ -27,9 +27,7 @@
       nums.length > 0 &&
       nums.every(function (n, i) {
         return (
-          !Number.isNaN(n) &&
-          String(n) === p.rows[i].value &&
-          (i === 0 || n === nums[i - 1] + 1)
+          !Number.isNaN(n) && String(n) === p.rows[i].value && (i === 0 || n === nums[i - 1] + 1)
         );
       })
     );
@@ -58,12 +56,7 @@
    * @return {!Element} The row.
    */
   function fieldRow(label, stepper) {
-    return h(
-      'div',
-      { class: 'field-row' },
-      h('span', { class: 'label' }, label),
-      stepper
-    );
+    return h("div", { class: "field-row" }, h("span", { class: "label" }, label), stepper);
   }
 
   /**
@@ -81,45 +74,45 @@
     var from = nums.length ? nums[0] : 1;
     var to = nums.length ? nums[nums.length - 1] : 1;
     return h(
-      'div',
-      { class: 'num-editor' },
+      "div",
+      { class: "num-editor" },
       h(
-        'div',
-        { class: 'num-run' },
+        "div",
+        { class: "num-run" },
         fieldRow(
-          'From',
+          "From",
           L.stepper({
-            name: 'range-from',
-            label: 'First number',
+            name: "range-from",
+            label: "First number",
             value: from,
             lo: 0,
             hi: MAX_FROM,
             set: function (v) {
               setRun(p, v, Math.max(v, to));
-            }
-          })
+            },
+          }),
         ),
         fieldRow(
-          'To',
+          "To",
           L.stepper({
-            name: 'range-to',
-            label: 'Last number',
+            name: "range-to",
+            label: "Last number",
             value: to,
             lo: from,
             hi: from + MAX_RUN,
             set: function (v) {
               setRun(p, from, v);
-            }
-          })
-        )
+            },
+          }),
+        ),
       ),
       h(
-        'p',
-        { class: 'muted-note' },
-        A.plural(p.rows.length, 'choice', 'choices') +
-          ': ' +
-          (p.rows.length ? from + ' to ' + to : 'none')
-      )
+        "p",
+        { class: "muted-note" },
+        A.plural(p.rows.length, "choice", "choices") +
+          ": " +
+          (p.rows.length ? from + " to " + to : "none"),
+      ),
     );
   };
 })(window.App);

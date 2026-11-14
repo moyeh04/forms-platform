@@ -15,13 +15,13 @@ var TemplatesService = (function () {
 
   /** The title of each step a template can have. */
   var STEP_TITLES_ = {
-    you: { en: 'About you', ar: 'عنك' },
-    study: { en: 'Study details', ar: 'بيانات الدراسة' },
-    members: { en: 'Team members', ar: 'أعضاء الفريق' },
-    project: { en: 'Project', ar: 'المشروع' },
-    task: { en: 'Task', ar: 'التاسك' },
-    slot: { en: 'Time slot', ar: 'الميعاد' },
-    schedule: { en: 'Schedule', ar: 'الجدول' }
+    you: { en: "About you", ar: "عنك" },
+    study: { en: "Study details", ar: "بيانات الدراسة" },
+    members: { en: "Team members", ar: "أعضاء الفريق" },
+    project: { en: "Project", ar: "المشروع" },
+    task: { en: "Task", ar: "التاسك" },
+    slot: { en: "Time slot", ar: "الميعاد" },
+    schedule: { en: "Schedule", ar: "الجدول" },
   };
 
   /**
@@ -33,33 +33,33 @@ var TemplatesService = (function () {
    */
   function commonConfig_(icon, uniqueBy) {
     return {
-      lang: { default: 'en', allowSwitch: true },
+      lang: { default: "en", allowSwitch: true },
       icon: icon,
       rules: {
         uniqueBy: uniqueBy,
         uniqueAcrossForm: false,
-        driveCheck: 'strict',
-        maxSubmissions: null
+        driveCheck: "strict",
+        maxSubmissions: null,
       },
       editKey: {
         enabled: true,
         days: EDIT_KEY_DAYS_,
         allowEdit: true,
-        allowDelete: true
+        allowDelete: true,
       },
-      notifications: { confirmEmail: true, alertEmail: '' },
+      notifications: { confirmEmail: true, alertEmail: "" },
       review: { sequential: true, steps: [] },
       messages: {
-        closed: { en: 'This form is closed.', ar: 'الفورم ده مقفول.' },
+        closed: { en: "This form is closed.", ar: "الفورم ده مقفول." },
         notYet: {
-          en: 'This form has not opened yet.',
-          ar: 'الفورم لسه مفتحش.'
+          en: "This form has not opened yet.",
+          ar: "الفورم لسه مفتحش.",
         },
         draft: {
-          en: 'This form is not available yet.',
-          ar: 'الفورم ده لسه مش متاح.'
-        }
-      }
+          en: "This form is not available yet.",
+          ar: "الفورم ده لسه مش متاح.",
+        },
+      },
     };
   }
 
@@ -82,10 +82,10 @@ var TemplatesService = (function () {
    */
   function teamSteps_(last) {
     return [
-      step_('you', ['email', 'leader_name', 'leader_code', 'phone']),
-      step_('study', ['major', 'level', 'section', 'curriculum']),
-      step_('members', ['team_size', 'members']),
-      step_(last, ['title', 'link'])
+      step_("you", ["email", "leader_name", "leader_code", "phone"]),
+      step_("study", ["major", "level", "section", "curriculum"]),
+      step_("members", ["team_size", "members"]),
+      step_(last, ["title", "link"]),
     ];
   }
 
@@ -100,7 +100,7 @@ var TemplatesService = (function () {
     return TemplateFields.personFields().concat(
       TemplateFields.studyFields(),
       [TemplateFields.teamSizeField(), TemplateFields.membersField()],
-      last
+      last,
     );
   }
 
@@ -110,25 +110,25 @@ var TemplatesService = (function () {
    * @return {!Object} The form settings.
    */
   function teamTemplate_() {
-    var cfg = commonConfig_('team', 'leader_code');
+    var cfg = commonConfig_("team", "leader_code");
     cfg.rules.uniqueAcrossForm = true;
     cfg.rules.teamSize = { min: 1, max: TEAM_MAX_ };
-    cfg.rules.folderName = { enabled: true, subject: '' };
+    cfg.rules.folderName = { enabled: true, subject: "" };
     cfg.fields = teamFields_([
       TemplateFields.field(
-        'title',
-        'english_text',
-        { en: 'Project title', ar: 'اسم المشروع (بالإنجليزي)' },
-        { role: 'title', help: { en: 'In English', ar: 'بالإنجليزي' } }
+        "title",
+        "english_text",
+        { en: "Project title", ar: "اسم المشروع (بالإنجليزي)" },
+        { role: "title", help: { en: "In English", ar: "بالإنجليزي" } },
       ),
       TemplateFields.field(
-        'link',
-        'drive_link',
-        { en: 'Project Drive folder link', ar: 'لينك فولدر المشروع على Drive' },
-        { role: 'link', required: false, kinds: ['folder'] }
-      )
+        "link",
+        "drive_link",
+        { en: "Project Drive folder link", ar: "لينك فولدر المشروع على Drive" },
+        { role: "link", required: false, kinds: ["folder"] },
+      ),
     ]);
-    cfg.steps = teamSteps_('project');
+    cfg.steps = teamSteps_("project");
     return cfg;
   }
 
@@ -138,34 +138,30 @@ var TemplatesService = (function () {
    * @return {!Object} The form settings.
    */
   function taskTemplate_() {
-    var cfg = commonConfig_('task', 'leader_code');
+    var cfg = commonConfig_("task", "leader_code");
     cfg.rules.teamSize = { min: 1, max: TASK_TEAM_MAX_ };
     cfg.fields = teamFields_([
       TemplateFields.field(
-        'title',
-        'english_text',
-        { en: 'Task name', ar: 'اسم التاسك (بالإنجليزي)' },
-        { role: 'title', help: { en: 'In English', ar: 'بالإنجليزي' } }
+        "title",
+        "english_text",
+        { en: "Task name", ar: "اسم التاسك (بالإنجليزي)" },
+        { role: "title", help: { en: "In English", ar: "بالإنجليزي" } },
       ),
       TemplateFields.field(
-        'link',
-        'drive_link',
-        { en: 'Task slides link', ar: 'لينك التاسك (Drive أو Google Slides)' },
+        "link",
+        "drive_link",
+        { en: "Task slides link", ar: "لينك التاسك (Drive أو Google Slides)" },
         {
-          role: 'link',
-          kinds: ['file', 'slides'],
+          role: "link",
+          kinds: ["file", "slides"],
           help: {
-            en:
-              'Share it as "Anyone with the link". ' +
-              'The first slide has your name and section.',
-            ar:
-              'اعمله شير "Anyone with the link". ' +
-              'أول سلايد فيها الاسم والسكشن.'
-          }
-        }
-      )
+            en: 'Share it as "Anyone with the link". The first slide has your name and section.',
+            ar: 'اعمله شير "Anyone with the link". أول سلايد فيها الاسم والسكشن.',
+          },
+        },
+      ),
     ]);
-    cfg.steps = teamSteps_('task');
+    cfg.steps = teamSteps_("task");
     return cfg;
   }
 
@@ -175,32 +171,29 @@ var TemplatesService = (function () {
    * @return {!Object} The form settings.
    */
   function reservationTemplate_() {
-    var cfg = commonConfig_('calendar', 'leader_code');
-    cfg.fields = TemplateFields.personFields().concat(
-      TemplateFields.studyFields(),
-      [
-        TemplateFields.field(
-          'title',
-          'english_text',
-          { en: 'Project title', ar: 'اسم المشروع (بالإنجليزي)' },
-          { role: 'title' }
-        ),
-        TemplateFields.reservationMembersField(),
-        TemplateFields.field(
-          'slot',
-          'slot',
-          { en: 'Booking slot', ar: 'ميعاد المناقشة' },
-          { role: 'slot' }
-        )
-      ]
-    );
+    var cfg = commonConfig_("calendar", "leader_code");
+    cfg.fields = TemplateFields.personFields().concat(TemplateFields.studyFields(), [
+      TemplateFields.field(
+        "title",
+        "english_text",
+        { en: "Project title", ar: "اسم المشروع (بالإنجليزي)" },
+        { role: "title" },
+      ),
+      TemplateFields.reservationMembersField(),
+      TemplateFields.field(
+        "slot",
+        "slot",
+        { en: "Booking slot", ar: "ميعاد المناقشة" },
+        { role: "slot" },
+      ),
+    ]);
     cfg.slots = { days: [], capacity: 1 };
     cfg.editKey.allowEdit = false;
     cfg.steps = [
-      step_('you', ['email', 'leader_name', 'leader_code', 'phone']),
-      step_('study', ['major', 'level', 'section', 'curriculum']),
-      step_('project', ['title', 'members']),
-      step_('slot', ['slot'])
+      step_("you", ["email", "leader_name", "leader_code", "phone"]),
+      step_("study", ["major", "level", "section", "curriculum"]),
+      step_("project", ["title", "members"]),
+      step_("slot", ["slot"]),
     ];
     return cfg;
   }
@@ -213,33 +206,33 @@ var TemplatesService = (function () {
   function whatsappPersonFields_() {
     return [
       TemplateFields.field(
-        'email',
-        'email',
-        { en: 'Email', ar: 'البريد الإلكتروني' },
-        { role: 'email' }
+        "email",
+        "email",
+        { en: "Email", ar: "البريد الإلكتروني" },
+        { role: "email" },
       ),
       TemplateFields.field(
-        'name',
-        'arabic_name',
-        { en: 'Full name', ar: 'الاسم رباعي' },
+        "name",
+        "arabic_name",
+        { en: "Full name", ar: "الاسم رباعي" },
         {
-          role: 'name',
+          role: "name",
           minParts: TemplateFields.NAME_PARTS,
-          help: TemplateFields.nameHelp()
-        }
+          help: TemplateFields.nameHelp(),
+        },
       ),
       TemplateFields.field(
-        'phone',
-        'phone',
-        { en: 'Phone number', ar: 'رقم التليفون' },
-        { role: 'phone' }
+        "phone",
+        "phone",
+        { en: "Phone number", ar: "رقم التليفون" },
+        { role: "phone" },
       ),
       TemplateFields.field(
-        'code',
-        'code',
-        { en: 'Code in your timetable', ar: 'الكود اللي في الجدول' },
-        { role: 'code', length: TemplateFields.CODE_LENGTH }
-      )
+        "code",
+        "code",
+        { en: "Code in your timetable", ar: "الكود اللي في الجدول" },
+        { role: "code", length: TemplateFields.CODE_LENGTH },
+      ),
     ];
   }
 
@@ -252,56 +245,49 @@ var TemplatesService = (function () {
   function whatsappStudyFields_() {
     return [
       TemplateFields.field(
-        'level',
-        'select',
-        { en: 'Level / year', ar: 'المستوى / الفرقة' },
-        { list: 'levels' }
+        "level",
+        "select",
+        { en: "Level / year", ar: "المستوى / الفرقة" },
+        { list: "levels" },
       ),
+      TemplateFields.field("major", "select", { en: "Major", ar: "التخصص" }, { list: "majors" }),
       TemplateFields.field(
-        'major',
-        'select',
-        { en: 'Major', ar: 'التخصص' },
-        { list: 'majors' }
-      ),
-      TemplateFields.field(
-        'group',
-        'select',
-        { en: 'Group', ar: 'الجروب' },
+        "group",
+        "select",
+        { en: "Group", ar: "الجروب" },
         {
-          list: 'groups',
+          list: "groups",
           help: {
-            en: 'Pick A if your timetable includes Chemistry, B if it does not',
-            ar: 'اختار A لو الجدول فيه كيمياء، و B لو مفيهوش'
-          }
-        }
+            en: "Pick A if your timetable includes Chemistry, B if it does not",
+            ar: "اختار A لو الجدول فيه كيمياء، و B لو مفيهوش",
+          },
+        },
       ),
       TemplateFields.field(
-        'section',
-        'select',
-        { en: 'Section number', ar: 'رقم السكشن' },
+        "section",
+        "select",
+        { en: "Section number", ar: "رقم السكشن" },
         {
-          list: 'wa_sections',
+          list: "wa_sections",
           help: {
-            en:
-              'The number next to TH in your timetable, ' +
-              'for example 21 in 1B-TH21',
-            ar: 'الرقم اللي جنب TH في جدولك'
-          }
-        }
+            en: "The number next to TH in your timetable, for example 21 in 1B-TH21",
+            ar: "الرقم اللي جنب TH في جدولك",
+          },
+        },
       ),
       TemplateFields.field(
-        'schedule',
-        'drive_link',
-        { en: 'Screenshot of your timetable', ar: 'صورة الجدول بتاعك' },
+        "schedule",
+        "drive_link",
+        { en: "Screenshot of your timetable", ar: "صورة الجدول بتاعك" },
         {
-          role: 'link',
-          kinds: ['file'],
+          role: "link",
+          kinds: ["file"],
           help: {
-            en: 'A Google Drive link showing your full name and code',
-            ar: 'لينك Drive ظاهر فيه الاسم والكود'
-          }
-        }
-      )
+            en: "A Google Drive link showing your full name and code",
+            ar: "لينك Drive ظاهر فيه الاسم والكود",
+          },
+        },
+      ),
     ];
   }
 
@@ -311,24 +297,24 @@ var TemplatesService = (function () {
    * @return {!Object} The form settings.
    */
   function whatsappTemplate_() {
-    var cfg = commonConfig_('chat', 'code');
+    var cfg = commonConfig_("chat", "code");
     cfg.fields = whatsappPersonFields_().concat(whatsappStudyFields_());
     cfg.steps = [
-      step_('you', ['email', 'name', 'phone', 'code']),
-      step_('study', ['level', 'major', 'group', 'section']),
-      step_('schedule', ['schedule'])
+      step_("you", ["email", "name", "phone", "code"]),
+      step_("study", ["level", "major", "group", "section"]),
+      step_("schedule", ["schedule"]),
     ];
     cfg.review = {
       sequential: true,
       steps: [
         {
-          id: 'schedule',
-          label: { en: 'Timetable check', ar: 'مراجعة الجدول' }
+          id: "schedule",
+          label: { en: "Timetable check", ar: "مراجعة الجدول" },
         },
-        { id: 'group', label: { en: 'Group match', ar: 'مطابقة الجروب' } }
-      ]
+        { id: "group", label: { en: "Group match", ar: "مطابقة الجروب" } },
+      ],
     };
-    cfg.matching = { enabled: true, field: 'phone' };
+    cfg.matching = { enabled: true, field: "phone" };
     return cfg;
   }
 
@@ -340,7 +326,7 @@ var TemplatesService = (function () {
     team_registration: teamTemplate_,
     task_submission: taskTemplate_,
     reservation: reservationTemplate_,
-    whatsapp_registration: whatsappTemplate_
+    whatsapp_registration: whatsappTemplate_,
   });
 
   /**
@@ -351,8 +337,7 @@ var TemplatesService = (function () {
    * @throws {ApiError} `unknown_type` for a type with no template.
    */
   function templateFor(type) {
-    if (!TEMPLATES_[type])
-      ApiError.fail('unknown_type', 'Unknown form type: ' + type);
+    if (!TEMPLATES_[type]) ApiError.fail("unknown_type", "Unknown form type: " + type);
     return TEMPLATES_[type]();
   }
 

@@ -4,7 +4,7 @@
  * reason.
  */
 (function (App) {
-  'use strict';
+  "use strict";
 
   var A = App.admin;
   var L = A.lists;
@@ -37,28 +37,28 @@
    * @return {!Element} The field.
    */
   function field(c) {
-    return h('input', {
-      class: 'input sec-letter',
-      name: c.name + '-new',
+    return h("input", {
+      class: "input sec-letter",
+      name: c.name + "-new",
       maxlength: String(KIND_LETTERS),
-      placeholder: 'L',
-      'aria-label': 'New kind',
-      'aria-describedby': c.name + '-err',
-      autocomplete: 'off',
+      placeholder: "L",
+      "aria-label": "New kind",
+      "aria-describedby": c.name + "-err",
+      autocomplete: "off",
       oninput: function (e) {
         e.target.value = L.cleanCode(e.target.value, KIND_LETTERS);
-        c.err.textContent = '';
+        c.err.textContent = "";
       },
       onkeydown: function (e) {
-        if (e.key === 'Enter') {
+        if (e.key === "Enter") {
           e.preventDefault();
           go(c);
-        } else if (e.key === 'Escape') {
+        } else if (e.key === "Escape") {
           e.preventDefault();
           e.stopPropagation();
           paint(c, false);
         }
-      }
+      },
     });
   }
 
@@ -74,36 +74,36 @@
     if (!typing) {
       box.appendChild(
         h(
-          'button',
+          "button",
           {
-            type: 'button',
-            class: 'toggle-chip sm add',
-            name: c.name + '-add',
+            type: "button",
+            class: "toggle-chip sm add",
+            name: c.name + "-add",
             onclick: function () {
               paint(c, true);
-              var el = box.querySelector('input');
+              var el = box.querySelector("input");
               if (el?.focus) el.focus();
-            }
+            },
           },
-          '+ New kind'
-        )
+          "+ New kind",
+        ),
       );
       return;
     }
-    c.err = h('span', { class: 'error', id: c.name + '-err', role: 'alert' });
+    c.err = h("span", { class: "error", id: c.name + "-err", role: "alert" });
     c.input = field(c);
     box.appendChild(c.input);
     box.appendChild(
       h(
-        'button',
+        "button",
         {
-          type: 'button',
-          class: 'btn btn-quiet sm',
-          name: c.name + '-take',
-          onclick: go.bind(null, c)
+          type: "button",
+          class: "btn btn-quiet sm",
+          name: c.name + "-take",
+          onclick: go.bind(null, c),
         },
-        'Add'
-      )
+        "Add",
+      ),
     );
     box.appendChild(c.err);
   }
@@ -121,7 +121,7 @@
       name: name,
       known: known,
       take: take,
-      box: h('span', { class: 'sec-new' })
+      box: h("span", { class: "sec-new" }),
     };
     paint(c, false);
     return c.box;

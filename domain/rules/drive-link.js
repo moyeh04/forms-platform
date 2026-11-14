@@ -3,25 +3,25 @@
  * a team gives its work: Team_Leader_Name_Project_Name_Subject_Name.
  */
 (function (root) {
-  'use strict';
+  "use strict";
 
-  var node = typeof module === 'object' && module.exports;
-  var textRules = node ? require('./text.js') : root.RulesText;
+  var node = typeof module === "object" && module.exports;
+  var textRules = node ? require("./text.js") : root.RulesText;
 
   /** The hosts of a Drive or Docs link. */
-  var DRIVE_HOSTS = ['drive.google.com', 'docs.google.com'];
+  var DRIVE_HOSTS = ["drive.google.com", "docs.google.com"];
 
   /**
    * The ways a link names its file or folder, the first match winning: the
    * id it holds and the kind of thing it opens.
    */
   var LINK_KINDS = [
-    { pattern: /\/folders\/([-\w]{20,})/, kind: 'folder' },
-    { pattern: /\/presentation\/d\/([-\w]{20,})/, kind: 'slides' },
-    { pattern: /\/document\/d\/([-\w]{20,})/, kind: 'doc' },
-    { pattern: /\/spreadsheets\/d\/([-\w]{20,})/, kind: 'sheet' },
-    { pattern: /\/file\/d\/([-\w]{20,})/, kind: 'file' },
-    { pattern: /[?&]id=([-\w]{20,})/, kind: 'file' }
+    { pattern: /\/folders\/([-\w]{20,})/, kind: "folder" },
+    { pattern: /\/presentation\/d\/([-\w]{20,})/, kind: "slides" },
+    { pattern: /\/document\/d\/([-\w]{20,})/, kind: "doc" },
+    { pattern: /\/spreadsheets\/d\/([-\w]{20,})/, kind: "sheet" },
+    { pattern: /\/file\/d\/([-\w]{20,})/, kind: "file" },
+    { pattern: /[?&]id=([-\w]{20,})/, kind: "file" },
   ];
 
   /** The parts a folder name needs: leader name, project and subject. */
@@ -38,9 +38,9 @@
    *     is not a Drive or Docs link to a file or folder.
    */
   function parseDriveLink(url) {
-    var u = String(url == null ? '' : url).trim();
+    var u = String(url == null ? "" : url).trim();
     if (!/^https?:\/\//i.test(u)) return { ok: false };
-    var host = (u.match(/^https?:\/\/([^/?#]+)/i) || [])[1] || '';
+    var host = (u.match(/^https?:\/\/([^/?#]+)/i) || [])[1] || "";
     if (DRIVE_HOSTS.indexOf(host.toLowerCase()) === -1) return { ok: false };
     var found = { ok: false };
     LINK_KINDS.some(function (k) {
@@ -63,14 +63,14 @@
   function validateDriveLink(raw, opts) {
     var o = opts || {};
     var kinds = o.kinds || [];
-    if (textRules.isEmpty(raw)) return { ok: false, error: 'required' };
+    if (textRules.isEmpty(raw)) return { ok: false, error: "required" };
     var p = parseDriveLink(raw);
-    if (!p.ok) return { ok: false, error: 'invalid_link' };
+    if (!p.ok) return { ok: false, error: "invalid_link" };
     if (kinds.length && kinds.indexOf(p.kind) === -1) {
       return {
         ok: false,
-        error: 'link_kind',
-        params: { kinds: kinds.join(', ') }
+        error: "link_kind",
+        params: { kinds: kinds.join(", ") },
       };
     }
     return { ok: true, value: p.url, meta: { id: p.id, kind: p.kind } };
@@ -84,11 +84,11 @@
    * @return {string} The part.
    */
   function folderPart(s) {
-    return String(s == null ? '' : s)
+    return String(s == null ? "" : s)
       .trim()
-      .replace(/[^A-Za-z0-9؀-ۿ-]+/g, '_')
-      .replace(/_+/g, '_')
-      .replace(/^_|_$/g, '');
+      .replace(/[^A-Za-z0-9؀-ۿ-]+/g, "_")
+      .replace(/_+/g, "_")
+      .replace(/^_|_$/g, "");
   }
 
   /**
@@ -101,10 +101,10 @@
   function folderNameExample(o) {
     var given = o || {};
     return [
-      folderPart(given.name) || 'Ahmed_Mohamed',
-      folderPart(given.project) || 'Project_Name',
-      folderPart(given.subject) || 'Subject_Name'
-    ].join('_');
+      folderPart(given.name) || "Ahmed_Mohamed",
+      folderPart(given.project) || "Project_Name",
+      folderPart(given.subject) || "Subject_Name",
+    ].join("_");
   }
 
   /**
@@ -115,20 +115,20 @@
    * @return {string} The error, or '' when the name is right.
    */
   function folderNameError(n, subject) {
-    if (/\s/.test(n)) return 'folder_name_spaces';
-    var parts = n.split('_');
+    if (/\s/.test(n)) return "folder_name_spaces";
+    var parts = n.split("_");
     var empty = parts.some(function (p) {
       return !p;
     });
-    if (parts.length < MIN_FOLDER_PARTS || empty) return 'folder_name_format';
-    if (!subject) return '';
-    var tail = '_' + subject.toLowerCase();
+    if (parts.length < MIN_FOLDER_PARTS || empty) return "folder_name_format";
+    if (!subject) return "";
+    var tail = "_" + subject.toLowerCase();
     if (n.toLowerCase().slice(-tail.length) !== tail) {
-      return 'folder_name_subject';
+      return "folder_name_subject";
     }
     // The leader's name and the project come before the subject name.
-    var head = n.slice(0, -tail.length).split('_');
-    return head.length < MIN_HEAD_PARTS ? 'folder_name_format' : '';
+    var head = n.slice(0, -tail.length).split("_");
+    return head.length < MIN_HEAD_PARTS ? "folder_name_format" : "";
   }
 
   /**
@@ -147,7 +147,7 @@
   function checkFolderName(name, opts) {
     var o = opts || {};
     var example = o.example || {};
-    var n = String(name == null ? '' : name).trim();
+    var n = String(name == null ? "" : name).trim();
     var subject = folderPart(o.subject);
     var error = folderNameError(n, subject);
     if (!error) return { ok: true };
@@ -158,11 +158,11 @@
         example: folderNameExample({
           name: example.name,
           project: example.project,
-          subject: subject
+          subject: subject,
         }),
         subject: subject,
-        name: n
-      }
+        name: n,
+      },
     };
   }
 
@@ -171,8 +171,8 @@
     validateDriveLink: validateDriveLink,
     folderPart: folderPart,
     folderNameExample: folderNameExample,
-    checkFolderName: checkFolderName
+    checkFolderName: checkFolderName,
   };
   if (node) module.exports = api;
   root.RulesDriveLink = api;
-})(typeof globalThis !== 'undefined' ? globalThis : this);
+})(typeof globalThis !== "undefined" ? globalThis : this);

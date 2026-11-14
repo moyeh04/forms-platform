@@ -64,7 +64,7 @@ button.pcell:hover {
 .pdot {
   width: 12px;
   height: 12px;
-  border: 2px solid currentColor;
+  border: 2px solid currentcolor;
   border-radius: 50%;
 }
 .pcell.is-submitted {
@@ -73,7 +73,7 @@ button.pcell:hover {
 }
 .pcell.is-submitted .pdot {
   border-style: solid;
-  background: linear-gradient(90deg, currentColor 50%, var(--mask-clear) 50%);
+  background: linear-gradient(90deg, currentcolor 50%, var(--mask-clear) 50%);
 }
 .pcell.is-discussed {
   color: var(--on-sea);
@@ -81,7 +81,7 @@ button.pcell:hover {
   border-color: var(--sea);
 }
 .pcell.is-discussed .pdot {
-  background: currentColor;
+  background: currentcolor;
 }
 .progress-states {
   display: flex;

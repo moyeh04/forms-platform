@@ -3,7 +3,7 @@
  * into, the filters with their counts, and the list of requests.
  */
 (function (App) {
-  'use strict';
+  "use strict";
 
   var A = App.admin;
   var R = A.responses;
@@ -12,13 +12,13 @@
 
   /** The filters, in order: a match status or a decision. */
   var FILTERS = [
-    ['all', 'All'],
-    ['pending', 'Pending'],
-    ['matched', 'Matched'],
-    ['none', 'No match'],
-    ['duplicate', 'Duplicate'],
-    ['approved', 'Approved'],
-    ['rejected', 'Rejected']
+    ["all", "All"],
+    ["pending", "Pending"],
+    ["matched", "Matched"],
+    ["none", "No match"],
+    ["duplicate", "Duplicate"],
+    ["approved", "Approved"],
+    ["rejected", "Rejected"],
   ];
 
   /**
@@ -29,12 +29,10 @@
    */
   function importText(r) {
     return (
-      'Added ' +
+      "Added " +
       r.added +
-      (r.duplicates ? ', ' + r.duplicates + ' already in the list' : '') +
-      (r.unparsed.length
-        ? ', ' + r.unparsed.length + ' line(s) had no phone number'
-        : '')
+      (r.duplicates ? ", " + r.duplicates + " already in the list" : "") +
+      (r.unparsed.length ? ", " + r.unparsed.length + " line(s) had no phone number" : "")
     );
   }
 
@@ -45,35 +43,31 @@
    * @return {!Array<!Element>} The box and its button row.
    */
   function pasteBox(m) {
-    var ta = h('textarea', {
-      class: 'textarea',
-      rows: '5',
-      name: 'paste',
+    var ta = h("textarea", {
+      class: "textarea",
+      rows: "5",
+      name: "paste",
       placeholder:
-        'Paste the pending WhatsApp requests here.\n' +
-        'One per line, each with the phone number.',
-      dir: 'ltr',
-      'aria-label': 'Pasted WhatsApp requests'
+        "Paste the pending WhatsApp requests here.\nOne per line, each with the phone number.",
+      dir: "ltr",
+      "aria-label": "Pasted WhatsApp requests",
     });
     var addBtn = h(
-      'button',
-      { type: 'button', class: 'btn btn-primary sm', name: 'import' },
-      'Add to the list'
+      "button",
+      { type: "button", class: "btn btn-primary sm", name: "import" },
+      "Add to the list",
     );
-    addBtn.addEventListener('click', function () {
+    addBtn.addEventListener("click", function () {
       A.busy(addBtn, async function () {
-        var r = await A.call('admin.matching.import', {
+        var r = await A.call("admin.matching.import", {
           slug: m.form.slug,
-          text: ta.value
+          text: ta.value,
         });
-        ui.toast(importText(r), r.added ? 'ok' : 'err');
+        ui.toast(importText(r), r.added ? "ok" : "err");
         await m.load(true);
       });
     });
-    return [
-      ta,
-      h('div', { class: 'actions', style: { marginTop: '8px' } }, addBtn)
-    ];
+    return [ta, h("div", { class: "actions", style: { marginTop: "8px" } }, addBtn)];
   }
 
   /**
@@ -84,12 +78,12 @@
    */
   function countsOf(requests) {
     var counts = { all: requests.length };
-    ['matched', 'none', 'duplicate'].forEach(function (k) {
+    ["matched", "none", "duplicate"].forEach(function (k) {
       counts[k] = requests.filter(function (r) {
         return r.status === k;
       }).length;
     });
-    ['pending', 'approved', 'rejected'].forEach(function (k) {
+    ["pending", "approved", "rejected"].forEach(function (k) {
       counts[k] = requests.filter(function (r) {
         return r.decision === k;
       }).length;
@@ -106,25 +100,25 @@
   function filterRow(m) {
     var counts = countsOf(m.data.requests);
     return h(
-      'div',
-      { class: 'actions', style: { marginTop: '14px' } },
+      "div",
+      { class: "actions", style: { marginTop: "14px" } },
       FILTERS.map(function (f) {
         var on = m.filter === f[0];
         return h(
-          'button',
+          "button",
           {
-            type: 'button',
-            class: 'btn sm ' + (on ? 'btn-primary' : 'btn-quiet'),
+            type: "button",
+            class: "btn sm " + (on ? "btn-primary" : "btn-quiet"),
             dataset: { filter: f[0] },
-            'aria-pressed': on ? 'true' : 'false',
+            "aria-pressed": on ? "true" : "false",
             onclick: function () {
               m.filter = f[0];
               m.paint();
-            }
+            },
           },
-          f[1] + ' (' + counts[f[0]] + ')'
+          f[1] + " (" + counts[f[0]] + ")",
         );
-      })
+      }),
     );
   }
 
@@ -137,20 +131,20 @@
    */
   function requestButton(m, r) {
     return h(
-      'button',
+      "button",
       {
-        type: 'button',
-        class: 'req',
+        type: "button",
+        class: "req",
         dataset: { id: r.id },
-        'aria-pressed': m.sel === r.id ? 'true' : 'false',
+        "aria-pressed": m.sel === r.id ? "true" : "false",
         onclick: function () {
           m.sel = r.id;
           m.paint();
-        }
+        },
       },
-      h('span', null, r.label ? R.bdi(r.label) : '(no name)'),
-      h('span', { class: 'mono' }, r.phone),
-      h('span', { class: 'req-badges' }, R.matchBadges(r))
+      h("span", null, r.label ? R.bdi(r.label) : "(no name)"),
+      h("span", { class: "mono" }, r.phone),
+      h("span", { class: "req-badges" }, R.matchBadges(r)),
     );
   }
 
@@ -162,13 +156,13 @@
    */
   function requestList(m) {
     var list = R.visibleRequests(m).map(requestButton.bind(null, m));
-    if (list.length) return h('div', { class: 'req-list' }, list);
+    if (list.length) return h("div", { class: "req-list" }, list);
     return h(
-      'div',
-      { class: 'empty', style: { marginTop: '10px' } },
+      "div",
+      { class: "empty", style: { marginTop: "10px" } },
       m.data.requests.length
-        ? 'No requests in this filter.'
-        : 'No requests yet. Paste the list above.'
+        ? "No requests in this filter."
+        : "No requests yet. Paste the list above.",
     );
   }
 
@@ -181,14 +175,14 @@
     var left = m.left;
     var waiting = m.data.notRequested.length;
     ui.clear(left);
-    left.appendChild(h('h2', null, 'WhatsApp requests'));
+    left.appendChild(h("h2", null, "WhatsApp requests"));
     left.appendChild(
       h(
-        'p',
-        { class: 'help' },
-        'WhatsApp does not let websites read join requests, so paste them' +
-          ' here. Each phone number is matched to what the student submitted.'
-      )
+        "p",
+        { class: "help" },
+        "WhatsApp does not let websites read join requests, so paste them" +
+          " here. Each phone number is matched to what the student submitted.",
+      ),
     );
     pasteBox(m).forEach(function (node) {
       left.appendChild(node);
@@ -198,10 +192,10 @@
     if (waiting) {
       left.appendChild(
         h(
-          'p',
-          { class: 'muted-note', style: { marginTop: '12px' } },
-          waiting + ' registration(s) have no matching WhatsApp request yet.'
-        )
+          "p",
+          { class: "muted-note", style: { marginTop: "12px" } },
+          waiting + " registration(s) have no matching WhatsApp request yet.",
+        ),
       );
     }
   };

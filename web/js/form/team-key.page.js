@@ -3,7 +3,7 @@
  * for the student to confirm.
  */
 (function (App) {
-  'use strict';
+  "use strict";
 
   var P = App.formPage;
   var h = App.ui.h;
@@ -20,13 +20,9 @@
   function bookedNote() {
     if (!S.teamBooked) return null;
     var text = S.teamSlot
-      ? t('teamBookedAt', { when: P.displayValue(P.slotField(), S.teamSlot) })
-      : t('teamBooked');
-    return h(
-      'div',
-      { class: 'banner info', role: 'status', name: 'team-booked' },
-      text
-    );
+      ? t("teamBookedAt", { when: P.displayValue(P.slotField(), S.teamSlot) })
+      : t("teamBooked");
+    return h("div", { class: "banner info", role: "status", name: "team-booked" }, text);
   }
 
   /**
@@ -36,26 +32,26 @@
    */
   function foundTeam() {
     return [
-      h('p', { class: 'step-help' }, t('teamIs') + ' (' + S.team.ref + ')'),
+      h("p", { class: "step-help" }, t("teamIs") + " (" + S.team.ref + ")"),
       P.teamSummary(),
       bookedNote(),
       h(
-        'p',
-        { class: 'foot' },
+        "p",
+        { class: "foot" },
         h(
-          'button',
+          "button",
           {
-            type: 'button',
-            class: 'link-btn',
-            name: 'other-key',
+            type: "button",
+            class: "link-btn",
+            name: "other-key",
             onclick: function () {
               forgetTeam();
               P.render();
-            }
+            },
           },
-          t('otherKey')
-        )
-      )
+          t("otherKey"),
+        ),
+      ),
     ];
   }
 
@@ -68,28 +64,20 @@
   function teamBody() {
     if (S.team) return foundTeam();
     var input = P.keyInput(
-      { id: 'team-key', autocomplete: 'off', value: S.teamKey },
+      { id: "team-key", autocomplete: "off", value: S.teamKey },
       function (key) {
         S.teamKey = key;
-      }
+      },
     );
     return [
+      h("p", { class: "step-help" }, t("teamHelp", { form: S.form.keyBooking.title })),
       h(
-        'p',
-        { class: 'step-help' },
-        t('teamHelp', { form: S.form.keyBooking.title })
-      ),
-      h(
-        'div',
-        { class: 'field' + (S.teamError ? ' has-error' : '') },
-        h('label', { class: 'label', for: 'team-key' }, t('keyLabel')),
+        "div",
+        { class: "field" + (S.teamError ? " has-error" : "") },
+        h("label", { class: "label", for: "team-key" }, t("keyLabel")),
         input,
-        h(
-          'p',
-          { class: 'error', role: 'alert', hidden: !S.teamError },
-          S.teamError
-        )
-      )
+        h("p", { class: "error", role: "alert", hidden: !S.teamError }, S.teamError),
+      ),
     ];
   }
 
@@ -99,9 +87,9 @@
     S.teamBooked = false;
     S.teamSlot = null;
     S.teamCanMove = false;
-    S.sourceKey = '';
-    S.teamKey = '';
-    S.teamError = '';
+    S.sourceKey = "";
+    S.teamKey = "";
+    S.teamError = "";
   }
 
   /**
@@ -117,7 +105,7 @@
     S.sourceKey = S.teamKey;
     S.busy = false;
     P.render();
-    var title = document.getElementById('step-title');
+    var title = document.getElementById("step-title");
     if (title?.focus) title.focus({ preventScroll: true });
   }
 
@@ -128,19 +116,19 @@
    */
   async function findTeam() {
     if (!P.isKey(S.teamKey)) {
-      S.teamError = t('errors.bad_key');
+      S.teamError = t("errors.bad_key");
       P.render();
       return P.focusFirstError();
     }
     S.busy = true;
-    S.teamError = '';
+    S.teamError = "";
     P.render();
     var res;
     try {
       res = await App.api.call({
-        action: 'bookingTeam',
+        action: "bookingTeam",
         slug: S.slug,
-        key: S.teamKey
+        key: S.teamKey,
       });
     } catch (e) {
       S.busy = false;

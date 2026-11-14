@@ -6,24 +6,24 @@
 var FormsPatch = (function () {
   /** The settings a patch may change. */
   var PATCHABLE_ = [
-    'title',
-    'slug',
-    'status',
-    'opensAt',
-    'closesAt',
-    'lang',
-    'icon',
-    'steps',
-    'fields',
-    'slots',
-    'rules',
-    'review',
-    'matching',
-    'editKey',
-    'notifications',
-    'messages',
-    'keyBooking',
-    'progress'
+    "title",
+    "slug",
+    "status",
+    "opensAt",
+    "closesAt",
+    "lang",
+    "icon",
+    "steps",
+    "fields",
+    "slots",
+    "rules",
+    "review",
+    "matching",
+    "editKey",
+    "notifications",
+    "messages",
+    "keyBooking",
+    "progress",
   ];
 
   /**
@@ -34,10 +34,7 @@ var FormsPatch = (function () {
    */
   function checkStatus_(status) {
     if (Object.values(FormStatus).indexOf(status) === -1) {
-      ApiError.fail(
-        'bad_status',
-        'Status must be draft, open, closed, or archived.'
-      );
+      ApiError.fail("bad_status", "Status must be draft, open, closed, or archived.");
     }
   }
 
@@ -52,7 +49,7 @@ var FormsPatch = (function () {
     var wanted = Text.slugify(slug);
     var clash = FormsRepository.findForm(wanted);
     if (clash && clash.id !== form.id) {
-      ApiError.fail('slug_taken', 'Another form already uses that link name.');
+      ApiError.fail("slug_taken", "Another form already uses that link name.");
     }
     if (wanted !== form.slug) ClientsRepository.keepClientForms();
     form.slug = wanted;
@@ -66,19 +63,16 @@ var FormsPatch = (function () {
    * @param {!Object} patch The patch.
    */
   function applyKey_(form, k, patch) {
-    if (k === 'status') checkStatus_(patch.status);
-    if (k === 'rules') {
+    if (k === "status") checkStatus_(patch.status);
+    if (k === "rules") {
       form.rules = FormsRules.normalizeRules(form.rules, patch.rules);
-    } else if (k === 'slots') {
+    } else if (k === "slots") {
       form.slots = SlotsRules.normalizeSlots(patch.slots);
-    } else if (k === 'keyBooking') {
-      form.keyBooking = KeyBookingService.normalizeKeyBooking(
-        form,
-        patch.keyBooking
-      );
-    } else if (k === 'progress') {
+    } else if (k === "keyBooking") {
+      form.keyBooking = KeyBookingService.normalizeKeyBooking(form, patch.keyBooking);
+    } else if (k === "progress") {
       form.progress = FormsRules.normalizeProgress(form, patch.progress);
-    } else if (k === 'slug') {
+    } else if (k === "slug") {
       setSlug_(form, patch.slug);
     } else {
       form[k] = patch[k];
@@ -97,9 +91,9 @@ var FormsPatch = (function () {
   function applyFormPatch_(form, patch, base) {
     if (base && String(base) !== form.updatedAt) {
       ApiError.fail(
-        'stale',
-        'This form was changed in another window since you opened it. ' +
-          'Press Discard to load the latest, then make your change again.'
+        "stale",
+        "This form was changed in another window since you opened it. " +
+          "Press Discard to load the latest, then make your change again.",
       );
     }
     FormMetadata.update(form, patch);

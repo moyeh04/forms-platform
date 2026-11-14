@@ -5,7 +5,7 @@
 
 var RegistryRepository = (function () {
   /** The name of the Drive folder that holds every form's files. */
-  var ROOT_FOLDER_NAME_ = 'Forms Platform';
+  var ROOT_FOLDER_NAME_ = "Forms Platform";
 
   /**
    * Opens the registry spreadsheet: the one setup stored, or the one the

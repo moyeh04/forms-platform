@@ -15,7 +15,7 @@ var MatchingService = (function () {
   function requireMatchingForm_(ref) {
     var form = FormsRepository.requireForm(ref);
     if (!form.matching?.enabled)
-      ApiError.fail('no_matching', 'Matching is not turned on for this form.');
+      ApiError.fail("no_matching", "Matching is not turned on for this form.");
     return form;
   }
 
@@ -29,8 +29,8 @@ var MatchingService = (function () {
   function labelOf_(line, raw) {
     return line
       .split(raw)
-      .join(' ')
-      .replace(/[\s,;:|\-]+/g, ' ')
+      .join(" ")
+      .replace(/[\s,;:|-]+/g, " ")
       .trim();
   }
 
@@ -52,7 +52,7 @@ var MatchingService = (function () {
       var fresh = [];
       var duplicates = 0;
       var unparsed = [];
-      String(text || '')
+      String(text || "")
         .split(/\r?\n/)
         .forEach(function (line) {
           line = line.trim();
@@ -75,7 +75,7 @@ var MatchingService = (function () {
               label: labelOf_(line, p.raw),
               added: Time.nowIso(),
               decision: ReviewStatus.PENDING,
-              note: ''
+              note: "",
             });
           });
         });
@@ -83,7 +83,7 @@ var MatchingService = (function () {
       return {
         added: fresh.length,
         duplicates: duplicates,
-        unparsed: unparsed
+        unparsed: unparsed,
       };
     });
   }
@@ -95,8 +95,8 @@ var MatchingService = (function () {
    * @return {string} `none`, `matched` or `duplicate`.
    */
   function matchStatus_(count) {
-    if (count === 0) return 'none';
-    return count === 1 ? 'matched' : 'duplicate';
+    if (count === 0) return "none";
+    return count === 1 ? "matched" : "duplicate";
   }
 
   /**
@@ -129,7 +129,7 @@ var MatchingService = (function () {
         decision: q.decision,
         note: q.note,
         matches: ids,
-        status: matchStatus_(ids.length)
+        status: matchStatus_(ids.length),
       };
     });
     var notRequested = subs
@@ -142,7 +142,7 @@ var MatchingService = (function () {
     return {
       requests: requests,
       submissions: subs,
-      notRequested: notRequested
+      notRequested: notRequested,
     };
   }
 
@@ -159,17 +159,16 @@ var MatchingService = (function () {
    * @throws {ApiError} `request_not_found` when there is no such request.
    */
   function decide_(form, requestId, decision, note) {
-    var stepId = form.matching.step || 'group';
+    var stepId = form.matching.step || "group";
     var hasStep = (form.review?.steps || []).some(function (s) {
       return s.id === stepId;
     });
     var linked = null;
     Lock.withLock(function () {
-      var q = MatchingRepository.readRequests(form).filter(function (x) {
+      var q = MatchingRepository.readRequests(form).find(function (x) {
         return x.id === requestId;
-      })[0];
-      if (!q)
-        ApiError.fail('request_not_found', 'That request does not exist.');
+      });
+      if (!q) ApiError.fail("request_not_found", "That request does not exist.");
       var subs = ResponsesRepository.readResponses(form).filter(function (r) {
         return Rules.normalizePhone(r.phone) === q.phone;
       });
@@ -211,6 +210,6 @@ var MatchingService = (function () {
     importNumbers: importNumbers_,
     matchList: matchList_,
     decide: decide_,
-    remove: remove_
+    remove: remove_,
   };
 })();

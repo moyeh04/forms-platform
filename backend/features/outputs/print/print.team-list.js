@@ -9,7 +9,7 @@ var PrintTeamList = (function () {
     team: 70,
     name: 330,
     code: 120,
-    task: 300
+    task: 300,
   };
 
   /** The widths in column order. */
@@ -31,10 +31,10 @@ var PrintTeamList = (function () {
   var TASK_COL_ = 4;
 
   /** The mark after the name of a team leader. */
-  var LEADER_MARK_ = '  ★';
+  var LEADER_MARK_ = "  ★";
 
   /** What a task without a title shows. */
-  var NO_TITLE_ = '—';
+  var NO_TITLE_ = "—";
 
   /**
    * Makes the rows, their tints and the block of each team.
@@ -49,15 +49,15 @@ var PrintTeamList = (function () {
       var tints = SheetStyle.PALETTE.groups[g % 2].shades;
       var start = out.values.length + PrintLayout.FIRST_ROW;
       t.members.forEach(function (m, i) {
-        var mark = m.leader ? LEADER_MARK_ : '';
-        out.values.push(['', i + 1 + '.  ' + m.name + mark, m.code, '']);
+        var mark = m.leader ? LEADER_MARK_ : "";
+        out.values.push(["", i + 1 + ".  " + m.name + mark, m.code, ""]);
         out.shades.push([tints[0], tints[i % 2], tints[i % 2], tints[0]]);
       });
       out.blocks.push({
         start: start,
         length: t.members.length,
         number: t.number,
-        response: t.response
+        response: t.response,
       });
     });
     return out;
@@ -71,20 +71,18 @@ var PrintTeamList = (function () {
    */
   function labelBlock_(sh, b) {
     var title = b.response.title || NO_TITLE_;
-    var link = b.response.link
-      ? SheetViewsLayout.hyperlink(b.response.link, title)
-      : '';
+    var link = b.response.link ? SheetViewsLayout.hyperlink(b.response.link, title) : "";
     var fill = PrintLayout.LABEL_FILL;
     SheetViewsLayout.mergedLabel(
       sh,
       { row: b.start, col: 1, length: b.length },
-      { value: b.number, formula: '', fill: fill }
+      { value: b.number, formula: "", fill: fill },
     );
     sh.getRange(b.start, 1).setFontColor(PrintLayout.BLACK);
     SheetViewsLayout.mergedLabel(
       sh,
       { row: b.start, col: TASK_COL_, length: b.length },
-      { value: title, formula: link, fill: fill }
+      { value: title, formula: link, fill: fill },
     );
     sh.getRange(b.start, TASK_COL_).setFontColor(PrintLayout.BLACK);
   }
@@ -105,23 +103,16 @@ var PrintTeamList = (function () {
       .setBackgrounds(rows.shades)
       .setFontFamily(SheetStyle.PALETTE.font)
       .setFontSize(PrintLayout.BODY_FONT)
-      .setVerticalAlignment('middle');
-    sh.getRange(first, NAME_COL_, n, 1).setFontWeight('bold');
-    sh.getRange(first, CODE_COL_, n, 1).setHorizontalAlignment('center');
+      .setVerticalAlignment("middle");
+    sh.getRange(first, NAME_COL_, n, 1).setFontWeight("bold");
+    sh.getRange(first, CODE_COL_, n, 1).setHorizontalAlignment("center");
     sh.setRowHeights(first, n, ROW_PX_);
     rows.blocks.forEach(function (b) {
       labelBlock_(sh, b);
     });
     var last = n + PrintLayout.HEADER_ROW;
-    SheetViewsLayout.frameBlocks(
-      sh,
-      { cols: COLS_, first: first, last: last },
-      rows.blocks
-    );
-    PrintLayout.frame(
-      sh.getRange(PrintLayout.HEADER_ROW, 1, 1, COLS_),
-      SheetStyle.PALETTE.ink
-    );
+    SheetViewsLayout.frameBlocks(sh, { cols: COLS_, first: first, last: last }, rows.blocks);
+    PrintLayout.frame(sh.getRange(PrintLayout.HEADER_ROW, 1, 1, COLS_), SheetStyle.PALETTE.ink);
   }
 
   /**
@@ -134,20 +125,16 @@ var PrintTeamList = (function () {
   function printList(form) {
     var vform = FormsPublic.validationForm(form);
     var ss = SpreadsheetApp.openById(form.sheetId);
-    var sh = SheetViewsLayout.freshView(ss, 'Print - Team list');
-    var headers = ['Team', 'Team member name', 'Code'];
+    var sh = SheetViewsLayout.freshView(ss, "Print - Team list");
+    var headers = ["Team", "Team member name", "Code"];
     headers.push(TeamsService.teamThing(form));
     var metadata = FormMetadata.caption(vform);
-    var caption = metadata ? '  -  ' + metadata : '';
-    PrintLayout.paintHeader(
-      sh,
-      vform.title + caption + '  -  Team list',
-      headers
-    );
+    var caption = metadata ? "  -  " + metadata : "";
+    PrintLayout.paintHeader(sh, vform.title + caption + "  -  Team list", headers);
     PrintLayout.setWidths(sh, WIDTHS_);
     var rows = teamRows_(form);
     if (!rows.values.length) {
-      PrintLayout.emptyNote(sh, COLS_, 'No registrations yet.');
+      PrintLayout.emptyNote(sh, COLS_, "No registrations yet.");
       return PrintLayout.printed(sh, 0);
     }
     writeRows_(sh, rows);

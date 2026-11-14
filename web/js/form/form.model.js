@@ -5,7 +5,7 @@
  * which the other parts of the page add their functions to.
  */
 (function (App) {
-  'use strict';
+  "use strict";
 
   /**
    * Gives the page text of a key in the page language.
@@ -28,36 +28,36 @@
     return App.i18n.L(o);
   }
 
-  var root = document.getElementById('app');
+  var root = document.getElementById("app");
 
   var S = {
-    slug: '',
+    slug: "",
     form: null,
-    state: '',
+    state: "",
     taken: {},
-    view: 'loading',
-    loadError: '',
+    view: "loading",
+    loadError: "",
     steps: [],
     stepIndex: 0,
     data: {},
     errors: {},
     banner: null,
     busy: false,
-    mode: 'new',
-    key: '',
+    mode: "new",
+    key: "",
     keyInfo: null,
-    ownSlot: '',
+    ownSlot: "",
     result: null,
-    keyError: '',
+    keyError: "",
     progress: null,
     expiredProgress: null,
     team: null,
     teamBooked: false,
     teamSlot: null,
     teamCanMove: false,
-    sourceKey: '',
-    teamKey: '',
-    teamError: ''
+    sourceKey: "",
+    teamKey: "",
+    teamError: "",
   };
 
   /**
@@ -67,7 +67,7 @@
    * @return {*} The answer, or undefined.
    */
   function getVal(path) {
-    return path.split('.').reduce(function (cur, part) {
+    return path.split(".").reduce(function (cur, part) {
       return cur == null ? cur : cur[part];
     }, S.data);
   }
@@ -79,7 +79,7 @@
    * @param {*} v The answer.
    */
   function setVal(path, v) {
-    var parts = path.split('.');
+    var parts = path.split(".");
     var last = parts.pop();
     var cur = parts.reduce(function (obj, part, i) {
       var below = i + 1 < parts.length ? parts[i + 1] : last;
@@ -106,7 +106,7 @@
    * @return {?Object} The field, or null.
    */
   function slotField() {
-    return Rules.fieldByRole(S.form, 'slot');
+    return Rules.fieldByRole(S.form, "slot");
   }
 
   /**
@@ -116,7 +116,7 @@
    * @return {boolean} True in that case.
    */
   function keyMode() {
-    return !!S.form?.keyBooking && S.mode === 'new';
+    return !!S.form?.keyBooking && S.mode === "new";
   }
 
   /**
@@ -126,7 +126,7 @@
    * @return {boolean} True in that case.
    */
   function slotOnly() {
-    return S.mode === 'edit' && !!S.keyInfo?.slotOnly && !!slotField();
+    return S.mode === "edit" && !!S.keyInfo?.slotOnly && !!slotField();
   }
 
   App.formPage = {
@@ -139,6 +139,6 @@
     activeFields: activeFields,
     slotOnly: slotOnly,
     getVal: getVal,
-    setVal: setVal
+    setVal: setVal,
   };
 })(window.App);

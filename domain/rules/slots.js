@@ -3,9 +3,9 @@
  * left in a slot, the names of dated days, and the check of a chosen slot.
  */
 (function (root) {
-  'use strict';
+  "use strict";
 
-  var node = typeof module === 'object' && module.exports;
+  var node = typeof module === "object" && module.exports;
 
   /** The minutes of an hour. */
   var MINUTES_PER_HOUR = 60;
@@ -29,31 +29,10 @@
   var ISO_DATE_LENGTH = 10;
 
   /** The week days, Sunday first, as Date.getUTCDay counts them. */
-  var WEEKDAYS = [
-    'Sunday',
-    'Monday',
-    'Tuesday',
-    'Wednesday',
-    'Thursday',
-    'Friday',
-    'Saturday'
-  ];
+  var WEEKDAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
   /** The short month names, January first. */
-  var MONTHS = [
-    'Jan',
-    'Feb',
-    'Mar',
-    'Apr',
-    'May',
-    'Jun',
-    'Jul',
-    'Aug',
-    'Sep',
-    'Oct',
-    'Nov',
-    'Dec'
-  ];
+  var MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
   /**
    * Reads a time of day as minutes after midnight.
@@ -74,7 +53,7 @@
    * @return {string} The number, with a 0 before one digit.
    */
   function twoDigits(n) {
-    return n < 10 ? '0' + n : String(n);
+    return n < 10 ? "0" + n : String(n);
   }
 
   /**
@@ -88,8 +67,8 @@
   function fmtTime(mins, style) {
     var h = Math.floor(mins / MINUTES_PER_HOUR);
     var mm = twoDigits(mins % MINUTES_PER_HOUR);
-    if (style === '24h') return twoDigits(h) + ':' + mm;
-    return (h % CLOCK_HOURS || CLOCK_HOURS) + ':' + mm;
+    if (style === "24h") return twoDigits(h) + ":" + mm;
+    return (h % CLOCK_HOURS || CLOCK_HOURS) + ":" + mm;
   }
 
   /**
@@ -107,13 +86,12 @@
     var end = toMinutes(o.end);
     var len = Number(o.length);
     var gap = Number(o.gap || 0);
-    var wrong =
-      Number.isNaN(start) || Number.isNaN(end) || !(len > 0) || gap < 0;
+    var wrong = Number.isNaN(start) || Number.isNaN(end) || !(len > 0) || gap < 0;
     if (wrong || end <= start) return [];
     var out = [];
     var t;
     for (t = start; t + len <= end; t += len + gap) {
-      out.push(fmtTime(t, o.style) + ' - ' + fmtTime(t + len, o.style));
+      out.push(fmtTime(t, o.style) + " - " + fmtTime(t + len, o.style));
     }
     return out;
   }
@@ -126,7 +104,7 @@
    * @return {string} The key, as "day|time".
    */
   function slotKey(dayId, time) {
-    return dayId + '|' + time;
+    return dayId + "|" + time;
   }
 
   /**
@@ -153,7 +131,7 @@
    * @return {?Date} The date, or null when it is not one.
    */
   function utcDate(date, days) {
-    var m = ISO_DATE.exec(String(date || ''));
+    var m = ISO_DATE.exec(String(date || ""));
     if (!m) return null;
     return new Date(Date.UTC(+m[1], +m[2] - 1, +m[3] + days));
   }
@@ -167,14 +145,8 @@
    */
   function dayLabel(date) {
     var d = utcDate(date, 0);
-    if (!d) return '';
-    return (
-      WEEKDAYS[d.getUTCDay()] +
-      ' ' +
-      d.getUTCDate() +
-      ' ' +
-      MONTHS[d.getUTCMonth()]
-    );
+    if (!d) return "";
+    return WEEKDAYS[d.getUTCDay()] + " " + d.getUTCDate() + " " + MONTHS[d.getUTCMonth()];
   }
 
   /**
@@ -187,7 +159,7 @@
    */
   function shiftDate(date, days) {
     var d = utcDate(date, days);
-    return d ? d.toISOString().slice(0, ISO_DATE_LENGTH) : '';
+    return d ? d.toISOString().slice(0, ISO_DATE_LENGTH) : "";
   }
 
   /**
@@ -201,7 +173,7 @@
    *     is today, later or not a date.
    */
   function isPastDate(date, today) {
-    return ISO_DATE.test(String(date || '')) && String(date) < today;
+    return ISO_DATE.test(String(date || "")) && String(date) < today;
   }
 
   /**
@@ -217,9 +189,7 @@
   function firstStart(hour, minutes) {
     var afternoon = hour === CLOCK_HOURS || (hour > 0 && hour < MORNING_HOUR);
     return (
-      (hour + (afternoon && hour < CLOCK_HOURS ? CLOCK_HOURS : 0)) *
-        MINUTES_PER_HOUR +
-      minutes
+      (hour + (afternoon && hour < CLOCK_HOURS ? CLOCK_HOURS : 0)) * MINUTES_PER_HOUR + minutes
     );
   }
 
@@ -294,12 +264,12 @@
     var days = setup.days || [];
     var pick = raw || {};
     if (!pick.day || !pick.time) {
-      return { ok: false, error: field.required === false ? 'ok' : 'required' };
+      return { ok: false, error: field.required === false ? "ok" : "required" };
     }
     var found = days.some(function (day) {
       return day.id === pick.day && (day.times || []).indexOf(pick.time) !== -1;
     });
-    if (!found) return { ok: false, error: 'invalid_slot' };
+    if (!found) return { ok: false, error: "invalid_slot" };
     return { ok: true, value: { day: pick.day, time: pick.time } };
   }
 
@@ -313,8 +283,8 @@
     slotStarts: slotStarts,
     isPastSlot: isPastSlot,
     isPastDay: isPastDay,
-    validateSlot: validateSlot
+    validateSlot: validateSlot,
   };
   if (node) module.exports = api;
   root.RulesSlots = api;
-})(typeof globalThis !== 'undefined' ? globalThis : this);
+})(typeof globalThis !== "undefined" ? globalThis : this);

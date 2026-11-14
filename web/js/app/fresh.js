@@ -11,7 +11,7 @@
  * happens there.
  */
 (function (App) {
-  'use strict';
+  "use strict";
 
   /** One second, in milliseconds. */
   var SECOND = 1000;
@@ -29,14 +29,14 @@
   var GAP = GAP_SECONDS * SECOND;
 
   /** The session storage key of the version this tab reloaded for. */
-  var TRIED = 'fp_fresh_tried';
+  var TRIED = "fp_fresh_tried";
 
-  var mine = '';
+  var mine = "";
   var touched = false;
   var checking = false;
   var last = 0;
   var bar = null;
-  var published = '';
+  var published = "";
 
   /**
    * Finds the session storage, which a locked-down browser may refuse.
@@ -59,15 +59,15 @@
    */
   function read() {
     return window
-      .fetch('version.json?t=' + Date.now(), { cache: 'no-store' })
+      .fetch("version.json?t=" + Date.now(), { cache: "no-store" })
       .then(function (r) {
         return r.ok ? r.json() : {};
       })
       .then(function (j) {
-        return String(j?.version || '');
+        return String(j?.version || "");
       })
       .catch(function () {
-        return '';
+        return "";
       });
   }
 
@@ -83,8 +83,8 @@
    */
   function words() {
     return {
-      text: 'A newer version of this page is ready.',
-      action: 'Reload'
+      text: "A newer version of this page is ready.",
+      action: "Reload",
     };
   }
 
@@ -95,7 +95,7 @@
    * @return {boolean} True when the page is in use.
    */
   function inUse() {
-    return touched || !!document.querySelector('.overlay');
+    return touched || !!document.querySelector(".overlay");
   }
 
   /**
@@ -104,15 +104,15 @@
    * @return {!Element} The bar.
    */
   function makeBar() {
-    var button = document.createElement('button');
-    button.type = 'button';
-    button.className = 'btn btn-primary sm';
-    button.name = 'fresh-reload';
-    button.addEventListener('click', go);
-    var made = document.createElement('div');
-    made.className = 'fresh-bar';
-    made.setAttribute('role', 'status');
-    made.appendChild(document.createElement('span'));
+    var button = document.createElement("button");
+    button.type = "button";
+    button.className = "btn btn-primary sm";
+    button.name = "fresh-reload";
+    button.addEventListener("click", go);
+    var made = document.createElement("div");
+    made.className = "fresh-bar";
+    made.setAttribute("role", "status");
+    made.appendChild(document.createElement("span"));
     made.appendChild(button);
     document.body.insertBefore(made, document.body.firstChild);
     return made;
@@ -187,7 +187,7 @@
 
   /** Checks when the tab is shown, unless the wait is not over. */
   function checkIfShown() {
-    if (!document.hidden) check();
+    if (!document.hidden) void check();
   }
 
   /**
@@ -195,13 +195,13 @@
    * button, the clock, and a change of the page language.
    */
   function listen() {
-    document.addEventListener('input', touch, true);
-    document.addEventListener('change', touch, true);
-    document.addEventListener('visibilitychange', checkIfShown);
+    document.addEventListener("input", touch, true);
+    document.addEventListener("change", touch, true);
+    document.addEventListener("visibilitychange", checkIfShown);
     // A page brought back by the Back button is shown as it was left,
     // without loading anything.
-    window.addEventListener('pageshow', function (e) {
-      if (e.persisted) check(true);
+    window.addEventListener("pageshow", function (e) {
+      if (e.persisted) void check(true);
     });
     window.setInterval(checkIfShown, EVERY);
     // A page that learns its language after it opened says the bar again in
@@ -210,7 +210,7 @@
       if (bar) show();
     }).observe(document.documentElement, {
       attributes: true,
-      attributeFilter: ['lang']
+      attributeFilter: ["lang"],
     });
   }
 
@@ -226,10 +226,10 @@
     if (mine || !version) return Promise.resolve();
     mine = String(version);
     listen();
-    if (document.readyState !== 'loading') return check(true);
+    if (document.readyState !== "loading") return check(true);
     return new Promise(function (done) {
-      document.addEventListener('DOMContentLoaded', function () {
-        check(true).then(done);
+      document.addEventListener("DOMContentLoaded", function () {
+        void check(true).then(done);
       });
     });
   }
@@ -239,10 +239,10 @@
     reload: reload,
     words: words,
     check: check,
-    start: start
+    start: start,
   };
   App.fresh = F;
 
   var config = window.APP_CONFIG || {};
-  start(config.VERSION);
+  void start(config.VERSION);
 })(window.App);

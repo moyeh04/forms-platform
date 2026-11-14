@@ -4,7 +4,7 @@
  * save would change. The page keeps all of it in one object, `p`.
  */
 (function (App) {
-  'use strict';
+  "use strict";
 
   var A = App.admin;
   var L = A.lists;
@@ -53,8 +53,7 @@
     p.order = false;
     p.renaming = false;
     p.draft = null;
-    p.sections =
-      L.kindOf(p) === ListKind.SECTIONS ? L.readSections(L.values(p)) : null;
+    p.sections = L.kindOf(p) === ListKind.SECTIONS ? L.readSections(L.values(p)) : null;
   };
 
   /**
@@ -137,22 +136,13 @@
   function rowProblem(r, i, seen, milestones) {
     var v = r.value.trim();
     if (milestones && !r.en.trim()) {
-      return (
-        'Milestone ' +
-        (i + 1) +
-        ' has no English name. Write one or remove the row.'
-      );
+      return "Milestone " + (i + 1) + " has no English name. Write one or remove the row.";
     }
     if (!v && (r.en.trim() || r.ar.trim())) {
-      return (
-        'Choice ' +
-        (i + 1) +
-        ' has a name but no value. Write the choice or remove the row.'
-      );
+      return "Choice " + (i + 1) + " has a name but no value. Write the choice or remove the row.";
     }
-    if (v && seen[v])
-      return '"' + v + '" is in the list twice. Remove one of them.';
-    return '';
+    if (v && seen[v]) return '"' + v + '" is in the list twice. Remove one of them.';
+    return "";
   }
 
   /**
@@ -164,7 +154,7 @@
    */
   L.problem = function (p) {
     var seen = {};
-    var out = { text: '', at: -1 };
+    var out = { text: "", at: -1 };
     var milestones = L.kindOf(p) === ListKind.MILESTONES;
     p.rows.some(function (r, i) {
       var text = rowProblem(r, i, seen, milestones);
@@ -174,8 +164,8 @@
     });
     if (!out.text && !L.fromRows(p.rows).length) {
       out.text = milestones
-        ? 'A list needs at least one milestone.'
-        : 'A list needs at least one choice.';
+        ? "A list needs at least one milestone."
+        : "A list needs at least one choice.";
     }
     return out;
   };
@@ -189,9 +179,9 @@
    * @return {!Array<!Object>} The forms.
    */
   function limitedForms(p, removed) {
-    var rule = '';
-    if (p.key === 'majors') rule = 'majors';
-    else if (L.kindOf(p) === ListKind.SECTIONS) rule = 'sections';
+    var rule = "";
+    if (p.key === "majors") rule = "majors";
+    else if (L.kindOf(p) === ListKind.SECTIONS) rule = "sections";
     if (!rule) return [];
     return L.formsUsing(p.forms, p.key).filter(function (f) {
       return (f.rules?.[rule] || []).some(function (v) {
@@ -221,9 +211,9 @@
       return now.indexOf(v) === -1;
     });
     var parts = [];
-    if (added.length) parts.push(added.length + ' added');
-    if (removed.length) parts.push(removed.length + ' removed');
-    if (!parts.length) parts.push('names or order changed');
-    return { text: parts.join(', '), limited: limitedForms(p, removed) };
+    if (added.length) parts.push(added.length + " added");
+    if (removed.length) parts.push(removed.length + " removed");
+    if (!parts.length) parts.push("names or order changed");
+    return { text: parts.join(", "), limited: limitedForms(p, removed) };
   };
 })(window.App);

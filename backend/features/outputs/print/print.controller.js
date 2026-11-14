@@ -10,14 +10,10 @@ var PrintController = (function () {
   function reservations(req) {
     var form = FormsService.requireForm(req.slug || req.id);
     if (form.type !== FormType.RESERVATION)
-      ApiError.fail('wrong_type', 'Only reservation forms have days to print.');
+      ApiError.fail("wrong_type", "Only reservation forms have days to print.");
     return PrintService.printResult(
       form,
-      PrintService.printReservations(
-        form,
-        String(req.dayId || ''),
-        !!req.includeEmpty
-      )
+      PrintService.printReservations(form, String(req.dayId || ""), !!req.includeEmpty),
     );
   }
 
@@ -30,7 +26,7 @@ var PrintController = (function () {
   function teamList(req) {
     var form = FormsService.requireForm(req.slug || req.id);
     if (!TeamsService.isTeamForm(form))
-      ApiError.fail('wrong_type', 'Only team and task forms have a team list.');
+      ApiError.fail("wrong_type", "Only team and task forms have a team list.");
     return PrintService.printResult(form, PrintService.printTeamList(form));
   }
 

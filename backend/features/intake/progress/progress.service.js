@@ -7,10 +7,9 @@
 var ProgressService = (function () {
   /** The sentence of each reason a mark is refused. */
   var REFUSED_ = {
-    bad_milestone: 'This form has no such milestone.',
-    bad_state: 'A milestone is Not yet, Submitted or Discussed.',
-    note_too_long:
-      'A note can have up to ' + Rules.PROGRESS_NOTE_MAX + ' characters.'
+    bad_milestone: "This form has no such milestone.",
+    bad_state: "A milestone is Not yet, Submitted or Discussed.",
+    note_too_long: "A note can have up to " + Rules.PROGRESS_NOTE_MAX + " characters.",
   };
 
   /**
@@ -21,7 +20,7 @@ var ProgressService = (function () {
    */
   function changeOf_(req) {
     var out = {};
-    ['state', 'teamNote', 'privateNote'].forEach(function (k) {
+    ["state", "teamNote", "privateNote"].forEach(function (k) {
       if (req[k] !== undefined && req[k] !== null) out[k] = String(req[k]);
     });
     return out;
@@ -36,14 +35,11 @@ var ProgressService = (function () {
    * @throws {ApiError} `submission_not_found`.
    */
   function liveTeam_(form, id) {
-    var r = ResponsesRepository.readResponses(form).filter(function (x) {
-      return x.id === String(id || '');
-    })[0];
+    var r = ResponsesRepository.readResponses(form).find(function (x) {
+      return x.id === String(id || "");
+    });
     if (!r) {
-      ApiError.fail(
-        'submission_not_found',
-        'This team is no longer registered.'
-      );
+      ApiError.fail("submission_not_found", "This team is no longer registered.");
     }
     return r;
   }
@@ -65,7 +61,7 @@ var ProgressService = (function () {
    *     `submission_not_found` or `changed_meanwhile`.
    */
   function mark_(form, req, by, shape) {
-    var id = String(req.milestone || '');
+    var id = String(req.milestone || "");
     var change = changeOf_(req);
     var why = Rules.markProblem(form, id, change);
     if (why) ApiError.fail(why, REFUSED_[why]);
@@ -73,15 +69,14 @@ var ProgressService = (function () {
       var r = liveTeam_(form, req.submissionId);
       if (Rules.markStale(r.progress, id, req.baseAt)) {
         ApiError.fail(
-          'changed_meanwhile',
-          'Someone else marked this milestone a moment ago. It now shows' +
-            ' their mark.',
-          { progress: shape(r.progress) }
+          "changed_meanwhile",
+          "Someone else marked this milestone a moment ago. It now shows their mark.",
+          { progress: shape(r.progress) },
         );
       }
       r.progress = Rules.applyMark(r.progress, id, change, {
         at: Time.nowIso(),
-        by: by
+        by: by,
       });
       ResponsesRepository.writeProgress(form, r);
       return shape(r.progress);
@@ -99,7 +94,7 @@ var ProgressService = (function () {
     return Rules.markCounts(
       ResponsesRepository.readResponses(form).map(function (r) {
         return r.progress;
-      })
+      }),
     );
   }
 

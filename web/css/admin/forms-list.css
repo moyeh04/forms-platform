@@ -53,8 +53,7 @@
   margin-top: 4px;
 }
 .page-head .more-menu {
-  inset-inline-start: auto;
-  inset-inline-end: 0;
+  inset-inline: auto 0;
 }
 .page-head .head-note {
   flex-basis: 100%;
@@ -158,7 +157,8 @@ a.badge:hover {
 .card {
   background: var(--sheet);
   border: 1.5px solid var(--line);
-  border-radius: 4px;
+  border-radius: 6px;
+  box-shadow: 0 1px 2px var(--shadow);
   padding: 16px 18px;
   display: flex;
   flex-direction: column;
@@ -188,10 +188,6 @@ a.badge:hover {
 }
 .card-tags {
   margin-top: 2px;
-}
-.card {
-  box-shadow: 0 1px 2px var(--shadow);
-  border-radius: 6px;
 }
 .card-actions {
   margin-top: auto;

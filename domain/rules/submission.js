@@ -3,18 +3,18 @@
  * member forms of a team, and nobody named twice.
  */
 (function (root) {
-  'use strict';
+  "use strict";
 
-  var node = typeof module === 'object' && module.exports;
+  var node = typeof module === "object" && module.exports;
   var parts = node
     ? {
-        text: require('./text.js'),
-        phone: require('./phone.js'),
-        codes: require('./codes.js'),
-        link: require('./drive-link.js'),
-        slots: require('./slots.js'),
-        form: require('./form.js'),
-        size: require('./team-size.js')
+        text: require("./text.js"),
+        phone: require("./phone.js"),
+        codes: require("./codes.js"),
+        link: require("./drive-link.js"),
+        slots: require("./slots.js"),
+        form: require("./form.js"),
+        size: require("./team-size.js"),
       }
     : {
         text: root.RulesText,
@@ -23,7 +23,7 @@
         link: root.RulesDriveLink,
         slots: root.RulesSlots,
         form: root.RulesForm,
-        size: root.RulesTeamSize
+        size: root.RulesTeamSize,
       };
 
   /** The longest answer of a long text field. */
@@ -42,9 +42,9 @@
   function validateSelect(field, raw) {
     var v = String(raw);
     var values = (field.options || []).map(function (o) {
-      return String(typeof o === 'object' ? o.value : o);
+      return String(typeof o === "object" ? o.value : o);
     });
-    if (values.indexOf(v) === -1) return { ok: false, error: 'invalid_choice' };
+    if (values.indexOf(v) === -1) return { ok: false, error: "invalid_choice" };
     return { ok: true, value: v };
   }
 
@@ -59,8 +59,8 @@
     if (v.length > MAX_TEXTAREA_LENGTH) {
       return {
         ok: false,
-        error: 'too_long',
-        params: { max: MAX_TEXTAREA_LENGTH }
+        error: "too_long",
+        params: { max: MAX_TEXTAREA_LENGTH },
       };
     }
     return { ok: true, value: v };
@@ -78,7 +78,7 @@
     var v = parts.text.squash(raw);
     var max = field.max || MAX_TEXT_LENGTH;
     if (v.length > max) {
-      return { ok: false, error: 'too_long', params: { max: max } };
+      return { ok: false, error: "too_long", params: { max: max } };
     }
     return { ok: true, value: v };
   }
@@ -93,26 +93,26 @@
    */
   function checkByType(field, raw, ctx) {
     switch (field.type) {
-      case 'arabic_name':
+      case "arabic_name":
         return parts.text.validateArabicName(raw, { minParts: field.minParts });
-      case 'english_text':
+      case "english_text":
         return parts.text.validateEnglishText(raw, {
           min: field.min,
-          max: field.max
+          max: field.max,
         });
-      case 'team_size':
+      case "team_size":
         return parts.size.validateTeamSize(raw, ctx.form);
-      case 'phone':
+      case "phone":
         return parts.phone.validatePhone(raw);
-      case 'code':
+      case "code":
         return parts.codes.validateCode(raw, { length: field.length });
-      case 'email':
+      case "email":
         return parts.text.validateEmail(raw);
-      case 'drive_link':
+      case "drive_link":
         return parts.link.validateDriveLink(raw, { kinds: field.kinds });
-      case 'select':
+      case "select":
         return validateSelect(field, raw);
-      case 'textarea':
+      case "textarea":
         return validateTextarea(raw);
       default:
         return validatePlain(field, raw);
@@ -132,12 +132,10 @@
   function validateField(field, raw, ctx) {
     var c = ctx || {};
     var t = field.type;
-    if (t === 'members') return validateMembers(field, raw, c);
-    if (t === 'slot') return parts.slots.validateSlot(field, raw, c);
+    if (t === "members") return validateMembers(field, raw, c);
+    if (t === "slot") return parts.slots.validateSlot(field, raw, c);
     if (parts.text.isEmpty(raw)) {
-      return field.required === false
-        ? { ok: true, value: '' }
-        : { ok: false, error: 'required' };
+      return field.required === false ? { ok: true, value: "" } : { ok: false, error: "required" };
     }
     return checkByType(field, raw, c);
   }
@@ -156,18 +154,18 @@
       if (count === ctx.memberCount) return null;
       return {
         ok: false,
-        error: 'members_count',
-        params: { count: ctx.memberCount }
+        error: "members_count",
+        params: { count: ctx.memberCount },
       };
     }
     var range = parts.size.teamSizeRange(ctx.form);
     var min = field.min == null ? range.min - 1 : field.min;
     var max = field.max == null ? range.max - 1 : field.max;
     if (count < min) {
-      return { ok: false, error: 'too_few_members', params: { min: min } };
+      return { ok: false, error: "too_few_members", params: { min: min } };
     }
     if (count > max) {
-      return { ok: false, error: 'too_many_members', params: { max: max } };
+      return { ok: false, error: "too_many_members", params: { max: max } };
     }
     return null;
   }
@@ -192,12 +190,12 @@
         if (sf.enabled === false) return;
         var r = validateField(sf, m ? m[sf.id] : undefined, ctx);
         if (r.ok) row[sf.id] = r.value;
-        else errors[i + '.' + sf.id] = { error: r.error, params: r.params };
+        else errors[i + "." + sf.id] = { error: r.error, params: r.params };
       });
       return row;
     });
     if (Object.keys(errors).length) {
-      return { ok: false, error: 'members_invalid', nested: errors };
+      return { ok: false, error: "members_invalid", nested: errors };
     }
     return { ok: true, value: clean };
   }
@@ -211,13 +209,13 @@
    *     duplicates.
    */
   function markDuplicateCodes(form, out, errors) {
-    var codeField = parts.form.fieldByRole(form, 'code');
-    var membersField = parts.form.fieldByRole(form, 'members');
+    var codeField = parts.form.fieldByRole(form, "code");
+    var membersField = parts.form.fieldByRole(form, "members");
     if (!codeField || !membersField || errors[membersField.id]) return;
     var list = out[membersField.id];
-    var codeSub = (membersField.fields || []).filter(function (sf) {
-      return sf.role === 'code';
-    })[0];
+    var codeSub = (membersField.fields || []).find(function (sf) {
+      return sf.role === "code";
+    });
     if (!Array.isArray(list) || !codeSub) return;
     var seen = {};
     if (out[codeField.id]) seen[out[codeField.id]] = true;
@@ -226,8 +224,8 @@
       var e = errors[membersField.id];
       if (!c) return;
       if (seen[c]) {
-        e = e || { error: 'members_invalid', nested: {} };
-        e.nested[i + '.' + codeSub.id] = { error: 'duplicate_code' };
+        e = e || { error: "members_invalid", nested: {} };
+        e.nested[i + "." + codeSub.id] = { error: "duplicate_code" };
         errors[membersField.id] = e;
       }
       seen[c] = true;
@@ -268,16 +266,15 @@
     c.memberCount = null;
     var out = {};
     var errors = {};
-    var sizeField = parts.form.fieldByRole(form, 'team_size');
+    var sizeField = parts.form.fieldByRole(form, "team_size");
     var hasSize = !!sizeField && sizeField.enabled !== false;
     if (hasSize) c.memberCount = membersNeeded(sizeField, answers, c);
     (form.fields || []).forEach(function (f) {
       if (f.enabled === false) return;
-      if (f.type === 'members' && hasSize && c.memberCount == null) return;
+      if (f.type === "members" && hasSize && c.memberCount == null) return;
       var r = validateField(f, answers[f.id], c);
       if (r.ok) out[f.id] = r.value;
-      else
-        errors[f.id] = { error: r.error, params: r.params, nested: r.nested };
+      else errors[f.id] = { error: r.error, params: r.params, nested: r.nested };
     });
     markDuplicateCodes(form, out, errors);
     return { ok: Object.keys(errors).length === 0, errors: errors, data: out };
@@ -285,8 +282,8 @@
 
   var api = {
     validateField: validateField,
-    validateSubmission: validateSubmission
+    validateSubmission: validateSubmission,
   };
   if (node) module.exports = api;
   root.RulesSubmission = api;
-})(typeof globalThis !== 'undefined' ? globalThis : this);
+})(typeof globalThis !== "undefined" ? globalThis : this);

@@ -10,7 +10,7 @@
  * part draws into; and what draws the page again.
  */
 (function (App) {
-  'use strict';
+  "use strict";
 
   var A = App.admin;
   var L = A.lists;
@@ -27,10 +27,10 @@
   async function leaveOk(p) {
     if (!L.dirty(p)) return true;
     return ui.confirm({
-      title: 'Leave without saving?',
-      body: 'Your changes to ' + L.nameOf(p) + ' are not saved.',
-      confirmText: 'Leave',
-      danger: true
+      title: "Leave without saving?",
+      body: "Your changes to " + L.nameOf(p) + " are not saved.",
+      confirmText: "Leave",
+      danger: true,
     });
   }
 
@@ -47,7 +47,7 @@
     if (other) L.load(p, key);
     p.creating = false;
     p.open = true;
-    A.setHash('#/lists/' + encodeURIComponent(key));
+    A.setHash("#/lists/" + encodeURIComponent(key));
     p.paint();
   }
 
@@ -62,7 +62,7 @@
     L.load(p, p.key);
     p.creating = true;
     p.open = true;
-    A.setHash('#/lists/new');
+    A.setHash("#/lists/new");
     p.paint();
     var el = p.pane.querySelector('[name="list-name"]');
     if (el?.focus) el.focus();
@@ -111,7 +111,7 @@
     p.preview = null;
     p.rowsBox.appendChild(ed || L.choicesEditor(p));
     if (k === ListKind.SECTIONS) {
-      p.preview = h('div');
+      p.preview = h("div");
       p.rowsBox.appendChild(p.preview);
       paintPreview(p);
     }
@@ -130,21 +130,17 @@
     if (!p.rows.length) return;
     p.preview.appendChild(
       h(
-        'details',
-        { class: 'list-many sec-preview', open: open || null },
+        "details",
+        { class: "list-many sec-preview", open: open || null },
+        h("summary", null, "See all " + A.plural(p.rows.length, "section", "sections")),
         h(
-          'summary',
-          null,
-          'See all ' + A.plural(p.rows.length, 'section', 'sections')
-        ),
-        h(
-          'ul',
-          { class: 'value-chips' },
+          "ul",
+          { class: "value-chips" },
           p.rows.map(function (r) {
-            return h('li', { class: 'value-chip plain' }, r.value);
-          })
-        )
-      )
+            return h("li", { class: "value-chip plain" }, r.value);
+          }),
+        ),
+      ),
     );
   }
 
@@ -158,20 +154,20 @@
     ui.clear(pane);
     pane.appendChild(
       h(
-        'button',
+        "button",
         {
-          type: 'button',
-          class: 'link-btn lists-back',
-          name: 'all-lists',
+          type: "button",
+          class: "link-btn lists-back",
+          name: "all-lists",
           onclick: function () {
             p.open = false;
             p.creating = false;
-            A.setHash('#/lists');
+            A.setHash("#/lists");
             p.paint();
-          }
+          },
         },
-        '‹ All lists'
-      )
+        "‹ All lists",
+      ),
     );
     if (p.creating) {
       L.createPane(p).forEach(function (n) {
@@ -186,14 +182,14 @@
     pane.appendChild(p.problemBox);
     pane.appendChild(
       h(
-        'p',
-        { class: 'muted-note' },
+        "p",
+        { class: "muted-note" },
         L.kindOf(p) === ListKind.MILESTONES
-          ? 'A form keeps its copy until it is updated from the list in' +
-              ' Setup, Progress. Marks already given stay with their teams.'
-          : 'A save reaches every form that asks this list. Answers already' +
-              ' given are not changed.'
-      )
+          ? "A form keeps its copy until it is updated from the list in" +
+              " Setup, Progress. Marks already given stay with their teams."
+          : "A save reaches every form that asks this list. Answers already" +
+              " given are not changed.",
+      ),
     );
   }
 
@@ -203,7 +199,7 @@
    * @param {!Object} p The page.
    */
   function paint(p) {
-    p.wrap.classList.toggle('picked', p.open);
+    p.wrap.classList.toggle("picked", p.open);
     paintPane(p);
     L.changed(p);
   }
@@ -226,20 +222,20 @@
       info: saved.info || {},
       forms: forms,
       key: known ? picked : keys[0],
-      open: known || picked === 'new',
-      creating: picked === 'new',
+      open: known || picked === "new",
+      creating: picked === "new",
       rows: [],
       order: false,
       renaming: false,
-      index: h('nav', {
-        class: 'l-side lists-index l-stack',
-        'aria-label': 'Lists'
+      index: h("nav", {
+        class: "l-side lists-index l-stack",
+        "aria-label": "Lists",
       }),
-      pane: h('section', { class: 'l-main panel list-pane' }),
-      rowsBox: h('div', { class: 'list-rows' }),
-      problemBox: h('p', { class: 'error', role: 'alert', hidden: true })
+      pane: h("section", { class: "l-main panel list-pane" }),
+      rowsBox: h("div", { class: "list-rows" }),
+      problemBox: h("p", { class: "error", role: "alert", hidden: true }),
     };
-    p.wrap = h('div', { class: 'lists l-split' }, p.index, p.pane);
+    p.wrap = h("div", { class: "lists l-split" }, p.index, p.pane);
     p.paint = paint.bind(null, p);
     p.paintRows = paintRows.bind(null, p);
     p.changed = L.changed.bind(null, p);
@@ -259,22 +255,19 @@
    * @return {!Promise} Settles once it is drawn.
    */
   A.views.lists = async function (mount, picked) {
-    var data = await Promise.all([
-      A.call('admin.lists.get'),
-      A.call('admin.forms.list')
-    ]);
+    var data = await Promise.all([A.call("admin.lists.get"), A.call("admin.forms.list")]);
     var p = pageOf(data[0], data[1].forms, picked);
     ui.clear(mount);
-    mount.appendChild(h('div', { class: 'page-head' }, h('h2', null, 'Lists')));
+    mount.appendChild(h("div", { class: "page-head" }, h("h2", null, "Lists")));
     mount.appendChild(
       h(
-        'p',
-        { class: 'help' },
-        'The choices of the dropdown questions. A list is shared: change it' +
-          ' here and every form that asks it follows. Make more lists, such' +
-          ' as another set of sections, and pick one for a question in the' +
-          ' Questions tab of a form.'
-      )
+        "p",
+        { class: "help" },
+        "The choices of the dropdown questions. A list is shared: change it" +
+          " here and every form that asks it follows. Make more lists, such" +
+          " as another set of sections, and pick one for a question in the" +
+          " Questions tab of a form.",
+      ),
     );
     L.load(p, p.key);
     mount.appendChild(p.wrap);

@@ -202,7 +202,7 @@
   vertical-align: 2px;
 }
 .lead-tag .icon svg {
-  fill: currentColor;
+  fill: currentcolor;
 }
 .mini .mono {
   font-family: var(--font-code);

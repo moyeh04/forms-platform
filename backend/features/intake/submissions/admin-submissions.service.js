@@ -29,11 +29,10 @@ var AdminSubmissionsService = (function () {
    * @throws {ApiError} `submission_not_found` when none has the id.
    */
   function requireSubmission_(rows, id) {
-    var r = rows.filter(function (x) {
+    var r = rows.find(function (x) {
       return x.id === id;
-    })[0];
-    if (!r)
-      ApiError.fail('submission_not_found', 'That submission does not exist.');
+    });
+    if (!r) ApiError.fail("submission_not_found", "That submission does not exist.");
     return r;
   }
 
@@ -47,18 +46,15 @@ var AdminSubmissionsService = (function () {
    */
   function adminRows_(form, includeDeleted) {
     var noMembers =
-      form.type === FormType.RESERVATION &&
-      Rules.fieldByRole(form, 'members').enabled === false;
-    return TeamNumbers.numberedResponses(form, includeDeleted).map(
-      function (r) {
-        var view = adminView_(r);
-        if (noMembers) {
-          view.data.members = [];
-          view.members = '';
-        }
-        return view;
+      form.type === FormType.RESERVATION && Rules.fieldByRole(form, "members").enabled === false;
+    return TeamNumbers.numberedResponses(form, includeDeleted).map(function (r) {
+      var view = adminView_(r);
+      if (noMembers) {
+        view.data.members = [];
+        view.members = "";
       }
-    );
+      return view;
+    });
   }
 
   /**
@@ -75,12 +71,10 @@ var AdminSubmissionsService = (function () {
       return s.id;
     });
     Object.keys(review).forEach(function (k) {
-      if (ids.indexOf(k) === -1)
-        ApiError.fail('bad_step', 'Unknown review step.');
+      if (ids.indexOf(k) === -1) ApiError.fail("bad_step", "Unknown review step.");
     });
     steps.forEach(function (s) {
-      if (review[s.id] !== undefined)
-        ResponsesReview.setReviewStep(form, r, s.id, review[s.id]);
+      if (review[s.id] !== undefined) ResponsesReview.setReviewStep(form, r, s.id, review[s.id]);
     });
   }
 
@@ -93,7 +87,7 @@ var AdminSubmissionsService = (function () {
    */
   function patchStatus_(r, status) {
     if (ResponsesRepository.SUBMISSION_STATUSES.indexOf(status) === -1)
-      ApiError.fail('bad_status', 'Unknown status.');
+      ApiError.fail("bad_status", "Unknown status.");
     r.status = status;
   }
 
@@ -108,7 +102,7 @@ var AdminSubmissionsService = (function () {
    */
   function patchData_(vform, r, answers, live) {
     var v = Rules.validateSubmission(vform, answers);
-    if (!v.ok) ApiError.fail('invalid', 'Some answers need fixing.', v.errors);
+    if (!v.ok) ApiError.fail("invalid", "Some answers need fixing.", v.errors);
     ResponsesRules.checkLimits(vform, v.data, live, r.id);
     r.data = v.data;
     ResponsesRepository.applyDerived(vform, r);
@@ -174,15 +168,15 @@ var AdminSubmissionsService = (function () {
     var key = KeysService.unsealKey(form, r.id, r.keySeal);
     if (!key || KeysService.keyHash(form, key) !== r.keyHash)
       ApiError.fail(
-        'key_unknown',
-        'This key was issued before keys could be shown. ' +
-          'Reset it to give the student a new one you can see.'
+        "key_unknown",
+        "This key was issued before keys could be shown. " +
+          "Reset it to give the student a new one you can see.",
       );
     return {
       key: key,
       keyExpires: r.keyExpires,
       ref: r.ref,
-      expired: KeysService.keyExpired(r)
+      expired: KeysService.keyExpired(r),
     };
   }
 
@@ -191,6 +185,6 @@ var AdminSubmissionsService = (function () {
     adminRows: adminRows_,
     patchSubmission: patchSubmission_,
     resetKey: resetKey_,
-    shownKey: shownKey_
+    shownKey: shownKey_,
   };
 })();

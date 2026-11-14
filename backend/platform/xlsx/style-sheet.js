@@ -23,17 +23,15 @@ var StyleSheet = (function () {
    * @return {string} The font element.
    */
   function font_(s) {
-    var color = s.color
-      ? Xml.element('color', { rgb: Xml.xlsxColor(s.color) })
-      : '';
+    var color = s.color ? Xml.element("color", { rgb: Xml.xlsxColor(s.color) }) : "";
     return Xml.element(
-      'font',
+      "font",
       null,
-      (s.bold ? Xml.element('b') : '') +
-        (s.underline ? Xml.element('u') : '') +
-        Xml.element('sz', { val: FONT_SIZE_ }) +
+      (s.bold ? Xml.element("b") : "") +
+        (s.underline ? Xml.element("u") : "") +
+        Xml.element("sz", { val: FONT_SIZE_ }) +
         color +
-        Xml.element('name', { val: SheetStyle.PALETTE.font })
+        Xml.element("name", { val: SheetStyle.PALETTE.font }),
     );
   }
 
@@ -46,14 +44,10 @@ var StyleSheet = (function () {
    */
   function fill_(pattern, color) {
     var body = color
-      ? Xml.element('fgColor', { rgb: Xml.xlsxColor(color) }) +
-        Xml.element('bgColor', { indexed: AUTO_COLOR_ })
+      ? Xml.element("fgColor", { rgb: Xml.xlsxColor(color) }) +
+        Xml.element("bgColor", { indexed: AUTO_COLOR_ })
       : undefined;
-    return Xml.element(
-      'fill',
-      null,
-      Xml.element('patternFill', { patternType: pattern }, body)
-    );
+    return Xml.element("fill", null, Xml.element("patternFill", { patternType: pattern }, body));
   }
 
   /**
@@ -63,19 +57,15 @@ var StyleSheet = (function () {
    * @return {string} The border element.
    */
   function border_(color) {
-    var sides = ['left', 'right', 'top', 'bottom'].map(function (side) {
+    var sides = ["left", "right", "top", "bottom"].map(function (side) {
       if (!color) return Xml.element(side);
       return Xml.element(
         side,
-        { style: 'thin' },
-        Xml.element('color', { rgb: Xml.xlsxColor(color) })
+        { style: "thin" },
+        Xml.element("color", { rgb: Xml.xlsxColor(color) }),
       );
     });
-    return Xml.element(
-      'border',
-      null,
-      sides.join('') + Xml.element('diagonal')
-    );
+    return Xml.element("border", null, sides.join("") + Xml.element("diagonal"));
   }
 
   /**
@@ -87,14 +77,14 @@ var StyleSheet = (function () {
    * @return {string} The xf element.
    */
   function cellFormat_(s, fontId, fillId) {
-    var alignment = Xml.element('alignment', {
-      horizontal: s.align || 'left',
-      vertical: 'center',
+    var alignment = Xml.element("alignment", {
+      horizontal: s.align || "left",
+      vertical: "center",
       wrapText: s.wrap ? 1 : undefined,
-      readingOrder: s.rtl ? RIGHT_TO_LEFT_ : undefined
+      readingOrder: s.rtl ? RIGHT_TO_LEFT_ : undefined,
     });
     return Xml.element(
-      'xf',
+      "xf",
       {
         numFmtId: 0,
         fontId: fontId,
@@ -104,9 +94,9 @@ var StyleSheet = (function () {
         applyFont: 1,
         applyFill: 1,
         applyBorder: 1,
-        applyAlignment: 1
+        applyAlignment: 1,
       },
-      alignment
+      alignment,
     );
   }
 
@@ -119,32 +109,29 @@ var StyleSheet = (function () {
   function styleSheet_(styles) {
     var plain = { numFmtId: 0, fontId: 0, fillId: 0, borderId: 0 };
     var fonts = [font_({})];
-    var fills = [fill_('none'), fill_('gray125')];
-    var xfs = [Xml.element('xf', Object.assign({}, plain, { xfId: 0 }))];
+    var fills = [fill_("none"), fill_("gray125")];
+    var xfs = [Xml.element("xf", Object.assign({}, plain, { xfId: 0 }))];
     styles.forEach(function (s) {
       fonts.push(font_(s));
       var fillId = 0;
       if (s.fill) {
-        fills.push(fill_('solid', s.fill));
+        fills.push(fill_("solid", s.fill));
         fillId = fills.length - 1;
       }
       xfs.push(cellFormat_(s, fonts.length - 1, fillId));
     });
-    var normal = { name: 'Normal', xfId: 0, builtinId: 0 };
+    var normal = { name: "Normal", xfId: 0, builtinId: 0 };
     return (
       Xml.DECLARATION +
       Xml.element(
-        'styleSheet',
+        "styleSheet",
         { xmlns: Xml.NS.main },
-        Xml.counted('fonts', fonts) +
-          Xml.counted('fills', fills) +
-          Xml.counted('borders', [
-            border_(),
-            border_(SheetStyle.PALETTE.grid)
-          ]) +
-          Xml.counted('cellStyleXfs', [Xml.element('xf', plain)]) +
-          Xml.counted('cellXfs', xfs) +
-          Xml.counted('cellStyles', [Xml.element('cellStyle', normal)])
+        Xml.counted("fonts", fonts) +
+          Xml.counted("fills", fills) +
+          Xml.counted("borders", [border_(), border_(SheetStyle.PALETTE.grid)]) +
+          Xml.counted("cellStyleXfs", [Xml.element("xf", plain)]) +
+          Xml.counted("cellXfs", xfs) +
+          Xml.counted("cellStyles", [Xml.element("cellStyle", normal)]),
       )
     );
   }

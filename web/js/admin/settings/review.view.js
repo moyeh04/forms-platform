@@ -4,7 +4,7 @@
  * requests.
  */
 (function (App) {
-  'use strict';
+  "use strict";
 
   var A = App.admin;
   var ui = App.ui;
@@ -21,37 +21,37 @@
    */
   function stepRow(r, step, i) {
     return h(
-      'div',
-      { class: 'row', dataset: { step: step.id } },
+      "div",
+      { class: "row", dataset: { step: step.id } },
       A.field(
-        'Step ' + (i + 1) + ' name (English)',
+        "Step " + (i + 1) + " name (English)",
         A.text(step.label.en, function (v) {
           step.label.en = v;
-        })
+        }),
       ),
       A.field(
-        'Name (Arabic)',
+        "Name (Arabic)",
         A.text(
           step.label.ar,
           function (v) {
             step.label.ar = v;
           },
-          { dir: 'rtl', lang: 'ar' }
-        )
+          { dir: "rtl", lang: "ar" },
+        ),
       ),
       h(
-        'button',
+        "button",
         {
-          type: 'button',
-          class: 'btn btn-quiet sm',
+          type: "button",
+          class: "btn btn-quiet sm",
           onclick: function () {
             r.f.review.steps.splice(i, 1);
             r.paint();
-          }
+          },
         },
-        icon('trash', A.ICON_SIZE.LINE),
-        'Remove'
-      )
+        icon("trash", A.ICON_SIZE.LINE),
+        "Remove",
+      ),
     );
   }
 
@@ -74,7 +74,7 @@
    */
   function addStep(steps) {
     var n = steps.length + 1;
-    var id = 'step' + n;
+    var id = "step" + n;
 
     /**
      * Tells whether a step has the id.
@@ -88,12 +88,12 @@
 
     while (steps.some(taken)) {
       n += 1;
-      id = 'step' + n;
+      id = "step" + n;
     }
     var count = steps.length + 1;
     steps.push({
       id: id,
-      label: { en: 'Review step ' + count, ar: 'خطوة مراجعة ' + count }
+      label: { en: "Review step " + count, ar: "خطوة مراجعة " + count },
     });
   }
 
@@ -106,13 +106,13 @@
    */
   function matchingSwitch(f) {
     return A.check(
-      'Match registrations to pasted WhatsApp requests',
+      "Match registrations to pasted WhatsApp requests",
       f.matching?.enabled,
       function (v) {
-        f.matching = Object.assign({ field: 'phone' }, f.matching || {}, {
-          enabled: v
+        f.matching = Object.assign({ field: "phone" }, f.matching || {}, {
+          enabled: v,
         });
-      }
+      },
     );
   }
 
@@ -123,12 +123,12 @@
    * @return {string} The names of the steps, or 'None'.
    */
   function summary(f) {
-    if (!f.review.steps.length) return 'None';
+    if (!f.review.steps.length) return "None";
     return f.review.steps
       .map(function (x) {
         return x.label.en;
       })
-      .join(', ');
+      .join(", ");
   }
 
   /**
@@ -140,29 +140,29 @@
   A.reviewPanel = function (s) {
     var f = s.f;
     f.review = f.review || { steps: [] };
-    var r = { f: f, box: h('div') };
+    var r = { f: f, box: h("div") };
     r.paint = paint.bind(null, r);
     r.paint();
     var panel = A.panel(
-      'Review steps',
-      'Reviewers (you or an instructor link that can review) mark each step' +
-        ' as pending, approved, or rejected.',
+      "Review steps",
+      "Reviewers (you or an instructor link that can review) mark each step" +
+        " as pending, approved, or rejected.",
       r.box,
       h(
-        'button',
+        "button",
         {
-          type: 'button',
-          class: 'btn btn-quiet',
-          name: 'addStep',
+          type: "button",
+          class: "btn btn-quiet",
+          name: "addStep",
           onclick: function () {
             addStep(f.review.steps);
             r.paint();
-          }
+          },
         },
-        icon('plus', A.ICON_SIZE.BUTTON),
-        'Add a review step'
+        icon("plus", A.ICON_SIZE.BUTTON),
+        "Add a review step",
       ),
-      f.type === FormType.WHATSAPP_REGISTRATION ? matchingSwitch(f) : null
+      f.type === FormType.WHATSAPP_REGISTRATION ? matchingSwitch(f) : null,
     );
     panel.summary = summary.bind(null, f);
     return panel;

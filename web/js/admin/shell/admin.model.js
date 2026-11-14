@@ -5,7 +5,7 @@
  * `App.admin`, which every other part adds to.
  */
 (function (App) {
-  'use strict';
+  "use strict";
 
   App.admin = { views: {} };
   var A = App.admin;
@@ -17,7 +17,7 @@
     BUTTON: 20,
     CARD: 22,
     PICK: 24,
-    PREVIEW: 26
+    PREVIEW: 26,
   };
 
   /**
@@ -27,87 +27,70 @@
    */
   A.TYPES = {
     team_registration: {
-      label: 'Team registration',
-      icon: 'team',
-      text: 'Teams sign up once: a leader, the members and a project title.',
-      pages: ['About you', 'Study details', 'Team members', 'Project'],
-      next: [
-        'Set the smallest and the largest team.',
-        'Choose who can register.'
-      ]
+      label: "Team registration",
+      icon: "team",
+      text: "Teams sign up once: a leader, the members and a project title.",
+      pages: ["About you", "Study details", "Team members", "Project"],
+      next: ["Set the smallest and the largest team.", "Choose who can register."],
     },
     task_submission: {
-      label: 'Task submission',
-      icon: 'task',
-      text: 'Teams hand in a task with a link to their work.',
-      pages: ['About you', 'Study details', 'Team members', 'Task'],
-      next: [
-        'Set the team size.',
-        'Check the rule for the links students send.'
-      ]
+      label: "Task submission",
+      icon: "task",
+      text: "Teams hand in a task with a link to their work.",
+      pages: ["About you", "Study details", "Team members", "Task"],
+      next: ["Set the team size.", "Check the rule for the links students send."],
     },
     reservation: {
-      label: 'Reservation',
-      icon: 'calendar',
-      text: 'Teams book one time slot on a day that you offer.',
-      pages: ['About you', 'Study details', 'Project', 'Time slot'],
+      label: "Reservation",
+      icon: "calendar",
+      text: "Teams book one time slot on a day that you offer.",
+      pages: ["About you", "Study details", "Project", "Time slot"],
       next: [
-        'Add the days and times in the Timetable tab.',
-        'Choose how many bookings one slot takes.'
-      ]
+        "Add the days and times in the Timetable tab.",
+        "Choose how many bookings one slot takes.",
+      ],
     },
     whatsapp_registration: {
-      label: 'WhatsApp group registration',
-      icon: 'chat',
-      text:
-        'Students ask to join a group, and you check each one against the' +
-        ' join requests.',
-      pages: ['About you', 'Study details', 'Schedule'],
-      next: ['Paste the join requests under Responses to match them.']
-    }
+      label: "WhatsApp group registration",
+      icon: "chat",
+      text: "Students ask to join a group, and you check each one against the join requests.",
+      pages: ["About you", "Study details", "Schedule"],
+      next: ["Paste the join requests under Responses to match them."],
+    },
   };
 
   /** The label of each status of a form. */
   A.STATUS_LABEL = {
-    draft: 'Draft',
-    open: 'Open',
-    closed: 'Closed',
-    archived: 'Archived'
+    draft: "Draft",
+    open: "Open",
+    closed: "Closed",
+    archived: "Archived",
   };
 
   /** The order of the forms list: what students can reach now comes first. */
-  A.STATUSES = [
-    FormStatus.OPEN,
-    FormStatus.DRAFT,
-    FormStatus.CLOSED,
-    FormStatus.ARCHIVED
-  ];
+  A.STATUSES = [FormStatus.OPEN, FormStatus.DRAFT, FormStatus.CLOSED, FormStatus.ARCHIVED];
 
   /** The statuses of a submission, in the order they are offered. */
-  A.SUB_STATUSES = ['new', 'in_review', 'approved', 'rejected', 'done'];
+  A.SUB_STATUSES = ["new", "in_review", "approved", "rejected", "done"];
 
   /** The label of each status of a submission and of a review. */
   A.SUB_LABEL = {
-    new: 'New',
-    in_review: 'In review',
-    approved: 'Approved',
-    rejected: 'Rejected',
-    done: 'Done',
-    pending: 'Pending'
+    new: "New",
+    in_review: "In review",
+    approved: "Approved",
+    rejected: "Rejected",
+    done: "Done",
+    pending: "Pending",
   };
 
   /** The answers of a review, in the order they are offered. */
-  A.REVIEW = [
-    ReviewStatus.PENDING,
-    ReviewStatus.APPROVED,
-    ReviewStatus.REJECTED
-  ];
+  A.REVIEW = [ReviewStatus.PENDING, ReviewStatus.APPROVED, ReviewStatus.REJECTED];
 
   /** The tabs of a form, the answers first. */
-  A.FORM_TABS = ['responses', 'questions', 'timetable', 'settings'];
+  A.FORM_TABS = ["responses", "questions", "timetable", "settings"];
 
   /** The seasons a term is named after. */
-  A.SEASONS = ['Fall', 'Spring', 'Summer'];
+  A.SEASONS = ["Fall", "Spring", "Summer"];
 
   /** The length of a date written as YYYY-MM-DD. */
   var ISO_DATE_LENGTH = 10;
@@ -119,10 +102,7 @@
    * @return {string} The address.
    */
   A.formLink = function (slug) {
-    return new URL(
-      'index.html?f=' + encodeURIComponent(slug),
-      window.location.href
-    ).href;
+    return new URL("index.html?f=" + encodeURIComponent(slug), window.location.href).href;
   };
 
   /**
@@ -132,10 +112,7 @@
    * @return {string} The address.
    */
   A.viewerLink = function (token) {
-    return new URL(
-      'viewer.html?t=' + encodeURIComponent(token),
-      window.location.href
-    ).href;
+    return new URL("viewer.html?t=" + encodeURIComponent(token), window.location.href).href;
   };
 
   /**
@@ -147,7 +124,7 @@
    * @return {string} The words.
    */
   A.plural = function (n, one, many) {
-    return n + ' ' + (n === 1 ? one : many);
+    return n + " " + (n === 1 ? one : many);
   };
 
   /**
@@ -158,10 +135,8 @@
    *     '' when there is none.
    */
   A.fmtDate = function (iso) {
-    if (!iso) return '';
+    if (!iso) return "";
     var d = new Date(iso);
-    return Number.isNaN(d.getTime())
-      ? String(iso)
-      : d.toISOString().slice(0, ISO_DATE_LENGTH);
+    return Number.isNaN(d.getTime()) ? String(iso) : d.toISOString().slice(0, ISO_DATE_LENGTH);
   };
 })(window.App);

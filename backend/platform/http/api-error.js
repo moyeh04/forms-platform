@@ -1,6 +1,7 @@
 /** The error every handler throws and the JSON reply the web app sends. */
 
 var ApiError = (function () {
+  // oxlint-disable no-shadow -- stack traces show the namespace's name
   /**
    * Makes an error the router answers with its code instead of hiding it.
    *
@@ -16,6 +17,7 @@ var ApiError = (function () {
     e.details = details;
     return e;
   }
+  // oxlint-enable no-shadow
 
   /**
    * Stops the request with an error the page shows.
@@ -36,7 +38,7 @@ var ApiError = (function () {
    */
   function json(obj) {
     return ContentService.createTextOutput(JSON.stringify(obj)).setMimeType(
-      ContentService.MimeType.JSON
+      ContentService.MimeType.JSON,
     );
   }
 

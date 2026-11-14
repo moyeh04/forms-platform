@@ -4,7 +4,7 @@
  * day with the places left in each, and the text of a booked slot.
  */
 (function (App) {
-  'use strict';
+  "use strict";
 
   var P = App.formPage;
   var h = App.ui.h;
@@ -44,7 +44,7 @@
    * @return {string} The number, with a 0 before one digit.
    */
   function two(n) {
-    return String(n).padStart(2, '0');
+    return String(n).padStart(2, "0");
   }
 
   /**
@@ -57,9 +57,8 @@
   function now() {
     var d = new Date();
     return {
-      date:
-        d.getFullYear() + '-' + two(d.getMonth() + 1) + '-' + two(d.getDate()),
-      time: two(d.getHours()) + ':' + two(d.getMinutes())
+      date: d.getFullYear() + "-" + two(d.getMonth() + 1) + "-" + two(d.getDate()),
+      time: two(d.getHours()) + ":" + two(d.getMinutes()),
     };
   }
 
@@ -98,9 +97,9 @@
    * @return {?Element} The line, or null.
    */
   function timeNote(shut, many, room) {
-    if (shut) return h('small', { class: 'slot-left' }, t(shut));
+    if (shut) return h("small", { class: "slot-left" }, t(shut));
     if (!many) return null;
-    return h('small', { class: 'slot-left' }, t('slotsLeft', { n: room }));
+    return h("small", { class: "slot-left" }, t("slotsLeft", { n: room }));
   }
 
   /**
@@ -117,26 +116,22 @@
     var room = roomIn(day.id, tm);
     var over = Rules.isPastSlot(day, tm, now());
     var taken = (!room || over) && cur.time !== tm;
-    var shut = over ? 'Past' : 'Full';
-    if (!taken) shut = '';
+    var shut = over ? "Past" : "Full";
+    if (!taken) shut = "";
     var slots = S.form.slots || {};
     return h(
-      'button',
+      "button",
       {
-        type: 'button',
-        class: 'slot-chip time' + (shut && ' is-' + shut.toLowerCase()),
+        type: "button",
+        class: "slot-chip time" + (shut && " is-" + shut.toLowerCase()),
         disabled: taken,
-        'aria-pressed': cur.time === tm ? 'true' : 'false',
+        "aria-pressed": cur.time === tm ? "true" : "false",
         onclick: function () {
           choose({ day: day.id, time: tm });
-        }
+        },
       },
-      h('span', { dir: 'ltr' }, tm),
-      timeNote(
-        shut && (over ? 'slotTimePast' : 'slotFull'),
-        (slots.capacity || 1) > 1,
-        room
-      )
+      h("span", { dir: "ltr" }, tm),
+      timeNote(shut && (over ? "slotTimePast" : "slotFull"), (slots.capacity || 1) > 1, room),
     );
   }
 
@@ -149,27 +144,23 @@
    * @return {!Element} The times, or a line that says why there are none.
    */
   function timesOf(day, cur, choose) {
-    if (!day) return h('p', { class: 'help' }, t('slotPick'));
+    if (!day) return h("p", { class: "help" }, t("slotPick"));
     var open = day.times.filter(function (tm) {
       var free = roomIn(day.id, tm) && !Rules.isPastSlot(day, tm, now());
       return free || cur.time === tm;
     });
-    if (!open.length) return h('p', { class: 'help' }, t('slotNone'));
+    if (!open.length) return h("p", { class: "help" }, t("slotNone"));
     return h(
-      'div',
-      { class: 'slot-times-box' },
+      "div",
+      { class: "slot-times-box" },
+      h("span", { class: "label", dir: "auto" }, t("slotTime") + " · " + day.label),
       h(
-        'span',
-        { class: 'label', dir: 'auto' },
-        t('slotTime') + ' · ' + day.label
-      ),
-      h(
-        'div',
-        { class: 'slot-times', role: 'group', 'aria-label': t('slotTime') },
+        "div",
+        { class: "slot-times", role: "group", "aria-label": t("slotTime") },
         day.times.map(function (tm) {
           return timeChip(day, tm, cur, choose);
-        })
-      )
+        }),
+      ),
     );
   }
 
@@ -181,15 +172,15 @@
    * @return {?Element} The note, or null.
    */
   function moveNote(cur) {
-    var picked = cur.day && cur.time ? Rules.slotKey(cur.day, cur.time) : '';
-    if (S.mode !== 'edit' || !S.ownSlot || !picked || picked === S.ownSlot) {
+    var picked = cur.day && cur.time ? Rules.slotKey(cur.day, cur.time) : "";
+    if (S.mode !== "edit" || !S.ownSlot || !picked || picked === S.ownSlot) {
       return null;
     }
     return h(
-      'p',
-      { class: 'slot-move', role: 'status', name: 'slot-move' },
-      App.ui.icon('info', NOTE_ICON_SIZE),
-      h('span', null, t('slotMove', { was: slotText(S.ownSlot) }))
+      "p",
+      { class: "slot-move", role: "status", name: "slot-move" },
+      App.ui.icon("info", NOTE_ICON_SIZE),
+      h("span", null, t("slotMove", { was: slotText(S.ownSlot) })),
     );
   }
 
@@ -206,9 +197,9 @@
   function dropPast(day, cur) {
     if (!day) return cur;
     if (cur.time && Rules.slotKey(day.id, cur.time) === S.ownSlot) return cur;
-    if (isPast(day)) return { day: '', time: '' };
+    if (isPast(day)) return { day: "", time: "" };
     if (cur.time && Rules.isPastSlot(day, cur.time, now())) {
-      return { day: cur.day, time: '' };
+      return { day: cur.day, time: "" };
     }
     return cur;
   }
@@ -237,9 +228,9 @@
       paintSlots(wrap, path);
     }
 
-    var day = days.filter(function (d) {
+    var day = days.find(function (d) {
       return d.id === cur.day;
-    })[0];
+    });
     var kept = dropPast(day, cur);
     if (kept !== cur) {
       cur = kept;
@@ -255,9 +246,9 @@
         isPast: isPast,
         today: now().date,
         choose: choose,
-        view: wrap.calendarView
+        view: wrap.calendarView,
       }),
-      timesOf(day, cur, choose)
+      timesOf(day, cur, choose),
     );
     var note = day ? moveNote(cur) : null;
     if (note) wrap.appendChild(note);
@@ -272,7 +263,7 @@
    * @return {!Element} The box.
    */
   function slotControl(_field, path, id) {
-    var wrap = h('div', { class: 'slot', id: id });
+    var wrap = h("div", { class: "slot", id: id });
     wrap.calendarView = {};
     paintSlots(wrap, path);
     return wrap;
@@ -286,7 +277,7 @@
    * @return {string} The text between isolate marks.
    */
   function ltr(text) {
-    return '\u2066' + text + '\u2069';
+    return "\u2066" + text + "\u2069";
   }
 
   /**
@@ -297,10 +288,10 @@
    * @return {*} The text.
    */
   function slotText(key) {
-    var parts = String(key).split('|');
+    var parts = String(key).split("|");
     return P.displayValue(P.slotField(), {
       day: parts[0],
-      time: parts.slice(1).join('|')
+      time: parts.slice(1).join("|"),
     });
   }
 

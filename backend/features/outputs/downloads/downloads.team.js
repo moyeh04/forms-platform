@@ -25,7 +25,7 @@ var DownloadsTeam = (function () {
       failed: {},
       started: Date.now(),
       count: 0,
-      savedNow: 0
+      savedNow: 0,
     };
     job.failed.forEach(function (f) {
       s.failed[f.path] = true;
@@ -47,7 +47,7 @@ var DownloadsTeam = (function () {
       title: s.team.title,
       path: path,
       reason: reason,
-      url: url || s.team.link
+      url: url || s.team.link,
     });
   }
 
@@ -71,8 +71,7 @@ var DownloadsTeam = (function () {
    */
   function spent_(s) {
     return (
-      s.count >= DownloadsJobs.FILES_PER_CALL ||
-      Date.now() - s.started > DownloadsJobs.BUDGET_MS
+      s.count >= DownloadsJobs.FILES_PER_CALL || Date.now() - s.started > DownloadsJobs.BUDGET_MS
     );
   }
 
@@ -104,7 +103,7 @@ var DownloadsTeam = (function () {
     try {
       got = DownloadsFiles.blobOf(item.file);
     } catch (e) {
-      got = { reason: 'Could not be read: ' + e.message };
+      got = { reason: "Could not be read: " + e.message };
     }
     if (got.reason) {
       miss_(s, path, got.reason, urlOf_(item));
@@ -129,10 +128,10 @@ var DownloadsTeam = (function () {
     var file = DriveApp.getFileById(id);
     var exported = DownloadsFiles.EXPORTS[String(file.getMimeType())];
     var own = String(file.getName()).match(OWN_EXT_);
-    var ext = '';
+    var ext = "";
     if (exported) ext = exported[0];
     else if (own) ext = own[1].toLowerCase();
-    return put_(s, file, base + (ext ? '.' + ext : ''));
+    return put_(s, file, base + (ext ? "." + ext : ""));
   }
 
   /**
@@ -157,10 +156,7 @@ var DownloadsTeam = (function () {
       done = put_(
         s,
         f,
-        base +
-          '/' +
-          at.rel +
-          DownloadsFiles.fileName(f.getName(), ex ? ex[0] : '')
+        base + "/" + at.rel + DownloadsFiles.fileName(f.getName(), ex ? ex[0] : ""),
       );
     }
     var subs = at.folder.getFolders();
@@ -168,7 +164,7 @@ var DownloadsTeam = (function () {
       sub = subs.next();
       queue.push({
         folder: sub,
-        rel: at.rel + DownloadsFiles.safeName(sub.getName(), 'folder') + '/'
+        rel: at.rel + DownloadsFiles.safeName(sub.getName(), "folder") + "/",
       });
     }
     return done;
@@ -183,7 +179,7 @@ var DownloadsTeam = (function () {
    * @return {boolean} False when the budget is spent.
    */
   function saveFolder_(s, id, base) {
-    var queue = [{ folder: DriveApp.getFolderById(id), rel: '' }];
+    var queue = [{ folder: DriveApp.getFolderById(id), rel: "" }];
     var done = true;
     while (queue.length && done) {
       done = saveFolderFiles_(s, queue, queue.shift(), base);
@@ -200,10 +196,8 @@ var DownloadsTeam = (function () {
    */
   function missLink_(s, team, base) {
     if (s.failed[base]) return;
-    var reason = team.link
-      ? 'The link is not a Google Drive link'
-      : 'No link was given';
-    miss_(s, base, reason, '');
+    var reason = team.link ? "The link is not a Google Drive link" : "No link was given";
+    miss_(s, base, reason, "");
   }
 
   /**
@@ -217,11 +211,11 @@ var DownloadsTeam = (function () {
    * @throws {ApiError} `submission_not_found` when the team is gone.
    */
   function saveTeam(form, job, ref) {
-    var team = TeamsService.teamBlocks(form).filter(function (t) {
+    var team = TeamsService.teamBlocks(form).find(function (t) {
       return t.ref === ref;
-    })[0];
+    });
     if (!team) {
-      ApiError.fail('submission_not_found', 'That team no longer exists.');
+      ApiError.fail("submission_not_found", "That team no longer exists.");
     }
     var base = DownloadsJobs.teamBase(form, team);
     var s = saver_(job, team);
@@ -234,13 +228,10 @@ var DownloadsTeam = (function () {
     s.saved = DownloadsJobs.savedFiles(job.folder);
     var done;
     try {
-      done =
-        link.kind === 'folder'
-          ? saveFolder_(s, link.id, base)
-          : saveFile_(s, link.id, base);
+      done = link.kind === "folder" ? saveFolder_(s, link.id, base) : saveFile_(s, link.id, base);
     } catch (e) {
       if (!s.failed[base]) {
-        miss_(s, base, 'The link could not be opened: ' + e.message);
+        miss_(s, base, "The link could not be opened: " + e.message);
       }
       done = true;
     }

@@ -4,20 +4,20 @@
  * sources live under `web/` and `domain/`. The site packager, the preview
  * server, the page tests and the structure check all read this one map.
  */
-const path = require('node:path');
+const path = require("node:path");
 
 /** The pages, published at the root of the site. */
-const PAGES = ['index.html', 'admin.html', 'viewer.html'];
+const PAGES = ["index.html", "admin.html", "viewer.html"];
 
 /** The source folder of the pages. */
-const PAGE_SOURCE = 'web/';
+const PAGE_SOURCE = "web/";
 
 /** Each published folder and the source folder it is copied from. */
 const FOLDERS = [
-  { published: 'assets/js/', source: 'web/js/' },
-  { published: 'assets/css/', source: 'web/css/' },
-  { published: 'assets/img/', source: 'web/img/' },
-  { published: 'shared/', source: 'domain/' }
+  { published: "assets/js/", source: "web/js/" },
+  { published: "assets/css/", source: "web/css/" },
+  { published: "assets/img/", source: "web/img/" },
+  { published: "shared/", source: "domain/" },
 ];
 
 /**
@@ -29,8 +29,8 @@ const FOLDERS = [
  *     the path is not part of the site or leaves it.
  */
 function sourceOf(published) {
-  const bare = published.replace(/[?#].*$/, '');
-  const clean = path.posix.normalize(`/${bare}`).replace(/^\/+/, '');
+  const bare = published.replace(/[?#].*$/, "");
+  const clean = path.posix.normalize(`/${bare}`).replace(/^\/+/, "");
   if (PAGES.includes(clean)) return PAGE_SOURCE + clean;
   const folder = FOLDERS.find((entry) => clean.startsWith(entry.published));
   if (!folder) return null;

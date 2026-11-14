@@ -5,7 +5,7 @@
  * `noteChips`, `notePreview` and `paint()`.
  */
 (function (App) {
-  'use strict';
+  "use strict";
 
   var ui = App.ui,
     h = ui.h,
@@ -36,15 +36,15 @@
     }
 
     return h(
-      'button',
+      "button",
       {
-        type: 'button',
-        class: 'toggle-chip',
-        name: c.o.names.note + 'notice-size-' + n,
-        'aria-pressed': on ? 'true' : 'false',
-        onclick: toggle
+        type: "button",
+        class: "toggle-chip",
+        name: c.o.names.note + "notice-size-" + n,
+        "aria-pressed": on ? "true" : "false",
+        onclick: toggle,
       },
-      String(n)
+      String(n),
     );
   }
 
@@ -60,31 +60,22 @@
     var w = c.o.words;
     var notice = c.notice;
     if (!notice.sizes.length) {
-      return h(
-        'span',
-        { class: 'muted-note' },
-        'Pick one or more numbers above to show the note.'
-      );
+      return h("span", { class: "muted-note" }, "Pick one or more numbers above to show the note.");
     }
     var sample = notice.sizes[0];
-    var text = Rules.sizeNotice(notice, sample, b.max, 'en');
+    var text = Rules.sizeNotice(notice, sample, b.max, "en");
     if (!text) {
-      return h('span', { class: 'muted-note' }, 'Write the note below.');
+      return h("span", { class: "muted-note" }, "Write the note below.");
     }
     return h(
-      'div',
+      "div",
       null,
       h(
-        'span',
-        { class: 'muted-note' },
-        w.who + ' ' + sample + (w.unit ? ' ' + w.unit : '') + ' sees:'
+        "span",
+        { class: "muted-note" },
+        w.who + " " + sample + (w.unit ? " " + w.unit : "") + " sees:",
       ),
-      h(
-        'p',
-        { class: 'size-notice' },
-        icon('info', A.ICON_SIZE.LINE),
-        h('span', null, text)
-      )
+      h("p", { class: "size-notice" }, icon("info", A.ICON_SIZE.LINE), h("span", null, text)),
     );
   }
 
@@ -117,27 +108,27 @@
    * @return {!Element} The field.
    */
   function noteField(c, lang) {
-    var ar = lang === 'ar';
+    var ar = lang === "ar";
     var text = c.notice.text;
     return A.field(
-      ar ? 'Note in Arabic' : 'Note in English',
+      ar ? "Note in Arabic" : "Note in English",
       h(
-        'textarea',
+        "textarea",
         {
-          class: 'textarea',
-          rows: '2',
-          name: c.o.names.note + (ar ? 'noticeAr' : 'noticeEn'),
-          dir: ar ? 'rtl' : null,
-          lang: ar ? 'ar' : null,
+          class: "textarea",
+          rows: "2",
+          name: c.o.names.note + (ar ? "noticeAr" : "noticeEn"),
+          dir: ar ? "rtl" : null,
+          lang: ar ? "ar" : null,
           placeholder: c.o.words.placeholder[lang],
           oninput: function (e) {
             text[lang] = e.target.value;
             // Only the English note is previewed.
             if (!ar) c.paint();
-          }
+          },
         },
-        text[lang] || ''
-      )
+        text[lang] || "",
+      ),
     );
   }
 
@@ -151,19 +142,18 @@
   A.rangeNoteBox = function (c) {
     var w = c.o.words;
     return h(
-      'div',
-      { class: 'subpanel' },
-      h('h3', null, w.note),
+      "div",
+      { class: "subpanel" },
+      h("h3", null, w.note),
       h(
-        'p',
-        { class: 'help' },
-        w.noteHelp +
-          ' Write {n} for the number they picked and {max} for the highest.'
+        "p",
+        { class: "help" },
+        w.noteHelp + " Write {n} for the number they picked and {max} for the highest.",
       ),
-      h('span', { class: 'label' }, w.noteFor),
+      h("span", { class: "label" }, w.noteFor),
       c.noteChips,
-      h('div', { class: 'desc-pair' }, noteField(c, 'en'), noteField(c, 'ar')),
-      c.notePreview
+      h("div", { class: "desc-pair" }, noteField(c, "en"), noteField(c, "ar")),
+      c.notePreview,
     );
   };
 })(window.App);

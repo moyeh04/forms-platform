@@ -8,15 +8,15 @@ var TransfersController = (function () {
    * @return {*} The answer, sent back as JSON.
    */
   function transferDecide(req) {
-    var form = FormsService.requireForm(String(req.slug || ''));
+    var form = FormsService.requireForm(String(req.slug || ""));
     var vform = FormsPublic.validationForm(form);
     var found = KeysService.findByKey(form, req.key);
     var out = Lock.withLock(function () {
       return TransferDecision.decide(vform, req.id, {
         approve: !!req.approve,
-        by: 'leader',
+        by: "leader",
         fromId: found.id,
-        next: req.handover
+        next: req.handover,
       });
     });
     ResponsesNotify.afterChange(form);
@@ -25,7 +25,7 @@ var TransfersController = (function () {
     return {
       submission: SubmissionsService.publicSubmission(fresh),
       transfers: TransfersView.teamTransfers(vform, fresh),
-      underMin: out.underMin
+      underMin: out.underMin,
     };
   }
 
@@ -36,7 +36,7 @@ var TransfersController = (function () {
    * @return {*} The answer, sent back as JSON.
    */
   function cancel(req) {
-    var form = FormsService.requireForm(String(req.slug || ''));
+    var form = FormsService.requireForm(String(req.slug || ""));
     var vform = FormsPublic.validationForm(form);
     var found = KeysService.findByKey(form, req.key);
     Lock.withLock(function () {
@@ -57,16 +57,16 @@ var TransfersController = (function () {
     var out = Lock.withLock(function () {
       return TransferDecision.decide(vform, req.transfer, {
         approve: !!req.approve,
-        by: 'admin',
-        fromId: '',
-        next: req.handover
+        by: "admin",
+        fromId: "",
+        next: req.handover,
       });
     });
     ResponsesNotify.afterChange(form);
     TransfersMail.mailDecision(vform, out);
     return {
       transfers: TransfersView.adminTransfers(form),
-      underMin: out.underMin
+      underMin: out.underMin,
     };
   }
 

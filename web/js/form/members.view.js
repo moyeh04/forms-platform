@@ -3,7 +3,7 @@
  * team size, and the teammates of a reservation.
  */
 (function (App) {
-  'use strict';
+  "use strict";
 
   var P = App.formPage;
   var h = App.ui.h;
@@ -27,18 +27,18 @@
    */
   function removeButton(i, remove) {
     return h(
-      'button',
+      "button",
       {
-        type: 'button',
-        class: 'btn btn-quiet',
-        name: 'remove-member-' + i,
-        'aria-label': t('removeMember') + ' ' + (i + 1),
+        type: "button",
+        class: "btn btn-quiet",
+        name: "remove-member-" + i,
+        "aria-label": t("removeMember") + " " + (i + 1),
         onclick: function () {
           remove(i);
-        }
+        },
       },
-      icon('trash', BUTTON_ICON_SIZE),
-      t('removeMember')
+      icon("trash", BUTTON_ICON_SIZE),
+      t("removeMember"),
     );
   }
 
@@ -57,17 +57,17 @@
       return sf.enabled !== false;
     });
     return h(
-      'div',
-      { class: 'member' },
+      "div",
+      { class: "member" },
       h(
-        'div',
-        { class: 'member-head' },
-        h('span', { class: 'member-title' }, t('memberN', { n: i + 1 })),
-        remove ? removeButton(i, remove) : null
+        "div",
+        { class: "member-head" },
+        h("span", { class: "member-title" }, t("memberN", { n: i + 1 })),
+        remove ? removeButton(i, remove) : null,
       ),
       subs.map(function (sf) {
-        return P.renderField(sf, path + '.' + i + '.' + sf.id);
-      })
+        return P.renderField(sf, path + "." + i + "." + sf.id);
+      }),
     );
   }
 
@@ -79,18 +79,33 @@
    */
   function undoButton(undo) {
     return h(
-      'button',
-      { type: 'button', class: 'link-btn', name: 'undo-remove', onclick: undo },
-      t('undo')
+      "button",
+      { type: "button", class: "link-btn", name: "undo-remove", onclick: undo },
+      t("undo"),
     );
   }
 
   /** Focuses the first box of the last member card. */
   function focusLastMember() {
-    var cards = root.querySelectorAll('.member');
+    var cards = root.querySelectorAll(".member");
     var last = cards.length ? cards[cards.length - 1] : null;
-    var input = last?.querySelector('input, select');
+    var input = last?.querySelector("input, select");
     if (input?.focus) input.focus();
+  }
+
+  /**
+   * Draws the button that adds a member.
+   *
+   * @param {function()} onclick Adds the member.
+   * @return {!Element} The button.
+   */
+  function addMemberButton(onclick) {
+    return h(
+      "button",
+      { type: "button", class: "btn btn-quiet", name: "add-member", onclick: onclick },
+      icon("plus", ADD_ICON_SIZE),
+      t("addMember"),
+    );
   }
 
   /**
@@ -137,7 +152,7 @@
         list.filter(function (_m, k) {
           return k !== i;
         }),
-        { kind: 'info', text: t('memberRemoved', { n: i + 1 }), action: undo }
+        { kind: "info", text: t("memberRemoved", { n: i + 1 }), action: undo },
       );
     }
 
@@ -145,26 +160,14 @@
     var cards = list.map(function (_m, i) {
       return memberCard(field, path, i, canRemove ? remove : null);
     });
-    var add = h(
-      'button',
-      {
-        type: 'button',
-        class: 'btn btn-quiet',
-        name: 'add-member',
-        onclick: function () {
-          commit(list.concat([P.freshMember(field)]));
-          focusLastMember();
-        }
-      },
-      icon('plus', ADD_ICON_SIZE),
-      t('addMember')
-    );
+    var add = addMemberButton(function () {
+      commit(list.concat([P.freshMember(field)]));
+      focusLastMember();
+    });
     return [
-      list.length ? h('div', { class: 'members' }, cards) : null,
-      list.length
-        ? h('p', { class: 'team-size' }, t('teamSize', { n: list.length + 1 }))
-        : null,
-      list.length < limits.max ? add : null
+      list.length ? h("div", { class: "members" }, cards) : null,
+      list.length ? h("p", { class: "team-size" }, t("teamSize", { n: list.length + 1 })) : null,
+      list.length < limits.max ? add : null,
     ];
   }
 
@@ -181,12 +184,12 @@
   function sizedMembers(field, path, sf, wrap) {
     var size = parseInt(S.data[sf.id], 10);
     if (Number.isNaN(size)) {
-      wrap.appendChild(h('p', { class: 'help pick-size' }, t('pickSize')));
+      wrap.appendChild(h("p", { class: "help pick-size" }, t("pickSize")));
       return;
     }
     if (P.getVal(path).length !== size - 1) P.syncMembers(size);
     if (size === 1) {
-      wrap.appendChild(h('p', { class: 'help solo-team' }, t('soloTeam')));
+      wrap.appendChild(h("p", { class: "help solo-team" }, t("soloTeam")));
     }
     var range = Rules.teamSizeRange(S.form);
     wrap.append(
@@ -197,8 +200,8 @@
           P.setVal(path, next);
           P.setVal(sf.id, String(next.length + 1));
           delete S.errors[sf.id];
-        }
-      }).filter(Boolean)
+        },
+      }).filter(Boolean),
     );
   }
 
@@ -220,8 +223,8 @@
         max: field.max == null ? range.max - 1 : field.max,
         resize: function (next) {
           P.setVal(path, next);
-        }
-      }).filter(Boolean)
+        },
+      }).filter(Boolean),
     );
     var note = Rules.teammateNotice(S.form, list.length, App.i18n.lang);
     if (note) wrap.appendChild(P.sizeNote(note));
@@ -235,7 +238,7 @@
    * @return {!Element} The members.
    */
   function membersControl(field, path) {
-    var wrap = h('div', { class: 'members-wrap' });
+    var wrap = h("div", { class: "members-wrap" });
     if (!Array.isArray(P.getVal(path))) P.setVal(path, []);
     var sf = P.sizeField();
     if (sf) sizedMembers(field, path, sf, wrap);
@@ -252,7 +255,7 @@
   function dropErrors(prefix) {
     var out = {};
     Object.keys(S.errors).forEach(function (k) {
-      if (k.indexOf(prefix + '.') !== 0) out[k] = S.errors[k];
+      if (k.indexOf(prefix + ".") !== 0) out[k] = S.errors[k];
     });
     return out;
   }

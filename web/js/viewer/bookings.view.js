@@ -3,7 +3,7 @@
  * day, with its bookings in a table.
  */
 (function (App) {
-  'use strict';
+  "use strict";
 
   var V = App.viewer;
   var S = V.state;
@@ -18,9 +18,9 @@
   function byDay(rows) {
     var groups = [];
     rows.forEach(function (r) {
-      var g = groups.filter(function (x) {
+      var g = groups.find(function (x) {
         return x.id === r.dayId;
-      })[0];
+      });
       if (!g) {
         g = { id: r.dayId, label: r.dayLabel, date: r.date, rows: [] };
         groups.push(g);
@@ -40,41 +40,41 @@
    */
   function dayBlock(cols, g, i) {
     return h(
-      'section',
+      "section",
       {
-        class: 'block single ' + (i % 2 ? 'tint-b' : 'tint-a'),
-        dataset: { day: g.id }
+        class: "block single " + (i % 2 ? "tint-b" : "tint-a"),
+        dataset: { day: g.id },
       },
       h(
-        'div',
-        { class: 'day-head' },
-        h('span', null, g.label + (g.date ? ' (' + g.date + ')' : '')),
-        h('span', null, g.rows.length + ' booked')
+        "div",
+        { class: "day-head" },
+        h("span", null, g.label + (g.date ? " (" + g.date + ")" : "")),
+        h("span", null, g.rows.length + " booked"),
       ),
       h(
-        'div',
-        { class: 'scroll-x' },
+        "div",
+        { class: "scroll-x" },
         h(
-          'table',
-          { class: 'mini' },
+          "table",
+          { class: "mini" },
           V.tableHead(cols),
           h(
-            'tbody',
+            "tbody",
             null,
             g.rows.map(function (r) {
               return h(
-                'tr',
+                "tr",
                 null,
                 cols.map(function (c) {
                   var td = V.cell(c.id, r);
                   td.dataset.label = c.label;
                   return td;
-                })
+                }),
               );
-            })
-          )
-        )
-      )
+            }),
+          ),
+        ),
+      ),
     );
   }
 
@@ -88,11 +88,11 @@
     var rows = d.rows.filter(V.matches);
     if (!rows.length) {
       return h(
-        'div',
-        { class: 'empty' },
-        S.mode === 'today' ? 'No bookings for today.' : 'No bookings to show.'
+        "div",
+        { class: "empty" },
+        S.mode === "today" ? "No bookings for today." : "No bookings to show.",
       );
     }
-    return h('div', null, byDay(rows).map(dayBlock.bind(null, d.columns)));
+    return h("div", null, byDay(rows).map(dayBlock.bind(null, d.columns)));
   };
 })(window.App);

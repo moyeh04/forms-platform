@@ -3,7 +3,7 @@
  * have ended, with the Extend keys button.
  */
 (function (App) {
-  'use strict';
+  "use strict";
 
   var A = App.admin;
   var h = App.ui.h;
@@ -18,19 +18,15 @@
     var expired = keys.filter(function (k) {
       return k.expired;
     }).length;
-    var given = h(
-      'strong',
-      null,
-      A.plural(keys.length, 'key', 'keys') + ' given'
-    );
-    if (!expired) return h('p', null, given, ', all working.');
+    var given = h("strong", null, A.plural(keys.length, "key", "keys") + " given");
+    if (!expired) return h("p", null, given, ", all working.");
     return h(
-      'p',
+      "p",
       null,
       given,
-      ': ' + (keys.length - expired) + ' working, ',
-      h('span', { class: 'warn-text' }, expired + ' expired'),
-      '.'
+      ": " + (keys.length - expired) + " working, ",
+      h("span", { class: "warn-text" }, expired + " expired"),
+      ".",
     );
   }
 
@@ -43,13 +39,13 @@
    * @return {!Element} The line.
    */
   A.keysSummary = function (form) {
-    var box = h('div', { class: 'keys-summary', hidden: true });
+    var box = h("div", { class: "keys-summary", hidden: true });
 
     /** Reads the keys and draws the line again. */
     async function load() {
       var keys;
       try {
-        keys = (await A.call('admin.keys.list', { slug: form.slug })).keys;
+        keys = (await A.call("admin.keys.list", { slug: form.slug })).keys;
       } catch {
         return;
       }
@@ -59,24 +55,24 @@
       box.appendChild(countLine(keys));
       box.appendChild(
         h(
-          'button',
+          "button",
           {
-            type: 'button',
-            class: 'btn btn-quiet',
-            name: 'extend-keys',
+            type: "button",
+            class: "btn btn-quiet",
+            name: "extend-keys",
             onclick: function (e) {
               A.busy(e.currentTarget, function () {
                 return A.extendKeys(form, { done: load });
               });
-            }
+            },
           },
-          App.ui.icon('calendar', A.ICON_SIZE.LINE),
-          'Extend keys'
-        )
+          App.ui.icon("calendar", A.ICON_SIZE.LINE),
+          "Extend keys",
+        ),
       );
     }
 
-    load();
+    void load();
     return box;
   };
 })(window.App);

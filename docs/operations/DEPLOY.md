@@ -3,17 +3,17 @@
 You need a Google account, a free GitHub account, and about 15 minutes.
 Nothing here needs a credit card.
 
-On your computer you need three tools:
+On your computer you need four tools:
 
 - **Node.js** 22 or newer, for the build and the Google command-line client (clasp)
+- **pnpm**, the version `packageManager` in `package.json` names (`corepack enable` installs it)
 - **git**
 - **GitHub CLI** (`gh`), signed in once with `gh auth login`
 
-One command, `npm run setup`, does the first deployment: it creates the Google
+One command, `pnpm run setup`, does the first deployment: it creates the Google
 Sheet with its Apps Script project, pushes the backend into it, creates the web app, and writes the IDs, the
 credential and the Pages setting into your GitHub repository. Nothing is pasted
 into the Apps Script editor and nothing is typed into GitHub settings.
-
 
 ## The whole thing at a glance
 
@@ -46,7 +46,7 @@ flowchart TD
     end
     a2 --> b1
     subgraph P2["Part 2: deploy, by command"]
-        b1["3. npm run setup<br/>sheet, backend, web app,<br/>variables, secret, Pages"] --> b2["4. In the sheet: First-time setup<br/>and Set admin PIN"]
+        b1["3. pnpm run setup<br/>sheet, backend, web app,<br/>variables, secret, Pages"] --> b2["4. In the sheet: First-time setup<br/>and Set admin PIN"]
         b2 --> b3["5. git push: Actions tests<br/>and publishes the website"]
         b3 --> b4["6. In the sheet: Set website address"]
     end
@@ -70,12 +70,14 @@ Deployment identifiers live in GitHub repository Variables. Google credentials l
 ## Part 1: Prepare (by hand, once)
 
 ### 1. Turn on the Apps Script API
+
 Open [Google Apps Script user settings](https://script.google.com/home/usersettings)
 and switch **Google Apps Script API** to **On**. Google offers this switch only
 on that page, so no command can flip it, and without it Google refuses every
 request the setup makes.
 
 ### 2. Create the GitHub repository
+
 In the project folder:
 
 ```bash
@@ -90,14 +92,15 @@ repository already exists, skip this step.
 ## Part 2: Deploy (by command)
 
 ### 3. Run the setup
+
 In the project folder:
 
 ```bash
-npm ci
+pnpm install --frozen-lockfile
 ```
 
 ```bash
-npm run setup
+pnpm run setup
 ```
 
 The first time, a browser window opens for Google sign-in: choose the account
@@ -129,14 +132,15 @@ address does not change.
 **Already have a sheet?** Answer **2** and paste its **Script ID**, found in the
 sheet under **Extensions > Apps Script > Project Settings** (gear icon). If you
 do not have the ID at hand, press Enter: the command stops without creating
-anything, and you run `npm run setup -- YOUR_SCRIPT_ID` later. The question is
+anything, and you run `pnpm run setup YOUR_SCRIPT_ID` later. The question is
 not asked again once a sheet is linked.
 
 ### 4. First-time setup and admin PIN (in the sheet)
+
 1. Open the **Forms Registry** sheet from the address the setup printed (it is also in your Google Drive). If it was already open, **reload the page** (F5). Wait about 5 seconds.
 2. A new menu **Forms Platform** appears next to Help. Click it, then **1. First-time setup**.
 3. Google asks for permission. Click **Continue**, choose your account, then:
-   - If you see "Google hasn't verified this app", click **Advanced**, then **Go to Forms Registry (unsafe)**. This message appears because the script is yours and was never submitted to Google. It is safe: you are giving the script access to *your own* account.
+   - If you see "Google hasn't verified this app", click **Advanced**, then **Go to Forms Registry (unsafe)**. This message appears because the script is yours and was never submitted to Google. It is safe: you are giving the script access to _your own_ account.
    - Click **Allow**.
 4. Click **Forms Platform > 1. First-time setup** again. A message says the setup finished. This creates the Forms, Lists, and Clients tabs and a Drive folder called **Forms Platform**.
 5. Click **Forms Platform > 2. Set admin PIN...** Type a PIN with at least 4 characters and press OK. Pick something not easy to guess: the admin page is public, and the PIN is the only lock.
@@ -144,6 +148,7 @@ not asked again once a sheet is linked.
 The web app answers only after this permission step, because it runs as you.
 
 ### 5. Publish the website
+
 ```bash
 git push -u origin master
 ```
@@ -164,6 +169,7 @@ gh api "repos/{owner}/{repo}/pages" --jq .html_url
 The address looks like `https://YOUR-NAME.github.io/forms/`.
 
 ### 6. Tell the sheet your website address (for emails)
+
 Back in the Forms Registry sheet: **Forms Platform > 3. Set website address...** and paste the address from step 5. Confirmation emails link to it.
 
 ---
@@ -180,15 +186,16 @@ Back in the Forms Registry sheet: **Forms Platform > 3. Set website address...**
    - **Emails**: whether students get a confirmation email.
    - **Limits and checks**: the Drive folder name rule `Team_Leader_Name_Project_Name_Subject_Name` (on by default for new team forms). Type the subject name, for example `Software Engineering`, so folders must end with `_Software_Engineering`.
    - **Booking with a key** for reservations: let teams from a registration form book with the 5-digit key they already have, so they type no details. Pick the registration form; each team books once and cancels with the same key.
-   - **Timetable** for reservations, in three parts. **Days**: click each date on the calendar that you offer; click it again to remove it. **Hours**: the first slot, when the last one ends, how long a slot is and the break after it; every day follows them. The same card sets how many bookings one slot takes. **What students can book**: one row for each day. Click a time to switch it off for that day, or choose *Different hours* when one day starts or ends at another time.
-   - **Teammates** for reservations (Questions tab): switch on *Ask for teammates*, set the fewest and the most, change the title students read, and hide the details you do not need. The name and the code of a teammate are always asked.
-   - **Moving a student between teams** (Setup, Limits and checks): tick *A leader may ask for a student who is in another team*. It is under *A student may appear in only one team of this form* and exists only while that is ticked. Requests that wait are listed at the top of Responses with **Approve and move** and **Reject**; the leader of the team that holds the student gets the same question when opening the form with the edit key. The leader of a team can be asked for too: whoever approves names the member who leads that team next and that member's email, and the team keeps its edit key, which the leader who left passes on. A leader who is alone in a team cannot be asked for. Tick *Show each leader the phone number of the other leader* to let the two leaders talk: the number shows next to a request while it waits, with a Copy button, and *Open the number in WhatsApp* under it turns the number into a WhatsApp link. No email is sent unless you also tick *Also email both leaders about each request and its answer*.
+   - **Timetable** for reservations, in three parts. **Days**: click each date on the calendar that you offer; click it again to remove it. **Hours**: the first slot, when the last one ends, how long a slot is and the break after it; every day follows them. The same card sets how many bookings one slot takes. **What students can book**: one row for each day. Click a time to switch it off for that day, or choose _Different hours_ when one day starts or ends at another time.
+   - **Teammates** for reservations (Questions tab): switch on _Ask for teammates_, set the fewest and the most, change the title students read, and hide the details you do not need. The name and the code of a teammate are always asked.
+   - **Moving a student between teams** (Setup, Limits and checks): tick _A leader may ask for a student who is in another team_. It is under _A student may appear in only one team of this form_ and exists only while that is ticked. Requests that wait are listed at the top of Responses with **Approve and move** and **Reject**; the leader of the team that holds the student gets the same question when opening the form with the edit key. The leader of a team can be asked for too: whoever approves names the member who leads that team next and that member's email, and the team keeps its edit key, which the leader who left passes on. A leader who is alone in a team cannot be asked for. Tick _Show each leader the phone number of the other leader_ to let the two leaders talk: the number shows next to a request while it waits, with a Copy button, and _Open the number in WhatsApp_ under it turns the number into a WhatsApp link. No email is sent unless you also tick _Also email both leaders about each request and its answer_.
    - **Status**: set to **Open** and click **Save settings**.
 4. Click **Copy link** and send it to students. The link looks like `.../index.html?f=database-team-project-registration-form-fall-2027`.
 5. Watch submissions under **Responses**. Each form's own Google Sheet is one click away (**Google Sheet**).
 6. For instructors: **Clients > New private link**. Send them the link, which is shown once, and send the six-digit access key apart from it, for example the link by email and the key by WhatsApp. They need no account. If they lose the key, **Show** in the list reads it again.
 
 ### First-run checklist (things only real Google can confirm)
+
 Do these once with a test form:
 
 - [ ] Register a team with a real Drive link shared to "Anyone with the link": accepted.
@@ -233,7 +240,7 @@ and serves the placeholder in `web/js/config.js` directly.
 
 ### What the setup stored, and how to renew it
 
-`npm run setup` wrote three Variables (`API_URL`, `APPS_SCRIPT_ID`,
+`pnpm run setup` wrote three Variables (`API_URL`, `APPS_SCRIPT_ID`,
 `APPS_SCRIPT_DEPLOYMENT_ID`) and one Secret (`CLASPRC_JSON`). Variables are
 readable configuration; secrets are credentials that GitHub masks in logs. The
 web app URL becomes public in the published browser configuration regardless of
@@ -260,7 +267,7 @@ refresh token to renew access tokens. If Google rejects the saved authorization,
 sign in again and replace the **whole** secret:
 
 ```bash
-npx --yes @google/clasp@3.4.1 login
+pnpm dlx @google/clasp@3.4.1 login
 ```
 
 ```bash
@@ -274,9 +281,9 @@ is not evidence that this configured workflow succeeded.
 ### Local preview
 
 GitHub variables are available inside Actions; they do not configure a raw
-local checkout. Use `npm run dev` for the in-memory preview (admin PIN `4321`).
+local checkout. Use `pnpm run dev` for the in-memory preview (admin PIN `4321`).
 To package a site locally, set `API_URL` in your shell and run
-`npm run build:site`; serve `_site/`. Keep the source placeholder unchanged.
+`pnpm run build:site`; serve `_site/`. Keep the source placeholder unchanged.
 
 ### Going back to an earlier backend
 
@@ -293,7 +300,7 @@ misbehaves, put the web app back on the one before it:
 The same from a terminal that is signed in with clasp:
 
 ```bash
-npx @google/clasp@3.4.1 deploy -i <deployment id> -V <earlier version> --description "Back to <earlier version>"
+pnpm dlx @google/clasp@3.4.1 deploy -i <deployment id> -V <earlier version> --description "Back to <earlier version>"
 ```
 
 Going back changes the code only. Rows that the newer version wrote stay as
@@ -308,32 +315,32 @@ Deploy**. This is a recovery path; routine updates use the configured workflow.
 
 ## If something goes wrong
 
-| What you see | What to do |
-|---|---|
-| Website says it is not connected to the backend | Verify Pages Source is **GitHub Actions** and `API_URL` is set under repository Variables. |
-| Page says it could not reach the server | Run **First-time setup** in the sheet (step 4); the web app answers only after you allow the permissions. If it still fails, check under **Deploy > Manage deployments** that access is **Anyone**. |
-| `npm run setup` stops at "Creating the Forms Registry sheet" | Turn on the Apps Script API (step 1), wait a minute, and run it again. If an empty **Forms Registry** sheet was left in Google Drive by the failed attempt, delete it. |
-| `npm run setup` stops at "Pushing the backend" | Turn on the Apps Script API (step 1). If you passed a Script ID, check that it is the one from Project Settings. |
-| `npm run setup` stops at a GitHub step | Run `gh auth login`, and check that the folder has an `origin` remote on GitHub (step 2). |
-| "That PIN is not correct" | Type it again; the field keeps what you typed. To choose a new PIN, run **Forms Platform > 2. Set admin PIN...** in the sheet. |
-| "Too many wrong PINs. Try again in 00:29:58." | Eight wrong PINs locked the dashboard for 30 minutes for every browser that has not signed in before. A browser you signed in on keeps working. Wait for the time it gives, or click **Forms Platform > Unlock the admin page** in the sheet, which lifts the lock at once and keeps your PIN. |
-| "Too many wrong PINs on this device. Try again in 00:29:58, ..." | Eight wrong PINs were typed on this trusted browser. Wait for the time it gives, or click **Forms Platform > Unlock the admin page**. |
-| The lock message should say something else | Click **Forms Platform > Set lock message...**, type it (an empty line between paragraphs) and click **Save**. The dashboard shows it on its lock screen, with the time left counting down. **Use the plain message** goes back to the plain sentence. |
-| A browser should stop being trusted, or trust should last longer or shorter | Click **Forms Platform > Forget trusted devices** to forget every browser; each is trusted again after its next sign-in. **Forms Platform > Set trusted device days...** sets how long trust lasts (30 days when never set). Setting a new PIN also forgets every browser. |
-| Backend update failed | Check the **Deploy Google Apps Script** job. Renew `CLASPRC_JSON` if authentication failed; verify both IDs and enable the Apps Script API. |
-| The site did not change after a push | Open the **Actions** tab: a red run means a test failed and nothing was published. After a green run an open page updates by itself within a few minutes: it reloads, or shows **A newer version of this page is ready** with **Reload** when something was typed. A page opened before this was added needs one manual refresh (**Ctrl+F5**, or **Cmd+Shift+R** on a Mac). |
-| Actions says Pages is not enabled | Settings, Pages, Source: **GitHub Actions**. |
-| The menu "Forms Platform" is missing | Reload the sheet and wait a few seconds. |
-| A data tab (Forms, Responses, ...) has no dark header or row tints | Click **Forms Platform > Rebuild all views**. It repaints every form and formats every data tab; it changes no data. |
+| What you see                                                                | What to do                                                                                                                                                                                                                                                                                                                                                                  |
+| --------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Website says it is not connected to the backend                             | Verify Pages Source is **GitHub Actions** and `API_URL` is set under repository Variables.                                                                                                                                                                                                                                                                                  |
+| Page says it could not reach the server                                     | Run **First-time setup** in the sheet (step 4); the web app answers only after you allow the permissions. If it still fails, check under **Deploy > Manage deployments** that access is **Anyone**.                                                                                                                                                                         |
+| `pnpm run setup` stops at "Creating the Forms Registry sheet"               | Turn on the Apps Script API (step 1), wait a minute, and run it again. If an empty **Forms Registry** sheet was left in Google Drive by the failed attempt, delete it.                                                                                                                                                                                                      |
+| `pnpm run setup` stops at "Pushing the backend"                             | Turn on the Apps Script API (step 1). If you passed a Script ID, check that it is the one from Project Settings.                                                                                                                                                                                                                                                            |
+| `pnpm run setup` stops at a GitHub step                                     | Run `gh auth login`, and check that the folder has an `origin` remote on GitHub (step 2).                                                                                                                                                                                                                                                                                   |
+| "That PIN is not correct"                                                   | Type it again; the field keeps what you typed. To choose a new PIN, run **Forms Platform > 2. Set admin PIN...** in the sheet.                                                                                                                                                                                                                                              |
+| "Too many wrong PINs. Try again in 00:29:58."                               | Eight wrong PINs locked the dashboard for 30 minutes for every browser that has not signed in before. A browser you signed in on keeps working. Wait for the time it gives, or click **Forms Platform > Unlock the admin page** in the sheet, which lifts the lock at once and keeps your PIN.                                                                              |
+| "Too many wrong PINs on this device. Try again in 00:29:58, ..."            | Eight wrong PINs were typed on this trusted browser. Wait for the time it gives, or click **Forms Platform > Unlock the admin page**.                                                                                                                                                                                                                                       |
+| The lock message should say something else                                  | Click **Forms Platform > Set lock message...**, type it (an empty line between paragraphs) and click **Save**. The dashboard shows it on its lock screen, with the time left counting down. **Use the plain message** goes back to the plain sentence.                                                                                                                      |
+| A browser should stop being trusted, or trust should last longer or shorter | Click **Forms Platform > Forget trusted devices** to forget every browser; each is trusted again after its next sign-in. **Forms Platform > Set trusted device days...** sets how long trust lasts (30 days when never set). Setting a new PIN also forgets every browser.                                                                                                  |
+| Backend update failed                                                       | Check the **Deploy Google Apps Script** job. Renew `CLASPRC_JSON` if authentication failed; verify both IDs and enable the Apps Script API.                                                                                                                                                                                                                                 |
+| The site did not change after a push                                        | Open the **Actions** tab: a red run means a test failed and nothing was published. After a green run an open page updates by itself within a few minutes: it reloads, or shows **A newer version of this page is ready** with **Reload** when something was typed. A page opened before this was added needs one manual refresh (**Ctrl+F5**, or **Cmd+Shift+R** on a Mac). |
+| Actions says Pages is not enabled                                           | Settings, Pages, Source: **GitHub Actions**.                                                                                                                                                                                                                                                                                                                                |
+| The menu "Forms Platform" is missing                                        | Reload the sheet and wait a few seconds.                                                                                                                                                                                                                                                                                                                                    |
+| A data tab (Forms, Responses, ...) has no dark header or row tints          | Click **Forms Platform > Rebuild all views**. It repaints every form and formats every data tab; it changes no data.                                                                                                                                                                                                                                                        |
 
 ---
 
 ## Want to know why it works this way?
 
-| Question | Read |
-|---|---|
-| How are configuration and hosting split? | [HOSTING.md](../architecture/HOSTING.md) |
-| What exactly is `dist/Code.gs`, and who builds it? | [BUILD-PIPELINE.md](../architecture/BUILD-PIPELINE.md) |
-| Why "Execute as Me" and "Anyone" is safe here | [WORKAROUNDS.md](../architecture/WORKAROUNDS.md) and [SECURITY.md](../backend/SECURITY.md) |
-| What is stored where? | [DATA-MODEL.md](../backend/DATA-MODEL.md) |
-| The whole picture | [ARCHITECTURE.md](../architecture/ARCHITECTURE.md) |
+| Question                                           | Read                                                                                       |
+| -------------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| How are configuration and hosting split?           | [HOSTING.md](../architecture/HOSTING.md)                                                   |
+| What exactly is `dist/Code.gs`, and who builds it? | [BUILD-PIPELINE.md](../architecture/BUILD-PIPELINE.md)                                     |
+| Why "Execute as Me" and "Anyone" is safe here      | [WORKAROUNDS.md](../architecture/WORKAROUNDS.md) and [SECURITY.md](../backend/SECURITY.md) |
+| What is stored where?                              | [DATA-MODEL.md](../backend/DATA-MODEL.md)                                                  |
+| The whole picture                                  | [ARCHITECTURE.md](../architecture/ARCHITECTURE.md)                                         |

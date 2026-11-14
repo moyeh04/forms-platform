@@ -5,7 +5,7 @@
 
 var DriveLinks = (function () {
   /** The sharing settings that let anyone with the link open an item. */
-  var PUBLIC_ACCESS_ = ['ANYONE', 'ANYONE_WITH_LINK'];
+  var PUBLIC_ACCESS_ = ["ANYONE", "ANYONE_WITH_LINK"];
 
   /**
    * Opens the Drive item a parsed link names.
@@ -16,9 +16,7 @@ var DriveLinks = (function () {
    */
   function openItem_(p) {
     try {
-      return p.kind === 'folder'
-        ? DriveApp.getFolderById(p.id)
-        : DriveApp.getFileById(p.id);
+      return p.kind === "folder" ? DriveApp.getFolderById(p.id) : DriveApp.getFileById(p.id);
     } catch (_e) {
       return null;
     }
@@ -66,13 +64,13 @@ var DriveLinks = (function () {
    */
   function checkDriveLink_(link, naming) {
     var p = Rules.parseDriveLink(link);
-    if (!p.ok) return { ok: false, error: 'invalid_link' };
+    if (!p.ok) return { ok: false, error: "invalid_link" };
     var item = openItem_(p);
-    if (!item) return { ok: false, error: 'link_unreachable' };
+    if (!item) return { ok: false, error: "link_unreachable" };
     var access = accessOf_(item);
     if (access && PUBLIC_ACCESS_.indexOf(access) === -1)
-      return { ok: false, error: 'link_not_public' };
-    if (naming && p.kind === 'folder') return checkName_(item, naming);
+      return { ok: false, error: "link_not_public" };
+    if (naming && p.kind === "folder") return checkName_(item, naming);
     return { ok: true };
   }
 
@@ -87,8 +85,8 @@ var DriveLinks = (function () {
     var fn = form.rules?.folderName;
     if (!fn?.enabled) return null;
     return {
-      subject: String(fn.subject || ''),
-      example: { project: Rules.valueByRole(form, data || {}, 'title') }
+      subject: String(fn.subject || ""),
+      example: { project: Rules.valueByRole(form, data || {}, "title") },
     };
   }
 
@@ -100,16 +98,16 @@ var DriveLinks = (function () {
    * @throws {ApiError} `invalid`, with the error of each bad link.
    */
   function checkDriveFields_(form, data) {
-    if (form.rules?.driveCheck === 'off') return;
+    if (form.rules?.driveCheck === "off") return;
     var naming = folderNaming_(form, data);
     var errors = {};
     form.fields.forEach(function (f) {
-      if (f.type !== 'drive_link' || f.enabled === false || !data[f.id]) return;
+      if (f.type !== "drive_link" || f.enabled === false || !data[f.id]) return;
       var r = checkDriveLink_(data[f.id], naming);
       if (!r.ok) errors[f.id] = { error: r.error, params: r.params };
     });
     if (Object.keys(errors).length)
-      ApiError.fail('invalid', 'Check the Google Drive links.', errors);
+      ApiError.fail("invalid", "Check the Google Drive links.", errors);
   }
 
   return { checkDriveFields: checkDriveFields_ };

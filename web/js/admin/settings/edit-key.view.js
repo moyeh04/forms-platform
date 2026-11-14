@@ -3,7 +3,7 @@
  * their registration, how long a new key works, and what it lets them do.
  */
 (function (App) {
-  'use strict';
+  "use strict";
 
   var A = App.admin;
   var h = App.ui.h;
@@ -21,11 +21,11 @@
    */
   function allowSwitch(key, name, label) {
     return h(
-      'div',
-      { class: 'field-row' },
+      "div",
+      { class: "field-row" },
       A.check(label, key[name], function (v) {
         key[name] = v;
-      })
+      }),
     );
   }
 
@@ -40,35 +40,31 @@
   function keyMore(f) {
     var key = f.editKey;
     return h(
-      'div',
-      { class: 'key-more', hidden: !key.enabled },
+      "div",
+      { class: "key-more", hidden: !key.enabled },
       A.field(
-        'A new key works for (days)',
+        "A new key works for (days)",
         A.number(
           key.days,
           function (v) {
             key.days = parseInt(v, 10) || KEY_DAYS.DEFAULT;
           },
           {
-            name: 'keyDays',
+            name: "keyDays",
             min: String(KEY_DAYS.MIN),
-            max: String(KEY_DAYS.MAX)
-          }
+            max: String(KEY_DAYS.MAX),
+          },
         ),
-        'Counted from when the key is given. To give keys already sent more' +
-          ' time, use Extend keys.'
+        "Counted from when the key is given. To give keys already sent more" +
+          " time, use Extend keys.",
       ),
       h(
-        'div',
-        { class: 'row' },
-        allowSwitch(key, 'allowEdit', 'Students may change their answers'),
-        allowSwitch(
-          key,
-          'allowDelete',
-          'Students may cancel their registration'
-        )
+        "div",
+        { class: "row" },
+        allowSwitch(key, "allowEdit", "Students may change their answers"),
+        allowSwitch(key, "allowDelete", "Students may cancel their registration"),
       ),
-      key.enabled && f.id ? A.keysSummary(f) : null
+      key.enabled && f.id ? A.keysSummary(f) : null,
     );
   }
 
@@ -79,14 +75,14 @@
    * @return {string} Off, or on with its days and what students may do.
    */
   function summary(key) {
-    if (!key.enabled) return 'Off';
-    var may = [key.allowEdit ? 'edit' : '', key.allowDelete ? 'cancel' : '']
+    if (!key.enabled) return "Off";
+    var may = [key.allowEdit ? "edit" : "", key.allowDelete ? "cancel" : ""]
       .filter(Boolean)
-      .join(' and ');
+      .join(" and ");
     return (
-      'On, ' +
-      A.plural(key.days, 'day', 'days') +
-      (may ? ', students can ' + may : ', students cannot change anything')
+      "On, " +
+      A.plural(key.days, "day", "days") +
+      (may ? ", students can " + may : ", students cannot change anything")
     );
   }
 
@@ -102,22 +98,22 @@
       enabled: true,
       days: KEY_DAYS.DEFAULT,
       allowEdit: true,
-      allowDelete: true
+      allowDelete: true,
     };
     var more = keyMore(f);
     var panel = A.panel(
-      'Edit key',
-      'Each student gets a 5-digit key on the success page and by email. The' +
-        ' key alone opens their registration.',
+      "Edit key",
+      "Each student gets a 5-digit key on the success page and by email. The" +
+        " key alone opens their registration.",
       h(
-        'div',
-        { class: 'field-row' },
-        A.check('Give students an edit key', f.editKey.enabled, function (v) {
+        "div",
+        { class: "field-row" },
+        A.check("Give students an edit key", f.editKey.enabled, function (v) {
           f.editKey.enabled = v;
           more.hidden = !v;
-        })
+        }),
       ),
-      more
+      more,
     );
     panel.summary = summary.bind(null, f.editKey);
     return panel;

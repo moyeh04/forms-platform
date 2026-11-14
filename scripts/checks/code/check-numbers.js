@@ -1,9 +1,9 @@
 /**
- * Checks the numbers Biome's noMagicNumbers lets through. Biome skips a number
+ * Checks the numbers Oxlint's no-magic-numbers lets through. It skips a number
  * that initialises a variable, a property or a default parameter, so
  * `let wait = 5000` passes it. Here such a number passes only when it is
  * named in CONSTANT_CASE: by its variable, by its property, or by a constant
- * object or array it sits in. The numbers Biome allows (0, 1, 2, 10, 24, 60
+ * object or array it sits in. The numbers it allows (0, 1, 2, 10, 24, 60
  * and their negatives) are allowed here too.
  *
  * It also refuses a time written into an error message (`Wait 30 minutes`,
@@ -11,20 +11,16 @@
  * the message would repeat a constant the code can change, and a page could
  * not count it down. The time goes in the details instead.
  */
-const walk = require('acorn-walk');
-const { select, read } = require('../lib/files.js');
-const { parse } = require('../lib/parse.js');
+const walk = require("acorn-walk");
+const { select, read } = require("../lib/files.js");
+const { parse } = require("../lib/parse.js");
 
 const CONSTANT = /^[A-Z][A-Z0-9_]*$/;
-const IGNORE = 'biome-ignore lint/style/noMagicNumbers';
-const CONTAINERS = ['ObjectExpression', 'ArrayExpression', 'Property'];
+const IGNORE = "oxlint-disable-next-line no-magic-numbers";
+const CONTAINERS = new Set(["ObjectExpression", "ArrayExpression", "Property"]);
 const TIME_AMOUNT =
-  '\\d+|an?|one|two|three|four|five|six|seven|eight|nine|ten|fifteen|' +
-  'twenty|thirty|sixty';
-const TIME_TEXT = new RegExp(
-  `\\b(?:${TIME_AMOUNT}) ?(?:second|minute|hour|day|week)s?\\b`,
-  'gi'
-);
+  "\\d+|an?|one|two|three|four|five|six|seven|eight|nine|ten|fifteen|twenty|thirty|sixty";
+const TIME_TEXT = new RegExp(`\\b(?:${TIME_AMOUNT}) ?(?:second|minute|hour|day|week)s?\\b`, "gi");
 
 /**
  * Says whether a call is `ApiError.fail(...)`.
@@ -35,9 +31,9 @@ const TIME_TEXT = new RegExp(
 function isErrorCall(node) {
   const callee = node.callee;
   return (
-    callee?.type === 'MemberExpression' &&
-    callee.object.name === 'ApiError' &&
-    callee.property.name === 'fail'
+    callee?.type === "MemberExpression" &&
+    callee.object.name === "ApiError" &&
+    callee.property.name === "fail"
   );
 }
 
@@ -52,16 +48,14 @@ function timesInMessage(file, call) {
   const out = [];
   if (!call.arguments[1]) return out;
   walk.full(call.arguments[1], (node) => {
-    const text =
-      node.type === 'TemplateElement' ? node.value.cooked : node.value;
-    if (typeof text !== 'string') return;
+    const text = node.type === "TemplateElement" ? node.value.cooked : node.value;
+    if (typeof text !== "string") return;
     for (const m of text.matchAll(TIME_TEXT)) {
       out.push({
         file,
         line: node.loc.start.line,
-        rule: 'error-times',
-        message:
-          `the error message gives a time ("${m[0]}"); ` + 'send it in details'
+        rule: "error-times",
+        message: `the error message gives a time ("${m[0]}"); send it in details`,
       });
     }
   });
@@ -76,9 +70,9 @@ function timesInMessage(file, call) {
  */
 function nameOf(node) {
   const target = node.id || node.key || node.left;
-  if (!target) return '';
-  if (target.type === 'MemberExpression') return target.property.name || '';
-  return target.name || String(target.value || '');
+  if (!target) return "";
+  if (target.type === "MemberExpression") return target.property.name || "";
+  return target.name || String(target.value || "");
 }
 
 /**
@@ -92,7 +86,7 @@ function nameOf(node) {
 function named(holders) {
   for (const node of holders) {
     if (CONSTANT.test(nameOf(node))) return true;
-    if (!CONTAINERS.includes(node.type)) return false;
+    if (!CONTAINERS.has(node.type)) return false;
   }
   return false;
 }
@@ -106,19 +100,19 @@ function named(holders) {
  *     first; empty when the number is not an initial value.
  */
 function holdersOf(ancestors) {
-  const up = ancestors.slice(0, -1).reverse();
+  const up = ancestors.slice(0, -1).toReversed();
   let value = ancestors[ancestors.length - 1];
-  while (up[0]?.type === 'UnaryExpression') value = up.shift();
+  while (up[0]?.type === "UnaryExpression") value = up.shift();
   const holder = up[0] || {};
   const holds =
     holder.init === value ||
-    (holder.type === 'Property' && holder.value === value) ||
-    (holder.type === 'AssignmentPattern' && holder.right === value);
+    (holder.type === "Property" && holder.value === value) ||
+    (holder.type === "AssignmentPattern" && holder.right === value);
   return holds ? up : [];
 }
 
 /**
- * Lists the lines whose next line Biome is told to leave alone.
+ * Lists the lines whose next line Oxlint is told to leave alone.
  *
  * @param {!Array<!Object>} comments Every comment of the file.
  * @return {!Set<number>} The lines that follow an ignore comment.
@@ -127,7 +121,7 @@ function ignoredLines(comments) {
   return new Set(
     comments
       .filter((comment) => comment.value.includes(IGNORE))
-      .map((comment) => comment.loc.end.line + 1)
+      .map((comment) => comment.loc.end.line + 1),
   );
 }
 
@@ -144,10 +138,10 @@ function checkSource(file, source, allowed) {
   const ignored = ignoredLines(comments);
   const out = [];
   walk.fullAncestor(ast, (node, _state, ancestors) => {
-    if (node.type === 'CallExpression' && isErrorCall(node)) {
+    if (node.type === "CallExpression" && isErrorCall(node)) {
       out.push(...timesInMessage(file, node));
     }
-    if (typeof node.value !== 'number' || node.type !== 'Literal') return;
+    if (typeof node.value !== "number" || node.type !== "Literal") return;
     if (allowed.includes(node.value)) return;
     const holders = holdersOf(ancestors);
     const line = node.loc.start.line;
@@ -155,8 +149,8 @@ function checkSource(file, source, allowed) {
     out.push({
       file,
       line,
-      rule: 'numbers',
-      message: `${node.raw} has no name; give it a CONSTANT_CASE constant`
+      rule: "numbers",
+      message: `${node.raw} has no name; give it a CONSTANT_CASE constant`,
     });
   });
   return out;
@@ -172,7 +166,7 @@ function checkSource(file, source, allowed) {
  */
 function check(root, files, config) {
   return select(files, config.numbers).flatMap((file) =>
-    checkSource(file, read(root, file), config.numbers.allowed)
+    checkSource(file, read(root, file), config.numbers.allowed),
   );
 }
 

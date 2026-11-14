@@ -4,7 +4,7 @@
  * the ticket parts; creates `App.ticket`, which the other parts add to.
  */
 (function (App) {
-  'use strict';
+  "use strict";
 
   /** The degrees of a full turn of a hand. */
   var FULL_TURN = 360;
@@ -20,7 +20,7 @@
     HOURS: CLOCK_HOURS,
     HALF_TURN: FULL_TURN / 2,
     PER_HOUR: FULL_TURN / CLOCK_HOURS,
-    PER_MINUTE: FULL_TURN / 60
+    PER_MINUTE: FULL_TURN / 60,
   };
 
   /** A time such as "12:30" at the start of a slot. */
@@ -49,7 +49,7 @@
    *     has no time.
    */
   function handAngles(time) {
-    var m = START.exec(String(time || ''));
+    var m = START.exec(String(time || ""));
     if (!m) return null;
     var hr = +m[1] % CLOCK_HOURS;
     var min = +m[2];
@@ -66,7 +66,7 @@
    *     it has no length.
    */
   function slotArc(time) {
-    var m = SPAN.exec(String(time || ''));
+    var m = SPAN.exec(String(time || ""));
     if (!m) return null;
     var from = dialMinutes(m[1], m[2]);
     var to = dialMinutes(m[3], m[4]);
@@ -80,6 +80,6 @@
   App.ticket = {
     DIAL: DIAL,
     handAngles: handAngles,
-    slotArc: slotArc
+    slotArc: slotArc,
   };
 })(window.App);

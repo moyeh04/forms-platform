@@ -3,7 +3,7 @@
  * member forms, and the note the admin set for a size.
  */
 (function (App) {
-  'use strict';
+  "use strict";
 
   var P = App.formPage;
   var h = App.ui.h;
@@ -24,7 +24,7 @@
    * @return {?Object} The field, or null.
    */
   function sizeField() {
-    var f = Rules.fieldByRole(S.form, 'team_size');
+    var f = Rules.fieldByRole(S.form, "team_size");
     return f && f.enabled !== false ? f : null;
   }
 
@@ -38,7 +38,7 @@
   function freshMember(mf) {
     var fresh = {};
     (mf.fields || []).forEach(function (sf) {
-      if (sf.type === 'select' && S.data[sf.id]) fresh[sf.id] = S.data[sf.id];
+      if (sf.type === "select" && S.data[sf.id]) fresh[sf.id] = S.data[sf.id];
     });
     return fresh;
   }
@@ -50,7 +50,7 @@
    * @param {number} size The team size, leader included.
    */
   function syncMembers(size) {
-    var mf = Rules.fieldByRole(S.form, 'members');
+    var mf = Rules.fieldByRole(S.form, "members");
     if (!mf) return;
     var kept = P.getVal(mf.id);
     var list = Array.isArray(kept) ? kept : [];
@@ -63,10 +63,10 @@
 
   /** Scrolls to the member forms. */
   function scrollToMembers() {
-    var el = root.querySelector('.members-wrap');
+    var el = root.querySelector(".members-wrap");
     if (!el?.scrollIntoView) return;
     try {
-      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      el.scrollIntoView({ behavior: "smooth", block: "start" });
     } catch {
       /* not available */
     }
@@ -110,24 +110,20 @@
    */
   function sizeDropdown(sizes, path, id, cur) {
     return h(
-      'select',
+      "select",
       {
         id: id,
-        class: 'select',
+        class: "select",
         name: path,
-        'aria-describedby': id + '-help ' + id + '-err',
+        "aria-describedby": id + "-help " + id + "-err",
         onchange: function (e) {
           if (e.target.value) pickSize(path, parseInt(e.target.value, 10));
-        }
+        },
       },
-      h('option', { value: '' }, t('choose')),
+      h("option", { value: "" }, t("choose")),
       sizes.map(function (n) {
-        return h(
-          'option',
-          { value: String(n), selected: String(cur) === String(n) },
-          String(n)
-        );
-      })
+        return h("option", { value: String(n), selected: String(cur) === String(n) }, String(n));
+      }),
     );
   }
 
@@ -142,29 +138,29 @@
    */
   function sizeChips(sizes, path, id, cur) {
     return h(
-      'div',
+      "div",
       {
-        class: 'chips size-chips',
-        role: 'radiogroup',
+        class: "chips size-chips",
+        role: "radiogroup",
         id: id,
-        'aria-describedby': id + '-help ' + id + '-err'
+        "aria-describedby": id + "-help " + id + "-err",
       },
       sizes.map(function (n) {
         return h(
-          'label',
-          { class: 'chip' },
-          h('input', {
-            type: 'radio',
+          "label",
+          { class: "chip" },
+          h("input", {
+            type: "radio",
             name: path,
             value: String(n),
             checked: String(cur) === String(n),
             onchange: function () {
               pickSize(path, n);
-            }
+            },
           }),
-          h('span', null, String(n))
+          h("span", null, String(n)),
         );
-      })
+      }),
     );
   }
 
@@ -185,7 +181,7 @@
       P.setVal(path, cur);
       syncMembers(sizes[0]);
     }
-    var note = cur ? Rules.teamSizeNotice(S.form, cur, App.i18n.lang) : '';
+    var note = cur ? Rules.teamSizeNotice(S.form, cur, App.i18n.lang) : "";
     var control =
       sizes.length > MAX_SIZE_CHIPS
         ? sizeDropdown(sizes, path, id, cur)
@@ -203,10 +199,10 @@
   function sizeNote(text) {
     if (!text) return null;
     return h(
-      'p',
-      { class: 'size-notice', role: 'status' },
-      icon('info', NOTE_ICON_SIZE),
-      h('span', null, text)
+      "p",
+      { class: "size-notice", role: "status" },
+      icon("info", NOTE_ICON_SIZE),
+      h("span", null, text),
     );
   }
 
@@ -219,12 +215,7 @@
    */
   function withNote(value, text) {
     if (!text) return value;
-    return h(
-      'span',
-      null,
-      value,
-      h('span', { class: 'size-notice-inline' }, text)
-    );
+    return h("span", null, value, h("span", { class: "size-notice-inline" }, text));
   }
 
   P.teamSizeControl = teamSizeControl;

@@ -7,7 +7,7 @@
  * web/js/form/ load before it.
  */
 (function (App) {
-  'use strict';
+  "use strict";
 
   var P = App.formPage;
   var h = App.ui.h;
@@ -21,13 +21,13 @@
 
   /** The part that draws each view of the page, by the view's name. */
   var VIEWS = {
-    closed: 'closedView',
-    form: 'formView',
-    keyEntry: 'keyEntryView',
-    readonly: 'readonlyView',
-    ticket: 'ticketView',
-    cancelled: 'cancelledView',
-    moved: 'movedView'
+    closed: "closedView",
+    form: "formView",
+    keyEntry: "keyEntryView",
+    readonly: "readonlyView",
+    ticket: "ticketView",
+    cancelled: "cancelledView",
+    moved: "movedView",
   };
 
   /**
@@ -37,7 +37,7 @@
    * @return {{text: string, action: string}} The message and the button.
    */
   function freshWords() {
-    return { text: t('freshReady'), action: t('freshReload') };
+    return { text: t("freshReady"), action: t("freshReload") };
   }
 
   /**
@@ -52,11 +52,9 @@
       form.title +
       FormMetadata.display(form)
         .map(function (item) {
-          return item.variant === 'subject'
-            ? ' (' + item.value + ')'
-            : ' - ' + item.value;
+          return item.variant === "subject" ? " (" + item.value + ")" : " - " + item.value;
         })
-        .join('')
+        .join("")
     );
   }
 
@@ -69,8 +67,8 @@
    */
   function pageLang(form) {
     var cfg = form.lang || {};
-    if (cfg.allowSwitch === false) return cfg.default || 'en';
-    return App.i18n.saved() || cfg.default || 'en';
+    if (cfg.allowSwitch === false) return cfg.default || "en";
+    return App.i18n.saved() || cfg.default || "en";
   }
 
   /**
@@ -84,11 +82,11 @@
     S.taken = res.taken || {};
     document.title = tabTitle(S.form);
     App.i18n.set(pageLang(S.form));
-    if (S.state === 'open' || S.state === 'closed') P.buildSteps();
-    if (S.state === 'open') {
+    if (S.state === "open" || S.state === "closed") P.buildSteps();
+    if (S.state === "open") {
       P.restoreDraft();
-      S.view = 'form';
-    } else S.view = 'closed';
+      S.view = "form";
+    } else S.view = "closed";
   }
 
   /**
@@ -97,16 +95,14 @@
    * @return {!Promise<void>} Settles when the page is drawn.
    */
   async function load() {
-    S.view = 'loading';
+    S.view = "loading";
     render();
     try {
-      takeForm(await App.api.call({ action: 'getForm', slug: S.slug }));
+      takeForm(await App.api.call({ action: "getForm", slug: S.slug }));
     } catch (e) {
       S.loadError =
-        e.code === 'form_not_found'
-          ? t('notFound')
-          : App.i18n.err({ error: e.code }) || e.message;
-      S.view = 'error';
+        e.code === "form_not_found" ? t("notFound") : App.i18n.err({ error: e.code }) || e.message;
+      S.view = "error";
     }
     render();
   }
@@ -120,7 +116,7 @@
   async function refreshAvailability() {
     var res;
     try {
-      res = await App.api.call({ action: 'getForm', slug: S.slug });
+      res = await App.api.call({ action: "getForm", slug: S.slug });
       S.taken = res.taken || {};
     } catch {
       /* keep what we have */
@@ -134,13 +130,13 @@
    */
   function errorView() {
     return P.sheet(
-      h('h2', { class: 'state-title' }, S.loadError),
+      h("h2", { class: "state-title" }, S.loadError),
       h(
-        'button',
-        { type: 'button', class: 'btn btn-quiet', onclick: load },
-        icon('refresh', RETRY_ICON_SIZE),
-        t('retry')
-      )
+        "button",
+        { type: "button", class: "btn btn-quiet", onclick: load },
+        icon("refresh", RETRY_ICON_SIZE),
+        t("retry"),
+      ),
     );
   }
 
@@ -148,9 +144,9 @@
   function render() {
     App.ui.clear(root);
     root.appendChild(P.topbar());
-    if (S.view === 'loading') {
-      root.appendChild(h('div', { class: 'loading' }, t('loading')));
-    } else if (S.view === 'error') root.appendChild(errorView());
+    if (S.view === "loading") {
+      root.appendChild(h("div", { class: "loading" }, t("loading")));
+    } else if (S.view === "error") root.appendChild(errorView());
     else if (VIEWS[S.view]) root.appendChild(P[VIEWS[S.view]]());
   }
 
@@ -161,14 +157,10 @@
    */
   function init() {
     var params = new URLSearchParams(window.location.search);
-    S.slug = (
-      params.get('f') ||
-      window.location.hash.replace('#', '') ||
-      ''
-    ).trim();
+    S.slug = (params.get("f") || window.location.hash.replace("#", "") || "").trim();
     if (!S.slug) {
-      S.loadError = t('notFound');
-      S.view = 'error';
+      S.loadError = t("notFound");
+      S.view = "error";
       return render();
     }
     return load();
@@ -179,5 +171,5 @@
   App.fresh.words = freshWords;
   App.form = { init: init, _state: S };
 
-  if (!window.__FORM_NO_AUTOSTART__) init();
+  if (!window.__FORM_NO_AUTOSTART__) void init();
 })(window.App);

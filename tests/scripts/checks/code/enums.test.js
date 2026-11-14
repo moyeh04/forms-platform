@@ -1,21 +1,19 @@
-const test = require('node:test');
-const assert = require('node:assert/strict');
-const {
-  checkSource
-} = require('../../../../scripts/checks/code/check-enums.js');
+const test = require("node:test");
+const assert = require("node:assert/strict");
+const { checkSource } = require("../../../../scripts/checks/code/check-enums.js");
 
 const RULES = {
-  properties: { type: 'FormType', review: 'ReviewStatus' },
+  properties: { type: "FormType", review: "ReviewStatus" },
   enums: {
-    FormType: { RESERVATION: 'reservation', TEAM: 'team' },
-    ReviewStatus: { APPROVED: 'approved' }
-  }
+    FormType: { RESERVATION: "reservation", TEAM: "team" },
+    ReviewStatus: { APPROVED: "approved" },
+  },
 };
 
 const problems = (source) =>
-  checkSource('a.js', source, RULES).map((f) => `${f.line} ${f.message}`);
+  checkSource("a.js", source, RULES).map((f) => `${f.line} ${f.message}`);
 
-test('Enum check: a value of a mapped enum written by hand is found', () => {
+test("Enum check: a value of a mapped enum written by hand is found", () => {
   const source = `
 if (form.type === 'reservation') book();
 const same = 'team' !== f.type;
@@ -29,11 +27,11 @@ switch (form.type) {
     "2 write FormType.RESERVATION, not 'reservation'",
     "3 write FormType.TEAM, not 'team'",
     "4 write ReviewStatus.APPROVED, not 'approved'",
-    "6 write FormType.TEAM, not 'team'"
+    "6 write FormType.TEAM, not 'team'",
   ]);
 });
 
-test('Enum check: members, other words and unmapped properties pass', () => {
+test("Enum check: members, other words and unmapped properties pass", () => {
   const source = `
 if (form.type === FormType.RESERVATION) book();
 if (field.type === 'select') pick();

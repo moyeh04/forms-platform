@@ -8,7 +8,7 @@ var Time = (function () {
   var DAY_MS_ = 86400000;
 
   /** Pads a clock part to two digits. */
-  var TWO_DIGITS_ = '00';
+  var TWO_DIGITS_ = "00";
 
   /**
    * Gives the current instant.
@@ -25,11 +25,7 @@ var Time = (function () {
    * @return {string} The date as `yyyy-MM-dd`.
    */
   function todayIso_() {
-    return Utilities.formatDate(
-      new Date(),
-      Session.getScriptTimeZone(),
-      'yyyy-MM-dd'
-    );
+    return Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "yyyy-MM-dd");
   }
 
   /**
@@ -38,11 +34,7 @@ var Time = (function () {
    * @return {string} The time as `HH:mm`, on a 24-hour clock.
    */
   function clockNow_() {
-    return Utilities.formatDate(
-      new Date(),
-      Session.getScriptTimeZone(),
-      'HH:mm'
-    );
+    return Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "HH:mm");
   }
 
   /**
@@ -68,7 +60,7 @@ var Time = (function () {
       .map(function (n) {
         return (TWO_DIGITS_ + n).slice(-2);
       })
-      .join(':');
+      .join(":");
   }
 
   return {
@@ -76,6 +68,6 @@ var Time = (function () {
     clockText: clockText_,
     todayIso: todayIso_,
     clockNow: clockNow_,
-    isoAfterDays: isoAfterDays_
+    isoAfterDays: isoAfterDays_,
   };
 })();

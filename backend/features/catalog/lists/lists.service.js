@@ -29,7 +29,7 @@ var ListsService = (function () {
   function listsView_() {
     return {
       lists: ListsRepository.readLists(),
-      info: ListsRepository.readListInfo()
+      info: ListsRepository.readListInfo(),
     };
   }
 
@@ -41,13 +41,9 @@ var ListsService = (function () {
    * @throws {ApiError} `list_not_found` when there is no such list.
    */
   function requireList_(key) {
-    key = String(key || '');
-    if (
-      !key ||
-      key.charAt(0) === '_' ||
-      !hasKey_(ListsRepository.readLists(), key)
-    )
-      ApiError.fail('list_not_found', 'There is no such list.');
+    key = String(key || "");
+    if (!key || key.charAt(0) === "_" || !hasKey_(ListsRepository.readLists(), key))
+      ApiError.fail("list_not_found", "There is no such list.");
     return key;
   }
 
@@ -59,7 +55,7 @@ var ListsService = (function () {
    * @return {string} The name, or an empty string.
    */
   function shownName_(key, info) {
-    return info[key]?.name || ListsRepository.BUILTIN_LIST_NAMES[key] || '';
+    return info[key]?.name || ListsRepository.BUILTIN_LIST_NAMES[key] || "";
   }
 
   /**
@@ -74,16 +70,14 @@ var ListsService = (function () {
    *     another list has it.
    */
   function freeListName_(name, lists, info, self) {
-    name = String(name || '')
+    name = String(name || "")
       .trim()
       .slice(0, MAX_NAME_LENGTH_);
-    if (!name) ApiError.fail('list_name', 'Give the list a name.');
+    if (!name) ApiError.fail("list_name", "Give the list a name.");
     var taken = Object.keys(lists).some(function (k) {
-      return (
-        k !== self && shownName_(k, info).toLowerCase() === name.toLowerCase()
-      );
+      return k !== self && shownName_(k, info).toLowerCase() === name.toLowerCase();
     });
-    if (taken) ApiError.fail('list_name_taken', 'Another list has that name.');
+    if (taken) ApiError.fail("list_name_taken", "Another list has that name.");
     return name;
   }
 
@@ -98,16 +92,13 @@ var ListsService = (function () {
     var base =
       name
         .toLowerCase()
-        .replace(/[^a-z0-9]+/g, '_')
-        .replace(/^_+|_+$/g, '')
-        .slice(0, MAX_KEY_LENGTH_) || 'list';
+        .replace(/[^a-z0-9]+/g, "_")
+        .replace(/^_+|_+$/g, "")
+        .slice(0, MAX_KEY_LENGTH_) || "list";
     var key = base;
     var n = FIRST_KEY_SUFFIX_;
-    while (
-      hasKey_(lists, key) ||
-      hasKey_(ListsRepository.BUILTIN_LIST_KINDS, key)
-    )
-      key = base + '_' + n++;
+    while (hasKey_(lists, key) || hasKey_(ListsRepository.BUILTIN_LIST_KINDS, key))
+      key = base + "_" + n++;
     return key;
   }
 
@@ -138,7 +129,7 @@ var ListsService = (function () {
     ListsRepository.saveList(key, copyOf ? lists[requireList_(copyOf)] : []);
     info[key] = {
       name: cleanName,
-      kind: Object.values(ListKind).indexOf(kind) === -1 ? ListKind.PLAIN : kind
+      kind: Object.values(ListKind).indexOf(kind) === -1 ? ListKind.PLAIN : kind,
     };
     ListsRepository.saveListInfo(info);
     return key;
@@ -155,16 +146,8 @@ var ListsService = (function () {
     key = requireList_(key);
     var info = ListsRepository.readListInfo();
     if (!info[key])
-      ApiError.fail(
-        'list_builtin',
-        'The lists that came with the platform keep their names.'
-      );
-    info[key].name = freeListName_(
-      name,
-      ListsRepository.readLists(),
-      info,
-      key
-    );
+      ApiError.fail("list_builtin", "The lists that came with the platform keep their names.");
+    info[key].name = freeListName_(name, ListsRepository.readLists(), info, key);
     ListsRepository.saveListInfo(info);
   }
 
@@ -178,21 +161,18 @@ var ListsService = (function () {
   function removeList_(key) {
     key = requireList_(key);
     if (!ListsRepository.readListInfo()[key])
-      ApiError.fail(
-        'list_builtin',
-        'The lists that came with the platform cannot be deleted.'
-      );
+      ApiError.fail("list_builtin", "The lists that came with the platform cannot be deleted.");
     var users = ListsRepository.formsUsingList(key);
     if (users.length)
       ApiError.fail(
-        'list_in_use',
-        'A form still asks this list: ' +
+        "list_in_use",
+        "A form still asks this list: " +
           users
             .map(function (f) {
               return f.title;
             })
-            .join(', ') +
-          '.'
+            .join(", ") +
+          ".",
       );
     ListsRepository.deleteList(key);
   }
@@ -202,6 +182,6 @@ var ListsService = (function () {
     setValues: setValues_,
     createList: createList_,
     renameList: renameList_,
-    removeList: removeList_
+    removeList: removeList_,
   };
 })();

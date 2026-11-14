@@ -4,7 +4,7 @@
  * object, `dr`: the page, the draft and the kinds it offers.
  */
 (function (App) {
-  'use strict';
+  "use strict";
 
   var A = App.admin;
   var L = A.lists;
@@ -17,7 +17,7 @@
    */
   L.draftName = function (dr) {
     var d = dr.d;
-    return d.year && d.letter ? d.year + d.letter : '';
+    return d.year && d.letter ? d.year + d.letter : "";
   };
 
   /**
@@ -53,14 +53,13 @@
    */
   L.draftMissing = function (dr) {
     var d = dr.d;
-    var why = '';
-    if (!d.year && !d.letter) why = 'Pick a year and a department letter.';
-    else if (!d.year) why = 'Pick a year.';
-    else if (!d.letter) why = 'Pick a department letter.';
-    else if (L.draftExists(dr))
-      why = L.draftName(dr) + ' is already in this list.';
-    else if (!L.draftTotal(dr)) why = 'Set at least one kind above 0.';
-    if (!dr.kinds.length && !why) why = 'Add a kind, such as TH.';
+    var why = "";
+    if (!d.year && !d.letter) why = "Pick a year and a department letter.";
+    else if (!d.year) why = "Pick a year.";
+    else if (!d.letter) why = "Pick a department letter.";
+    else if (L.draftExists(dr)) why = L.draftName(dr) + " is already in this list.";
+    else if (!L.draftTotal(dr)) why = "Set at least one kind above 0.";
+    if (!dr.kinds.length && !why) why = "Add a kind, such as TH.";
     return why;
   };
 

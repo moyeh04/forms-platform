@@ -62,7 +62,7 @@ The files that are not JavaScript carry `#` comments under the same rules:
 they say what and why, never who or when.
 
 - A shell script or git hook has a comment block right under its `#!` line
-  that says what it does and when it runs: on `npm install`, before each
+  that says what it does and when it runs: on `pnpm install`, before each
   commit, before each push.
 - A CI workflow starts with a comment block that says what it runs, on which
   events, and what it deploys.

@@ -8,12 +8,12 @@
  * passes, because the same property names other words too, such as the type
  * of a question.
  */
-const path = require('node:path');
-const walk = require('acorn-walk');
-const { select, read } = require('../lib/files.js');
-const { parse } = require('../lib/parse.js');
+const path = require("node:path");
+const walk = require("acorn-walk");
+const { select, read } = require("../lib/files.js");
+const { parse } = require("../lib/parse.js");
 
-const EQUALITY = ['===', '!==', '==', '!='];
+const EQUALITY = new Set(["===", "!==", "==", "!="]);
 
 /**
  * Names the property a member expression reads: `type` for `form.type`, and
@@ -23,7 +23,7 @@ const EQUALITY = ['===', '!==', '==', '!='];
  * @return {?string} The property name, or null for any other node.
  */
 function propertyOf(node) {
-  if (node.type !== 'MemberExpression') return null;
+  if (node.type !== "MemberExpression") return null;
   if (!node.computed) return node.property.name;
   return propertyOf(node.object);
 }
@@ -39,12 +39,12 @@ function propertyOf(node) {
  */
 function memberFor(node, property, rules) {
   const name = rules.properties[property];
-  if (!name || node.type !== 'Literal' || typeof node.value !== 'string') {
-    return '';
+  if (!name || node.type !== "Literal" || typeof node.value !== "string") {
+    return "";
   }
   const members = rules.enums[name] || {};
   const key = Object.keys(members).find((k) => members[k] === node.value);
-  return key ? `${name}.${key}` : '';
+  return key ? `${name}.${key}` : "";
 }
 
 /**
@@ -57,10 +57,10 @@ function memberFor(node, property, rules) {
  */
 function stringsOf(node, rules) {
   const pairs = [];
-  if (node.type === 'BinaryExpression' && EQUALITY.includes(node.operator)) {
+  if (node.type === "BinaryExpression" && EQUALITY.has(node.operator)) {
     pairs.push([node.left, node.right], [node.right, node.left]);
   }
-  if (node.type === 'SwitchStatement') {
+  if (node.type === "SwitchStatement") {
     for (const branch of node.cases) {
       if (branch.test) pairs.push([branch.test, node.discriminant]);
     }
@@ -68,7 +68,7 @@ function stringsOf(node, rules) {
   return pairs
     .map(([text, other]) => ({
       node: text,
-      member: memberFor(text, propertyOf(other), rules)
+      member: memberFor(text, propertyOf(other), rules),
     }))
     .filter((found) => found.member);
 }
@@ -88,8 +88,8 @@ function checkSource(file, source, rules) {
       out.push({
         file,
         line: found.node.loc.start.line,
-        rule: 'enums',
-        message: `write ${found.member}, not '${found.node.value}'`
+        rule: "enums",
+        message: `write ${found.member}, not '${found.node.value}'`,
       });
     }
   });
@@ -107,11 +107,9 @@ function checkSource(file, source, rules) {
 function check(root, files, config) {
   const rules = {
     properties: config.enums.properties,
-    enums: require(path.join(root, config.enums.source))
+    enums: require(path.join(root, config.enums.source)),
   };
-  return select(files, config.enums).flatMap((file) =>
-    checkSource(file, read(root, file), rules)
-  );
+  return select(files, config.enums).flatMap((file) => checkSource(file, read(root, file), rules));
 }
 
 module.exports = { check, checkSource };

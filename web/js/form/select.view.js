@@ -2,7 +2,7 @@
  * Answers picked from a list: chips for a few choices and a dropdown for many.
  */
 (function (App) {
-  'use strict';
+  "use strict";
 
   var P = App.formPage;
   var h = App.ui.h;
@@ -23,7 +23,7 @@
    */
   function onlyChoice(field, path) {
     var opts = field.options || [];
-    var cur = P.getVal(path) || '';
+    var cur = P.getVal(path) || "";
     var only = opts.length === 1 && field.required !== false;
     if (only && String(cur) !== String(opts[0].value)) {
       cur = opts[0].value;
@@ -58,29 +58,29 @@
    */
   function chips(field, path, id, cur) {
     return h(
-      'div',
+      "div",
       {
-        class: 'chips',
-        role: 'radiogroup',
+        class: "chips",
+        role: "radiogroup",
         id: id,
-        'aria-describedby': id + '-err'
+        "aria-describedby": id + "-err",
       },
       field.options.map(function (o) {
         return h(
-          'label',
-          { class: 'chip' },
-          h('input', {
-            type: 'radio',
+          "label",
+          { class: "chip" },
+          h("input", {
+            type: "radio",
             name: path,
             value: o.value,
             checked: String(cur) === String(o.value),
             onchange: function () {
               pick(path, o.value);
-            }
+            },
           }),
-          h('span', null, L(o.label))
+          h("span", null, L(o.label)),
         );
-      })
+      }),
     );
   }
 
@@ -95,24 +95,24 @@
    */
   function dropdown(field, path, id, cur) {
     return h(
-      'select',
+      "select",
       {
         id: id,
-        class: 'select',
+        class: "select",
         name: path,
-        'aria-describedby': id + '-help ' + id + '-err',
+        "aria-describedby": id + "-help " + id + "-err",
         onchange: function (e) {
           pick(path, e.target.value);
-        }
+        },
       },
-      h('option', { value: '' }, t('choose')),
+      h("option", { value: "" }, t("choose")),
       (field.options || []).map(function (o) {
         return h(
-          'option',
+          "option",
           { value: o.value, selected: String(cur) === String(o.value) },
-          L(o.label)
+          L(o.label),
         );
-      })
+      }),
     );
   }
 

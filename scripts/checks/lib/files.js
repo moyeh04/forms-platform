@@ -1,7 +1,7 @@
 /** Picks the files a run of the checks looks at. */
-const { execFileSync } = require('node:child_process');
-const fs = require('node:fs');
-const path = require('node:path');
+const { execFileSync } = require("node:child_process");
+const fs = require("node:fs");
+const path = require("node:path");
 
 /**
  * Lists the tracked files, or only the staged ones, that exist on disk.
@@ -11,13 +11,9 @@ const path = require('node:path');
  * @return {!Array<string>} Paths relative to the root, with forward slashes.
  */
 function listFiles(root, staged) {
-  const args = staged
-    ? ['diff', '--cached', '--name-only', '--diff-filter=ACMR']
-    : ['ls-files'];
-  const out = execFileSync('git', args, { cwd: root, encoding: 'utf8' });
-  return out
-    .split('\n')
-    .filter((file) => file && fs.existsSync(path.join(root, file)));
+  const args = staged ? ["diff", "--cached", "--name-only", "--diff-filter=ACMR"] : ["ls-files"];
+  const out = execFileSync("git", args, { cwd: root, encoding: "utf8" });
+  return out.split("\n").filter((file) => file && fs.existsSync(path.join(root, file)));
 }
 
 /**
@@ -35,7 +31,7 @@ function select(files, scope) {
     (file) =>
       scope.include.some((dir) => file.startsWith(dir)) &&
       scope.extensions.includes(path.extname(file)) &&
-      !exclude.some((skip) => file.startsWith(skip))
+      !exclude.some((skip) => file.startsWith(skip)),
   );
 }
 
@@ -47,7 +43,7 @@ function select(files, scope) {
  * @return {string} The content.
  */
 function read(root, file) {
-  return fs.readFileSync(path.join(root, file), 'utf8');
+  return fs.readFileSync(path.join(root, file), "utf8");
 }
 
 module.exports = { listFiles, select, read };

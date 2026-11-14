@@ -14,10 +14,10 @@ var PrintLayout = (function () {
   var BODY_FONT = 12;
 
   /** The fill of the header row and of the merged labels. */
-  var LABEL_FILL = '#E9DFC4';
+  var LABEL_FILL = "#E9DFC4";
 
   /** The colour of the text and the frame of a printed page. */
-  var BLACK = '#000000';
+  var BLACK = "#000000";
 
   /** The font size of the title row. */
   var TITLE_FONT_ = 16;
@@ -41,7 +41,7 @@ var PrintLayout = (function () {
    * @return {string} `Print - ` and the label, cut to the longest name.
    */
   function sheetName(label) {
-    var name = 'Print - ' + String(label).replace(BAD_NAME_CHARS_, '-');
+    var name = "Print - " + String(label).replace(BAD_NAME_CHARS_, "-");
     return name.slice(0, MAX_NAME_LENGTH_);
   }
 
@@ -59,18 +59,18 @@ var PrintLayout = (function () {
       .setValue(title)
       .setFontFamily(SheetStyle.PALETTE.font)
       .setFontSize(TITLE_FONT_)
-      .setFontWeight('bold')
-      .setHorizontalAlignment('center')
-      .setVerticalAlignment('middle');
+      .setFontWeight("bold")
+      .setHorizontalAlignment("center")
+      .setVerticalAlignment("middle");
     sh.setRowHeight(1, TITLE_PX_);
     sh.getRange(HEADER_ROW, 1, 1, cols)
       .setValues([headers])
       .setFontFamily(SheetStyle.PALETTE.font)
       .setFontSize(BODY_FONT)
-      .setFontWeight('bold')
+      .setFontWeight("bold")
       .setBackground(LABEL_FILL)
-      .setHorizontalAlignment('center')
-      .setVerticalAlignment('middle');
+      .setHorizontalAlignment("center")
+      .setVerticalAlignment("middle");
     sh.setRowHeight(HEADER_ROW, HEADER_PX_);
   }
 
@@ -93,16 +93,7 @@ var PrintLayout = (function () {
    * @param {string} colour The colour of the lines.
    */
   function frame(range, colour) {
-    range.setBorder(
-      true,
-      true,
-      true,
-      true,
-      true,
-      true,
-      colour,
-      SpreadsheetApp.BorderStyle.SOLID
-    );
+    range.setBorder(true, true, true, true, true, true, colour, SpreadsheetApp.BorderStyle.SOLID);
   }
 
   /**
@@ -113,10 +104,7 @@ var PrintLayout = (function () {
    * @param {string} note The note.
    */
   function emptyNote(sh, cols, note) {
-    sh.getRange(FIRST_ROW, 1, 1, cols)
-      .merge()
-      .setValue(note)
-      .setHorizontalAlignment('center');
+    sh.getRange(FIRST_ROW, 1, 1, cols).merge().setValue(note).setHorizontalAlignment("center");
   }
 
   /**
@@ -132,7 +120,7 @@ var PrintLayout = (function () {
       sheetName: sh.getName(),
       gid: sh.getSheetId(),
       count: count,
-      landscape: false
+      landscape: false,
     };
   }
 
@@ -147,6 +135,6 @@ var PrintLayout = (function () {
     setWidths,
     frame,
     emptyNote,
-    printed
+    printed,
   };
 })();

@@ -3,11 +3,11 @@
  * for a size, and the warnings about small teams.
  */
 (function (root) {
-  'use strict';
+  "use strict";
 
-  var node = typeof module === 'object' && module.exports;
-  var textRules = node ? require('./text.js') : root.RulesText;
-  var formRules = node ? require('./form.js') : root.RulesForm;
+  var node = typeof module === "object" && module.exports;
+  var textRules = node ? require("./text.js") : root.RulesText;
+  var formRules = node ? require("./form.js") : root.RulesForm;
 
   /** The biggest team when the form does not say. */
   var DEFAULT_MAX_SIZE = 6;
@@ -16,7 +16,7 @@
   var MIN_ALERT_SIZE = 2;
 
   /** The levels, the stronger first: a team gets the first it is under. */
-  var SIZE_ALERT_LEVELS = ['critical', 'warning'];
+  var SIZE_ALERT_LEVELS = ["critical", "warning"];
 
   /**
    * Reads the submission rules of a form.
@@ -56,10 +56,10 @@
    */
   function sizeNotice(notice, size, max, lang) {
     var v = parseInt(size, 10);
-    if (!notice || !Array.isArray(notice.sizes)) return '';
-    if (notice.sizes.map(Number).indexOf(v) === -1) return '';
+    if (!notice || !Array.isArray(notice.sizes)) return "";
+    if (notice.sizes.map(Number).indexOf(v) === -1) return "";
     var text = notice.text || {};
-    return String(text[lang] || text.en || text.ar || '')
+    return String(text[lang] || text.en || text.ar || "")
       .replace(/\{n\}/g, String(v))
       .replace(/\{max\}/g, String(max));
   }
@@ -87,8 +87,8 @@
    * @return {string} The note, or ''.
    */
   function teammateNotice(form, count, lang) {
-    var mf = formRules.fieldByRole(form, 'members');
-    return mf ? sizeNotice(mf.notice, count, mf.max, lang) : '';
+    var mf = formRules.fieldByRole(form, "members");
+    return mf ? sizeNotice(mf.notice, count, mf.max, lang) : "";
   }
 
   /**
@@ -139,7 +139,7 @@
     var half = Math.max(MIN_ALERT_SIZE, Math.ceil(max / 2));
     var start = {
       critical: half,
-      warning: Math.min(max, Math.max(max - 1, half + 1))
+      warning: Math.min(max, Math.max(max - 1, half + 1)),
     };
     var out = {};
     SIZE_ALERT_LEVELS.forEach(function (k) {
@@ -147,7 +147,7 @@
       var n = parseInt(level.below, 10);
       out[k] = {
         on: level.on === true,
-        below: n >= MIN_ALERT_SIZE ? Math.min(n, max) : start[k]
+        below: n >= MIN_ALERT_SIZE ? Math.min(n, max) : start[k],
       };
     });
     return out;
@@ -169,15 +169,15 @@
       var level = raw[k] || {};
       return level.on === true;
     });
-    var bad = on.filter(function (k) {
-      var s = String(raw[k].below == null ? '' : raw[k].below).trim();
+    var bad = on.find(function (k) {
+      var s = String(raw[k].below == null ? "" : raw[k].below).trim();
       return !/^\d+$/.test(s) || +s < MIN_ALERT_SIZE || +s > max;
-    })[0];
+    });
     var min = MIN_ALERT_SIZE;
-    if (bad) return { level: bad, error: 'range', min: min, max: max };
+    if (bad) return { level: bad, error: "range", min: min, max: max };
     var both = on.length === SIZE_ALERT_LEVELS.length;
     if (both && +raw.warning.below <= +raw.critical.below) {
-      return { level: 'warning', error: 'order', min: min, max: max };
+      return { level: "warning", error: "order", min: min, max: max };
     }
     return null;
   }
@@ -205,10 +205,10 @@
    * @return {string} The level, or '' when the team is not small.
    */
   function sizeAlertOf(alerts, count) {
-    var hit = sizeAlertLevels(alerts).filter(function (l) {
+    var hit = sizeAlertLevels(alerts).find(function (l) {
       return count < l.below;
-    })[0];
-    return hit ? hit.level : '';
+    });
+    return hit ? hit.level : "";
   }
 
   /**
@@ -226,8 +226,8 @@
     if (Number.isNaN(n) || n < r.min || n > r.max) {
       return {
         ok: false,
-        error: 'invalid_team_size',
-        params: { min: r.min, max: r.max }
+        error: "invalid_team_size",
+        params: { min: r.min, max: r.max },
       };
     }
     return { ok: true, value: String(n) };
@@ -244,8 +244,8 @@
     sizeAlertLevelIds: sizeAlertLevelIds,
     sizeAlertLevels: sizeAlertLevels,
     sizeAlertOf: sizeAlertOf,
-    validateTeamSize: validateTeamSize
+    validateTeamSize: validateTeamSize,
   };
   if (node) module.exports = api;
   root.RulesTeamSize = api;
-})(typeof globalThis !== 'undefined' ? globalThis : this);
+})(typeof globalThis !== "undefined" ? globalThis : this);

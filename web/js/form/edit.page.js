@@ -3,7 +3,7 @@
  * button, cancelling it, and starting a new one.
  */
 (function (App) {
-  'use strict';
+  "use strict";
 
   var P = App.formPage;
   var h = App.ui.h;
@@ -25,12 +25,7 @@
         return !s.review;
       })
       .map(function (s) {
-        return h(
-          'div',
-          null,
-          h('h3', { class: 'member-title' }, P.stepTitle(s)),
-          P.summaryList(s)
-        );
+        return h("div", null, h("h3", { class: "member-title" }, P.stepTitle(s)), P.summaryList(s));
       });
   }
 
@@ -41,27 +36,27 @@
    * @return {!Element} The sheet.
    */
   function readonlyView() {
-    var why = t(S.keyInfo.locked ? 'deadlineLocked' : 'readOnly');
+    var why = t(S.keyInfo.locked ? "deadlineLocked" : "readOnly");
     var cancel = S.keyInfo.canDelete
       ? h(
-          'button',
-          { type: 'button', class: 'btn btn-danger', onclick: askCancel },
-          icon('trash', BUTTON_ICON_SIZE),
-          t('cancelReg')
+          "button",
+          { type: "button", class: "btn btn-danger", onclick: askCancel },
+          icon("trash", BUTTON_ICON_SIZE),
+          t("cancelReg"),
         )
       : null;
     return P.sheet(
       P.head(),
       h(
-        'div',
-        { class: 'banner info', role: 'status' },
-        t('editing', { ref: S.keyInfo.ref }) + '. ' + why
+        "div",
+        { class: "banner info", role: "status" },
+        t("editing", { ref: S.keyInfo.ref }) + ". " + why,
       ),
       P.transferNotes(),
       P.bannerEl(),
       P.progressBlock(S.progress),
       answerGroups(),
-      h('div', { class: 'nav' }, closeButton(), cancel)
+      h("div", { class: "nav" }, closeButton(), cancel),
     );
   }
 
@@ -72,11 +67,11 @@
    */
   function confirmLeave() {
     return App.ui.confirm({
-      title: t('leaveTitle'),
-      body: t('leaveBody'),
-      confirmText: t('leaveYes'),
-      cancelText: t('leaveNo'),
-      danger: true
+      title: t("leaveTitle"),
+      body: t("leaveBody"),
+      confirmText: t("leaveYes"),
+      cancelText: t("leaveNo"),
+      danger: true,
     });
   }
 
@@ -87,19 +82,19 @@
    * @return {!Element} The button.
    */
   function closeButton() {
-    var unsaved = S.view === 'form' && P.changed();
+    var unsaved = S.view === "form" && P.changed();
     return h(
-      'button',
+      "button",
       {
-        type: 'button',
-        class: 'btn btn-quiet',
-        name: 'close-edit',
+        type: "button",
+        class: "btn btn-quiet",
+        name: "close-edit",
         onclick: async function () {
           if (unsaved && !(await confirmLeave())) return;
           resetForNew();
-        }
+        },
       },
-      t(unsaved ? 'closeUnsaved' : 'closeEdit')
+      t(unsaved ? "closeUnsaved" : "closeEdit"),
     );
   }
 
@@ -110,20 +105,20 @@
    */
   async function askCancel() {
     var yes = await App.ui.confirm({
-      title: t('cancelTitle'),
-      body: t('cancelBody'),
-      confirmText: t('cancelYes'),
-      cancelText: t('cancelNo'),
-      danger: true
+      title: t("cancelTitle"),
+      body: t("cancelBody"),
+      confirmText: t("cancelYes"),
+      cancelText: t("cancelNo"),
+      danger: true,
     });
     if (!yes) return;
     try {
-      await App.api.call({ action: 'remove', slug: S.slug, key: S.key });
-      S.view = 'cancelled';
+      await App.api.call({ action: "remove", slug: S.slug, key: S.key });
+      S.view = "cancelled";
     } catch (e) {
       S.banner = {
-        kind: 'err',
-        text: App.i18n.err({ error: e.code }) || e.message
+        kind: "err",
+        text: App.i18n.err({ error: e.code }) || e.message,
       };
     }
     P.render();
@@ -137,40 +132,40 @@
   function cancelledView() {
     return P.sheet(
       P.head(),
-      h('h2', { class: 'state-title' }, t('cancelledTitle')),
-      h('p', null, t('cancelledBody')),
+      h("h2", { class: "state-title" }, t("cancelledTitle")),
+      h("p", null, t("cancelledBody")),
       h(
-        'div',
-        { class: 'nav' },
+        "div",
+        { class: "nav" },
         h(
-          'button',
+          "button",
           {
-            type: 'button',
-            class: 'btn btn-primary',
+            type: "button",
+            class: "btn btn-primary",
             onclick: function () {
               resetForNew();
-            }
+            },
           },
-          t('newRegistration')
-        )
-      )
+          t("newRegistration"),
+        ),
+      ),
     );
   }
 
   /** Leaves the registration and starts a new one. */
   function resetForNew() {
-    S.mode = 'new';
-    S.key = '';
+    S.mode = "new";
+    S.key = "";
     S.keyInfo = null;
     S.data = {};
     S.errors = {};
     S.banner = null;
     S.stepIndex = 0;
-    S.ownSlot = '';
+    S.ownSlot = "";
     P.forgetTeam();
     P.buildSteps();
     P.refreshAvailability().then(function () {
-      S.view = S.state === 'open' ? 'form' : 'closed';
+      S.view = S.state === "open" ? "form" : "closed";
       P.render();
     });
   }

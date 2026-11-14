@@ -3,7 +3,7 @@
  * in a dialog with its PDF, and the CSV file saved from the browser.
  */
 (function (App) {
-  'use strict';
+  "use strict";
 
   var A = App.admin;
   var R = A.responses;
@@ -22,11 +22,7 @@
    * @return {!Element} The link.
    */
   function openLink(cls, href, text) {
-    return h(
-      'a',
-      { class: 'btn ' + cls, href: href, target: '_blank', rel: 'noopener' },
-      text
-    );
+    return h("a", { class: "btn " + cls, href: href, target: "_blank", rel: "noopener" }, text);
   }
 
   /**
@@ -41,29 +37,25 @@
     A.busy(btn, async function () {
       var r = await A.call(action, Object.assign({ slug: form.slug }, extra));
       var body = h(
-        'div',
+        "div",
         null,
+        h("p", null, r.count + " row(s) are ready in a print tab of the Google Sheet."),
         h(
-          'p',
-          null,
-          r.count + ' row(s) are ready in a print tab of the Google Sheet.'
-        ),
-        h(
-          'div',
-          { class: 'actions' },
-          openLink('btn-primary', r.sheetUrl, 'Open print tab'),
-          r.pdfUrl ? openLink('btn-quiet', r.pdfUrl, 'Open PDF') : null
+          "div",
+          { class: "actions" },
+          openLink("btn-primary", r.sheetUrl, "Open print tab"),
+          r.pdfUrl ? openLink("btn-quiet", r.pdfUrl, "Open PDF") : null,
         ),
         r.pdfUrl
           ? null
           : h(
-              'p',
-              { class: 'help' },
-              'The PDF could not be made automatically. Open the print tab' +
-                ' and use File > Print.'
-            )
+              "p",
+              { class: "help" },
+              "The PDF could not be made automatically. Open the print tab" +
+                " and use File > Print.",
+            ),
       );
-      A.modal('Ready to print', body);
+      A.modal("Ready to print", body);
     });
   };
 
@@ -74,7 +66,7 @@
    * @return {string} The cell.
    */
   function csvCell(v) {
-    return '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"';
+    return '"' + String(v == null ? "" : v).replace(/"/g, '""') + '"';
   }
 
   /**
@@ -85,19 +77,17 @@
    */
   R.downloadCsv = function (form, rows) {
     var csv =
-      '\ufeff' +
+      "\ufeff" +
       R.csvLines(form, rows)
         .map(function (r) {
-          return r.map(csvCell).join(',');
+          return r.map(csvCell).join(",");
         })
-        .join('\r\n');
+        .join("\r\n");
     var url;
     var a;
     try {
-      url = URL.createObjectURL(
-        new Blob([csv], { type: 'text/csv;charset=utf-8' })
-      );
-      a = h('a', { href: url, download: form.slug + '.csv' });
+      url = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }));
+      a = h("a", { href: url, download: form.slug + ".csv" });
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -105,7 +95,7 @@
         URL.revokeObjectURL(url);
       }, REVOKE_AFTER_MS);
     } catch {
-      ui.toast('Could not make the file here.', 'err');
+      ui.toast("Could not make the file here.", "err");
     }
   };
 })(window.App);

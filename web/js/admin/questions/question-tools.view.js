@@ -4,7 +4,7 @@
  * Remove. Folded until asked for, to keep the list short.
  */
 (function (App) {
-  'use strict';
+  "use strict";
 
   var A = App.admin;
   var Q = A.questions;
@@ -20,12 +20,7 @@
    * @return {!Element} The tool.
    */
   function tool(tag, label, ...body) {
-    return h(
-      tag,
-      { class: 'q-tool' },
-      h('span', { class: 'tool-label' }, label),
-      body
-    );
+    return h(tag, { class: "q-tool" }, h("span", { class: "tool-label" }, label), body);
   }
 
   /**
@@ -39,15 +34,15 @@
     var sel = A.select(
       Q.pageOf(s.f, fd).id,
       s.f.steps.map(function (st, n) {
-        return [st.id, n + 1 + '. ' + Q.pageName(st)];
+        return [st.id, n + 1 + ". " + Q.pageName(st)];
       }),
       function (v) {
         Q.moveToPage(s.f, fd, v);
         s.paintQuestions();
-      }
+      },
     );
-    sel.name = 'page-' + fd.id;
-    return tool('label', 'Page', sel);
+    sel.name = "page-" + fd.id;
+    return tool("label", "Page", sel);
   }
 
   /**
@@ -63,18 +58,18 @@
     var list = Q.pageOf(s.f, fd).fields;
     var at = list.indexOf(fd.id);
     return h(
-      'button',
+      "button",
       {
-        type: 'button',
-        class: 'icon-btn sm',
-        name: (up ? 'up-' : 'down-') + fd.id,
-        'aria-label': up ? 'Move up' : 'Move down',
+        type: "button",
+        class: "icon-btn sm",
+        name: (up ? "up-" : "down-") + fd.id,
+        "aria-label": up ? "Move up" : "Move down",
         disabled: up ? at === 0 : at === list.length - 1,
         onclick: function () {
           if (Q.shift(s.f, fd, by)) s.paintQuestions();
-        }
+        },
       },
-      up ? '↑' : '↓'
+      up ? "↑" : "↓",
     );
   }
 
@@ -88,11 +83,11 @@
   function kindTool(s, fd) {
     var sel = A.select(fd.type, Q.KINDS, function (v) {
       fd.type = v;
-      if (v !== 'select') delete fd.options;
+      if (v !== "select") delete fd.options;
       s.paintQuestions();
     });
-    sel.name = 'kind-' + fd.id;
-    return tool('label', 'Kind of answer', sel);
+    sel.name = "kind-" + fd.id;
+    return tool("label", "Kind of answer", sel);
   }
 
   /**
@@ -104,21 +99,19 @@
    */
   function removeButton(s, fd) {
     return h(
-      'button',
+      "button",
       {
-        type: 'button',
-        class: 'btn btn-quiet sm danger',
-        name: 'remove-' + fd.id,
-        title:
-          'Answers already given stay in the Google Sheet but are no longer' +
-          ' shown.',
+        type: "button",
+        class: "btn btn-quiet sm danger",
+        name: "remove-" + fd.id,
+        title: "Answers already given stay in the Google Sheet but are no longer shown.",
         onclick: function () {
           Q.removeQuestion(s.f, fd);
           s.paintQuestions();
-        }
+        },
       },
-      icon('trash', A.ICON_SIZE.MENU),
-      'Remove question'
+      icon("trash", A.ICON_SIZE.MENU),
+      "Remove question",
     );
   }
 
@@ -130,22 +123,22 @@
    */
   function choicesField(fd) {
     return h(
-      'label',
-      { class: 'field-row q-choices' },
-      h('span', { class: 'label' }, 'Choices, one on each line'),
+      "label",
+      { class: "field-row q-choices" },
+      h("span", { class: "label" }, "Choices, one on each line"),
       h(
-        'textarea',
+        "textarea",
         {
-          class: 'textarea',
-          rows: '4',
-          name: 'choices-' + fd.id,
-          placeholder: 'Yes\nNo\nTo add the Arabic text: Yes | نعم',
+          class: "textarea",
+          rows: "4",
+          name: "choices-" + fd.id,
+          placeholder: "Yes\nNo\nTo add the Arabic text: Yes | نعم",
           oninput: function (e) {
             fd.options = Q.readChoices(e.target.value);
-          }
+          },
         },
-        Q.choicesText(fd.options)
-      )
+        Q.choicesText(fd.options),
+      ),
     );
   }
 
@@ -161,19 +154,17 @@
     var movable = Q.isMovable(s.f, fd);
     if (!movable && !fd.custom) return null;
     return h(
-      'div',
+      "div",
       {
-        class: 'q-tools',
+        class: "q-tools",
         dataset: { tools: fd.id },
-        hidden: !s.toolsOpen[fd.id]
+        hidden: !s.toolsOpen[fd.id],
       },
       movable ? pageTool(s, fd) : null,
-      movable
-        ? tool('span', 'Order', orderButton(s, fd, -1), orderButton(s, fd, 1))
-        : null,
+      movable ? tool("span", "Order", orderButton(s, fd, -1), orderButton(s, fd, 1)) : null,
       fd.custom ? kindTool(s, fd) : null,
       fd.custom ? removeButton(s, fd) : null,
-      fd.custom && fd.type === 'select' ? choicesField(fd) : null
+      fd.custom && fd.type === "select" ? choicesField(fd) : null,
     );
   };
 })(window.App);

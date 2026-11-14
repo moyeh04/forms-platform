@@ -25,7 +25,7 @@ var AuthService = (function () {
    * @return {string} The message, or '' when none is set.
    */
   function lockMessage() {
-    return Properties.getProp(Constants.PROPS.LOCKED_MESSAGE) || '';
+    return Properties.getProp(Constants.PROPS.LOCKED_MESSAGE) || "";
   }
 
   /**
@@ -37,13 +37,11 @@ var AuthService = (function () {
    * @return {boolean} True when a message of its own is set.
    */
   function setLockMessage(text) {
-    var t = String(text ?? '')
-      .replace(/\r\n?/g, '\n')
+    var t = String(text ?? "")
+      .replace(/\r\n?/g, "\n")
       .trim();
     if (!t) {
-      PropertiesService.getScriptProperties().deleteProperty(
-        Constants.PROPS.LOCKED_MESSAGE
-      );
+      PropertiesService.getScriptProperties().deleteProperty(Constants.PROPS.LOCKED_MESSAGE);
       return false;
     }
     Properties.setProp(Constants.PROPS.LOCKED_MESSAGE, t);
@@ -57,7 +55,7 @@ var AuthService = (function () {
    * @return {string} The hash the script stores.
    */
   function pinHash_(pin) {
-    return Crypto.sha256Hex(Properties.pepper() + ':admin:' + pin);
+    return Crypto.sha256Hex(Properties.pepper() + ":admin:" + pin);
   }
 
   /**
@@ -82,7 +80,7 @@ var AuthService = (function () {
    *     now, and when they are forgotten.
    */
   function readFails_(cache, key) {
-    var parts = (cache.get(key) || '0').split('|');
+    var parts = (cache.get(key) || "0").split("|");
     return { count: parseInt(parts[0], 10), untilMs: Number(parts[1]) || 0 };
   }
 
@@ -96,7 +94,7 @@ var AuthService = (function () {
    */
   function countFail_(cache, key, count) {
     var untilMs = Date.now() + ADMIN_LOCK_SECONDS * MS_PER_SECOND_;
-    cache.put(key, count + '|' + untilMs, ADMIN_LOCK_SECONDS);
+    cache.put(key, count + "|" + untilMs, ADMIN_LOCK_SECONDS);
     return { count, untilMs };
   }
 
@@ -109,26 +107,23 @@ var AuthService = (function () {
    * @throws {ApiError} `device_locked` for a trusted device, else `locked`.
    */
   function failLocked_(device, untilMs) {
-    var seconds = Math.max(
-      0,
-      Math.ceil((untilMs - Date.now()) / MS_PER_SECOND_)
-    );
+    var seconds = Math.max(0, Math.ceil((untilMs - Date.now()) / MS_PER_SECOND_));
     var details = { seconds, until: new Date(untilMs).toISOString() };
     var left = Time.clockText(seconds);
     if (device) {
       ApiError.fail(
-        'device_locked',
-        'Too many wrong PINs on this device. Try again in ' +
+        "device_locked",
+        "Too many wrong PINs on this device. Try again in " +
           left +
-          ', or unlock the admin page from the Forms Platform menu in the ' +
-          'sheet.',
-        details
+          ", or unlock the admin page from the Forms Platform menu in the " +
+          "sheet.",
+        details,
       );
     }
     ApiError.fail(
-      'locked',
-      lockMessage() || 'Too many wrong PINs. Try again in ' + left + '.',
-      details
+      "locked",
+      lockMessage() || "Too many wrong PINs. Try again in " + left + ".",
+      details,
     );
   }
 
@@ -140,12 +135,9 @@ var AuthService = (function () {
    * @return {boolean} True once it is stored.
    */
   function setAdminPin(pin) {
-    var text = String(pin || '').trim();
+    var text = String(pin || "").trim();
     if (text.length < MIN_PIN_LENGTH_) {
-      ApiError.fail(
-        'weak_pin',
-        'The admin PIN needs at least ' + MIN_PIN_LENGTH_ + ' characters.'
-      );
+      ApiError.fail("weak_pin", "The admin PIN needs at least " + MIN_PIN_LENGTH_ + " characters.");
     }
     Properties.setProp(Constants.PROPS.ADMIN_PIN_HASH, pinHash_(text));
     AuthDevices.forgetAll();
@@ -186,10 +178,7 @@ var AuthService = (function () {
   function requireAdmin(req) {
     var stored = Properties.getProp(Constants.PROPS.ADMIN_PIN_HASH);
     if (!stored) {
-      ApiError.fail(
-        'not_configured',
-        'Set the admin PIN from the Forms Platform menu first.'
-      );
+      ApiError.fail("not_configured", "Set the admin PIN from the Forms Platform menu first.");
     }
     return Lock.withLock(function () {
       return checkPin_(req, stored);
@@ -215,7 +204,7 @@ var AuthService = (function () {
     if (!pin || pinHash_(pin) !== stored) {
       fails = countFail_(cache, key, fails.count + 1);
       if (fails.count >= ADMIN_MAX_FAILS) failLocked_(device, fails.untilMs);
-      ApiError.fail('bad_pin', 'That PIN is not correct.');
+      ApiError.fail("bad_pin", "That PIN is not correct.");
     }
     cache.remove(key);
     return true;
@@ -227,6 +216,6 @@ var AuthService = (function () {
     unlockAdmin,
     lockMessage,
     setLockMessage,
-    pinHash: pinHash_
+    pinHash: pinHash_,
   };
 })();

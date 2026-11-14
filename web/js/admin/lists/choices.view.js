@@ -5,7 +5,7 @@
  * is a hidden id, and always with the Arabic name.
  */
 (function (App) {
-  'use strict';
+  "use strict";
 
   var A = App.admin;
   var L = A.lists;
@@ -56,43 +56,43 @@
    */
   function rowTools(p, r, i) {
     return h(
-      'span',
-      { class: 'choice-tools' },
+      "span",
+      { class: "choice-tools" },
       h(
-        'button',
+        "button",
         {
-          type: 'button',
-          class: 'icon-btn sm',
-          'aria-label': 'Move up',
+          type: "button",
+          class: "icon-btn sm",
+          "aria-label": "Move up",
           disabled: i === 0,
-          onclick: move.bind(null, p, i, -1)
+          onclick: move.bind(null, p, i, -1),
         },
-        '↑'
+        "↑",
       ),
       h(
-        'button',
+        "button",
         {
-          type: 'button',
-          class: 'icon-btn sm',
-          'aria-label': 'Move down',
+          type: "button",
+          class: "icon-btn sm",
+          "aria-label": "Move down",
           disabled: i === p.rows.length - 1,
-          onclick: move.bind(null, p, i, 1)
+          onclick: move.bind(null, p, i, 1),
         },
-        '↓'
+        "↓",
       ),
       h(
-        'button',
+        "button",
         {
-          type: 'button',
-          class: 'icon-btn sm danger',
-          name: 'remove-' + i,
-          'aria-label': 'Remove ' + (r.en || r.value || 'this choice'),
+          type: "button",
+          class: "icon-btn sm danger",
+          name: "remove-" + i,
+          "aria-label": "Remove " + (r.en || r.value || "this choice"),
           onclick: function () {
             p.removeRow(i);
-          }
+          },
         },
-        icon('trash', A.ICON_SIZE.MENU)
-      )
+        icon("trash", A.ICON_SIZE.MENU),
+      ),
     );
   }
 
@@ -106,37 +106,37 @@
    * @return {!Element} The row.
    */
   function rowEl(p, r, i) {
-    var what = p.milestones ? 'milestone ' : 'choice ';
+    var what = p.milestones ? "milestone " : "choice ";
     return h(
-      'li',
-      { class: 'choice', dataset: { i: String(i) } },
-      h('span', { class: 'choice-n' }, String(i + 1)),
+      "li",
+      { class: "choice", dataset: { i: String(i) } },
+      h("span", { class: "choice-n" }, String(i + 1)),
       p.milestones
         ? null
-        : A.text(r.value, edit(p, r, 'value'), {
-            class: 'input',
-            name: 'value-' + i,
-            'aria-label': 'Choice ' + (i + 1),
-            dir: 'auto'
+        : A.text(r.value, edit(p, r, "value"), {
+            class: "input",
+            name: "value-" + i,
+            "aria-label": "Choice " + (i + 1),
+            dir: "auto",
           }),
-      A.text(r.en, edit(p, r, 'en'), {
-        class: 'input choice-en',
-        name: 'en-' + i,
-        'aria-label': 'English name of ' + what + (i + 1),
-        placeholder: 'English name',
-        dir: 'ltr'
+      A.text(r.en, edit(p, r, "en"), {
+        class: "input choice-en",
+        name: "en-" + i,
+        "aria-label": "English name of " + what + (i + 1),
+        placeholder: "English name",
+        dir: "ltr",
       }),
       p.withAr
-        ? A.text(r.ar, edit(p, r, 'ar'), {
-            class: 'input choice-ar',
-            name: 'ar-' + i,
-            'aria-label': 'Arabic name of ' + what + (i + 1),
-            placeholder: 'الاسم بالعربية',
-            dir: 'rtl',
-            lang: 'ar'
+        ? A.text(r.ar, edit(p, r, "ar"), {
+            class: "input choice-ar",
+            name: "ar-" + i,
+            "aria-label": "Arabic name of " + what + (i + 1),
+            placeholder: "الاسم بالعربية",
+            dir: "rtl",
+            lang: "ar",
           })
         : null,
-      rowTools(p, r, i)
+      rowTools(p, r, i),
     );
   }
 
@@ -150,21 +150,21 @@
    */
   function chipEl(p, r, i) {
     return h(
-      'li',
-      { class: 'value-chip', dataset: { i: String(i) } },
-      h('span', { dir: 'auto' }, r.value),
+      "li",
+      { class: "value-chip", dataset: { i: String(i) } },
+      h("span", { dir: "auto" }, r.value),
       h(
-        'button',
+        "button",
         {
-          type: 'button',
-          name: 'remove-' + i,
-          'aria-label': 'Remove ' + r.value,
+          type: "button",
+          name: "remove-" + i,
+          "aria-label": "Remove " + r.value,
           onclick: function () {
             p.removeRow(i);
-          }
+          },
         },
-        icon('x', CHIP_ICON)
-      )
+        icon("x", CHIP_ICON),
+      ),
     );
   }
 
@@ -175,19 +175,19 @@
    * @return {!Array<!Element>} The heads and the rows.
    */
   function rowList(p) {
-    var ar = p.withAr && !p.milestones ? ' with-ar' : '';
-    if (p.milestones) ar = ' milestones';
+    var ar = p.withAr && !p.milestones ? " with-ar" : "";
+    if (p.milestones) ar = " milestones";
     return [
       h(
-        'div',
-        { class: 'choice-head' + ar, 'aria-hidden': 'true' },
-        h('span'),
-        p.milestones ? null : h('span', null, 'Choice'),
-        h('span', null, 'English name'),
-        p.withAr ? h('span', null, 'Arabic name') : null,
-        h('span')
+        "div",
+        { class: "choice-head" + ar, "aria-hidden": "true" },
+        h("span"),
+        p.milestones ? null : h("span", null, "Choice"),
+        h("span", null, "English name"),
+        p.withAr ? h("span", null, "Arabic name") : null,
+        h("span"),
       ),
-      h('ol', { class: 'choices' + ar }, p.rows.map(rowEl.bind(null, p)))
+      h("ol", { class: "choices" + ar }, p.rows.map(rowEl.bind(null, p))),
     ];
   }
 
@@ -202,18 +202,18 @@
    */
   function viewSwitch(p, rows) {
     return h(
-      'button',
+      "button",
       {
-        type: 'button',
-        class: 'link-btn',
-        name: rows ? 'short-view' : 'edit-rows',
+        type: "button",
+        class: "link-btn",
+        name: rows ? "short-view" : "edit-rows",
         onclick: function () {
           p.order = !rows;
           p.paintRows();
           p.changed();
-        }
+        },
       },
-      rows ? 'Back to the short view' : 'Rename, reorder or add English names'
+      rows ? "Back to the short view" : "Rename, reorder or add English names",
     );
   }
 
@@ -224,7 +224,7 @@
    * @return {!Element} The editor.
    */
   L.choicesEditor = function (p) {
-    var box = h('div');
+    var box = h("div");
     p.milestones = L.kindOf(p) === ListKind.MILESTONES;
     p.withAr =
       p.milestones ||
@@ -235,21 +235,13 @@
     var shown;
     if (!p.rows.length) {
       shown = h(
-        'div',
-        { class: 'empty' },
-        h(
-          'strong',
-          null,
-          p.milestones ? 'No milestones yet.' : 'No choices yet.'
-        ),
-        ' Add the first one below.'
+        "div",
+        { class: "empty" },
+        h("strong", null, p.milestones ? "No milestones yet." : "No choices yet."),
+        " Add the first one below.",
       );
     } else if (!rows) {
-      shown = h(
-        'ul',
-        { class: 'value-chips' },
-        p.rows.map(chipEl.bind(null, p))
-      );
+      shown = h("ul", { class: "value-chips" }, p.rows.map(chipEl.bind(null, p)));
     } else {
       shown = rowList(p);
     }

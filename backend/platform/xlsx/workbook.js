@@ -17,15 +17,13 @@
 
 var Workbook = (function () {
   /** The namespace of the list of the package's parts. */
-  var NS_TYPES_ =
-    'http://schemas.openxmlformats.org/package/2006/content-types';
+  var NS_TYPES_ = "http://schemas.openxmlformats.org/package/2006/content-types";
 
   /** How the media type of each spreadsheet part starts. */
-  var SPREADSHEET_TYPE_ =
-    'application/vnd.openxmlformats-officedocument.spreadsheetml.';
+  var SPREADSHEET_TYPE_ = "application/vnd.openxmlformats-officedocument.spreadsheetml.";
 
   /** The media type of a list of links. */
-  var RELS_TYPE_ = 'application/vnd.openxmlformats-package.relationships+xml';
+  var RELS_TYPE_ = "application/vnd.openxmlformats-package.relationships+xml";
 
   /** The longest sheet name Excel accepts. */
   var MAX_SHEET_NAME_ = 31;
@@ -38,9 +36,9 @@ var Workbook = (function () {
    * @return {string} The Override element.
    */
   function override_(name, type) {
-    return Xml.element('Override', {
+    return Xml.element("Override", {
       PartName: name,
-      ContentType: SPREADSHEET_TYPE_ + type
+      ContentType: SPREADSHEET_TYPE_ + type,
     });
   }
 
@@ -52,24 +50,21 @@ var Workbook = (function () {
    */
   function contentTypes_(sheets) {
     var parts = sheets.map(function (_s, i) {
-      return override_(
-        '/xl/worksheets/sheet' + (i + 1) + '.xml',
-        'worksheet+xml'
-      );
+      return override_("/xl/worksheets/sheet" + (i + 1) + ".xml", "worksheet+xml");
     });
     return (
       Xml.DECLARATION +
       Xml.element(
-        'Types',
+        "Types",
         { xmlns: NS_TYPES_ },
-        Xml.element('Default', { Extension: 'rels', ContentType: RELS_TYPE_ }) +
-          Xml.element('Default', {
-            Extension: 'xml',
-            ContentType: 'application/xml'
+        Xml.element("Default", { Extension: "rels", ContentType: RELS_TYPE_ }) +
+          Xml.element("Default", {
+            Extension: "xml",
+            ContentType: "application/xml",
           }) +
-          override_('/xl/workbook.xml', 'sheet.main+xml') +
-          override_('/xl/styles.xml', 'styles+xml') +
-          parts.join('')
+          override_("/xl/workbook.xml", "sheet.main+xml") +
+          override_("/xl/styles.xml", "styles+xml") +
+          parts.join(""),
       )
     );
   }
@@ -82,18 +77,18 @@ var Workbook = (function () {
    */
   function workbookPart_(sheets) {
     var items = sheets.map(function (s, i) {
-      return Xml.element('sheet', {
+      return Xml.element("sheet", {
         name: Xml.xmlText(String(s.name).slice(0, MAX_SHEET_NAME_)),
         sheetId: i + 1,
-        'r:id': 'rId' + (i + 1)
+        "r:id": "rId" + (i + 1),
       });
     });
     return (
       Xml.DECLARATION +
       Xml.element(
-        'workbook',
-        { xmlns: Xml.NS.main, 'xmlns:r': Xml.NS.rel },
-        Xml.element('sheets', null, items.join(''))
+        "workbook",
+        { xmlns: Xml.NS.main, "xmlns:r": Xml.NS.rel },
+        Xml.element("sheets", null, items.join("")),
       )
     );
   }
@@ -106,10 +101,10 @@ var Workbook = (function () {
    */
   function workbookRels_(sheets) {
     var items = sheets.map(function (_s, i) {
-      var target = 'worksheets/sheet' + (i + 1) + '.xml';
-      return Xml.relationship(i + 1, 'worksheet', target);
+      var target = "worksheets/sheet" + (i + 1) + ".xml";
+      return Xml.relationship(i + 1, "worksheet", target);
     });
-    items.push(Xml.relationship(sheets.length + 1, 'styles', 'styles.xml'));
+    items.push(Xml.relationship(sheets.length + 1, "styles", "styles.xml"));
     return Xml.relationships(items);
   }
 
@@ -130,27 +125,23 @@ var Workbook = (function () {
      * @param {string} text Its XML.
      */
     function add(path, text) {
-      files.push(Utilities.newBlob(text, 'application/xml', path));
+      files.push(Utilities.newBlob(text, "application/xml", path));
     }
-    add('[Content_Types].xml', contentTypes_(sheets));
+    add("[Content_Types].xml", contentTypes_(sheets));
     add(
-      '_rels/.rels',
-      Xml.relationships([
-        Xml.relationship(1, 'officeDocument', 'xl/workbook.xml')
-      ])
+      "_rels/.rels",
+      Xml.relationships([Xml.relationship(1, "officeDocument", "xl/workbook.xml")]),
     );
-    add('xl/workbook.xml', workbookPart_(sheets));
-    add('xl/_rels/workbook.xml.rels', workbookRels_(sheets));
-    add('xl/styles.xml', StyleSheet.write(styles || []));
+    add("xl/workbook.xml", workbookPart_(sheets));
+    add("xl/_rels/workbook.xml.rels", workbookRels_(sheets));
+    add("xl/styles.xml", StyleSheet.write(styles || []));
     sheets.forEach(function (s, i) {
       var out = Worksheet.write(s);
-      var file = 'sheet' + (i + 1) + '.xml';
-      add('xl/worksheets/' + file, out.xml);
-      if (out.rels) add('xl/worksheets/_rels/' + file + '.rels', out.rels);
+      var file = "sheet" + (i + 1) + ".xml";
+      add("xl/worksheets/" + file, out.xml);
+      if (out.rels) add("xl/worksheets/_rels/" + file + ".rels", out.rels);
     });
-    return Utilities.zip(files, name).setContentType(
-      SPREADSHEET_TYPE_ + 'sheet'
-    );
+    return Utilities.zip(files, name).setContentType(SPREADSHEET_TYPE_ + "sheet");
   }
 
   return { xlsxBlob: xlsxBlob_ };

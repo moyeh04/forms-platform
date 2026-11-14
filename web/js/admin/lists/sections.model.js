@@ -4,7 +4,7 @@
  * group goes, and the kinds, letters and years a new group can pick.
  */
 (function (App) {
-  'use strict';
+  "use strict";
 
   var A = App.admin;
   var L = A.lists;
@@ -14,7 +14,7 @@
    * section list already uses. (A level counts from 0, but a section is
    * named by the year.) The kinds and the letters come from the lists.
    */
-  var YEARS = ['1', '2', '3', '4', '5'];
+  var YEARS = ["1", "2", "3", "4", "5"];
 
   /**
    * Adds a value read from a section to its group and kind.
@@ -23,16 +23,16 @@
    * @param {!Array<string>} m The parts: group, kind and number.
    */
   function addValue(groups, m) {
-    var g = groups.filter(function (x) {
+    var g = groups.find(function (x) {
       return x.name === m[1];
-    })[0];
+    });
     if (!g) {
       g = { name: m[1], kinds: [] };
       groups.push(g);
     }
-    var k = g.kinds.filter(function (x) {
+    var k = g.kinds.find(function (x) {
       return x.code === m[2];
-    })[0];
+    });
     if (!k) {
       k = { code: m[2], count: 0, nums: [] };
       g.kinds.push(k);
@@ -61,7 +61,7 @@
         k.count = k.nums.length;
       } else {
         k.nums.forEach(function (n) {
-          extras.push(g.name + '-' + k.code + n);
+          extras.push(g.name + "-" + k.code + n);
         });
         k.count = 0;
       }
@@ -97,7 +97,7 @@
       groups: groups.filter(function (g) {
         return g.kinds.length;
       }),
-      extras: extras
+      extras: extras,
     };
   };
 
@@ -112,13 +112,13 @@
     s.groups.forEach(function (g) {
       g.kinds.forEach(function (k) {
         var n;
-        for (n = 1; n <= k.count; n++) out.push(g.name + '-' + k.code + n);
+        for (n = 1; n <= k.count; n++) out.push(g.name + "-" + k.code + n);
       });
     });
     return out.concat(
       s.extras.filter(function (v) {
         return out.indexOf(v) === -1;
-      })
+      }),
     );
   };
 
@@ -145,12 +145,10 @@
     var p = L.groupParts(name);
     var q;
     var i;
-    for (i = 0; p && i < groups.length; i++) {
+    if (!p) return groups.length;
+    for (i = 0; i < groups.length; i++) {
       q = L.groupParts(groups[i].name);
-      if (
-        q &&
-        (+q.year > +p.year || (q.year === p.year && q.letter > p.letter))
-      ) {
+      if (q && (+q.year > +p.year || (q.year === p.year && q.letter > p.letter))) {
         return i;
       }
     }
@@ -166,8 +164,8 @@
    * @return {string} The code.
    */
   L.cleanCode = function (v, max) {
-    return String(v || '')
-      .replace(/[^A-Za-z]/g, '')
+    return String(v || "")
+      .replace(/[^A-Za-z]/g, "")
       .toUpperCase()
       .slice(0, max);
   };
@@ -224,8 +222,8 @@
           L.readSections(
             (p.lists[k] || []).map(function (o) {
               return String(o.value);
-            })
-          ).groups
+            }),
+          ).groups,
         );
       }
     });
@@ -244,11 +242,11 @@
    * @return {string} The reason, or ''.
    */
   L.newKindProblem = function (code, known) {
-    if (!code) return 'Type the letters of the kind, such as TH.';
+    if (!code) return "Type the letters of the kind, such as TH.";
     return known.some(function (k) {
       return k.toUpperCase() === code;
     })
-      ? code + ' is already a kind.'
-      : '';
+      ? code + " is already a kind."
+      : "";
   };
 })(window.App);

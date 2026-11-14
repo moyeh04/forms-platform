@@ -4,7 +4,7 @@
  * type has.
  */
 (function (App) {
-  'use strict';
+  "use strict";
 
   var A = App.admin;
   var R = A.responses;
@@ -23,15 +23,15 @@
    */
   function toolButton(iconName, text, onclick, name) {
     return h(
-      'button',
+      "button",
       {
-        type: 'button',
-        class: 'btn btn-quiet sm',
+        type: "button",
+        class: "btn btn-quiet sm",
         name: name,
-        onclick: onclick
+        onclick: onclick,
       },
       icon(iconName, A.ICON_SIZE.LINE),
-      text
+      text,
     );
   }
 
@@ -42,30 +42,30 @@
    * @return {!Array<!Element>} The two controls.
    */
   function filters(p) {
-    var search = h('input', {
-      class: 'input',
-      type: 'search',
-      name: 'search',
-      placeholder: 'Search name, code, phone, project',
-      'aria-label': 'Search',
+    var search = h("input", {
+      class: "input",
+      type: "search",
+      name: "search",
+      placeholder: "Search name, code, phone, project",
+      "aria-label": "Search",
       oninput: function (e) {
         p.state.q = e.target.value;
         p.paint();
-      }
+      },
     });
     var statusSel = A.select(
-      'all',
-      [['all', 'All statuses']].concat(
+      "all",
+      [["all", "All statuses"]].concat(
         A.SUB_STATUSES.map(function (s) {
           return [s, A.SUB_LABEL[s]];
-        })
+        }),
       ),
       function (v) {
         p.state.status = v;
         p.paint();
-      }
+      },
     );
-    statusSel.setAttribute('aria-label', 'Filter by status');
+    statusSel.setAttribute("aria-label", "Filter by status");
     return [search, statusSel];
   }
 
@@ -80,26 +80,24 @@
     var form = p.form;
     var tools = [
       toolButton(
-        'printer',
-        'Print team list',
+        "printer",
+        "Print team list",
         function (e) {
-          R.printOut(e.currentTarget, 'admin.print.teamList', form);
+          R.printOut(e.currentTarget, "admin.print.teamList", form);
         },
-        'printTeams'
-      )
+        "printTeams",
+      ),
     ];
     if (p.all.length) {
       tools.push(
         toolButton(
-          'download',
-          form.type === FormType.TASK_SUBMISSION
-            ? 'Download all tasks'
-            : 'Download all projects',
+          "download",
+          form.type === FormType.TASK_SUBMISSION ? "Download all tasks" : "Download all projects",
           function () {
             A.downloadAll(form);
           },
-          'download-all'
-        )
+          "download-all",
+        ),
       );
     }
     return tools;
@@ -123,28 +121,28 @@
       }),
       function (v) {
         choice.dayId = v;
-      }
+      },
     );
-    daySel.setAttribute('aria-label', 'Day to print');
+    daySel.setAttribute("aria-label", "Day to print");
     return h(
-      'div',
-      { class: 'tool-group', role: 'group', 'aria-label': 'Print a day sheet' },
-      h('span', { class: 'tool-label' }, 'Day sheet'),
+      "div",
+      { class: "tool-group", role: "group", "aria-label": "Print a day sheet" },
+      h("span", { class: "tool-label" }, "Day sheet"),
       daySel,
-      A.check('Include empty slots', false, function (v) {
+      A.check("Include empty slots", false, function (v) {
         choice.includeEmpty = v;
       }),
       toolButton(
-        'printer',
-        'Print this day',
+        "printer",
+        "Print this day",
         function (e) {
-          R.printOut(e.currentTarget, 'admin.print.reservations', form, {
+          R.printOut(e.currentTarget, "admin.print.reservations", form, {
             dayId: choice.dayId,
-            includeEmpty: choice.includeEmpty
+            includeEmpty: choice.includeEmpty,
           });
         },
-        'printDay'
-      )
+        "printDay",
+      ),
     );
   }
 
@@ -159,15 +157,12 @@
     var form = p.form;
     var days = form.slots?.days || [];
     var tools = filters(p).concat([
-      toolButton('refresh', 'Refresh', p.reload),
-      toolButton('download', 'Download CSV', function () {
+      toolButton("refresh", "Refresh", p.reload),
+      toolButton("download", "Download CSV", function () {
         R.downloadCsv(form, p.filtered());
-      })
+      }),
     ]);
-    if (
-      form.type === FormType.TEAM_REGISTRATION ||
-      form.type === FormType.TASK_SUBMISSION
-    ) {
+    if (form.type === FormType.TEAM_REGISTRATION || form.type === FormType.TASK_SUBMISSION) {
       tools = tools.concat(teamTools(p));
     }
     if (Rules.progressOn(form)) {
@@ -176,14 +171,14 @@
           p.state.view = v;
           p.toolbar.replaceWith(R.toolbar(p));
           p.paint();
-        })
+        }),
       );
     }
     // A day sheet needs a day: a reservation with no days has nothing to print.
     if (form.type === FormType.RESERVATION && days.length) {
       tools.push(daySheet(form, days));
     }
-    p.toolbar = h('div', { class: 'toolbar' }, tools);
+    p.toolbar = h("div", { class: "toolbar" }, tools);
     return p.toolbar;
   };
 })(window.App);

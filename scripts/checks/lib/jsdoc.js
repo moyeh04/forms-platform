@@ -10,11 +10,11 @@
  */
 function splitType(text) {
   const trimmed = text.trimStart();
-  if (!trimmed.startsWith('{')) return { type: null, rest: trimmed };
+  if (!trimmed.startsWith("{")) return { type: null, rest: trimmed };
   let depth = 0;
   for (let i = 0; i < trimmed.length; i++) {
-    if (trimmed[i] === '{') depth++;
-    if (trimmed[i] === '}') depth--;
+    if (trimmed[i] === "{") depth++;
+    if (trimmed[i] === "}") depth--;
     if (depth === 0) {
       return { type: trimmed.slice(1, i), rest: trimmed.slice(i + 1).trim() };
     }
@@ -30,9 +30,9 @@ function splitType(text) {
  */
 function lines(value) {
   return value
-    .replace(/^\*/, '')
-    .split('\n')
-    .map((line) => line.replace(/^\s*\*?\s?/, '').trimEnd());
+    .replace(/^\*/, "")
+    .split("\n")
+    .map((line) => line.replace(/^\s*\*?\s?/, "").trimEnd());
 }
 
 /**
@@ -46,9 +46,9 @@ function lines(value) {
 function readTag(text) {
   const [, tag, after] = /^@(\w+)\s*([\s\S]*)$/.exec(text);
   const { type, rest } = splitType(after);
-  if (tag !== 'param') return { tag, type, name: '', text: rest };
-  const [, name = '', said = ''] = /^(\S*)\s*([\s\S]*)$/.exec(rest);
-  return { tag, type, name: name.replace(/^\[|\]$|=.*$/g, ''), text: said };
+  if (tag !== "param") return { tag, type, name: "", text: rest };
+  const [, name = "", said = ""] = /^(\S*)\s*([\s\S]*)$/.exec(rest);
+  return { tag, type, name: name.replace(/^\[|\]$|=.*$/g, ""), text: said };
 }
 
 /**
@@ -63,11 +63,11 @@ function readDoc(value) {
   const summary = [];
   const tags = [];
   for (const line of lines(value)) {
-    if (line.startsWith('@')) tags.push(line);
+    if (line.startsWith("@")) tags.push(line);
     else if (tags.length) tags[tags.length - 1] += ` ${line}`;
     else summary.push(line);
   }
-  return { summary: summary.join(' ').trim(), tags: tags.map(readTag) };
+  return { summary: summary.join(" ").trim(), tags: tags.map(readTag) };
 }
 
 module.exports = { readDoc };

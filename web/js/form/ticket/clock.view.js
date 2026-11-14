@@ -5,7 +5,7 @@
  * clock-hands.view.js.
  */
 (function (App) {
-  'use strict';
+  "use strict";
 
   var T = App.ticket;
   var C = T.COLORS;
@@ -18,17 +18,17 @@
     LINE: 2.6,
     SHADE_FROM: 63,
     SHADE_DROP: 8,
-    SHADE: 'a63 63 0 0 0 126 0a52 52 0 0 1-126 0z',
-    SHADE_OPACITY: '.45',
+    SHADE: "a63 63 0 0 0 126 0a52 52 0 0 1-126 0z",
+    SHADE_OPACITY: ".45",
     SHINE_RADIUS: 59,
     SHINE_FROM: 290,
     SHINE_TO: 340,
     SHINE_LINE: 2.6,
-    SHINE_OPACITY: '.85',
+    SHINE_OPACITY: ".85",
     GRAIN_LINE: 1.3,
-    GRAIN_OPACITY: '.7',
+    GRAIN_OPACITY: ".7",
     SHADOW_Y: 178,
-    SHADOW_HALF_WIDTH: 62
+    SHADOW_HALF_WIDTH: 62,
   };
 
   /** The lines of grain on the wood: a radius and the angles it runs. */
@@ -38,7 +38,7 @@
     { R: 60, FROM: 20, TO: 70 },
     { R: 57, FROM: 110, TO: 160 },
     { R: 62, FROM: 150, TO: 185 },
-    { R: 56, FROM: 220, TO: 245 }
+    { R: 56, FROM: 220, TO: 245 },
   ];
 
   /** The rings of the gold rim and the paper face, outside in. */
@@ -47,11 +47,11 @@
     GOLD_LINE: 2.2,
     SHINE: 50,
     SHINE_LINE: 1.2,
-    SHINE_OPACITY: '.9',
+    SHINE_OPACITY: ".9",
     FACE: 47,
     FACE_LINE: 1.8,
     INNER: 45.3,
-    INNER_LINE: 2
+    INNER_LINE: 2,
   };
 
   /** The hour marks, between the numbers. */
@@ -63,11 +63,11 @@
     { HOUR: 12, AT: 0 },
     { HOUR: 3, AT: 90 },
     { HOUR: 6, AT: 180 },
-    { HOUR: 9, AT: 270 }
+    { HOUR: 9, AT: 270 },
   ];
   var NUMERAL_FONT =
     ' text-anchor="middle"' +
-    ' font-family="Georgia, \'Times New Roman\', serif"' +
+    " font-family=\"Georgia, 'Times New Roman', serif\"" +
     ' font-weight="700" font-size="14"';
 
   /** The pin in the middle, and the brass knobs round the ring. */
@@ -96,20 +96,7 @@
   function arcAround(r, from, to) {
     var a = at(r, from);
     var b = at(r, to);
-    return (
-      'M' +
-      a[0] +
-      ' ' +
-      a[1] +
-      'A' +
-      r +
-      ' ' +
-      r +
-      ' 0 0 1 ' +
-      b[0] +
-      ' ' +
-      b[1]
-    );
+    return "M" + a[0] + " " + a[1] + "A" + r + " " + r + " 0 0 1 " + b[0] + " " + b[1];
   }
 
   /**
@@ -120,10 +107,7 @@
    * @return {string} The markup.
    */
   function ringOf(r, paint) {
-    return T.el(
-      'circle',
-      Object.assign({ cx: CENTRE.X, cy: CENTRE.Y, r: r }, paint)
-    );
+    return T.el("circle", Object.assign({ cx: CENTRE.X, cy: CENTRE.Y, r: r }, paint));
   }
 
   /**
@@ -133,13 +117,13 @@
    */
   function grain() {
     return GRAIN.map(function (g) {
-      return T.path(arcAround(g.R, g.FROM, g.TO), 'none', {
+      return T.path(arcAround(g.R, g.FROM, g.TO), "none", {
         stroke: C.woodDark,
-        'stroke-width': WOOD.GRAIN_LINE,
-        'stroke-linecap': 'round',
-        opacity: WOOD.GRAIN_OPACITY
+        "stroke-width": WOOD.GRAIN_LINE,
+        "stroke-linecap": "round",
+        opacity: WOOD.GRAIN_OPACITY,
       });
-    }).join('');
+    }).join("");
   }
 
   /**
@@ -150,25 +134,21 @@
    */
   function wood() {
     var shade =
-      'M' +
-      (CENTRE.X - WOOD.SHADE_FROM) +
-      ' ' +
-      (CENTRE.Y + WOOD.SHADE_DROP) +
-      WOOD.SHADE;
+      "M" + (CENTRE.X - WOOD.SHADE_FROM) + " " + (CENTRE.Y + WOOD.SHADE_DROP) + WOOD.SHADE;
     var shine = arcAround(WOOD.SHINE_RADIUS, WOOD.SHINE_FROM, WOOD.SHINE_TO);
     return (
       ringOf(WOOD.RADIUS, {
         fill: C.wood,
         stroke: C.line,
-        'stroke-width': WOOD.LINE
+        "stroke-width": WOOD.LINE,
       }) +
       T.path(shade, C.woodDark, { opacity: WOOD.SHADE_OPACITY }) +
       grain() +
-      T.path(shine, 'none', {
+      T.path(shine, "none", {
         stroke: C.woodLight,
-        'stroke-width': WOOD.SHINE_LINE,
-        'stroke-linecap': 'round',
-        opacity: WOOD.SHINE_OPACITY
+        "stroke-width": WOOD.SHINE_LINE,
+        "stroke-linecap": "round",
+        opacity: WOOD.SHINE_OPACITY,
       })
     );
   }
@@ -183,23 +163,23 @@
       ringOf(RIM.GOLD, {
         fill: C.gold,
         stroke: C.line,
-        'stroke-width': RIM.GOLD_LINE
+        "stroke-width": RIM.GOLD_LINE,
       }) +
       ringOf(RIM.SHINE, {
-        fill: 'none',
+        fill: "none",
         stroke: C.goldLight,
-        'stroke-width': RIM.SHINE_LINE,
-        opacity: RIM.SHINE_OPACITY
+        "stroke-width": RIM.SHINE_LINE,
+        opacity: RIM.SHINE_OPACITY,
       }) +
       ringOf(RIM.FACE, {
         fill: C.face,
         stroke: C.line,
-        'stroke-width': RIM.FACE_LINE
+        "stroke-width": RIM.FACE_LINE,
       }) +
       ringOf(RIM.INNER, {
-        fill: 'none',
+        fill: "none",
         stroke: C.faceRing,
-        'stroke-width': RIM.INNER_LINE
+        "stroke-width": RIM.INNER_LINE,
       })
     );
   }
@@ -210,21 +190,21 @@
    * @return {string} The markup.
    */
   function marks() {
-    var out = '';
+    var out = "";
     var a;
     var b;
     for (let hr = 1; hr < DIAL.HOURS; hr++) {
       if (hr % MARK.NUMBER_EVERY === 0) continue;
       a = at(MARK.FROM, hr * DIAL.PER_HOUR);
       b = at(MARK.TO, hr * DIAL.PER_HOUR);
-      out += T.el('line', {
+      out += T.el("line", {
         x1: a[0],
         y1: a[1],
         x2: b[0],
         y2: b[1],
         stroke: C.line,
-        'stroke-width': MARK.LINE,
-        'stroke-linecap': 'round'
+        "stroke-width": MARK.LINE,
+        "stroke-linecap": "round",
       });
     }
     return out;
@@ -250,9 +230,9 @@
         C.line +
         '">' +
         n.HOUR +
-        '</text>'
+        "</text>"
       );
-    }).join('');
+    }).join("");
   }
 
   /**
@@ -267,13 +247,13 @@
       ringOf(PIN.RADIUS, {
         fill: C.gold,
         stroke: C.line,
-        'stroke-width': PIN.LINE
+        "stroke-width": PIN.LINE,
       }) +
-      T.el('circle', {
+      T.el("circle", {
         cx: x - PIN.SHINE_AT,
         cy: y - PIN.SHINE_AT,
         r: PIN.SHINE,
-        fill: C.goldLight
+        fill: C.goldLight,
       }) +
       T.knob(x, y - KNOBS.UPRIGHT, KNOBS.BIG, true) +
       T.knob(x, y + KNOBS.UPRIGHT, KNOBS.BIG) +
@@ -292,7 +272,7 @@
   function clockArt(hands, arc) {
     return (
       T.shadow(CENTRE.X, WOOD.SHADOW_Y, WOOD.SHADOW_HALF_WIDTH) +
-      '<g>' +
+      "<g>" +
       wood() +
       face() +
       T.sliceArt(arc) +
@@ -301,7 +281,7 @@
       T.arrowArt(arc) +
       T.handsArt(hands) +
       pinAndKnobs() +
-      '</g>'
+      "</g>"
     );
   }
 

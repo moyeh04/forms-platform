@@ -13,11 +13,10 @@ const ID_PATTERN = /^[A-Za-z0-9_-]+$/;
  * @throws {Error} When clasp printed none.
  */
 function deploymentId(output) {
-  const match = /([A-Za-z0-9_-]{20,})\s+@\d+/.exec(output || '');
+  const match = /([A-Za-z0-9_-]{20,})\s+@\d+/.exec(output || "");
   if (!match)
     throw new Error(
-      'clasp did not report a deployment ID. Its output was:\n' +
-        (output || '(empty)')
+      "clasp did not report a deployment ID. Its output was:\n" + (output || "(empty)"),
     );
   return match[1];
 }
@@ -32,25 +31,19 @@ function deploymentId(output) {
  * @throws {Error} When clasp printed no Script ID.
  */
 function createdProject(output) {
-  const text = output || '';
+  const text = output || "";
   let created = {};
   try {
-    created = JSON.parse(
-      text.slice(text.indexOf('{'), text.lastIndexOf('}') + 1)
-    );
-  } catch (_) {
+    created = JSON.parse(text.slice(text.indexOf("{"), text.lastIndexOf("}") + 1));
+  } catch {
     /* reported below */
   }
-  if (!ID_PATTERN.test(created.scriptId || '')) {
-    throw new Error(
-      'clasp did not report a Script ID. Its output was:\n' +
-        (text || '(empty)')
-    );
+  if (!ID_PATTERN.test(created.scriptId || "")) {
+    throw new Error("clasp did not report a Script ID. Its output was:\n" + (text || "(empty)"));
   }
   return {
     scriptId: created.scriptId,
-    sheetUrl:
-      'https://docs.google.com/spreadsheets/d/' + created.parentId + '/edit'
+    sheetUrl: "https://docs.google.com/spreadsheets/d/" + created.parentId + "/edit",
   };
 }
 

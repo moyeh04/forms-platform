@@ -7,7 +7,7 @@ var ListsRepository = (function () {
    * admin made, so the tab keeps its two columns. A key that starts with "_"
    * is never a list.
    */
-  var LIST_INFO_KEY_ = '_info';
+  var LIST_INFO_KEY_ = "_info";
 
   /**
    * The kind of each built-in list; a list an admin made has its kind in
@@ -19,21 +19,21 @@ var ListsRepository = (function () {
     majors: ListKind.NAMED,
     sections: ListKind.SECTIONS,
     groups: ListKind.PLAIN,
-    wa_sections: ListKind.NUMBERS
+    wa_sections: ListKind.NUMBERS,
   };
 
   /** The name each built-in list is shown with. */
   var BUILTIN_LIST_NAMES_ = {
-    levels: 'Levels',
-    curricula: 'Bylaws',
-    majors: 'Majors',
-    sections: 'Sections',
-    groups: 'Groups',
-    wa_sections: 'WhatsApp section numbers'
+    levels: "Levels",
+    curricula: "Bylaws",
+    majors: "Majors",
+    sections: "Sections",
+    groups: "Groups",
+    wa_sections: "WhatsApp section numbers",
   };
 
   /** The columns of the Lists tab. */
-  var COLS_ = ['key', 'values'];
+  var COLS_ = ["key", "values"];
 
   /**
    * Opens the Lists tab of the registry.
@@ -62,8 +62,7 @@ var ListsRepository = (function () {
   function readLists() {
     var out = {};
     listRows_().forEach(function (r) {
-      if (String(r.key).charAt(0) !== '_')
-        out[r.key] = Json.parseJson(r.values, []);
+      if (String(r.key).charAt(0) !== "_") out[r.key] = Json.parseJson(r.values, []);
     });
     return out;
   }
@@ -74,9 +73,9 @@ var ListsRepository = (function () {
    * @return {!Object<string, {name: string, kind: string}>} The info by key.
    */
   function readListInfo() {
-    var row = listRows_().filter(function (r) {
+    var row = listRows_().find(function (r) {
       return r.key === LIST_INFO_KEY_;
-    })[0];
+    });
     return row ? Json.parseJson(row.values, {}) : {};
   }
 
@@ -88,7 +87,7 @@ var ListsRepository = (function () {
    * @return {string} The kind; `plain` when nothing names one.
    */
   function listKind_(key, info) {
-    return info?.[key]?.kind || BUILTIN_LIST_KINDS_[key] || 'plain';
+    return info?.[key]?.kind || BUILTIN_LIST_KINDS_[key] || "plain";
   }
 
   /**
@@ -99,9 +98,9 @@ var ListsRepository = (function () {
    */
   function writeListRow_(key, json) {
     var sh = listsSheet_();
-    var row = Table.readTable(sh, COLS_).filter(function (r) {
+    var row = Table.readTable(sh, COLS_).find(function (r) {
       return r.key === key;
-    })[0];
+    });
     if (row) Table.writeRow(sh, row._row, COLS_, { key: key, values: json });
     else Table.appendPlain(sh, [key, json]);
   }
@@ -132,9 +131,9 @@ var ListsRepository = (function () {
    */
   function deleteList_(key) {
     var sh = listsSheet_();
-    var row = Table.readTable(sh, COLS_).filter(function (r) {
+    var row = Table.readTable(sh, COLS_).find(function (r) {
       return r.key === key;
-    })[0];
+    });
     if (row) sh.deleteRow(row._row);
     var info = readListInfo();
     delete info[key];
@@ -175,6 +174,6 @@ var ListsRepository = (function () {
     BUILTIN_LIST_KINDS: BUILTIN_LIST_KINDS_,
     saveListInfo: saveListInfo_,
     formsUsingList: formsUsingList_,
-    deleteList: deleteList_
+    deleteList: deleteList_,
   };
 })();

@@ -34,12 +34,11 @@ var ClientsLinks = (function () {
    * @throws {ApiError} `name_required` when it has no name.
    */
   function createLink_(req) {
-    var name = String(req.name || '').trim();
-    if (!name)
-      ApiError.fail('name_required', 'Give this person or group a name.');
+    var name = String(req.name || "").trim();
+    if (!name) ApiError.fail("name_required", "Give this person or group a name.");
     var token = ClientsService.newToken();
     var c = {
-      id: Crypto.shortId('c_'),
+      id: Crypto.shortId("c_"),
       name: name,
       tokenHash: ClientsService.clientToken(token),
       forms: ClientsService.cleanClientForms(req.forms),
@@ -49,9 +48,9 @@ var ClientsLinks = (function () {
       progress: ClientsRepository.progressAccess(req.progress),
       active: true,
       createdAt: Time.nowIso(),
-      expires: ClientsService.cleanExpiry(req.expires)
+      expires: ClientsService.cleanExpiry(req.expires),
     };
-    var key = req.withKey === false ? '' : ClientsService.newClientKey();
+    var key = req.withKey === false ? "" : ClientsService.newClientKey();
     ClientsService.setClientKey(c, key);
     Lock.withLock(function () {
       ClientsRepository.saveClient(c);
@@ -59,7 +58,7 @@ var ClientsLinks = (function () {
     return {
       client: ClientsService.publicClient(c),
       token: token,
-      accessKey: key
+      accessKey: key,
     };
   }
 
@@ -70,19 +69,15 @@ var ClientsLinks = (function () {
    * @param {!Object} p The change.
    */
   function applyPatch_(c, p) {
-    var flags = ['canReview', 'showSizeAlerts', 'active'];
+    var flags = ["canReview", "showSizeAlerts", "active"];
     if (p.name !== undefined) c.name = String(p.name).trim() || c.name;
-    if (p.forms !== undefined)
-      c.forms = ClientsService.cleanClientForms(p.forms);
-    if (p.hiddenColumns !== undefined)
-      c.hiddenColumns = hiddenColumnsOf_(p.hiddenColumns);
+    if (p.forms !== undefined) c.forms = ClientsService.cleanClientForms(p.forms);
+    if (p.hiddenColumns !== undefined) c.hiddenColumns = hiddenColumnsOf_(p.hiddenColumns);
     flags.forEach(function (k) {
       if (p[k] !== undefined) c[k] = !!p[k];
     });
-    if (p.expires !== undefined)
-      c.expires = ClientsService.cleanExpiry(p.expires);
-    if (p.progress !== undefined)
-      c.progress = ClientsRepository.progressAccess(p.progress);
+    if (p.expires !== undefined) c.expires = ClientsService.cleanExpiry(p.expires);
+    if (p.progress !== undefined) c.progress = ClientsRepository.progressAccess(p.progress);
   }
 
   /**
@@ -123,12 +118,10 @@ var ClientsLinks = (function () {
    * @return {{client: !Object, accessKey: string}} The link and its key.
    */
   function setLinkKey_(id, on) {
-    var key = on ? ClientsService.newClientKey() : '';
+    var key = on ? ClientsService.newClientKey() : "";
     return ClientsRepository.changeClient(id, function (c) {
       ClientsService.setClientKey(c, key);
-      CacheService.getScriptCache().remove(
-        Constants.CACHE.CLIENT_KEY_PREFIX + c.id
-      );
+      CacheService.getScriptCache().remove(Constants.CACHE.CLIENT_KEY_PREFIX + c.id);
       return { client: ClientsService.publicClient(c), accessKey: key };
     });
   }
@@ -141,10 +134,10 @@ var ClientsLinks = (function () {
    * @throws {ApiError} `client_not_found` when there is none.
    */
   function requireLink_(id) {
-    var c = ClientsRepository.readClients().filter(function (x) {
+    var c = ClientsRepository.readClients().find(function (x) {
       return x.id === id;
-    })[0];
-    if (!c) ApiError.fail('client_not_found', 'That client does not exist.');
+    });
+    if (!c) ApiError.fail("client_not_found", "That client does not exist.");
     return c;
   }
 
@@ -159,18 +152,16 @@ var ClientsLinks = (function () {
    */
   function shownKey_(id) {
     var c = requireLink_(id);
-    if (!c.keyHash)
-      ApiError.fail('no_key', 'This link does not ask for a key.');
+    if (!c.keyHash) ApiError.fail("no_key", "This link does not ask for a key.");
     var key = Crypto.unsealDigits(
       ClientsService.clientKeyPad(c),
       c.keySeal,
-      ClientsService.KEY_DIGITS
+      ClientsService.KEY_DIGITS,
     );
     if (!key || ClientsService.clientKeyHash(c, key) !== c.keyHash)
       ApiError.fail(
-        'key_unknown',
-        'This key was made before keys could be shown. ' +
-          'Make a new key to see it.'
+        "key_unknown",
+        "This key was made before keys could be shown. Make a new key to see it.",
       );
     return key;
   }
@@ -194,6 +185,6 @@ var ClientsLinks = (function () {
     renewLink: renewLink_,
     setLinkKey: setLinkKey_,
     shownKey: shownKey_,
-    removeLink: removeLink_
+    removeLink: removeLink_,
   };
 })();

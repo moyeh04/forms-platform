@@ -4,7 +4,7 @@
  * typed: the reason a save is refused, the marked row and the index.
  */
 (function (App) {
-  'use strict';
+  "use strict";
 
   var A = App.admin;
   var L = A.lists;
@@ -21,23 +21,22 @@
     if (L.problem(p).text) {
       L.changed(p);
       if (p.problemBox.scrollIntoView) {
-        p.problemBox.scrollIntoView({ block: 'center' });
+        p.problemBox.scrollIntoView({ block: "center" });
       }
       return;
     }
-    var out = await A.call('admin.lists.set', {
+    var out = await A.call("admin.lists.set", {
       key: p.key,
-      values: L.fromRows(p.rows, L.kindOf(p))
+      values: L.fromRows(p.rows, L.kindOf(p)),
     });
     p.lists = out.lists;
     p.info = out.info || p.info;
     L.load(p, p.key);
     ui.toast(
       L.kindOf(p) === ListKind.MILESTONES
-        ? L.nameOf(p) + ' saved. A form picks the change up in Setup.'
-        : L.nameOf(p) +
-            ' saved. Every form that uses it shows the new choices.',
-      'ok'
+        ? L.nameOf(p) + " saved. A form picks the change up in Setup."
+        : L.nameOf(p) + " saved. Every form that uses it shows the new choices.",
+      "ok",
     );
     p.paint();
   }
@@ -50,34 +49,34 @@
    * @return {!Element} The bar, hidden until there is a change.
    */
   L.saveBar = function (p) {
-    p.barNote = h('span', { class: 'savebar-note', role: 'status' });
-    p.barWarn = h('span', { class: 'savebar-warn' });
-    p.saveBtn = h('button', {
-      type: 'button',
-      class: 'btn btn-primary',
-      name: 'save-list',
+    p.barNote = h("span", { class: "savebar-note", role: "status" });
+    p.barWarn = h("span", { class: "savebar-warn" });
+    p.saveBtn = h("button", {
+      type: "button",
+      class: "btn btn-primary",
+      name: "save-list",
       onclick: function () {
         A.busy(p.saveBtn, save.bind(null, p));
-      }
+      },
     });
     return h(
-      'div',
-      { class: 'savebar', hidden: true },
-      h('span', { class: 'savebar-text' }, p.barNote, p.barWarn),
+      "div",
+      { class: "savebar", hidden: true },
+      h("span", { class: "savebar-text" }, p.barNote, p.barWarn),
       h(
-        'button',
+        "button",
         {
-          type: 'button',
-          class: 'btn btn-quiet',
-          name: 'discard',
+          type: "button",
+          class: "btn btn-quiet",
+          name: "discard",
           onclick: function () {
             L.load(p, p.key);
             p.paint();
-          }
+          },
         },
-        'Discard'
+        "Discard",
       ),
-      p.saveBtn
+      p.saveBtn,
     );
   };
 
@@ -88,17 +87,17 @@
    */
   function paintNote(p) {
     var c = L.changes(p);
-    p.barNote.textContent = L.nameOf(p) + ': ' + c.text + '. Not saved yet.';
+    p.barNote.textContent = L.nameOf(p) + ": " + c.text + ". Not saved yet.";
     p.barWarn.textContent = c.limited.length
-      ? 'Limited to a removed choice: ' +
+      ? "Limited to a removed choice: " +
         c.limited
           .map(function (f) {
             return f.title;
           })
-          .join(', ') +
-        '.'
-      : '';
-    p.saveBtn.textContent = 'Save ' + L.nameOf(p);
+          .join(", ") +
+        "."
+      : "";
+    p.saveBtn.textContent = "Save " + L.nameOf(p);
   }
 
   /**
@@ -114,12 +113,9 @@
     p.bar.hidden = !isDirty;
     p.problemBox.hidden = !(isDirty && bad.text);
     p.problemBox.textContent = bad.text;
-    Array.prototype.forEach.call(
-      p.rowsBox.querySelectorAll('[data-i]'),
-      function (el) {
-        el.classList.toggle('bad', isDirty && +el.dataset.i === bad.at);
-      }
-    );
+    Array.prototype.forEach.call(p.rowsBox.querySelectorAll("[data-i]"), function (el) {
+      el.classList.toggle("bad", isDirty && +el.dataset.i === bad.at);
+    });
     if (isDirty) paintNote(p);
     L.paintIndex(p);
   };

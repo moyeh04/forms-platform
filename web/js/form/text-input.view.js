@@ -4,7 +4,7 @@
  * pastes.
  */
 (function (App) {
-  'use strict';
+  "use strict";
 
   var P = App.formPage;
   var h = App.ui.h;
@@ -19,20 +19,20 @@
    * is already there.
    */
   var PLACEHOLDERS = {
-    email: 'name@example.com',
-    phone: '01xxxxxxxxx',
-    drive_link: 'https://drive.google.com/...'
+    email: "name@example.com",
+    phone: "01xxxxxxxxx",
+    drive_link: "https://drive.google.com/...",
   };
 
   /** The browser input type of each field type; text otherwise. */
-  var INPUT_TYPES = { email: 'email', phone: 'tel', drive_link: 'url' };
+  var INPUT_TYPES = { email: "email", phone: "tel", drive_link: "url" };
 
   /** The keyboard and autofill hints of each field type. */
   var TYPE_ATTRS = {
-    arabic_name: { lang: 'ar', dir: 'rtl', autocomplete: 'name' },
-    code: { inputmode: 'numeric' },
-    phone: { inputmode: 'tel', autocomplete: 'tel' },
-    email: { inputmode: 'email', autocomplete: 'email', autocapitalize: 'off' }
+    arabic_name: { lang: "ar", dir: "rtl", autocomplete: "name" },
+    code: { inputmode: "numeric" },
+    phone: { inputmode: "tel", autocomplete: "tel" },
+    email: { inputmode: "email", autocomplete: "email", autocapitalize: "off" },
   };
 
   /**
@@ -43,7 +43,7 @@
    */
   function filterArabic(before) {
     var c = Rules.cleanArabicName(before, false);
-    return { after: c.value, message: c.blocked ? t('hintArabic') : '' };
+    return { after: c.value, message: c.blocked ? t("hintArabic") : "" };
   }
 
   /**
@@ -53,8 +53,8 @@
    * @return {{after: string, message: string}} The text and why it changed.
    */
   function filterEnglish(before) {
-    var after = before.replace(ARABIC, '');
-    return { after: after, message: after !== before ? t('hintEnglish') : '' };
+    var after = before.replace(ARABIC, "");
+    return { after: after, message: after !== before ? t("hintEnglish") : "" };
   }
 
   /**
@@ -65,11 +65,11 @@
    * @return {{after: string, message: string}} The text and why it changed.
    */
   function filterCode(before, field) {
-    var digits = Rules.latinDigits(before).replace(/\s+/g, '');
-    var only = digits.replace(/\D/g, '');
+    var digits = Rules.latinDigits(before).replace(/\s+/g, "");
+    var only = digits.replace(/\D/g, "");
     return {
       after: only.slice(0, Rules.codeLength(field)),
-      message: only !== digits ? t('hintDigits') : ''
+      message: only !== digits ? t("hintDigits") : "",
     };
   }
 
@@ -82,8 +82,8 @@
    */
   function filterPhone(before) {
     var d = Rules.latinDigits(before);
-    var after = d.replace(/[^\d+\s\-()]/g, '');
-    return { after: after, message: after !== d ? t('hintDigits') : '' };
+    var after = d.replace(/[^\d+\s\-()]/g, "");
+    return { after: after, message: after !== d ? t("hintDigits") : "" };
   }
 
   /**
@@ -95,16 +95,16 @@
    */
   function filtered(field, before) {
     switch (field.type) {
-      case 'arabic_name':
+      case "arabic_name":
         return filterArabic(before);
-      case 'english_text':
+      case "english_text":
         return filterEnglish(before);
-      case 'code':
+      case "code":
         return filterCode(before, field);
-      case 'phone':
+      case "phone":
         return filterPhone(before);
       default:
-        return { after: before, message: '' };
+        return { after: before, message: "" };
     }
   }
 
@@ -142,7 +142,7 @@
     if (f.after !== before) replaceText(input, before, f.after);
     if (f.message) P.hint(input, f.message);
     P.setVal(path, input.value);
-    if (field.role === 'title') P.paintFolderRule();
+    if (field.role === "title") P.paintFolderRule();
     if (S.errors[path]) {
       delete S.errors[path];
       P.paintError(path);
@@ -161,19 +161,18 @@
     var value = P.getVal(path);
     var attrs = {
       id: id,
-      class: field.type === 'textarea' ? 'textarea' : 'input',
+      class: field.type === "textarea" ? "textarea" : "input",
       name: path,
-      value: value == null ? '' : String(value),
-      'aria-describedby': id + '-help ' + id + '-err',
-      autocomplete: 'off',
-      placeholder: PLACEHOLDERS[field.type] || null
+      value: value == null ? "" : String(value),
+      "aria-describedby": id + "-help " + id + "-err",
+      autocomplete: "off",
+      placeholder: PLACEHOLDERS[field.type] || null,
     };
-    if (field.type === 'textarea') return attrs;
-    attrs.type = INPUT_TYPES[field.type] || 'text';
-    attrs.dir = 'ltr';
+    if (field.type === "textarea") return attrs;
+    attrs.type = INPUT_TYPES[field.type] || "text";
+    attrs.dir = "ltr";
     Object.assign(attrs, TYPE_ATTRS[field.type]);
-    if (field.type === 'code')
-      attrs.maxlength = String(Rules.codeLength(field));
+    if (field.type === "code") attrs.maxlength = String(Rules.codeLength(field));
     return attrs;
   }
 
@@ -186,12 +185,12 @@
    * @param {string} path The path of the answer.
    */
   function leave(field, input, path) {
-    var phone = field.type === 'phone' && Rules.normalizePhone(input.value);
+    var phone = field.type === "phone" && Rules.normalizePhone(input.value);
     if (phone) {
       input.value = phone;
       P.setVal(path, phone);
     }
-    if (input.value.trim() !== '' || S.errors[path]) {
+    if (input.value.trim() !== "" || S.errors[path]) {
       P.validateOne(field, path);
     }
   }
@@ -206,14 +205,14 @@
    */
   function textControl(field, path, id) {
     var attrs = textAttrs(field, path, id);
-    var isArea = field.type === 'textarea';
-    var input = h(isArea ? 'textarea' : 'input', attrs);
+    var isArea = field.type === "textarea";
+    var input = h(isArea ? "textarea" : "input", attrs);
     if (isArea) input.value = attrs.value;
-    input.addEventListener('input', function () {
+    input.addEventListener("input", function () {
       liveFilter(field, input, path);
       P.saveDraft();
     });
-    input.addEventListener('blur', function () {
+    input.addEventListener("blur", function () {
       leave(field, input, path);
     });
     return input;

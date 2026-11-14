@@ -4,7 +4,7 @@
  * so `set` may redraw the page or not.
  */
 (function (App) {
-  'use strict';
+  "use strict";
 
   var A = App.admin;
   var L = A.lists;
@@ -44,27 +44,27 @@
    */
   function field(c) {
     var o = c.o;
-    return h('input', {
-      class: 'input num stepper-input',
-      type: 'number',
-      inputmode: 'numeric',
+    return h("input", {
+      class: "input num stepper-input",
+      type: "number",
+      inputmode: "numeric",
       name: o.name,
       min: String(o.lo),
       max: String(o.hi),
       value: String(c.value),
-      'aria-label': o.label,
+      "aria-label": o.label,
       onchange: typed.bind(null, c),
       // The number is typed over, not added to.
       onfocus: function (e) {
         if (e.target.select) e.target.select();
       },
       onkeydown: function (e) {
-        if (e.key === 'Enter' && o.enter) {
+        if (e.key === "Enter" && o.enter) {
           e.preventDefault();
           typed(c);
           o.enter();
         }
-      }
+      },
     });
   }
 
@@ -79,18 +79,18 @@
     var o = c.o;
     var down = by < 0;
     return h(
-      'button',
+      "button",
       {
-        type: 'button',
-        class: 'icon-btn sm',
-        name: o.name + (down ? '-down' : '-up'),
-        'aria-label': (down ? 'Fewer: ' : 'More: ') + o.label,
+        type: "button",
+        class: "icon-btn sm",
+        name: o.name + (down ? "-down" : "-up"),
+        "aria-label": (down ? "Fewer: " : "More: ") + o.label,
         disabled: down ? c.value <= o.lo : c.value >= o.hi,
         onclick: function () {
           take(c, c.value + by);
-        }
+        },
       },
-      down ? '−' : '+'
+      down ? "−" : "+",
     );
   }
 
@@ -108,6 +108,6 @@
     c.input = field(c);
     c.down = stepButton(c, -1);
     c.up = stepButton(c, 1);
-    return h('span', { class: 'stepper' }, c.down, c.input, c.up);
+    return h("span", { class: "stepper" }, c.down, c.input, c.up);
   };
 })(window.App);

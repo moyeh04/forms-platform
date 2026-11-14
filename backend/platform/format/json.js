@@ -19,7 +19,7 @@ var Json = (function () {
    * @return {*} The value the text holds, or the fallback.
    */
   function parseJson(text, fallback) {
-    if (text === '' || text === null || text === undefined) return fallback;
+    if (text === "" || text === null || text === undefined) return fallback;
     try {
       return JSON.parse(text);
     } catch (e) {

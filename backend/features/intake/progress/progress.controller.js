@@ -22,7 +22,7 @@ var ProgressController = (function () {
    */
   function adminMark(req) {
     var form = FormsService.requireForm(req.slug || req.id);
-    return { progress: ProgressService.mark(form, req, 'a', whole_) };
+    return { progress: ProgressService.mark(form, req, "a", whole_) };
   }
 
   /**
@@ -36,15 +36,15 @@ var ProgressController = (function () {
   function viewerMark(req, client) {
     var form = ViewerService.requireClientForm(client, req.slug);
     if (client.progress !== ProgressAccess.MARK) {
-      ApiError.fail('forbidden', 'This link cannot mark progress.');
+      ApiError.fail("forbidden", "This link cannot mark progress.");
     }
     return {
       progress: ProgressService.mark(
         form,
         req,
-        'c:' + client.id,
-        Rules.linkProgress.bind(null, form)
-      )
+        "c:" + client.id,
+        Rules.linkProgress.bind(null, form),
+      ),
     };
   }
 
@@ -55,7 +55,7 @@ var ProgressController = (function () {
    * @return {*} The answer, sent back as JSON.
    */
   function mine(req) {
-    var form = FormsService.requireForm(String(req.slug || ''));
+    var form = FormsService.requireForm(String(req.slug || ""));
     return { progress: ProgressService.mine(form, req.key) };
   }
 

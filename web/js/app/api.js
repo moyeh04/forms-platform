@@ -3,23 +3,23 @@
  * so the browser sends no CORS preflight.
  */
 (function (App) {
-  'use strict';
+  "use strict";
 
   /** The session storage key of the admin PIN, kept for this tab only. */
-  var PIN_KEY = 'fp_admin_pin';
+  var PIN_KEY = "fp_admin_pin";
 
   /**
    * The local storage key of the trusted-device pass the backend gave this
    * browser after the right PIN. It outlives the tab, so wrong PINs typed
    * elsewhere do not lock this browser out.
    */
-  var DEVICE_KEY = 'fp_admin_device';
+  var DEVICE_KEY = "fp_admin_device";
 
   /** The message when the site was published without the backend URL. */
   var NOT_CONFIGURED =
-    'The website is not connected to the backend yet. Set the GitHub ' +
-    'Actions API_URL variable and publish through GitHub Actions. For ' +
-    'local preview, run npm run dev.';
+    "The website is not connected to the backend yet. Set the GitHub " +
+    "Actions API_URL variable and publish through GitHub Actions. For " +
+    "local preview, run pnpm run dev.";
 
   /**
    * Makes the error a call throws.
@@ -44,9 +44,9 @@
    */
   function endpoint() {
     var config = window.APP_CONFIG || {};
-    var url = config.API_URL || '';
-    if (!url || url.indexOf('PASTE_') === 0) {
-      throw apiError('not_configured', NOT_CONFIGURED);
+    var url = config.API_URL || "";
+    if (!url || url.indexOf("PASTE_") === 0) {
+      throw apiError("not_configured", NOT_CONFIGURED);
     }
     return url;
   }
@@ -60,17 +60,14 @@
   async function send(payload) {
     try {
       return await fetch(endpoint(), {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
         body: JSON.stringify(payload),
-        redirect: 'follow'
+        redirect: "follow",
       });
     } catch (e) {
       if (e?.code) throw e;
-      throw apiError(
-        'network',
-        'Could not reach the server. Check your connection and try again.'
-      );
+      throw apiError("network", "Could not reach the server. Check your connection and try again.");
     }
   }
 
@@ -86,14 +83,14 @@
     try {
       data = await res.json();
     } catch {
-      throw apiError('bad_response', 'The server sent an unexpected answer.');
+      throw apiError("bad_response", "The server sent an unexpected answer.");
     }
     if (data?.ok) return data;
     var er = data?.error || {};
     throw apiError(
-      er.code || 'server_error',
-      er.message || 'Something went wrong. Try again.',
-      er.details
+      er.code || "server_error",
+      er.message || "Something went wrong. Try again.",
+      er.details,
     );
   }
 
@@ -117,9 +114,9 @@
    */
   function getDevice() {
     try {
-      return window.localStorage.getItem(DEVICE_KEY) || '';
+      return window.localStorage.getItem(DEVICE_KEY) || "";
     } catch {
-      return '';
+      return "";
     }
   }
 
@@ -143,7 +140,7 @@
    */
   function getPin() {
     var s = store();
-    return s ? s.getItem(PIN_KEY) || '' : '';
+    return s ? s.getItem(PIN_KEY) || "" : "";
   }
 
   /**
@@ -170,7 +167,7 @@
   function admin(action, extra, pin) {
     var base = {
       action: action,
-      admin: { pin: pin ?? getPin(), device: getDevice() }
+      admin: { pin: pin ?? getPin(), device: getDevice() },
     };
     return call(Object.assign(base, extra || {}));
   }
@@ -195,6 +192,6 @@
     setPin: setPin,
     getDevice: getDevice,
     setDevice: setDevice,
-    error: apiError
+    error: apiError,
   };
 })(window.App);

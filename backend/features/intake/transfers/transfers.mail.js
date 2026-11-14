@@ -3,10 +3,10 @@
 var TransfersMail = (function () {
   /** The subject of each kind of email. */
   var SUBJECTS_ = {
-    asked: 'A team asks for one of your members',
-    leads: 'You now lead your team',
-    approved: 'Your request was approved',
-    rejected: 'Your request was rejected'
+    asked: "A team asks for one of your members",
+    leads: "You now lead your team",
+    approved: "Your request was approved",
+    rejected: "Your request was rejected",
   };
 
   /**
@@ -16,9 +16,7 @@ var TransfersMail = (function () {
    * @return {string} The subject.
    */
   function subjectOf_(kind) {
-    return Object.keys(SUBJECTS_).indexOf(kind) === -1
-      ? SUBJECTS_.rejected
-      : SUBJECTS_[kind];
+    return Object.keys(SUBJECTS_).indexOf(kind) === -1 ? SUBJECTS_.rejected : SUBJECTS_[kind];
   }
 
   /**
@@ -32,11 +30,11 @@ var TransfersMail = (function () {
    * @return {*} The email, or nothing when the team has none.
    */
   function recipient_(form, t, kind) {
-    var teamId = kind === 'asked' || kind === 'leads' ? t.fromId : t.toId;
-    var team = ResponsesRepository.readResponses(form).filter(function (r) {
+    var teamId = kind === "asked" || kind === "leads" ? t.fromId : t.toId;
+    var team = ResponsesRepository.readResponses(form).find(function (r) {
       return r.id === teamId;
-    })[0];
-    return team && Rules.valueByRole(form, team.data, 'email');
+    });
+    return team && Rules.valueByRole(form, team.data, "email");
   }
 
   /**
@@ -48,48 +46,33 @@ var TransfersMail = (function () {
    * @return {!Array<string>} The lines.
    */
   function linesOf_(form, t, kind) {
-    var who = (t.member.name || '') + ' (' + t.code + ')';
+    var who = (t.member.name || "") + " (" + t.code + ")";
     var link = ResponsesNotify.siteLink(form);
-    var tail = link ? ' ' + link : '';
-    if (kind === 'asked') {
+    var tail = link ? " " + link : "";
+    if (kind === "asked") {
       return [
-        'Team ' +
-          t.toRef +
-          ' asks for ' +
-          who +
-          ', who is on your team ' +
-          t.fromRef +
-          '.',
-        '',
-        'Open the form with your edit key to approve or reject.' + tail
+        "Team " + t.toRef + " asks for " + who + ", who is on your team " + t.fromRef + ".",
+        "",
+        "Open the form with your edit key to approve or reject." + tail,
       ];
     }
-    if (kind === 'leads') {
+    if (kind === "leads") {
       return [
-        'You now lead team ' +
+        "You now lead team " +
           t.fromRef +
-          '. ' +
+          ". " +
           who +
-          ' led it and moved to team ' +
+          " led it and moved to team " +
           t.toRef +
-          '.',
-        '',
-        'Ask them for the edit key of the team; it opens the form for you.' +
-          tail
+          ".",
+        "",
+        "Ask them for the edit key of the team; it opens the form for you." + tail,
       ];
     }
-    if (kind === 'approved') {
-      return [who + ' moved to your team ' + t.toRef + '.'];
+    if (kind === "approved") {
+      return [who + " moved to your team " + t.toRef + "."];
     }
-    return [
-      'Team ' +
-        t.fromRef +
-        ' kept ' +
-        who +
-        '. Your team ' +
-        t.toRef +
-        ' stays as it is.'
-    ];
+    return ["Team " + t.fromRef + " kept " + who + ". Your team " + t.toRef + " stays as it is."];
   }
 
   /**
@@ -110,11 +93,11 @@ var TransfersMail = (function () {
       if (!to) return;
       MailApp.sendEmail({
         to: to,
-        subject: '[' + form.title + '] ' + subjectOf_(kind),
-        body: linesOf_(form, t, kind).join('\n')
+        subject: "[" + form.title + "] " + subjectOf_(kind),
+        body: linesOf_(form, t, kind).join("\n"),
       });
     } catch (e) {
-      Logger.log('Transfer email not sent: ' + e.message);
+      Logger.log("Transfer email not sent: " + e.message);
     }
   }
 
@@ -127,7 +110,7 @@ var TransfersMail = (function () {
    */
   function mailDecision_(form, out) {
     mailTransfer_(form, out.transfer, out.transfer.status);
-    if (out.handed) mailTransfer_(form, out.transfer, 'leads');
+    if (out.handed) mailTransfer_(form, out.transfer, "leads");
   }
 
   return { mailTransfer: mailTransfer_, mailDecision: mailDecision_ };

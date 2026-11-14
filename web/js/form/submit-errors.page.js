@@ -5,7 +5,7 @@
  * form that closed.
  */
 (function (App) {
-  'use strict';
+  "use strict";
 
   var P = App.formPage;
   var h = App.ui.h;
@@ -14,9 +14,9 @@
 
   /** The state of the form behind each error of a form that closed. */
   var CLOSED_STATES = {
-    form_closed: 'closed',
-    form_not_yet: 'not_yet',
-    form_draft: 'draft'
+    form_closed: "closed",
+    form_not_yet: "not_yet",
+    form_draft: "draft",
   };
 
   /** The errors of a slot that can no longer be booked: taken or over. */
@@ -36,7 +36,7 @@
         return;
       }
       Object.keys(x.nested).forEach(function (k) {
-        errs[id + '.' + k] = x.nested[k];
+        errs[id + "." + k] = x.nested[k];
       });
     });
     P.showErrorsAndJump(errs);
@@ -49,18 +49,18 @@
    */
   function keyPageButton() {
     return h(
-      'button',
+      "button",
       {
-        type: 'button',
-        class: 'link-btn',
+        type: "button",
+        class: "link-btn",
         onclick: function () {
-          S.view = 'keyEntry';
-          S.keyError = '';
+          S.view = "keyEntry";
+          S.keyError = "";
           S.banner = null;
           P.render();
-        }
+        },
       },
-      t('editLink')
+      t("editLink"),
     );
   }
 
@@ -74,12 +74,12 @@
     var first = S.steps[0].fields[0] || {};
     var field = d.field || first.id;
     S.errors = {};
-    S.errors[field] = { error: 'duplicate' };
+    S.errors[field] = { error: "duplicate" };
     S.stepIndex = P.stepOfPath(field);
     S.banner = {
-      kind: 'err',
-      text: t('errors.duplicate'),
-      action: keyPageButton()
+      kind: "err",
+      text: t("errors.duplicate"),
+      action: keyPageButton(),
     };
     P.render();
     P.focusFirstError();
@@ -106,15 +106,15 @@
   function offerText(offer) {
     var list = offer
       .map(function (o) {
-        var leads = o.leader ? ' ' + t('transferLeads') : '';
-        return P.who(P.memberName(o.code), o.code) + ' → ' + o.team + leads;
+        var leads = o.leader ? " " + t("transferLeads") : "";
+        return P.who(P.memberName(o.code), o.code) + " → " + o.team + leads;
       })
-      .join(t('listSep'));
+      .join(t("listSep"));
     var leaders = offer.some(function (o) {
       return o.leader;
     });
-    var body = t('transferBody', { list: list });
-    return leaders ? body + ' ' + t('transferBodyLeader') : body;
+    var body = t("transferBody", { list: list });
+    return leaders ? body + " " + t("transferBodyLeader") : body;
   }
 
   /**
@@ -130,10 +130,10 @@
       return false;
     }
     var ask = await App.ui.confirm({
-      title: t('transferTitle'),
+      title: t("transferTitle"),
       body: offerText(offer),
-      confirmText: t('transferAsk'),
-      cancelText: t('transferNo')
+      confirmText: t("transferAsk"),
+      cancelText: t("transferNo"),
     });
     if (!ask) return false;
     S.transfer = offer.map(function (o) {
@@ -152,19 +152,19 @@
    * @return {string} The sentence, or ''.
    */
   function aloneText(d, offer, codes) {
-    if (!d.transfer) return '';
+    if (!d.transfer) return "";
     var alone = codes.filter(function (c) {
       return !offer.some(function (o) {
         return String(o.code) === String(c);
       });
     });
-    if (!alone.length) return '';
+    if (!alone.length) return "";
     var list = alone
       .map(function (c) {
         return P.who(P.memberName(c), c);
       })
-      .join(t('listSep'));
-    return ' ' + t('transferAlone', { list: list });
+      .join(t("listSep"));
+    return " " + t("transferAlone", { list: list });
   }
 
   /**
@@ -175,15 +175,15 @@
    * @param {!Array<*>} codes Every clashing code.
    */
   function refuseMembers(d, offer, codes) {
-    var listed = d.codes ? ' (' + d.codes.join(', ') + ')' : '';
+    var listed = d.codes ? " (" + d.codes.join(", ") + ")" : "";
     S.transfer = null;
     S.banner = {
-      kind: 'err',
-      text: t('errors.duplicate_member') + listed + aloneText(d, offer, codes)
+      kind: "err",
+      text: t("errors.duplicate_member") + listed + aloneText(d, offer, codes),
     };
     var step = S.steps.findIndex(function (s) {
       return s.fields.some(function (f) {
-        return f.type === 'members';
+        return f.type === "members";
       });
     });
     S.stepIndex = Math.max(0, step);
@@ -216,12 +216,12 @@
     var sf = P.slotField();
     var picked = (sf && S.data[sf.id]) || {};
     if (sf) {
-      S.data[sf.id] = { day: picked.day, time: '' };
+      S.data[sf.id] = { day: picked.day, time: "" };
       S.errors = {};
       S.errors[sf.id] = { error: code };
       S.stepIndex = P.stepOfPath(sf.id);
     }
-    S.banner = { kind: 'err', text: t('errors.' + code) };
+    S.banner = { kind: "err", text: t("errors." + code) };
     P.render();
   }
 
@@ -232,7 +232,7 @@
    */
   function onClosed(code) {
     S.state = CLOSED_STATES[code];
-    S.view = 'closed';
+    S.view = "closed";
     P.render();
   }
 
@@ -245,15 +245,15 @@
   function handleSubmitError(e) {
     var code = e.code;
     var d = e.details || {};
-    if (code === 'invalid' && typeof d === 'object') return onInvalid(d);
-    if (code === 'duplicate') return onDuplicate(d);
-    if (code === 'already_booked') return onAlreadyBooked();
-    if (code === 'duplicate_member') return onDuplicateMember(d);
+    if (code === "invalid" && typeof d === "object") return onInvalid(d);
+    if (code === "duplicate") return onDuplicate(d);
+    if (code === "already_booked") return onAlreadyBooked();
+    if (code === "duplicate_member") return onDuplicateMember(d);
     if (SLOT_REFUSED.test(code)) return onSlotTaken(code);
     if (CLOSED_STATES[code]) return onClosed(code);
     S.banner = {
-      kind: 'err',
-      text: App.i18n.err({ error: code }) || e.message
+      kind: "err",
+      text: App.i18n.err({ error: code }) || e.message,
     };
     P.render();
   }

@@ -28,15 +28,15 @@ var ResponsesReview = (function () {
       return review[s.id] || ReviewStatus.PENDING;
     });
     if (!vals.length) return null;
-    if (vals.indexOf(ReviewStatus.REJECTED) !== -1) return 'rejected';
+    if (vals.indexOf(ReviewStatus.REJECTED) !== -1) return "rejected";
     if (
       vals.every(function (v) {
         return v === ReviewStatus.APPROVED;
       })
     )
-      return 'approved';
-    if (vals.indexOf(ReviewStatus.APPROVED) !== -1) return 'in_review';
-    return 'new';
+      return "approved";
+    if (vals.indexOf(ReviewStatus.APPROVED) !== -1) return "in_review";
+    return "new";
   }
 
   /**
@@ -54,9 +54,9 @@ var ResponsesReview = (function () {
         return s.id;
       })
       .lastIndexOf(stepId);
-    if (idx < 0) ApiError.fail('bad_step', 'Unknown review step.');
+    if (idx < 0) ApiError.fail("bad_step", "Unknown review step.");
     if (Object.values(ReviewStatus).indexOf(status) === -1)
-      ApiError.fail('bad_status', 'Unknown review status.');
+      ApiError.fail("bad_status", "Unknown review status.");
     return idx;
   }
 
@@ -69,8 +69,7 @@ var ResponsesReview = (function () {
    */
   function reopenLater_(steps, review, idx) {
     steps.slice(idx + 1).forEach(function (s) {
-      if (review[s.id] === ReviewStatus.APPROVED)
-        review[s.id] = ReviewStatus.PENDING;
+      if (review[s.id] === ReviewStatus.APPROVED) review[s.id] = ReviewStatus.PENDING;
     });
   }
 
@@ -91,13 +90,8 @@ var ResponsesReview = (function () {
     var sequential = form.review.sequential !== false;
     var approving = status === ReviewStatus.APPROVED;
     var before = steps[idx - 1];
-    if (
-      sequential &&
-      approving &&
-      before &&
-      r.review[before.id] !== ReviewStatus.APPROVED
-    )
-      ApiError.fail('review_order', 'Finish "' + before.label.en + '" first.');
+    if (sequential && approving && before && r.review[before.id] !== ReviewStatus.APPROVED)
+      ApiError.fail("review_order", 'Finish "' + before.label.en + '" first.');
     r.review[stepId] = status;
     if (sequential && !approving) reopenLater_(steps, r.review, idx);
     var derived = reviewStatus_(steps, r.review);
@@ -106,6 +100,6 @@ var ResponsesReview = (function () {
 
   return {
     setReviewStep: setReviewStep_,
-    defaultReview: defaultReview_
+    defaultReview: defaultReview_,
   };
 })();

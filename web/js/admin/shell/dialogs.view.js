@@ -3,7 +3,7 @@
  * link or a key once, with a copy button.
  */
 (function (App) {
-  'use strict';
+  "use strict";
 
   var A = App.admin;
   var h = App.ui.h;
@@ -19,18 +19,18 @@
    */
   function dialogButton(b, close) {
     return h(
-      'button',
+      "button",
       {
-        type: 'button',
-        class: 'btn btn-' + (b.kind || 'quiet'),
+        type: "button",
+        class: "btn btn-" + (b.kind || "quiet"),
         onclick: function (e) {
           if (!b.onclick) return close();
           A.busy(e.currentTarget, async function () {
             if ((await b.onclick(close)) !== false) close();
           });
-        }
+        },
       },
-      b.text
+      b.text,
     );
   }
 
@@ -52,8 +52,8 @@
      * @param {!KeyboardEvent} e The key.
      */
     function onKey(e) {
-      var all = document.querySelectorAll('.overlay');
-      if (e.key === 'Escape' && all[all.length - 1] === overlay) {
+      var all = document.querySelectorAll(".overlay");
+      if (e.key === "Escape" && all[all.length - 1] === overlay) {
         e.stopImmediatePropagation();
         close();
       }
@@ -61,38 +61,36 @@
 
     /** Closes the dialog. */
     function close() {
-      document.removeEventListener('keydown', onKey);
+      document.removeEventListener("keydown", onKey);
       if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
     }
 
-    var actions = (buttons || [{ text: 'Close', kind: 'quiet' }]).map(
-      function (b) {
-        return dialogButton(b, close);
-      }
-    );
+    var actions = (buttons || [{ text: "Close", kind: "quiet" }]).map(function (b) {
+      return dialogButton(b, close);
+    });
     overlay = h(
-      'div',
+      "div",
       {
-        class: 'overlay',
+        class: "overlay",
         onclick: function (e) {
           if (e.target === overlay) close();
-        }
+        },
       },
       h(
-        'div',
+        "div",
         {
-          class: 'dialog',
-          role: 'dialog',
-          'aria-modal': 'true',
-          'aria-label': title
+          class: "dialog",
+          role: "dialog",
+          "aria-modal": "true",
+          "aria-label": title,
         },
-        h('h2', { class: 'dialog-title' }, title),
+        h("h2", { class: "dialog-title" }, title),
         body,
-        h('div', { class: 'dialog-actions' }, actions)
-      )
+        h("div", { class: "dialog-actions" }, actions),
+      ),
     );
     document.body.appendChild(overlay);
-    document.addEventListener('keydown', onKey);
+    document.addEventListener("keydown", onKey);
     return { close: close, el: overlay };
   };
 
@@ -107,12 +105,12 @@
    */
   A.reveal = function (title, note, value, big) {
     var body = h(
-      'div',
+      "div",
       null,
-      h('p', null, note),
+      h("p", null, note),
       big
-        ? h('div', { class: 'key-reveal' }, value)
-        : h('div', { class: 'link-box' }, h('code', null, value))
+        ? h("div", { class: "key-reveal" }, value)
+        : h("div", { class: "link-box" }, h("code", null, value)),
     );
 
     /**
@@ -122,13 +120,13 @@
      */
     async function copy() {
       var copied = await App.ui.copyText(value);
-      App.ui.toast(copied ? 'Copied' : 'Could not copy', 'ok');
+      App.ui.toast(copied ? "Copied" : "Could not copy", "ok");
       return false;
     }
 
     return A.modal(title, body, [
-      { text: 'Copy', kind: 'primary', onclick: copy },
-      { text: 'Done', kind: 'quiet' }
+      { text: "Copy", kind: "primary", onclick: copy },
+      { text: "Done", kind: "quiet" },
     ]);
   };
 })(window.App);

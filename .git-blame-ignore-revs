@@ -1,5 +1,5 @@
 # Commits that only change layout. git blame skips them when
-# blame.ignoreRevsFile points here, which npm install sets.
+# blame.ignoreRevsFile points here, which pnpm install sets.
 
 # style(domain): Format with Biome
 62be895e970c39f596ba9a47d3135473bec267c1
@@ -18,3 +18,6 @@ a6ba6299ae5743d440aedae6383d4b8fc820330d
 
 # style(backend): Indent the namespace bodies
 28b1f3fca079189ffa0de393eaff2e91d0213202
+
+# style: Format the tree with Oxfmt
+dcfc88d2ac06c1fb4ad8133883ae2db97a1e9495

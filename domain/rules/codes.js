@@ -4,10 +4,10 @@
  * of a private link six.
  */
 (function (root) {
-  'use strict';
+  "use strict";
 
-  var node = typeof module === 'object' && module.exports;
-  var textRules = node ? require('./text.js') : root.RulesText;
+  var node = typeof module === "object" && module.exports;
+  var textRules = node ? require("./text.js") : root.RulesText;
 
   /** The digits of a student code when the field does not say. */
   var CODE_LENGTH = 7;
@@ -19,7 +19,7 @@
   var ACCESS_KEY_DIGITS = 6;
 
   /** A whole registration key. */
-  var EDIT_KEY = new RegExp('^\\d{' + EDIT_KEY_DIGITS + '}$');
+  var EDIT_KEY = new RegExp("^\\d{" + EDIT_KEY_DIGITS + "}$");
 
   /**
    * Gives the digits a student code question asks for.
@@ -43,10 +43,10 @@
   function validateCode(raw, opts) {
     var o = opts || {};
     var len = codeLength(o);
-    var v = textRules.latinDigits(raw).replace(/\s+/g, '');
-    if (!v) return { ok: false, error: 'required' };
+    var v = textRules.latinDigits(raw).replace(/\s+/g, "");
+    if (!v) return { ok: false, error: "required" };
     if (!/^\d+$/.test(v) || v.length !== len) {
-      return { ok: false, error: 'invalid_code', params: { length: len } };
+      return { ok: false, error: "invalid_code", params: { length: len } };
     }
     return { ok: true, value: v };
   }
@@ -86,8 +86,8 @@
     validateCode: validateCode,
     editKeyDigits: editKeyDigits,
     isEditKey: isEditKey,
-    accessKeyDigits: accessKeyDigits
+    accessKeyDigits: accessKeyDigits,
   };
   if (node) module.exports = api;
   root.RulesCodes = api;
-})(typeof globalThis !== 'undefined' ? globalThis : this);
+})(typeof globalThis !== "undefined" ? globalThis : this);

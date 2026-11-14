@@ -70,15 +70,15 @@ var TeamNumbers = (function () {
     Table.ensureHeaders(sh, ResponsesRepository.RESPONSE_COLS);
     var column = sh.getRange(
       2,
-      ResponsesRepository.RESPONSE_COLS.indexOf('number') + 1,
+      ResponsesRepository.RESPONSE_COLS.indexOf("number") + 1,
       sh.getLastRow() - 1,
-      1
+      1,
     );
     var values = column.getValues();
     stored.forEach(function (r) {
       values[r._row - 2][0] = String(r.number);
     });
-    column.setNumberFormat('@').setValues(values);
+    column.setNumberFormat("@").setValues(values);
   }
 
   /**
@@ -95,6 +95,6 @@ var TeamNumbers = (function () {
   return {
     numberedResponses: numberedResponses_,
     byTeamNumber: byTeamNumber_,
-    keepTeamNumbers: keepTeamNumbers_
+    keepTeamNumbers: keepTeamNumbers_,
   };
 })();

@@ -6,7 +6,7 @@
  * what draws the page again.
  */
 (function (App) {
-  'use strict';
+  "use strict";
 
   var A = App.admin;
   var R = A.responses;
@@ -23,12 +23,7 @@
    * @return {!Element} The stat.
    */
   function stat(n, label, attrs) {
-    return h(
-      'span',
-      Object.assign({ class: 'stat' }, attrs),
-      h('b', null, String(n)),
-      label
-    );
+    return h("span", Object.assign({ class: "stat" }, attrs), h("b", null, String(n)), label);
   }
 
   /**
@@ -38,12 +33,12 @@
    */
   function paintStats(p) {
     ui.clear(p.stats);
-    p.stats.appendChild(stat(p.all.length, 'Total'));
+    p.stats.appendChild(stat(p.all.length, "Total"));
     p.stats.appendChild(
-      stat(Rules.countPeople(p.form, p.all), 'People', {
-        title: 'Leaders and members. A student code is counted once.',
-        dataset: { stat: 'people' }
-      })
+      stat(Rules.countPeople(p.form, p.all), "People", {
+        title: "Leaders and members. A student code is counted once.",
+        dataset: { stat: "people" },
+      }),
     );
     A.SUB_STATUSES.forEach(function (st) {
       var n = p.all.filter(function (s) {
@@ -65,13 +60,10 @@
       Rules.sizeAlertLevels(alerts),
       p.all.map(function (s) {
         return {
-          label: 'Team ' + s.number,
-          alert: Rules.sizeAlertOf(
-            alerts,
-            Rules.membersOf(p.form, s.data).length
-          )
+          label: "Team " + s.number,
+          alert: Rules.sizeAlertOf(alerts, Rules.membersOf(p.form, s.data).length),
         };
-      })
+      }),
     );
   }
 
@@ -84,18 +76,18 @@
    */
   function underMinLine(small, min) {
     return h(
-      'p',
-      { class: 'request-warn', name: 'under-min' },
-      (small.length === 1 ? 'One team is' : small.length + ' teams are') +
-        ' under the minimum of ' +
+      "p",
+      { class: "request-warn", name: "under-min" },
+      (small.length === 1 ? "One team is" : small.length + " teams are") +
+        " under the minimum of " +
         min +
-        ': ' +
+        ": " +
         small
           .map(function (s) {
             return s.ref;
           })
-          .join(', ') +
-        '.'
+          .join(", ") +
+        ".",
     );
   }
 
@@ -108,18 +100,16 @@
    * @return {?Element} The section, or null when nothing waits.
    */
   function needsYou(p) {
-    var sizeField = Rules.fieldByRole(p.form, 'team_size');
+    var sizeField = Rules.fieldByRole(p.form, "team_size");
     var small = R.underMin(p.form, p.all, sizeField);
     var warning = sizeField ? warned(p) : null;
     if (!p.transfers.length && !small.length && !warning) return null;
     return h(
-      'section',
-      { class: 'requests', 'aria-label': 'Needs you' },
+      "section",
+      { class: "requests", "aria-label": "Needs you" },
       R.transferRows(p),
-      small.length
-        ? underMinLine(small, Rules.teamSizeRange(p.form).min)
-        : null,
-      warning
+      small.length ? underMinLine(small, Rules.teamSizeRange(p.form).min) : null,
+      warning,
     );
   }
 
@@ -134,19 +124,19 @@
   function tabButton(p, tab, text) {
     var on = p.state.tab === tab;
     return h(
-      'button',
+      "button",
       {
-        type: 'button',
-        class: 'btn sm ' + (on ? 'btn-primary' : 'btn-quiet'),
-        role: 'tab',
-        'aria-selected': on ? 'true' : 'false',
-        name: 'tab-' + tab,
+        type: "button",
+        class: "btn sm " + (on ? "btn-primary" : "btn-quiet"),
+        role: "tab",
+        "aria-selected": on ? "true" : "false",
+        name: "tab-" + tab,
         onclick: function () {
           p.state.tab = tab;
           p.paint();
-        }
+        },
       },
-      text
+      text,
     );
   }
 
@@ -168,20 +158,20 @@
       view: p.boardView,
       save: function (team, id, change, baseAt) {
         return A.call(
-          'admin.progress.mark',
+          "admin.progress.mark",
           Object.assign(
             {
               slug: p.form.slug,
               submissionId: team.id,
               milestone: id,
-              baseAt: baseAt
+              baseAt: baseAt,
             },
-            change
-          )
+            change,
+          ),
         ).then(function (out) {
           return out.progress;
         });
-      }
+      },
     });
   }
 
@@ -195,11 +185,11 @@
     var rows = p.filtered();
     if (!rows.length) {
       return h(
-        'div',
-        { class: 'empty' },
+        "div",
+        { class: "empty" },
         p.all.length
-          ? 'Nothing matches that search.'
-          : 'No submissions yet. Share the form link to start collecting.'
+          ? "Nothing matches that search."
+          : "No submissions yet. Share the form link to start collecting.",
       );
     }
     if (p.form.type === FormType.RESERVATION) {
@@ -208,7 +198,7 @@
     if (p.form.type === FormType.WHATSAPP_REGISTRATION) {
       return R.registrations(p.form, rows, p.reload);
     }
-    if (p.state.view === 'progress' && Rules.progressOn(p.form)) {
+    if (p.state.view === "progress" && Rules.progressOn(p.form)) {
       return progressBoard(p, rows);
     }
     return R.teams(p.form, rows, p.reload);
@@ -227,17 +217,17 @@
     if (R.hasMatching(p.form)) {
       content.appendChild(
         h(
-          'div',
+          "div",
           {
-            class: 'actions',
-            style: { marginBottom: '14px' },
-            role: 'tablist'
+            class: "actions",
+            style: { marginBottom: "14px" },
+            role: "tablist",
           },
-          tabButton(p, 'matching', 'Match WhatsApp requests'),
-          tabButton(p, 'list', 'All registrations')
-        )
+          tabButton(p, "matching", "Match WhatsApp requests"),
+          tabButton(p, "list", "All registrations"),
+        ),
       );
-      if (p.state.tab === 'matching') {
+      if (p.state.tab === "matching") {
         p.stats.hidden = true;
         return R.matching(p.form, content);
       }
@@ -262,29 +252,29 @@
    */
   A.views.responses = async function (mount, slug) {
     var both = await Promise.all([
-      A.call('admin.forms.get', { id: slug }),
-      A.call('admin.submissions', { slug: slug })
+      A.call("admin.forms.get", { id: slug }),
+      A.call("admin.submissions", { slug: slug }),
     ]);
     var p = {
       form: both[0].form,
       all: both[1].submissions,
       transfers: both[1].transfers || [],
-      content: h('div'),
-      stats: h('div', { class: 'stats' }),
+      content: h("div"),
+      stats: h("div", { class: "stats" }),
       boardView: {},
-      reload: reload
+      reload: reload,
     };
     p.state = {
-      q: '',
-      status: 'all',
-      tab: R.hasMatching(p.form) ? 'matching' : 'list',
-      view: App.progress.savedView(p.form.slug)
+      q: "",
+      status: "all",
+      tab: R.hasMatching(p.form) ? "matching" : "list",
+      view: App.progress.savedView(p.form.slug),
     };
     p.paint = paint.bind(null, p);
     p.filtered = R.filtered.bind(null, p.form, p.all, p.state);
     ui.clear(mount);
     mount.appendChild(A.formHead(p.form));
-    mount.appendChild(A.formTabs(p.form, 'responses'));
+    mount.appendChild(A.formTabs(p.form, "responses"));
     paintStats(p);
     mount.appendChild(p.stats);
     mount.appendChild(R.toolbar(p));

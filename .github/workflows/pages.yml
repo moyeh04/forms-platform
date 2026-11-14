@@ -36,17 +36,18 @@ jobs:
       # can skip a deploy without saying so.
       - uses: actions/setup-go@v5
         with:
-          go-version: '1.23.x'
+          go-version: "1.23.x"
       - name: Validate GitHub Actions workflow
         run: go run github.com/rhysd/actionlint/cmd/actionlint@v1.7.7
+      - uses: pnpm/action-setup@v6
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: npm
-      - run: npm ci
-      - run: npm run check
-      - run: npm test
-      - run: npm run build
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm run check
+      - run: pnpm test
+      - run: pnpm run build
       # A push that touches only the website skips the Apps Script deploy,
       # so a live backend is never redeployed for nothing.
       - name: Check whether the backend changed
@@ -68,7 +69,7 @@ jobs:
         env:
           API_URL: ${{ vars.API_URL }}
           APPS_SCRIPT_DEPLOYMENT_ID: ${{ vars.APPS_SCRIPT_DEPLOYMENT_ID }}
-        run: npm run build:site
+        run: pnpm run build:site
       - uses: actions/upload-artifact@v4
         if: >-
           github.event_name != 'pull_request' &&
@@ -96,11 +97,12 @@ jobs:
       API_URL: ${{ vars.API_URL }}
     steps:
       - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v6
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: npm
-      - run: npm ci
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
       - name: Prepare validated clasp configuration
         env:
           CLASPRC_JSON: ${{ secrets.CLASPRC_JSON }}
@@ -114,8 +116,8 @@ jobs:
       # backend version and how to go back to the one before it.
       - name: Update the existing web deployment
         run: |
-          npx --yes @google/clasp@3.4.1 push --force
-          npx --yes @google/clasp@3.4.1 deploy -i "$APPS_SCRIPT_DEPLOYMENT_ID" \
+          pnpm dlx @google/clasp@3.4.1 push --force
+          pnpm dlx @google/clasp@3.4.1 deploy -i "$APPS_SCRIPT_DEPLOYMENT_ID" \
             --description "Commit $GITHUB_SHA" | tee deploy.log
           version=$(grep -o '@[0-9][0-9]*' deploy.log | tail -n 1)
           {

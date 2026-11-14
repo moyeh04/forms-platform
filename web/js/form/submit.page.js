@@ -3,7 +3,7 @@
  * gives back.
  */
 (function (App) {
-  'use strict';
+  "use strict";
 
   var P = App.formPage;
   var S = P.S;
@@ -16,11 +16,11 @@
    */
   async function sendUpdate(v) {
     var res = await App.api.call({
-      action: 'update',
+      action: "update",
       slug: S.slug,
       key: S.key,
       data: v.data,
-      transfer: S.transfer || undefined
+      transfer: S.transfer || undefined,
     });
     S.result = { ref: res.ref, edited: true };
     return res;
@@ -34,11 +34,11 @@
    */
   async function sendNew(v) {
     var request = {
-      action: 'submit',
+      action: "submit",
       slug: S.slug,
       data: v.data,
       lang: App.i18n.lang,
-      transfer: S.transfer || undefined
+      transfer: S.transfer || undefined,
     };
     if (P.keyMode()) request.sourceKey = S.sourceKey;
     var res = await App.api.call(request);
@@ -46,7 +46,7 @@
       ref: res.ref,
       key: res.key,
       keyExpires: res.keyExpires,
-      emailed: !!res.emailed
+      emailed: !!res.emailed,
     };
     return res;
   }
@@ -64,7 +64,7 @@
     S.transfer = null;
     P.clearDraft();
     S.busy = false;
-    S.view = 'ticket';
+    S.view = "ticket";
     P.render();
     try {
       window.scrollTo(0, 0);
@@ -88,7 +88,7 @@
     P.render();
     var res;
     try {
-      res = await (S.mode === 'edit' ? sendUpdate(v) : sendNew(v));
+      res = await (S.mode === "edit" ? sendUpdate(v) : sendNew(v));
     } catch (e) {
       S.busy = false;
       return P.handleSubmitError(e);

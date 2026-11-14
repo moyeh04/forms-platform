@@ -3,7 +3,7 @@
  * a question is on.
  */
 (function (App) {
-  'use strict';
+  "use strict";
 
   var P = App.formPage;
   var t = P.t;
@@ -11,18 +11,18 @@
   var S = P.S;
 
   /** The title of a step the form did not name. */
-  var DETAILS = { en: 'Details', ar: 'البيانات' };
+  var DETAILS = { en: "Details", ar: "البيانات" };
 
   /** Sets the steps of a key booking: the team, the slot, the review. */
   function buildKeySteps() {
     var sf = P.slotField();
-    var def = (S.form.steps || []).filter(function (s) {
+    var def = (S.form.steps || []).find(function (s) {
       return s.fields.indexOf(sf.id) !== -1;
-    })[0];
+    });
     S.steps = [
-      { id: '_team', team: true, fields: [] },
-      { id: 'slot', title: def ? def.title : sf.label, fields: [sf] },
-      { id: '_review', review: true, fields: [] }
+      { id: "_team", team: true, fields: [] },
+      { id: "slot", title: def ? def.title : sf.label, fields: [sf] },
+      { id: "_review", review: true, fields: [] },
     ];
   }
 
@@ -37,7 +37,7 @@
     var ids = fields.map(function (f) {
       return f.id;
     });
-    return [{ id: 'all', title: DETAILS, fields: ids }];
+    return [{ id: "all", title: DETAILS, fields: ids }];
   }
 
   /**
@@ -49,7 +49,7 @@
    */
   function addLeftOver(steps, left) {
     if (!left.length) return;
-    if (!steps.length) steps.push({ id: 'more', title: DETAILS, fields: [] });
+    if (!steps.length) steps.push({ id: "more", title: DETAILS, fields: [] });
     var last = steps[steps.length - 1];
     last.fields = last.fields.concat(left);
   }
@@ -77,7 +77,7 @@
         return {
           id: s.id,
           title: s.title,
-          fields: asked.map((id) => byId[id])
+          fields: asked.map((id) => byId[id]),
         };
       })
       .filter(function (s) {
@@ -87,9 +87,9 @@
       steps,
       fields.filter(function (f) {
         return !used[f.id];
-      })
+      }),
     );
-    steps.push({ id: '_review', review: true, fields: [] });
+    steps.push({ id: "_review", review: true, fields: [] });
     S.steps = steps;
   }
 
@@ -100,8 +100,8 @@
    * @return {string} The title in the page language.
    */
   function stepTitle(s) {
-    if (s.review) return t('reviewStep');
-    return s.team ? t('teamStep') : L(s.title);
+    if (s.review) return t("reviewStep");
+    return s.team ? t("teamStep") : L(s.title);
   }
 
   /**
@@ -111,7 +111,7 @@
    * @return {number} The index of the step, or 0.
    */
   function stepOfPath(path) {
-    var id = path.split('.')[0];
+    var id = path.split(".")[0];
     var found = S.steps.findIndex(function (step) {
       return step.fields.some(function (f) {
         return f.id === id;

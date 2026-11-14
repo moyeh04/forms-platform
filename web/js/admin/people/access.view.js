@@ -3,7 +3,7 @@
  * can be sent through two channels.
  */
 (function (App) {
-  'use strict';
+  "use strict";
 
   var A = App.admin;
   var ui = App.ui;
@@ -17,17 +17,17 @@
    */
   function copyButton(value) {
     return h(
-      'button',
+      "button",
       {
-        type: 'button',
-        class: 'btn btn-quiet sm',
+        type: "button",
+        class: "btn btn-quiet sm",
         onclick: async function () {
           var copied = await ui.copyText(value);
-          ui.toast(copied ? 'Copied' : 'Could not copy', 'ok');
-        }
+          ui.toast(copied ? "Copied" : "Could not copy", "ok");
+        },
       },
-      ui.icon('copy', A.ICON_SIZE.MENU),
-      'Copy'
+      ui.icon("copy", A.ICON_SIZE.MENU),
+      "Copy",
     );
   }
 
@@ -42,12 +42,12 @@
    */
   function block(label, shown, value, help) {
     return h(
-      'div',
+      "div",
       null,
-      h('span', { class: 'label' }, label),
+      h("span", { class: "label" }, label),
       shown,
       copyButton(value),
-      h('p', { class: 'help' }, help)
+      h("p", { class: "help" }, help),
     );
   }
 
@@ -61,29 +61,29 @@
    * @return {{close: function(), el: !Element}} The dialog.
    */
   A.revealAccess = function (title, token, key) {
-    var link = token ? A.viewerLink(token) : '';
+    var link = token ? A.viewerLink(token) : "";
     var body = h(
-      'div',
-      { class: 'access-reveal l-stack' },
+      "div",
+      { class: "access-reveal l-stack" },
       link
         ? block(
-            'Link',
-            h('div', { class: 'link-box' }, h('code', null, link)),
+            "Link",
+            h("div", { class: "link-box" }, h("code", null, link)),
             link,
-            'Shown only this once. If it is lost, make a new link.'
+            "Shown only this once. If it is lost, make a new link.",
           )
         : null,
       key
         ? block(
-            'Access key',
-            h('div', { class: 'key-reveal', name: 'access-key' }, key),
+            "Access key",
+            h("div", { class: "key-reveal", name: "access-key" }, key),
             key,
-            'Send the key apart from the link, for example the link by' +
-              ' email and the key by WhatsApp. The link alone opens nothing.' +
-              ' You can see the key again from the list.'
+            "Send the key apart from the link, for example the link by" +
+              " email and the key by WhatsApp. The link alone opens nothing." +
+              " You can see the key again from the list.",
           )
-        : null
+        : null,
     );
-    return A.modal(title, body, [{ text: 'Done', kind: 'primary' }]);
+    return A.modal(title, body, [{ text: "Done", kind: "primary" }]);
   };
 })(window.App);

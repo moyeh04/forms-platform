@@ -4,7 +4,7 @@
  * summary.
  */
 (function (App) {
-  'use strict';
+  "use strict";
 
   var P = App.formPage;
   var h = App.ui.h;
@@ -18,10 +18,10 @@
 
   /** The message of each state of a form that cannot be answered. */
   var CLOSED_TEXT = {
-    closed: 'closed',
-    not_yet: 'notYet',
-    draft: 'draft',
-    archived: 'closed'
+    closed: "closed",
+    not_yet: "notYet",
+    draft: "draft",
+    archived: "closed",
   };
 
   /**
@@ -31,14 +31,10 @@
    * @return {!Element} The sheet.
    */
   function closedView() {
-    var key = CLOSED_TEXT[S.state] || 'closed';
+    var key = CLOSED_TEXT[S.state] || "closed";
     var messages = S.form.messages || {};
     var msg = messages[key] ? L(messages[key]) : t(key);
-    return P.sheet(
-      P.head(),
-      h('h2', { class: 'state-title' }, msg),
-      editLink()
-    );
+    return P.sheet(P.head(), h("h2", { class: "state-title" }, msg), editLink());
   }
 
   /**
@@ -49,21 +45,21 @@
   function editLink() {
     if (!S.form.editKey?.enabled || !S.form.fields) return null;
     return h(
-      'p',
-      { class: 'foot' },
+      "p",
+      { class: "foot" },
       h(
-        'button',
+        "button",
         {
-          type: 'button',
-          class: 'link-btn',
+          type: "button",
+          class: "link-btn",
           onclick: function () {
-            S.view = 'keyEntry';
-            S.keyError = '';
+            S.view = "keyEntry";
+            S.keyError = "";
             P.render();
-          }
+          },
         },
-        t('editLink')
-      )
+        t("editLink"),
+      ),
     );
   }
 
@@ -75,7 +71,7 @@
    * @return {boolean} True for a registration opened with its key.
    */
   function hub() {
-    return S.mode === 'edit';
+    return S.mode === "edit";
   }
 
   /**
@@ -108,9 +104,9 @@
    * @return {string} The words.
    */
   function sendLabel() {
-    if (S.busy) return t('submitting');
-    if (S.mode === 'edit') return t('saveChanges');
-    return t(P.keyMode() ? 'book' : 'submit');
+    if (S.busy) return t("submitting");
+    if (S.mode === "edit") return t("saveChanges");
+    return t(P.keyMode() ? "book" : "submit");
   }
 
   /**
@@ -122,14 +118,14 @@
    * @return {!Element} The button.
    */
   function forwardButton(step, last) {
-    var label = t(step.team && !S.team ? 'findTeam' : 'next');
-    if (hub()) label = t('done');
+    var label = t(step.team && !S.team ? "findTeam" : "next");
+    if (hub()) label = t("done");
     if (last) label = sendLabel();
     return h(
-      'button',
-      { type: 'submit', class: 'btn btn-primary', disabled: S.busy },
+      "button",
+      { type: "submit", class: "btn btn-primary", disabled: S.busy },
       label,
-      last || hub() ? null : icon('arrow', ARROW_SIZE)
+      last || hub() ? null : icon("arrow", ARROW_SIZE),
     );
   }
 
@@ -141,20 +137,20 @@
    */
   function openBookingButton() {
     return h(
-      'button',
+      "button",
       {
-        type: 'button',
-        class: 'btn btn-primary',
-        name: 'open-booking',
+        type: "button",
+        class: "btn btn-primary",
+        name: "open-booking",
         disabled: S.busy,
         onclick: function () {
-          S.view = 'keyEntry';
-          S.keyError = '';
+          S.view = "keyEntry";
+          S.keyError = "";
           P.openByKey(S.sourceKey, S.teamCanMove);
-        }
+        },
       },
-      t(S.teamCanMove ? 'moveTime' : 'editOpen'),
-      icon('arrow', ARROW_SIZE)
+      t(S.teamCanMove ? "moveTime" : "editOpen"),
+      icon("arrow", ARROW_SIZE),
     );
   }
 
@@ -169,7 +165,7 @@
   function primaryButton(step, last) {
     if (step.team && S.team && S.teamBooked) return openBookingButton();
     if (hub() && last && !changed()) {
-      return h('p', { class: 'help no-changes' }, t('noChanges'));
+      return h("p", { class: "help no-changes" }, t("noChanges"));
     }
     return forwardButton(step, last);
   }
@@ -185,15 +181,15 @@
     if (hub()) return last ? P.closeButton() : null;
     if (S.stepIndex === 0) return null;
     return h(
-      'button',
+      "button",
       {
-        type: 'button',
-        class: 'btn btn-quiet',
+        type: "button",
+        class: "btn btn-quiet",
         onclick: function () {
           P.go(S.stepIndex - 1);
-        }
+        },
       },
-      t('back')
+      t("back"),
     );
   }
 
@@ -204,11 +200,11 @@
    * @return {string} The help, or '' on other steps.
    */
   function stepHelp(step) {
-    if (!step.review) return '';
+    if (!step.review) return "";
     if (hub()) {
-      return t(P.slotOnly() ? 'yourBookingHelp' : 'yourRegistrationHelp');
+      return t(P.slotOnly() ? "yourBookingHelp" : "yourRegistrationHelp");
     }
-    return t(S.form.editKey?.enabled ? 'reviewHelpKey' : 'reviewHelp');
+    return t(S.form.editKey?.enabled ? "reviewHelpKey" : "reviewHelp");
   }
 
   /**
@@ -219,28 +215,22 @@
    * @return {!Element} The form.
    */
   function stepForm(step, last) {
-    var heading = step.review
-      ? t(hub() ? 'yourRegistration' : 'reviewTitle')
-      : P.stepTitle(step);
+    var heading = step.review ? t(hub() ? "yourRegistration" : "reviewTitle") : P.stepTitle(step);
     var help = stepHelp(step);
     return h(
-      'form',
+      "form",
       {
-        novalidate: 'novalidate',
+        novalidate: "novalidate",
         onsubmit: function (e) {
           e.preventDefault();
           if (!S.busy) P.next();
-        }
+        },
       },
-      h(
-        'h2',
-        { class: 'step-title', tabindex: '-1', id: 'step-title' },
-        heading
-      ),
-      help ? h('p', { class: 'step-help' }, help) : null,
+      h("h2", { class: "step-title", tabindex: "-1", id: "step-title" }, heading),
+      help ? h("p", { class: "step-help" }, help) : null,
       step.review && hub() ? P.progressBlock(S.progress) : null,
       stepBody(step),
-      h('div', { class: 'nav' }, backButton(last), primaryButton(step, last))
+      h("div", { class: "nav" }, backButton(last), primaryButton(step, last)),
     );
   }
 
@@ -251,14 +241,12 @@
    * @return {?Element} The note, or null for a new registration.
    */
   function editBanner() {
-    if (S.mode !== 'edit') return null;
+    if (S.mode !== "edit") return null;
     var until = App.i18n.fmtDate(S.keyInfo.keyExpires);
     return h(
-      'div',
-      { class: 'banner info', role: 'status' },
-      t('editing', { ref: S.keyInfo.ref }) +
-        '. ' +
-        t('keyUntil', { date: until })
+      "div",
+      { class: "banner info", role: "status" },
+      t("editing", { ref: S.keyInfo.ref }) + ". " + t("keyUntil", { date: until }),
     );
   }
 
@@ -269,15 +257,11 @@
    * @return {?Element} The link, or null.
    */
   function cancelLink(last) {
-    if (S.mode !== 'edit' || !S.keyInfo.canDelete || !last) return null;
+    if (S.mode !== "edit" || !S.keyInfo.canDelete || !last) return null;
     return h(
-      'p',
-      { class: 'foot' },
-      h(
-        'button',
-        { type: 'button', class: 'link-btn', onclick: P.askCancel },
-        t('cancelReg')
-      )
+      "p",
+      { class: "foot" },
+      h("button", { type: "button", class: "link-btn", onclick: P.askCancel }, t("cancelReg")),
     );
   }
 
@@ -291,7 +275,7 @@
   function formView() {
     var step = S.steps[S.stepIndex];
     var last = S.stepIndex === S.steps.length - 1;
-    var first = S.mode === 'new' && S.stepIndex === 0 && !P.keyMode();
+    var first = S.mode === "new" && S.stepIndex === 0 && !P.keyMode();
     return P.sheet(
       P.head(),
       editBanner(),
@@ -300,7 +284,7 @@
       P.bannerEl(),
       stepForm(step, last),
       cancelLink(last),
-      first ? editLink() : null
+      first ? editLink() : null,
     );
   }
 

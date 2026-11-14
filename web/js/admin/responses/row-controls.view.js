@@ -4,7 +4,7 @@
  * the Details button.
  */
 (function (App) {
-  'use strict';
+  "use strict";
 
   var A = App.admin;
   var R = A.responses;
@@ -19,7 +19,7 @@
    * @return {!Element} The name.
    */
   R.bdi = function (text) {
-    return h('bdi', { lang: 'ar' }, text || '');
+    return h("bdi", { lang: "ar" }, text || "");
   };
 
   /**
@@ -48,19 +48,19 @@
         return [x, A.SUB_LABEL[x]];
       }),
       function (v) {
-        A.call('admin.submission.update', {
+        A.call("admin.submission.update", {
           slug: form.slug,
           submissionId: s.id,
-          patch: { status: v }
+          patch: { status: v },
         })
           .then(function () {
             s.status = v;
-            toast('Status updated', 'ok');
+            toast("Status updated", "ok");
           })
           .catch(A.fail);
-      }
+      },
     );
-    sel.setAttribute('aria-label', 'Status of ' + s.ref);
+    sel.setAttribute("aria-label", "Status of " + s.ref);
     return sel;
   };
 
@@ -74,26 +74,26 @@
    */
   R.reviewSelect = function (form, s, step) {
     var sel = A.select(
-      s.review?.[step.id] || 'pending',
+      s.review?.[step.id] || "pending",
       A.REVIEW.map(function (x) {
         return [x, A.SUB_LABEL[x]];
       }),
       function (v) {
         var patch = { review: {} };
         patch.review[step.id] = v;
-        A.call('admin.submission.update', {
+        A.call("admin.submission.update", {
           slug: form.slug,
           submissionId: s.id,
-          patch: patch
+          patch: patch,
         })
           .then(function () {
             s.review[step.id] = v;
-            toast(step.label.en + ': ' + v, 'ok');
+            toast(step.label.en + ": " + v, "ok");
           })
           .catch(A.fail);
-      }
+      },
     );
-    sel.setAttribute('aria-label', step.label.en + ' for ' + s.ref);
+    sel.setAttribute("aria-label", step.label.en + " for " + s.ref);
     return sel;
   };
 
@@ -107,16 +107,16 @@
    */
   R.detailsButton = function (form, s, reload) {
     return h(
-      'button',
+      "button",
       {
-        type: 'button',
-        class: 'btn btn-quiet sm',
-        name: 'details',
+        type: "button",
+        class: "btn btn-quiet sm",
+        name: "details",
         onclick: function () {
           R.details(form, s, reload);
-        }
+        },
       },
-      'Details'
+      "Details",
     );
   };
 })(window.App);

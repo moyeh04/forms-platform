@@ -3,10 +3,43 @@
  * is set to now. A click on the line unfolds it.
  */
 (function (App) {
-  'use strict';
+  "use strict";
 
   var A = App.admin;
   var h = App.ui.h;
+
+  /**
+   * Builds the elements of a folded section.
+   *
+   * @param {string} title Its name.
+   * @param {*} help The help under the name, or null.
+   * @param {!Array<*>} body What it holds.
+   * @return {{content: !Element, sum: !Element, head: !Element, node: !Element}}
+   *     The body, the folded line, the button and the section.
+   */
+  function frame(title, help, body) {
+    var content = h(
+      "div",
+      { class: "panel-body", hidden: true },
+      help ? h("p", { class: "help" }, help) : null,
+      body,
+    );
+    var sum = h("span", { class: "panel-sum" });
+    var head = h(
+      "button",
+      { type: "button", class: "panel-head", "aria-expanded": "false" },
+      h("span", { class: "panel-title" }, title),
+      sum,
+    );
+    var node = h(
+      "section",
+      { class: "panel fold", dataset: { panel: title } },
+      h("h2", null, head),
+      content,
+    );
+    node.panelTitle = title;
+    return { content: content, sum: sum, head: head, node: node };
+  }
 
   /**
    * Draws a folded section.
@@ -20,26 +53,11 @@
    *     `onToggle(open)`, when set, is told each fold.
    */
   A.panel = function (title, help, ...body) {
-    var content = h(
-      'div',
-      { class: 'panel-body', hidden: true },
-      help ? h('p', { class: 'help' }, help) : null,
-      body
-    );
-    var sum = h('span', { class: 'panel-sum' });
-    var head = h(
-      'button',
-      { type: 'button', class: 'panel-head', 'aria-expanded': 'false' },
-      h('span', { class: 'panel-title' }, title),
-      sum
-    );
-    var node = h(
-      'section',
-      { class: 'panel fold', dataset: { panel: title } },
-      h('h2', null, head),
-      content
-    );
-    node.panelTitle = title;
+    var parts = frame(title, help, body);
+    var content = parts.content;
+    var sum = parts.sum;
+    var head = parts.head;
+    var node = parts.node;
 
     /**
      * Tells whether the section is unfolded.
@@ -57,20 +75,20 @@
      */
     function setOpen(open) {
       content.hidden = !open;
-      head.setAttribute('aria-expanded', open ? 'true' : 'false');
-      node.classList.toggle('open', !!open);
+      head.setAttribute("aria-expanded", open ? "true" : "false");
+      node.classList.toggle("open", !!open);
       if (node.onToggle) node.onToggle(!!open);
     }
 
     /** Draws the folded line again. */
     function paintSummary() {
-      sum.textContent = node.summary ? node.summary() : '';
+      sum.textContent = node.summary ? node.summary() : "";
     }
 
     /** Keeps the section open: a work area has nothing to fold to. */
     function pin() {
       node.pinned = true;
-      node.classList.add('pinned');
+      node.classList.add("pinned");
       head.disabled = true;
       setOpen(true);
     }
@@ -79,7 +97,7 @@
     node.setOpen = setOpen;
     node.paintSummary = paintSummary;
     node.pin = pin;
-    head.addEventListener('click', function () {
+    head.addEventListener("click", function () {
       node.setOpen(content.hidden);
     });
     return node;
