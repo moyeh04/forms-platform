@@ -107,9 +107,10 @@ flowchart LR
 ## Quick start
 
 ```
-pnpm install          # once, installs the browser test library, Biome and the git hooks
+pnpm install          # once, installs the browser test library, Oxfmt, Oxlint, Stylelint and the git hooks
 pnpm run dev          # local preview on http://localhost:8080 (PIN 4321), in memory, no Google needed
-pnpm run check        # Biome, line width, JSDoc, constants and structure checks
+pnpm run check        # layout, lint, line width, JSDoc, constants and structure checks
+pnpm fmt             # lays out every file with Oxfmt
 pnpm test             # rules, backend, form page, dashboard, instructor page, deployment
 pnpm run build        # writes dist/Code.gs and dist/appsscript.json for clasp
 pnpm run setup        # first deployment: creates the sheet, pushes the backend, creates the web app, configures GitHub

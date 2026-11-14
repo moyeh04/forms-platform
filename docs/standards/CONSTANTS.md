@@ -54,17 +54,17 @@ exempt: an expected value is data.
 
 ## How it is checked
 
-| Where the number is                                                                   | Check                                                                                                     |
-| ------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
-| an argument, an operand, an array element, a comparison                               | Biome `style/noMagicNumbers`                                                                              |
-| the initial value of a variable, a property or a default parameter, which Biome skips | `check-numbers.js`: it passes only under a CONSTANT_CASE variable, property, or constant object around it |
-| a colour in a stylesheet: a hex value, a colour function or a colour keyword          | `check-colours.js`: it passes only as the value of a custom property in `web/css/theme.css`               |
+| Where the number is                                                                    | Check                                                                                                     |
+| -------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| an argument, an operand, an array element, a comparison                                | Oxlint `no-magic-numbers`                                                                                 |
+| the initial value of a variable, a property or a default parameter, which Oxlint skips | `check-numbers.js`: it passes only under a CONSTANT_CASE variable, property, or constant object around it |
+| a colour in a stylesheet: a hex value, a colour function or a colour keyword           | `check-colours.js`: it passes only as the value of a custom property in `web/css/theme.css`               |
 
 A number that must stay as written, such as a length fixed by a standard,
 is silenced on its own line with the reason, and both checks honour it:
 
 ```js
-// biome-ignore lint/style/noMagicNumbers: SHA-256 gives 32 bytes
+// oxlint-disable-next-line no-magic-numbers -- SHA-256 gives 32 bytes
 ```
 
 ## Where the constants live today
