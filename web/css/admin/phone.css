@@ -20,8 +20,7 @@
   .team-card .mini tr {
     display: grid;
     grid-template-columns: 1.6rem minmax(0, 1fr) minmax(0, 1fr);
-    column-gap: 8px;
-    row-gap: 3px;
+    gap: 3px 8px;
     padding: 10px 14px;
     border-top: 1px solid color-mix(in srgb, var(--line) 70%, transparent);
   }

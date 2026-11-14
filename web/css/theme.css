@@ -34,17 +34,17 @@
   --sea-2: #4e9db3;
   --err: #a12b1f;
   --focus: #3f6b66;
-  --shadow: rgba(47, 36, 24, 0.16);
+  --shadow: rgb(47 36 24 / 16%);
   --sea-frame: #2a1c12;
   --scene-card: #f0e2c5;
 
   /* The same in both themes. */
-  --stain-red: rgba(154, 51, 40, 0.05);
-  --stain-sea: rgba(63, 107, 102, 0.06);
-  --backdrop: rgba(20, 14, 8, 0.55);
-  --backdrop-dashboard: rgba(20, 16, 11, 0.55);
-  --horizon-foam: rgba(255, 255, 255, 0.7);
-  --course-line: rgba(255, 255, 255, 0.85);
+  --stain-red: rgb(154 51 40 / 5%);
+  --stain-sea: rgb(63 107 102 / 6%);
+  --backdrop: rgb(20 14 8 / 55%);
+  --backdrop-dashboard: rgb(20 16 11 / 55%);
+  --horizon-foam: rgb(255 255 255 / 70%);
+  --course-line: rgb(255 255 255 / 85%);
   /* The booking scene keeps its own ink in both themes, as the saved image does. */
   --scene-ink: #2f2418;
   --scene-mute: #4a3a2a;
@@ -118,7 +118,7 @@
     --sea-2: #0f2c35;
     --err: #f08a7c;
     --focus: #86b8ad;
-    --shadow: rgba(0, 0, 0, 0.5);
+    --shadow: rgb(0 0 0 / 50%);
     --sea-frame: #5a4a38;
     --scene-card: #d8c69c;
     color-scheme: dark;
@@ -145,7 +145,7 @@
   --sea-2: #0f2c35;
   --err: #f08a7c;
   --focus: #86b8ad;
-  --shadow: rgba(0, 0, 0, 0.5);
+  --shadow: rgb(0 0 0 / 50%);
   --sea-frame: #5a4a38;
   --scene-card: #d8c69c;
   color-scheme: dark;
@@ -214,7 +214,7 @@ textarea {
   width: 1px;
   height: 1px;
   overflow: hidden;
-  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
   white-space: nowrap;
 }
 .code {

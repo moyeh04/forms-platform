@@ -16,6 +16,7 @@ const ROOT = path.resolve(__dirname, "..", "..");
 const CONFIG = require("./config.json");
 const CHECKS = [
   require("./code/check-oxlint.js"),
+  require("./code/check-stylelint.js"),
   require("./code/check-lines.js"),
   require("./code/check-jsdoc.js"),
   require("./code/check-comments.js"),

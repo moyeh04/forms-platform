@@ -1,1 +1,3 @@
 minimumReleaseAge: 10080
+minimumReleaseAgeExclude:
+  - stylelint-declaration-strict-value@1.13.0

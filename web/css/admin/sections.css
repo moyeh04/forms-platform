@@ -102,8 +102,6 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-}
-.sec-new {
   flex-wrap: wrap;
 }
 .sec-new .error {

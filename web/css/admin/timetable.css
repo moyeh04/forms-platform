@@ -67,10 +67,10 @@
   content: "";
   position: absolute;
   bottom: 4px;
-  left: 50%;
+  inset-inline-start: 50%;
   width: 5px;
   height: 5px;
-  margin-left: -2.5px;
+  margin-inline-start: -2.5px;
   border-radius: 50%;
   background: var(--gold);
 }

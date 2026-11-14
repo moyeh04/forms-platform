@@ -20,6 +20,7 @@
     "extensions": [".js"],
     "exclude": ["tests/fixtures/"]
   },
+  "stylelint": { "include": ["web/css/"], "extensions": [".css"] },
   "lines": {
     "limit": 100,
     "byExtension": { ".css": 120 },
@@ -33,6 +34,7 @@
       ".github/",
       ".oxlintrc.json",
       ".oxfmtrc.json",
+      "stylelint.config.mjs",
       "package.json"
     ],
     "extensions": [".js", ".css", ".html", ".sh", ".yml", ".json", ""],
@@ -111,6 +113,7 @@
       "pnpm-workspace.yaml",
       ".oxfmtrc.json",
       ".oxlintrc.json",
+      "stylelint.config.mjs",
       ".gitignore",
       ".git-blame-ignore-revs",
       ".githooks",
