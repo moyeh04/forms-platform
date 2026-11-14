@@ -79,8 +79,8 @@ test(
       assert.equal(typeof w.ctx[name], 'function', name);
     }
     const menu = bundleSource().code;
-    const named = [...menu.matchAll(/addItem\('[^']*', '(\w+)'\)/g)].map(
-      (m) => m[1]
+    const named = [...menu.matchAll(/addItem\((['"])[^'"]*\1, (['"])(\w+)\2\)/g)].map(
+      (m) => m[3]
     );
     assert.ok(named.length > 0);
     for (const name of named)

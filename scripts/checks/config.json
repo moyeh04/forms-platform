@@ -30,7 +30,7 @@
     "exclude": ["tests/fixtures/"]
   },
   "lines": {
-    "limit": 80,
+    "limit": 100,
     "byExtension": { ".css": 120 },
     "include": [
       "web/",
@@ -117,6 +117,7 @@
       "package.json",
       "pnpm-lock.yaml",
       "pnpm-workspace.yaml",
+      ".oxfmtrc.json",
       "biome.json",
       ".gitignore",
       ".git-blame-ignore-revs",

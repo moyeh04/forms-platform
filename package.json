@@ -16,7 +16,8 @@
     "@biomejs/biome": "2.5.15",
     "acorn": "8.14.1",
     "acorn-walk": "8.3.4",
-    "jsdom": "^24.1.0"
+    "jsdom": "^24.1.0",
+    "oxfmt": "0.77.0"
   },
   "license": "UNLICENSED",
   "packageManager": "pnpm@12.18.0"

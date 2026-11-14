@@ -1,6 +1,7 @@
 /**
  * Runs Biome over the files of a run and turns what it reports into
- * findings: formatting, lint rules and the size limits of biome.json.
+ * findings: lint rules and the size limits of biome.json. Oxfmt owns the
+ * layout.
  * Suggestions Biome marks as "info" are left out.
  */
 const { spawnSync } = require('node:child_process');

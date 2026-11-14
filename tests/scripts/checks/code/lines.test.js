@@ -52,7 +52,7 @@ test('Line check: an extension with its own width uses it', () => {
 
 test('Line check: Arabic by character, URLs free, other folders out', () => {
   const root = repo({
-    'src/b.js': 'أحمد محمد\n// https://example.com/a/very/long/path\n',
+    'src/b.js': 'أحمّد محمّد\n// https://example.com/a/very/long/path\n',
     'src/skip/c.js': '12345678901\n',
     'other/d.js': '12345678901\n'
   });

@@ -9,10 +9,10 @@ const path = require('node:path');
 const Module = require('node:module');
 const { select, read } = require('../lib/files.js');
 
-const ROUTE = /\baction: '([A-Za-z.]+)',\s*access: Access\.([A-Z]+)/g;
+const ROUTE = /\baction: (['"])([A-Za-z.]+)\1,\s*access: Access\.([A-Z]+)/g;
 const SECTION = /^## (.*)$/;
-const API_ROW = /^\| `([A-Za-z.]+)` \| (?:yes|no) \|/gm;
-const TEST_ROW = /^\|[^|]+\| `([a-z0-9/._-]+\.test\.js)` \| (\d+) \|/gm;
+const API_ROW = /^\| +`([A-Za-z.]+)` +\| +(?:yes|no) +\|/gm;
+const TEST_ROW = /^\|[^|]+\| +`([a-z0-9/._-]+\.test\.js)` +\| +(\d+) +\|/gm;
 const TOTAL = /(\d+) automated tests|# (\d+) tests/g;
 const LINK = /\]\(([^)#\s]+)(?:#[^)\s]*)?\)/g;
 
@@ -67,7 +67,7 @@ function actions(root, files, config) {
   const code = new Map();
   for (const file of select(files, config.backend)) {
     for (const match of read(root, file).matchAll(ROUTE)) {
-      code.set(match[1], match[2]);
+      code.set(match[2], match[3]);
     }
   }
   const text = read(root, config.api);
