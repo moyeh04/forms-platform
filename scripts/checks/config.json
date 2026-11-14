@@ -15,6 +15,11 @@
       "extensions": [".js"]
     }
   },
+  "oxfmt": {
+    "include": [""],
+    "extensions": [".js", ".mjs", ".json", ".css", ".html", ".md", ".yml", ".yaml"],
+    "exclude": ["tests/fixtures/", "pnpm-lock.yaml"]
+  },
   "oxlint": {
     "include": ["web/js/", "backend/", "domain/", "scripts/", "tests/"],
     "extensions": [".js"],
@@ -23,7 +28,6 @@
   "stylelint": { "include": ["web/css/"], "extensions": [".css"] },
   "lines": {
     "limit": 100,
-    "byExtension": { ".css": 120 },
     "include": [
       "web/",
       "backend/",
@@ -117,6 +121,7 @@
       ".gitignore",
       ".git-blame-ignore-revs",
       ".githooks",
+      ".vscode",
       ".github",
       "backend",
       "web",

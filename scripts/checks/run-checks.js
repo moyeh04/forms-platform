@@ -15,6 +15,7 @@ const { formatFinding, printBlock } = require("./lib/report.js");
 const ROOT = path.resolve(__dirname, "..", "..");
 const CONFIG = require("./config.json");
 const CHECKS = [
+  require("./code/check-oxfmt.js"),
   require("./code/check-oxlint.js"),
   require("./code/check-stylelint.js"),
   require("./code/check-lines.js"),

@@ -44,6 +44,23 @@
   },
   "overrides": [
     {
+      // Over 300 lines before the rule; each split is its own change. They are listed here, not
+      // in exceptions.json, so the editor and pnpm lint agree with the checks.
+      "files": [
+        "backend/features/catalog/templates/templates.service.js",
+        "web/js/admin/questions/questions.model.js",
+        "web/js/admin/settings/timetable.model.js",
+        "web/js/admin/keys/extend-keys.view.js",
+        "web/js/teams/progress-board.view.js",
+        "scripts/deploy/setup-deployment.js",
+        "web/js/admin/shell/form-head.view.js",
+        "web/js/form/slot-calendar.view.js",
+        "scripts/dev/sample-world.js",
+        "web/js/viewer/print.view.js"
+      ],
+      "rules": { "max-lines": "off" }
+    },
+    {
       // The bundler joins the backend into one Apps Script file with one global scope: each file
       // defines a namespace other files call, and entry-points.js and main.js define the
       // functions Apps Script calls by name.

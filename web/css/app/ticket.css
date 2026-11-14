@@ -107,10 +107,11 @@
   text-align: start;
   margin-top: 8px;
 }
-/* The time of a booking: the parrot points at the time on a clock, the pirate his hook at the day on a calendar.
-   One picture for both languages, with its own colours on a parchment card, the same in both themes and in
-   the saved image; only the card is a little darker at night. The words and the two figures sit over the
-   drawing, placed in hundredths of its 440 by 220 box, each centred on what it labels. */
+/* The time of a booking: the parrot points at the time on a clock, the pirate his hook at the day
+   on a calendar. One picture for both languages, with its own colours on a parchment card, the same
+   in both themes and in the saved image; only the card is a little darker at night. The words and
+   the two figures sit over the drawing, placed in hundredths of its 440 by 220 box, each centred on
+   what it labels. */
 .when {
   position: relative;
   max-width: 440px;
@@ -173,8 +174,8 @@
 .still .when .slice {
   animation: none;
 }
-/* The month is centred on the red band below the rings (x 306 to 422, y 30 to 47); the day on the front page (x 306 to
-   416, y 53 to 137). */
+/* The month is centred on the red band below the rings (x 306 to 422, y 30 to 47); the day on the
+   front page (x 306 to 416, y 53 to 137). */
 .when-head {
   position: absolute;
   top: 13.7%;

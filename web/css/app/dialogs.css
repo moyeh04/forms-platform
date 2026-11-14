@@ -37,7 +37,8 @@
   gap: 8px;
   pointer-events: none;
 }
-/* A newer version of the site is published: a strip above the page, so it covers nothing and stays in view. */
+/* A newer version of the site is published: a strip above the page, so it covers nothing and stays
+   in view. */
 .fresh-bar {
   position: sticky;
   z-index: 40;

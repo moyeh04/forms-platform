@@ -8,55 +8,5 @@
     "path": "backend/features/intake/keys/keys.service.js",
     "rule": "error-times",
     "reason": "The edit-key lock predates the rule; its own change"
-  },
-  {
-    "path": "backend/features/catalog/templates/templates.service.js",
-    "rule": "oxlint/eslint/max-lines",
-    "reason": "Over 300 lines before the rule; its split is its own change"
-  },
-  {
-    "path": "web/js/admin/questions/questions.model.js",
-    "rule": "oxlint/eslint/max-lines",
-    "reason": "Over 300 lines before the rule; its split is its own change"
-  },
-  {
-    "path": "web/js/admin/settings/timetable.model.js",
-    "rule": "oxlint/eslint/max-lines",
-    "reason": "Over 300 lines before the rule; its split is its own change"
-  },
-  {
-    "path": "web/js/admin/keys/extend-keys.view.js",
-    "rule": "oxlint/eslint/max-lines",
-    "reason": "Over 300 lines before the rule; its split is its own change"
-  },
-  {
-    "path": "web/js/teams/progress-board.view.js",
-    "rule": "oxlint/eslint/max-lines",
-    "reason": "Over 300 lines before the rule; its split is its own change"
-  },
-  {
-    "path": "scripts/deploy/setup-deployment.js",
-    "rule": "oxlint/eslint/max-lines",
-    "reason": "Over 300 lines before the rule; its split is its own change"
-  },
-  {
-    "path": "web/js/admin/shell/form-head.view.js",
-    "rule": "oxlint/eslint/max-lines",
-    "reason": "Over 300 lines before the rule; its split is its own change"
-  },
-  {
-    "path": "web/js/form/slot-calendar.view.js",
-    "rule": "oxlint/eslint/max-lines",
-    "reason": "Over 300 lines before the rule; its split is its own change"
-  },
-  {
-    "path": "scripts/dev/sample-world.js",
-    "rule": "oxlint/eslint/max-lines",
-    "reason": "Over 300 lines before the rule; its split is its own change"
-  },
-  {
-    "path": "web/js/viewer/print.view.js",
-    "rule": "oxlint/eslint/max-lines",
-    "reason": "Over 300 lines before the rule; its split is its own change"
   }
 ]

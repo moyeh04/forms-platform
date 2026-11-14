@@ -11,7 +11,9 @@
     "build:site": "node scripts/build/build-site.js",
     "setup": "node scripts/deploy/setup-deployment.js",
     "dev": "node scripts/dev/dev-server.js",
-    "prepare": "sh scripts/dev/setup-git.sh"
+    "prepare": "sh scripts/dev/setup-git.sh",
+    "fmt": "oxfmt",
+    "lint": "oxlint --type-aware --deny-warnings && stylelint \"web/css/**/*.css\""
   },
   "devDependencies": {
     "acorn": "8.14.1",
