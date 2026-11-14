@@ -14,7 +14,7 @@
   var HOW = [
     "Name, code, phone and every other question the two forms share are" +
       " copied from the registration. Students are not asked them again.",
-    "The Questions section below still decides which answers are kept and" + " shown.",
+    "The Questions section below still decides which answers are kept and shown.",
     "The same key opens and cancels the booking. A key that has expired for" +
       " editing still books.",
     "Each team books once.",
@@ -47,6 +47,20 @@
   }
 
   /**
+   * Says that no form gives keys yet, so there is nothing to switch on.
+   *
+   * @return {!Element} The note.
+   */
+  function noSourceNote() {
+    return h(
+      "p",
+      { class: "muted-note" },
+      "No form gives its students a key yet. Create a team registration form first, then" +
+        " come back here.",
+    );
+  }
+
+  /**
    * Draws the panel's body again. Without a form that issues keys there is
    * nothing to switch on, so the switch is not shown. A source that no
    * longer gives keys is replaced by the first one that does.
@@ -57,14 +71,7 @@
     var kb = k.f.keyBooking;
     ui.clear(k.body);
     if (!k.sources.length) {
-      k.body.appendChild(
-        h(
-          "p",
-          { class: "muted-note" },
-          "No form gives its students a key yet. Create a team registration" +
-            " form first, then come back here.",
-        ),
-      );
+      k.body.appendChild(noSourceNote());
       return;
     }
     var known = k.sources.some(function (s) {
@@ -88,7 +95,7 @@
         h(
           "p",
           { class: "error", role: "alert" },
-          "The registration form this used no longer gives keys. Choose" + " another one.",
+          "The registration form this used no longer gives keys. Choose another one.",
         ),
       );
       kb.source = k.sources[0].id;
@@ -114,9 +121,9 @@
   function summary(k) {
     var kb = k.f.keyBooking;
     if (!kb.enabled) return "Off";
-    var from = k.sources.filter(function (x) {
+    var from = k.sources.find(function (x) {
       return x.id === kb.source;
-    })[0];
+    });
     return "On" + (from ? ", keys of " + from.title : ", no form chosen");
   }
 
@@ -133,7 +140,7 @@
     paint(k);
     var panel = A.panel(
       "Booking with a key",
-      "Let teams that already registered book a slot without typing their" + " details again.",
+      "Let teams that already registered book a slot without typing their details again.",
       k.body,
     );
     panel.summary = summary.bind(null, k);

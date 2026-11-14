@@ -194,7 +194,7 @@ test(
 );
 
 test(
-  "Transfer: rejecting keeps both teams, and the team that asked can " + "cancel while it waits",
+  "Transfer: rejecting keeps both teams, and the " + "team that asked can cancel while it waits",
   () => {
     const w = boot();
     const { a, b } = asked(w);
@@ -242,7 +242,7 @@ test("Transfer: a team deleted by the admin takes its requests with it", () => {
   const w = boot();
   const { a, b } = asked(w);
   assert.equal(rows(w).transfers.length, 1);
-  const asking = rows(w).submissions.filter((s) => s.ref === b.ref)[0];
+  const asking = rows(w).submissions.find((s) => s.ref === b.ref);
   assert.equal(
     w.admin({
       action: "admin.submission.delete",
@@ -280,7 +280,7 @@ test(
 );
 
 test(
-  "Transfer: a full team cannot receive, and a second request for the " + "same student closes",
+  "Transfer: a full team cannot receive, and a " + "second request for the same student closes",
   () => {
     const w = boot();
     const a = send(w, team(4230001, [4230002, 4230003]));
@@ -452,7 +452,7 @@ test(
 );
 
 test(
-  "Transfer: the admin moves a leader with the same question, and sees " + "who can lead next",
+  "Transfer: the admin moves a leader with the " + "same question, and sees who can lead next",
   () => {
     const w = boot();
     const { a, b } = leaderAsked(w);
@@ -484,7 +484,7 @@ test(
 );
 
 test(
-  "Transfer: with the switch on, the two leaders of a waiting request " + "see each other's phone",
+  "Transfer: with the switch on, the two leaders " + "of a waiting request see each other's phone",
   () => {
     const phoned = (req, phone) => ({ ...req, data: { ...req.data, phone } });
     const w = boot({ transferPhones: true });
@@ -547,7 +547,7 @@ test(
   },
 );
 
-test("Transfer: off by default, and a cancelled team takes its requests " + "with it", () => {
+test("Transfer: off by default, and a cancelled team takes its requests with it", () => {
   const off = boot({ transfers: false });
   send(off, team(4230001, [4230002, 4230003]));
   const refused = send(off, team(4230011, [4230002, 4230004], { transfer: ["4230002"] }));

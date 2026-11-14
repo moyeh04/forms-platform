@@ -64,7 +64,9 @@
       .map(function (k) {
         return A.extendedEnd(k.keyExpires, v.choice);
       })
-      .sort();
+      .sort(function (a, b) {
+        return a < b ? -1 : Number(a > b);
+      });
     var first = A.day(ends[0]);
     var last = A.day(ends[ends.length - 1]);
     return h(
@@ -125,7 +127,7 @@
         h(
           "span",
           { class: "help" },
-          "Time is added from today, or from a key" + "'s end date when that is later.",
+          "Time is added from today, or from a key's end date when that is later.",
         ),
       );
     }
@@ -249,17 +251,9 @@
       chosen: [],
       search: "",
       choice: { days: DEFAULT_DAYS },
-      whichBox: h("div", {
-        class: "toggle-chips",
-        role: "group",
-        "aria-label": "Which keys",
-      }),
+      whichBox: h("div", { class: "toggle-chips", role: "group", "aria-label": "Which keys" }),
       listBox: h("div", { class: "key-choose" }),
-      rowsBox: h("div", {
-        class: "key-rows",
-        role: "group",
-        "aria-label": "Teams",
-      }),
+      rowsBox: h("div", { class: "key-rows", role: "group", "aria-label": "Teams" }),
       preview: h("p", { class: "extend-preview", role: "status" }),
     };
     v.searchInput = h("input", {

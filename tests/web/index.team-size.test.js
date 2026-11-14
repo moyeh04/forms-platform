@@ -3,36 +3,33 @@ const assert = require("node:assert/strict");
 const { settle } = require("../harness/dom.js");
 const { boot, open, fillAbout, fillStudy } = require("../harness/form-page.js");
 
-test(
-  "Team size: member forms stay hidden until a size is chosen, and " + "Next needs it",
-  async () => {
-    const w = boot();
-    const p = await open(w);
-    await fillAbout(p);
-    p.submitForm();
-    await settle();
-    await fillStudy(p);
-    p.submitForm();
-    await settle();
-    assert.equal(p.$(".trail .is-current .trail-label").textContent, "Team members");
-    assert.equal(p.$$(".member").length, 0);
-    assert.ok(p.text().includes("Choose the team size above"));
-    assert.deepEqual(
-      p.$$(".size-chips input").map((i) => i.value),
-      ["1", "2", "3", "4", "5", "6"],
-    );
-    p.submitForm();
-    await settle();
-    assert.equal(
-      p.$(".trail .is-current .trail-label").textContent,
-      "Team members",
-      "cannot skip the team part",
-    );
-    assert.ok(p.$('[data-path="team_size"] .error').textContent.includes("required"));
-  },
-);
+test("Team size: member forms stay hidden until a size is chosen, and Next needs it", async () => {
+  const w = boot();
+  const p = await open(w);
+  await fillAbout(p);
+  p.submitForm();
+  await settle();
+  await fillStudy(p);
+  p.submitForm();
+  await settle();
+  assert.equal(p.$(".trail .is-current .trail-label").textContent, "Team members");
+  assert.equal(p.$$(".member").length, 0);
+  assert.ok(p.text().includes("Choose the team size above"));
+  assert.deepEqual(
+    p.$$(".size-chips input").map((i) => i.value),
+    ["1", "2", "3", "4", "5", "6"],
+  );
+  p.submitForm();
+  await settle();
+  assert.equal(
+    p.$(".trail .is-current .trail-label").textContent,
+    "Team members",
+    "cannot skip the team part",
+  );
+  assert.ok(p.$('[data-path="team_size"] .error').textContent.includes("required"));
+});
 
-test("Team size: choosing a size " + "shows exactly that many member forms", async () => {
+test("Team size: choosing a size shows exactly that many member forms", async () => {
   const w = boot();
   const p = await open(w);
   await fillAbout(p);
@@ -143,7 +140,7 @@ test("Team size: the admin range decides which sizes are offered", async () => {
   );
 });
 
-test("Team size: a fixed size " + "is selected for the student automatically", async () => {
+test("Team size: a fixed size is selected for the student automatically", async () => {
   const w = boot("team_registration", {
     rules: { teamSize: { min: 3, max: 3 } },
   });
@@ -157,7 +154,7 @@ test("Team size: a fixed size " + "is selected for the student automatically", a
   assert.equal(p.$$(".member").length, 2);
 });
 
-test("Team size: a team of three " + "submits all its members and stores them", async () => {
+test("Team size: a team of three submits all its members and stores them", async () => {
   const w = boot();
   const p = await open(w);
   await fillAbout(p);
@@ -194,7 +191,7 @@ test("Team size: a team of three " + "submits all its members and stores them", 
 });
 
 test(
-  "Size note: picking a size with a note shows it under the chips and " + "on the review",
+  "Size note: picking a size with a note " + "shows it under the chips and on the review",
   async () => {
     const w = boot("team_registration", {
       rules: {

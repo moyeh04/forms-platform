@@ -40,7 +40,7 @@ function testFindings(files, tests) {
     const dir = path.posix.dirname(rel);
     if (dir !== "." && !sources.has(dir)) stray.add(`${tests.root}${dir}/`);
   }
-  const message = "mirrors no source folder; move each test to the path of " + "the code it checks";
+  const message = "mirrors no source folder; move each test to the path of the code it checks";
   return [...stray].map((dir) => finding(dir, "tests", message));
 }
 

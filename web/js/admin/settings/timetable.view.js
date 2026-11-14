@@ -70,7 +70,7 @@
           "div",
           { class: "empty" },
           h("strong", null, "No days yet."),
-          " Click a date in the calendar to offer it. Each day gets the hours" + " you set.",
+          " Click a date in the calendar to offer it. Each day gets the hours you set.",
         ),
       );
       return;

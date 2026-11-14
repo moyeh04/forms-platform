@@ -22,9 +22,9 @@
    * @return {*} The label, or the answer itself.
    */
   function optionLabel(field, value) {
-    var o = (field.options || []).filter(function (x) {
+    var o = (field.options || []).find(function (x) {
       return String(x.value) === String(value);
-    })[0];
+    });
     return o ? L(o.label) : value;
   }
 
@@ -48,9 +48,9 @@
    */
   function slotValue(value) {
     var slots = S.form.slots || {};
-    var day = (slots.days || []).filter(function (d) {
+    var day = (slots.days || []).find(function (d) {
       return d.id === value.day;
-    })[0];
+    });
     return P.ltr((day ? day.label : value.day) + " - " + value.time);
   }
 

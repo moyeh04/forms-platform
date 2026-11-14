@@ -47,7 +47,7 @@ var MenuService = (function () {
     var ui = SpreadsheetApp.getUi();
     var res = ui.prompt(
       "Admin PIN",
-      "Choose a PIN with at least 4 characters. " + "You will type it on the admin page.",
+      "Choose a PIN with at least 4 characters. You will type it on the admin page.",
       ui.ButtonSet.OK_CANCEL,
     );
     if (res.getSelectedButton() !== ui.Button.OK) return;
@@ -167,7 +167,7 @@ var MenuService = (function () {
     });
     ui.alert(
       "Views rebuilt",
-      n + " form(s) updated. " + "Every data tab has its header, widths and row tints.",
+      n + " form(s) updated. Every data tab has its header, widths and row tints.",
       ui.ButtonSet.OK,
     );
   }

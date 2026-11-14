@@ -1,9 +1,9 @@
 /**
- * Checks the numbers Biome's noMagicNumbers lets through. Biome skips a number
+ * Checks the numbers Oxlint's no-magic-numbers lets through. It skips a number
  * that initialises a variable, a property or a default parameter, so
  * `let wait = 5000` passes it. Here such a number passes only when it is
  * named in CONSTANT_CASE: by its variable, by its property, or by a constant
- * object or array it sits in. The numbers Biome allows (0, 1, 2, 10, 24, 60
+ * object or array it sits in. The numbers it allows (0, 1, 2, 10, 24, 60
  * and their negatives) are allowed here too.
  *
  * It also refuses a time written into an error message (`Wait 30 minutes`,
@@ -16,10 +16,10 @@ const { select, read } = require("../lib/files.js");
 const { parse } = require("../lib/parse.js");
 
 const CONSTANT = /^[A-Z][A-Z0-9_]*$/;
-const IGNORE = "biome-ignore lint/style/noMagicNumbers";
-const CONTAINERS = ["ObjectExpression", "ArrayExpression", "Property"];
+const IGNORE = "oxlint-disable-next-line no-magic-numbers";
+const CONTAINERS = new Set(["ObjectExpression", "ArrayExpression", "Property"]);
 const TIME_AMOUNT =
-  "\\d+|an?|one|two|three|four|five|six|seven|eight|nine|ten|fifteen|" + "twenty|thirty|sixty";
+  "\\d+|an?|one|two|three|four|five|six|seven|eight|nine|ten|fifteen|twenty|thirty|sixty";
 const TIME_TEXT = new RegExp(`\\b(?:${TIME_AMOUNT}) ?(?:second|minute|hour|day|week)s?\\b`, "gi");
 
 /**
@@ -55,7 +55,7 @@ function timesInMessage(file, call) {
         file,
         line: node.loc.start.line,
         rule: "error-times",
-        message: `the error message gives a time ("${m[0]}"); ` + "send it in details",
+        message: `the error message gives a time ("${m[0]}"); send it in details`,
       });
     }
   });
@@ -86,7 +86,7 @@ function nameOf(node) {
 function named(holders) {
   for (const node of holders) {
     if (CONSTANT.test(nameOf(node))) return true;
-    if (!CONTAINERS.includes(node.type)) return false;
+    if (!CONTAINERS.has(node.type)) return false;
   }
   return false;
 }
@@ -100,7 +100,7 @@ function named(holders) {
  *     first; empty when the number is not an initial value.
  */
 function holdersOf(ancestors) {
-  const up = ancestors.slice(0, -1).reverse();
+  const up = ancestors.slice(0, -1).toReversed();
   let value = ancestors[ancestors.length - 1];
   while (up[0]?.type === "UnaryExpression") value = up.shift();
   const holder = up[0] || {};
@@ -112,7 +112,7 @@ function holdersOf(ancestors) {
 }
 
 /**
- * Lists the lines whose next line Biome is told to leave alone.
+ * Lists the lines whose next line Oxlint is told to leave alone.
  *
  * @param {!Array<!Object>} comments Every comment of the file.
  * @return {!Set<number>} The lines that follow an ignore comment.

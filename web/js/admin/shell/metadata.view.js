@@ -132,6 +132,27 @@
     }
 
     paint();
+    return termPicker(
+      chips,
+      custom,
+      yearSel,
+      subjectField(subject, function (v) {
+        subject = v;
+        emit();
+      }),
+    );
+  };
+
+  /**
+   * Lays out the term editor: the seasons, the year and the subject.
+   *
+   * @param {!Element} chips The seasons.
+   * @param {!Element} custom The note on a term in another shape.
+   * @param {!Element} yearSel The year.
+   * @param {!Element} subject The subject field.
+   * @return {!Element} The editor.
+   */
+  function termPicker(chips, custom, yearSel, subject) {
     return h(
       "div",
       { class: "term-picker" },
@@ -143,12 +164,9 @@
         custom,
       ),
       h("label", { class: "field-row term-year" }, h("span", { class: "label" }, "Year"), yearSel),
-      subjectField(subject, function (v) {
-        subject = v;
-        emit();
-      }),
+      subject,
     );
-  };
+  }
 
   /**
    * Edits the batch year of a form.

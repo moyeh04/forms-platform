@@ -62,9 +62,9 @@
    */
   function dateCell(t, n) {
     var date = TT.iso(t.view.y, t.view.m, n);
-    var day = t.days.filter(function (d) {
+    var day = t.days.find(function (d) {
       return d.date === date;
-    })[0];
+    });
     var has = day ? TT.bookedOn(t, day) : 0;
     return h(
       "button",

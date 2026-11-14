@@ -188,7 +188,7 @@
       h(
         "p",
         { class: "help" },
-        "Teammates do not count the leader. Set the fewest to 0 when a leader" + " may book alone.",
+        "Teammates do not count the leader. Set the fewest to 0 when a leader may book alone.",
       ),
       range.node,
       wordsBox(tm),

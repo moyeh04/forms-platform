@@ -16,9 +16,9 @@
   /** Sets the steps of a key booking: the team, the slot, the review. */
   function buildKeySteps() {
     var sf = P.slotField();
-    var def = (S.form.steps || []).filter(function (s) {
+    var def = (S.form.steps || []).find(function (s) {
       return s.fields.indexOf(sf.id) !== -1;
-    })[0];
+    });
     S.steps = [
       { id: "_team", team: true, fields: [] },
       { id: "slot", title: def ? def.title : sf.label, fields: [sf] },

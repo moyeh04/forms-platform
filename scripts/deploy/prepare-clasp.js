@@ -38,7 +38,8 @@ function deploymentConfig(env) {
     credentials = JSON.parse(env.CLASPRC_JSON || "");
   } catch (_) {
     throw new Error(
-      "CLASPRC_JSON must contain the entire valid JSON credentials file," + " including braces.",
+      "CLASPRC_JSON must contain the entire valid JSON credentials file, including braces.",
+      { cause: _ },
     );
   }
   if (

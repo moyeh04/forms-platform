@@ -104,9 +104,9 @@ var KeyBookingService = (function () {
    * @return {!Object|undefined} The question.
    */
   function sameBy_(fields, f, key) {
-    return fields.filter(function (s) {
+    return fields.find(function (s) {
       return s[key] === f[key] && s.type === f.type;
-    })[0];
+    });
   }
 
   /**
@@ -218,9 +218,9 @@ var KeyBookingService = (function () {
     var row = registrationByKey_(source, key);
     var code = Rules.fieldByRole(form, "code");
     var teamCode = String(row.data[Rules.fieldByRole(source, "code").id]);
-    var booking = ResponsesRepository.readResponses(form).filter(function (r) {
+    var booking = ResponsesRepository.readResponses(form).find(function (r) {
       return code && String(r.data[code.id]) === teamCode;
-    })[0];
+    });
     var out = { team: teamPreview_(source, row), booked: !!booking };
     // The team's own time, so the page can show it beside the way to change it.
     if (booking) {

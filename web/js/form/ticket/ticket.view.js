@@ -162,6 +162,11 @@
     );
   }
 
+  /** Opens the print dialog, where the ticket is kept as a PDF. */
+  function print() {
+    window.print();
+  }
+
   /**
    * Draws the buttons under the ticket: save it as an image, print it to
    * a PDF, and copy the key when it has one.
@@ -183,11 +188,6 @@
     async function copy() {
       var ok = await App.ui.copyText(o.key);
       if (ok) App.ui.toast(t("copied"), "ok");
-    }
-
-    /** Opens the print dialog, where the ticket is kept as a PDF. */
-    function print() {
-      window.print();
     }
 
     return h(

@@ -3,28 +3,23 @@ const assert = require("node:assert/strict");
 const { openPage, settle } = require("../harness/dom.js");
 const { boot, openAdmin, person } = require("../harness/admin-page.js");
 
-test(
-  "Questions: an admin adds a description and students read it under " + "the question",
-  async () => {
-    const w = boot();
-    const f = w.make("team_registration", "Projects");
-    const p = await openAdmin(w, `#/f/${f.slug}/settings`);
-    assert.ok(p.$('[data-desc="link"]').hidden, "no description yet, so its editor is folded away");
-    p.click('[name="desc-link"]');
-    assert.equal(p.$('[data-desc="link"]').hidden, false);
-    p.type('[name="help-en-link"]', "Name it Name_Project_Name_Subject and share it with anyone");
-    p.type('[name="help-ar-link"]', "اعمل شير للفولدر");
-    p.click('[name="save"]');
-    await settle(12);
-    const link = w
-      .api({ action: "getForm", slug: f.slug })
-      .form.fields.find((x) => x.id === "link");
-    assert.deepEqual(link.help, {
-      en: "Name it Name_Project_Name_Subject and share it with anyone",
-      ar: "اعمل شير للفولدر",
-    });
-  },
-);
+test("Questions: an admin adds a description and students read it under the question", async () => {
+  const w = boot();
+  const f = w.make("team_registration", "Projects");
+  const p = await openAdmin(w, `#/f/${f.slug}/settings`);
+  assert.ok(p.$('[data-desc="link"]').hidden, "no description yet, so its editor is folded away");
+  p.click('[name="desc-link"]');
+  assert.equal(p.$('[data-desc="link"]').hidden, false);
+  p.type('[name="help-en-link"]', "Name it Name_Project_Name_Subject and share it with anyone");
+  p.type('[name="help-ar-link"]', "اعمل شير للفولدر");
+  p.click('[name="save"]');
+  await settle(12);
+  const link = w.api({ action: "getForm", slug: f.slug }).form.fields.find((x) => x.id === "link");
+  assert.deepEqual(link.help, {
+    en: "Name it Name_Project_Name_Subject and share it with anyone",
+    ar: "اعمل شير للفولدر",
+  });
+});
 
 test(
   "Questions: the admin adds a question to a page, students answer it, " +

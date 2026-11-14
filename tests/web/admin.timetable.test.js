@@ -17,7 +17,7 @@ const slotTexts = (p, row) =>
   [...p.$$(".tt-row")[row].querySelectorAll(".tt-slot")].map((c) => c.firstChild.textContent);
 
 test(
-  "Timetable: a day needs a name, gets the general hours, " + "and bookings appear grouped by day",
+  "Timetable: a day needs a name, gets the general " + "hours, and bookings appear grouped by day",
   async () => {
     const w = boot();
     const f = w.make("reservation", "Seminar");
@@ -57,7 +57,7 @@ test(
   },
 );
 
-test("Timetable: dates picked on the calendar become days that follow the " + "hours", async () => {
+test("Timetable: dates picked on the calendar become days that follow the hours", async () => {
   const w = boot();
   const f = w.make("reservation", "Seminar");
   const p = await openAdmin(w, `#/f/${f.slug}/settings`);
@@ -180,7 +180,7 @@ test(
 );
 
 test(
-  "Timetable: a booked slot shows its count, and switching it off " + "warns before saving",
+  "Timetable: a booked slot shows its count, " + "and switching it off warns before saving",
   async () => {
     const w = boot();
     const f = w.make("reservation", "Seminar");
@@ -238,38 +238,35 @@ test(
   },
 );
 
-test(
-  "Timetable: times saved by hand are kept as they are until the day " + "gets hours",
-  async () => {
-    const w = boot();
-    const f = w.make("reservation", "Seminar");
-    w.admin({
-      action: "admin.forms.update",
-      id: f.id,
-      patch: {
-        slots: {
-          days: [
-            {
-              id: "one",
-              label: "Sunday",
-              date: "2027-11-16",
-              times: ["9:00 - 9:30", "11:30 - 11:45"],
-            },
-          ],
-          capacity: 1,
-        },
+test("Timetable: times saved by hand are kept as they are until the day gets hours", async () => {
+  const w = boot();
+  const f = w.make("reservation", "Seminar");
+  w.admin({
+    action: "admin.forms.update",
+    id: f.id,
+    patch: {
+      slots: {
+        days: [
+          {
+            id: "one",
+            label: "Sunday",
+            date: "2027-11-16",
+            times: ["9:00 - 9:30", "11:30 - 11:45"],
+          },
+        ],
+        capacity: 1,
       },
-    });
-    const p = await openAdmin(w, `#/f/${f.slug}/settings`);
-    assert.deepEqual(slotTexts(p, 0), ["9:00 - 9:30", "11:30 - 11:45"]);
-    p.type('[name="hours-end"]', "14:10");
-    assert.deepEqual(
-      slotTexts(p, 0),
-      ["9:00 - 9:30", "11:30 - 11:45"],
-      "the general hours do not replace them",
-    );
-    assert.equal(p.$('[name="own-hours-0"]').textContent, "Set hours for this day");
-    p.click('[name="own-hours-0"]');
-    assert.equal(slotTexts(p, 0).length, 4);
-  },
-);
+    },
+  });
+  const p = await openAdmin(w, `#/f/${f.slug}/settings`);
+  assert.deepEqual(slotTexts(p, 0), ["9:00 - 9:30", "11:30 - 11:45"]);
+  p.type('[name="hours-end"]', "14:10");
+  assert.deepEqual(
+    slotTexts(p, 0),
+    ["9:00 - 9:30", "11:30 - 11:45"],
+    "the general hours do not replace them",
+  );
+  assert.equal(p.$('[name="own-hours-0"]').textContent, "Set hours for this day");
+  p.click('[name="own-hours-0"]');
+  assert.equal(slotTexts(p, 0).length, 4);
+});

@@ -342,7 +342,7 @@ if (require.main === module) {
           " sheet, then Forms Platform > 1. First-time setup (allow" +
           " permissions).",
         "  2. Forms Platform > 2. Set admin PIN...",
-        "  3. git push origin master (or: gh workflow run pages.yml) to" + " publish the website.",
+        "  3. git push origin master (or: gh workflow run pages.yml) to publish the website.",
       ].join("\n"),
     );
   } catch (err) {

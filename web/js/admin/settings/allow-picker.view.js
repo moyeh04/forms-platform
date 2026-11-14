@@ -43,9 +43,9 @@
     var groups = [];
     opts.options.forEach(function (o) {
       var id = opts.groupOf ? opts.groupOf(o) : "";
-      var g = groups.filter(function (x) {
+      var g = groups.find(function (x) {
         return x.id === id;
-      })[0];
+      });
       if (!g) {
         g = { id: id, options: [] };
         groups.push(g);

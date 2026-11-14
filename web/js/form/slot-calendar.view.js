@@ -97,11 +97,11 @@
   /**
    * Lists the months from the first booking day to the last.
    *
-   * @param {!Array<string>} dates The dates, in any order.
+   * @param {!Array<string>} list The dates, in any order.
    * @return {!Array<string>} The months, as YYYY-MM.
    */
-  function monthsOf(dates) {
-    var sorted = dates.slice().sort();
+  function monthsOf(list) {
+    var sorted = list.slice().sort();
     var at = utc(monthOf(sorted[0]) + "-01");
     var last = monthOf(sorted[sorted.length - 1]);
     var out = [monthOf(isoOf(at))];
@@ -239,10 +239,10 @@
    * @return {string} The month.
    */
   function openMonth(c) {
-    var dates = Object.keys(c.days).sort();
-    var picked = dates.filter(function (d) {
+    var keys = Object.keys(c.days).sort();
+    var picked = keys.find(function (d) {
       return c.days[d].id === c.cur.day;
-    })[0];
+    });
     if (picked) return monthOf(picked);
     var now = monthOf(c.today);
     var first = c.months[0];

@@ -54,7 +54,7 @@ test("Structure check: each broken rule is found where it is", () => {
     "docs/FILES.md": "Names `a.js`, `b.js` and `utils.js`.",
     "tests/pages/app.test.js": "",
   });
-  assert.deepEqual(found(tree).sort(), [
+  assert.deepEqual(found(tree).toSorted(), [
     "notes.txt:0 structure/root",
     "tests/pages/:0 structure/tests",
     "web/helpers/:0 structure/name",

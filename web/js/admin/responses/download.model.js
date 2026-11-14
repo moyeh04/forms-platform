@@ -76,6 +76,7 @@
     var size = part.size;
     var c;
     while (offset !== null) {
+      // oxlint-disable-next-line no-await-in-loop -- a chunk starts where the last ended
       c = await A.call("admin.download.chunk", {
         slug: form.slug,
         job: job,
@@ -110,6 +111,7 @@
       d.progress.team(t, n, files);
       for (done = false; !done;) {
         if (!d.open()) return false;
+        // oxlint-disable-next-line no-await-in-loop -- one team at a time, so cancel acts between
         r = await A.call("admin.download.team", {
           slug: d.form.slug,
           job: start.job,
@@ -139,6 +141,7 @@
       if (!d.open()) return null;
       d.progress.pack(p, count);
       parts.push(
+        // oxlint-disable-next-line no-await-in-loop -- packs are built in turn: one job
         await A.call("admin.download.pack", {
           slug: d.form.slug,
           job: job,

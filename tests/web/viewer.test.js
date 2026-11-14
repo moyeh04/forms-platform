@@ -80,7 +80,7 @@ function bookings(w, f) {
   book("4230003", "week-11-tuesday", "12:30 - 12:50", "Later");
 }
 
-test("Instructor link: opens on today, " + "with the columns the admin chose", async () => {
+test("Instructor link: opens on today, with the columns the admin chose", async () => {
   const w = boot();
   const f = w.make("reservation", "Seminar", { slots });
   bookings(w, f);
@@ -95,13 +95,13 @@ test("Instructor link: opens on today, " + "with the columns the admin chose", a
       .map((c) => c.textContent),
     ["12:30 - 12:50", "12:55 - 1:15"],
   );
-  const headers = p.$$("thead th").map((t) => t.textContent);
-  assert.ok(headers.includes("Team leader") && headers.includes("Code"));
-  assert.equal(headers.includes("Phone"), false, "hidden columns never reach the page");
+  const headers = new Set(p.$$("thead th").map((t) => t.textContent));
+  assert.ok(headers.has("Team leader") && headers.has("Code"));
+  assert.equal(headers.has("Phone"), false, "hidden columns never reach the page");
   assert.equal(p.text().includes("01012345678"), false);
 });
 
-test("Instructor link: switch to a " + "day or to everything, and search", async () => {
+test("Instructor link: switch to a day or to everything, and search", async () => {
   const w = boot();
   const f = w.make("reservation", "Seminar", { slots });
   bookings(w, f);
@@ -128,7 +128,7 @@ test("Instructor link: switch to a " + "day or to everything, and search", async
 });
 
 test(
-  "Instructor link: reservation teammate names are displayed only when " + "collection is enabled",
+  "Instructor link: reservation teammate names " + "are displayed only when collection is enabled",
   async () => {
     const w = boot();
     const f = w.make("reservation", "Seminar", {
@@ -244,7 +244,7 @@ test(
   },
 );
 
-test("Instructor link: small teams are listed by level and marked on " + "their card", async () => {
+test("Instructor link: small teams are listed by level and marked on their card", async () => {
   const w = boot();
   const f = w.make("team_registration", "Projects", {
     rules: {
@@ -316,7 +316,7 @@ test("Instructor link: small teams are listed by level and marked on " + "their 
 });
 
 test(
-  "Instructor link: WhatsApp metadata shows the batch year without " + "subject or semester",
+  "Instructor link: WhatsApp metadata shows " + "the batch year without subject or semester",
   async () => {
     const w = boot();
     const f = w.make("whatsapp_registration", "Groups", {
@@ -331,7 +331,7 @@ test(
   },
 );
 
-test("Instructor link: reviewers can mark steps, read-only links only see " + "them", async () => {
+test("Instructor link: reviewers can mark steps, read-only links only see them", async () => {
   const w = boot();
   const f = w.make("whatsapp_registration", "Groups");
   w.api({
@@ -364,35 +364,32 @@ test("Instructor link: reviewers can mark steps, read-only links only see " + "t
   );
 });
 
-test(
-  "Instructor link: invalid, missing, and turned-off links explain " + "themselves",
-  async () => {
-    const w = boot();
-    w.make("reservation", "Seminar", { slots });
-    const bad = await openViewer(w, "not-a-real-token");
-    assert.ok(bad.text().includes("This link is not valid"));
-    const none = await openPage("viewer.html", w, { query: "" });
-    await none.window.App.viewer.start();
-    await settle(4);
-    assert.ok(none.window.document.body.textContent.includes("missing its access code"));
+test("Instructor link: invalid, missing, and turned-off links explain themselves", async () => {
+  const w = boot();
+  w.make("reservation", "Seminar", { slots });
+  const bad = await openViewer(w, "not-a-real-token");
+  assert.ok(bad.text().includes("This link is not valid"));
+  const none = await openPage("viewer.html", w, { query: "" });
+  await none.window.App.viewer.start();
+  await settle(4);
+  assert.ok(none.window.document.body.textContent.includes("missing its access code"));
 
-    const made = w.admin({
-      action: "admin.clients.create",
-      name: "Temp",
-      forms: ["*"],
-      withKey: false,
-    });
-    w.admin({
-      action: "admin.clients.update",
-      id: made.client.id,
-      patch: { active: false },
-    });
-    const off = await openViewer(w, made.token);
-    assert.ok(off.text().includes("turned off"));
-  },
-);
+  const made = w.admin({
+    action: "admin.clients.create",
+    name: "Temp",
+    forms: ["*"],
+    withKey: false,
+  });
+  w.admin({
+    action: "admin.clients.update",
+    id: made.client.id,
+    patch: { active: false },
+  });
+  const off = await openViewer(w, made.token);
+  assert.ok(off.text().includes("turned off"));
+});
 
-test("Instructor link: only the forms " + "shared with the client are listed", async () => {
+test("Instructor link: only the forms shared with the client are listed", async () => {
   const w = boot();
   const a = w.make("reservation", "Seminar A", { slots });
   const b = w.make("reservation", "Seminar B", { slots });
@@ -405,7 +402,7 @@ test("Instructor link: only the forms " + "shared with the client are listed", a
 });
 
 test(
-  "Instructor link: each member value names its column and the phone " + "is a call link",
+  "Instructor link: each member value names " + "its column and the phone is a call link",
   async () => {
     const w = boot();
     const f = w.make("team_registration", "Teams");
@@ -428,7 +425,7 @@ test(
 );
 
 test(
-  "Teams: a card shows the number the team was given, with a gap where " + "a team cancelled",
+  "Teams: a card shows the number the team was " + "given, with a gap where a team cancelled",
   async () => {
     const w = boot();
     const f = w.make("team_registration", "Projects", {

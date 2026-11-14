@@ -73,7 +73,7 @@ function actions(root, files, config) {
   const text = read(root, config.api);
   const page = [...text.matchAll(API_ROW)].map((m) => m[1]);
   const sections = pageRows(text, config.accessSections || {});
-  return { code, page: page.sort(), sections };
+  return { code, page: page.toSorted(), sections };
 }
 
 /**
@@ -86,7 +86,7 @@ function actions(root, files, config) {
  */
 function apiFindings(root, files, config) {
   const { code, page, sections } = actions(root, files, config);
-  const names = [...code.keys()].sort();
+  const names = [...code.keys()].toSorted();
   const missing = names.filter((name) => !page.includes(name));
   const extra = page.filter((name) => !code.has(name));
   const twice = page.filter((name, i) => page.indexOf(name) !== i);
@@ -141,7 +141,7 @@ function testCounts(dir) {
     .readdirSync(dir, { recursive: true })
     .map((file) => file.split(path.sep).join("/"))
     .filter((file) => file.endsWith(".test.js"))
-    .sort();
+    .toSorted();
   const counts = {};
   const load = Module._load;
   let current = "";

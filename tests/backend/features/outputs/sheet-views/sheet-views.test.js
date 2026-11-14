@@ -56,7 +56,7 @@ const person = (o) =>
   });
 
 test(
-  "Team list: every team is a block with its members, star on the " + "leader, merged linked task",
+  "Team list: every team is a block with its " + "members, star on the leader, merged linked task",
   () => {
     const w = boot("task_submission");
     const link = (c) => `https://docs.google.com/presentation/d/${ID(c)}/edit`;
@@ -97,7 +97,7 @@ test(
   },
 );
 
-test("Team list: projects without a link show plain text and the header " + "says Project", () => {
+test("Team list: projects without a link show plain text and the header says Project", () => {
   const w = boot("team_registration");
   w.api({
     action: "submit",
@@ -121,7 +121,7 @@ test("Team list: deleted teams disappear and an empty form says so", () => {
 });
 
 test(
-  "Bookings: grouped by day, ordered by timetable, day label on the " + "first row of each block",
+  "Bookings: grouped by day, ordered by timetable, " + "day label on the first row of each block",
   () => {
     const w = boot("reservation", {
       slots: {
@@ -161,55 +161,52 @@ test(
   },
 );
 
-test(
-  "Bookings: teammate names appear in the sheet view only when " + "collection is enabled",
-  () => {
-    const w = boot("reservation", {
-      slots: {
-        days: [{ label: "Sunday", date: "2027-11-18", times: ["12:30 - 12:50"] }],
-        capacity: 2,
-      },
-    });
-    const form = w.admin({ action: "admin.forms.get", id: w.form.id }).form;
-    w.admin({
-      action: "admin.forms.update",
-      id: w.form.id,
-      patch: {
-        fields: form.fields.map((field) =>
-          field.role === "members" ? { ...field, enabled: true } : field,
-        ),
-        steps: form.steps.map((step) =>
-          step.id === "project" ? { ...step, fields: step.fields.concat("members") } : step,
-        ),
-      },
-    });
-    const name = "سارة خالد حسن علي";
-    const result = w.api({
-      action: "submit",
-      slug: w.form.slug,
-      data: person({
-        title: "Seminar project",
-        slot: { day: "sunday", time: "12:30 - 12:50" },
-        members: [member(name, "4230002")],
-      }),
-    });
-    assert.equal(result.ok, true);
-    const rows = w.view("Bookings").rows();
-    assert.deepEqual(rows[0], [
-      "Day",
-      "Time",
-      "Team leader",
-      "Code",
-      "Phone",
-      "Project",
-      "Teammates",
-    ]);
-    assert.equal(rows[1][6], name);
-  },
-);
+test("Bookings: teammate names appear in the sheet view only when collection is enabled", () => {
+  const w = boot("reservation", {
+    slots: {
+      days: [{ label: "Sunday", date: "2027-11-18", times: ["12:30 - 12:50"] }],
+      capacity: 2,
+    },
+  });
+  const form = w.admin({ action: "admin.forms.get", id: w.form.id }).form;
+  w.admin({
+    action: "admin.forms.update",
+    id: w.form.id,
+    patch: {
+      fields: form.fields.map((field) =>
+        field.role === "members" ? { ...field, enabled: true } : field,
+      ),
+      steps: form.steps.map((step) =>
+        step.id === "project" ? { ...step, fields: step.fields.concat("members") } : step,
+      ),
+    },
+  });
+  const name = "سارة خالد حسن علي";
+  const result = w.api({
+    action: "submit",
+    slug: w.form.slug,
+    data: person({
+      title: "Seminar project",
+      slot: { day: "sunday", time: "12:30 - 12:50" },
+      members: [member(name, "4230002")],
+    }),
+  });
+  assert.equal(result.ok, true);
+  const rows = w.view("Bookings").rows();
+  assert.deepEqual(rows[0], [
+    "Day",
+    "Time",
+    "Team leader",
+    "Code",
+    "Phone",
+    "Project",
+    "Teammates",
+  ]);
+  assert.equal(rows[1][6], name);
+});
 
 test(
-  "Bookings: legacy reservations gain disabled teammate metadata " + "before views and printing",
+  "Bookings: legacy reservations gain disabled " + "teammate metadata before views and printing",
   () => {
     const w = boot("reservation", {
       slots: {
@@ -273,76 +270,70 @@ test(
   },
 );
 
-test(
-  "Registrations: WhatsApp rows sorted by group and section with " + "review text and link",
-  () => {
-    const w = boot("whatsapp_registration");
-    const reg = (code, group, section, phone) =>
-      w.api({
-        action: "submit",
-        slug: w.form.slug,
-        data: {
-          email: "a@b.com",
-          name: "أحمد محمد محمود أحمد",
-          phone,
-          code,
-          level: "صفر / الأولى",
-          major: "حاسبات",
-          group,
-          section,
-          schedule: `https://drive.google.com/file/d/${ID("s")}/view`,
-        },
-      });
-    reg("4230001", "B", "3", "01012345671");
-    reg("4230002", "A", "21", "01012345672");
-    reg("4230003", "A", "4", "01012345673");
-    const rows = w.view("Registrations").rows();
-    assert.deepEqual(
-      rows.slice(1).map((r) => r[2]),
-      ["4230003", "4230002", "4230001"],
-    );
-    assert.equal(rows[1][7], "Timetable check: pending  |  Group match: pending");
-    assert.ok(rows[1][6].startsWith("=HYPERLINK("));
-  },
-);
+test("Registrations: WhatsApp rows sorted by group and section with review text and link", () => {
+  const w = boot("whatsapp_registration");
+  const reg = (code, group, section, phone) =>
+    w.api({
+      action: "submit",
+      slug: w.form.slug,
+      data: {
+        email: "a@b.com",
+        name: "أحمد محمد محمود أحمد",
+        phone,
+        code,
+        level: "صفر / الأولى",
+        major: "حاسبات",
+        group,
+        section,
+        schedule: `https://drive.google.com/file/d/${ID("s")}/view`,
+      },
+    });
+  reg("4230001", "B", "3", "01012345671");
+  reg("4230002", "A", "21", "01012345672");
+  reg("4230003", "A", "4", "01012345673");
+  const rows = w.view("Registrations").rows();
+  assert.deepEqual(
+    rows.slice(1).map((r) => r[2]),
+    ["4230003", "4230002", "4230001"],
+  );
+  assert.equal(rows[1][7], "Timetable check: pending  |  Group match: pending");
+  assert.ok(rows[1][6].startsWith("=HYPERLINK("));
+});
 
 const marked = (w) => [...w.props.keys()].filter((k) => k.startsWith("dirty:"));
 
-test(
-  "Views: changes book one run a minute later, which paints the view " + "and removes itself",
-  () => {
-    const w = boot("team_registration");
-    assert.deepEqual(w.triggers, [], "nothing is booked while nothing changed");
-    w.api({
-      action: "submit",
-      slug: w.form.slug,
-      data: person({ title: "One", members: [] }),
-    });
-    w.api({
-      action: "submit",
-      slug: w.form.slug,
-      data: person({ leader_code: "4230099", title: "Two", members: [] }),
-    });
-    assert.deepEqual(
-      w.triggers.map((t) => [t.fn, t.kind, t.arg]),
-      [["processDirtyViews", "after", 60000]],
-      "two changes, one run",
-    );
-    assert.equal(
-      w.sheet(w.form.sheetId, "Team Members List"),
-      null,
-      "the submission did not wait for the view",
-    );
-    assert.equal(marked(w).length, 1);
-    assert.equal(w.runTriggers(), 1);
-    assert.equal(w.sheet(w.form.sheetId, "Team Members List").rows().length, 3);
-    assert.deepEqual([w.triggers.length, marked(w).length], [0, 0], "the run left nothing behind");
-    assert.equal(w.runTriggers(), 0, "and nothing runs again until the next change");
-  },
-);
+test("Views: changes book one run a minute later, which paints the view and removes itself", () => {
+  const w = boot("team_registration");
+  assert.deepEqual(w.triggers, [], "nothing is booked while nothing changed");
+  w.api({
+    action: "submit",
+    slug: w.form.slug,
+    data: person({ title: "One", members: [] }),
+  });
+  w.api({
+    action: "submit",
+    slug: w.form.slug,
+    data: person({ leader_code: "4230099", title: "Two", members: [] }),
+  });
+  assert.deepEqual(
+    w.triggers.map((t) => [t.fn, t.kind, t.arg]),
+    [["processDirtyViews", "after", 60000]],
+    "two changes, one run",
+  );
+  assert.equal(
+    w.sheet(w.form.sheetId, "Team Members List"),
+    null,
+    "the submission did not wait for the view",
+  );
+  assert.equal(marked(w).length, 1);
+  assert.equal(w.runTriggers(), 1);
+  assert.equal(w.sheet(w.form.sheetId, "Team Members List").rows().length, 3);
+  assert.deepEqual([w.triggers.length, marked(w).length], [0, 0], "the run left nothing behind");
+  assert.equal(w.runTriggers(), 0, "and nothing runs again until the next change");
+});
 
 test(
-  "Views: a repaint that fails keeps its mark, and the timer of an " + "older version is removed",
+  "Views: a repaint that fails keeps its mark, " + "and the timer of an older version is removed",
   () => {
     const w = boot("team_registration");
     // A deployment made before this version left a run every five minutes.
@@ -378,7 +369,7 @@ test(
   },
 );
 
-test("Views: a change that arrives while a form is painted books one more " + "run", () => {
+test("Views: a change that arrives while a form is painted books one more run", () => {
   const w = boot("team_registration");
   w.api({
     action: "submit",

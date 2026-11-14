@@ -35,9 +35,9 @@
    */
   R.slotText = function (form, slot) {
     if (!slot) return "";
-    var day = (form.slots?.days || []).filter(function (d) {
+    var day = (form.slots?.days || []).find(function (d) {
       return d.id === slot.day;
-    })[0];
+    });
     return (day ? day.label : slot.day) + " - " + slot.time;
   };
 
@@ -123,9 +123,9 @@
     });
     rows.forEach(function (s) {
       var id = s.data.slot ? s.data.slot.day : "";
-      var g = groups.filter(function (x) {
+      var g = groups.find(function (x) {
         return x.id === id;
-      })[0];
+      });
       if (!g) {
         g = {
           id: id,

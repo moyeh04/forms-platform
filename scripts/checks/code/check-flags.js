@@ -9,8 +9,8 @@ const walk = require("acorn-walk");
 const { select, read } = require("../lib/files.js");
 const { parse } = require("../lib/parse.js");
 
-const FLAGS = ["1", "0"];
-const EQUALITY = ["===", "!==", "==", "!="];
+const FLAGS = new Set(["1", "0"]);
+const EQUALITY = new Set(["===", "!==", "==", "!="]);
 
 /**
  * Says whether a node is a string flag literal.
@@ -19,7 +19,7 @@ const EQUALITY = ["===", "!==", "==", "!="];
  * @return {boolean} True for '1' or '0'.
  */
 function isFlag(node) {
-  return node.type === "Literal" && FLAGS.includes(node.value);
+  return node.type === "Literal" && FLAGS.has(node.value);
 }
 
 /**
@@ -44,7 +44,7 @@ function readsField(node) {
  * @return {string} The problem, or an empty string.
  */
 function flagProblem(node) {
-  if (node.type === "BinaryExpression" && EQUALITY.includes(node.operator)) {
+  if (node.type === "BinaryExpression" && EQUALITY.has(node.operator)) {
     const pairs = [
       [node.left, node.right],
       [node.right, node.left],

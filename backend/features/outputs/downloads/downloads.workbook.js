@@ -95,9 +95,9 @@ var DownloadsWorkbook = (function () {
    * @return {string} The relative link, or empty when nothing was saved.
    */
   function localLink_(paths, base) {
-    var hit = paths.filter(function (p) {
+    var hit = paths.find(function (p) {
       return p === base || p.indexOf(base + ".") === 0 || p.indexOf(base + "/") === 0;
-    })[0];
+    });
     if (!hit) return "";
     var target = hit.indexOf(base + "/") === 0 ? base + "/" : hit;
     return target.split("/").map(encodeURIComponent).join("/");

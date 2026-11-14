@@ -33,7 +33,7 @@
         lang: ar ? "ar" : null,
         placeholder: ar
           ? "بالعربي"
-          : "English, for example: In case of 3 or 4, other students will" + " be added to reach 5",
+          : "English, for example: In case of 3 or 4, other students will be added to reach 5",
         oninput: function (e) {
           var patch = {};
           patch[lang] = e.target.value;

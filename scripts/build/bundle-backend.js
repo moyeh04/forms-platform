@@ -87,7 +87,7 @@ function listBackend() {
     .readdirSync(dir, { recursive: true })
     .map((f) => f.split(path.sep).join("/"))
     .filter((f) => f.endsWith(".js"))
-    .sort((a, b) => rankOf(a) - rankOf(b) || a.localeCompare(b))
+    .toSorted((a, b) => rankOf(a) - rankOf(b) || a.localeCompare(b))
     .map((f) => path.posix.join("backend", f));
 }
 
@@ -106,6 +106,7 @@ function bundleSource() {
   const code = parts.join("\n");
 
   // Fail loudly on syntax errors instead of discovering them in the editor.
+  // oxlint-disable-next-line no-new -- compiling the bundle is the check; the script is never run
   new vm.Script(code, { filename: "Code.gs" });
   return { code, files };
 }

@@ -27,7 +27,7 @@ function temp(t) {
   return dir;
 }
 
-test("Deployment: missing or malformed API_URL cannot produce a site " + "artifact", (t) => {
+test("Deployment: missing or malformed API_URL cannot produce a site artifact", (t) => {
   const output = path.join(temp(t), "site");
   for (const value of [
     "",
@@ -51,14 +51,14 @@ test("Deployment: API_URL must match the deployment being updated", () => {
   );
 });
 
-test("Deployment: built admin, student and viewer pages use the variable " + "URL", async (t) => {
+test("Deployment: built admin, student and viewer pages use the variable URL", async (t) => {
   const output = path.join(temp(t), "site");
   const sourceConfig = fs.readFileSync(path.join(root, "web/js/config.js"), "utf8");
   buildSite(env, output);
   fs.writeFileSync(path.join(output, "private-marker"), "must not be published");
   buildSite(env, output);
   assert.equal(fs.existsSync(path.join(output, "private-marker")), false);
-  assert.deepEqual(fs.readdirSync(output).sort(), [
+  assert.deepEqual(fs.readdirSync(output).toSorted(), [
     ".nojekyll",
     "admin.html",
     "assets",

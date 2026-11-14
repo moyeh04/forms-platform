@@ -23,16 +23,16 @@
    * @param {!Array<string>} m The parts: group, kind and number.
    */
   function addValue(groups, m) {
-    var g = groups.filter(function (x) {
+    var g = groups.find(function (x) {
       return x.name === m[1];
-    })[0];
+    });
     if (!g) {
       g = { name: m[1], kinds: [] };
       groups.push(g);
     }
-    var k = g.kinds.filter(function (x) {
+    var k = g.kinds.find(function (x) {
       return x.code === m[2];
-    })[0];
+    });
     if (!k) {
       k = { code: m[2], count: 0, nums: [] };
       g.kinds.push(k);
@@ -145,7 +145,8 @@
     var p = L.groupParts(name);
     var q;
     var i;
-    for (i = 0; p && i < groups.length; i++) {
+    if (!p) return groups.length;
+    for (i = 0; i < groups.length; i++) {
       q = L.groupParts(groups[i].name);
       if (q && (+q.year > +p.year || (q.year === p.year && q.letter > p.letter))) {
         return i;

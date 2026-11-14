@@ -16,9 +16,9 @@ var TransferDecision = (function () {
    * @throws {ApiError} `transfer_gone` when it is not waiting.
    */
   function requirePending_(all, id, fromId) {
-    var t = all.filter(function (x) {
+    var t = all.find(function (x) {
       return x.id === String(id) && x.status === "pending";
-    })[0];
+    });
     if (!t || (fromId && t.fromId !== fromId)) {
       ApiError.fail("transfer_gone", "This request was already answered.");
     }
@@ -35,9 +35,9 @@ var TransferDecision = (function () {
    * @throws {ApiError} `transfer_gone` when the team no longer exists.
    */
   function requireAsker_(form, rows, t) {
-    var to = rows.filter(function (r) {
+    var to = rows.find(function (r) {
       return r.id === t.toId;
-    })[0];
+    });
     if (!to) {
       t.status = "closed";
       TransfersRepository.saveTransfer(form, t);
@@ -107,9 +107,9 @@ var TransferDecision = (function () {
     var out = { underMin: false, handed: false };
     rows.forEach(function (r) {
       if (r.id === t.toId) return;
-      var mine = Rules.membersOf(form, r.data).filter(function (m) {
+      var mine = Rules.membersOf(form, r.data).find(function (m) {
         return m.code === t.code;
-      })[0];
+      });
       if (!mine) return;
       if (mine.leader) {
         TransferMembers.handOver(form, r.data, answer.next);

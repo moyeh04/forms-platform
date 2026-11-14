@@ -13,9 +13,9 @@ var TransferMembers = (function () {
    */
   function codeId(form) {
     var mf = Rules.fieldByRole(form, "members");
-    var sub = (mf?.fields || []).filter(function (sf) {
+    var sub = (mf?.fields || []).find(function (sf) {
       return sf.role === "code";
-    })[0];
+    });
     return sub ? sub.id : "code";
   }
 
@@ -61,9 +61,9 @@ var TransferMembers = (function () {
       ApiError.fail("transfer_leader", "This student leads a team alone and cannot be moved.");
     }
     var id = codeId(form);
-    var heir = list.filter(function (m) {
+    var heir = list.find(function (m) {
       return String(m[id]) === String(code || "");
-    })[0];
+    });
     if (!heir) {
       ApiError.fail("transfer_heir", "Choose who leads the team after this student.");
     }
@@ -101,10 +101,10 @@ var TransferMembers = (function () {
   function copyHeirAnswers_(form, data, heir) {
     var mf = Rules.fieldByRole(form, "members");
     (mf.fields || []).forEach(function (sf) {
-      var top = (form.fields || []).filter(function (f) {
+      var top = (form.fields || []).find(function (f) {
         var same = sf.role ? f.role === sf.role : f.id === sf.id;
         return f.type === sf.type && same;
-      })[0];
+      });
       if (top && heir[sf.id] != null && heir[sf.id] !== "") {
         data[top.id] = heir[sf.id];
       }

@@ -24,14 +24,14 @@ test("Rules: the loader gathers every function of every part", () => {
 });
 
 test("Rules: a page loading the enums and parts gets the same Rules", () => {
-  const page = vm.createContext({});
+  const context = vm.createContext({});
   for (const file of parts) {
-    vm.runInContext(fs.readFileSync(path.join(root, file), "utf8"), page, {
+    vm.runInContext(fs.readFileSync(path.join(root, file), "utf8"), context, {
       filename: file,
     });
   }
-  const names = vm.runInContext("Object.keys(Rules)", page);
-  assert.deepEqual([...names].sort(), Object.keys(R).sort());
-  assert.equal(vm.runInContext("Rules.normalizePhone('+20 101 234 5678')", page), "01012345678");
-  assert.equal(vm.runInContext("Rules.formState({ status: 'draft' })", page), "draft");
+  const names = vm.runInContext("Object.keys(Rules)", context);
+  assert.deepEqual([...names].toSorted(), Object.keys(R).toSorted());
+  assert.equal(vm.runInContext("Rules.normalizePhone('+20 101 234 5678')", context), "01012345678");
+  assert.equal(vm.runInContext("Rules.formState({ status: 'draft' })", context), "draft");
 });

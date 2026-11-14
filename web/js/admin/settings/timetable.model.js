@@ -257,9 +257,9 @@
       return !String(d.label || "").trim();
     });
     if (unnamed) return "Give every day a name.";
-    var empty = t.days.filter(function (d) {
+    var empty = t.days.find(function (d) {
       return !d.times.length;
-    })[0];
+    });
     return empty ? '"' + empty.label + '" has no time slots.' : "";
   };
 

@@ -155,7 +155,7 @@ test("Viewer: a link cannot open a form it was not given", () => {
   assert.equal(w.data(c.token, w.team.slug).error.code, "forbidden");
 });
 
-test("Reservations: teammate names appear " + "only when collecting teammates", () => {
+test("Reservations: teammate names appear only when collecting teammates", () => {
   const w = boot();
   const client = w.client();
   const hidden = w.data(client.token, w.res.slug, { mode: "all" });
@@ -414,7 +414,7 @@ test(
 );
 
 test(
-  "Viewer link end: a link stops on its end date and opens again when " + "the admin moves it",
+  "Viewer link end: a link stops on its end " + "date and opens again when the admin moves it",
   () => {
     const w = boot();
     const made = w.client({ expires: "2027-11-20T21:59:00Z" });

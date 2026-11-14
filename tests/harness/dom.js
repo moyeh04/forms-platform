@@ -72,15 +72,15 @@ function helpers(window) {
       fire(el, "blur");
       return el;
     },
-    pick(path, value) {
-      const radio = $(`input[type=radio][name="${path}"][value="${value}"]`);
+    pick(field, value) {
+      const radio = $(`input[type=radio][name="${field}"][value="${value}"]`);
       if (radio) {
         radio.checked = true;
         fire(radio, "change");
         return radio;
       }
-      const sel = $(`select[name="${path}"]`);
-      if (!sel) throw new Error("No choice field " + path);
+      const sel = $(`select[name="${field}"]`);
+      if (!sel) throw new Error("No choice field " + field);
       sel.value = value;
       fire(sel, "change");
       return sel;

@@ -48,7 +48,7 @@
       rows: "5",
       name: "paste",
       placeholder:
-        "Paste the pending WhatsApp requests here.\n" + "One per line, each with the phone number.",
+        "Paste the pending WhatsApp requests here.\nOne per line, each with the phone number.",
       dir: "ltr",
       "aria-label": "Pasted WhatsApp requests",
     });

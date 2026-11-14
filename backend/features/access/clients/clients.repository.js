@@ -125,9 +125,9 @@ var ClientsRepository = (function () {
    */
   function changeClient_(id, change) {
     return Lock.withLock(function () {
-      var c = readClients_().filter(function (x) {
+      var c = readClients_().find(function (x) {
         return x.id === id;
-      })[0];
+      });
       if (!c) ApiError.fail("client_not_found", "That client does not exist.");
       var out = change(c);
       saveClient_(c);

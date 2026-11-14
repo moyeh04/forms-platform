@@ -70,9 +70,9 @@
   function pageRows(s, c, st, n) {
     var mine = (st.fields || [])
       .map(function (id) {
-        return c.listed.filter(function (fd) {
+        return c.listed.find(function (fd) {
           return fd.id === id;
-        })[0];
+        });
       })
       .filter(Boolean);
     var rows = [Q.pageHead(s, st, n)];
@@ -85,7 +85,7 @@
         h(
           "p",
           { class: "muted-note q-empty" },
-          "This page has no questions yet. Students do not see a page with" + " no questions.",
+          "This page has no questions yet. Students do not see a page with no questions.",
         ),
       );
     }

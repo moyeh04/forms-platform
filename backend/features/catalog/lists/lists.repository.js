@@ -73,9 +73,9 @@ var ListsRepository = (function () {
    * @return {!Object<string, {name: string, kind: string}>} The info by key.
    */
   function readListInfo() {
-    var row = listRows_().filter(function (r) {
+    var row = listRows_().find(function (r) {
       return r.key === LIST_INFO_KEY_;
-    })[0];
+    });
     return row ? Json.parseJson(row.values, {}) : {};
   }
 
@@ -98,9 +98,9 @@ var ListsRepository = (function () {
    */
   function writeListRow_(key, json) {
     var sh = listsSheet_();
-    var row = Table.readTable(sh, COLS_).filter(function (r) {
+    var row = Table.readTable(sh, COLS_).find(function (r) {
       return r.key === key;
-    })[0];
+    });
     if (row) Table.writeRow(sh, row._row, COLS_, { key: key, values: json });
     else Table.appendPlain(sh, [key, json]);
   }
@@ -131,9 +131,9 @@ var ListsRepository = (function () {
    */
   function deleteList_(key) {
     var sh = listsSheet_();
-    var row = Table.readTable(sh, COLS_).filter(function (r) {
+    var row = Table.readTable(sh, COLS_).find(function (r) {
       return r.key === key;
-    })[0];
+    });
     if (row) sh.deleteRow(row._row);
     var info = readListInfo();
     delete info[key];

@@ -90,7 +90,7 @@ function boot(patch = {}) {
 }
 
 test(
-  "Key booking: the setting needs a form that issues keys, and only a " + "reservation takes it",
+  "Key booking: the setting needs a form that " + "issues keys, and only a reservation takes it",
   () => {
     const w = boot();
     assert.deepEqual(
@@ -118,14 +118,11 @@ test(
   },
 );
 
-test(
-  "Key booking: the public form names the registration form and " + "nothing else about it",
-  () => {
-    const w = boot();
-    const pub = w.api({ action: "getForm", slug: w.form.slug }).form;
-    assert.deepEqual(pub.keyBooking, { title: "Database Teams" });
-  },
-);
+test("Key booking: the public form names the registration form and nothing else about it", () => {
+  const w = boot();
+  const pub = w.api({ action: "getForm", slug: w.form.slug }).form;
+  assert.deepEqual(pub.keyBooking, { title: "Database Teams" });
+});
 
 test(
   "Key booking: a key shows the team to confirm, with the names of its " +
@@ -155,32 +152,29 @@ test(
   },
 );
 
-test(
-  "Key booking: the booking carries the registration answers and only " + "the slot is sent",
-  () => {
-    const w = boot();
-    const res = w.book(w.keyA, slot(0));
-    assert.equal(res.ok, true);
-    const row = w.rows()[0];
-    assert.equal(row.data.leader_name, "أحمد محمد محمود علي");
-    assert.equal(row.data.leader_code, "4230001");
-    assert.equal(row.data.title, "Library System");
-    assert.equal(row.data.section, "4C-TH2");
-    assert.deepEqual(row.data.slot, slot(0));
-    assert.equal(row.data._source.form, w.teams.id);
-    assert.equal(row.slot, "sunday|12:30 - 12:50");
-    assert.deepEqual(
-      row.data.members || [],
-      [],
-      "teammates stay out while the form does not ask for them",
-    );
-  },
-);
+test("Key booking: the booking carries the registration answers and only the slot is sent", () => {
+  const w = boot();
+  const res = w.book(w.keyA, slot(0));
+  assert.equal(res.ok, true);
+  const row = w.rows()[0];
+  assert.equal(row.data.leader_name, "أحمد محمد محمود علي");
+  assert.equal(row.data.leader_code, "4230001");
+  assert.equal(row.data.title, "Library System");
+  assert.equal(row.data.section, "4C-TH2");
+  assert.deepEqual(row.data.slot, slot(0));
+  assert.equal(row.data._source.form, w.teams.id);
+  assert.equal(row.slot, "sunday|12:30 - 12:50");
+  assert.deepEqual(
+    row.data.members || [],
+    [],
+    "teammates stay out while the form does not ask for them",
+  );
+});
 
-test("Key booking: teammates are copied " + "when the reservation asks for them", () => {
+test("Key booking: teammates are copied when the reservation asks for them", () => {
   const w = boot();
   const form = w.admin({ action: "admin.forms.get", id: w.form.id }).form;
-  form.fields.filter((f) => f.role === "members")[0].enabled = true;
+  form.fields.find((f) => f.role === "members").enabled = true;
   w.update({ fields: form.fields });
   assert.equal(w.book(w.keyA, slot(0)).ok, true);
   assert.deepEqual(
@@ -190,7 +184,7 @@ test("Key booking: teammates are copied " + "when the reservation asks for them"
 });
 
 test(
-  "Key booking: answers typed by hand are ignored, a wrong key and a " + "bad slot are refused",
+  "Key booking: answers typed by hand are ignored, " + "a wrong key and a bad slot are refused",
   () => {
     const w = boot();
     const forged = w.api({
@@ -215,7 +209,7 @@ test(
   },
 );
 
-test("Key booking: one booking per team, opened and cancelled by the same " + "key", () => {
+test("Key booking: one booking per team, opened and cancelled by the same key", () => {
   const w = boot();
   const first = w.book(w.keyA, slot(0));
   assert.equal(first.key, w.keyA, "the booking answers to the registration key");
@@ -230,7 +224,7 @@ test("Key booking: one booking per team, opened and cancelled by the same " + "k
 });
 
 test(
-  "Key booking: with editing on, a booking can move to another slot " + "and nothing else changes",
+  "Key booking: with editing on, a booking can " + "move to another slot and nothing else changes",
   () => {
     const w = boot({
       editKey: { enabled: true, days: 7, allowEdit: true, allowDelete: true },

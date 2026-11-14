@@ -21,9 +21,9 @@
    * @return {string} Hidden, Can see or Can mark.
    */
   A.progressWord = function (access) {
-    var known = PROGRESS.filter(function (x) {
+    var known = PROGRESS.find(function (x) {
       return x[0] === access;
-    })[0];
+    });
     return (known || PROGRESS[1])[1];
   };
 

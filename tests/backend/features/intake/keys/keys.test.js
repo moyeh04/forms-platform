@@ -52,7 +52,7 @@ const team = (o = {}) =>
     ...o,
   });
 
-test("Key: lookup returns the registration " + "and wrong keys are throttled", () => {
+test("Key: lookup returns the registration and wrong keys are throttled", () => {
   const w = boot();
   const r = w.submit(team());
   const hit = w.api({ action: "lookup", slug: w.form.slug, key: r.key });
@@ -162,7 +162,7 @@ test("Key: keys are unique across a form", () => {
   }
 });
 
-test("Keys: the admin can read a student key back; the sheet only holds a " + "sealed copy", () => {
+test("Keys: the admin can read a student key back; the sheet only holds a sealed copy", () => {
   const w = boot();
   const r = w.submit(team());
   const subs = w.admin({
@@ -205,7 +205,7 @@ test("Keys: the admin can read a student key back; the sheet only holds a " + "s
   );
 });
 
-test("Keys: registrations made before sealing say so and point to Reset " + "key", () => {
+test("Keys: registrations made before sealing say so and point to Reset key", () => {
   const w = boot();
   w.submit(team());
   const sh = w.sheet(w.form.sheetId, "Responses");

@@ -45,7 +45,7 @@ function ok(reply) {
   return reply;
 }
 
-test("Golden: every function Apps Script calls by name exists in the " + "bundle", () => {
+test("Golden: every function Apps Script calls by name exists in the bundle", () => {
   const w = createWorld();
   const names = [
     "doGet",
@@ -78,7 +78,7 @@ test("Golden: every function Apps Script calls by name exists in the " + "bundle
   for (const name of named) assert.ok(names.includes(name), `menu item ${name} is pinned`);
 });
 
-test("Golden: the salted hashes and seals " + "are the same for the same pepper", () => {
+test("Golden: the salted hashes and seals are the same for the same pepper", () => {
   const w = createWorld();
   w.props.set("PEPPER", "pepper-for-golden-tests");
   const form = { id: "form-1" };
@@ -110,7 +110,7 @@ test(
   () => {
     const w = boot();
     const form = openForm(w, "team_registration", "Team Form 1");
-    const actions = w.ctx.Routes.actions().sort();
+    const actions = w.ctx.Routes.actions().toSorted();
     const codeOf = (reply) => (reply.error ? reply.error.code : "ok");
     const table = {};
     for (const action of actions) {
@@ -130,7 +130,7 @@ test(
   },
 );
 
-test("Golden: legacy flag cells read the same and are written back the " + "same", () => {
+test("Golden: legacy flag cells read the same and are written back the same", () => {
   const w = boot();
   const sheet = w.sheet(w.props.get("REGISTRY_ID"), "Clients");
   const header = sheet.rows()[0];
@@ -209,7 +209,7 @@ function openForm(w, type, title, patch = {}) {
       patch: {
         status: "open",
         ...patch,
-        rules: { ...rules, ...(patch.rules || {}) },
+        rules: { ...rules, ...patch.rules },
       },
     }),
   );
@@ -351,14 +351,14 @@ function stored(w) {
   }));
   return {
     sheets,
-    properties: Object.fromEntries([...w.props.entries()].sort()),
-    cache: Object.fromEntries([...w.cache.entries()].map(([k, e]) => [k, e.v]).sort()),
+    properties: Object.fromEntries([...w.props.entries()].toSorted()),
+    cache: Object.fromEntries([...w.cache.entries()].map(([k, e]) => [k, e.v]).toSorted()),
     mail: w.mail.map((m) => ({ to: m.to, subject: m.subject })),
     triggers: w.triggers.map((t) => t.fn),
   };
 }
 
-test("Golden: one scripted run leaves the same sheets, properties, cache " + "and mail", () => {
+test("Golden: one scripted run leaves the same sheets, properties, cache and mail", () => {
   const w = boot();
   scenario(w);
   matchesFixture("world.json", stored(w));

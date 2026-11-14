@@ -241,7 +241,7 @@
       : h(
           "p",
           { class: "error" },
-          "These hours leave no room for a slot. Make the day longer or the" + " slot shorter.",
+          "These hours leave no room for a slot. Make the day longer or the slot shorter.",
         );
     return h(
       "div",

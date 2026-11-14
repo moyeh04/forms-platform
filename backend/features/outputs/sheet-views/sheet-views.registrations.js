@@ -85,7 +85,7 @@ var SheetViewsRegistrations = (function () {
         reviewText_(form, r),
       ]);
       var tint = SheetStyle.PALETTE.groups[i % 2].shades[0];
-      out.shades.push(new Array(COLS_).fill(tint));
+      out.shades.push(Array.from({ length: COLS_ }, () => tint));
     });
     return out;
   }

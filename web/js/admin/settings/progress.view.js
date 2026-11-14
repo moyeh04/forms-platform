@@ -166,7 +166,7 @@
       );
     }
     return A.check(
-      "Teams see their progress when they open their registration with" + " the edit key",
+      "Teams see their progress when they open their registration with the edit key",
       g.f.progress.students !== false,
       function (v) {
         g.f.progress.students = v;

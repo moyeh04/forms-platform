@@ -5,7 +5,7 @@
  */
 
 const MIN_REASON_WORDS = 4;
-const WEAK_REASONS = ["allow", "exception", "legacy", "needed", "todo"];
+const WEAK_REASONS = new Set(["allow", "exception", "legacy", "needed", "todo"]);
 
 /**
  * Says whether an exception covers a finding.
@@ -31,7 +31,7 @@ function weakReasons(exceptions) {
       const words = String(entry.reason || "")
         .trim()
         .split(/\s+/);
-      const weak = words.every((word) => WEAK_REASONS.includes(word.toLowerCase()));
+      const weak = words.every((word) => WEAK_REASONS.has(word.toLowerCase()));
       return words.length < MIN_REASON_WORDS || weak;
     })
     .map((entry) => `${entry.path}: the ${entry.rule} exception needs a reason`);

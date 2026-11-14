@@ -115,7 +115,7 @@ var SubmissionsService = (function () {
       if (keyBooking && e.code === "duplicate")
         ApiError.fail(
           "already_booked",
-          "Your team already has a booking. " + "Open it with your key to change its time.",
+          "Your team already has a booking. Open it with your key to change its time.",
         );
       throw e;
     }
@@ -202,9 +202,9 @@ var SubmissionsService = (function () {
     var data = change.data;
     return Lock.withLock(function () {
       var live = ResponsesRepository.readResponses(form);
-      var current = live.filter(function (r) {
+      var current = live.find(function (r) {
         return r.id === id;
-      })[0];
+      });
       if (!current) ApiError.fail("bad_key", "That key is not right.");
       var wants = TransfersService.takeOutTransfers(vform, data, live, {
         selfId: current.id,
@@ -257,9 +257,9 @@ var SubmissionsService = (function () {
    */
   function cancelResponse_(form, id) {
     var rows = ResponsesRepository.readResponses(form, true);
-    var r = rows.filter(function (x) {
+    var r = rows.find(function (x) {
       return x.id === id && !x.deleted;
-    })[0];
+    });
     if (!r) return null;
     TeamNumbers.keepTeamNumbers(form, rows);
     r.deleted = true;

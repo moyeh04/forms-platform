@@ -207,6 +207,22 @@
   }
 
   /**
+   * Links the form's Google Sheet, when it has one.
+   *
+   * @param {!Object} f The form.
+   * @return {?Element} The menu item, or null.
+   */
+  function sheetLink(f) {
+    if (!f.sheetUrl) return null;
+    return h(
+      "a",
+      { role: "menuitem", href: f.sheetUrl, target: "_blank", rel: "noopener" },
+      icon("task", SIZE.MENU),
+      "Open Google Sheet",
+    );
+  }
+
+  /**
    * Lists the items of the More menu of a form.
    *
    * @param {!Object} f The form.
@@ -215,19 +231,7 @@
    * @return {!Array<?Element>} The items.
    */
   function moreItems(f, more, afterDelete) {
-    var sheet = f.sheetUrl
-      ? h(
-          "a",
-          {
-            role: "menuitem",
-            href: f.sheetUrl,
-            target: "_blank",
-            rel: "noopener",
-          },
-          icon("task", SIZE.MENU),
-          "Open Google Sheet",
-        )
-      : null;
+    var sheet = sheetLink(f);
     var rebuild = menuItem(
       {
         name: "rebuild",

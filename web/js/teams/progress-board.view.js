@@ -29,7 +29,7 @@
   P.savedView = function (slug) {
     try {
       return window.sessionStorage.getItem(VIEW_KEY + slug) || "teams";
-    } catch (_e) {
+    } catch {
       return "teams";
     }
   };
@@ -60,7 +60,7 @@
             onclick: function () {
               try {
                 window.sessionStorage.setItem(VIEW_KEY + slug, x[0]);
-              } catch (_e) {
+              } catch {
                 // The choice lasts until the page is drawn again.
               }
               pick(x[0]);
@@ -223,10 +223,42 @@
    * @return {string} Its id.
    */
   function firstOpen(b) {
-    var open = b.milestones.filter(function (m) {
+    var open = b.milestones.find(function (m) {
       return discussedBy(b.teams, m.id) < b.teams.length;
-    })[0];
+    });
     return (open || b.milestones[0]).id;
+  }
+
+  /**
+   * Draws the three states of one team on a phone, one tap marks.
+   *
+   * @param {!Object} b The board.
+   * @param {!Object} team The team.
+   * @param {!Object} m The milestone.
+   * @param {!Object} mark The team's mark on it.
+   * @return {!Element} The states.
+   */
+  function phoneStates(b, team, m, mark) {
+    return h(
+      "span",
+      { class: "progress-states", role: "radiogroup", "aria-label": "State" },
+      P.STATES.map(function (x) {
+        return h(
+          "button",
+          {
+            type: "button",
+            role: "radio",
+            class: "toggle-chip sm state-" + x[0],
+            name: "line-" + team.number + "-" + x[0],
+            "aria-checked": mark.s === x[0] ? "true" : "false",
+            onclick: function () {
+              P.change(b, team, m.id, { state: x[0] });
+            },
+          },
+          x[1],
+        );
+      }),
+    );
   }
 
   /**
@@ -242,30 +274,7 @@
   function phoneLine(b, team, m) {
     var mark = Rules.markOf(team.progress, m.id);
     var states = b.canMark
-      ? h(
-          "span",
-          {
-            class: "progress-states",
-            role: "radiogroup",
-            "aria-label": "State",
-          },
-          P.STATES.map(function (x) {
-            return h(
-              "button",
-              {
-                type: "button",
-                role: "radio",
-                class: "toggle-chip sm state-" + x[0],
-                name: "line-" + team.number + "-" + x[0],
-                "aria-checked": mark.s === x[0] ? "true" : "false",
-                onclick: function () {
-                  P.change(b, team, m.id, { state: x[0] });
-                },
-              },
-              x[1],
-            );
-          }),
-        )
+      ? phoneStates(b, team, m, mark)
       : h("span", { class: "pstate is-" + mark.s }, P.word(mark.s));
     return h(
       "li",
@@ -303,9 +312,9 @@
    * @return {!Element} The view.
    */
   function phone(b) {
-    var m = b.milestones.filter(function (x) {
+    var m = b.milestones.find(function (x) {
       return x.id === b.view.picked;
-    })[0];
+    });
     if (!m) {
       b.view.picked = firstOpen(b);
       return phone(b);

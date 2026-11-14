@@ -104,9 +104,9 @@
    */
   Q.pageOf = function (f, fd) {
     return (
-      (f.steps || []).filter(function (st) {
+      (f.steps || []).find(function (st) {
         return (st.fields || []).indexOf(fd.id) !== -1;
-      })[0] || null
+      }) || null
     );
   };
 
@@ -136,9 +136,9 @@
         return x !== fd.id;
       });
     }
-    var to = f.steps.filter(function (st) {
+    var to = f.steps.find(function (st) {
       return st.id === id;
-    })[0];
+    });
     to.fields = (to.fields || []).concat([fd.id]);
   };
 
@@ -311,9 +311,9 @@
     if (unwritten) {
       return "Write the question for every question you added, or remove it.";
     }
-    var few = added.filter(function (fd) {
+    var few = added.find(function (fd) {
       return fd.type === "select" && (fd.options || []).length < 2;
-    })[0];
+    });
     if (few) {
       return '"' + (few.label.en || few.label.ar) + '" needs at least two choices.';
     }

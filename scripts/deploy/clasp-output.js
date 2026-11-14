@@ -35,7 +35,7 @@ function createdProject(output) {
   let created = {};
   try {
     created = JSON.parse(text.slice(text.indexOf("{"), text.lastIndexOf("}") + 1));
-  } catch (_) {
+  } catch {
     /* reported below */
   }
   if (!ID_PATTERN.test(created.scriptId || "")) {

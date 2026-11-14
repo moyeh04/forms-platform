@@ -53,7 +53,7 @@
     whatsapp_registration: {
       label: "WhatsApp group registration",
       icon: "chat",
-      text: "Students ask to join a group, and you check each one against the" + " join requests.",
+      text: "Students ask to join a group, and you check each one against the join requests.",
       pages: ["About you", "Study details", "Schedule"],
       next: ["Paste the join requests under Responses to match them."],
     },

@@ -144,7 +144,7 @@ function download(w, slug) {
 }
 
 test(
-  "Download: every task is saved under its team number, with a " + "workbook that links to it",
+  "Download: every task is saved under its team " + "number, with a workbook that links to it",
   () => {
     const w = boot();
     const f = w.make("task_submission", "Software Engineering Tasks");
@@ -182,7 +182,7 @@ test(
 
     const { entries, fin } = download(w, f.slug);
     const root = "Software Engineering Tasks/";
-    assert.deepEqual(Object.keys(entries).sort(), [
+    assert.deepEqual(Object.keys(entries).toSorted(), [
       root + "Tasks/01 - Task 1.pptx",
       root + "Tasks/02 - Task 2.pdf",
       root + "Teams.xlsx",
@@ -230,7 +230,7 @@ test(
 );
 
 test(
-  "Download: a project folder comes with its subfolders, over as many " + "requests as it needs",
+  "Download: a project folder comes with its " + "subfolders, over as many requests as it needs",
   () => {
     const w = boot();
     const f = w.make("team_registration", "Database Projects");
@@ -285,7 +285,7 @@ test(
       45,
       "every file once, none twice",
     );
-    assert.deepEqual(fin.failed.map((x) => x.reason).sort(), [
+    assert.deepEqual(fin.failed.map((x) => x.reason).toSorted(), [
       "No link was given",
       "This kind of Google file cannot be downloaded",
     ]);
@@ -299,86 +299,80 @@ test(
   },
 );
 
-test(
-  "Download: big downloads are split into parts and the work folder " + "keeps only the zips",
-  () => {
-    const w = boot();
-    const f = w.make("task_submission", "Tasks");
-    for (let i = 0; i < 3; i++) {
-      const id = ID(String.fromCharCode(103 + i));
-      w.drive.addFile({
-        id,
-        name: `t${i}.pdf`,
-        mime: "application/pdf",
-        bytes: Buffer.alloc(18 * 1024 * 1024, i),
-      });
-      w.api({
-        action: "submit",
-        slug: f.slug,
-        data: person("423000" + i, {
-          title: "Task " + i,
-          link: `https://drive.google.com/file/d/${id}/view`,
-        }),
-      });
-    }
-    const { fin, entries, start } = download(w, f.slug);
-    assert.equal(fin.parts, 2);
-    assert.equal(Object.keys(entries).filter((n) => n.endsWith(".pdf")).length, 3);
-    const kept = [...w.drive.files.entries()]
-      .filter(([id, x]) => x.parent === start.job && !w.drive.trashed.has(id))
-      .map(([, x]) => x.name);
-    assert.deepEqual(kept.sort(), ["Tasks - part 1 of 2.zip", "Tasks - part 2 of 2.zip"]);
-  },
-);
-
-test(
-  "Download: only the admin, only team forms, and only a download that " + "is still there",
-  () => {
-    const w = boot();
-    const f = w.make("task_submission", "Tasks");
-    const res = w.make("reservation", "Seminar");
-    assert.equal(
-      w.admin({ action: "admin.download.start", slug: f.slug }).error.code,
-      "nothing_to_download",
-    );
-    assert.equal(
-      w.admin({ action: "admin.download.start", slug: res.slug }).error.code,
-      "wrong_type",
-    );
+test("Download: big downloads are split into parts and the work folder keeps only the zips", () => {
+  const w = boot();
+  const f = w.make("task_submission", "Tasks");
+  for (let i = 0; i < 3; i++) {
+    const id = ID(String.fromCharCode(103 + i));
+    w.drive.addFile({
+      id,
+      name: `t${i}.pdf`,
+      mime: "application/pdf",
+      bytes: Buffer.alloc(18 * 1024 * 1024, i),
+    });
     w.api({
       action: "submit",
       slug: f.slug,
-      data: person("4230001", {
-        title: "One",
-        link: `https://drive.google.com/file/d/${ID("z")}/view`,
+      data: person("423000" + i, {
+        title: "Task " + i,
+        link: `https://drive.google.com/file/d/${id}/view`,
       }),
     });
-    assert.equal(w.api({ action: "admin.download.start", slug: f.slug }).error.code, "bad_pin");
-    const start = w.admin({ action: "admin.download.start", slug: f.slug });
-    assert.equal(
-      w.admin({
-        action: "admin.download.chunk",
-        slug: f.slug,
-        job: start.job,
-        file: ID("z"),
-      }).error.code,
-      "bad_part",
-      "only the zips of this download can be read",
-    );
-    const again = w.admin({ action: "admin.download.start", slug: f.slug });
-    assert.ok(w.drive.trashed.has(start.job), "a new download replaces the older one");
-    w.setNow(w.nowMs + 7 * 3600 * 1000);
-    assert.equal(
-      w.admin({
-        action: "admin.download.team",
-        slug: f.slug,
-        job: again.job,
-        ref: start.teams[0].ref,
-      }).error.code,
-      "download_gone",
-    );
-  },
-);
+  }
+  const { fin, entries, start } = download(w, f.slug);
+  assert.equal(fin.parts, 2);
+  assert.equal(Object.keys(entries).filter((n) => n.endsWith(".pdf")).length, 3);
+  const kept = [...w.drive.files.entries()]
+    .filter(([id, x]) => x.parent === start.job && !w.drive.trashed.has(id))
+    .map(([, x]) => x.name);
+  assert.deepEqual(kept.toSorted(), ["Tasks - part 1 of 2.zip", "Tasks - part 2 of 2.zip"]);
+});
+
+test("Download: only the admin, only team forms, and only a download that is still there", () => {
+  const w = boot();
+  const f = w.make("task_submission", "Tasks");
+  const res = w.make("reservation", "Seminar");
+  assert.equal(
+    w.admin({ action: "admin.download.start", slug: f.slug }).error.code,
+    "nothing_to_download",
+  );
+  assert.equal(
+    w.admin({ action: "admin.download.start", slug: res.slug }).error.code,
+    "wrong_type",
+  );
+  w.api({
+    action: "submit",
+    slug: f.slug,
+    data: person("4230001", {
+      title: "One",
+      link: `https://drive.google.com/file/d/${ID("z")}/view`,
+    }),
+  });
+  assert.equal(w.api({ action: "admin.download.start", slug: f.slug }).error.code, "bad_pin");
+  const start = w.admin({ action: "admin.download.start", slug: f.slug });
+  assert.equal(
+    w.admin({
+      action: "admin.download.chunk",
+      slug: f.slug,
+      job: start.job,
+      file: ID("z"),
+    }).error.code,
+    "bad_part",
+    "only the zips of this download can be read",
+  );
+  const again = w.admin({ action: "admin.download.start", slug: f.slug });
+  assert.ok(w.drive.trashed.has(start.job), "a new download replaces the older one");
+  w.setNow(w.nowMs + 7 * 3600 * 1000);
+  assert.equal(
+    w.admin({
+      action: "admin.download.team",
+      slug: f.slug,
+      job: again.job,
+      ref: start.teams[0].ref,
+    }).error.code,
+    "download_gone",
+  );
+});
 
 test(
   "Deadline: a task cannot be changed or cancelled after the form " +

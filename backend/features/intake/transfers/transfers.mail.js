@@ -31,9 +31,9 @@ var TransfersMail = (function () {
    */
   function recipient_(form, t, kind) {
     var teamId = kind === "asked" || kind === "leads" ? t.fromId : t.toId;
-    var team = ResponsesRepository.readResponses(form).filter(function (r) {
+    var team = ResponsesRepository.readResponses(form).find(function (r) {
       return r.id === teamId;
-    })[0];
+    });
     return team && Rules.valueByRole(form, team.data, "email");
   }
 

@@ -246,9 +246,9 @@ var ViewerService = (function () {
    */
   function reviewSubmission_(form, submissionId, stepId, status) {
     Lock.withLock(function () {
-      var r = ResponsesRepository.readResponses(form).filter(function (x) {
+      var r = ResponsesRepository.readResponses(form).find(function (x) {
         return x.id === submissionId;
-      })[0];
+      });
       if (!r) ApiError.fail("submission_not_found", "That submission does not exist.");
       ResponsesReview.setReviewStep(form, r, stepId, status);
       ResponsesRepository.saveResponse(form, r);

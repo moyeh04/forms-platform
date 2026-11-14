@@ -155,9 +155,8 @@ var TemplatesService = (function () {
           role: "link",
           kinds: ["file", "slides"],
           help: {
-            en:
-              'Share it as "Anyone with the link". ' + "The first slide has your name and section.",
-            ar: 'اعمله شير "Anyone with the link". ' + "أول سلايد فيها الاسم والسكشن.",
+            en: 'Share it as "Anyone with the link". The first slide has your name and section.',
+            ar: 'اعمله شير "Anyone with the link". أول سلايد فيها الاسم والسكشن.',
           },
         },
       ),
@@ -271,7 +270,7 @@ var TemplatesService = (function () {
         {
           list: "wa_sections",
           help: {
-            en: "The number next to TH in your timetable, " + "for example 21 in 1B-TH21",
+            en: "The number next to TH in your timetable, for example 21 in 1B-TH21",
             ar: "الرقم اللي جنب TH في جدولك",
           },
         },

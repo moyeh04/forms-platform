@@ -273,7 +273,7 @@
     if (w.sections.length) body = body.concat(sectionsPart(w));
     var panel = A.panel(
       "Who can register",
-      "Limit this form to some students. With no limit, every choice of the" + " list is offered.",
+      "Limit this form to some students. With no limit, every choice of the list is offered.",
       body,
     );
     panel.summary = summary.bind(null, w);

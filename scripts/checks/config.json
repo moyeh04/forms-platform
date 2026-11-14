@@ -15,18 +15,9 @@
       "extensions": [".js"]
     }
   },
-  "biome": {
-    "include": [
-      "web/js/",
-      "web/css/",
-      "backend/",
-      "domain/",
-      "scripts/",
-      "tests/",
-      "package.json",
-      "biome.json"
-    ],
-    "extensions": [".js", ".css", ".json"],
+  "oxlint": {
+    "include": ["web/js/", "backend/", "domain/", "scripts/", "tests/"],
+    "extensions": [".js"],
     "exclude": ["tests/fixtures/"]
   },
   "lines": {
@@ -40,7 +31,8 @@
       "tests/",
       ".githooks/",
       ".github/",
-      "biome.json",
+      ".oxlintrc.json",
+      ".oxfmtrc.json",
       "package.json"
     ],
     "extensions": [".js", ".css", ".html", ".sh", ".yml", ".json", ""],
@@ -118,7 +110,7 @@
       "pnpm-lock.yaml",
       "pnpm-workspace.yaml",
       ".oxfmtrc.json",
-      "biome.json",
+      ".oxlintrc.json",
       ".gitignore",
       ".git-blame-ignore-revs",
       ".githooks",

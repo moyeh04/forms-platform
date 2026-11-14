@@ -128,7 +128,7 @@ test("Fresh page: an open dialog is not closed by a reload", async (t) => {
 });
 
 test(
-  "Fresh page: a preview has no version and a site that cannot be read " + "changes nothing",
+  "Fresh page: a preview has no version and a " + "site that cannot be read changes nothing",
   async (t) => {
     const p = await open(t, "viewer.html", boot(), { query: "?t=none" });
     assert.equal(p.win.APP_CONFIG.VERSION, undefined, "the source config has no version");

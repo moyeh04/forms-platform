@@ -55,7 +55,7 @@ function fakeSetup(t, answers = {}) {
 
 const newId = "AKfycbTestDeployment_0123456789";
 
-test("Setup: a first run creates the web app and stores its address in " + "GitHub", (t) => {
+test("Setup: a first run creates the web app and stores its address in GitHub", (t) => {
   const fake = fakeSetup(t, {
     "variable get": { status: 1 },
     " deploy ": { stdout: "Deployed " + newId + " @1" },
@@ -78,14 +78,14 @@ test("Setup: a first run creates the web app and stores its address in " + "GitH
   const positions = order.map((part) => lines.findIndex((line) => line.includes(part)));
   assert.deepEqual(
     positions,
-    [...positions].sort((a, b) => a - b),
+    [...positions].toSorted((a, b) => a - b),
   );
   assert.equal(positions.includes(-1), false, lines.join("\n"));
   assert.equal(fake.calls.find((call) => call.line.includes("push --force")).project, true);
   assert.equal(fs.existsSync(path.join(fake.dir, ".clasp.json")), false);
 });
 
-test("Setup: the credential reaches " + "GitHub through standard input only", (t) => {
+test("Setup: the credential reaches GitHub through standard input only", (t) => {
   const fake = fakeSetup(t, {
     " deploy ": { stdout: "Deployed " + newId + " @1" },
     "variable get": { status: 1 },
@@ -103,7 +103,7 @@ test("Setup: the credential reaches " + "GitHub through standard input only", (t
   );
 });
 
-test("Setup: a stored deployment is updated in place and Pages is left " + "alone", (t) => {
+test("Setup: a stored deployment is updated in place and Pages is left alone", (t) => {
   const fake = fakeSetup(t, {
     "variable get": { stdout: "test-deployment\n" },
     "--jq .build_type": { stdout: "workflow\n" },
@@ -150,7 +150,7 @@ test("Setup: a failed step stops before GitHub is configured", (t) => {
   assert.throws(() => deploymentId("Created version 1."), /deployment ID/);
 });
 
-test("Setup: without a Script ID a sheet with a bound script is created " + "once", (t) => {
+test("Setup: without a Script ID a sheet with a bound script is created once", (t) => {
   const created = JSON.stringify({
     scriptId: "new-script",
     parentId: "new-sheet",
@@ -188,7 +188,7 @@ test("Setup: without a Script ID a sheet with a bound script is created " + "onc
   assert.throws(() => createdProject("User has not enabled the Apps Script API."), /Script ID/);
 });
 
-test("Setup: on a terminal the owner chooses a new sheet or an existing " + "one", (t) => {
+test("Setup: on a terminal the owner chooses a new sheet or an existing one", (t) => {
   const created = JSON.stringify({
     scriptId: "new-script",
     parentId: "new-sheet",
@@ -244,7 +244,7 @@ test("Setup: on a terminal the owner chooses a new sheet or an existing " + "one
   assert.deepEqual(silent.asked, []);
 });
 
-test("Setup: the workstation and the " + "workflow pin the same clasp version", () => {
+test("Setup: the workstation and the workflow pin the same clasp version", () => {
   const workflow = fs.readFileSync(path.join(root, ".github/workflows/pages.yml"), "utf8");
   const pins = [...workflow.matchAll(/@google\/clasp@[0-9.]+/g)].map((match) => match[0]);
   assert.equal(pins.length > 0 && pins.every((pin) => pin === CLASP), true);

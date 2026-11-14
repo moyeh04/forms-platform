@@ -78,29 +78,26 @@ const plain = (sheet) => {
   sheet.frozenRows = 0;
 };
 
-test(
-  "Data tabs: the registry and a new form get the header, the widths " + "and the row tints",
-  () => {
-    const w = boot("team_registration");
-    const tinted = (cols) => ({
-      head: true,
-      frozen: 1,
-      bands: [[1000, cols, INK, "#FFFFFF", "#F8F1DE"]],
-    });
-    assert.deepEqual(looks(w.registry.getSheetByName("Forms"), 13), tinted(13));
-    assert.deepEqual(looks(w.registry.getSheetByName("Clients"), 13), tinted(13));
-    assert.deepEqual(looks(w.registry.getSheetByName("Lists"), 2), tinted(2));
-    const responses = w.sheet(w.form.sheetId, "Responses");
-    assert.deepEqual(looks(responses, 21), tinted(21));
-    assert.equal(responses.widths.get(8), 240, "the name column is wide");
-    assert.equal(responses.widths.get(20), 80, "the number column is narrow");
-    assert.deepEqual(
-      responses.rows()[0].slice(0, 3),
-      ["id", "ref", "created"],
-      "the header still holds the column names",
-    );
-  },
-);
+test("Data tabs: the registry and a new form get the header, the widths and the row tints", () => {
+  const w = boot("team_registration");
+  const tinted = (cols) => ({
+    head: true,
+    frozen: 1,
+    bands: [[1000, cols, INK, "#FFFFFF", "#F8F1DE"]],
+  });
+  assert.deepEqual(looks(w.registry.getSheetByName("Forms"), 13), tinted(13));
+  assert.deepEqual(looks(w.registry.getSheetByName("Clients"), 13), tinted(13));
+  assert.deepEqual(looks(w.registry.getSheetByName("Lists"), 2), tinted(2));
+  const responses = w.sheet(w.form.sheetId, "Responses");
+  assert.deepEqual(looks(responses, 21), tinted(21));
+  assert.equal(responses.widths.get(8), 240, "the name column is wide");
+  assert.equal(responses.widths.get(20), 80, "the number column is narrow");
+  assert.deepEqual(
+    responses.rows()[0].slice(0, 3),
+    ["id", "ref", "created"],
+    "the header still holds the column names",
+  );
+});
 
 test(
   "Data tabs: a sheet made before the look existed gets it on the next " +

@@ -104,7 +104,7 @@
         type: "button",
         class: "btn btn-quiet sm danger",
         name: "remove-" + fd.id,
-        title: "Answers already given stay in the Google Sheet but are no longer" + " shown.",
+        title: "Answers already given stay in the Google Sheet but are no longer shown.",
         onclick: function () {
           Q.removeQuestion(s.f, fd);
           s.paintQuestions();

@@ -36,7 +36,7 @@ var DownloadsFiles = (function () {
   var BUSY_ = /rate|too many|quota|429|503|try again|backend error/i;
 
   /** The characters a name in a zip may not hold, control ones too. */
-  // biome-ignore lint/suspicious/noControlCharactersInRegex: it removes them
+  // oxlint-disable-next-line no-control-regex -- it removes the control characters
   var BAD_NAME_CHARS_ = /[\\/:*?"<>|\u0000-\u001F]+/g;
 
   /** What a Google file is saved as: its extension and export address. */

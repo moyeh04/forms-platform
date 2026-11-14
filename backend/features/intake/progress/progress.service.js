@@ -35,9 +35,9 @@ var ProgressService = (function () {
    * @throws {ApiError} `submission_not_found`.
    */
   function liveTeam_(form, id) {
-    var r = ResponsesRepository.readResponses(form).filter(function (x) {
+    var r = ResponsesRepository.readResponses(form).find(function (x) {
       return x.id === String(id || "");
-    })[0];
+    });
     if (!r) {
       ApiError.fail("submission_not_found", "This team is no longer registered.");
     }
@@ -70,7 +70,7 @@ var ProgressService = (function () {
       if (Rules.markStale(r.progress, id, req.baseAt)) {
         ApiError.fail(
           "changed_meanwhile",
-          "Someone else marked this milestone a moment ago. It now shows" + " their mark.",
+          "Someone else marked this milestone a moment ago. It now shows their mark.",
           { progress: shape(r.progress) },
         );
       }

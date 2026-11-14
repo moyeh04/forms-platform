@@ -224,7 +224,7 @@ test(
 );
 
 test(
-  "Lists: a kind is added by name or removed with its own button, and " + "a count never reaches 0",
+  "Lists: a kind is added by name or removed with " + "its own button, and a count never reaches 0",
   async () => {
     const w = boot();
     w.admin({
@@ -239,7 +239,7 @@ test(
     );
     assert.ok(
       p.text().includes("4C-TH01"),
-      "a number written with a leading zero is kept as written, under " + "Other sections",
+      "a number written with a leading zero is kept as written, under Other sections",
     );
     assert.equal(p.$('[name="count-4C-T-down"]').disabled, true, "a count stops at 1");
     p.type('[name="count-4C-T"]', "0");
@@ -267,7 +267,7 @@ test(
     assert.equal(
       p.$('[name="remove-kind-4C-LAB"]'),
       null,
-      "the last kind of a group has no remove of its own: it goes with " + "the group",
+      "the last kind of a group has no remove of its own: it goes with the group",
     );
     p.click('[name="save-list"]');
     await settle(8);
@@ -390,33 +390,27 @@ test(
   },
 );
 
-test(
-  "Lists: the server refuses a list that does not exist and a question " + "that reads one",
-  () => {
-    const w = boot();
-    const f = w.make("team_registration", "Projects");
-    assert.equal(
-      w.admin({ action: "admin.lists.set", key: "nope", values: ["A"] }).error.code,
-      "list_not_found",
-    );
-    assert.equal(
-      w.admin({ action: "admin.lists.set", key: "_info", values: ["A"] }).error.code,
-      "list_not_found",
-      "the info row is not a list",
-    );
-    const fields = w
-      .admin({ action: "admin.forms.get", id: f.id })
-      .form.fields.map((x) => (x.id === "section" ? { ...x, list: "nope" } : x));
-    assert.equal(
-      w.admin({ action: "admin.forms.update", id: f.id, patch: { fields } }).error.code,
-      "list_not_found",
-    );
-    assert.equal(
-      Object.keys(w.admin({ action: "admin.lists.get" }).lists).includes("_info"),
-      false,
-    );
-  },
-);
+test("Lists: the server refuses a list that does not exist and a question that reads one", () => {
+  const w = boot();
+  const f = w.make("team_registration", "Projects");
+  assert.equal(
+    w.admin({ action: "admin.lists.set", key: "nope", values: ["A"] }).error.code,
+    "list_not_found",
+  );
+  assert.equal(
+    w.admin({ action: "admin.lists.set", key: "_info", values: ["A"] }).error.code,
+    "list_not_found",
+    "the info row is not a list",
+  );
+  const fields = w
+    .admin({ action: "admin.forms.get", id: f.id })
+    .form.fields.map((x) => (x.id === "section" ? { ...x, list: "nope" } : x));
+  assert.equal(
+    w.admin({ action: "admin.forms.update", id: f.id, patch: { fields } }).error.code,
+    "list_not_found",
+  );
+  assert.equal(Object.keys(w.admin({ action: "admin.lists.get" }).lists).includes("_info"), false);
+});
 
 test(
   "Lists: a list of milestones is named rows with hidden ids that stay " +

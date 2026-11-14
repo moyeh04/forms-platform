@@ -194,8 +194,8 @@
       rows: "5",
       name: "paste-list",
       placeholder: p.milestones
-        ? "One milestone on each line. For an Arabic name, add a bar:\n" + "Task 1 | المهمة 1"
-        : "One choice on each line. For an English name, add a bar:\n" + "حاسبات | Computers",
+        ? "One milestone on each line. For an Arabic name, add a bar:\nTask 1 | المهمة 1"
+        : "One choice on each line. For an English name, add a bar:\nحاسبات | Computers",
       "aria-label": p.milestones ? "Milestones, one on each line" : "Choices, one on each line",
     });
     var acts = h("div", { class: "actions" });

@@ -116,7 +116,7 @@ var SheetViewsBookings = (function () {
       var tint = current.style.shades[current.length % 2];
       current.length++;
       out.values.push(bookingRow_(p, r, withMembers));
-      var row = new Array(WIDTHS_.length + (withMembers ? 1 : 0)).fill(tint);
+      var row = Array.from({ length: WIDTHS_.length + (withMembers ? 1 : 0) }, () => tint);
       row[0] = current.style.solid;
       out.shades.push(row);
     });

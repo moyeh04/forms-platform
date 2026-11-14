@@ -9,7 +9,7 @@
 
   /** The library that draws a part of the page onto a canvas. */
   var HTML2CANVAS_URL =
-    "https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/" + "html2canvas.min.js";
+    "https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js";
 
   /** The image has this many pixels for each pixel of the page. */
   var IMAGE_SCALE = 2;
@@ -27,8 +27,8 @@
     return new Promise(function (resolve, reject) {
       var s = document.createElement("script");
       s.src = src;
-      s.onload = resolve;
-      s.onerror = reject;
+      s.addEventListener("load", resolve);
+      s.addEventListener("error", reject);
       document.head.appendChild(s);
     });
   }

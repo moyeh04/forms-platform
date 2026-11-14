@@ -48,9 +48,9 @@
    * @return {string} The reason.
    */
   function reason(stop) {
-    var level = LEVELS.filter(function (l) {
+    var level = LEVELS.find(function (l) {
       return l.id === stop.level;
-    })[0];
+    });
     if (stop.error === "order") {
       return (
         "The warning must be for a higher number than the critical" +

@@ -112,7 +112,7 @@ function boot() {
   return w;
 }
 
-test("Clients: a link is created once, " + "the token itself is never stored", () => {
+test("Clients: a link is created once, the token itself is never stored", () => {
   const w = boot();
   const c = w.client();
   assert.match(c.token, /^[0-9a-f]{24}$/);

@@ -78,7 +78,7 @@ async function openWithKey(w, key) {
 }
 
 test(
-  "Transfer: a member of another team can be asked for, and the team " + "registers without them",
+  "Transfer: a member of another team can be " + "asked for, and the team registers without them",
   async () => {
     const w = bootTransfers();
     const p = await teamBWith(w, "4230002");
@@ -127,7 +127,7 @@ test(
       b
         .$('[data-transfer="pending"]')
         .textContent.includes(
-          `Waiting for team ${w.teamA.ref} to release سارة خالد حسن علي ` + `(4230002).`,
+          `Waiting for team ${w.teamA.ref} to release سارة خالد حسن علي (4230002).`,
         ),
     );
     b.click('[name="transfer-cancel"]');
@@ -372,7 +372,7 @@ test(
 );
 
 test(
-  "Transfer: a leader who is alone in a team is not offered, and the " + "page says why",
+  "Transfer: a leader who is alone in a team " + "is not offered, and the page says why",
   async () => {
     const w = bootTransfers();
     w.api({

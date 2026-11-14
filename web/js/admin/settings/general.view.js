@@ -124,22 +124,22 @@
   }
 
   /**
+   * Writes a moment for the folded line.
+   *
+   * @param {string} iso The moment.
+   * @return {string} YYYY-MM-DD HH:MM.
+   */
+  function when(iso) {
+    return toLocal(iso).replace("T", " ");
+  }
+
+  /**
    * Gives the folded line of the panel.
    *
    * @param {!Object} f The form.
    * @return {string} The title and the dates.
    */
   function summary(f) {
-    /**
-     * Writes a moment for the folded line.
-     *
-     * @param {string} iso The moment.
-     * @return {string} YYYY-MM-DD HH:MM.
-     */
-    function when(iso) {
-      return toLocal(iso).replace("T", " ");
-    }
-
     return [
       f.title,
       f.opensAt ? "opens " + when(f.opensAt) : "",

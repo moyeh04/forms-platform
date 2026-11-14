@@ -38,9 +38,9 @@ var PrintReservations = (function () {
    */
   function requireDay_(vform, dayId) {
     var days = vform.slots?.days || [];
-    var day = days.filter(function (d) {
+    var day = days.find(function (d) {
       return d.id === dayId;
-    })[0];
+    });
     if (!day) {
       ApiError.fail("day_not_found", "That day is not in the timetable.");
     }
@@ -98,7 +98,7 @@ var PrintReservations = (function () {
    * @return {!Array<string>} The row.
    */
   function emptyRow_(time, cols) {
-    var row = new Array(cols).fill("");
+    var row = Array.from({ length: cols }, () => "");
     row[1] = time;
     return row;
   }

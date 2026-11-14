@@ -9,17 +9,15 @@
   var h = App.ui.h;
 
   /**
-   * Draws a folded section.
+   * Builds the elements of a folded section.
    *
    * @param {string} title Its name.
    * @param {*} help The help under the name, or null.
-   * @param {...*} body What it holds.
-   * @return {!Element} The section. `summary` is a function, set by the
-   *     caller, that returns the folded line; `setOpen(open)` unfolds it;
-   *     `paintSummary()` draws the line again; `pin()` keeps it open;
-   *     `onToggle(open)`, when set, is told each fold.
+   * @param {!Array<*>} body What it holds.
+   * @return {{content: !Element, sum: !Element, head: !Element, node: !Element}}
+   *     The body, the folded line, the button and the section.
    */
-  A.panel = function (title, help, ...body) {
+  function frame(title, help, body) {
     var content = h(
       "div",
       { class: "panel-body", hidden: true },
@@ -40,6 +38,26 @@
       content,
     );
     node.panelTitle = title;
+    return { content: content, sum: sum, head: head, node: node };
+  }
+
+  /**
+   * Draws a folded section.
+   *
+   * @param {string} title Its name.
+   * @param {*} help The help under the name, or null.
+   * @param {...*} body What it holds.
+   * @return {!Element} The section. `summary` is a function, set by the
+   *     caller, that returns the folded line; `setOpen(open)` unfolds it;
+   *     `paintSummary()` draws the line again; `pin()` keeps it open;
+   *     `onToggle(open)`, when set, is told each fold.
+   */
+  A.panel = function (title, help, ...body) {
+    var parts = frame(title, help, body);
+    var content = parts.content;
+    var sum = parts.sum;
+    var head = parts.head;
+    var node = parts.node;
 
     /**
      * Tells whether the section is unfolded.

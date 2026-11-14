@@ -10,7 +10,7 @@ function boot() {
   return w;
 }
 
-test("Forms: every template can be " + "created and gets its own spreadsheet", () => {
+test("Forms: every template can be created and gets its own spreadsheet", () => {
   const w = boot();
   const types = ["team_registration", "task_submission", "reservation", "whatsapp_registration"];
   const sheets = new Set();
@@ -46,7 +46,7 @@ test("Forms: creation validates type and title", () => {
   );
 });
 
-test("Public form: draft hides fields, open form hides internals and " + "resolves lists", () => {
+test("Public form: draft hides fields, open form hides internals and resolves lists", () => {
   const w = boot();
   const f = w.admin({
     action: "admin.forms.create",
@@ -136,7 +136,7 @@ test("Forms: updates validate status and keep link names unique", () => {
   );
 });
 
-test("Forms: duplicating gives a draft copy with a fresh sheet and " + "settings kept", () => {
+test("Forms: duplicating gives a draft copy with a fresh sheet and settings kept", () => {
   const w = boot();
   const a = w.admin({
     action: "admin.forms.create",
@@ -164,7 +164,7 @@ test("Forms: duplicating gives a draft copy with a fresh sheet and " + "settings
   assert.equal(copy.editKey.days, 3);
 });
 
-test("WhatsApp metadata: duplicating a legacy record keeps only " + "batch-year metadata", () => {
+test("WhatsApp metadata: duplicating a legacy record keeps only batch-year metadata", () => {
   const w = boot();
   const source = w.admin({
     action: "admin.forms.create",

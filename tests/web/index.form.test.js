@@ -4,7 +4,7 @@ const { openPage, settle } = require("../harness/dom.js");
 const { boot, open, AR_NAME, fillAbout, fillStudy } = require("../harness/form-page.js");
 
 test(
-  "Form: shows the title, the term tag, a type icon, and one dot per " + "step plus review",
+  "Form: shows the title, the term tag, a type " + "icon, and one dot per step plus review",
   async () => {
     const w = boot();
     const p = await open(w);
@@ -19,7 +19,7 @@ test(
 );
 
 test(
-  "Form: Arabic name field strips English letters and digits as you " + "type and says why",
+  "Form: Arabic name field strips English " + "letters and digits as you type and says why",
   async () => {
     const w = boot();
     const p = await open(w);
@@ -32,7 +32,7 @@ test(
   },
 );
 
-test("Form: the code field keeps " + "digits only and converts Arabic digits", async () => {
+test("Form: the code field keeps digits only and converts Arabic digits", async () => {
   const w = boot();
   const p = await open(w);
   const input = p.$('[name="leader_code"]');
@@ -40,7 +40,7 @@ test("Form: the code field keeps " + "digits only and converts Arabic digits", a
   assert.equal(input.value, "4230999");
 });
 
-test("Form: Next on an empty step " + "shows clear errors and stays put", async () => {
+test("Form: Next on an empty step shows clear errors and stays put", async () => {
   const w = boot();
   const p = await open(w);
   p.submitForm();
@@ -55,14 +55,14 @@ test("Form: Next on an empty step " + "shows clear errors and stays put", async 
   assert.ok(p.text().includes("This field is required."));
 });
 
-test("Form: an English name is refused " + "with a specific message on blur", async () => {
+test("Form: an English name is refused with a specific message on blur", async () => {
   const w = boot();
   const p = await open(w);
   p.type('[name="leader_name"]', "أحمد محمد");
   assert.ok(p.$('[data-path="leader_name"] .error').textContent.includes("at least 4 names"));
 });
 
-test("Form: full registration with a team member ends on a ticket with a " + "key", async () => {
+test("Form: full registration with a team member ends on a ticket with a key", async () => {
   const w = boot();
   const p = await open(w);
   await fillAbout(p);
@@ -127,7 +127,7 @@ test("Form: a draft survives a reload of the page", async () => {
   assert.ok(stored.includes("draft@example.com"));
 });
 
-test("Form: a duplicate code explains " + "itself and offers the key flow", async () => {
+test("Form: a duplicate code explains itself and offers the key flow", async () => {
   const w = boot("team_registration");
   const first = await open(w);
   await fillAbout(first);
@@ -175,7 +175,7 @@ test("Closed form shows the message and no questions", async () => {
   assert.equal(p.$('input[name="email"]'), null);
 });
 
-test("Language: switching to Arabic flips " + "direction and uses Arabic labels", async () => {
+test("Language: switching to Arabic flips direction and uses Arabic labels", async () => {
   const w = boot("team_registration");
   const p = await open(w);
   assert.equal(p.win.document.documentElement.dir, "ltr");
@@ -199,7 +199,7 @@ test("Language: a form can lock the language", async () => {
   assert.equal(p.$$(".topbar button").length, 1, "only the theme toggle remains");
 });
 
-test("Theme: the toggle switches between " + "light and dark and remembers it", async () => {
+test("Theme: the toggle switches between light and dark and remembers it", async () => {
   const w = boot("team_registration");
   const p = await open(w);
   p.click(".topbar button[aria-label]");
@@ -221,26 +221,23 @@ test("Unknown or missing form links give a friendly message", async () => {
   assert.ok(none.window.document.body.textContent.includes("does not exist"));
 });
 
-test(
-  "Descriptions: a question description is shown between the label and " + "the answer",
-  async () => {
-    const w = boot();
-    const fields = w.admin({ action: "admin.forms.get", id: w.form.id }).form.fields;
-    fields.find((x) => x.id === "email").help = {
-      en: "Use your university email",
-      ar: "إيميل الجامعة",
-    };
-    w.admin({ action: "admin.forms.update", id: w.form.id, patch: { fields } });
-    const p = await open(w);
-    const field = p.$('[data-path="email"]');
-    const desc = field.querySelector(".field-desc");
-    assert.equal(desc.textContent, "Use your university email");
-    assert.equal(desc.previousElementSibling.tagName, "LABEL");
-    assert.equal(desc.nextElementSibling.getAttribute("name"), "email");
-  },
-);
+test("Descriptions: a question description is shown between the label and the answer", async () => {
+  const w = boot();
+  const fields = w.admin({ action: "admin.forms.get", id: w.form.id }).form.fields;
+  fields.find((x) => x.id === "email").help = {
+    en: "Use your university email",
+    ar: "إيميل الجامعة",
+  };
+  w.admin({ action: "admin.forms.update", id: w.form.id, patch: { fields } });
+  const p = await open(w);
+  const field = p.$('[data-path="email"]');
+  const desc = field.querySelector(".field-desc");
+  assert.equal(desc.textContent, "Use your university email");
+  assert.equal(desc.previousElementSibling.tagName, "LABEL");
+  assert.equal(desc.nextElementSibling.getAttribute("name"), "email");
+});
 
-test("Subject: the subject code is shown " + "as a tag next to the term", async () => {
+test("Subject: the subject code is shown as a tag next to the term", async () => {
   const w = boot("team_registration", { subject: "CMPn323" });
   const p = await open(w);
   assert.deepEqual(
@@ -249,21 +246,18 @@ test("Subject: the subject code is shown " + "as a tag next to the term", async 
   );
 });
 
-test(
-  "WhatsApp: the public form shows only the batch year in its title " + "and metadata",
-  async () => {
-    const w = boot("whatsapp_registration", { batchYear: "2028/2029" });
-    const p = await open(w);
-    assert.equal(p.win.document.title, "Database Team Project Registration Form - Batch 2028/2029");
-    assert.deepEqual(
-      p.$$(".form-head .tag").map((tag) => tag.textContent),
-      ["Batch 2028/2029"],
-    );
-    assert.equal(p.$(".form-head .tag-subject"), null);
-  },
-);
+test("WhatsApp: the public form shows only the batch year in its title and metadata", async () => {
+  const w = boot("whatsapp_registration", { batchYear: "2028/2029" });
+  const p = await open(w);
+  assert.equal(p.win.document.title, "Database Team Project Registration Form - Batch 2028/2029");
+  assert.deepEqual(
+    p.$$(".form-head .tag").map((tag) => tag.textContent),
+    ["Batch 2028/2029"],
+  );
+  assert.equal(p.$(".form-head .tag-subject"), null);
+});
 
-test("Specialization: a Communications-only form says so and fills in the " + "major", async () => {
+test("Specialization: a Communications-only form says so and fills in the major", async () => {
   const w = boot("team_registration", { rules: { majors: ["اتصالات"] } });
   const p = await open(w);
   assert.equal(p.$(".audience").textContent, "For Communications students only");
@@ -276,7 +270,7 @@ test("Specialization: a Communications-only form says so and fills in the " + "m
   assert.equal(p.win.App.form._state.data.major, "اتصالات");
 });
 
-test('Ticket: "a copy was sent" only ' + "appears when an email really went out", async () => {
+test('Ticket: "a copy was sent" only appears when an email really went out', async () => {
   const w = boot("team_registration", {
     notifications: { confirmEmail: false, alertEmail: "" },
   });
@@ -300,33 +294,30 @@ test('Ticket: "a copy was sent" only ' + "appears when an email really went out"
   assert.ok(!p.text().includes("A copy was sent"), "no false email promise");
 });
 
-test(
-  "Folder rule: typing the project title updates the example and keeps " + "the icon",
-  async () => {
-    const w = boot("team_registration", {
-      subject: "CMPn323",
-      rules: { folderName: { enabled: true, subject: "Software_Engineering" } },
-    });
-    const p = await open(w);
-    p.win.App.form._state.stepIndex = 3;
-    p.win.App.form._state.data.team_size = "1";
-    p.win.document.querySelector(".topbar button").click();
-    p.win.document.querySelector(".topbar button").click();
-    await settle();
-    p.type('[name="title"]', "Smart Parking");
-    const rule = p.$(".folder-rule");
-    assert.ok(rule.querySelector(".icon svg"), "the icon is still an icon");
-    assert.ok(
-      rule
-        .querySelector(".folder-rule-text")
-        .textContent.includes("Ahmed_Mohamed_Smart_Parking_Software_Engineering"),
-      "ends with the subject name, not the code",
-    );
-  },
-);
+test("Folder rule: typing the project title updates the example and keeps the icon", async () => {
+  const w = boot("team_registration", {
+    subject: "CMPn323",
+    rules: { folderName: { enabled: true, subject: "Software_Engineering" } },
+  });
+  const p = await open(w);
+  p.win.App.form._state.stepIndex = 3;
+  p.win.App.form._state.data.team_size = "1";
+  p.win.document.querySelector(".topbar button").click();
+  p.win.document.querySelector(".topbar button").click();
+  await settle();
+  p.type('[name="title"]', "Smart Parking");
+  const rule = p.$(".folder-rule");
+  assert.ok(rule.querySelector(".icon svg"), "the icon is still an icon");
+  assert.ok(
+    rule
+      .querySelector(".folder-rule-text")
+      .textContent.includes("Ahmed_Mohamed_Smart_Parking_Software_Engineering"),
+    "ends with the subject name, not the code",
+  );
+});
 
 test(
-  "Route: a sea of islands, and the ship sails from island to island " + "toward the treasure",
+  "Route: a sea of islands, and the ship sails " + "from island to island toward the treasure",
   async () => {
     const w = boot();
     const p = await open(w);
@@ -346,9 +337,7 @@ test(
       "an island for each step and the treasure island",
     );
     assert.ok(
-      p.$(
-        ".trail li:last-child.trail-x .isle " + 'img.trail-treasure[src="assets/img/treasure.svg"]',
-      ),
+      p.$('.trail li:last-child.trail-x .isle img.trail-treasure[src="assets/img/treasure.svg"]'),
       "the treasure waits on the last island",
     );
     assert.equal(p.$(".trail-x .icon-x"), null, "with no X beside it");

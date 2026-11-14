@@ -60,7 +60,7 @@ function filesUnder(output, dir) {
         .split(path.sep)
         .join("/"),
     )
-    .sort();
+    .toSorted();
 }
 
 /**
@@ -114,9 +114,7 @@ function apiUrl(env) {
   const value = (env.API_URL || "").trim();
   const match = API_URL_PATTERN.exec(value);
   if (!match) {
-    throw new Error(
-      "API_URL must be set to the Apps Script HTTPS web app URL ending in" + " /exec.",
-    );
+    throw new Error("API_URL must be set to the Apps Script HTTPS web app URL ending in /exec.");
   }
   if (env.APPS_SCRIPT_DEPLOYMENT_ID && match[1] !== env.APPS_SCRIPT_DEPLOYMENT_ID) {
     throw new Error("API_URL and APPS_SCRIPT_DEPLOYMENT_ID must refer to the same deployment.");

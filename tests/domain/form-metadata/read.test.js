@@ -3,7 +3,7 @@ const assert = require("node:assert/strict");
 const read = require("../../../domain/form-metadata/read.js");
 const batch = require("../../../domain/form-metadata/batch.js");
 
-test("Term: a season belongs to the " + "academic year that starts in its year", () => {
+test("Term: a season belongs to the academic year that starts in its year", () => {
   assert.deepEqual(read.termParts("Spring 2026"), {
     season: "Spring",
     year: "2026/2027",

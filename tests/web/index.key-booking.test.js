@@ -160,7 +160,7 @@ test(
 );
 
 test(
-  "Key booking page: a team that already booked is told its time and " + "changes it from there",
+  "Key booking page: a team that already booked " + "is told its time and changes it from there",
   async () => {
     const w = boot();
     w.book(w.keyA, slot(0));
@@ -196,7 +196,7 @@ test(
   },
 );
 
-test("Key booking page: another key can " + "be tried after a booked team", async () => {
+test("Key booking page: another key can be tried after a booked team", async () => {
   const w = boot({
     editKey: { enabled: true, days: 7, allowEdit: false, allowDelete: false },
   });
@@ -220,7 +220,7 @@ test("Key booking page: another key can " + "be tried after a booked team", asyn
 });
 
 test(
-  "Key booking page: one key box, and the key that finds a booked team " + "opens its booking",
+  "Key booking page: one key box, and the key " + "that finds a booked team opens its booking",
   async () => {
     const w = boot();
     w.book(w.keyA, slot(0));

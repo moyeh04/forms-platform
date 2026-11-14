@@ -71,7 +71,7 @@ test("Keys: the list says which keys are given and which expired", () => {
 });
 
 test(
-  "Keys: extending the expired ones counts from today, so they work " + "for the whole period",
+  "Keys: extending the expired ones counts from " + "today, so they work for the whole period",
   () => {
     const w = boot();
     const before = w.keys();
@@ -88,22 +88,19 @@ test(
   },
 );
 
-test(
-  "Keys: extending all of them adds time to each end, and a date sets " + "one end for all",
-  () => {
-    const w = boot();
-    const before = w.keys();
-    w.extend({ which: "all", days: 3 });
-    const after = w.keys();
-    assert.equal(
-      after[1].keyExpires,
-      new Date(Date.parse(before[1].keyExpires) + 3 * DAY).toISOString(),
-      "from the later end date",
-    );
-    w.extend({ which: "all", until: "2027-12-31T21:59:00Z" });
-    assert.deepEqual([...new Set(w.keys().map((k) => k.keyExpires))], ["2027-12-31T21:59:00.000Z"]);
-  },
-);
+test("Keys: extending all of them adds time to each end, and a date sets one end for all", () => {
+  const w = boot();
+  const before = w.keys();
+  w.extend({ which: "all", days: 3 });
+  const after = w.keys();
+  assert.equal(
+    after[1].keyExpires,
+    new Date(Date.parse(before[1].keyExpires) + 3 * DAY).toISOString(),
+    "from the later end date",
+  );
+  w.extend({ which: "all", until: "2027-12-31T21:59:00Z" });
+  assert.deepEqual([...new Set(w.keys().map((k) => k.keyExpires))], ["2027-12-31T21:59:00.000Z"]);
+});
 
 test("Keys: only the chosen teams change", () => {
   const w = boot();

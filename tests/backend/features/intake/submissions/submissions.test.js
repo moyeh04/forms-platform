@@ -54,7 +54,7 @@ const team = (o = {}) =>
     ...o,
   });
 
-test("Submit: stores a clean row and " + "returns a reference and a 5-digit key", () => {
+test("Submit: stores a clean row and returns a reference and a 5-digit key", () => {
   const w = boot();
   const r = w.submit(team());
   assert.equal(r.ok, true);
@@ -342,7 +342,7 @@ test(
   },
 );
 
-test("Email: a form without edit keys still confirms, with no key in the " + "message", () => {
+test("Email: a form without edit keys still confirms, with no key in the message", () => {
   const w = boot("team_registration", {
     editKey: { enabled: false, days: 7, allowEdit: false, allowDelete: false },
   });
@@ -354,7 +354,7 @@ test("Email: a form without edit keys still confirms, with no key in the " + "me
   assert.doesNotMatch(w.mail[0].body, /Edit key|The key works until|المفتاح/);
 });
 
-test("Email: with confirmations off nothing is " + "sent and the answer says so", () => {
+test("Email: with confirmations off nothing is sent and the answer says so", () => {
   const w = boot("team_registration", {
     notifications: { confirmEmail: false, alertEmail: "" },
   });

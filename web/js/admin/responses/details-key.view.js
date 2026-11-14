@@ -104,9 +104,9 @@
               return A.extendKeys(form, {
                 ids: [s.id],
                 done: function (keys) {
-                  var mine = keys.filter(function (k) {
+                  var mine = keys.find(function (k) {
                     return k.id === s.id;
-                  })[0];
+                  });
                   if (mine) s.keyExpires = mine.keyExpires;
                   again();
                 },

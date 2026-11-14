@@ -1,0 +1,81 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["typescript", "unicorn", "oxc", "import", "node"],
+  // correctness: code that is wrong or does nothing. suspicious: code that is most likely wrong.
+  // perf: code that is needlessly slow. Type-aware runs come from `--type-aware` in the scripts,
+  // never from an "options" entry here, so the pre-commit hook stays fast.
+  "categories": { "correctness": "error", "suspicious": "error", "perf": "error" },
+  "ignorePatterns": ["tests/fixtures/**"],
+  "rules": {
+    "max-lines": "error",
+    // Blank lines are not counted (CODING_STYLE.md); the IIFE that wraps a file is not either.
+    "max-lines-per-function": ["error", { "skipBlankLines": true }],
+    // Four parameters, then one options object (CODING_STYLE.md).
+    "max-params": ["error", { "max": 4 }],
+    "complexity": "error",
+    // The numbers that need no name, and their negatives (CONSTANTS.md). An index into a regular
+    // expression match (m[3]) is a position, not a quantity.
+    "no-magic-numbers": [
+      "error",
+      { "ignore": [-60, -24, -10, -2, -1, 0, 1, 2, 10, 24, 60], "ignoreArrayIndexes": true }
+    ],
+    "import/no-cycle": "error",
+    "typescript/switch-exhaustiveness-check": "error",
+    // Off: the code is JavaScript with unchecked JSDoc, so every operand is `any` to the type
+    // checker and the rule reports every `||`, including the many where an empty string or 0
+    // must fall back (`g.title || "-"`), which `??` would break.
+    "typescript/prefer-nullish-coalescing": "off",
+    // Off: TypeScript reads a Closure-style JSDoc type such as `!Object` as `any`, so every
+    // `{!Object|undefined}` is reported as a union that `any` swallows.
+    "typescript/no-redundant-type-constituents": "off",
+    // Off: the JSDoc types are not checked, and values read from sheets, requests and storage
+    // need not be what the JSDoc says, so a String() or !! is a guard, not a no-op.
+    "typescript/no-unnecessary-type-conversion": "off",
+    // Off: a trailing underscore marks an Apps Script function private (hidden from
+    // google.script.run and the script editor), and the browser and backend files follow it.
+    "no-underscore-dangle": "off",
+    // Off: without declared return types the checker cannot tell a handler that returns a value
+    // only where one is needed (false to stop a click, a promise to wait on) or a function that
+    // ends in ApiError.fail, which always throws, from a missed return.
+    "typescript/consistent-return": "off",
+    // Off: the objects spread here are plain JSON objects the checker cannot type in JavaScript,
+    // and the line check splits a line into code points on purpose, to count Arabic by letter.
+    "typescript/no-misused-spread": "off"
+  },
+  "overrides": [
+    {
+      // The bundler joins the backend into one Apps Script file with one global scope: each file
+      // defines a namespace other files call, and entry-points.js and main.js define the
+      // functions Apps Script calls by name.
+      "files": ["backend/**"],
+      "rules": { "no-unused-vars": "off" }
+    },
+    {
+      // Apps Script's V8 runtime does not document Array#toSorted (ES2023), and the pages serve
+      // students' older phones; every sort here is on a fresh array (filter, map, slice, keys).
+      "files": ["backend/**", "domain/**", "web/**"],
+      "rules": { "unicorn/no-array-sort": "off" }
+    },
+    {
+      // A test's expected values are data, and a describe or test callback just groups its cases.
+      // Helpers sit next to the one test that uses them, and steps that wait in turn wait in turn.
+      "files": ["tests/**", "**/*.test.js"],
+      "rules": {
+        "max-lines": "off",
+        "max-lines-per-function": "off",
+        "max-params": "off",
+        "complexity": "off",
+        "no-magic-numbers": "off",
+        "unicorn/consistent-function-scoping": "off",
+        "oxc/no-map-spread": "off",
+        "no-await-in-loop": "off",
+        // The arrays a test sorts are strings, which typed code would exempt, and the golden
+        // fixtures pin the order the default sort gives.
+        "typescript/require-array-sort-compare": "off",
+        // A long test name is split with + to fit the line width, and Oxfmt keeps the parts on
+        // one line once the call breaks.
+        "no-useless-concat": "off"
+      }
+    }
+  ]
+}

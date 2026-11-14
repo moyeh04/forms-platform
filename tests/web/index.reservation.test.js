@@ -4,7 +4,7 @@ const { settle } = require("../harness/dom.js");
 const { boot, open, AR_NAME, fillAbout, fillStudy } = require("../harness/form-page.js");
 
 test(
-  "Reservation: optional teammates can be added, validated, and " + "included on the ticket",
+  "Reservation: optional teammates can be " + "added, validated, and included on the ticket",
   async () => {
     const w = boot("reservation", {
       slots: {
@@ -81,7 +81,7 @@ test(
   },
 );
 
-test("Reservation: taken slots are disabled " + "and a booking can be made", async () => {
+test("Reservation: taken slots are disabled and a booking can be made", async () => {
   const w = boot("reservation", {
     slots: {
       days: [

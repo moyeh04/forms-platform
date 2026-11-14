@@ -20,9 +20,9 @@
     var v = sf && S.data[sf.id];
     if (!v) return null;
     var slots = S.form.slots || {};
-    var day = (slots.days || []).filter(function (d) {
+    var day = (slots.days || []).find(function (d) {
       return d.id === v.day;
-    })[0];
+    });
     return day && v.time ? { day: day, time: v.time } : null;
   }
 

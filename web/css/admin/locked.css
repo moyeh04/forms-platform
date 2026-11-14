@@ -62,7 +62,7 @@
 @media (prefers-reduced-motion: reduce) {
   .t-modal,
   .t-stagger-line {
-    /* biome-ignore lint/complexity/noImportantStyles: the snippet's reduced-motion guard must beat its own states. */
+    /* the snippet's reduced-motion guard must beat its own states. */
     transition: none !important;
   }
 }

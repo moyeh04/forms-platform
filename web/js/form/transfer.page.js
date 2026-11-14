@@ -56,9 +56,9 @@
    * @param {!Object} handover The next leader, as `{leader, email}`.
    */
   function showMoved(r, handover) {
-    var heir = r.heirs.filter(function (m) {
+    var heir = r.heirs.find(function (m) {
       return m.code === handover.leader;
-    })[0];
+    });
     S.moved = {
       team: r.team,
       ref: S.keyInfo.ref,
@@ -172,6 +172,7 @@
     var list = (S.transfers.incoming || []).slice();
     for (const r of list) {
       if (S.view === "moved") break;
+      // oxlint-disable-next-line no-await-in-loop -- one request at a time; a move ends them
       await answerTransfer(r);
     }
   }
@@ -231,7 +232,7 @@
       P.askedText(r),
       " ",
       noteButton("transfer-answer", t("transferAnswer"), function () {
-        answerTransfer(r);
+        void answerTransfer(r);
       }),
       P.leaderContact(r),
     );
@@ -250,7 +251,7 @@
     var cancel =
       r.status === "pending"
         ? noteButton("transfer-cancel", t("transferCancel"), function () {
-            cancelTransfer(r);
+            void cancelTransfer(r);
           })
         : null;
     return h(

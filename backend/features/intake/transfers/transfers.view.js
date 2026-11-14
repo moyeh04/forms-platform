@@ -20,9 +20,9 @@ var TransfersView = (function () {
     return function (teamId) {
       if (rules.transferPhones !== true) return {};
       rows = rows || ResponsesRepository.readResponses(form);
-      var team = rows.filter(function (r) {
+      var team = rows.find(function (r) {
         return r.id === teamId;
-      })[0];
+      });
       var phone = team ? String(Rules.valueByRole(form, team.data, "phone") || "") : "";
       if (!phone) return {};
       return rules.transferWhatsapp === true ? { phone: phone, whatsapp: true } : { phone: phone };
@@ -76,9 +76,9 @@ var TransfersView = (function () {
       })
       .map(function (t) {
         var m =
-          people.filter(function (x) {
+          people.find(function (x) {
             return String(x.code) === t.code;
-          })[0] || {};
+          }) || {};
         return Object.assign(
           {
             id: t.id,
@@ -153,9 +153,9 @@ var TransfersView = (function () {
     });
     var rows = waiting.length ? ResponsesRepository.readResponses(form) : [];
     return waiting.map(function (t) {
-      var from = rows.filter(function (r) {
+      var from = rows.find(function (r) {
         return r.id === t.fromId;
-      })[0];
+      });
       return Object.assign(
         {
           id: t.id,

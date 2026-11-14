@@ -84,9 +84,9 @@
    * @return {?Element} The mark, or null for a team that is not small.
    */
   function tag(levels, alert) {
-    var l = (levels || []).filter(function (x) {
+    var l = (levels || []).find(function (x) {
       return x.level === alert;
-    })[0];
+    });
     if (!l) return null;
     return h(
       "span",

@@ -169,10 +169,10 @@
       var level = raw[k] || {};
       return level.on === true;
     });
-    var bad = on.filter(function (k) {
+    var bad = on.find(function (k) {
       var s = String(raw[k].below == null ? "" : raw[k].below).trim();
       return !/^\d+$/.test(s) || +s < MIN_ALERT_SIZE || +s > max;
-    })[0];
+    });
     var min = MIN_ALERT_SIZE;
     if (bad) return { level: bad, error: "range", min: min, max: max };
     var both = on.length === SIZE_ALERT_LEVELS.length;
@@ -205,9 +205,9 @@
    * @return {string} The level, or '' when the team is not small.
    */
   function sizeAlertOf(alerts, count) {
-    var hit = sizeAlertLevels(alerts).filter(function (l) {
+    var hit = sizeAlertLevels(alerts).find(function (l) {
       return count < l.below;
-    })[0];
+    });
     return hit ? hit.level : "";
   }
 

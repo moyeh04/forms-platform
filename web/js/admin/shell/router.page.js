@@ -56,7 +56,7 @@
    */
   function logOut() {
     App.api.setPin("");
-    render();
+    void render();
   }
 
   /**
@@ -144,7 +144,7 @@
   async function onHashChange() {
     if (A.unsaved && !(await mayLeave())) return;
     shown = window.location.hash;
-    render();
+    void render();
   }
 
   /**

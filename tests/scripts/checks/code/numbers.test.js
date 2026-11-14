@@ -15,7 +15,7 @@ App.TIMEOUT = 300;
 const style = { WIDTH: 140 };
 let i = 0;
 const back = -1;
-// biome-ignore lint/style/noMagicNumbers: the RFC fixes this length
+// oxlint-disable-next-line no-magic-numbers -- the RFC fixes this length
 const size = 16;
 `;
   assert.deepEqual(problems(source), []);

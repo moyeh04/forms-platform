@@ -4,7 +4,7 @@ const { openPage, helpers, settle } = require("../harness/dom.js");
 const { boot, openAdmin, person, member, submit } = require("../harness/admin-page.js");
 
 test(
-  "Team size: admin sets the minimum and maximum and students see " + "exactly those choices",
+  "Team size: admin sets the minimum and maximum " + "and students see exactly those choices",
   async () => {
     const w = boot();
     const f = w.make("team_registration", "Projects");
@@ -48,7 +48,7 @@ test(
 );
 
 test(
-  "Setup: a save over a newer change is refused, and the reason and " + "what was typed stay",
+  "Setup: a save over a newer change is refused, " + "and the reason and what was typed stay",
   async () => {
     const w = boot();
     const f = w.make("task_submission", "Tasks");
@@ -83,7 +83,7 @@ test(
   },
 );
 
-test("Team size: an impossible range " + "is refused before anything is saved", async () => {
+test("Team size: an impossible range is refused before anything is saved", async () => {
   const w = boot();
   const f = w.make("task_submission", "Tasks");
   const p = await openAdmin(w, `#/f/${f.slug}/settings`);
@@ -98,7 +98,7 @@ test("Team size: an impossible range " + "is refused before anything is saved", 
   });
 });
 
-test("Settings: status, dates, edit key, " + "and question labels are saved", async () => {
+test("Settings: status, dates, edit key, and question labels are saved", async () => {
   const w = boot();
   const f = w.make("team_registration", "Projects", { status: "draft" });
   const p = await openAdmin(w, `#/f/${f.slug}/settings`);
@@ -213,79 +213,72 @@ test(
   },
 );
 
-test(
-  "Reservation teammates: an admin can enable and disable teammate " + "collection",
-  async () => {
-    const w = boot();
-    const f = w.make("reservation", "Seminar");
-    const p = await openAdmin(w, `#/f/${f.slug}/settings`);
-    const field = p.$('[name="reservation-members"]');
-    assert.ok(field, "settings exposes a teammate collection toggle");
-    assert.equal(
-      field.checked,
-      false,
-      "existing reservation forms keep solo booking as the default",
-    );
-    field.checked = true;
-    p.fire(field, "change");
-    p.click('[name="save"]');
-    await settle(12);
-    let saved = w.admin({ action: "admin.forms.get", id: f.id }).form;
-    const members = saved.fields.find((item) => item.role === "members");
-    assert.equal(members.enabled, true);
-    assert.equal(members.required, true);
-    assert.ok(saved.steps.some((step) => step.fields.includes(members.id)));
-    w.admin({
-      action: "admin.forms.update",
-      id: f.id,
-      patch: {
-        slots: {
-          days: [
-            {
-              id: "one",
-              label: "Sunday",
-              date: "2027-11-14",
-              times: ["12:30 - 12:50"],
-            },
-          ],
-          capacity: 1,
-        },
+test("Reservation teammates: an admin can enable and disable teammate collection", async () => {
+  const w = boot();
+  const f = w.make("reservation", "Seminar");
+  const p = await openAdmin(w, `#/f/${f.slug}/settings`);
+  const field = p.$('[name="reservation-members"]');
+  assert.ok(field, "settings exposes a teammate collection toggle");
+  assert.equal(field.checked, false, "existing reservation forms keep solo booking as the default");
+  field.checked = true;
+  p.fire(field, "change");
+  p.click('[name="save"]');
+  await settle(12);
+  let saved = w.admin({ action: "admin.forms.get", id: f.id }).form;
+  const members = saved.fields.find((item) => item.role === "members");
+  assert.equal(members.enabled, true);
+  assert.equal(members.required, true);
+  assert.ok(saved.steps.some((step) => step.fields.includes(members.id)));
+  w.admin({
+    action: "admin.forms.update",
+    id: f.id,
+    patch: {
+      slots: {
+        days: [
+          {
+            id: "one",
+            label: "Sunday",
+            date: "2027-11-14",
+            times: ["12:30 - 12:50"],
+          },
+        ],
+        capacity: 1,
       },
-    });
-    w.api({
-      action: "submit",
-      slug: f.slug,
-      data: person({
-        leader_code: "4230002",
-        title: "Library",
-        slot: { day: "one", time: "12:30 - 12:50" },
-        members: [member("سارة خالد حسن علي", "4230003")],
-      }),
-    });
+    },
+  });
+  w.api({
+    action: "submit",
+    slug: f.slug,
+    data: person({
+      leader_code: "4230002",
+      title: "Library",
+      slot: { day: "one", time: "12:30 - 12:50" },
+      members: [member("سارة خالد حسن علي", "4230003")],
+    }),
+  });
 
-    const reload = await openAdmin(w, `#/f/${f.slug}/settings`);
-    assert.equal(reload.$('[name="reservation-members"]').checked, true);
-    reload.$('[name="reservation-members"]').checked = false;
-    reload.fire(reload.$('[name="reservation-members"]'), "change");
-    reload.click('[name="save"]');
-    await settle(12);
-    saved = w.admin({ action: "admin.forms.get", id: f.id }).form;
-    assert.equal(saved.fields.find((item) => item.role === "members").enabled, false);
-    assert.equal(saved.fields.find((item) => item.role === "members").required, false);
-    const rows = w.admin({
-      action: "admin.submissions",
-      slug: f.slug,
-    }).submissions;
-    assert.deepEqual(
-      rows[0].data.members,
-      [],
-      "disabled roster details are not exposed in submissions",
-    );
-  },
-);
+  const reload = await openAdmin(w, `#/f/${f.slug}/settings`);
+  assert.equal(reload.$('[name="reservation-members"]').checked, true);
+  reload.$('[name="reservation-members"]').checked = false;
+  reload.fire(reload.$('[name="reservation-members"]'), "change");
+  reload.click('[name="save"]');
+  await settle(12);
+  saved = w.admin({ action: "admin.forms.get", id: f.id }).form;
+  assert.equal(saved.fields.find((item) => item.role === "members").enabled, false);
+  assert.equal(saved.fields.find((item) => item.role === "members").required, false);
+  const rows = w.admin({
+    action: "admin.submissions",
+    slug: f.slug,
+  }).submissions;
+  assert.deepEqual(
+    rows[0].data.members,
+    [],
+    "disabled roster details are not exposed in submissions",
+  );
+});
 
 test(
-  "Reservation teammates: how many, the title students read, and what " + "is asked about each one",
+  "Reservation teammates: how many, the title " + "students read, and what is asked about each one",
   async () => {
     const w = boot();
     const f = w.make("reservation", "Seminar", {
@@ -395,7 +388,7 @@ test(
   },
 );
 
-test("Team size note: the admin picks sizes, writes the note, and it is " + "saved", async () => {
+test("Team size note: the admin picks sizes, writes the note, and it is saved", async () => {
   const w = boot();
   const f = w.make("team_registration", "Projects", {
     rules: { teamSize: { min: 1, max: 5 } },
@@ -420,7 +413,7 @@ test("Team size note: the admin picks sizes, writes the note, and it is " + "sav
   });
 });
 
-test("Who can register: picking one " + "specialization saves it, All clears it", async () => {
+test("Who can register: picking one specialization saves it, All clears it", async () => {
   const w = boot();
   const f = w.make("team_registration", "Projects");
   const p = await openAdmin(w, `#/f/${f.slug}/settings`);
@@ -437,23 +430,20 @@ test("Who can register: picking one " + "specialization saves it, All clears it"
   assert.deepEqual(w.admin({ action: "admin.forms.get", id: f.id }).form.rules.majors, []);
 });
 
-test(
-  "Settings: saving project and task forms preserves enabled teammate " + "collection",
-  async () => {
-    for (const type of ["team_registration", "task_submission"]) {
-      const w = boot();
-      const f = w.make(type, "Teams");
-      const p = await openAdmin(w, `#/f/${f.slug}/settings`);
-      p.click('[name="save"]');
-      await settle(12);
-      const saved = w.admin({ action: "admin.forms.get", id: f.id }).form;
-      const members = saved.fields.find((field) => field.role === "members");
-      assert.notEqual(members.enabled, false);
-      assert.equal(members.required, true);
-      p.dom.window.close();
-    }
-  },
-);
+test("Settings: saving project and task forms preserves enabled teammate collection", async () => {
+  for (const type of ["team_registration", "task_submission"]) {
+    const w = boot();
+    const f = w.make(type, "Teams");
+    const p = await openAdmin(w, `#/f/${f.slug}/settings`);
+    p.click('[name="save"]');
+    await settle(12);
+    const saved = w.admin({ action: "admin.forms.get", id: f.id }).form;
+    const members = saved.fields.find((field) => field.role === "members");
+    assert.notEqual(members.enabled, false);
+    assert.equal(members.required, true);
+    p.dom.window.close();
+  }
+});
 
 test(
   "Setup: a section shows what it is set to, and the save bar exists " +
@@ -513,40 +503,37 @@ test(
   },
 );
 
-test(
-  "Who can register: sections are picked one by one or a whole year " + "group at once",
-  async () => {
-    const w = boot();
-    const lists = w.admin({ action: "admin.lists.get" }).lists;
-    const f = w.make("reservation", "Seminar");
-    const p = await openAdmin(w, `#/f/${f.slug}/settings`);
-    const who = p.$('[data-panel="Who can register"]');
-    assert.equal(who.querySelector(".panel-sum").textContent, "Everyone");
-    assert.equal(p.$('[name="section-all"]').getAttribute("aria-pressed"), "true");
-    p.click('[name="section-4C-TH1"]');
-    p.click('[name="section-4C-O2"]');
-    assert.equal(who.querySelector(".panel-sum").textContent, "2 sections (4C)");
-    p.click('[name="save"]');
-    await settle(12);
-    assert.deepEqual(w.admin({ action: "admin.forms.get", id: f.id }).form.rules.sections, [
-      "4C-TH1",
-      "4C-O2",
-    ]);
+test("Who can register: sections are picked one by one or a whole year group at once", async () => {
+  const w = boot();
+  const lists = w.admin({ action: "admin.lists.get" }).lists;
+  const f = w.make("reservation", "Seminar");
+  const p = await openAdmin(w, `#/f/${f.slug}/settings`);
+  const who = p.$('[data-panel="Who can register"]');
+  assert.equal(who.querySelector(".panel-sum").textContent, "Everyone");
+  assert.equal(p.$('[name="section-all"]').getAttribute("aria-pressed"), "true");
+  p.click('[name="section-4C-TH1"]');
+  p.click('[name="section-4C-O2"]');
+  assert.equal(who.querySelector(".panel-sum").textContent, "2 sections (4C)");
+  p.click('[name="save"]');
+  await settle(12);
+  assert.deepEqual(w.admin({ action: "admin.forms.get", id: f.id }).form.rules.sections, [
+    "4C-TH1",
+    "4C-O2",
+  ]);
 
-    p.click('[name="section-group-4C"]');
-    assert.equal(
-      p.$('[name="section-all"]').getAttribute("aria-pressed"),
-      "true",
-      "every section chosen is the same as no limit",
-    );
-    p.click('[name="save"]');
-    await settle(12);
-    assert.deepEqual(w.admin({ action: "admin.forms.get", id: f.id }).form.rules.sections, []);
-    assert.ok(lists.sections.length > 2);
-  },
-);
+  p.click('[name="section-group-4C"]');
+  assert.equal(
+    p.$('[name="section-all"]').getAttribute("aria-pressed"),
+    "true",
+    "every section chosen is the same as no limit",
+  );
+  p.click('[name="save"]');
+  await settle(12);
+  assert.deepEqual(w.admin({ action: "admin.forms.get", id: f.id }).form.rules.sections, []);
+  assert.ok(lists.sections.length > 2);
+});
 
-test("Setup: Extend keys gives the expired keys, or chosen teams, more " + "time", async () => {
+test("Setup: Extend keys gives the expired keys, or chosen teams, more time", async () => {
   const w = boot();
   const f = w.make("team_registration", "Projects");
   submit(w, f, person({ leader_code: "4230001", title: "Old", members: [] }));
@@ -596,7 +583,7 @@ test("Setup: Extend keys gives the expired keys, or chosen teams, more " + "time
 });
 
 test(
-  "Team size: the panel counts the saved teams a new range leaves " + "outside, before the save",
+  "Team size: the panel counts the saved teams " + "a new range leaves outside, before the save",
   async () => {
     const w = boot();
     const f = w.make("team_registration", "Projects");

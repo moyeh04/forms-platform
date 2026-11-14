@@ -66,9 +66,9 @@
    */
   function majorName(mf, v) {
     var options = mf?.options || [];
-    var o = options.filter(function (x) {
+    var o = options.find(function (x) {
       return String(x.value) === String(v);
-    })[0];
+    });
     return o ? L(o.label) : v;
   }
 
@@ -81,9 +81,9 @@
   function audience() {
     var allowed = S.form?.rules?.majors;
     if (!allowed?.length) return null;
-    var mf = (S.form.fields || []).filter(function (f) {
+    var mf = (S.form.fields || []).find(function (f) {
       return f.list === "majors";
-    })[0];
+    });
     var names = allowed.map(function (v) {
       return majorName(mf, v);
     });

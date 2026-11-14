@@ -118,9 +118,9 @@ var SlotsRules = (function () {
    */
   function slotParts_(form, key) {
     var parts = String(key).split("|");
-    var day = (form.slots?.days || []).filter(function (d) {
+    var day = (form.slots?.days || []).find(function (d) {
       return d.id === parts[0];
-    })[0];
+    });
     return {
       dayId: parts[0],
       time: parts.slice(1).join("|"),

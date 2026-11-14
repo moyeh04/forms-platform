@@ -61,9 +61,9 @@
    * @return {!Object|undefined} The registration.
    */
   R.matchedSub = function (m, id) {
-    return m.data.submissions.filter(function (s) {
+    return m.data.submissions.find(function (s) {
       return s.id === id;
-    })[0];
+    });
   };
 
   /**
@@ -109,9 +109,9 @@
       return r.id;
     });
     var at = order.indexOf(q.id);
-    return m.data.requests.filter(function (r) {
+    return m.data.requests.find(function (r) {
       return order.indexOf(r.id) > at && r.decision === "pending" && r.id !== q.id;
-    })[0];
+    });
   }
 
   /**

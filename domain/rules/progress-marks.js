@@ -48,7 +48,7 @@
     try {
       v = JSON.parse(String(cell || "{}"));
       return v && typeof v === "object" && !Array.isArray(v) ? v : {};
-    } catch (_e) {
+    } catch {
       return {};
     }
   }

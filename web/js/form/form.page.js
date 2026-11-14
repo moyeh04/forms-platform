@@ -171,5 +171,5 @@
   App.fresh.words = freshWords;
   App.form = { init: init, _state: S };
 
-  if (!window.__FORM_NO_AUTOSTART__) init();
+  if (!window.__FORM_NO_AUTOSTART__) void init();
 })(window.App);

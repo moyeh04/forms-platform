@@ -134,7 +134,7 @@
   function messageLines(error, close) {
     var img = h("img", { class: "locked-image t-stagger-line", alt: "" });
     img.hidden = true;
-    loadImage().then(function (src) {
+    void loadImage().then(function (src) {
       if (!src) return;
       img.src = src;
       img.hidden = false;
@@ -258,7 +258,7 @@
       "Continue to the dashboard",
     );
     console.log("%c" + error.message, CONSOLE_STYLE);
-    loadImage();
+    void loadImage();
     show(ui.body, [
       h("h2", { class: "dialog-title t-stagger-line", id: "locked-title" }, "Welcome, funny kid"),
       h("div", { class: "dialog-actions t-stagger-line locked-late" }, go),

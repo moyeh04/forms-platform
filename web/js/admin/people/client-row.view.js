@@ -45,9 +45,9 @@
     if (c.forms.indexOf("*") !== -1) return "All forms";
     return c.forms
       .map(function (id) {
-        var f = forms.filter(function (x) {
+        var f = forms.find(function (x) {
           return x.id === id;
-        })[0];
+        });
         return f ? f.title : id;
       })
       .join(", ");

@@ -3,59 +3,52 @@ const assert = require("node:assert/strict");
 const { settle } = require("../harness/dom.js");
 const { boot, openAdmin } = require("../harness/admin-page.js");
 
-test(
-  "Clients: create a private link, see it once, and it opens the " + "instructor view",
-  async () => {
-    const w = boot();
-    const f = w.make("reservation", "Seminar");
-    const p = await openAdmin(w, "#/clients");
-    p.click('[name="newClient"]');
-    await settle(2);
-    p.type('[name="clientName"]', "Dr. Ahmed");
-    const all = p
-      .$$(".dialog .check")
-      .find((l) => l.textContent.includes("All forms"))
-      .querySelector("input");
-    all.checked = true;
-    p.fire(all, "change");
-    const phone = p
-      .$$(".dialog .check")
-      .find((l) => l.textContent === "Phone")
-      .querySelector("input");
-    phone.checked = true;
-    p.fire(phone, "change");
-    assert.equal(
-      p.$('[name="withKey"]').checked,
-      true,
-      "a new link asks for a key unless unticked",
-    );
-    const key = p.$('[name="withKey"]');
-    key.checked = false;
-    p.fire(key, "change");
-    assert.equal(
-      p.$('[name="showSizeAlerts"]').checked,
-      true,
-      "a new link shows the warnings about small teams unless unticked",
-    );
-    const alerts = p.$('[name="showSizeAlerts"]');
-    alerts.checked = false;
-    p.fire(alerts, "change");
-    p.clickText("Create link", p.$(".dialog"));
-    await settle(10);
-    const link = p.$(".link-box code").textContent;
-    assert.equal(p.$('[name="access-key"]'), null, "no key was made");
-    assert.ok(link.includes("viewer.html?t="));
-    const token = new URL(link).searchParams.get("t");
-    const me = w.api({ action: "viewer.me", token });
-    assert.equal(me.client.name, "Dr. Ahmed");
-    assert.deepEqual(
-      me.forms.map((x) => x.slug),
-      [f.slug],
-    );
-    assert.deepEqual(w.admin({ action: "admin.clients.list" }).clients[0].hiddenColumns, ["phone"]);
-    assert.equal(w.admin({ action: "admin.clients.list" }).clients[0].showSizeAlerts, false);
-  },
-);
+test("Clients: create a private link, see it once, and it opens the instructor view", async () => {
+  const w = boot();
+  const f = w.make("reservation", "Seminar");
+  const p = await openAdmin(w, "#/clients");
+  p.click('[name="newClient"]');
+  await settle(2);
+  p.type('[name="clientName"]', "Dr. Ahmed");
+  const all = p
+    .$$(".dialog .check")
+    .find((l) => l.textContent.includes("All forms"))
+    .querySelector("input");
+  all.checked = true;
+  p.fire(all, "change");
+  const phone = p
+    .$$(".dialog .check")
+    .find((l) => l.textContent === "Phone")
+    .querySelector("input");
+  phone.checked = true;
+  p.fire(phone, "change");
+  assert.equal(p.$('[name="withKey"]').checked, true, "a new link asks for a key unless unticked");
+  const key = p.$('[name="withKey"]');
+  key.checked = false;
+  p.fire(key, "change");
+  assert.equal(
+    p.$('[name="showSizeAlerts"]').checked,
+    true,
+    "a new link shows the warnings about small teams unless unticked",
+  );
+  const alerts = p.$('[name="showSizeAlerts"]');
+  alerts.checked = false;
+  p.fire(alerts, "change");
+  p.clickText("Create link", p.$(".dialog"));
+  await settle(10);
+  const link = p.$(".link-box code").textContent;
+  assert.equal(p.$('[name="access-key"]'), null, "no key was made");
+  assert.ok(link.includes("viewer.html?t="));
+  const token = new URL(link).searchParams.get("t");
+  const me = w.api({ action: "viewer.me", token });
+  assert.equal(me.client.name, "Dr. Ahmed");
+  assert.deepEqual(
+    me.forms.map((x) => x.slug),
+    [f.slug],
+  );
+  assert.deepEqual(w.admin({ action: "admin.clients.list" }).clients[0].hiddenColumns, ["phone"]);
+  assert.equal(w.admin({ action: "admin.clients.list" }).clients[0].showSizeAlerts, false);
+});
 
 test(
   "Clients: a link with an access key shows the link once and the key " +
@@ -116,7 +109,7 @@ test(
 );
 
 test(
-  "Clients: the admin sees a lost key again, and a link ends on its " + "date until it is moved",
+  "Clients: the admin sees a lost key again, and " + "a link ends on its date until it is moved",
   async () => {
     const w = boot();
     const f = w.make("reservation", "Seminar");

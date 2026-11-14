@@ -95,7 +95,7 @@ test("Print: a booking form prints the days it shows", async () => {
 });
 
 test(
-  "Print: registrations print each review step as words and the " + "timetable as a link",
+  "Print: registrations print each review " + "step as words and the timetable as a link",
   async () => {
     const w = boot();
     const f = w.make("whatsapp_registration", "Groups");

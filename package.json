@@ -14,11 +14,12 @@
     "prepare": "sh scripts/dev/setup-git.sh"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.5.15",
     "acorn": "8.14.1",
     "acorn-walk": "8.3.4",
     "jsdom": "^24.1.0",
-    "oxfmt": "0.77.0"
+    "oxfmt": "0.77.0",
+    "oxlint": "1.92.0",
+    "oxlint-tsgolint": "7.0.2006"
   },
   "packageManager": "pnpm@12.18.0"
 }

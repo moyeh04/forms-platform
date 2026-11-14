@@ -41,12 +41,12 @@
   }
 
   /**
-   * Draws the PIN screen.
+   * Builds the parts of the PIN screen that sign-in reads and changes.
    *
-   * @param {!Element} root Where it is drawn.
+   * @return {!Object} The PIN field, the error line, the button and `stop`.
    */
-  A.loginView = function (root) {
-    var v = {
+  function loginParts() {
+    return {
       pin: h("input", {
         class: "input pin-input",
         type: "password",
@@ -66,6 +66,15 @@
       /** Stops the time left shown under the PIN; none runs yet. */
       stop: function () {},
     };
+  }
+
+  /**
+   * Draws the PIN screen.
+   *
+   * @param {!Element} root Where it is drawn.
+   */
+  A.loginView = function (root) {
+    var v = loginParts();
     var form = h(
       "form",
       {
@@ -79,7 +88,7 @@
       h(
         "p",
         { class: "help" },
-        "Enter the admin PIN you set from the Forms Platform menu in the" + " registry sheet.",
+        "Enter the admin PIN you set from the Forms Platform menu in the registry sheet.",
       ),
       h("label", { class: "field", for: "pin" }, h("span", { class: "label" }, "Admin PIN")),
       v.pin,

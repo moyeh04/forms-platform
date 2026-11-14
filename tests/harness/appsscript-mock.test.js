@@ -40,7 +40,7 @@ test("Harness: clock and cache respect the controlled time", () => {
   assert.equal(new w.ctx.Date().toISOString(), "2027-09-02T00:00:00.000Z");
 });
 
-test("Harness: a seeded world gives the same ids and random numbers every " + "time", () => {
+test("Harness: a seeded world gives the same ids and random numbers every time", () => {
   const run = (seed) => {
     const w = createWorld({ seed });
     w.call("setup");

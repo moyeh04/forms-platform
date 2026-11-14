@@ -51,7 +51,7 @@ const slots = {
   capacity: 1,
 };
 
-test("Menu: print dialogs list the right " + "forms and days and escape titles", () => {
+test("Menu: print dialogs list the right forms and days and escape titles", () => {
   const w = boot("reservation", { slots });
   w.admin({
     action: "admin.forms.create",

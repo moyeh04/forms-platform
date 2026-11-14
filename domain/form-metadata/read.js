@@ -91,8 +91,8 @@
    */
   function yearFromTerm(term) {
     var value = text(term);
-    var academicYear = value.match(/(?:^|\s)(\d{4})\/(\d{4})$/);
-    if (academicYear) return academicYear[1] + "/" + academicYear[2];
+    var years = value.match(/(?:^|\s)(\d{4})\/(\d{4})$/);
+    if (years) return years[1] + "/" + years[2];
     var season = termParts(value).year;
     if (season) return season;
     var match = value.match(/(?:^|\s)(\d{4})$/);

@@ -42,31 +42,28 @@ function boot() {
   return w;
 }
 
-test(
-  "Import: reads numbers in any format, skips repeats, reports lines " + "it cannot read",
-  () => {
-    const w = boot();
-    const r = w.import(
-      "Sara Ali  +20 10 1234 5678\n" +
-        "01112345678\n" +
-        "\n" +
-        "٠١٢١٢٣٤٥٦٧٨\n" +
-        "no number here\n" +
-        "+201012345678",
-    );
-    assert.equal(r.added, 3);
-    assert.equal(r.duplicates, 1);
-    assert.deepEqual(JSON.parse(JSON.stringify(r.unparsed)), ["no number here"]);
-    const again = w.import("01112345678");
-    assert.equal(again.added, 0);
-    assert.equal(again.duplicates, 1);
-    const list = w.list().requests;
-    assert.equal(list[0].label, "Sara Ali");
-    assert.equal(list[0].phone, "01012345678");
-  },
-);
+test("Import: reads numbers in any format, skips repeats, reports lines it cannot read", () => {
+  const w = boot();
+  const r = w.import(
+    "Sara Ali  +20 10 1234 5678\n" +
+      "01112345678\n" +
+      "\n" +
+      "٠١٢١٢٣٤٥٦٧٨\n" +
+      "no number here\n" +
+      "+201012345678",
+  );
+  assert.equal(r.added, 3);
+  assert.equal(r.duplicates, 1);
+  assert.deepEqual(JSON.parse(JSON.stringify(r.unparsed)), ["no number here"]);
+  const again = w.import("01112345678");
+  assert.equal(again.added, 0);
+  assert.equal(again.duplicates, 1);
+  const list = w.list().requests;
+  assert.equal(list[0].label, "Sara Ali");
+  assert.equal(list[0].phone, "01012345678");
+});
 
-test("List: each request is matched, unmatched, or duplicate by " + "normalized phone", () => {
+test("List: each request is matched, unmatched, or duplicate by normalized phone", () => {
   const w = boot();
   w.reg("4230001", "+201012345678");
   w.reg("4230002", "01112345678");
@@ -85,7 +82,7 @@ test("List: each request is matched, unmatched, or duplicate by " + "normalized 
   assert.equal(unmatched.code, "4230004");
 });
 
-test("Review: the second step needs the first, and rejecting resets later " + "approvals", () => {
+test("Review: the second step needs the first, and rejecting resets later approvals", () => {
   const w = boot();
   w.reg("4230001", "01012345678");
   const id = w.admin({ action: "admin.submissions", slug: w.form.slug }).submissions[0].id;
@@ -112,52 +109,49 @@ test("Review: the second step needs the first, and rejecting resets later " + "a
   assert.equal(set({ schedule: "maybe" }).error.code, "bad_status");
 });
 
-test(
-  "Decide: approving a matched request completes the group step on the " + "registration",
-  () => {
-    const w = boot();
-    w.reg("4230001", "01012345678");
-    w.import("01012345678");
-    const id = w.admin({ action: "admin.submissions", slug: w.form.slug }).submissions[0].id;
-    const q = w.list().requests[0];
+test("Decide: approving a matched request completes the group step on the registration", () => {
+  const w = boot();
+  w.reg("4230001", "01012345678");
+  w.import("01012345678");
+  const id = w.admin({ action: "admin.submissions", slug: w.form.slug }).submissions[0].id;
+  const q = w.list().requests[0];
 
-    const early = w.admin({
-      action: "admin.matching.decide",
-      slug: w.form.slug,
-      requestId: q.id,
-      decision: "approved",
-    });
-    assert.equal(early.error.code, "review_order");
+  const early = w.admin({
+    action: "admin.matching.decide",
+    slug: w.form.slug,
+    requestId: q.id,
+    decision: "approved",
+  });
+  assert.equal(early.error.code, "review_order");
 
-    w.admin({
-      action: "admin.submission.update",
-      slug: w.form.slug,
-      submissionId: id,
-      patch: { review: { schedule: "approved" } },
-    });
-    const ok = w.admin({
-      action: "admin.matching.decide",
-      slug: w.form.slug,
-      requestId: q.id,
-      decision: "approved",
-      note: "Looks right",
-    });
-    assert.equal(ok.submissionId, id);
-    const after = w.list();
-    assert.equal(after.requests[0].decision, "approved");
-    assert.equal(after.requests[0].note, "Looks right");
-    const sub = after.submissions[0];
-    assert.equal(sub.status, "approved");
-    w.runTriggers();
-    assert.equal(
-      w.sheet(w.form.sheetId, "Registrations").rows()[1][7],
-      "Timetable check: approved  |  Group match: approved",
-    );
-  },
-);
+  w.admin({
+    action: "admin.submission.update",
+    slug: w.form.slug,
+    submissionId: id,
+    patch: { review: { schedule: "approved" } },
+  });
+  const ok = w.admin({
+    action: "admin.matching.decide",
+    slug: w.form.slug,
+    requestId: q.id,
+    decision: "approved",
+    note: "Looks right",
+  });
+  assert.equal(ok.submissionId, id);
+  const after = w.list();
+  assert.equal(after.requests[0].decision, "approved");
+  assert.equal(after.requests[0].note, "Looks right");
+  const sub = after.submissions[0];
+  assert.equal(sub.status, "approved");
+  w.runTriggers();
+  assert.equal(
+    w.sheet(w.form.sheetId, "Registrations").rows()[1][7],
+    "Timetable check: approved  |  Group match: approved",
+  );
+});
 
 test(
-  "Decide: requests without exactly one match are decided without " + "touching registrations",
+  "Decide: requests without exactly one match " + "are decided without touching registrations",
   () => {
     const w = boot();
     w.import("01212345678");
@@ -182,7 +176,7 @@ test(
   },
 );
 
-test("Remove: deleted requests disappear; other form types have no " + "matching", () => {
+test("Remove: deleted requests disappear; other form types have no matching", () => {
   const w = boot();
   w.import("01012345678\n01112345678");
   const ids = w.list().requests.map((r) => r.id);

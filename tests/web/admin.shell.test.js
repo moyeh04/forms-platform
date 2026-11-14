@@ -3,7 +3,7 @@ const assert = require("node:assert/strict");
 const { openPage, settle } = require("../harness/dom.js");
 const { boot, openAdmin } = require("../harness/admin-page.js");
 
-test("Login: a wrong PIN is refused " + "and the right one opens the dashboard", async () => {
+test("Login: a wrong PIN is refused and the right one opens the dashboard", async () => {
   const w = boot();
   const p = await openAdmin(w, "", false);
   assert.ok(p.$("#pin"));
@@ -25,7 +25,7 @@ test("Login: a wrong PIN is refused " + "and the right one opens the dashboard",
 });
 
 test(
-  "Login: a browser that signed in keeps working through a lock made " + "by wrong tries elsewhere",
+  "Login: a browser that signed in keeps working " + "through a lock made by wrong tries elsewhere",
   async () => {
     const w = boot();
     w.make("team_registration", "Projects");
@@ -48,44 +48,41 @@ test(
   },
 );
 
-test(
-  "Login: the PIN that locks the page opens the lock screen, never the " + "dashboard",
-  async () => {
-    const w = boot();
-    w.make("team_registration", "Projects");
-    w.call("saveLockMessage", "Line one\n\nLine two");
-    const p = await openAdmin(w, "", false);
-    const logged = [];
-    p.win.console.log = (...a) => logged.push(a.join(" "));
-    for (let i = 0; i < 8; i++) {
-      p.type("#pin", "0000");
-      p.submitForm();
-      await settle(8);
-    }
-    const box = p.$(".locked");
-    assert.equal(box.getAttribute("role"), "dialog");
-    assert.equal(p.$(".locked h2").textContent, "Welcome, funny kid");
-    assert.ok(logged.some((l) => l.includes("Line one\n\nLine two")));
-    p.clickText("Continue to the dashboard");
-    await settle(2);
-    assert.deepEqual(
-      p.$$(".locked p.locked-message").map((x) => x.textContent),
-      ["Line one", "Line two"],
-    );
-    assert.match(p.$(".locked-time").textContent, /^Time left 00:(29|30):\d\d$/);
-    assert.deepEqual(
-      p.$$(".locked button").map((b) => b.textContent),
-      ["Sorry", "Sorry"],
-    );
-    assert.equal(p.text().includes("Projects"), false, "no form is shown");
-    assert.equal(p.$(".admin-nav"), null);
-    p.click(p.$$(".locked button")[1]);
-    assert.equal(p.$(".locked"), null);
-    assert.equal(p.win.document.activeElement, p.$("#pin"));
-  },
-);
+test("Login: the PIN that locks the page opens the lock screen, never the dashboard", async () => {
+  const w = boot();
+  w.make("team_registration", "Projects");
+  w.call("saveLockMessage", "Line one\n\nLine two");
+  const p = await openAdmin(w, "", false);
+  const logged = [];
+  p.win.console.log = (...a) => logged.push(a.join(" "));
+  for (let i = 0; i < 8; i++) {
+    p.type("#pin", "0000");
+    p.submitForm();
+    await settle(8);
+  }
+  const box = p.$(".locked");
+  assert.equal(box.getAttribute("role"), "dialog");
+  assert.equal(p.$(".locked h2").textContent, "Welcome, funny kid");
+  assert.ok(logged.some((l) => l.includes("Line one\n\nLine two")));
+  p.clickText("Continue to the dashboard");
+  await settle(2);
+  assert.deepEqual(
+    p.$$(".locked p.locked-message").map((x) => x.textContent),
+    ["Line one", "Line two"],
+  );
+  assert.match(p.$(".locked-time").textContent, /^Time left 00:(29|30):\d\d$/);
+  assert.deepEqual(
+    p.$$(".locked button").map((b) => b.textContent),
+    ["Sorry", "Sorry"],
+  );
+  assert.equal(p.text().includes("Projects"), false, "no form is shown");
+  assert.equal(p.$(".admin-nav"), null);
+  p.click(p.$$(".locked button")[1]);
+  assert.equal(p.$(".locked"), null);
+  assert.equal(p.win.document.activeElement, p.$("#pin"));
+});
 
-test("Forms: the list shows every form " + "with its type, status, and actions", async () => {
+test("Forms: the list shows every form with its type, status, and actions", async () => {
   const w = boot();
   w.make("team_registration", "Projects");
   w.make("reservation", "Seminar", { status: "closed" });
@@ -97,7 +94,7 @@ test("Forms: the list shows every form " + "with its type, status, and actions",
   assert.ok(cards[0].querySelector('a[href*="index.html?f="]'));
 });
 
-test("Create: pick a type, name it, and " + "land on its settings as a draft", async () => {
+test("Create: pick a type, name it, and land on its settings as a draft", async () => {
   const w = boot();
   const p = await openAdmin(w, "#/new");
   p.pick("type", "task_submission");
@@ -123,70 +120,60 @@ test("Create: pick a type, name it, and " + "land on its settings as a draft", a
   assert.ok(p.$('[name="teamMin"]'), "settings page is showing");
 });
 
-test(
-  "Create: switching types replaces subject and term metadata with a " + "batch year",
-  async () => {
-    const w = boot();
-    const p = await openAdmin(w, "#/new");
-    p.pick("type", "task_submission");
-    p.type('[name="subject"]', "CMPn323");
-    p.click('[name="season-spring"]');
-    const termYear = p.$('[name="termYear"]');
-    termYear.value = "2028/2029";
-    p.fire(termYear, "change");
+test("Create: switching types replaces subject and term metadata with a batch year", async () => {
+  const w = boot();
+  const p = await openAdmin(w, "#/new");
+  p.pick("type", "task_submission");
+  p.type('[name="subject"]', "CMPn323");
+  p.click('[name="season-spring"]');
+  const termYear = p.$('[name="termYear"]');
+  termYear.value = "2028/2029";
+  p.fire(termYear, "change");
 
-    p.pick("type", "whatsapp_registration");
-    assert.equal(
-      p.$('[name="subject"]'),
-      null,
-      "WhatsApp registration does not ask for a subject code",
-    );
-    assert.equal(
-      p.$('[name="termYear"]'),
-      null,
-      "WhatsApp registration does not ask for a semester",
-    );
-    assert.equal(
-      p.$('[name="batchYear"]').value,
-      new Date().getFullYear() + "/" + (new Date().getFullYear() + 1),
-    );
-    p.pick("batchYear", "2030/2031");
+  p.pick("type", "whatsapp_registration");
+  assert.equal(
+    p.$('[name="subject"]'),
+    null,
+    "WhatsApp registration does not ask for a subject code",
+  );
+  assert.equal(p.$('[name="termYear"]'), null, "WhatsApp registration does not ask for a semester");
+  assert.equal(
+    p.$('[name="batchYear"]').value,
+    new Date().getFullYear() + "/" + (new Date().getFullYear() + 1),
+  );
+  p.pick("batchYear", "2030/2031");
 
-    p.pick("type", "task_submission");
-    assert.equal(
-      p.$('[name="subject"]').value,
-      "CMPn323",
-      "switching back restores subject metadata",
-    );
-    assert.equal(
-      p.$('[name="termYear"]').value,
-      "2028/2029",
-      "switching back restores term metadata",
-    );
-    p.pick("type", "whatsapp_registration");
-    assert.equal(
-      p.$('[name="batchYear"]').value,
-      "2030/2031",
-      "switching types preserves the batch year",
-    );
+  p.pick("type", "task_submission");
+  assert.equal(
+    p.$('[name="subject"]').value,
+    "CMPn323",
+    "switching back restores subject metadata",
+  );
+  assert.equal(
+    p.$('[name="termYear"]').value,
+    "2028/2029",
+    "switching back restores term metadata",
+  );
+  p.pick("type", "whatsapp_registration");
+  assert.equal(
+    p.$('[name="batchYear"]').value,
+    "2030/2031",
+    "switching types preserves the batch year",
+  );
 
-    p.type('[name="title"]', "Groups 2029");
-    p.submitForm();
-    await settle(12);
-    const saved = w.admin({ action: "admin.forms.list" }).forms[0];
-    assert.equal(saved.type, "whatsapp_registration");
-    assert.equal(saved.batchYear, "2030/2031");
-    assert.equal(
-      JSON.parse(w.registry.getSheetByName("Forms").rows()[1][10]).batchYear,
-      "2030/2031",
-    );
-    assert.equal(saved.term, "", "new WhatsApp forms do not persist a semester");
-    assert.equal(saved.subject, undefined, "new WhatsApp forms do not persist a subject code");
-  },
-);
+  p.type('[name="title"]', "Groups 2029");
+  p.submitForm();
+  await settle(12);
+  const saved = w.admin({ action: "admin.forms.list" }).forms[0];
+  assert.equal(saved.type, "whatsapp_registration");
+  assert.equal(saved.batchYear, "2030/2031");
+  assert.equal(JSON.parse(w.registry.getSheetByName("Forms").rows()[1][10]).batchYear, "2030/2031");
+  assert.equal(saved.term, "", "new WhatsApp forms do not persist a semester");
+  assert.equal(saved.subject, undefined, "new WhatsApp forms do not persist a subject code");
+});
 
 test(
-  "WhatsApp metadata: settings, public form, and viewer retain and " + "display batch year",
+  "WhatsApp metadata: settings, public form, " + "and viewer retain and display batch year",
   async () => {
     const w = boot();
     const f = w.admin({
@@ -359,7 +346,7 @@ test("Create: a title is required", async () => {
 });
 
 test(
-  "Create: the preview shows the title, the tags and the pages of the " + "chosen kind of form",
+  "Create: the preview shows the title, the tags " + "and the pages of the chosen kind of form",
   async () => {
     const w = boot();
     const p = await openAdmin(w, "#/new");
@@ -386,7 +373,7 @@ test(
 );
 
 test(
-  "Term: settings show the saved season and year, and switching season " + "saves the new term",
+  "Term: settings show the saved season and " + "year, and switching season saves the new term",
   async () => {
     const w = boot();
     const f = w.make("team_registration", "Projects");
@@ -405,26 +392,23 @@ test(
   },
 );
 
-test(
-  "Delete form: one confirmation from the card removes it; cancelling " + "keeps it",
-  async () => {
-    const w = boot();
-    w.make("team_registration", "Old projects");
-    const p = await openAdmin(w);
-    p.click('[name="delete-form"]');
-    await settle(2);
-    assert.ok(p.text().includes('Delete "Old projects"?'));
-    p.clickText("Keep it");
-    await settle(4);
-    assert.equal(w.admin({ action: "admin.forms.list" }).forms.length, 1);
-    p.click('[name="delete-form"]');
-    await settle(2);
-    p.click(".overlay .btn-danger");
-    await settle(12);
-    assert.equal(w.admin({ action: "admin.forms.list" }).forms.length, 0);
-    assert.ok(p.text().includes("No forms yet"));
-  },
-);
+test("Delete form: one confirmation from the card removes it; cancelling keeps it", async () => {
+  const w = boot();
+  w.make("team_registration", "Old projects");
+  const p = await openAdmin(w);
+  p.click('[name="delete-form"]');
+  await settle(2);
+  assert.ok(p.text().includes('Delete "Old projects"?'));
+  p.clickText("Keep it");
+  await settle(4);
+  assert.equal(w.admin({ action: "admin.forms.list" }).forms.length, 1);
+  p.click('[name="delete-form"]');
+  await settle(2);
+  p.click(".overlay .btn-danger");
+  await settle(12);
+  assert.equal(w.admin({ action: "admin.forms.list" }).forms.length, 0);
+  assert.ok(p.text().includes("No forms yet"));
+});
 
 test(
   "Form tabs: questions, timetable and setup are tabs of one page, and " +
@@ -481,7 +465,7 @@ test(
 );
 
 test(
-  "Form header: the same on every tab, and the status is saved where " + "it is changed",
+  "Form header: the same on every tab, and " + "the status is saved where it is changed",
   async () => {
     const w = boot();
     const f = w.make("team_registration", "Projects");

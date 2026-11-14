@@ -76,7 +76,7 @@ test("Progress: with keys off, teams are not shown progress", async () => {
   assert.ok(p.$('[name="progress-students-off"]'));
 });
 
-test("Progress: the board marks a team, and its card counts what was " + "discussed", async () => {
+test("Progress: the board marks a team, and its card counts what was discussed", async () => {
   const w = boot();
   const key = withList(w);
   const f = w.make("team_registration", "Projects", {

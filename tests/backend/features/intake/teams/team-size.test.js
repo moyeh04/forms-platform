@@ -52,7 +52,7 @@ test("Team size: the question is required and must be inside the range", () => {
   );
 });
 
-test("Team size: the chosen size decides exactly how many member forms " + "are needed", () => {
+test("Team size: the chosen size decides exactly how many member forms are needed", () => {
   const d = (size, members) => ({
     leader_code: "4230001",
     team_size: size,
@@ -86,7 +86,7 @@ test("Team size: a solo team needs no members when one is allowed", () => {
   );
 });
 
-test("Team size: member details are " + "still checked once the count matches", () => {
+test("Team size: member details are still checked once the count matches", () => {
   const r = R.validateSubmission(form, {
     leader_code: "4230001",
     team_size: "2",
@@ -96,7 +96,7 @@ test("Team size: member details are " + "still checked once the count matches", 
   assert.equal(r.errors.members.nested["0.code"].error, "invalid_code");
 });
 
-test("Team size: forms that hide the question keep the range-based member " + "limits", () => {
+test("Team size: forms that hide the question keep the range-based member limits", () => {
   const hidden = {
     ...form,
     fields: form.fields.map((f) => (f.id === "team_size" ? { ...f, enabled: false } : f)),
@@ -155,33 +155,30 @@ const member = (code) => ({
   section: "4C-TH1",
 });
 
-test(
-  "Templates: projects allow 1 to 6 people, tasks 1 to 5, and the " + "question is mandatory",
-  () => {
-    assert.deepEqual(boot("team_registration").get().rules.teamSize, {
-      min: 1,
-      max: 6,
-    });
-    const tasks = boot("task_submission").get();
-    assert.deepEqual(tasks.rules.teamSize, { min: 1, max: 5 });
-    const size = tasks.fields.find((f) => f.id === "team_size");
-    assert.equal(size.required, true);
-    assert.equal(tasks.fields.find((f) => f.id === "members").required, true);
-    assert.deepEqual(tasks.steps.find((s) => s.id === "members").fields, ["team_size", "members"]);
-    const reservationMembers = boot("reservation")
+test("Templates: projects allow 1 to 6 people, tasks 1 to 5, and the question is mandatory", () => {
+  assert.deepEqual(boot("team_registration").get().rules.teamSize, {
+    min: 1,
+    max: 6,
+  });
+  const tasks = boot("task_submission").get();
+  assert.deepEqual(tasks.rules.teamSize, { min: 1, max: 5 });
+  const size = tasks.fields.find((f) => f.id === "team_size");
+  assert.equal(size.required, true);
+  assert.equal(tasks.fields.find((f) => f.id === "members").required, true);
+  assert.deepEqual(tasks.steps.find((s) => s.id === "members").fields, ["team_size", "members"]);
+  const reservationMembers = boot("reservation")
+    .get()
+    .fields.find((f) => f.role === "members");
+  assert.equal(reservationMembers.enabled, false);
+  assert.equal(reservationMembers.required, true);
+  assert.equal(reservationMembers.min, 1);
+  assert.equal(
+    boot("reservation")
       .get()
-      .fields.find((f) => f.role === "members");
-    assert.equal(reservationMembers.enabled, false);
-    assert.equal(reservationMembers.required, true);
-    assert.equal(reservationMembers.min, 1);
-    assert.equal(
-      boot("reservation")
-        .get()
-        .fields.some((f) => f.role === "team_size"),
-      false,
-    );
-  },
-);
+      .fields.some((f) => f.role === "team_size"),
+    false,
+  );
+});
 
 test(
   "Reservation teammates: disabled forms remain solo-only and enabled " +
@@ -256,7 +253,7 @@ test(
   },
 );
 
-test("Admin: minimum and maximum team size are saved and enforced on " + "submissions", () => {
+test("Admin: minimum and maximum team size are saved and enforced on submissions", () => {
   const w = boot();
   const r = w.admin({
     action: "admin.forms.update",
@@ -350,21 +347,18 @@ test(
   },
 );
 
-test(
-  "Students: the public form exposes the range so the page can offer " + "the right choices",
-  () => {
-    const w = boot();
-    w.admin({
-      action: "admin.forms.update",
-      id: w.form.id,
-      patch: { rules: { teamSize: { min: 2, max: 3 } } },
-    });
-    assert.deepEqual(w.api({ action: "getForm", slug: w.form.slug }).form.rules.teamSize, {
-      min: 2,
-      max: 3,
-    });
-  },
-);
+test("Students: the public form exposes the range so the page can offer the right choices", () => {
+  const w = boot();
+  w.admin({
+    action: "admin.forms.update",
+    id: w.form.id,
+    patch: { rules: { teamSize: { min: 2, max: 3 } } },
+  });
+  assert.deepEqual(w.api({ action: "getForm", slug: w.form.slug }).form.rules.teamSize, {
+    min: 2,
+    max: 3,
+  });
+});
 
 test(
   "Admin: the form comes with the sizes of its saved teams, so the " +
@@ -391,7 +385,7 @@ test(
   },
 );
 
-test("Admin: editing a team through the dashboard keeps the size and " + "members in step", () => {
+test("Admin: editing a team through the dashboard keeps the size and members in step", () => {
   const w = boot();
   w.submit({ ...leader, team_size: "2", members: [member("4230002")] });
   const sub = w.admin({ action: "admin.submissions", slug: w.form.slug }).submissions[0];
@@ -417,7 +411,7 @@ test("Admin: editing a team through the dashboard keeps the size and " + "member
   assert.equal(good.ok, true);
 });
 
-test("Size note: only the chosen sizes get it, with {n} and {max} filled " + "in", () => {
+test("Size note: only the chosen sizes get it, with {n} and {max} filled in", () => {
   const f = {
     rules: {
       teamSize: {
@@ -456,7 +450,7 @@ test("Size note: only the chosen sizes get it, with {n} and {max} filled " + "in
   );
 });
 
-test("Size note: saved with the range, cleaned, kept on later saves, and " + "public", () => {
+test("Size note: saved with the range, cleaned, kept on later saves, and public", () => {
   const w = boot();
   const save = (teamSize) =>
     w.admin({
@@ -493,7 +487,7 @@ test("Size note: saved with the range, cleaned, kept on later saves, and " + "pu
   );
 });
 
-test("Specialization: a form limited to Computers only offers and accepts " + "Computers", () => {
+test("Specialization: a form limited to Computers only offers and accepts Computers", () => {
   const w = boot();
   w.admin({
     action: "admin.forms.update",

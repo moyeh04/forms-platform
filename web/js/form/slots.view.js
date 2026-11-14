@@ -228,9 +228,9 @@
       paintSlots(wrap, path);
     }
 
-    var day = days.filter(function (d) {
+    var day = days.find(function (d) {
       return d.id === cur.day;
-    })[0];
+    });
     var kept = dropPast(day, cur);
     if (kept !== cur) {
       cur = kept;

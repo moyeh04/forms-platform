@@ -4,7 +4,7 @@ const { settle } = require("../harness/dom.js");
 const { ID, boot, openAdmin, person, member, submit } = require("../harness/admin-page.js");
 
 test(
-  "Responses: each team is its own tinted block with a leader star and " + "a linked task",
+  "Responses: each team is its own tinted " + "block with a leader star and a linked task",
   async () => {
     const w = boot();
     const f = w.make("task_submission", "Tasks");
@@ -60,7 +60,7 @@ test(
   },
 );
 
-test("Responses: small teams are listed by " + "level and marked on their card", async () => {
+test("Responses: small teams are listed by level and marked on their card", async () => {
   const w = boot();
   const f = w.make("team_registration", "Projects");
   const team = (code, title, codes) => {
@@ -112,7 +112,7 @@ test("Responses: small teams are listed by " + "level and marked on their card",
   );
 });
 
-test("Responses: People counts a student " + "once however many tasks name them", async () => {
+test("Responses: People counts a student once however many tasks name them", async () => {
   const w = boot();
   const tasks = w.make("task_submission", "Tasks", {
     rules: {
@@ -197,7 +197,7 @@ test(
   },
 );
 
-test("Responses: search narrows the list " + "and a status change is saved", async () => {
+test("Responses: search narrows the list and a status change is saved", async () => {
   const w = boot();
   const f = w.make("team_registration", "Projects");
   submit(w, f, person({ title: "Alpha", members: [] }));
@@ -217,7 +217,7 @@ test("Responses: search narrows the list " + "and a status change is saved", asy
 });
 
 test(
-  "Responses: details open, and resetting a key gives a new one and " + "kills the old one",
+  "Responses: details open, and resetting a " + "key gives a new one and kills the old one",
   async () => {
     const w = boot();
     const f = w.make("team_registration", "Projects");
@@ -235,62 +235,59 @@ test(
   },
 );
 
-test(
-  "WhatsApp: paste requests, see matches beside the registration, and " + "approve",
-  async () => {
-    const w = boot();
-    const f = w.make("whatsapp_registration", "Groups");
-    w.api({
-      action: "submit",
-      slug: f.slug,
-      data: {
-        email: "a@b.com",
-        name: "أحمد محمد محمود أحمد",
-        phone: "01012345678",
-        code: "4230999",
-        level: "صفر / الأولى",
-        major: "حاسبات",
-        group: "A",
-        section: "21",
-        schedule: `https://drive.google.com/file/d/${ID("s")}/view`,
-      },
-    });
-    const p = await openAdmin(w, `#/f/${f.slug}`);
-    assert.ok(p.$(".split"), "split screen is the default");
-    p.type('[name="paste"]', "Sara Ali +20 10 1234 5678\nStranger 01155555555\nno number here");
-    p.click('[name="import"]');
-    await settle(12);
-    const reqs = p.$$(".req");
-    assert.equal(reqs.length, 2);
-    assert.ok(reqs[0].textContent.includes("Matched"));
-    assert.ok(reqs[1].textContent.includes("No match"));
-    p.click(reqs[0]);
-    await settle(2);
-    assert.ok(p.$(".detail").textContent.includes("4230999"));
-    assert.ok(p.$("iframe.preview").getAttribute("src").includes(ID("s")));
-    p.click('[name="approve"]');
-    await settle(12);
-    assert.ok(p.text().includes('Finish "Timetable check" first'), "step 2 waits for step 1");
-    assert.equal(
-      w.admin({ action: "admin.submissions", slug: f.slug }).submissions[0].review.group,
-      "pending",
-    );
+test("WhatsApp: paste requests, see matches beside the registration, and approve", async () => {
+  const w = boot();
+  const f = w.make("whatsapp_registration", "Groups");
+  w.api({
+    action: "submit",
+    slug: f.slug,
+    data: {
+      email: "a@b.com",
+      name: "أحمد محمد محمود أحمد",
+      phone: "01012345678",
+      code: "4230999",
+      level: "صفر / الأولى",
+      major: "حاسبات",
+      group: "A",
+      section: "21",
+      schedule: `https://drive.google.com/file/d/${ID("s")}/view`,
+    },
+  });
+  const p = await openAdmin(w, `#/f/${f.slug}`);
+  assert.ok(p.$(".split"), "split screen is the default");
+  p.type('[name="paste"]', "Sara Ali +20 10 1234 5678\nStranger 01155555555\nno number here");
+  p.click('[name="import"]');
+  await settle(12);
+  const reqs = p.$$(".req");
+  assert.equal(reqs.length, 2);
+  assert.ok(reqs[0].textContent.includes("Matched"));
+  assert.ok(reqs[1].textContent.includes("No match"));
+  p.click(reqs[0]);
+  await settle(2);
+  assert.ok(p.$(".detail").textContent.includes("4230999"));
+  assert.ok(p.$("iframe.preview").getAttribute("src").includes(ID("s")));
+  p.click('[name="approve"]');
+  await settle(12);
+  assert.ok(p.text().includes('Finish "Timetable check" first'), "step 2 waits for step 1");
+  assert.equal(
+    w.admin({ action: "admin.submissions", slug: f.slug }).submissions[0].review.group,
+    "pending",
+  );
 
-    const step1 = p.$('.detail select[aria-label^="Timetable check"]');
-    step1.value = "approved";
-    p.fire(step1, "change");
-    await settle(10);
-    p.click('[name="approve"]');
-    await settle(12);
-    const sub = w.admin({ action: "admin.submissions", slug: f.slug }).submissions[0];
-    assert.deepEqual(sub.review, { schedule: "approved", group: "approved" });
-    p.click('[data-filter="approved"]');
-    await settle(2);
-    assert.equal(p.$$(".req").length, 1);
-  },
-);
+  const step1 = p.$('.detail select[aria-label^="Timetable check"]');
+  step1.value = "approved";
+  p.fire(step1, "change");
+  await settle(10);
+  p.click('[name="approve"]');
+  await settle(12);
+  const sub = w.admin({ action: "admin.submissions", slug: f.slug }).submissions[0];
+  assert.deepEqual(sub.review, { schedule: "approved", group: "approved" });
+  p.click('[data-filter="approved"]');
+  await settle(2);
+  assert.equal(p.$$(".req").length, 1);
+});
 
-test("Details: the admin can show a student key and the email switch is " + "saved", async () => {
+test("Details: the admin can show a student key and the email switch is saved", async () => {
   const w = boot();
   const f = w.make("team_registration", "Projects");
   const r = submit(w, f, person({ title: "Library System", members: [] }));
@@ -396,7 +393,7 @@ test(
   },
 );
 
-test("Responses: a registration shows when its key ends and extends it " + "alone", async () => {
+test("Responses: a registration shows when its key ends and extends it alone", async () => {
   const w = boot();
   const f = w.make("team_registration", "Projects");
   submit(w, f, person({ leader_code: "4230001", title: "Old", members: [] }));
@@ -429,7 +426,7 @@ test("Responses: a registration shows when its key ends and extends it " + "alon
 });
 
 test(
-  "Responses: Download all saves every task, shows what was not " + "downloaded, and saves the zip",
+  "Responses: Download all saves every task, shows " + "what was not downloaded, and saves the zip",
   async () => {
     const w = boot();
     const f = w.make("task_submission", "Tasks", {
@@ -495,7 +492,7 @@ test(
   },
 );
 
-test("Responses: Download all is " + "not offered before anyone registers", async () => {
+test("Responses: Download all is not offered before anyone registers", async () => {
   const w = boot();
   const f = w.make("team_registration", "Projects");
   const p = await openAdmin(w, "#/f/" + f.slug + "/responses");

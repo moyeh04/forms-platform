@@ -30,7 +30,7 @@ var MatchingService = (function () {
     return line
       .split(raw)
       .join(" ")
-      .replace(/[\s,;:|\-]+/g, " ")
+      .replace(/[\s,;:|-]+/g, " ")
       .trim();
   }
 
@@ -165,9 +165,9 @@ var MatchingService = (function () {
     });
     var linked = null;
     Lock.withLock(function () {
-      var q = MatchingRepository.readRequests(form).filter(function (x) {
+      var q = MatchingRepository.readRequests(form).find(function (x) {
         return x.id === requestId;
-      })[0];
+      });
       if (!q) ApiError.fail("request_not_found", "That request does not exist.");
       var subs = ResponsesRepository.readResponses(form).filter(function (r) {
         return Rules.normalizePhone(r.phone) === q.phone;

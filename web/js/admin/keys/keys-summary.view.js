@@ -72,7 +72,7 @@
       );
     }
 
-    load();
+    void load();
     return box;
   };
 })(window.App);

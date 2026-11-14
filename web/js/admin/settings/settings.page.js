@@ -212,9 +212,9 @@
         s.f,
         tab.id,
         function (id) {
-          var next = s.tabs.filter(function (x) {
+          var next = s.tabs.find(function (x) {
             return x.id === id;
-          })[0];
+          });
           if (!next) return false;
           A.setHash("#/f/" + encodeURIComponent(s.slug) + "/" + id);
           show(s, next);
@@ -253,9 +253,9 @@
     });
     mount.appendChild(bar.node);
     s.show(
-      s.tabs.filter(function (tab) {
+      s.tabs.find(function (tab) {
         return tab.id === startTab;
-      })[0] || s.tabs[s.tabs.length - 1],
+      }) || s.tabs[s.tabs.length - 1],
     );
     bar.refresh();
   };

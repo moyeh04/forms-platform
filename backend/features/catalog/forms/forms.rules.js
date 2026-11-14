@@ -134,7 +134,7 @@ var FormsRules = (function () {
     if (!out.ok) {
       ApiError.fail(
         "bad_progress",
-        "Each milestone needs an English name, and no milestone may be in" + " the list twice.",
+        "Each milestone needs an English name, and no milestone may be in the list twice.",
       );
     }
     return out.value;

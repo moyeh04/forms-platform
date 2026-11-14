@@ -95,7 +95,7 @@
       return h(
         "p",
         { class: "banner info" },
-        "More than one registration uses this number. Check them below" + " before deciding.",
+        "More than one registration uses this number. Check them below before deciding.",
       );
     }
     return null;
@@ -222,16 +222,16 @@
    */
   R.paintMatchDetail = function (m) {
     var right = m.right;
-    var q = m.data.requests.filter(function (r) {
+    var q = m.data.requests.find(function (r) {
       return r.id === m.sel;
-    })[0];
+    });
     ui.clear(right);
     if (!q) {
       right.appendChild(
         h(
           "div",
           { class: "empty" },
-          "Choose a request from the list to see the student's registration" + " and timetable.",
+          "Choose a request from the list to see the student's registration and timetable.",
         ),
       );
       return;

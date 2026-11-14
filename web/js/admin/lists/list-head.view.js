@@ -160,7 +160,7 @@
             },
             ["Asked by "],
           )
-        : "No form asks it yet. Pick it for a question in the Questions tab" + " of a form.",
+        : "No form asks it yet. Pick it for a question in the Questions tab of a form.",
     );
   }
 

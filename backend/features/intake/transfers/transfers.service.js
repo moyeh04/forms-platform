@@ -194,9 +194,9 @@ var TransfersService = (function () {
    * @throws {ApiError} `transfer_gone` when the request is not waiting.
    */
   function cancelTransfer_(form, id, teamId) {
-    var t = TransfersRepository.readTransfers(form).filter(function (x) {
+    var t = TransfersRepository.readTransfers(form).find(function (x) {
       return x.id === String(id) && x.status === "pending" && x.toId === teamId;
-    })[0];
+    });
     if (!t) ApiError.fail("transfer_gone", "This request was already answered.");
     t.status = "cancelled";
     TransfersRepository.saveTransfer(form, t);
@@ -210,9 +210,9 @@ var TransfersService = (function () {
    * @return {!Object|undefined} The team, if it still exists.
    */
   function findTeam_(form, teamId) {
-    return ResponsesRepository.readResponses(form).filter(function (r) {
+    return ResponsesRepository.readResponses(form).find(function (r) {
       return r.id === teamId;
-    })[0];
+    });
   }
 
   return {

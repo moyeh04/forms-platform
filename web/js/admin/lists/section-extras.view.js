@@ -28,7 +28,7 @@
       h(
         "p",
         { class: "help" },
-        "These do not follow the year-kind-number pattern, so they are kept" + " as they are.",
+        "These do not follow the year-kind-number pattern, so they are kept as they are.",
       ),
       h(
         "ul",

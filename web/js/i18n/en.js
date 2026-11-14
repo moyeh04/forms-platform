@@ -21,7 +21,7 @@
     reviewStep: "Review",
     reviewTitle: "Check your details",
     reviewHelp: "Make sure everything is right before you send it.",
-    reviewHelpKey: "Make sure everything is right. You can still fix it later with your " + "key.",
+    reviewHelpKey: "Make sure everything is right. You can still fix it later with your key.",
     optional: "optional",
     change: "Change",
     choose: "Choose...",
@@ -45,7 +45,7 @@
     slotDayPast: "The day has passed",
     slotTimePast: "Time has passed",
     slotsLeft: "{n} left",
-    slotMove: "Your time now, {was}, is given up when you save, and anyone can book " + "it then.",
+    slotMove: "Your time now, {was}, is given up when you save, and anyone can book it then.",
     slotNone: "No free slots on this day.",
     slotPick: "Pick a day to see the times.",
     hintArabic: "Arabic letters only",
@@ -150,8 +150,7 @@
     transferAskedYouTitle: "A team asks for you",
     transferAskedYou: "Team {team} asks for you to move to it.",
     handoverChoose: "You lead this team, so choose who leads it after you.",
-    handoverAlone:
-      "You are the only one in this team, so there is nobody to lead it " + "after you.",
+    handoverAlone: "You are the only one in this team, so there is nobody to lead it after you.",
     handoverWho: "New leader",
     handoverEmail: "Email of the new leader",
     handoverPick: "Choose the new leader.",
@@ -176,9 +175,8 @@
     cancelledTitle: "Registration cancelled",
     cancelledBody: "You can fill in the form again if you need to.",
     savedTitle: "Changes saved",
-    readOnly: "Changes are not allowed for this form. You can cancel and register " + "again.",
-    deadlineLocked:
-      "The deadline has passed, so this task can no longer be changed or " + "cancelled.",
+    readOnly: "Changes are not allowed for this form. You can cancel and register again.",
+    deadlineLocked: "The deadline has passed, so this task can no longer be changed or cancelled.",
     backToForm: "Back to the form",
     newRegistration: "Register again",
     errors: {
@@ -195,7 +193,7 @@
       invalid_link: "Paste a Google Drive link.",
       link_kind: "This link should point to: {kinds}.",
       link_unreachable:
-        'This link does not open. Check it and share it with "Anyone with ' + 'the link".',
+        'This link does not open. Check it and share it with "Anyone with the link".',
       link_not_public: 'Share this file with "Anyone with the link", then try again.',
       folder_name_spaces:
         'The folder is named "{name}", which has spaces. Rename it in Drive ' +
@@ -205,7 +203,7 @@
         "leader's name, the project name, and the subject name joined by " +
         "underscores, like {example}.",
       folder_name_subject:
-        "The folder name must end with _{subject}. Rename it in Drive, like " + "{example}.",
+        "The folder name must end with _{subject}. Rename it in Drive, like {example}.",
       invalid_slot: "Pick a day and a time.",
       too_many_members: "A team can have {max} extra members at most.",
       too_few_members: "Add at least {min} team members.",
@@ -224,8 +222,7 @@
       slot_taken: "That time was just taken. Pick another.",
       slot_past: "That time is over. Pick another.",
       form_full: "This form is full.",
-      already_booked:
-        "Your team already has a booking. Open it with your key to change " + "its time.",
+      already_booked: "Your team already has a booking. Open it with your key to change its time.",
       key_booking_off: "This form no longer takes keys. Reload the page.",
       bad_key: "That key is not right.",
       key_expired:

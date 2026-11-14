@@ -19,22 +19,19 @@ function temp(t) {
   return dir;
 }
 
-test(
-  "Deployment: absent IDs or credentials are explicit failures without " + "exposing tokens",
-  () => {
-    for (const key of ["APPS_SCRIPT_ID", "APPS_SCRIPT_DEPLOYMENT_ID", "CLASPRC_JSON"]) {
-      assert.throws(() => deploymentConfig({ ...env, [key]: "" }), new RegExp(key));
-    }
-    for (const credentials of ["bad-secret-test-only", "null", "[]", "{}"]) {
-      assert.throws(
-        () => deploymentConfig({ ...env, CLASPRC_JSON: credentials }),
-        (error) => error.message.includes("CLASPRC_JSON") && !error.message.includes("test-only"),
-      );
-    }
-  },
-);
+test("Deployment: absent IDs or credentials are explicit failures without exposing tokens", () => {
+  for (const key of ["APPS_SCRIPT_ID", "APPS_SCRIPT_DEPLOYMENT_ID", "CLASPRC_JSON"]) {
+    assert.throws(() => deploymentConfig({ ...env, [key]: "" }), new RegExp(key));
+  }
+  for (const credentials of ["bad-secret-test-only", "null", "[]", "{}"]) {
+    assert.throws(
+      () => deploymentConfig({ ...env, CLASPRC_JSON: credentials }),
+      (error) => error.message.includes("CLASPRC_JSON") && !error.message.includes("test-only"),
+    );
+  }
+});
 
-test("Deployment: clasp targets dist and writes private credentials " + "separately", (t) => {
+test("Deployment: clasp targets dist and writes private credentials separately", (t) => {
   const dir = temp(t);
   const home = path.join(dir, "home");
   fs.mkdirSync(home);

@@ -212,9 +212,9 @@ var TemplateFields = (function () {
     }
     clampTeammates_(members);
     cleanTeammatesNotice_(members);
-    var project = form.steps.filter(function (step) {
+    var project = form.steps.find(function (step) {
       return step.id === "project";
-    })[0];
+    });
     if (project && project.fields.indexOf(members.id) === -1) project.fields.push(members.id);
     return form;
   }

@@ -23,6 +23,6 @@ test("Edit keys: five digits, as the page asks and the backend makes", () => {
   assert.equal(R.isEditKey("12a45"), false);
 });
 
-test("Access keys: six digits, as the instructor page asks and the " + "backend makes", () => {
+test("Access keys: six digits, as the instructor page asks and the backend makes", () => {
   assert.equal(R.accessKeyDigits(), 6);
 });

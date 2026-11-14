@@ -89,7 +89,7 @@ function boot(patch = {}) {
 const { openPage, helpers, settle } = require("../harness/dom.js");
 
 test(
-  "Key booking setting: offered only with a form that issues keys, and " + "saved with its form",
+  "Key booking setting: offered only with a form " + "that issues keys, and saved with its form",
   async () => {
     const openAdmin = async (world, hash) => {
       const dom = await openPage("admin.html", world, { hash });

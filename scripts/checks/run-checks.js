@@ -15,7 +15,7 @@ const { formatFinding, printBlock } = require("./lib/report.js");
 const ROOT = path.resolve(__dirname, "..", "..");
 const CONFIG = require("./config.json");
 const CHECKS = [
-  require("./code/check-biome.js"),
+  require("./code/check-oxlint.js"),
   require("./code/check-lines.js"),
   require("./code/check-jsdoc.js"),
   require("./code/check-comments.js"),
@@ -43,11 +43,13 @@ function readJson(name) {
  *
  * @param {!Array<string>} files The files to look at.
  * @param {!Array<string>} tracked Every tracked file.
+ * @param {{staged: boolean}} run Whether this is the staged run.
  * @return {!Array<!Object>} Every finding.
  */
-function runAll(files, tracked) {
+function runAll(files, tracked, run) {
+  const config = { ...CONFIG, run };
   return CHECKS.flatMap((check) =>
-    check.check(ROOT, check.wholeTree ? tracked : files, CONFIG, tracked),
+    check.check(ROOT, check.wholeTree ? tracked : files, config, tracked),
   );
 }
 
@@ -62,7 +64,7 @@ function main(args) {
   const tracked = listFiles(ROOT, false);
   const files = staged ? listFiles(ROOT, true) : tracked;
   const allowed = readJson(CONFIG.exceptions);
-  const { kept, unused } = exceptions.apply(runAll(files, tracked), allowed);
+  const { kept, unused } = exceptions.apply(runAll(files, tracked, { staged }), allowed);
   let problems = printBlock("Not allowed:", kept.map(formatFinding));
   problems += printBlock("Exceptions:", exceptions.weakReasons(allowed));
   if (!staged) problems += printBlock("Out of date:", unused);

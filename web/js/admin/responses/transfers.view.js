@@ -113,9 +113,9 @@
         handover: next ? next.value() : undefined,
       });
       var heir = next
-        ? t.heirs.filter(function (m) {
+        ? t.heirs.find(function (m) {
             return m.code === next.value().leader;
-          })[0]
+          })
         : null;
       ui.toast(doneText(t, approve, heir, out), "ok");
       p.reload();

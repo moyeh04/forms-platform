@@ -242,7 +242,7 @@
         h(
           "p",
           { class: "muted-note" },
-          "The form starts as a draft. Students cannot open it until you set" + " it to Open.",
+          "The form starts as a draft. Students cannot open it until you set it to Open.",
         ),
         v.btn,
       ),

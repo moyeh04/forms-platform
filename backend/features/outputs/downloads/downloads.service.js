@@ -115,7 +115,7 @@ var DownloadsService = (function () {
   function finish(form, job) {
     var saved = DownloadsJobs.savedFiles(job.folder);
     Object.keys(saved).forEach(function (n) {
-      if (/\.zip$/.test(n) && !/\//.test(n)) delete saved[n];
+      if (n.endsWith(".zip") && !/\//.test(n)) delete saved[n];
     });
     delete saved[WORKBOOK_];
     var book = job.folder.createFile(DownloadsWorkbook.build(form, job, saved).setName(WORKBOOK_));

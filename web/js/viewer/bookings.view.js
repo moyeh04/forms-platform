@@ -18,9 +18,9 @@
   function byDay(rows) {
     var groups = [];
     rows.forEach(function (r) {
-      var g = groups.filter(function (x) {
+      var g = groups.find(function (x) {
         return x.id === r.dayId;
-      })[0];
+      });
       if (!g) {
         g = { id: r.dayId, label: r.dayLabel, date: r.date, rows: [] };
         groups.push(g);

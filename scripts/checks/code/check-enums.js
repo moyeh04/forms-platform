@@ -13,7 +13,7 @@ const walk = require("acorn-walk");
 const { select, read } = require("../lib/files.js");
 const { parse } = require("../lib/parse.js");
 
-const EQUALITY = ["===", "!==", "==", "!="];
+const EQUALITY = new Set(["===", "!==", "==", "!="]);
 
 /**
  * Names the property a member expression reads: `type` for `form.type`, and
@@ -57,7 +57,7 @@ function memberFor(node, property, rules) {
  */
 function stringsOf(node, rules) {
   const pairs = [];
-  if (node.type === "BinaryExpression" && EQUALITY.includes(node.operator)) {
+  if (node.type === "BinaryExpression" && EQUALITY.has(node.operator)) {
     pairs.push([node.left, node.right], [node.right, node.left]);
   }
   if (node.type === "SwitchStatement") {

@@ -13,6 +13,7 @@
   Object.keys(api).forEach(function (name) {
     root[name] = api[name];
   });
+  // oxlint-disable-next-line max-lines-per-function -- the factory only lists the frozen enums
 })(typeof globalThis !== "undefined" ? globalThis : this, function () {
   "use strict";
 

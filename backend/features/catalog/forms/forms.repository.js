@@ -97,9 +97,9 @@ var FormsRepository = (function () {
    * @return {?Object} The form, or null.
    */
   function findForm(slugOrId) {
-    var hit = readForms().filter(function (f) {
+    var hit = readForms().find(function (f) {
       return f.slug === slugOrId || f.id === slugOrId;
-    })[0];
+    });
     return hit || null;
   }
 

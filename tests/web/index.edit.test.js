@@ -3,7 +3,7 @@ const assert = require("node:assert/strict");
 const { settle } = require("../harness/dom.js");
 const { ID, boot, open, AR_NAME, fillAbout, fillStudy } = require("../harness/form-page.js");
 
-test("Edit by key: open, change the title, save, then cancel and register " + "again", async () => {
+test("Edit by key: open, change the title, save, then cancel and register again", async () => {
   const w = boot("team_registration");
   const first = await open(w);
   await fillAbout(first);
@@ -86,7 +86,7 @@ test("Edit by key: open, change the title, save, then cancel and register " + "a
 });
 
 test(
-  "Deadline: after a task form closes, the key shows the task but " + "cannot change or cancel it",
+  "Deadline: after a task form closes, the key " + "shows the task but cannot change or cancel it",
   async () => {
     const w = boot("task_submission", {
       closesAt: "2027-09-02T10:00:00Z",
@@ -128,7 +128,7 @@ test(
 );
 
 test(
-  "Edit by key: Close leaves the registration, and asks first when " + "something was changed",
+  "Edit by key: Close leaves the registration, " + "and asks first when something was changed",
   async () => {
     const w = boot("team_registration");
     const r = w.api({

@@ -57,7 +57,7 @@
         key: key,
       });
       S.expiredProgress = res.progress;
-    } catch (_e) {
+    } catch {
       S.expiredProgress = null;
     }
   };

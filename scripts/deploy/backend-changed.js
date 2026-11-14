@@ -50,7 +50,7 @@ function changedFiles(before, run = execFileSync) {
     return String(run("git", ["diff", "--name-only", before, "HEAD"]))
       .split("\n")
       .filter(Boolean);
-  } catch (_) {
+  } catch {
     return null;
   }
 }

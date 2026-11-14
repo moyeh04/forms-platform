@@ -29,9 +29,9 @@ var AdminSubmissionsService = (function () {
    * @throws {ApiError} `submission_not_found` when none has the id.
    */
   function requireSubmission_(rows, id) {
-    var r = rows.filter(function (x) {
+    var r = rows.find(function (x) {
       return x.id === id;
-    })[0];
+    });
     if (!r) ApiError.fail("submission_not_found", "That submission does not exist.");
     return r;
   }

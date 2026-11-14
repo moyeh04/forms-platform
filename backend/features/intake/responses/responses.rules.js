@@ -89,9 +89,9 @@ var ResponsesRules = (function () {
    */
   function checkPast_(form, key, pick, own) {
     if (key === own) return;
-    var day = (form.slots?.days || []).filter(function (d) {
+    var day = (form.slots?.days || []).find(function (d) {
       return d.id === pick.day;
-    })[0];
+    });
     var now = { date: Time.todayIso(), time: Time.clockNow() };
     if (day && Rules.isPastSlot(day, pick.time, now))
       ApiError.fail("slot_past", "That time is over. Pick another.", {
@@ -141,9 +141,9 @@ var ResponsesRules = (function () {
     checkFull_(rules, others, selfId);
     checkUnique_(rules, data, others);
     if (rules.uniqueAcrossForm) checkMembers_(form, data, others);
-    var self = rows.filter(function (r) {
+    var self = rows.find(function (r) {
       return r.id === selfId;
-    })[0];
+    });
     checkSlot_(form, data, others, self?.slot || "");
   }
 

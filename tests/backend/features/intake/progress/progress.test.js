@@ -156,7 +156,7 @@ test("Progress: a mark on a stale state or a bad input is refused", () => {
     milestone: "m_b",
     state: "discussed",
   });
-  assert.deepEqual(Object.keys(second.progress).sort(), ["m_a", "m_b"]);
+  assert.deepEqual(Object.keys(second.progress).toSorted(), ["m_a", "m_b"]);
   const stale = w.mark({ state: "discussed", baseAt: "" });
   assert.equal(stale.error.code, "changed_meanwhile");
   assert.equal(stale.error.details.progress.m_a.s, "submitted");

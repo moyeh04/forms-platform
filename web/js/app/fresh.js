@@ -187,7 +187,7 @@
 
   /** Checks when the tab is shown, unless the wait is not over. */
   function checkIfShown() {
-    if (!document.hidden) check();
+    if (!document.hidden) void check();
   }
 
   /**
@@ -201,7 +201,7 @@
     // A page brought back by the Back button is shown as it was left,
     // without loading anything.
     window.addEventListener("pageshow", function (e) {
-      if (e.persisted) check(true);
+      if (e.persisted) void check(true);
     });
     window.setInterval(checkIfShown, EVERY);
     // A page that learns its language after it opened says the bar again in
@@ -229,7 +229,7 @@
     if (document.readyState !== "loading") return check(true);
     return new Promise(function (done) {
       document.addEventListener("DOMContentLoaded", function () {
-        check(true).then(done);
+        void check(true).then(done);
       });
     });
   }
@@ -244,5 +244,5 @@
   App.fresh = F;
 
   var config = window.APP_CONFIG || {};
-  start(config.VERSION);
+  void start(config.VERSION);
 })(window.App);

@@ -213,9 +213,9 @@
     var membersField = parts.form.fieldByRole(form, "members");
     if (!codeField || !membersField || errors[membersField.id]) return;
     var list = out[membersField.id];
-    var codeSub = (membersField.fields || []).filter(function (sf) {
+    var codeSub = (membersField.fields || []).find(function (sf) {
       return sf.role === "code";
-    })[0];
+    });
     if (!Array.isArray(list) || !codeSub) return;
     var seen = {};
     if (out[codeField.id]) seen[out[codeField.id]] = true;

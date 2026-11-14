@@ -34,9 +34,9 @@
   function memberName(code) {
     var mf = Rules.fieldByRole(S.form, "members");
     var members = (mf && S.data[mf.id]) || [];
-    var hit = members.filter(function (m) {
+    var hit = members.find(function (m) {
       return String(m.code) === String(code);
-    })[0];
+    });
     return hit ? hit.name : "";
   }
 

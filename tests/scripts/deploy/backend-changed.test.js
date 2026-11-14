@@ -5,7 +5,7 @@ const path = require("node:path");
 
 const root = path.resolve(__dirname, "..", "..", "..");
 
-test("Workflow: a push that changes no backend file skips the Apps Script " + "deployment", () => {
+test("Workflow: a push that changes no backend file skips the Apps Script deployment", () => {
   const { backendChanged, touchesBackend } = require("../../../scripts/deploy/backend-changed.js");
   assert.equal(
     touchesBackend([

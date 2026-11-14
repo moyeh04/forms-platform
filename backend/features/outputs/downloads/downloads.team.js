@@ -211,9 +211,9 @@ var DownloadsTeam = (function () {
    * @throws {ApiError} `submission_not_found` when the team is gone.
    */
   function saveTeam(form, job, ref) {
-    var team = TeamsService.teamBlocks(form).filter(function (t) {
+    var team = TeamsService.teamBlocks(form).find(function (t) {
       return t.ref === ref;
-    })[0];
+    });
     if (!team) {
       ApiError.fail("submission_not_found", "That team no longer exists.");
     }

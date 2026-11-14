@@ -95,7 +95,7 @@
         novalidate: "novalidate",
         onsubmit: function (e) {
           e.preventDefault();
-          openByKey(input.value);
+          void openByKey(input.value);
         },
       },
       h("h2", { class: "step-title" }, t("editTitle")),

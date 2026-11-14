@@ -134,9 +134,9 @@ var ClientsLinks = (function () {
    * @throws {ApiError} `client_not_found` when there is none.
    */
   function requireLink_(id) {
-    var c = ClientsRepository.readClients().filter(function (x) {
+    var c = ClientsRepository.readClients().find(function (x) {
       return x.id === id;
-    })[0];
+    });
     if (!c) ApiError.fail("client_not_found", "That client does not exist.");
     return c;
   }
@@ -161,7 +161,7 @@ var ClientsLinks = (function () {
     if (!key || ClientsService.clientKeyHash(c, key) !== c.keyHash)
       ApiError.fail(
         "key_unknown",
-        "This key was made before keys could be shown. " + "Make a new key to see it.",
+        "This key was made before keys could be shown. Make a new key to see it.",
       );
     return key;
   }

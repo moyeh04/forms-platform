@@ -167,9 +167,9 @@
     var cols = columnsOf(d);
     var days = [];
     shown(d).forEach(function (r) {
-      var day = days.filter(function (x) {
+      var day = days.find(function (x) {
         return x.id === r.dayId;
-      })[0];
+      });
       if (!day) {
         day = { id: r.dayId, label: r.dayLabel, date: r.date, rows: [] };
         days.push(day);
@@ -273,9 +273,9 @@
   function viewText(d) {
     if (d.kind !== "reservation") return "";
     if (S.mode === "today") return "Today";
-    var day = (d.days || []).filter(function (x) {
+    var day = (d.days || []).find(function (x) {
       return x.id === S.dayId;
-    })[0];
+    });
     return S.mode === "day" && day ? day.label : "All days";
   }
 

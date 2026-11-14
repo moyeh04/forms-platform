@@ -33,9 +33,9 @@
    * @return {string} The word.
    */
   P.word = function (s) {
-    return P.STATES.filter(function (x) {
+    return P.STATES.find(function (x) {
       return x[0] === s;
-    })[0][1];
+    })[1];
   };
 
   /**
@@ -158,14 +158,14 @@
     area.value = saved;
     save.hidden = true;
     /** Saves the note; a refused one stays in its field. */
-    save.onclick = function () {
+    save.addEventListener("click", function () {
       var change = {};
       change[n[1]] = area.value;
       P.change(m.b, m.team, m.id, change).then(function (why) {
         m.said(why);
         if (!why) save.hidden = true;
       });
-    };
+    });
     return h("label", { class: "field-row" }, h("span", { class: "label" }, n[2]), area, save);
   }
 
@@ -221,6 +221,32 @@
   }
 
   /**
+   * Draws the box of one team on one milestone, with its Done button.
+   *
+   * @param {string} title The team and the milestone.
+   * @param {!Element} body What the box holds.
+   * @param {function()} close Closes the box.
+   * @return {!Element} The dialog.
+   */
+  function markDialog(title, body, close) {
+    return h(
+      "div",
+      { class: "dialog mark-box", role: "dialog", "aria-modal": "true", "aria-label": title },
+      h("h2", { class: "dialog-title" }, title),
+      body,
+      h(
+        "div",
+        { class: "dialog-actions" },
+        h(
+          "button",
+          { type: "button", class: "btn btn-primary", name: "mark-done", onclick: close },
+          "Done",
+        ),
+      ),
+    );
+  }
+
+  /**
    * Opens the box of one team on one milestone. Escape, a click outside
    * it or Done closes it.
    *
@@ -240,7 +266,6 @@
     m.said = said.bind(null, m);
     var title = "Team " + team.number + " · " + milestone.label.en;
     var overlay;
-
     /** Closes the box. */
     function close() {
       document.removeEventListener("keydown", onKey);
@@ -264,31 +289,7 @@
           if (e.target === overlay) close();
         },
       },
-      h(
-        "div",
-        {
-          class: "dialog mark-box",
-          role: "dialog",
-          "aria-modal": "true",
-          "aria-label": title,
-        },
-        h("h2", { class: "dialog-title" }, title),
-        m.body,
-        h(
-          "div",
-          { class: "dialog-actions" },
-          h(
-            "button",
-            {
-              type: "button",
-              class: "btn btn-primary",
-              name: "mark-done",
-              onclick: close,
-            },
-            "Done",
-          ),
-        ),
-      ),
+      markDialog(title, m.body, close),
     );
     m.paint();
     document.body.appendChild(overlay);

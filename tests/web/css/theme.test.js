@@ -43,7 +43,7 @@ function luminance(hex) {
 }
 
 function ratio(a, b) {
-  const [hi, lo] = [luminance(a), luminance(b)].sort((x, y) => y - x);
+  const [hi, lo] = [luminance(a), luminance(b)].toSorted((x, y) => y - x);
   return (hi + 0.05) / (lo + 0.05);
 }
 
@@ -72,20 +72,20 @@ const PAIRS = [
   ["focus", "sheet", 3, "focus ring"],
 ];
 
-for (const [name, theme] of [
+for (const [name, theme] of /** @type {const} */ ([
   ["light", light],
   ["dark (toggle)", darkToggle],
   ["dark (device)", darkDevice],
-]) {
-  test(`Contrast: ${name} theme meets WCAG AA ` + "for every pair the pages use", () => {
+])) {
+  test(`Contrast: ${name} theme meets WCAG AA for every pair the pages use`, () => {
     const failures = PAIRS.filter(([fg, bg, min]) => ratio(theme[fg], theme[bg]) < min).map(
       ([fg, bg, min, use]) =>
-        `${fg} on ${bg} (${use}): ` + `${ratio(theme[fg], theme[bg]).toFixed(2)} < ${min}`,
+        `${fg} on ${bg} (${use}): ${ratio(theme[fg], theme[bg]).toFixed(2)} < ${min}`,
     );
     assert.deepEqual(failures, []);
   });
 }
 
-test("Contrast: the device dark theme and the dark toggle use the same " + "colours", () => {
+test("Contrast: the device dark theme and the dark toggle use the same colours", () => {
   assert.deepEqual(darkDevice, darkToggle);
 });

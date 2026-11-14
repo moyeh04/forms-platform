@@ -179,17 +179,17 @@ function printLinks(port, info) {
   if (info.team) console.log(`  Form:     ${base}/index.html?f=${info.team.slug}`);
   if (info.viewerToken)
     console.log(
-      `  Viewer:   ${base}/viewer.html?t=${info.viewerToken}` + `   access key ${info.viewerKey}`,
+      `  Viewer:   ${base}/viewer.html?t=${info.viewerToken}   access key ${info.viewerKey}`,
     );
   if (info.discussion)
     console.log(
-      `  Book with a key: ${base}/index.html?f=${info.discussion.slug}` + `   key ${info.key}`,
+      `  Book with a key: ${base}/index.html?f=${info.discussion.slug}   key ${info.key}`,
     );
 }
 
 if (require.main === module) {
   const opts = readArgs(process.argv.slice(2));
-  start(opts.port, opts).then(({ info }) => printLinks(opts.port, info));
+  void start(opts.port, opts).then(({ info }) => printLinks(opts.port, info));
 }
 
 module.exports = { start, PIN };

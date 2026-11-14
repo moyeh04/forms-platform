@@ -45,7 +45,7 @@
     },
     majors: {
       name: "Majors",
-      about: "Specializations. A form can also be limited to some of them in its" + " setup.",
+      about: "Specializations. A form can also be limited to some of them in its setup.",
       kind: ListKind.NAMED,
       types: ALL_TYPES,
     },
@@ -76,7 +76,7 @@
     sections: {
       label: "Sections",
       example: "4C-TH1, 4C-T1, 3L-TH1",
-      about: "Built from year groups and how many of each kind they have. Nothing" + " to type.",
+      about: "Built from year groups and how many of each kind they have. Nothing to type.",
     },
     numbers: {
       label: "Numbers",
@@ -96,7 +96,7 @@
     milestones: {
       label: "Milestones",
       example: "Task 1, Task 2, Task 3",
-      about: "Milestones of a project. A form copies these milestones when it" + " picks the list.",
+      about: "Milestones of a project. A form copies these milestones when it picks the list.",
     },
   };
 

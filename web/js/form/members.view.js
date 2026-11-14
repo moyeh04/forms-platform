@@ -94,6 +94,21 @@
   }
 
   /**
+   * Draws the button that adds a member.
+   *
+   * @param {function()} onclick Adds the member.
+   * @return {!Element} The button.
+   */
+  function addMemberButton(onclick) {
+    return h(
+      "button",
+      { type: "button", class: "btn btn-quiet", name: "add-member", onclick: onclick },
+      icon("plus", ADD_ICON_SIZE),
+      t("addMember"),
+    );
+  }
+
+  /**
    * Draws the member forms with one remove button each and one add button.
    * `limits.resize(list)` stores the new list; with a team size question
    * it also moves the chosen size, so the two never disagree. A removed
@@ -145,20 +160,10 @@
     var cards = list.map(function (_m, i) {
       return memberCard(field, path, i, canRemove ? remove : null);
     });
-    var add = h(
-      "button",
-      {
-        type: "button",
-        class: "btn btn-quiet",
-        name: "add-member",
-        onclick: function () {
-          commit(list.concat([P.freshMember(field)]));
-          focusLastMember();
-        },
-      },
-      icon("plus", ADD_ICON_SIZE),
-      t("addMember"),
-    );
+    var add = addMemberButton(function () {
+      commit(list.concat([P.freshMember(field)]));
+      focusLastMember();
+    });
     return [
       list.length ? h("div", { class: "members" }, cards) : null,
       list.length ? h("p", { class: "team-size" }, t("teamSize", { n: list.length + 1 })) : null,
