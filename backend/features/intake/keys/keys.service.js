@@ -29,9 +29,7 @@ var KeysService = (function () {
    * @return {string} The hash stored in the `keyHash` column.
    */
   function keyHash_(form, key) {
-    return Crypto.sha256Hex(
-      Properties.pepper() + ':key:' + form.id + ':' + key
-    );
+    return Crypto.sha256Hex(Properties.pepper() + ":key:" + form.id + ":" + key);
   }
 
   /**
@@ -45,9 +43,7 @@ var KeysService = (function () {
    * @return {string} The pad, as hex digits.
    */
   function keyPad_(form, responseId) {
-    return Crypto.sha256Hex(
-      Properties.pepper() + ':seal:' + form.id + ':' + responseId
-    );
+    return Crypto.sha256Hex(Properties.pepper() + ":seal:" + form.id + ":" + responseId);
   }
 
   /**
@@ -95,10 +91,7 @@ var KeysService = (function () {
       h = keyHash_(form, key);
       if (!used[h]) return { key: key, hash: h };
     }
-    ApiError.fail(
-      'keys_exhausted',
-      'No free edit keys are left for this form.'
-    );
+    ApiError.fail("keys_exhausted", "No free edit keys are left for this form.");
   }
 
   /**
@@ -111,7 +104,7 @@ var KeysService = (function () {
    * @return {{key: string, hash: string}} The key and its hash.
    */
   function bookingKey_(form, rows, key) {
-    key = String(key || '').trim();
+    key = String(key || "").trim();
     var hash = keyHash_(form, key);
     var used = rows.some(function (r) {
       return !r.deleted && r.keyHash === hash;
@@ -138,10 +131,7 @@ var KeysService = (function () {
    */
   function requireKeyEnabled_(form) {
     if (!form.editKey?.enabled)
-      ApiError.fail(
-        'key_disabled',
-        'Editing with a key is turned off for this form.'
-      );
+      ApiError.fail("key_disabled", "Editing with a key is turned off for this form.");
   }
 
   /**
@@ -160,9 +150,9 @@ var KeysService = (function () {
     });
     if (!anyAge && keyExpired_(hit))
       ApiError.fail(
-        'key_expired',
-        'This key has expired. ' +
-          'Ask your instructor to extend it, or to make the change for you.'
+        "key_expired",
+        "This key has expired. " +
+          "Ask your instructor to extend it, or to make the change for you.",
       );
     return hit;
   }
@@ -180,21 +170,18 @@ var KeysService = (function () {
   function matchKey_(form, key) {
     var cache = CacheService.getScriptCache();
     var tag = Constants.CACHE.BAD_KEY_PREFIX + form.id;
-    var fails = parseInt(cache.get(tag) || '0', 10);
+    var fails = parseInt(cache.get(tag) || "0", 10);
     if (fails >= MAX_BAD_KEYS_)
-      ApiError.fail(
-        'too_many_attempts',
-        'Too many wrong keys. Wait a minute and try again.'
-      );
-    key = String(key || '').trim();
-    var h = Rules.isEditKey(key) ? keyHash_(form, key) : '';
+      ApiError.fail("too_many_attempts", "Too many wrong keys. Wait a minute and try again.");
+    key = String(key || "").trim();
+    var h = Rules.isEditKey(key) ? keyHash_(form, key) : "";
     var hit = null;
     ResponsesRepository.readResponses(form).forEach(function (r) {
       if (h && r.keyHash === h) hit = r;
     });
     if (!hit) {
       cache.put(tag, String(fails + 1), BAD_KEY_WINDOW_S_);
-      ApiError.fail('bad_key', 'That key is not right.');
+      ApiError.fail("bad_key", "That key is not right.");
     }
     return hit;
   }
@@ -219,10 +206,10 @@ var KeysService = (function () {
     return {
       id: r.id,
       ref: r.ref,
-      name: String(r.name || ''),
-      title: String(r.title || ''),
+      name: String(r.name || ""),
+      title: String(r.title || ""),
       keyExpires: r.keyExpires,
-      expired: keyExpired_(r)
+      expired: keyExpired_(r),
     };
   }
 
@@ -258,10 +245,7 @@ var KeysService = (function () {
    */
   function extendedExpiry_(current, days, until) {
     if (until) return until;
-    return Time.isoAfterDays(
-      Math.max(Date.now(), Date.parse(current) || 0),
-      days
-    );
+    return Time.isoAfterDays(Math.max(Date.now(), Date.parse(current) || 0), days);
   }
 
   /**
@@ -279,14 +263,14 @@ var KeysService = (function () {
   function extendKeys_(form, which, ids, span) {
     return Lock.withLock(function () {
       var picked = keyedRows_(form).filter(function (r) {
-        if (which === 'all') return true;
-        if (which === 'expired') return keyExpired_(r);
+        if (which === "all") return true;
+        if (which === "expired") return keyExpired_(r);
         return ids.indexOf(r.id) !== -1;
       });
-      if (which === 'chosen' && picked.length !== ids.length)
+      if (which === "chosen" && picked.length !== ids.length)
         ApiError.fail(
-          'submission_not_found',
-          'A chosen registration no longer exists. Open the list again.'
+          "submission_not_found",
+          "A chosen registration no longer exists. Open the list again.",
         );
       picked.forEach(function (r) {
         r.keyExpires = extendedExpiry_(r.keyExpires, span.days, span.until);
@@ -308,6 +292,6 @@ var KeysService = (function () {
     keyPad: keyPad_,
     keyExpired: keyExpired_,
     listKeys: listKeys_,
-    extendKeys: extendKeys_
+    extendKeys: extendKeys_,
   };
 })();

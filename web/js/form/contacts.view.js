@@ -3,7 +3,7 @@
  * is asked, and how to reach the other leader.
  */
 (function (App) {
-  'use strict';
+  "use strict";
 
   var P = App.formPage;
   var h = App.ui.h;
@@ -22,7 +22,7 @@
    * @return {string} "Name (code)", or the code alone.
    */
   function who(name, code) {
-    return name ? name + ' (' + code + ')' : String(code);
+    return name ? name + " (" + code + ")" : String(code);
   }
 
   /**
@@ -32,12 +32,12 @@
    * @return {string} The name, or ''.
    */
   function memberName(code) {
-    var mf = Rules.fieldByRole(S.form, 'members');
+    var mf = Rules.fieldByRole(S.form, "members");
     var members = (mf && S.data[mf.id]) || [];
     var hit = members.filter(function (m) {
       return String(m.code) === String(code);
     })[0];
-    return hit ? hit.name : '';
+    return hit ? hit.name : "";
   }
 
   /**
@@ -47,20 +47,20 @@
    * @return {!Element} The number.
    */
   function phoneNumber(r) {
-    var link = r.whatsapp ? Rules.whatsappLink(r.phone) : '';
-    if (!link) return h('span', { class: 'mono', dir: 'ltr' }, r.phone);
+    var link = r.whatsapp ? Rules.whatsappLink(r.phone) : "";
+    if (!link) return h("span", { class: "mono", dir: "ltr" }, r.phone);
     return h(
-      'a',
+      "a",
       {
-        class: 'mono',
+        class: "mono",
         href: link,
-        target: '_blank',
-        rel: 'noopener',
-        dir: 'ltr',
-        title: t('openWhatsapp')
+        target: "_blank",
+        rel: "noopener",
+        dir: "ltr",
+        title: t("openWhatsapp"),
       },
-      icon('chat', CONTACT_ICON_SIZE),
-      r.phone
+      icon("chat", CONTACT_ICON_SIZE),
+      r.phone,
     );
   }
 
@@ -74,24 +74,24 @@
   function leaderContact(r) {
     if (!r.phone) return null;
     return h(
-      'p',
-      { class: 'leader-contact', dataset: { team: r.team } },
-      h('span', null, t('transferLeaderPhone', { team: r.team })),
+      "p",
+      { class: "leader-contact", dataset: { team: r.team } },
+      h("span", null, t("transferLeaderPhone", { team: r.team })),
       phoneNumber(r),
       h(
-        'button',
+        "button",
         {
-          type: 'button',
-          class: 'link-btn',
-          name: 'copy-phone',
+          type: "button",
+          class: "link-btn",
+          name: "copy-phone",
           onclick: async function () {
             var ok = await App.ui.copyText(r.phone);
-            App.ui.toast(t(ok ? 'copied' : 'copyFail'), ok ? 'ok' : 'err');
-          }
+            App.ui.toast(t(ok ? "copied" : "copyFail"), ok ? "ok" : "err");
+          },
         },
-        icon('copy', CONTACT_ICON_SIZE),
-        t('copyNumber')
-      )
+        icon("copy", CONTACT_ICON_SIZE),
+        t("copyNumber"),
+      ),
     );
   }
 
@@ -122,8 +122,8 @@
    */
   function askedText(r) {
     return r.leader
-      ? t('transferAskedYou', { team: r.team })
-      : t('transferAskedBody', { team: r.team, who: who(r.name, r.code) });
+      ? t("transferAskedYou", { team: r.team })
+      : t("transferAskedBody", { team: r.team, who: who(r.name, r.code) });
   }
 
   P.who = who;

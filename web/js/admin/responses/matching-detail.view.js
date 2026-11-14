@@ -4,7 +4,7 @@
  * buttons that decide.
  */
 (function (App) {
-  'use strict';
+  "use strict";
 
   var A = App.admin;
   var R = A.responses;
@@ -23,24 +23,21 @@
   function registrationDetails(form, s) {
     var d = s.data;
     return h(
-      'dl',
+      "dl",
       null,
-      h('dt', null, 'Name'),
-      h('dd', null, R.bdi(s.name)),
-      h('dt', null, 'Code'),
-      h('dd', { class: 'mono' }, s.code),
-      h('dt', null, 'Level'),
-      h('dd', null, d.level || ''),
-      h('dt', null, 'Major'),
-      h('dd', null, d.major || ''),
-      h('dt', null, 'Group and section'),
-      h('dd', null, (d.group || '') + ' / ' + (d.section || '')),
+      h("dt", null, "Name"),
+      h("dd", null, R.bdi(s.name)),
+      h("dt", null, "Code"),
+      h("dd", { class: "mono" }, s.code),
+      h("dt", null, "Level"),
+      h("dd", null, d.level || ""),
+      h("dt", null, "Major"),
+      h("dd", null, d.major || ""),
+      h("dt", null, "Group and section"),
+      h("dd", null, (d.group || "") + " / " + (d.section || "")),
       (form.review?.steps || []).map(function (st) {
-        return [
-          h('dt', null, st.label.en),
-          h('dd', null, R.reviewSelect(form, s, st))
-        ];
-      })
+        return [h("dt", null, st.label.en), h("dd", null, R.reviewSelect(form, s, st))];
+      }),
     );
   }
 
@@ -56,25 +53,25 @@
     if (!p.ok) return [];
     return [
       h(
-        'div',
-        { class: 'actions', style: { marginBottom: '8px' } },
+        "div",
+        { class: "actions", style: { marginBottom: "8px" } },
         h(
-          'a',
+          "a",
           {
-            class: 'btn btn-quiet sm',
+            class: "btn btn-quiet sm",
             href: s.link,
-            target: '_blank',
-            rel: 'noopener'
+            target: "_blank",
+            rel: "noopener",
           },
-          'Open timetable in Drive'
-        )
+          "Open timetable in Drive",
+        ),
       ),
-      h('iframe', {
-        class: 'preview',
-        src: 'https://drive.google.com/file/d/' + p.id + '/preview',
-        title: 'Timetable screenshot of ' + s.name,
-        loading: 'lazy'
-      })
+      h("iframe", {
+        class: "preview",
+        src: "https://drive.google.com/file/d/" + p.id + "/preview",
+        title: "Timetable screenshot of " + s.name,
+        loading: "lazy",
+      }),
     ];
   }
 
@@ -88,18 +85,17 @@
   function matchNote(n) {
     if (!n) {
       return h(
-        'p',
+        "p",
         null,
-        'No registration uses this phone number. Ask the student to' +
-          ' register, or check that they used the same number in WhatsApp.'
+        "No registration uses this phone number. Ask the student to" +
+          " register, or check that they used the same number in WhatsApp.",
       );
     }
     if (n > 1) {
       return h(
-        'p',
-        { class: 'banner info' },
-        'More than one registration uses this number. Check them below' +
-          ' before deciding.'
+        "p",
+        { class: "banner info" },
+        "More than one registration uses this number. Check them below" + " before deciding.",
       );
     }
     return null;
@@ -116,16 +112,16 @@
    */
   function actButton(cls, name, content, act) {
     return h(
-      'button',
+      "button",
       {
-        type: 'button',
-        class: 'btn ' + cls,
+        type: "button",
+        class: "btn " + cls,
         name: name,
         onclick: function (e) {
           A.busy(e.currentTarget, act);
-        }
+        },
       },
-      content
+      content,
     );
   }
 
@@ -137,11 +133,11 @@
    * @return {!Promise} Settles once it is removed and drawn.
    */
   async function removeRequest(m, q) {
-    await A.call('admin.matching.remove', {
+    await A.call("admin.matching.remove", {
       slug: m.form.slug,
-      requestIds: [q.id]
+      requestIds: [q.id],
     });
-    ui.toast('Removed from the list', 'ok');
+    ui.toast("Removed from the list", "ok");
     await m.load(false);
   }
 
@@ -155,32 +151,27 @@
   function decisionRow(m, q) {
     var decide = R.decideMatch.bind(null, m, q);
     return h(
-      'div',
-      { class: 'actions' },
+      "div",
+      { class: "actions" },
       actButton(
-        'btn-primary',
-        'approve',
-        [icon('check', A.ICON_SIZE.BUTTON), 'Approve'],
-        decide.bind(null, 'approved')
+        "btn-primary",
+        "approve",
+        [icon("check", A.ICON_SIZE.BUTTON), "Approve"],
+        decide.bind(null, "approved"),
       ),
       actButton(
-        'btn-danger',
-        'reject',
-        [icon('x', A.ICON_SIZE.BUTTON), 'Reject'],
-        decide.bind(null, 'rejected')
+        "btn-danger",
+        "reject",
+        [icon("x", A.ICON_SIZE.BUTTON), "Reject"],
+        decide.bind(null, "rejected"),
       ),
+      actButton("btn-quiet", "pending", ["Back to pending"], decide.bind(null, "pending")),
       actButton(
-        'btn-quiet',
-        'pending',
-        ['Back to pending'],
-        decide.bind(null, 'pending')
+        "btn-quiet",
+        "remove",
+        [icon("trash", A.ICON_SIZE.LINE), "Remove from list"],
+        removeRequest.bind(null, m, q),
       ),
-      actButton(
-        'btn-quiet',
-        'remove',
-        [icon('trash', A.ICON_SIZE.LINE), 'Remove from list'],
-        removeRequest.bind(null, m, q)
-      )
     );
   }
 
@@ -202,25 +193,25 @@
       function (v) {
         m.note = v;
       },
-      { name: 'note', placeholder: 'Note (optional)' }
+      { name: "note", placeholder: "Note (optional)" },
     );
     var parts = [
-      h('h2', null, q.label ? R.bdi(q.label) : q.phone),
+      h("h2", null, q.label ? R.bdi(q.label) : q.phone),
       h(
-        'div',
-        { class: 'actions', style: { marginBottom: '12px' } },
-        h('span', { class: 'mono' }, q.phone),
-        R.matchBadges(q)
+        "div",
+        { class: "actions", style: { marginBottom: "12px" } },
+        h("span", { class: "mono" }, q.phone),
+        R.matchBadges(q),
       ),
-      matchNote(matches.length)
+      matchNote(matches.length),
     ];
     matches.forEach(function (s) {
       parts = parts.concat(registrationDetails(m.form, s), timetable(s));
     });
     return parts.concat(
-      h('div', { style: { marginTop: '14px' } }, A.field('Note', note)),
+      h("div", { style: { marginTop: "14px" } }, A.field("Note", note)),
       decisionRow(m, q),
-      q.note ? h('p', { class: 'muted-note' }, 'Saved note: ' + q.note) : null
+      q.note ? h("p", { class: "muted-note" }, "Saved note: " + q.note) : null,
     );
   }
 
@@ -238,11 +229,10 @@
     if (!q) {
       right.appendChild(
         h(
-          'div',
-          { class: 'empty' },
-          "Choose a request from the list to see the student's registration" +
-            ' and timetable.'
-        )
+          "div",
+          { class: "empty" },
+          "Choose a request from the list to see the student's registration" + " and timetable.",
+        ),
       );
       return;
     }

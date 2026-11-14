@@ -3,7 +3,7 @@
  * booking for its picture.
  */
 (function (App) {
-  'use strict';
+  "use strict";
 
   var P = App.formPage;
   var h = App.ui.h;
@@ -33,9 +33,9 @@
    * @return {!Object} The ticket, as App.ticket.render takes it.
    */
   function ticketOptions() {
-    var em = Rules.valueByRole(S.form, S.data, 'email');
+    var em = Rules.valueByRole(S.form, S.data, "email");
     var r = S.result;
-    var key = S.form.keyBooking && r.key === S.sourceKey ? '' : r.key;
+    var key = S.form.keyBooking && r.key === S.sourceKey ? "" : r.key;
     return {
       ref: r.ref,
       key: key,
@@ -43,8 +43,8 @@
       edited: !!r.edited,
       when: bookedWhen(),
       teamKey: !!S.form.keyBooking && !key && !r.edited,
-      email: !r.edited && r.emailed ? em : '',
-      summary: P.ticketSummary()
+      email: !r.edited && r.emailed ? em : "",
+      summary: P.ticketSummary(),
     };
   }
 
@@ -58,14 +58,14 @@
     if (!asked.length) return null;
     var list = asked
       .map(function (a) {
-        return P.who(a.name, a.code) + ' → ' + a.team;
+        return P.who(a.name, a.code) + " → " + a.team;
       })
-      .join(t('listSep'));
+      .join(t("listSep"));
     return h(
-      'div',
-      { class: 'banner info', role: 'status', name: 'transfer-sent' },
-      t('transferSent', { list: list }),
-      P.leaderContacts(asked)
+      "div",
+      { class: "banner info", role: "status", name: "transfer-sent" },
+      t("transferSent", { list: list }),
+      P.leaderContacts(asked),
     );
   }
 
@@ -76,12 +76,7 @@
    */
   function ticketView() {
     var opts = ticketOptions();
-    return P.sheet(
-      P.head(),
-      transferNote(),
-      App.ticket.render(opts),
-      App.ticket.actions(opts)
-    );
+    return P.sheet(P.head(), transferNote(), App.ticket.render(opts), App.ticket.actions(opts));
   }
 
   P.ticketView = ticketView;

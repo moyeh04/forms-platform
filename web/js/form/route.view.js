@@ -4,7 +4,7 @@
  * banner above it.
  */
 (function (App) {
-  'use strict';
+  "use strict";
 
   var P = App.formPage;
   var h = App.ui.h;
@@ -34,11 +34,11 @@
    * @return {!Element} The image.
    */
   function art(name, cls) {
-    return h('img', {
+    return h("img", {
       class: cls,
-      src: 'assets/img/' + name + '.svg',
-      alt: '',
-      draggable: 'false'
+      src: "assets/img/" + name + ".svg",
+      alt: "",
+      draggable: "false",
     });
   }
 
@@ -50,7 +50,7 @@
    * @return {string} The place, as a CSS percentage.
    */
   function stopAt(i, stops) {
-    return (((i + MIDDLE) * FULL) / stops).toFixed(DECIMALS) + '%';
+    return (((i + MIDDLE) * FULL) / stops).toFixed(DECIMALS) + "%";
   }
 
   /**
@@ -61,14 +61,14 @@
    * @return {!Element} The island.
    */
   function island(s, i) {
-    var state = '';
-    if (i < S.stepIndex) state = 'is-done';
-    else if (i === S.stepIndex) state = 'is-current';
+    var state = "";
+    if (i < S.stepIndex) state = "is-done";
+    else if (i === S.stepIndex) state = "is-current";
     return h(
-      'li',
-      { class: state, 'aria-current': i === S.stepIndex ? 'step' : null },
-      h('span', { class: 'isle' }, art('island')),
-      h('span', { class: 'trail-label' }, P.stepTitle(s))
+      "li",
+      { class: state, "aria-current": i === S.stepIndex ? "step" : null },
+      h("span", { class: "isle" }, art("island")),
+      h("span", { class: "trail-label" }, P.stepTitle(s)),
     );
   }
 
@@ -79,15 +79,10 @@
    */
   function treasureIsland() {
     return h(
-      'li',
-      { class: 'trail-x', 'aria-hidden': 'true' },
-      h(
-        'span',
-        { class: 'isle' },
-        art('island'),
-        art('treasure', 'trail-treasure')
-      ),
-      h('span', { class: 'trail-label' }, t('treasure'))
+      "li",
+      { class: "trail-x", "aria-hidden": "true" },
+      h("span", { class: "isle" }, art("island"), art("treasure", "trail-treasure")),
+      h("span", { class: "trail-label" }, t("treasure")),
     );
   }
 
@@ -103,22 +98,21 @@
     shipAt = S.stepIndex;
     var items = S.steps.map(island);
     items.push(treasureIsland());
-    var place =
-      '--at:' + stopAt(S.stepIndex, stops) + ';--from:' + stopAt(from, stops);
+    var place = "--at:" + stopAt(S.stepIndex, stops) + ";--from:" + stopAt(from, stops);
     return [
       h(
-        'div',
-        { class: 'trail-sea' },
-        h('ol', { class: 'trail' }, items),
-        h('span', { class: 'trail-ship', style: place }, art('ship'))
+        "div",
+        { class: "trail-sea" },
+        h("ol", { class: "trail" }, items),
+        h("span", { class: "trail-ship", style: place }, art("ship")),
       ),
       h(
-        'p',
-        { class: 'step-count' },
-        t('stepOf', { n: S.stepIndex + 1, total: S.steps.length }) +
-          ' - ' +
-          P.stepTitle(S.steps[S.stepIndex])
-      )
+        "p",
+        { class: "step-count" },
+        t("stepOf", { n: S.stepIndex + 1, total: S.steps.length }) +
+          " - " +
+          P.stepTitle(S.steps[S.stepIndex]),
+      ),
     ];
   }
 
@@ -129,11 +123,7 @@
    * @return {!Element} The sheet.
    */
   function sheet(...children) {
-    return h(
-      'section',
-      { class: 'sheet' },
-      h('div', { class: 'wrap' }, children)
-    );
+    return h("section", { class: "sheet" }, h("div", { class: "wrap" }, children));
   }
 
   /**
@@ -143,16 +133,16 @@
    */
   function bannerEl() {
     if (!S.banner) return null;
-    var info = S.banner.kind === 'info';
+    var info = S.banner.kind === "info";
     return h(
-      'div',
+      "div",
       {
-        class: 'banner' + (info ? ' info' : ''),
-        role: info ? 'status' : 'alert'
+        class: "banner" + (info ? " info" : ""),
+        role: info ? "status" : "alert",
       },
       S.banner.text,
-      ' ',
-      S.banner.action || null
+      " ",
+      S.banner.action || null,
     );
   }
 

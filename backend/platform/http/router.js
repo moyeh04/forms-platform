@@ -16,11 +16,10 @@ var Router = (function () {
       return Access[name];
     });
     if (levels.indexOf(route.access) === -1)
-      throw new Error('The route ' + route.action + ' names no valid access.');
-    if (typeof route.handler !== 'function')
-      throw new Error('The route ' + route.action + ' has no handler.');
-    if (table.has(route.action))
-      throw new Error('The route ' + route.action + ' is listed twice.');
+      throw new Error("The route " + route.action + " names no valid access.");
+    if (typeof route.handler !== "function")
+      throw new Error("The route " + route.action + " has no handler.");
+    if (table.has(route.action)) throw new Error("The route " + route.action + " is listed twice.");
   }
 
   /**
@@ -34,8 +33,7 @@ var Router = (function () {
    */
   function run_(route, req, guards) {
     if (route.access === Access.ADMIN) guards.requireAdmin(req);
-    if (route.access === Access.CLIENT)
-      return route.handler(req, guards.requireClient(req));
+    if (route.access === Access.CLIENT) return route.handler(req, guards.requireClient(req));
     return route.handler(req);
   }
 
@@ -51,17 +49,15 @@ var Router = (function () {
     if (err?.isApiError)
       return {
         ok: false,
-        error: { code: err.code, message: err.message, details: err.details }
+        error: { code: err.code, message: err.message, details: err.details },
       };
-    Logger.log(
-      'Unhandled error in ' + action + ': ' + (err?.stack ? err.stack : err)
-    );
+    Logger.log("Unhandled error in " + action + ": " + (err?.stack ? err.stack : err));
     return {
       ok: false,
       error: {
-        code: 'server_error',
-        message: 'Something went wrong on the server. Try again.'
-      }
+        code: "server_error",
+        message: "Something went wrong on the server. Try again.",
+      },
     };
   }
 
@@ -91,11 +87,11 @@ var Router = (function () {
      *     error.
      */
     function reply(req) {
-      var route = table.get(String(req.action || ''));
+      var route = table.get(String(req.action || ""));
       if (!route)
         return {
           ok: false,
-          error: { code: 'unknown_action', message: 'Unknown action.' }
+          error: { code: "unknown_action", message: "Unknown action." },
         };
       try {
         return Object.assign({ ok: true }, run_(route, req, guards));

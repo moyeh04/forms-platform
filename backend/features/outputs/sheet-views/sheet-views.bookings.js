@@ -11,7 +11,7 @@ var SheetViewsBookings = (function () {
     leader: 300,
     code: 110,
     phone: 130,
-    project: 280
+    project: 280,
   };
 
   /** The widths in column order. */
@@ -75,7 +75,7 @@ var SheetViewsBookings = (function () {
    * @return {!Array<*>} The row.
    */
   function bookingRow_(p, r, withMembers) {
-    var row = ['', p.time, r.name, r.code, r.phone, r.title];
+    var row = ["", p.time, r.name, r.code, r.phone, r.title];
     if (withMembers) {
       row.push(
         (r.data.members || [])
@@ -83,7 +83,7 @@ var SheetViewsBookings = (function () {
             return member.name;
           })
           .filter(Boolean)
-          .join(', ')
+          .join(", "),
       );
     }
     return row;
@@ -109,7 +109,7 @@ var SheetViewsBookings = (function () {
           label: p.day ? p.day.label : p.dayId,
           start: out.values.length + SheetViewsLayout.FIRST_ROW,
           length: 0,
-          style: SheetStyle.PALETTE.groups[out.blocks.length % 2]
+          style: SheetStyle.PALETTE.groups[out.blocks.length % 2],
         };
         out.blocks.push(current);
       }
@@ -134,21 +134,21 @@ var SheetViewsBookings = (function () {
     var first = SheetViewsLayout.FIRST_ROW;
     var n = rows.values.length;
     SheetViewsLayout.writeRows(sh, rows.values, rows.shades);
-    sh.getRange(first, LEADER_COL_, n, 1).setFontWeight('bold');
-    sh.getRange(first, 2, n, 1).setHorizontalAlignment('center');
-    sh.getRange(first, CODE_COL_, n, 2).setHorizontalAlignment('center');
+    sh.getRange(first, LEADER_COL_, n, 1).setFontWeight("bold");
+    sh.getRange(first, 2, n, 1).setHorizontalAlignment("center");
+    sh.getRange(first, CODE_COL_, n, 2).setHorizontalAlignment("center");
     sh.setRowHeights(first, n, ROW_PX_);
     rows.blocks.forEach(function (b) {
       SheetViewsLayout.mergedLabel(
         sh,
         { row: b.start, col: 1, length: b.length },
-        { value: b.label, formula: '', fill: b.style.solid }
+        { value: b.label, formula: "", fill: b.style.solid },
       );
     });
     SheetViewsLayout.frameBlocks(
       sh,
       { cols: WIDTHS_.length, first: first, last: n + 1 },
-      rows.blocks
+      rows.blocks,
     );
   }
 
@@ -159,19 +159,16 @@ var SheetViewsBookings = (function () {
    * @param {!SpreadsheetApp.Spreadsheet} ss The form's spreadsheet.
    */
   function build(form, ss) {
-    var sh = SheetViewsLayout.freshView(ss, 'Bookings');
-    var membersField = Rules.fieldByRole(form, 'members');
+    var sh = SheetViewsLayout.freshView(ss, "Bookings");
+    var membersField = Rules.fieldByRole(form, "members");
     var withMembers = !!(membersField && membersField.enabled !== false);
-    var headers = ['Day', 'Time', 'Team leader', 'Code', 'Phone', 'Project'];
-    if (withMembers) headers.push('Teammates');
+    var headers = ["Day", "Time", "Team leader", "Code", "Phone", "Project"];
+    if (withMembers) headers.push("Teammates");
     SheetViewsLayout.paintHeader(sh, headers);
-    SheetViewsLayout.setWidths(
-      sh,
-      WIDTHS_.concat(withMembers ? [TEAMMATES_PX_] : [])
-    );
+    SheetViewsLayout.setWidths(sh, WIDTHS_.concat(withMembers ? [TEAMMATES_PX_] : []));
     var rows = bookings_(form);
     if (!rows.length) {
-      SheetViewsLayout.emptyView(sh, WIDTHS_.length, 'No bookings yet.');
+      SheetViewsLayout.emptyView(sh, WIDTHS_.length, "No bookings yet.");
       return;
     }
     writeDays_(sh, dayRows_(form, rows, withMembers));

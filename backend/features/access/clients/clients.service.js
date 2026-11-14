@@ -42,7 +42,7 @@ var ClientsService = (function () {
    * @return {string} The hash stored in the `tokenHash` column.
    */
   function clientToken_(token) {
-    return Crypto.sha256Hex(Properties.pepper() + ':client:' + token);
+    return Crypto.sha256Hex(Properties.pepper() + ":client:" + token);
   }
 
   /**
@@ -53,9 +53,7 @@ var ClientsService = (function () {
    * @return {string} The hash stored in the `keyHash` column.
    */
   function clientKeyHash_(c, key) {
-    return Crypto.sha256Hex(
-      Properties.pepper() + ':clientkey:' + c.id + ':' + key
-    );
+    return Crypto.sha256Hex(Properties.pepper() + ":clientkey:" + c.id + ":" + key);
   }
 
   /**
@@ -65,7 +63,7 @@ var ClientsService = (function () {
    * @return {string} The pad, as hex digits.
    */
   function clientKeyPad_(c) {
-    return Crypto.sha256Hex(Properties.pepper() + ':clientseal:' + c.id);
+    return Crypto.sha256Hex(Properties.pepper() + ":clientseal:" + c.id);
   }
 
   /**
@@ -75,8 +73,8 @@ var ClientsService = (function () {
    * @param {string} key The key, or an empty string.
    */
   function setClientKey_(c, key) {
-    c.keyHash = key ? clientKeyHash_(c, key) : '';
-    c.keySeal = key ? Crypto.sealDigits(clientKeyPad_(c), key) : '';
+    c.keyHash = key ? clientKeyHash_(c, key) : "";
+    c.keySeal = key ? Crypto.sealDigits(clientKeyPad_(c), key) : "";
   }
 
   /**
@@ -97,11 +95,10 @@ var ClientsService = (function () {
    * @throws {ApiError} `bad_date` when it is not a date.
    */
   function cleanExpiry_(value) {
-    var v = String(value || '').trim();
-    if (!v) return '';
+    var v = String(value || "").trim();
+    if (!v) return "";
     var t = Date.parse(v);
-    if (Number.isNaN(t))
-      ApiError.fail('bad_date', 'That end date is not a date.');
+    if (Number.isNaN(t)) ApiError.fail("bad_date", "That end date is not a date.");
     return new Date(t).toISOString();
   }
 
@@ -111,9 +108,9 @@ var ClientsService = (function () {
    * @return {string} KEY_DIGITS digits.
    */
   function newClientKey_() {
-    var hex = Crypto.uuid().replace(/-/g, '').slice(0, KEY_SOURCE_HEX_);
+    var hex = Crypto.uuid().replace(/-/g, "").slice(0, KEY_SOURCE_HEX_);
     var n = parseInt(hex, HEX_) % 10 ** KEY_DIGITS;
-    return String(n).padStart(KEY_DIGITS, '0');
+    return String(n).padStart(KEY_DIGITS, "0");
   }
 
   /**
@@ -122,9 +119,7 @@ var ClientsService = (function () {
    * @return {string} TOKEN_LENGTH_ hex digits.
    */
   function newToken_() {
-    return (Crypto.uuid() + Crypto.uuid())
-      .replace(/-/g, '')
-      .slice(0, TOKEN_LENGTH_);
+    return (Crypto.uuid() + Crypto.uuid()).replace(/-/g, "").slice(0, TOKEN_LENGTH_);
   }
 
   /**
@@ -147,7 +142,7 @@ var ClientsService = (function () {
       hasKey: !!c.keyHash,
       keyKnown: !!(c.keyHash && c.keySeal),
       expires: c.expires,
-      expired: clientExpired_(c)
+      expired: clientExpired_(c),
     };
   }
 
@@ -160,11 +155,10 @@ var ClientsService = (function () {
    */
   function cleanClientForms_(list) {
     list = Array.isArray(list) ? list : [];
-    if (list.indexOf('*') !== -1) return ['*'];
+    if (list.indexOf("*") !== -1) return ["*"];
     return list.map(function (s) {
       var f = FormsRepository.findForm(String(s));
-      if (!f)
-        ApiError.fail('form_not_found', 'Form "' + s + '" does not exist.');
+      if (!f) ApiError.fail("form_not_found", 'Form "' + s + '" does not exist.');
       return f.id;
     });
   }
@@ -180,6 +174,6 @@ var ClientsService = (function () {
     cleanExpiry: cleanExpiry_,
     newClientKey: newClientKey_,
     setClientKey: setClientKey_,
-    clientKeyPad: clientKeyPad_
+    clientKeyPad: clientKeyPad_,
   };
 })();

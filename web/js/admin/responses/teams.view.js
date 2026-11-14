@@ -3,7 +3,7 @@
  * border, as in the Google Sheet, with its members in a table.
  */
 (function (App) {
-  'use strict';
+  "use strict";
 
   var A = App.admin;
   var R = A.responses;
@@ -26,29 +26,22 @@
    */
   function memberRow(m, k) {
     return h(
-      'tr',
-      { class: m.leader ? 'leader' : null },
-      h('td', { class: 'num' }, String(k + 1)),
+      "tr",
+      { class: m.leader ? "leader" : null },
+      h("td", { class: "num" }, String(k + 1)),
       h(
-        'td',
-        { class: 'nm' },
+        "td",
+        { class: "nm" },
         R.bdi(m.name),
-        m.leader
-          ? h(
-              'span',
-              { class: 'lead-tag' },
-              icon('star', LEADER_ICON),
-              'Leader'
-            )
-          : null
+        m.leader ? h("span", { class: "lead-tag" }, icon("star", LEADER_ICON), "Leader") : null,
       ),
-      h('td', { dataset: { label: 'Section' } }, m.section || '-'),
-      h('td', { class: 'mono', dataset: { label: 'Code' } }, m.code),
+      h("td", { dataset: { label: "Section" } }, m.section || "-"),
+      h("td", { class: "mono", dataset: { label: "Code" } }, m.code),
       h(
-        'td',
-        { class: 'mono tel', dataset: { label: 'Phone' } },
-        m.phone ? h('a', { href: 'tel:' + m.phone }, m.phone) : '-'
-      )
+        "td",
+        { class: "mono tel", dataset: { label: "Phone" } },
+        m.phone ? h("a", { href: "tel:" + m.phone }, m.phone) : "-",
+      ),
     );
   }
 
@@ -60,26 +53,26 @@
    */
   function memberTable(members) {
     return h(
-      'div',
-      { class: 'scroll-x' },
+      "div",
+      { class: "scroll-x" },
       h(
-        'table',
-        { class: 'mini' },
+        "table",
+        { class: "mini" },
         h(
-          'thead',
+          "thead",
           null,
           h(
-            'tr',
+            "tr",
             null,
-            h('th', null, '#'),
-            h('th', null, 'Team member'),
-            h('th', null, 'Section'),
-            h('th', null, 'Code'),
-            h('th', null, 'Phone')
-          )
+            h("th", null, "#"),
+            h("th", null, "Team member"),
+            h("th", null, "Section"),
+            h("th", null, "Code"),
+            h("th", null, "Phone"),
+          ),
         ),
-        h('tbody', null, members.map(memberRow))
-      )
+        h("tbody", null, members.map(memberRow)),
+      ),
     );
   }
 
@@ -91,20 +84,20 @@
    * @return {!Element} The title.
    */
   function titleOf(form, s) {
-    var third = form.type === FormType.TASK_SUBMISSION ? 'Task' : 'Project';
-    var title = s.title || '-';
+    var third = form.type === FormType.TASK_SUBMISSION ? "Task" : "Project";
+    var title = s.title || "-";
     return h(
-      'div',
-      { class: 'block-side block-title' },
-      h('span', { class: 'kicker' }, third),
+      "div",
+      { class: "block-side block-title" },
+      h("span", { class: "kicker" }, third),
       s.link
         ? h(
-            'a',
-            { href: s.link, target: '_blank', rel: 'noopener' },
+            "a",
+            { href: s.link, target: "_blank", rel: "noopener" },
             title,
-            icon('link', LINK_ICON)
+            icon("link", LINK_ICON),
           )
-        : h('span', null, title)
+        : h("span", null, title),
     );
   }
 
@@ -121,35 +114,34 @@
   function teamHead(form, s, members, reload) {
     var alerts = Rules.sizeAlerts(form);
     return h(
-      'header',
-      { class: 'block-head' },
-      h('span', { class: 'team-no' }, 'Team ' + s.number),
+      "header",
+      { class: "block-head" },
+      h("span", { class: "team-no" }, "Team " + s.number),
       titleOf(form, s),
       h(
-        'span',
-        { class: 'block-meta' },
-        h('span', { class: 'mono' }, s.ref),
-        ' · ',
-        members.length === 1 ? 'Solo' : members.length + ' members',
+        "span",
+        { class: "block-meta" },
+        h("span", { class: "mono" }, s.ref),
+        " · ",
+        members.length === 1 ? "Solo" : members.length + " members",
         App.sizeAlerts.tag(
           Rules.sizeAlertLevels(alerts),
-          Rules.sizeAlertOf(alerts, members.length)
+          Rules.sizeAlertOf(alerts, members.length),
         ),
         Rules.progressOn(form)
           ? h(
-              'span',
-              { class: 'progress-count' },
-              ' · ' +
-                App.progress.countText(Rules.milestonesOf(form), s.progress)
+              "span",
+              { class: "progress-count" },
+              " · " + App.progress.countText(Rules.milestonesOf(form), s.progress),
             )
-          : null
+          : null,
       ),
       h(
-        'div',
-        { class: 'actions block-actions' },
+        "div",
+        { class: "actions block-actions" },
         R.statusSelect(form, s),
-        R.detailsButton(form, s, reload)
-      )
+        R.detailsButton(form, s, reload),
+      ),
     );
   }
 
@@ -166,20 +158,20 @@
       return a.number - b.number;
     });
     return h(
-      'div',
-      { class: 'team-list' },
+      "div",
+      { class: "team-list" },
       sorted.map(function (s, i) {
         var members = Rules.membersOf(form, s.data);
         return h(
-          'article',
+          "article",
           {
-            class: 'block team-card ' + (i % 2 ? 'tint-b' : 'tint-a'),
-            dataset: { ref: s.ref }
+            class: "block team-card " + (i % 2 ? "tint-b" : "tint-a"),
+            dataset: { ref: s.ref },
           },
           teamHead(form, s, members, reload),
-          memberTable(members)
+          memberTable(members),
         );
-      })
+      }),
     );
   };
 })(window.App);

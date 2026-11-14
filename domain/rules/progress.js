@@ -5,10 +5,10 @@
  * own progress. The marks of the teams are in progress-marks.js.
  */
 (function (root) {
-  'use strict';
+  "use strict";
 
-  var node = typeof module === 'object' && module.exports;
-  var enums = node ? require('../enums.js') : root;
+  var node = typeof module === "object" && module.exports;
+  var enums = node ? require("../enums.js") : root;
   var FormType = enums.FormType;
 
   /** The longest milestone id. */
@@ -60,7 +60,7 @@
       var en = String(label.en || o.value);
       return {
         id: String(o.value),
-        label: { en: en, ar: String(label.ar || en) }
+        label: { en: en, ar: String(label.ar || en) },
       };
     });
   }
@@ -73,12 +73,12 @@
    *     has no id or no English name.
    */
   function cleanMilestone(m) {
-    var id = String(m?.id || '').trim();
+    var id = String(m?.id || "").trim();
     var label = m?.label || {};
-    var en = String(label.en || '').trim();
+    var en = String(label.en || "").trim();
     if (!id || id.length > MILESTONE_ID_MAX || !en) return null;
     if (en.length > MILESTONE_NAME_MAX) return null;
-    var ar = String(label.ar || '').trim() || en;
+    var ar = String(label.ar || "").trim() || en;
     return { id: id, label: { en: en, ar: ar.slice(0, MILESTONE_NAME_MAX) } };
   }
 
@@ -101,14 +101,14 @@
     var bad = milestones.some(function (m, i) {
       return !m || ids.indexOf(m.id) !== i;
     });
-    if (bad) return { ok: false, value: null, error: 'bad_progress' };
+    if (bad) return { ok: false, value: null, error: "bad_progress" };
     return {
       ok: true,
       value: {
-        from: String(raw.from || ''),
+        from: String(raw.from || ""),
         milestones: milestones,
-        students: raw.students !== false
-      }
+        students: raw.students !== false,
+      },
     };
   }
 
@@ -160,19 +160,11 @@
       }),
       renamed: list.filter(function (m) {
         var i = copyIds.indexOf(m.id);
-        return (
-          i !== -1 && JSON.stringify(copy[i].label) !== JSON.stringify(m.label)
-        );
-      })
+        return i !== -1 && JSON.stringify(copy[i].label) !== JSON.stringify(m.label);
+      }),
     };
-    out.moved =
-      keptIds(copy, copyIds, listIds).join() !==
-      keptIds(list, copyIds, listIds).join();
-    out.same =
-      !out.added.length &&
-      !out.removed.length &&
-      !out.renamed.length &&
-      !out.moved;
+    out.moved = keptIds(copy, copyIds, listIds).join() !== keptIds(list, copyIds, listIds).join();
+    out.same = !out.added.length && !out.removed.length && !out.renamed.length && !out.moved;
     return out;
   }
 
@@ -204,8 +196,8 @@
     milestonesFromList: milestonesFromList,
     cleanProgress: cleanProgress,
     milestonesDiff: milestonesDiff,
-    marksHidden: marksHidden
+    marksHidden: marksHidden,
   };
   if (node) module.exports = api;
   root.RulesProgress = api;
-})(typeof globalThis !== 'undefined' ? globalThis : this);
+})(typeof globalThis !== "undefined" ? globalThis : this);

@@ -4,7 +4,7 @@
  * when it is left.
  */
 (function (App) {
-  'use strict';
+  "use strict";
 
   var P = App.formPage;
   var h = App.ui.h;
@@ -22,10 +22,10 @@
 
   /** The part that draws the control of each field type; text otherwise. */
   var CONTROLS = {
-    team_size: 'teamSizeControl',
-    members: 'membersControl',
-    slot: 'slotControl',
-    select: 'selectControl'
+    team_size: "teamSizeControl",
+    members: "membersControl",
+    slot: "slotControl",
+    select: "selectControl",
   };
 
   /**
@@ -35,7 +35,7 @@
    * @return {string} The id.
    */
   function fid(path) {
-    return 'f-' + path.replace(/\./g, '-');
+    return "f-" + path.replace(/\./g, "-");
   }
 
   /**
@@ -47,17 +47,15 @@
    * @return {!Element} The label.
    */
   function fieldLabel(field, id) {
-    var chips = field.type === 'select' && P.usesChips(field);
+    var chips = field.type === "select" && P.usesChips(field);
     return h(
-      'label',
+      "label",
       {
-        class: 'label' + (field.type === 'members' ? ' sr-only' : ''),
-        for: chips ? null : id
+        class: "label" + (field.type === "members" ? " sr-only" : ""),
+        for: chips ? null : id,
       },
       L(field.label),
-      field.required === false
-        ? h('span', { class: 'opt' }, '(' + t('optional') + ')')
-        : null
+      field.required === false ? h("span", { class: "opt" }, "(" + t("optional") + ")") : null,
     );
   }
 
@@ -72,18 +70,16 @@
    */
   function renderField(field, path) {
     var id = fid(path);
-    var control = P[CONTROLS[field.type] || 'textControl'](field, path, id);
-    var help = field.help ? L(field.help) : '';
+    var control = P[CONTROLS[field.type] || "textControl"](field, path, id);
+    var help = field.help ? L(field.help) : "";
     var node = h(
-      'div',
-      { class: 'field', dataset: { path: path } },
+      "div",
+      { class: "field", dataset: { path: path } },
       fieldLabel(field, id),
-      help
-        ? h('p', { class: 'help field-desc', id: id + '-help' }, help)
-        : null,
+      help ? h("p", { class: "help field-desc", id: id + "-help" }, help) : null,
       control,
       folderRule(field),
-      h('p', { class: 'error', id: id + '-err', role: 'alert', hidden: true })
+      h("p", { class: "error", id: id + "-err", role: "alert", hidden: true }),
     );
     if (S.errors[path]) paintErrorNode(node, S.errors[path]);
     return node;
@@ -107,8 +103,8 @@
   function folderExample() {
     var fn = folderName();
     return Rules.folderNameExample({
-      project: Rules.valueByRole(S.form, S.data, 'title'),
-      subject: fn?.subject
+      project: Rules.valueByRole(S.form, S.data, "title"),
+      subject: fn?.subject,
     });
   }
 
@@ -121,8 +117,8 @@
    */
   function showsFolderRule(field) {
     var fn = folderName();
-    if (!fn?.enabled || field.type !== 'drive_link') return false;
-    return !field.kinds || field.kinds.indexOf('folder') !== -1;
+    if (!fn?.enabled || field.type !== "drive_link") return false;
+    return !field.kinds || field.kinds.indexOf("folder") !== -1;
   }
 
   /**
@@ -135,21 +131,17 @@
   function folderRule(field) {
     if (!showsFolderRule(field)) return null;
     return h(
-      'p',
-      { class: 'folder-rule' },
-      icon('info', RULE_ICON_SIZE),
-      h(
-        'span',
-        { class: 'folder-rule-text' },
-        t('folderRule', { example: folderExample() })
-      )
+      "p",
+      { class: "folder-rule" },
+      icon("info", RULE_ICON_SIZE),
+      h("span", { class: "folder-rule-text" }, t("folderRule", { example: folderExample() })),
     );
   }
 
   /** Writes the folder rule again after the project title changed. */
   function paintFolderRule() {
-    var el = root.querySelector('.folder-rule-text');
-    if (el) el.textContent = t('folderRule', { example: folderExample() });
+    var el = root.querySelector(".folder-rule-text");
+    if (el) el.textContent = t("folderRule", { example: folderExample() });
   }
 
   /**
@@ -159,10 +151,10 @@
    * @param {?Object} err The error, or null.
    */
   function paintErrorNode(node, err) {
-    var p = node.querySelector(':scope > .error');
+    var p = node.querySelector(":scope > .error");
     if (!p) return;
-    node.classList.toggle('has-error', !!err);
-    p.textContent = err ? App.i18n.err(err) : '';
+    node.classList.toggle("has-error", !!err);
+    p.textContent = err ? App.i18n.err(err) : "";
     p.hidden = !err;
   }
 
@@ -184,12 +176,12 @@
    * @param {string} text The note.
    */
   function hint(input, text) {
-    var field = input.closest('.field');
+    var field = input.closest(".field");
     if (!field) return;
-    var old = field.querySelector(':scope > .hint');
+    var old = field.querySelector(":scope > .hint");
     if (old) old.remove();
-    var el = h('p', { class: 'hint', role: 'status' }, text);
-    field.insertBefore(el, field.querySelector(':scope > .error'));
+    var el = h("p", { class: "hint", role: "status" }, text);
+    field.insertBefore(el, field.querySelector(":scope > .error"));
     setTimeout(function () {
       if (el.parentNode) el.remove();
     }, HINT_MS);

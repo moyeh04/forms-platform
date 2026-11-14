@@ -4,17 +4,17 @@
  * leave it. Loaded last of the shell parts; the page starts it.
  */
 (function (App) {
-  'use strict';
+  "use strict";
 
   var A = App.admin;
   var h = App.ui.h;
   var started = false;
 
   /** The address drawn now, put back when the admin stays on a page. */
-  var shown = '';
+  var shown = "";
 
   /** The pages that belong to the Forms section of the bar. */
-  var FORM_PAGES = ['responses', 'settings', 'create'];
+  var FORM_PAGES = ["responses", "settings", "create"];
 
   /**
    * Reads the page the address names, as `#/`, `#/new`, `#/clients`,
@@ -24,19 +24,19 @@
    *     given.
    */
   function route() {
-    var parts = (window.location.hash || '')
-      .replace(/^#\/?/, '')
-      .split('/')
+    var parts = (window.location.hash || "")
+      .replace(/^#\/?/, "")
+      .split("/")
       .filter(Boolean)
       .map(decodeURIComponent);
-    if (!parts.length) return { name: 'forms', args: [] };
-    if (parts[0] === 'new') return { name: 'create', args: [] };
-    if (parts[0] === 'clients') return { name: 'clients', args: [] };
-    if (parts[0] === 'lists') return { name: 'lists', args: [parts[1] || ''] };
-    if (parts[0] !== 'f' || !parts[1]) return { name: 'forms', args: [] };
+    if (!parts.length) return { name: "forms", args: [] };
+    if (parts[0] === "new") return { name: "create", args: [] };
+    if (parts[0] === "clients") return { name: "clients", args: [] };
+    if (parts[0] === "lists") return { name: "lists", args: [parts[1] || ""] };
+    if (parts[0] !== "f" || !parts[1]) return { name: "forms", args: [] };
     return A.FORM_TABS.indexOf(parts[2]) > 0
-      ? { name: 'settings', args: [parts[1], parts[2]] }
-      : { name: 'responses', args: [parts[1]] };
+      ? { name: "settings", args: [parts[1], parts[2]] }
+      : { name: "responses", args: [parts[1]] };
   }
 
   /**
@@ -48,14 +48,14 @@
    * @return {!Element} The link.
    */
   function navLink(href, text, active) {
-    return h('a', { href: href, 'aria-current': active ? 'page' : null }, text);
+    return h("a", { href: href, "aria-current": active ? "page" : null }, text);
   }
 
   /**
    * Signs this window out and draws the PIN screen.
    */
   function logOut() {
-    App.api.setPin('');
+    App.api.setPin("");
     render();
   }
 
@@ -67,28 +67,28 @@
    */
   function bar(group) {
     return h(
-      'header',
-      { class: 'admin-bar' },
-      h('h1', null, 'Forms dashboard'),
+      "header",
+      { class: "admin-bar" },
+      h("h1", null, "Forms dashboard"),
       h(
-        'nav',
-        { class: 'admin-nav', 'aria-label': 'Sections' },
-        navLink('#/', 'Forms', group === 'forms'),
-        navLink('#/clients', 'Clients', group === 'clients'),
-        navLink('#/lists', 'Lists', group === 'lists')
+        "nav",
+        { class: "admin-nav", "aria-label": "Sections" },
+        navLink("#/", "Forms", group === "forms"),
+        navLink("#/clients", "Clients", group === "clients"),
+        navLink("#/lists", "Lists", group === "lists"),
       ),
       App.ui.themeButton(),
       h(
-        'button',
+        "button",
         {
-          type: 'button',
-          class: 'icon-btn',
-          'aria-label': 'Log out',
-          onclick: logOut
+          type: "button",
+          class: "icon-btn",
+          "aria-label": "Log out",
+          onclick: logOut,
         },
-        App.ui.icon('logout', A.ICON_SIZE.BUTTON),
-        h('span', { class: 'btn-text' }, 'Log out')
-      )
+        App.ui.icon("logout", A.ICON_SIZE.BUTTON),
+        h("span", { class: "btn-text" }, "Log out"),
+      ),
     );
   }
 
@@ -100,26 +100,20 @@
    * @return {!Promise} Settles when the page is drawn.
    */
   async function render() {
-    var root = document.getElementById('app');
+    var root = document.getElementById("app");
     A.unsaved = false;
     App.ui.clear(root);
     if (!App.api.getPin()) return A.loginView(root);
     var r = route();
-    var mount = h(
-      'main',
-      { id: 'main' },
-      h('div', { class: 'loading' }, 'Loading...')
-    );
-    var group = FORM_PAGES.indexOf(r.name) === -1 ? r.name : 'forms';
-    root.appendChild(h('div', { class: 'admin-page' }, bar(group), mount));
+    var mount = h("main", { id: "main" }, h("div", { class: "loading" }, "Loading..."));
+    var group = FORM_PAGES.indexOf(r.name) === -1 ? r.name : "forms";
+    root.appendChild(h("div", { class: "admin-page" }, bar(group), mount));
     try {
       await A.views[r.name].apply(null, [mount].concat(r.args));
     } catch (e) {
       App.ui.clear(mount);
-      mount.appendChild(
-        h('div', { class: 'banner' }, e.message || 'Could not load this page.')
-      );
-      if (e.code === 'bad_pin') logOut();
+      mount.appendChild(h("div", { class: "banner" }, e.message || "Could not load this page."));
+      if (e.code === "bad_pin") logOut();
     }
   }
 
@@ -132,10 +126,10 @@
   async function mayLeave() {
     if (window.location.hash === shown) return false;
     var leave = await App.ui.confirm({
-      title: 'Leave without saving?',
-      body: 'Your changes on this page are not saved.',
-      confirmText: 'Leave',
-      danger: true
+      title: "Leave without saving?",
+      body: "Your changes on this page are not saved.",
+      confirmText: "Leave",
+      danger: true,
     });
     if (!leave) window.location.hash = shown;
     return leave;
@@ -161,7 +155,7 @@
   function onBeforeUnload(e) {
     if (A.unsaved) {
       e.preventDefault();
-      e.returnValue = '';
+      e.returnValue = "";
     }
   }
 
@@ -171,7 +165,7 @@
    * @param {!MouseEvent} e The click.
    */
   function closeMenus(e) {
-    document.querySelectorAll('details.more[open]').forEach(function (d) {
+    document.querySelectorAll("details.more[open]").forEach(function (d) {
       if (!d.contains(e.target)) d.open = false;
     });
   }
@@ -182,7 +176,7 @@
    * @param {string} hash The new address.
    */
   A.setHash = function (hash) {
-    window.history.replaceState(null, '', hash);
+    window.history.replaceState(null, "", hash);
     shown = hash;
   };
 
@@ -196,9 +190,9 @@
     if (!started) {
       started = true;
       shown = window.location.hash;
-      window.addEventListener('hashchange', onHashChange);
-      window.addEventListener('beforeunload', onBeforeUnload);
-      document.addEventListener('click', closeMenus);
+      window.addEventListener("hashchange", onHashChange);
+      window.addEventListener("beforeunload", onBeforeUnload);
+      document.addEventListener("click", closeMenus);
     }
     return render();
   };

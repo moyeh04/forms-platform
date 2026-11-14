@@ -54,7 +54,7 @@ var SheetViewsBuilder = (function () {
     team_registration: teamList_,
     task_submission: teamList_,
     reservation: bookings_,
-    whatsapp_registration: registrations_
+    whatsapp_registration: registrations_,
   };
 
   return { byCreated: byCreated_, VIEW_BUILDERS: VIEW_BUILDERS_ };

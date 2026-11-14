@@ -30,7 +30,7 @@ var DownloadsFiles = (function () {
   var HTTP_SERVER_ERROR = 500;
 
   /** The error a busy answer throws, so `retry` tries it again. */
-  var BUSY_MESSAGE = '429 try again';
+  var BUSY_MESSAGE = "429 try again";
 
   /** The errors that mean Google is busy, not that the call is wrong. */
   var BUSY_ = /rate|too many|quota|429|503|try again|backend error/i;
@@ -41,22 +41,22 @@ var DownloadsFiles = (function () {
 
   /** What a Google file is saved as: its extension and export address. */
   var EXPORTS = {
-    'application/vnd.google-apps.presentation': [
-      'pptx',
-      'https://docs.google.com/presentation/d/{id}/export/pptx'
+    "application/vnd.google-apps.presentation": [
+      "pptx",
+      "https://docs.google.com/presentation/d/{id}/export/pptx",
     ],
-    'application/vnd.google-apps.document': [
-      'docx',
-      'https://docs.google.com/document/d/{id}/export?format=docx'
+    "application/vnd.google-apps.document": [
+      "docx",
+      "https://docs.google.com/document/d/{id}/export?format=docx",
     ],
-    'application/vnd.google-apps.spreadsheet': [
-      'xlsx',
-      'https://docs.google.com/spreadsheets/d/{id}/export?format=xlsx'
+    "application/vnd.google-apps.spreadsheet": [
+      "xlsx",
+      "https://docs.google.com/spreadsheets/d/{id}/export?format=xlsx",
     ],
-    'application/vnd.google-apps.drawing': [
-      'png',
-      'https://docs.google.com/drawings/d/{id}/export/png'
-    ]
+    "application/vnd.google-apps.drawing": [
+      "png",
+      "https://docs.google.com/drawings/d/{id}/export/png",
+    ],
   };
 
   /**
@@ -67,12 +67,12 @@ var DownloadsFiles = (function () {
    * @return {string} The name.
    */
   function safeName(text, fallback) {
-    var s = String(text || '')
-      .replace(BAD_NAME_CHARS_, ' ')
-      .replace(/\s+/g, ' ')
+    var s = String(text || "")
+      .replace(BAD_NAME_CHARS_, " ")
+      .replace(/\s+/g, " ")
       .trim()
-      .replace(/^\.+/, '');
-    return (s || fallback || 'file').slice(0, MAX_NAME_LENGTH_).trim();
+      .replace(/^\.+/, "");
+    return (s || fallback || "file").slice(0, MAX_NAME_LENGTH_).trim();
   }
 
   /**
@@ -120,16 +120,16 @@ var DownloadsFiles = (function () {
    */
   function exportBlob_(file, ex) {
     var resp = retry(function () {
-      var r = UrlFetchApp.fetch(ex[1].replace('{id}', file.getId()), {
-        headers: { Authorization: 'Bearer ' + ScriptApp.getOAuthToken() },
-        muteHttpExceptions: true
+      var r = UrlFetchApp.fetch(ex[1].replace("{id}", file.getId()), {
+        headers: { Authorization: "Bearer " + ScriptApp.getOAuthToken() },
+        muteHttpExceptions: true,
       });
       if (busyStatus(r.getResponseCode())) throw new Error(BUSY_MESSAGE);
       return r;
     });
     var code = resp.getResponseCode();
     if (code !== HTTP_OK) {
-      return { reason: 'Google would not export it (' + code + ')' };
+      return { reason: "Google would not export it (" + code + ")" };
     }
     return { blob: resp.getBlob(), ext: ex[0] };
   }
@@ -145,23 +145,20 @@ var DownloadsFiles = (function () {
     var mime = String(file.getMimeType());
     var ex = EXPORTS[mime];
     if (ex) return exportBlob_(file, ex);
-    if (mime.indexOf('application/vnd.google-apps.') === 0) {
-      return { reason: 'This kind of Google file cannot be downloaded' };
+    if (mime.indexOf("application/vnd.google-apps.") === 0) {
+      return { reason: "This kind of Google file cannot be downloaded" };
     }
     var size = file.getSize();
     if (size > FILE_MAX_BYTES_) {
       return {
-        reason:
-          'Too big to pack (' +
-          Math.round(size / MB_) +
-          ' MB): open it in Drive'
+        reason: "Too big to pack (" + Math.round(size / MB_) + " MB): open it in Drive",
       };
     }
     return {
       blob: retry(function () {
         return file.getBlob();
       }),
-      ext: ''
+      ext: "",
     };
   }
 
@@ -175,8 +172,8 @@ var DownloadsFiles = (function () {
    */
   function fileName(name, ext) {
     var n = safeName(name);
-    var hasExt = new RegExp('\\.' + ext + '$', 'i').test(n);
-    return ext && !hasExt ? n + '.' + ext : n;
+    var hasExt = new RegExp("\\." + ext + "$", "i").test(n);
+    return ext && !hasExt ? n + "." + ext : n;
   }
 
   return {
@@ -187,6 +184,6 @@ var DownloadsFiles = (function () {
     retry,
     busyStatus,
     blobOf,
-    fileName
+    fileName,
   };
 })();

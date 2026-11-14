@@ -4,7 +4,7 @@
  * reads that list.
  */
 (function (App) {
-  'use strict';
+  "use strict";
 
   var A = App.admin;
   var ui = App.ui;
@@ -44,7 +44,7 @@
    * @return {string} The list, or ''.
    */
   function sectionList(s) {
-    var key = '';
+    var key = "";
     (s.f.fields || []).forEach(function (x) {
       [x].concat(x.fields || []).forEach(function (y) {
         if (
@@ -93,16 +93,16 @@
    */
   function majorNote(w) {
     var names = majorNames(w);
-    if (!names.length) return 'Students of every specialization can register.';
+    if (!names.length) return "Students of every specialization can register.";
     if (names.length === 1) {
       return (
-        'Only ' +
+        "Only " +
         names[0] +
-        ' students can register. The Major question is filled in for them' +
-        ' and locked.'
+        " students can register. The Major question is filled in for them" +
+        " and locked."
       );
     }
-    return 'Only ' + names.join(' and ') + ' students can register.';
+    return "Only " + names.join(" and ") + " students can register.";
   }
 
   /**
@@ -113,21 +113,19 @@
    */
   function majorsPart(w) {
     var f = w.f;
-    f.rules.majors = Array.isArray(f.rules.majors)
-      ? f.rules.majors.slice()
-      : [];
-    var note = h('p', { class: 'muted-note' }, majorNote(w));
+    f.rules.majors = Array.isArray(f.rules.majors) ? f.rules.majors.slice() : [];
+    var note = h("p", { class: "muted-note" }, majorNote(w));
     return [
-      h('h3', null, 'Specializations'),
+      h("h3", null, "Specializations"),
       h(
-        'p',
-        { class: 'help' },
-        'The choices come from the Majors list. Students of other' +
-          ' specializations cannot submit.'
+        "p",
+        { class: "help" },
+        "The choices come from the Majors list. Students of other" +
+          " specializations cannot submit.",
       ),
       A.allowPicker({
-        name: 'major',
-        all: 'All specializations',
+        name: "major",
+        all: "All specializations",
         options: w.majors,
         get: function () {
           return f.rules.majors;
@@ -135,9 +133,9 @@
         set: function (v) {
           f.rules.majors = v;
           note.textContent = majorNote(w);
-        }
+        },
       }),
-      note
+      note,
     ];
   }
 
@@ -151,15 +149,15 @@
     var chosen = w.f.rules.sections;
     if (chosen.length) {
       return (
-        'Students choose from ' +
-        A.plural(chosen.length, 'section', 'sections') +
-        '. The other sections are not offered and are refused.'
+        "Students choose from " +
+        A.plural(chosen.length, "section", "sections") +
+        ". The other sections are not offered and are refused."
       );
     }
     return (
-      'Students choose from every section in the list ' +
+      "Students choose from every section in the list " +
       A.listName(sectionList(w.s), w.s.res.listInfo) +
-      '.'
+      "."
     );
   }
 
@@ -180,21 +178,17 @@
     });
     ui.clear(w.help);
     w.help.append(
-      'Pick the sections this form is for; they can be from more than one' +
-        ' year. The choices come from the list ' +
+      "Pick the sections this form is for; they can be from more than one" +
+        " year. The choices come from the list " +
         A.listName(key, w.s.res.listInfo) +
-        '. ',
-      h(
-        'a',
-        { href: '#/lists/' + encodeURIComponent(key) },
-        'Change the sections in Lists.'
-      )
+        ". ",
+      h("a", { href: "#/lists/" + encodeURIComponent(key) }, "Change the sections in Lists."),
     );
     ui.clear(w.box);
     w.box.appendChild(
       A.allowPicker({
-        name: 'section',
-        all: 'All sections',
+        name: "section",
+        all: "All sections",
         options: w.sections,
         groupOf: A.sectionGroup,
         get: function () {
@@ -203,8 +197,8 @@
         set: function (v) {
           f.rules.sections = v;
           w.note.textContent = sectionNote(w);
-        }
-      })
+        },
+      }),
     );
     w.note.textContent = sectionNote(w);
   }
@@ -218,15 +212,13 @@
    */
   function sectionsPart(w) {
     var f = w.f;
-    f.rules.sections = Array.isArray(f.rules.sections)
-      ? f.rules.sections.slice()
-      : [];
-    w.help = h('p', { class: 'help' });
-    w.box = h('div');
-    w.note = h('p', { class: 'muted-note' });
+    f.rules.sections = Array.isArray(f.rules.sections) ? f.rules.sections.slice() : [];
+    w.help = h("p", { class: "help" });
+    w.box = h("div");
+    w.note = h("p", { class: "muted-note" });
     w.s.paintSectionRule = paintSections.bind(null, w);
     w.s.paintSectionRule();
-    return [h('h3', null, 'Sections'), w.help, w.box, w.note];
+    return [h("h3", null, "Sections"), w.help, w.box, w.note];
   }
 
   /**
@@ -240,7 +232,7 @@
     var parts = [];
     var groups = [];
     if (w.majors.length && f.rules.majors.length) {
-      parts.push('Only ' + majorNames(w).join(', '));
+      parts.push("Only " + majorNames(w).join(", "));
     }
     if (w.sections.length && f.rules.sections.length) {
       f.rules.sections.forEach(function (v) {
@@ -248,13 +240,10 @@
         if (groups.indexOf(g) === -1) groups.push(g);
       });
       parts.push(
-        A.plural(f.rules.sections.length, 'section', 'sections') +
-          ' (' +
-          groups.join(', ') +
-          ')'
+        A.plural(f.rules.sections.length, "section", "sections") + " (" + groups.join(", ") + ")",
       );
     }
-    return parts.length ? parts.join(' · ') : 'Everyone';
+    return parts.length ? parts.join(" · ") : "Everyone";
   }
 
   /** Draws no section rule: no section limit is offered. */
@@ -274,8 +263,8 @@
     var w = {
       s: s,
       f: s.f,
-      majors: readsList(s.f, 'majors') ? s.res.lists?.majors || [] : [],
-      sections: optionsOf(s, sectionList(s))
+      majors: readsList(s.f, "majors") ? s.res.lists?.majors || [] : [],
+      sections: optionsOf(s, sectionList(s)),
     };
     s.paintSectionRule = noSections;
     if (!w.majors.length && !w.sections.length) return null;
@@ -283,10 +272,9 @@
     if (w.majors.length) body = body.concat(majorsPart(w));
     if (w.sections.length) body = body.concat(sectionsPart(w));
     var panel = A.panel(
-      'Who can register',
-      'Limit this form to some students. With no limit, every choice of the' +
-        ' list is offered.',
-      body
+      "Who can register",
+      "Limit this form to some students. With no limit, every choice of the" + " list is offered.",
+      body,
     );
     panel.summary = summary.bind(null, w);
     return panel;

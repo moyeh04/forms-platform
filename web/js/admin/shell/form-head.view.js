@@ -3,7 +3,7 @@
  * its status, its link, and what is done to it less often.
  */
 (function (App) {
-  'use strict';
+  "use strict";
 
   var A = App.admin;
   var h = App.ui.h;
@@ -13,10 +13,10 @@
 
   /** The label of each tab of a form. */
   var TAB_LABEL = {
-    responses: 'Responses',
-    questions: 'Questions',
-    timetable: 'Timetable',
-    settings: 'Setup'
+    responses: "Responses",
+    questions: "Questions",
+    timetable: "Timetable",
+    settings: "Setup",
   };
 
   /**
@@ -33,36 +33,29 @@
    */
   A.formTabs = function (form, active, pick, alerts) {
     var ids = A.FORM_TABS.filter(function (id) {
-      return id !== 'timetable' || form.type === FormType.RESERVATION;
+      return id !== "timetable" || form.type === FormType.RESERVATION;
     });
     return h(
-      'nav',
-      { class: 'form-tabs', 'aria-label': 'Parts of this form' },
+      "nav",
+      { class: "form-tabs", "aria-label": "Parts of this form" },
       ids.map(function (id) {
-        var href =
-          '#/f/' +
-          encodeURIComponent(form.slug) +
-          (id === 'responses' ? '' : '/' + id);
+        var href = "#/f/" + encodeURIComponent(form.slug) + (id === "responses" ? "" : "/" + id);
         return h(
-          'a',
+          "a",
           {
             href: href,
-            name: 'tab-' + id,
-            'aria-current': id === active ? 'page' : null,
+            name: "tab-" + id,
+            "aria-current": id === active ? "page" : null,
             onclick: function (e) {
               if (pick?.(id)) e.preventDefault();
-            }
+            },
           },
           TAB_LABEL[id],
           alerts && alerts.indexOf(id) !== -1
-            ? h(
-                'span',
-                { class: 'tab-alert', title: 'Needs your attention' },
-                '!'
-              )
-            : null
+            ? h("span", { class: "tab-alert", title: "Needs your attention" }, "!")
+            : null,
         );
-      })
+      }),
     );
   };
 
@@ -79,23 +72,22 @@
     var was = form.status;
     refused.hidden = true;
     statusSel.disabled = true;
-    A.call('admin.forms.update', {
+    A.call("admin.forms.update", {
       id: form.id,
       base: form.updatedAt,
-      patch: { status: v }
+      patch: { status: v },
     })
       .then(
         function (out) {
           form.status = out.form.status;
           form.updatedAt = out.form.updatedAt;
-          toast('Status saved: ' + A.STATUS_LABEL[form.status], 'ok');
+          toast("Status saved: " + A.STATUS_LABEL[form.status], "ok");
         },
         function (e) {
           statusSel.value = was;
-          refused.textContent =
-            'The status is still ' + A.STATUS_LABEL[was] + '. ' + A.message(e);
+          refused.textContent = "The status is still " + A.STATUS_LABEL[was] + ". " + A.message(e);
           refused.hidden = false;
-        }
+        },
       )
       .then(function () {
         statusSel.disabled = false;
@@ -116,22 +108,19 @@
     var statusSel = A.select(
       form.status,
       A.STATUSES.map(function (st) {
-        return [
-          st,
-          st === FormStatus.DRAFT ? 'Draft (hidden)' : A.STATUS_LABEL[st]
-        ];
+        return [st, st === FormStatus.DRAFT ? "Draft (hidden)" : A.STATUS_LABEL[st]];
       }),
       function (v) {
         saveStatus(form, v, statusSel, refused);
-      }
+      },
     );
-    statusSel.name = 'status';
+    statusSel.name = "status";
     statusSel.dataset.status = form.status;
     return h(
-      'label',
-      { class: 'status-pick' },
-      h('span', { class: 'tool-label' }, 'Status'),
-      statusSel
+      "label",
+      { class: "status-pick" },
+      h("span", { class: "tool-label" }, "Status"),
+      statusSel,
     );
   }
 
@@ -144,34 +133,34 @@
   A.formHead = function (form) {
     var type = A.TYPES[form.type] || { label: form.type };
     var link = A.formLink(form.slug);
-    var refused = h('p', {
-      class: 'error head-note',
-      role: 'alert',
-      hidden: true
+    var refused = h("p", {
+      class: "error head-note",
+      role: "alert",
+      hidden: true,
     });
     return h(
-      'div',
-      { class: 'page-head' },
-      h('h2', null, form.title),
+      "div",
+      { class: "page-head" },
+      h("h2", null, form.title),
       A.termTags(form),
-      h('span', { class: 'muted-note' }, type.label),
+      h("span", { class: "muted-note" }, type.label),
       statusPicker(form, refused),
       h(
-        'a',
+        "a",
         {
-          class: 'btn btn-quiet sm',
+          class: "btn btn-quiet sm",
           href: link,
-          target: '_blank',
-          rel: 'noopener'
+          target: "_blank",
+          rel: "noopener",
         },
-        'Open form'
+        "Open form",
       ),
       A.copyLinkButton(form, link),
       A.formMore(form, function () {
         A.unsaved = false;
-        window.location.hash = '#/';
+        window.location.hash = "#/";
       }),
-      refused
+      refused,
     );
   };
 
@@ -184,19 +173,19 @@
    */
   A.copyLinkButton = function (form, link) {
     return h(
-      'button',
+      "button",
       {
-        type: 'button',
-        class: 'btn btn-quiet sm',
-        name: 'copy-link',
-        'aria-label': 'Copy the link of ' + form.title,
+        type: "button",
+        class: "btn btn-quiet sm",
+        name: "copy-link",
+        "aria-label": "Copy the link of " + form.title,
         onclick: async function () {
           var copied = await App.ui.copyText(link);
-          toast(copied ? 'Form link copied' : 'Could not copy', 'ok');
-        }
+          toast(copied ? "Form link copied" : "Could not copy", "ok");
+        },
       },
-      icon('link', SIZE.LINE),
-      'Copy link'
+      icon("link", SIZE.LINE),
+      "Copy link",
     );
   };
 
@@ -210,10 +199,10 @@
    */
   function menuItem(attrs, iconName, label) {
     return h(
-      'button',
-      Object.assign({ type: 'button', role: 'menuitem' }, attrs),
+      "button",
+      Object.assign({ type: "button", role: "menuitem" }, attrs),
       icon(iconName, SIZE.MENU),
-      label
+      label,
     );
   }
 
@@ -228,56 +217,56 @@
   function moreItems(f, more, afterDelete) {
     var sheet = f.sheetUrl
       ? h(
-          'a',
+          "a",
           {
-            role: 'menuitem',
+            role: "menuitem",
             href: f.sheetUrl,
-            target: '_blank',
-            rel: 'noopener'
+            target: "_blank",
+            rel: "noopener",
           },
-          icon('task', SIZE.MENU),
-          'Open Google Sheet'
+          icon("task", SIZE.MENU),
+          "Open Google Sheet",
         )
       : null;
     var rebuild = menuItem(
       {
-        name: 'rebuild',
+        name: "rebuild",
         title:
-          'Write the tabs of the Google Sheet again from the saved answers.' +
-          ' Use it when the sheet looks out of date.',
+          "Write the tabs of the Google Sheet again from the saved answers." +
+          " Use it when the sheet looks out of date.",
         onclick: function (e) {
           A.busy(e.currentTarget, async function () {
-            await A.call('admin.views.rebuild', { slug: f.slug });
+            await A.call("admin.views.rebuild", { slug: f.slug });
             more.open = false;
-            toast('Google Sheet views rebuilt', 'ok');
+            toast("Google Sheet views rebuilt", "ok");
           });
-        }
+        },
       },
-      'refresh',
-      'Rebuild sheet'
+      "refresh",
+      "Rebuild sheet",
     );
     var duplicate = menuItem(
       {
         onclick: function () {
           more.open = false;
           A.duplicateForm(f);
-        }
+        },
       },
-      'copy',
-      'Duplicate for a new term'
+      "copy",
+      "Duplicate for a new term",
     );
     var remove = menuItem(
       {
-        class: 'danger',
-        name: 'delete-form',
-        'aria-label': 'Delete ' + f.title,
+        class: "danger",
+        name: "delete-form",
+        "aria-label": "Delete " + f.title,
         onclick: function () {
           more.open = false;
           A.deleteForm(f, afterDelete);
-        }
+        },
       },
-      'trash',
-      'Delete form'
+      "trash",
+      "Delete form",
     );
     return [sheet, rebuild, duplicate, remove];
   }
@@ -292,20 +281,20 @@
    * @return {!Element} The menu.
    */
   A.formMore = function (f, afterDelete) {
-    var menu = h('div', { class: 'more-menu', role: 'menu' });
+    var menu = h("div", { class: "more-menu", role: "menu" });
     var more = h(
-      'details',
-      { class: 'more' },
+      "details",
+      { class: "more" },
       h(
-        'summary',
+        "summary",
         {
-          class: 'btn btn-quiet sm',
-          'aria-label': 'More actions for ' + f.title
+          class: "btn btn-quiet sm",
+          "aria-label": "More actions for " + f.title,
         },
-        icon('menu', SIZE.MENU),
-        'More'
+        icon("menu", SIZE.MENU),
+        "More",
       ),
-      menu
+      menu,
     );
     moreItems(f, more, afterDelete).forEach(function (item) {
       if (item) menu.appendChild(item);

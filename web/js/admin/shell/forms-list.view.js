@@ -3,7 +3,7 @@
  * bookings opened with its keys listed under it.
  */
 (function (App) {
-  'use strict';
+  "use strict";
 
   var A = App.admin;
   var h = App.ui.h;
@@ -18,56 +18,47 @@
    * @return {!Element} The card.
    */
   function formCard(f, kids) {
-    var type = A.TYPES[f.type] || { label: f.type, icon: 'task' };
+    var type = A.TYPES[f.type] || { label: f.type, icon: "task" };
     var link = A.formLink(f.slug);
-    var page = '#/f/' + encodeURIComponent(f.slug);
+    var page = "#/f/" + encodeURIComponent(f.slug);
     return h(
-      'article',
+      "article",
       {
-        class: 'card' + (kids.length ? ' has-series' : ''),
-        dataset: { slug: f.slug }
+        class: "card" + (kids.length ? " has-series" : ""),
+        dataset: { slug: f.slug },
       },
       h(
-        'div',
-        { class: 'card-top' },
-        h('span', { class: 'card-icon' }, icon(type.icon, SIZE.CARD)),
-        h(
-          'div',
-          null,
-          h('h4', null, f.title),
-          h('div', { class: 'card-tags' }, A.termTags(f))
-        )
+        "div",
+        { class: "card-top" },
+        h("span", { class: "card-icon" }, icon(type.icon, SIZE.CARD)),
+        h("div", null, h("h4", null, f.title), h("div", { class: "card-tags" }, A.termTags(f))),
       ),
       h(
-        'div',
-        { class: 'actions' },
+        "div",
+        { class: "actions" },
         A.badge(A.STATUS_LABEL[f.status] || f.status, f.status),
-        h('span', { class: 'muted-note' }, type.label),
-        f.type === FormType.RESERVATION ? A.daysNote(f) : null
+        h("span", { class: "muted-note" }, type.label),
+        f.type === FormType.RESERVATION ? A.daysNote(f) : null,
       ),
       h(
-        'div',
-        { class: 'actions card-actions' },
-        h('a', { class: 'btn btn-primary sm', href: page }, 'Responses'),
+        "div",
+        { class: "actions card-actions" },
+        h("a", { class: "btn btn-primary sm", href: page }, "Responses"),
+        h("a", { class: "btn btn-quiet sm", href: page + "/settings" }, "Setup"),
         h(
-          'a',
-          { class: 'btn btn-quiet sm', href: page + '/settings' },
-          'Setup'
-        ),
-        h(
-          'a',
+          "a",
           {
-            class: 'btn btn-quiet sm',
+            class: "btn btn-quiet sm",
             href: link,
-            target: '_blank',
-            rel: 'noopener'
+            target: "_blank",
+            rel: "noopener",
           },
-          'Open form'
+          "Open form",
         ),
         A.copyLinkButton(f, link),
-        A.formMore(f)
+        A.formMore(f),
       ),
-      A.series(f, kids)
+      A.series(f, kids),
     );
   }
 
@@ -78,15 +69,10 @@
    */
   function listHead() {
     return h(
-      'div',
-      { class: 'page-head' },
-      h('h2', null, 'Forms'),
-      h(
-        'a',
-        { class: 'btn btn-primary', href: '#/new' },
-        icon('plus', SIZE.BUTTON),
-        'New form'
-      )
+      "div",
+      { class: "page-head" },
+      h("h2", null, "Forms"),
+      h("a", { class: "btn btn-primary", href: "#/new" }, icon("plus", SIZE.BUTTON), "New form"),
     );
   }
 
@@ -101,21 +87,21 @@
    */
   function statusGroup(st, group, kidsOf) {
     return h(
-      'section',
-      { class: 'form-group', dataset: { status: st } },
+      "section",
+      { class: "form-group", dataset: { status: st } },
       h(
-        'h3',
-        { class: 'group-title' },
+        "h3",
+        { class: "group-title" },
         A.STATUS_LABEL[st],
-        h('span', { class: 'group-count' }, String(group.length))
+        h("span", { class: "group-count" }, String(group.length)),
       ),
       h(
-        'div',
-        { class: 'cards' },
+        "div",
+        { class: "cards" },
         group.map(function (f) {
           return formCard(f, kidsOf(f));
-        })
-      )
+        }),
+      ),
     );
   }
 
@@ -127,7 +113,7 @@
    * @param {!Element} mount Where the page is drawn.
    */
   A.views.forms = async function (mount) {
-    var res = await A.call('admin.forms.list');
+    var res = await A.call("admin.forms.list");
     var forms = res.forms.slice().sort(function (a, b) {
       return String(b.createdAt).localeCompare(String(a.createdAt));
     });
@@ -136,10 +122,10 @@
     if (!forms.length) {
       mount.appendChild(
         h(
-          'div',
-          { class: 'empty' },
-          'No forms yet. Create the first one and choose what it collects.'
-        )
+          "div",
+          { class: "empty" },
+          "No forms yet. Create the first one and choose what it collects.",
+        ),
       );
       return;
     }
@@ -155,7 +141,7 @@
      */
     function under(f) {
       var src = A.bookedBy(f);
-      return src && ids.indexOf(src) !== -1 ? src : '';
+      return src && ids.indexOf(src) !== -1 ? src : "";
     }
 
     var cards = forms.filter(function (f) {
@@ -172,7 +158,7 @@
           return forms.filter(function (k) {
             return under(k) === f.id;
           });
-        })
+        }),
       );
     });
   };

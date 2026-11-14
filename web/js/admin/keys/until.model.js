@@ -3,7 +3,7 @@
  * end of a picked day, and where a key ends once it is given more time.
  */
 (function (App) {
-  'use strict';
+  "use strict";
 
   var A = App.admin;
 
@@ -24,11 +24,11 @@
    */
   A.day = function (iso) {
     var d = new Date(iso);
-    if (Number.isNaN(d.getTime())) return '';
-    return d.toLocaleDateString('en-GB', {
-      day: 'numeric',
-      month: 'short',
-      year: 'numeric'
+    if (Number.isNaN(d.getTime())) return "";
+    return d.toLocaleDateString("en-GB", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
     });
   };
 
@@ -49,14 +49,8 @@
    * @return {string} The moment it ends.
    */
   A.endOfDay = function (value) {
-    var p = String(value).split('-').map(Number);
-    return new Date(
-      p[0],
-      p[1] - 1,
-      p[2],
-      END_OF_DAY.HOUR,
-      END_OF_DAY.MINUTE
-    ).toISOString();
+    var p = String(value).split("-").map(Number);
+    return new Date(p[0], p[1] - 1, p[2], END_OF_DAY.HOUR, END_OF_DAY.MINUTE).toISOString();
   };
 
   /**
@@ -68,10 +62,10 @@
   A.dateValue = function (d) {
     return (
       d.getFullYear() +
-      '-' +
-      ('0' + (d.getMonth() + 1)).slice(-2) +
-      '-' +
-      ('0' + d.getDate()).slice(-2)
+      "-" +
+      ("0" + (d.getMonth() + 1)).slice(-2) +
+      "-" +
+      ("0" + d.getDate()).slice(-2)
     );
   };
 
@@ -84,11 +78,11 @@
    * @return {string} The new end, or '' for none.
    */
   A.extendedEnd = function (current, choice) {
-    if (!choice) return '';
+    if (!choice) return "";
     if (choice.until) return choice.until;
-    if (choice.none) return '';
+    if (choice.none) return "";
     return new Date(
-      Math.max(Date.now(), Date.parse(current) || 0) + choice.days * DAY_MS
+      Math.max(Date.now(), Date.parse(current) || 0) + choice.days * DAY_MS,
     ).toISOString();
   };
 })(window.App);

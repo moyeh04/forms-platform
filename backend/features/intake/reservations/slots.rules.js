@@ -20,7 +20,7 @@ var SlotsRules = (function () {
   function cleanTimes_(times) {
     var out = [];
     (times || []).forEach(function (t) {
-      t = String(t).replace(/\s+/g, ' ').trim();
+      t = String(t).replace(/\s+/g, " ").trim();
       if (t && out.indexOf(t) === -1) out.push(t);
     });
     return out;
@@ -38,26 +38,19 @@ var SlotsRules = (function () {
    *     times.
    */
   function cleanDay_(d, seen) {
-    var label = String(d.label || '').trim();
+    var label = String(d.label || "").trim();
     if (!label)
-      ApiError.fail(
-        'bad_slots',
-        'Every day needs a name, for example "Week 11 - Sunday".'
-      );
+      ApiError.fail("bad_slots", 'Every day needs a name, for example "Week 11 - Sunday".');
     var id = Text.slugify(d.id || label);
     var base = id;
     var n = 2;
-    while (seen[id]) id = base + '-' + n++;
+    while (seen[id]) id = base + "-" + n++;
     seen[id] = true;
-    var date = String(d.date || '').trim();
+    var date = String(d.date || "").trim();
     if (!ISO_DATE_.test(date))
-      ApiError.fail(
-        'bad_slots',
-        '"' + label + '" needs a date that looks like 2027-11-14.'
-      );
+      ApiError.fail("bad_slots", '"' + label + '" needs a date that looks like 2027-11-14.');
     var times = cleanTimes_(d.times);
-    if (!times.length)
-      ApiError.fail('bad_slots', '"' + label + '" has no time slots.');
+    if (!times.length) ApiError.fail("bad_slots", '"' + label + '" has no time slots.');
     return { id: id, label: label, date: date, times: times };
   }
 
@@ -75,7 +68,7 @@ var SlotsRules = (function () {
       start: String(p.start),
       end: String(p.end),
       length: Math.max(1, parseInt(p.length, 10) || DEFAULT_SLOT_MINUTES_),
-      gap: Math.max(0, parseInt(p.gap, 10) || 0)
+      gap: Math.max(0, parseInt(p.gap, 10) || 0),
     };
   }
 
@@ -94,7 +87,7 @@ var SlotsRules = (function () {
       days: (slots?.days || []).map(function (d) {
         return cleanDay_(d, seen);
       }),
-      capacity: capacity
+      capacity: capacity,
     };
     var pattern = cleanPattern_(slots?.pattern);
     if (pattern) result.pattern = pattern;
@@ -124,20 +117,20 @@ var SlotsRules = (function () {
    *     the day of the form or null when it is gone.
    */
   function slotParts_(form, key) {
-    var parts = String(key).split('|');
+    var parts = String(key).split("|");
     var day = (form.slots?.days || []).filter(function (d) {
       return d.id === parts[0];
     })[0];
     return {
       dayId: parts[0],
-      time: parts.slice(1).join('|'),
-      day: day || null
+      time: parts.slice(1).join("|"),
+      day: day || null,
     };
   }
 
   return {
     slotParts: slotParts_,
     slotAvailability: slotAvailability_,
-    normalizeSlots: normalizeSlots_
+    normalizeSlots: normalizeSlots_,
   };
 })();

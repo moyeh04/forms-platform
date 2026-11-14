@@ -1,13 +1,7 @@
-const test = require('node:test');
-const assert = require('node:assert/strict');
-const { settle } = require('../harness/dom.js');
-const {
-  boot,
-  open,
-  AR_NAME,
-  fillAbout,
-  fillStudy
-} = require('../harness/form-page.js');
+const test = require("node:test");
+const assert = require("node:assert/strict");
+const { settle } = require("../harness/dom.js");
+const { boot, open, AR_NAME, fillAbout, fillStudy } = require("../harness/form-page.js");
 
 /**
  * Opens a reservation at its time slot step.
@@ -17,13 +11,13 @@ const {
  */
 async function atSlots(w) {
   const p = await open(w);
-  await fillAbout(p, '4230002');
+  await fillAbout(p, "4230002");
   p.submitForm();
   await settle();
   await fillStudy(p);
   p.submitForm();
   await settle();
-  p.type('[name="title"]', 'Project 1');
+  p.type('[name="title"]', "Project 1");
   p.submitForm();
   await settle();
   return p;
@@ -37,72 +31,72 @@ async function atSlots(w) {
  * @return {?Element} The button.
  */
 function dayButton(p, label) {
-  return p.$$('.cal-date.is-day').find((b) => b.title === label) || null;
+  return p.$$(".cal-date.is-day").find((b) => b.title === label) || null;
 }
 
-test('Slot calendar: a date is picked first, then a time', async () => {
-  const w = boot('reservation', {
+test("Slot calendar: a date is picked first, then a time", async () => {
+  const w = boot("reservation", {
     slots: {
       days: [
-        { label: 'Day 1', date: '2027-11-14', times: ['10:00 - 10:20'] },
-        { label: 'Day 2', date: '2027-12-05', times: ['11:00 - 11:20'] }
+        { label: "Day 1", date: "2027-11-14", times: ["10:00 - 10:20"] },
+        { label: "Day 2", date: "2027-12-05", times: ["11:00 - 11:20"] },
       ],
-      capacity: 1
-    }
+      capacity: 1,
+    },
   });
   w.api({
-    action: 'submit',
+    action: "submit",
     slug: w.form.slug,
     data: {
-      email: 'a@b.com',
+      email: "a@b.com",
       leader_name: AR_NAME,
-      leader_code: '4230001',
-      phone: '01012345678',
-      major: 'حاسبات',
-      level: 'صفر / الأولى',
-      section: '4C-TH1',
-      curriculum: '2020',
-      title: 'Taken',
-      slot: { day: 'day-1', time: '10:00 - 10:20' }
-    }
+      leader_code: "4230001",
+      phone: "01012345678",
+      major: "حاسبات",
+      level: "صفر / الأولى",
+      section: "4C-TH1",
+      curriculum: "2020",
+      title: "Taken",
+      slot: { day: "day-1", time: "10:00 - 10:20" },
+    },
   });
   const p = await atSlots(w);
-  assert.equal(p.$$('.cal-wd').length, 7, 'a week has seven columns');
-  assert.equal(p.$$('.slot-chip.time').length, 0, 'no times before a day');
+  assert.equal(p.$$(".cal-wd").length, 7, "a week has seven columns");
+  assert.equal(p.$$(".slot-chip.time").length, 0, "no times before a day");
   assert.ok(
-    p.$('.cal-month').textContent.includes('November'),
-    'it opens on the month nearest today, with nothing picked'
+    p.$(".cal-month").textContent.includes("November"),
+    "it opens on the month nearest today, with nothing picked",
   );
   assert.equal(p.$$('.cal-date[aria-pressed="true"]').length, 0);
-  assert.equal(dayButton(p, 'Day 1').disabled, true, 'a full day is shut');
-  assert.equal(p.$$('.cal-grid .cal-date').length, 30);
+  assert.equal(dayButton(p, "Day 1").disabled, true, "a full day is shut");
+  assert.equal(p.$$(".cal-grid .cal-date").length, 30);
   p.click(p.$('[name="month-next"]'));
   await settle();
-  p.click(dayButton(p, 'Day 2'));
+  p.click(dayButton(p, "Day 2"));
   await settle();
-  assert.equal(dayButton(p, 'Day 2').getAttribute('aria-pressed'), 'true');
-  const times = p.$$('.slot-chip.time');
+  assert.equal(dayButton(p, "Day 2").getAttribute("aria-pressed"), "true");
+  const times = p.$$(".slot-chip.time");
   assert.equal(times.length, 1);
-  assert.ok(times[0].textContent.includes('11:00 - 11:20'));
+  assert.ok(times[0].textContent.includes("11:00 - 11:20"));
 });
 
-test('Slot calendar: a day that is over is greyed out', async () => {
-  const w = boot('reservation', {
+test("Slot calendar: a day that is over is greyed out", async () => {
+  const w = boot("reservation", {
     slots: {
       days: [
-        { label: 'Day 1', date: '2020-01-05', times: ['10:00 - 10:20'] },
-        { label: 'Day 2', date: '2020-01-12', times: ['11:00 - 11:20'] }
+        { label: "Day 1", date: "2020-01-05", times: ["10:00 - 10:20"] },
+        { label: "Day 2", date: "2020-01-12", times: ["11:00 - 11:20"] },
       ],
-      capacity: 1
-    }
+      capacity: 1,
+    },
   });
   const p = await atSlots(w);
-  const past = dayButton(p, 'Day 1');
+  const past = dayButton(p, "Day 1");
   assert.equal(past.disabled, true);
-  assert.ok(past.classList.contains('is-past'), 'grey, not the red X');
-  assert.ok(past.getAttribute('aria-label').includes('The day has passed'));
+  assert.ok(past.classList.contains("is-past"), "grey, not the red X");
+  assert.ok(past.getAttribute("aria-label").includes("The day has passed"));
   assert.ok(
-    p.$('.cal-month').textContent.includes('January 2020'),
-    'today is after the timetable, so it opens on its last month'
+    p.$(".cal-month").textContent.includes("January 2020"),
+    "today is after the timetable, so it opens on its last month",
   );
 });

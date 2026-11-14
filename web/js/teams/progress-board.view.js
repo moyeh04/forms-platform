@@ -6,7 +6,7 @@
  * progress-mark.view.js. The counts come from Rules; this file only draws.
  */
 (function (App) {
-  'use strict';
+  "use strict";
 
   var ui = App.ui;
   var h = ui.h;
@@ -18,7 +18,7 @@
   var NOTE_ICON = 12;
 
   /** Where the tab keeps whether a form shows Teams or Progress. */
-  var VIEW_KEY = 'progress-view:';
+  var VIEW_KEY = "progress-view:";
 
   /**
    * Reads whether a form showed Teams or Progress last in this tab.
@@ -28,9 +28,9 @@
    */
   P.savedView = function (slug) {
     try {
-      return window.sessionStorage.getItem(VIEW_KEY + slug) || 'teams';
+      return window.sessionStorage.getItem(VIEW_KEY + slug) || "teams";
     } catch (_e) {
-      return 'teams';
+      return "teams";
     }
   };
 
@@ -44,19 +44,19 @@
    */
   P.viewSwitch = function (slug, view, pick) {
     return h(
-      'div',
-      { class: 'seg', role: 'group', 'aria-label': 'Show' },
+      "div",
+      { class: "seg", role: "group", "aria-label": "Show" },
       [
-        ['teams', 'Teams'],
-        ['progress', 'Progress']
+        ["teams", "Teams"],
+        ["progress", "Progress"],
       ].map(function (x) {
         return h(
-          'button',
+          "button",
           {
-            type: 'button',
-            class: 'btn sm ' + (view === x[0] ? 'btn-primary' : 'btn-quiet'),
-            name: 'view-' + x[0],
-            'aria-pressed': view === x[0] ? 'true' : 'false',
+            type: "button",
+            class: "btn sm " + (view === x[0] ? "btn-primary" : "btn-quiet"),
+            name: "view-" + x[0],
+            "aria-pressed": view === x[0] ? "true" : "false",
             onclick: function () {
               try {
                 window.sessionStorage.setItem(VIEW_KEY + slug, x[0]);
@@ -64,11 +64,11 @@
                 // The choice lasts until the page is drawn again.
               }
               pick(x[0]);
-            }
+            },
           },
-          x[1]
+          x[1],
         );
-      })
+      }),
     );
   };
 
@@ -81,7 +81,7 @@
   function formOf(milestones) {
     return {
       type: FormType.TEAM_REGISTRATION,
-      progress: { milestones: milestones }
+      progress: { milestones: milestones },
     };
   }
 
@@ -94,7 +94,7 @@
    */
   P.countText = function (milestones, progress) {
     var c = Rules.progressCount(formOf(milestones), progress);
-    return c.discussed + ' of ' + c.total + ' discussed';
+    return c.discussed + " of " + c.total + " discussed";
   };
 
   /**
@@ -119,15 +119,15 @@
    * @return {string} The description.
    */
   function cellLabel(team, m, mark) {
-    var notes = [mark.t, mark.p].filter(Boolean).join(' / ');
+    var notes = [mark.t, mark.p].filter(Boolean).join(" / ");
     return (
-      'Team ' +
+      "Team " +
       team.number +
-      ', ' +
+      ", " +
       m.label.en +
-      ': ' +
+      ": " +
       P.word(mark.s) +
-      (notes ? '. Note: ' + notes : '')
+      (notes ? ". Note: " + notes : "")
     );
   }
 
@@ -144,27 +144,27 @@
     var mark = Rules.markOf(team.progress, m.id);
     var label = cellLabel(team, m, mark);
     var inner = [
-      h('span', { class: 'pdot', 'aria-hidden': 'true' }),
-      mark.t || mark.p ? icon('note', NOTE_ICON) : null
+      h("span", { class: "pdot", "aria-hidden": "true" }),
+      mark.t || mark.p ? icon("note", NOTE_ICON) : null,
     ];
     var open = b.canMark || mark.t || mark.p;
     var node = open
       ? h(
-          'button',
+          "button",
           {
-            type: 'button',
-            class: 'pcell is-' + mark.s,
-            name: 'cell-' + team.number + '-' + m.id,
-            'aria-label': label,
+            type: "button",
+            class: "pcell is-" + mark.s,
+            name: "cell-" + team.number + "-" + m.id,
+            "aria-label": label,
             title: label,
             onclick: function () {
               P.open(b, team, m);
-            }
+            },
           },
-          inner
+          inner,
         )
-      : h('span', { class: 'pcell is-' + mark.s, title: label }, inner);
-    return h('td', null, node);
+      : h("span", { class: "pcell is-" + mark.s, title: label }, inner);
+    return h("td", null, node);
   }
 
   /**
@@ -176,49 +176,42 @@
   function table(b) {
     var ms = b.milestones;
     var head = h(
-      'tr',
+      "tr",
       null,
-      h('th', { scope: 'col' }, 'Team'),
+      h("th", { scope: "col" }, "Team"),
       ms.map(function (m) {
         return h(
-          'th',
-          { scope: 'col' },
-          h('span', { dir: 'auto' }, m.label.en),
+          "th",
+          { scope: "col" },
+          h("span", { dir: "auto" }, m.label.en),
           h(
-            'span',
-            { class: 'muted-note' },
-            discussedBy(b.teams, m.id) + ' of ' + b.teams.length + ' discussed'
-          )
+            "span",
+            { class: "muted-note" },
+            discussedBy(b.teams, m.id) + " of " + b.teams.length + " discussed",
+          ),
         );
       }),
-      h('th', { scope: 'col' }, 'Discussed')
+      h("th", { scope: "col" }, "Discussed"),
     );
     var rows = b.teams.map(function (t) {
       var c = Rules.progressCount(formOf(ms), t.progress);
       return h(
-        'tr',
+        "tr",
         { dataset: { team: String(t.number) } },
         h(
-          'th',
-          { scope: 'row' },
-          'Team ' + t.number,
-          t.title
-            ? h('span', { class: 'muted-note', dir: 'auto' }, t.title)
-            : null
+          "th",
+          { scope: "row" },
+          "Team " + t.number,
+          t.title ? h("span", { class: "muted-note", dir: "auto" }, t.title) : null,
         ),
         ms.map(cell.bind(null, b, t)),
-        h('td', { class: 'pcount' }, c.discussed + ' of ' + c.total)
+        h("td", { class: "pcount" }, c.discussed + " of " + c.total),
       );
     });
     return h(
-      'div',
-      { class: 'progress-scroll' },
-      h(
-        'table',
-        { class: 'progress-table' },
-        h('thead', null, head),
-        h('tbody', null, rows)
-      )
+      "div",
+      { class: "progress-scroll" },
+      h("table", { class: "progress-table" }, h("thead", null, head), h("tbody", null, rows)),
     );
   }
 
@@ -250,58 +243,56 @@
     var mark = Rules.markOf(team.progress, m.id);
     var states = b.canMark
       ? h(
-          'span',
+          "span",
           {
-            class: 'progress-states',
-            role: 'radiogroup',
-            'aria-label': 'State'
+            class: "progress-states",
+            role: "radiogroup",
+            "aria-label": "State",
           },
           P.STATES.map(function (x) {
             return h(
-              'button',
+              "button",
               {
-                type: 'button',
-                role: 'radio',
-                class: 'toggle-chip sm state-' + x[0],
-                name: 'line-' + team.number + '-' + x[0],
-                'aria-checked': mark.s === x[0] ? 'true' : 'false',
+                type: "button",
+                role: "radio",
+                class: "toggle-chip sm state-" + x[0],
+                name: "line-" + team.number + "-" + x[0],
+                "aria-checked": mark.s === x[0] ? "true" : "false",
                 onclick: function () {
                   P.change(b, team, m.id, { state: x[0] });
-                }
+                },
               },
-              x[1]
+              x[1],
             );
-          })
+          }),
         )
-      : h('span', { class: 'pstate is-' + mark.s }, P.word(mark.s));
+      : h("span", { class: "pstate is-" + mark.s }, P.word(mark.s));
     return h(
-      'li',
-      { class: 'progress-line', dataset: { team: String(team.number) } },
+      "li",
+      { class: "progress-line", dataset: { team: String(team.number) } },
       h(
-        'div',
-        { class: 'progress-line-head' },
-        h('strong', null, 'Team ' + team.number),
-        team.title
-          ? h('span', { class: 'muted-note', dir: 'auto' }, team.title)
-          : null
+        "div",
+        { class: "progress-line-head" },
+        h("strong", null, "Team " + team.number),
+        team.title ? h("span", { class: "muted-note", dir: "auto" }, team.title) : null,
       ),
       states,
       b.canMark || mark.t || mark.p
         ? h(
-            'button',
+            "button",
             {
-              type: 'button',
-              class: 'icon-btn sm',
-              name: 'notes-' + team.number,
-              'aria-label': 'Notes of team ' + team.number,
+              type: "button",
+              class: "icon-btn sm",
+              name: "notes-" + team.number,
+              "aria-label": "Notes of team " + team.number,
               onclick: function () {
                 P.open(b, team, m);
-              }
+              },
             },
-            icon('note', NOTE_ICON)
+            icon("note", NOTE_ICON),
           )
         : null,
-      mark.t ? h('p', { class: 'progress-note', dir: 'auto' }, mark.t) : null
+      mark.t ? h("p", { class: "progress-note", dir: "auto" }, mark.t) : null,
     );
   }
 
@@ -320,35 +311,31 @@
       return phone(b);
     }
     var sel = h(
-      'select',
+      "select",
       {
-        class: 'select',
-        name: 'progress-milestone',
-        'aria-label': 'Milestone',
+        class: "select",
+        name: "progress-milestone",
+        "aria-label": "Milestone",
         onchange: function (e) {
           b.view.picked = e.target.value;
           b.paint();
-        }
+        },
       },
       b.milestones.map(function (x) {
-        return h(
-          'option',
-          { value: x.id, selected: x.id === m.id },
-          x.label.en
-        );
-      })
+        return h("option", { value: x.id, selected: x.id === m.id }, x.label.en);
+      }),
     );
     return h(
-      'div',
-      { class: 'progress-phone' },
+      "div",
+      { class: "progress-phone" },
       sel,
       h(
-        'ol',
-        { class: 'progress-lines' },
+        "ol",
+        { class: "progress-lines" },
         b.teams.map(function (t) {
           return phoneLine(b, t, m);
-        })
-      )
+        }),
+      ),
     );
   }
 
@@ -363,12 +350,12 @@
    */
   P.board = function (o) {
     var b = Object.assign({ queue: {}, view: {} }, o);
-    var node = h('div', { class: 'progress-board' });
+    var node = h("div", { class: "progress-board" });
     /** Draws the board again from the marks of its teams. */
     b.paint = function () {
       ui.clear(node);
       if (!b.teams.length) {
-        node.appendChild(h('div', { class: 'empty' }, 'No teams to show.'));
+        node.appendChild(h("div", { class: "empty" }, "No teams to show."));
         return;
       }
       node.appendChild(table(b));

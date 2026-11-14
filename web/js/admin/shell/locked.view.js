@@ -5,7 +5,7 @@
  * since the lock means the PIN was never given.
  */
 (function (App) {
-  'use strict';
+  "use strict";
 
   var A = App.admin;
   var h = App.ui.h;
@@ -14,19 +14,19 @@
   var MS_PER_SECOND = 1000;
 
   /** The picture as base64 text, fetched only when the lock screen opens. */
-  var IMAGE_SRC = 'assets/img/locked-image.txt';
+  var IMAGE_SRC = "assets/img/locked-image.txt";
 
   /** What turns the fetched text into a picture the page can show. */
-  var IMAGE_PREFIX = 'data:image/webp;base64,';
+  var IMAGE_PREFIX = "data:image/webp;base64,";
 
   /** How the message stands out in the browser console. */
-  var CONSOLE_STYLE = 'font-weight: bold; font-size: 1.25em;';
+  var CONSOLE_STYLE = "font-weight: bold; font-size: 1.25em;";
 
   /** A time inside a message, as the backend writes it. */
   var CLOCK_RE = /\d\d:\d\d:\d\d/;
 
   /** The padding that gives a number two digits. */
-  var TWO_DIGITS = '00';
+  var TWO_DIGITS = "00";
 
   /** The fetch of the picture, once it has started. */
   var imageLoad = null;
@@ -49,9 +49,7 @@
    */
   function clockText(seconds) {
     var m = Math.floor(seconds / 60);
-    return (
-      two(Math.floor(m / 60)) + ':' + two(m % 60) + ':' + two(seconds % 60)
-    );
+    return two(Math.floor(m / 60)) + ":" + two(m % 60) + ":" + two(seconds % 60);
   }
 
   /**
@@ -112,14 +110,14 @@
       imageLoad ||
       fetch(IMAGE_SRC)
         .then(function (res) {
-          return res.ok ? res.text() : '';
+          return res.ok ? res.text() : "";
         })
         .then(function (text) {
-          return text ? IMAGE_PREFIX + text.trim() : '';
+          return text ? IMAGE_PREFIX + text.trim() : "";
         })
         .catch(function () {
           imageLoad = null;
-          return '';
+          return "";
         });
     return imageLoad;
   }
@@ -134,29 +132,25 @@
    *     down and the two buttons.
    */
   function messageLines(error, close) {
-    var img = h('img', { class: 'locked-image t-stagger-line', alt: '' });
+    var img = h("img", { class: "locked-image t-stagger-line", alt: "" });
     img.hidden = true;
     loadImage().then(function (src) {
       if (!src) return;
       img.src = src;
       img.hidden = false;
     });
-    var time = h('p', {
-      class: 'locked-time t-stagger-line t-stagger-line--2'
+    var time = h("p", {
+      class: "locked-time t-stagger-line t-stagger-line--2",
     });
     var said = error.message.split(/\n\s*\n/).map(function (part) {
-      var cls = 'locked-message t-stagger-line t-stagger-line--2';
-      return h('p', { class: cls }, part.trim());
+      var cls = "locked-message t-stagger-line t-stagger-line--2";
+      return h("p", { class: cls }, part.trim());
     });
-    var sorry = ['Sorry', 'Sorry'].map(function (label, i) {
-      var cls = i ? 'btn btn-quiet' : 'btn btn-primary';
-      return h('button', { type: 'button', class: cls, onclick: close }, label);
+    var sorry = ["Sorry", "Sorry"].map(function (label, i) {
+      var cls = i ? "btn btn-quiet" : "btn btn-primary";
+      return h("button", { type: "button", class: cls, onclick: close }, label);
     });
-    var actions = h(
-      'div',
-      { class: 'dialog-actions t-stagger-line locked-late' },
-      sorry
-    );
+    var actions = h("div", { class: "dialog-actions t-stagger-line locked-late" }, sorry);
     return { lines: [img].concat(said, [time, actions]), time, sorry };
   }
 
@@ -167,18 +161,18 @@
    *     backdrop, the modal and the body its lines go in.
    */
   function frame() {
-    var body = h('div', { class: 't-stagger' });
+    var body = h("div", { class: "t-stagger" });
     var box = h(
-      'div',
+      "div",
       {
-        class: 'dialog locked t-modal',
-        role: 'dialog',
-        'aria-modal': 'true',
-        'aria-labelledby': 'locked-title'
+        class: "dialog locked t-modal",
+        role: "dialog",
+        "aria-modal": "true",
+        "aria-labelledby": "locked-title",
       },
-      body
+      body,
     );
-    return { overlay: h('div', { class: 'overlay' }, box), box, body };
+    return { overlay: h("div", { class: "overlay" }, box), box, body };
   }
 
   /**
@@ -188,10 +182,10 @@
    * @param {!Array<!Element>} lines The lines.
    */
   function show(body, lines) {
-    body.classList.remove('is-shown');
+    body.classList.remove("is-shown");
     body.replaceChildren.apply(body, lines);
     void body.offsetWidth;
-    body.classList.add('is-shown');
+    body.classList.add("is-shown");
   }
 
   /**
@@ -204,12 +198,12 @@
    */
   function closer(ui, back) {
     var root = getComputedStyle(document.documentElement);
-    var closeMs = parseFloat(root.getPropertyValue('--modal-close-dur')) || 0;
+    var closeMs = parseFloat(root.getPropertyValue("--modal-close-dur")) || 0;
     /** Closes the screen once its closing motion has played. */
     function close() {
-      document.removeEventListener('keydown', onKey);
-      ui.box.classList.remove('is-open');
-      ui.box.classList.add('is-closing');
+      document.removeEventListener("keydown", onKey);
+      ui.box.classList.remove("is-open");
+      ui.box.classList.add("is-closing");
       if (closeMs) setTimeout(ui.overlay.remove.bind(ui.overlay), closeMs);
       else ui.overlay.remove();
       back.focus();
@@ -221,9 +215,9 @@
      * @param {!KeyboardEvent} e The key pressed.
      */
     function onKey(e) {
-      if (e.key === 'Escape') close();
+      if (e.key === "Escape") close();
     }
-    document.addEventListener('keydown', onKey);
+    document.addEventListener("keydown", onKey);
     return close;
   }
 
@@ -238,7 +232,7 @@
     var parts = messageLines(error, close);
     show(body, parts.lines);
     A.countdown(parts.time, A.lockEnd(error), function (t) {
-      return 'Time left ' + t;
+      return "Time left " + t;
     });
     parts.sorry[0].focus();
   }
@@ -255,27 +249,23 @@
     var ui = frame();
     var close = closer(ui, back);
     var go = h(
-      'button',
+      "button",
       {
-        type: 'button',
-        class: 'btn btn-primary',
-        onclick: reveal.bind(null, error, ui.body, close)
+        type: "button",
+        class: "btn btn-primary",
+        onclick: reveal.bind(null, error, ui.body, close),
       },
-      'Continue to the dashboard'
+      "Continue to the dashboard",
     );
-    console.log('%c' + error.message, CONSOLE_STYLE);
+    console.log("%c" + error.message, CONSOLE_STYLE);
     loadImage();
     show(ui.body, [
-      h(
-        'h2',
-        { class: 'dialog-title t-stagger-line', id: 'locked-title' },
-        'Welcome, funny kid'
-      ),
-      h('div', { class: 'dialog-actions t-stagger-line locked-late' }, go)
+      h("h2", { class: "dialog-title t-stagger-line", id: "locked-title" }, "Welcome, funny kid"),
+      h("div", { class: "dialog-actions t-stagger-line locked-late" }, go),
     ]);
     document.body.appendChild(ui.overlay);
     void ui.box.offsetWidth;
-    ui.box.classList.add('is-open');
+    ui.box.classList.add("is-open");
     go.focus();
   };
 })(window.App);

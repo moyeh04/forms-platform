@@ -19,9 +19,7 @@ var FormsRules = (function () {
   function cleanLists_(merged) {
     FormsPublic.LIMITED_LISTS.forEach(function (list) {
       if (merged[list] === undefined) return;
-      merged[list] = Array.isArray(merged[list])
-        ? merged[list].map(String).filter(Boolean)
-        : [];
+      merged[list] = Array.isArray(merged[list]) ? merged[list].map(String).filter(Boolean) : [];
     });
   }
 
@@ -39,10 +37,10 @@ var FormsRules = (function () {
     var max = parseInt(merged.teamSize?.max, DECIMAL_);
     if (!(min >= 1) || !(max >= min) || max > MAX_TEAM_) {
       ApiError.fail(
-        'bad_team_size',
-        'Team size must be between 1 and ' +
+        "bad_team_size",
+        "Team size must be between 1 and " +
           MAX_TEAM_ +
-          ', and the maximum cannot be lower than the minimum.'
+          ", and the maximum cannot be lower than the minimum.",
       );
     }
     merged.teamSize = { min: min, max: max };
@@ -65,16 +63,12 @@ var FormsRules = (function () {
     var stop = Rules.sizeAlertsProblem({ rules: merged });
     if (stop) {
       ApiError.fail(
-        'bad_size_alerts',
-        stop.error === 'order'
-          ? 'The warning must be for a higher number than the critical ' +
-              'warning, or no team gets it.'
-          : 'A warning about small teams needs a number from ' +
-              stop.min +
-              ' to ' +
-              stop.max +
-              '.',
-        { level: stop.level, error: stop.error }
+        "bad_size_alerts",
+        stop.error === "order"
+          ? "The warning must be for a higher number than the critical " +
+              "warning, or no team gets it."
+          : "A warning about small teams needs a number from " + stop.min + " to " + stop.max + ".",
+        { level: stop.level, error: stop.error },
       );
     }
     merged.sizeAlerts = Rules.sizeAlerts({ rules: merged });
@@ -119,9 +113,9 @@ var FormsRules = (function () {
     return {
       sizes: sizes,
       text: {
-        en: String(text.en || '').trim(),
-        ar: String(text.ar || '').trim()
-      }
+        en: String(text.en || "").trim(),
+        ar: String(text.ar || "").trim(),
+      },
     };
   }
 
@@ -139,9 +133,8 @@ var FormsRules = (function () {
     var out = Rules.cleanProgress(next);
     if (!out.ok) {
       ApiError.fail(
-        'bad_progress',
-        'Each milestone needs an English name, and no milestone may be in' +
-          ' the list twice.'
+        "bad_progress",
+        "Each milestone needs an English name, and no milestone may be in" + " the list twice.",
       );
     }
     return out.value;
@@ -150,6 +143,6 @@ var FormsRules = (function () {
   return {
     normalizeRules: normalizeRules_,
     normalizeSizeNotice: normalizeSizeNotice_,
-    normalizeProgress: normalizeProgress_
+    normalizeProgress: normalizeProgress_,
   };
 })();

@@ -16,18 +16,18 @@ var SheetStyle = (function () {
    * from one team or day to the next.
    */
   var PALETTE = Object.freeze({
-    ink: '#3A2A1A',
-    onInk: '#F3E6C4',
-    grid: '#C9B58A',
-    font: 'Arial',
+    ink: "#3A2A1A",
+    onInk: "#F3E6C4",
+    grid: "#C9B58A",
+    font: "Arial",
     groups: [
-      { shades: ['#DCEAE4', '#EEF5F1'], solid: '#3F6B66' },
-      { shades: ['#F0E4C6', '#F8F1DE'], solid: '#8E2B22' }
-    ]
+      { shades: ["#DCEAE4", "#EEF5F1"], solid: "#3F6B66" },
+      { shades: ["#F0E4C6", "#F8F1DE"], solid: "#8E2B22" },
+    ],
   });
 
   /** Tints of the rows under the header, the lighter one first. */
-  var DATA_TAB_ROWS_ = ['#FFFFFF', '#F8F1DE'];
+  var DATA_TAB_ROWS_ = ["#FFFFFF", "#F8F1DE"];
 
   /** The height of a data tab's header row, in pixels. */
   var DATA_TAB_HEADER_PX_ = 32;
@@ -74,7 +74,7 @@ var SheetStyle = (function () {
     closesAt: 170,
     keyExpires: 170,
     expires: 170,
-    added: 170
+    added: 170,
   };
 
   /**
@@ -86,9 +86,7 @@ var SheetStyle = (function () {
    * @return {boolean} True when nothing needs painting.
    */
   function dataTabStyled_(sh, cols) {
-    var last = String(
-      sh.getRange(1, cols.length).getBackground()
-    ).toLowerCase();
+    var last = String(sh.getRange(1, cols.length).getBackground()).toLowerCase();
     if (last !== PALETTE.ink.toLowerCase()) return false;
     return sh.getBandings().some(function (b) {
       return (
@@ -114,7 +112,7 @@ var SheetStyle = (function () {
       paintDataTab_(sh, cols);
       return true;
     } catch (e) {
-      Logger.log('Tab ' + sh.getName() + ' not styled: ' + e.message);
+      Logger.log("Tab " + sh.getName() + " not styled: " + e.message);
       return false;
     }
   }
@@ -129,9 +127,9 @@ var SheetStyle = (function () {
     sh.getRange(1, 1, 1, n)
       .setBackground(PALETTE.ink)
       .setFontColor(PALETTE.onInk)
-      .setFontWeight('bold')
+      .setFontWeight("bold")
       .setFontFamily(PALETTE.font)
-      .setVerticalAlignment('middle');
+      .setVerticalAlignment("middle");
     sh.setRowHeight(1, DATA_TAB_HEADER_PX_);
     sh.setFrozenRows(1);
   }
@@ -153,7 +151,7 @@ var SheetStyle = (function () {
     if (rows > 1) {
       sh.getRange(2, 1, rows - 1, n)
         .setFontFamily(PALETTE.font)
-        .setVerticalAlignment('middle')
+        .setVerticalAlignment("middle")
         .setWrapStrategy(SpreadsheetApp.WrapStrategy.CLIP);
     }
     sh.getBandings().forEach(function (b) {

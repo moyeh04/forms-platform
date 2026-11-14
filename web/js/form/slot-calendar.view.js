@@ -5,7 +5,7 @@
  * slots.view.js.
  */
 (function (App) {
-  'use strict';
+  "use strict";
 
   var P = App.formPage;
   var h = App.ui.h;
@@ -21,7 +21,7 @@
   var WEEK_START = 6;
 
   /** A Saturday, the first column of the calendar. */
-  var A_SATURDAY = '2000-01-01';
+  var A_SATURDAY = "2000-01-01";
 
   /** The characters of a month, YYYY-MM, at the start of a date. */
   var MONTH_LENGTH = 7;
@@ -39,7 +39,7 @@
    * @return {?Date} The date, or null when it is not one.
    */
   function utc(date) {
-    var m = ISO_DATE.exec(String(date || ''));
+    var m = ISO_DATE.exec(String(date || ""));
     return m ? new Date(Date.UTC(+m[1], +m[2] - 1, +m[3])) : null;
   }
 
@@ -51,14 +51,11 @@
    * @return {string} The text, or '' when the browser cannot write it.
    */
   function dateText(d, o) {
-    var locale = App.i18n.lang === 'ar' ? 'ar-EG-u-nu-latn' : 'en-GB';
+    var locale = App.i18n.lang === "ar" ? "ar-EG-u-nu-latn" : "en-GB";
     try {
-      return d.toLocaleDateString(
-        locale,
-        Object.assign({ timeZone: 'UTC' }, o)
-      );
+      return d.toLocaleDateString(locale, Object.assign({ timeZone: "UTC" }, o));
     } catch {
-      return '';
+      return "";
     }
   }
 
@@ -105,7 +102,7 @@
    */
   function monthsOf(dates) {
     var sorted = dates.slice().sort();
-    var at = utc(monthOf(sorted[0]) + '-01');
+    var at = utc(monthOf(sorted[0]) + "-01");
     var last = monthOf(sorted[sorted.length - 1]);
     var out = [monthOf(isoOf(at))];
     while (out[out.length - 1] < last) {
@@ -125,11 +122,7 @@
     var out = [];
     while (out.length < WEEK) {
       out.push(
-        h(
-          'span',
-          { class: 'cal-wd', 'aria-hidden': 'true' },
-          dateText(d, { weekday: 'short' })
-        )
+        h("span", { class: "cal-wd", "aria-hidden": "true" }, dateText(d, { weekday: "short" })),
       );
       d.setUTCDate(d.getUTCDate() + 1);
     }
@@ -150,27 +143,27 @@
     var left = c.roomOf(day);
     var picked = c.cur.day === day.id;
     var past = c.isPast(day);
-    var note = left ? t('slotsLeft', { n: left }) : t('slotFull');
-    var said = past ? t('slotDayPast') : note;
-    if (past) note = t('slotPassed');
-    var shut = '';
-    if (!(left || picked)) shut = past ? ' is-past' : ' is-full';
+    var note = left ? t("slotsLeft", { n: left }) : t("slotFull");
+    var said = past ? t("slotDayPast") : note;
+    if (past) note = t("slotPassed");
+    var shut = "";
+    if (!(left || picked)) shut = past ? " is-past" : " is-full";
     return h(
-      'button',
+      "button",
       {
-        type: 'button',
-        class: 'cal-date is-day' + shut,
-        name: 'day-' + day.id,
+        type: "button",
+        class: "cal-date is-day" + shut,
+        name: "day-" + day.id,
         disabled: !(left || picked),
-        'aria-pressed': picked ? 'true' : 'false',
-        'aria-label': day.label + ', ' + said,
+        "aria-pressed": picked ? "true" : "false",
+        "aria-label": day.label + ", " + said,
         title: day.label,
         onclick: function () {
-          c.choose({ day: day.id, time: '' });
-        }
+          c.choose({ day: day.id, time: "" });
+        },
       },
-      h('span', { class: 'cal-num', dir: 'auto' }, text),
-      h('small', { class: 'cal-left' }, note)
+      h("span", { class: "cal-num", dir: "auto" }, text),
+      h("small", { class: "cal-left" }, note),
     );
   }
 
@@ -184,7 +177,7 @@
   function dateCell(c, date) {
     var num = String(utc(date).getUTCDate());
     var day = c.days[date];
-    return day ? dayButton(c, day, num) : h('span', { class: 'cal-date' }, num);
+    return day ? dayButton(c, day, num) : h("span", { class: "cal-date" }, num);
   }
 
   /**
@@ -196,10 +189,10 @@
    * @return {!Array<!Element>} The cells.
    */
   function dates(c, month) {
-    var d = utc(month + '-01');
+    var d = utc(month + "-01");
     var out = [];
     var blanks = (d.getUTCDay() - WEEK_START + WEEK) % WEEK;
-    while (out.length < blanks) out.push(h('span', { class: 'cal-blank' }));
+    while (out.length < blanks) out.push(h("span", { class: "cal-blank" }));
     while (monthOf(isoOf(d)) === month) {
       out.push(dateCell(c, isoOf(d)));
       d.setUTCDate(d.getUTCDate() + 1);
@@ -218,22 +211,22 @@
   function arrow(c, step) {
     var to = c.months[c.at + step];
     var back = step < 0;
-    if (!to) return h('span', { class: 'cal-nav' });
+    if (!to) return h("span", { class: "cal-nav" });
     return h(
-      'button',
+      "button",
       {
-        type: 'button',
-        class: 'icon-btn cal-nav' + (back ? ' cal-prev' : ''),
-        name: back ? 'month-prev' : 'month-next',
-        'aria-label': dateText(utc(to + '-01'), {
-          month: 'long',
-          year: 'numeric'
+        type: "button",
+        class: "icon-btn cal-nav" + (back ? " cal-prev" : ""),
+        name: back ? "month-prev" : "month-next",
+        "aria-label": dateText(utc(to + "-01"), {
+          month: "long",
+          year: "numeric",
         }),
         onclick: function () {
           c.show(to);
-        }
+        },
       },
-      App.ui.icon('arrow', ARROW_SIZE)
+      App.ui.icon("arrow", ARROW_SIZE),
     );
   }
 
@@ -269,7 +262,7 @@
     var month = c.view.month;
     if (c.months.indexOf(month) < 0) month = openMonth(c);
     c.at = c.months.indexOf(month);
-    var node = h('div', { class: 'cal' });
+    var node = h("div", { class: "cal" });
     /**
      * Shows another month.
      *
@@ -281,17 +274,17 @@
     };
     node.append(
       h(
-        'div',
-        { class: 'cal-head' },
+        "div",
+        { class: "cal-head" },
         arrow(c, -1),
         h(
-          'strong',
-          { class: 'cal-month', 'aria-live': 'polite' },
-          dateText(utc(month + '-01'), { month: 'long', year: 'numeric' })
+          "strong",
+          { class: "cal-month", "aria-live": "polite" },
+          dateText(utc(month + "-01"), { month: "long", year: "numeric" }),
         ),
-        arrow(c, 1)
+        arrow(c, 1),
       ),
-      h('div', { class: 'cal-grid' }, weekdays().concat(dates(c, month)))
+      h("div", { class: "cal-grid" }, weekdays().concat(dates(c, month))),
     );
     return node;
   }
@@ -309,9 +302,9 @@
   P.slotCalendar = function (o) {
     var c = Object.assign({}, o, { days: byDate(o.days) });
     return h(
-      'div',
-      { class: 'slot-days', role: 'group', 'aria-label': t('slotDay') },
-      Object.keys(c.days).length ? monthView(c) : null
+      "div",
+      { class: "slot-days", role: "group", "aria-label": t("slotDay") },
+      Object.keys(c.days).length ? monthView(c) : null,
     );
   };
 })(window.App);

@@ -5,11 +5,11 @@
 
 var Access = Object.freeze({
   /** A verified admin: the router checks the PIN before the handler runs. */
-  ADMIN: 'admin',
+  ADMIN: "admin",
   /** A private link: the router checks it and hands it to the handler. */
-  CLIENT: 'client',
+  CLIENT: "client",
   /** The holder of a registration key, which the service checks itself. */
-  KEY: 'key',
+  KEY: "key",
   /** Anyone. */
-  PUBLIC: 'public'
+  PUBLIC: "public",
 });

@@ -1,6 +1,6 @@
 /** The inline icons the pages draw, as SVG paths in one table. */
 (function (App) {
-  'use strict';
+  "use strict";
 
   /** The width and height of an icon, in pixels, when none is given. */
   var ICON_SIZE = 22;
@@ -9,7 +9,7 @@
   var ICON_STROKE = 1.7;
 
   /** The icons a form can show next to its title. */
-  var FORM_ICONS = ['team', 'calendar', 'task', 'chat'];
+  var FORM_ICONS = ["team", "calendar", "task", "chat"];
 
   /** The inside of each icon's SVG, drawn on a 24 by 24 grid. */
   var ICONS = {
@@ -58,14 +58,11 @@
       '<path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5' +
       ' 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="2.8"/>',
     star:
-      '<path d="M12 3.5l2.6 5.4 5.9.8-4.3 4.1 1 5.9L12 16.9 6.8 19.7' +
-      'l1-5.9L3.5 9.7l5.9-.8z"/>',
+      '<path d="M12 3.5l2.6 5.4 5.9.8-4.3 4.1 1 5.9L12 16.9 6.8 19.7' + 'l1-5.9L3.5 9.7l5.9-.8z"/>',
     menu: '<path d="M4 7h16M4 12h16M4 17h16"/>',
     info: '<circle cx="12" cy="12" r="8.5"/><path d="M12 11v5.5M12 7.6v.1"/>',
     warn: '<path d="M12 4.2l8.6 15H3.4z"/><path d="M12 10.2v4.3M12 16.9v.1"/>',
-    logout:
-      '<path d="M10 4H6a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h4M15 8l4 4-4 4' +
-      'M19 12H9"/>'
+    logout: '<path d="M10 4H6a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h4M15 8l4 4-4 4' + 'M19 12H9"/>',
   };
 
   /**
@@ -77,9 +74,9 @@
    * @return {!Element} A span holding the SVG.
    */
   function icon(name, size) {
-    var s = document.createElement('span');
-    s.className = 'icon icon-' + name;
-    s.setAttribute('aria-hidden', 'true');
+    var s = document.createElement("span");
+    s.className = "icon icon-" + name;
+    s.setAttribute("aria-hidden", "true");
     var px = size || ICON_SIZE;
     s.innerHTML =
       '<svg viewBox="0 0 24 24" width="' +
@@ -89,8 +86,8 @@
       '" fill="none" stroke="currentColor" stroke-width="' +
       ICON_STROKE +
       '" stroke-linecap="round" stroke-linejoin="round">' +
-      (ICONS[name] || '') +
-      '</svg>';
+      (ICONS[name] || "") +
+      "</svg>";
     return s;
   }
 

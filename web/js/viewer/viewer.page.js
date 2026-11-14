@@ -4,7 +4,7 @@
  * columns that appear here, and can turn the link off at any time.
  */
 (function (App) {
-  'use strict';
+  "use strict";
 
   var V = App.viewer;
   var S = V.state;
@@ -22,7 +22,7 @@
     S.token = p.t;
     S.slug = p.f;
     if (!S.token) {
-      S.error = 'This link is missing its access code. Ask for a new one.';
+      S.error = "This link is missing its access code. Ask for a new one.";
       return V.render();
     }
     S.key = V.storedKey();
@@ -37,7 +37,7 @@
     var known = S.me.forms.some(function (f) {
       return f.slug === S.slug;
     });
-    if (!known) S.slug = S.me.forms[0] ? S.me.forms[0].slug : '';
+    if (!known) S.slug = S.me.forms[0] ? S.me.forms[0].slug : "";
   }
 
   /**
@@ -52,9 +52,9 @@
       return;
     }
     // A stored key that stopped working (a new key was made) is forgotten.
-    V.storeKey('');
+    V.storeKey("");
     S.askKey = true;
-    S.keyError = e.code === 'key_needed' ? '' : e.message;
+    S.keyError = e.code === "key_needed" ? "" : e.message;
   }
 
   /**
@@ -65,9 +65,9 @@
    */
   V.open = async function () {
     try {
-      S.me = await V.call('viewer.me');
+      S.me = await V.call("viewer.me");
       S.askKey = false;
-      S.keyError = '';
+      S.keyError = "";
       V.storeKey(S.key);
       pickForm();
       if (S.slug) await V.load();
@@ -86,9 +86,9 @@
   V.reload = async function (msg) {
     try {
       await V.load();
-      if (msg) toast(msg, 'ok');
+      if (msg) toast(msg, "ok");
     } catch (e) {
-      toast(e.message, 'err');
+      toast(e.message, "err");
     }
     V.render();
   };
@@ -102,35 +102,34 @@
    */
   function topBar(d) {
     return h(
-      'header',
-      { class: 'admin-bar' },
-      h('h1', null, d ? d.form.title : 'Registrations'),
+      "header",
+      { class: "admin-bar" },
+      h("h1", null, d ? d.form.title : "Registrations"),
       d &&
         FormMetadata.display(d.form).map(function (item) {
           return h(
-            'span',
+            "span",
             {
-              class:
-                'tag-sm' + (item.variant === 'subject' ? ' tag-subject' : '')
+              class: "tag-sm" + (item.variant === "subject" ? " tag-subject" : ""),
             },
-            item.value
+            item.value,
           );
         }),
-      h('span', { class: 'muted-note' }, 'Viewing as ' + S.me.client.name),
-      ui.themeButton()
+      h("span", { class: "muted-note" }, "Viewing as " + S.me.client.name),
+      ui.themeButton(),
     );
   }
 
   /** Draws the rows of the open form, by its kind. */
   V.paintBody = function () {
-    var body = document.getElementById('body');
+    var body = document.getElementById("body");
     if (!body) return;
     ui.clear(body);
     var d = S.data;
     var node =
-      d.kind === 'reservation'
+      d.kind === "reservation"
         ? V.bookings(d)
-        : d.kind === 'team'
+        : d.kind === "team"
           ? V.teams(d)
           : V.registrations(d);
     body.appendChild(node);
@@ -138,7 +137,7 @@
 
   /** Draws the page: the reason the link cannot open, its key, or a form. */
   V.render = function () {
-    var root = document.getElementById('app');
+    var root = document.getElementById("app");
     var el;
     ui.clear(root);
     if (S.error) {
@@ -147,21 +146,19 @@
     }
     if (S.askKey) {
       root.appendChild(V.keyView());
-      el = document.getElementById('access-key');
+      el = document.getElementById("access-key");
       if (el) el.focus();
       return;
     }
     var d = S.data;
-    var page = h('div', { class: 'admin-page' }, topBar(d));
+    var page = h("div", { class: "admin-page" }, topBar(d));
     root.appendChild(page);
     if (!d) {
-      page.appendChild(
-        h('div', { class: 'empty' }, 'No forms have been shared with you yet.')
-      );
+      page.appendChild(h("div", { class: "empty" }, "No forms have been shared with you yet."));
       return;
     }
     page.appendChild(V.toolbar(d));
-    page.appendChild(h('div', { id: 'body' }));
+    page.appendChild(h("div", { id: "body" }));
     V.paintBody();
   };
 })(window.App);

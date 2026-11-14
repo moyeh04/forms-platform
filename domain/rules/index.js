@@ -8,21 +8,21 @@
  * before it, each part after the parts it reads.
  */
 (function (root) {
-  'use strict';
+  "use strict";
 
-  var node = typeof module === 'object' && module.exports;
+  var node = typeof module === "object" && module.exports;
   var parts = node
     ? [
-        require('./text.js'),
-        require('./phone.js'),
-        require('./codes.js'),
-        require('./drive-link.js'),
-        require('./slots.js'),
-        require('./form.js'),
-        require('./team-size.js'),
-        require('./progress.js'),
-        require('./progress-marks.js'),
-        require('./submission.js')
+        require("./text.js"),
+        require("./phone.js"),
+        require("./codes.js"),
+        require("./drive-link.js"),
+        require("./slots.js"),
+        require("./form.js"),
+        require("./team-size.js"),
+        require("./progress.js"),
+        require("./progress-marks.js"),
+        require("./submission.js"),
       ]
     : [
         root.RulesText,
@@ -34,7 +34,7 @@
         root.RulesTeamSize,
         root.RulesProgress,
         root.RulesProgressMarks,
-        root.RulesSubmission
+        root.RulesSubmission,
       ];
 
   var api = {};
@@ -45,4 +45,4 @@
   });
   if (node) module.exports = api;
   root.Rules = api;
-})(typeof globalThis !== 'undefined' ? globalThis : this);
+})(typeof globalThis !== "undefined" ? globalThis : this);

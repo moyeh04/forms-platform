@@ -4,13 +4,13 @@
  * the page shows, so a save never undoes someone else's.
  */
 (function (App) {
-  'use strict';
+  "use strict";
 
   var A = App.admin;
   var h = App.ui.h;
   var toast = App.ui.toast;
 
-  var UNSAVED = 'You have changes that are not saved.';
+  var UNSAVED = "You have changes that are not saved.";
 
   /**
    * Shows what the save bar says. The reason a save was refused stays
@@ -22,8 +22,8 @@
    */
   function say(note, text, refused) {
     note.textContent = text;
-    note.classList.toggle('is-error', !!refused);
-    note.setAttribute('role', refused ? 'alert' : 'status');
+    note.classList.toggle("is-error", !!refused);
+    note.setAttribute("role", refused ? "alert" : "status");
   }
 
   /**
@@ -64,20 +64,19 @@
     var patch = changed(A.settingsPatch(s), JSON.parse(s.saved));
     var out;
     try {
-      out = await A.call('admin.forms.update', {
+      out = await A.call("admin.forms.update", {
         id: s.f.id,
         base: s.f.updatedAt,
-        patch: patch
+        patch: patch,
       });
     } catch (e) {
       say(note, A.message(e), true);
       return;
     }
     A.unsaved = false;
-    toast('Settings saved', 'ok');
+    toast("Settings saved", "ok");
     if (out.form.slug !== s.slug) {
-      window.location.hash =
-        '#/f/' + encodeURIComponent(out.form.slug) + '/settings';
+      window.location.hash = "#/f/" + encodeURIComponent(out.form.slug) + "/settings";
     } else {
       A.render();
     }
@@ -93,36 +92,36 @@
    *     the bar shows while the patch differs from the saved copy.
    */
   A.saveBar = function (s) {
-    var note = h('span', { class: 'savebar-note', role: 'status' }, UNSAVED);
+    var note = h("span", { class: "savebar-note", role: "status" }, UNSAVED);
     var saveBtn = h(
-      'button',
-      { type: 'button', class: 'btn btn-primary', name: 'save' },
-      'Save settings'
+      "button",
+      { type: "button", class: "btn btn-primary", name: "save" },
+      "Save settings",
     );
-    saveBtn.addEventListener('click', function () {
+    saveBtn.addEventListener("click", function () {
       A.busy(saveBtn, function () {
         return save(s, note);
       });
     });
     s.saved = JSON.stringify(A.settingsPatch(s));
     var bar = h(
-      'div',
-      { class: 'savebar', hidden: true },
+      "div",
+      { class: "savebar", hidden: true },
       note,
       h(
-        'button',
+        "button",
         {
-          type: 'button',
-          class: 'btn btn-quiet',
-          name: 'discard',
+          type: "button",
+          class: "btn btn-quiet",
+          name: "discard",
           onclick: function () {
             A.unsaved = false;
             A.render();
-          }
+          },
         },
-        'Discard'
+        "Discard",
       ),
-      saveBtn
+      saveBtn,
     );
 
     /**

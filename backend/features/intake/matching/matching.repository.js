@@ -2,15 +2,7 @@
 
 var MatchingRepository = (function () {
   /** The columns of the Requests tab, in sheet order. */
-  var REQUEST_COLS_ = [
-    'id',
-    'raw',
-    'phone',
-    'label',
-    'added',
-    'decision',
-    'note'
-  ];
+  var REQUEST_COLS_ = ["id", "raw", "phone", "label", "added", "decision", "note"];
 
   /**
    * Opens the Requests tab of a form, making it when it is missing.
@@ -19,11 +11,7 @@ var MatchingRepository = (function () {
    * @return {!SpreadsheetApp.Sheet} The tab.
    */
   function requestsSheet_(form) {
-    return Table.ensureTab(
-      SpreadsheetApp.openById(form.sheetId),
-      'Requests',
-      REQUEST_COLS_
-    );
+    return Table.ensureTab(SpreadsheetApp.openById(form.sheetId), "Requests", REQUEST_COLS_);
   }
 
   /**
@@ -33,20 +21,18 @@ var MatchingRepository = (function () {
    * @return {!Array<!Object>} One request for each row, with its `_row`.
    */
   function readRequests_(form) {
-    return Table.readTable(requestsSheet_(form), REQUEST_COLS_).map(
-      function (r) {
-        return {
-          _row: r._row,
-          id: String(r.id),
-          raw: String(r.raw),
-          phone: String(r.phone),
-          label: String(r.label),
-          added: String(r.added),
-          decision: String(r.decision || ReviewStatus.PENDING),
-          note: String(r.note)
-        };
-      }
-    );
+    return Table.readTable(requestsSheet_(form), REQUEST_COLS_).map(function (r) {
+      return {
+        _row: r._row,
+        id: String(r.id),
+        raw: String(r.raw),
+        phone: String(r.phone),
+        label: String(r.label),
+        added: String(r.added),
+        decision: String(r.decision || ReviewStatus.PENDING),
+        note: String(r.note),
+      };
+    });
   }
 
   /**
@@ -62,7 +48,7 @@ var MatchingRepository = (function () {
         sh,
         REQUEST_COLS_.map(function (c) {
           return q[c];
-        })
+        }),
       );
     });
   }
@@ -101,6 +87,6 @@ var MatchingRepository = (function () {
     readRequests: readRequests_,
     addRequests: addRequests_,
     saveRequest: saveRequest_,
-    deleteRequests: deleteRequests_
+    deleteRequests: deleteRequests_,
   };
 })();

@@ -21,7 +21,7 @@ function formatFinding(finding) {
  */
 function printBlock(title, lines) {
   if (lines.length === 0) return 0;
-  console.error(`${title}\n  ${lines.join('\n  ')}`);
+  console.error(`${title}\n  ${lines.join("\n  ")}`);
   return lines.length;
 }
 

@@ -4,7 +4,7 @@
  * of a leader who moved.
  */
 (function (App) {
-  'use strict';
+  "use strict";
 
   var P = App.formPage;
   var h = App.ui.h;
@@ -13,10 +13,10 @@
 
   /** The text of a request this team sent, by its status. */
   var OUTGOING_TEXT = {
-    pending: 'transferWaiting',
-    approved: 'transferJoined',
-    rejected: 'transferKept',
-    closed: 'transferElsewhere'
+    pending: "transferWaiting",
+    approved: "transferJoined",
+    rejected: "transferKept",
+    closed: "transferElsewhere",
   };
 
   /**
@@ -28,28 +28,24 @@
   function movedView() {
     return P.sheet(
       P.head(),
+      h("h2", { class: "state-title" }, t("movedTitle", { team: S.moved.team })),
+      h("p", { name: "moved-note" }, t("movedBody", S.moved)),
       h(
-        'h2',
-        { class: 'state-title' },
-        t('movedTitle', { team: S.moved.team })
-      ),
-      h('p', { name: 'moved-note' }, t('movedBody', S.moved)),
-      h(
-        'div',
-        { class: 'nav' },
+        "div",
+        { class: "nav" },
         h(
-          'button',
+          "button",
           {
-            type: 'button',
-            class: 'btn btn-primary',
-            name: 'close-edit',
+            type: "button",
+            class: "btn btn-primary",
+            name: "close-edit",
             onclick: function () {
               P.resetForNew();
-            }
+            },
           },
-          t('closeEdit')
-        )
-      )
+          t("closeEdit"),
+        ),
+      ),
     );
   }
 
@@ -67,9 +63,9 @@
       team: r.team,
       ref: S.keyInfo.ref,
       who: P.who(heir.name, heir.code),
-      key: S.key
+      key: S.key,
     };
-    S.view = 'moved';
+    S.view = "moved";
   }
 
   /**
@@ -80,9 +76,9 @@
    * @return {string} The sentence.
    */
   function decidedText(r, approve) {
-    var key = 'transferRejected';
-    if (approve) key = 'transferApproved';
-    else if (r.leader) key = 'transferStayed';
+    var key = "transferRejected";
+    if (approve) key = "transferApproved";
+    else if (r.leader) key = "transferStayed";
     return t(key, { who: P.who(r.name, r.code), team: r.team });
   }
 
@@ -97,7 +93,7 @@
     S.data = res.submission.data || {};
     S.original = JSON.stringify(S.data);
     S.transfers = res.transfers;
-    S.banner = { kind: 'info', text: decidedText(r, approve) };
+    S.banner = { kind: "info", text: decidedText(r, approve) };
     P.buildSteps();
     S.stepIndex = S.steps.length - 1;
   }
@@ -111,7 +107,7 @@
   async function reloadTransfers() {
     var res;
     try {
-      res = await App.api.call({ action: 'lookup', slug: S.slug, key: S.key });
+      res = await App.api.call({ action: "lookup", slug: S.slug, key: S.key });
     } catch {
       return;
     }
@@ -129,17 +125,17 @@
     var res;
     try {
       res = await App.api.call({
-        action: 'transfer.decide',
+        action: "transfer.decide",
         slug: S.slug,
         key: S.key,
         id: r.id,
         approve: answer.approve,
-        handover: answer.handover
+        handover: answer.handover,
       });
     } catch (e) {
       S.banner = {
-        kind: 'err',
-        text: App.i18n.err({ error: e.code }) || e.message
+        kind: "err",
+        text: App.i18n.err({ error: e.code }) || e.message,
       };
       await reloadTransfers();
       return P.render();
@@ -158,7 +154,7 @@
    */
   async function answerTransfer(r) {
     if (P.changed()) {
-      S.banner = { kind: 'err', text: t('transferSaveFirst') };
+      S.banner = { kind: "err", text: t("transferSaveFirst") };
       return P.render();
     }
     var answer = await P.transferDialog(r);
@@ -175,7 +171,7 @@
   async function askTransfers() {
     var list = (S.transfers.incoming || []).slice();
     for (const r of list) {
-      if (S.view === 'moved') break;
+      if (S.view === "moved") break;
       await answerTransfer(r);
     }
   }
@@ -190,16 +186,16 @@
     var res;
     try {
       res = await App.api.call({
-        action: 'transfer.cancel',
+        action: "transfer.cancel",
         slug: S.slug,
         key: S.key,
-        id: r.id
+        id: r.id,
       });
       S.transfers = res.transfers;
     } catch (e) {
       S.banner = {
-        kind: 'err',
-        text: App.i18n.err({ error: e.code }) || e.message
+        kind: "err",
+        text: App.i18n.err({ error: e.code }) || e.message,
       };
     }
     P.render();
@@ -214,11 +210,7 @@
    * @return {!Element} The button.
    */
   function noteButton(name, text, act) {
-    return h(
-      'button',
-      { type: 'button', class: 'link-btn', name: name, onclick: act },
-      text
-    );
+    return h("button", { type: "button", class: "link-btn", name: name, onclick: act }, text);
   }
 
   /**
@@ -230,18 +222,18 @@
    */
   function incomingNote(r) {
     return h(
-      'div',
+      "div",
       {
-        class: 'banner info transfer-note',
-        role: 'status',
-        dataset: { transfer: 'incoming' }
+        class: "banner info transfer-note",
+        role: "status",
+        dataset: { transfer: "incoming" },
       },
       P.askedText(r),
-      ' ',
-      noteButton('transfer-answer', t('transferAnswer'), function () {
+      " ",
+      noteButton("transfer-answer", t("transferAnswer"), function () {
         answerTransfer(r);
       }),
-      P.leaderContact(r)
+      P.leaderContact(r),
     );
   }
 
@@ -256,22 +248,22 @@
     var key = OUTGOING_TEXT[r.status];
     if (!key) return null;
     var cancel =
-      r.status === 'pending'
-        ? noteButton('transfer-cancel', t('transferCancel'), function () {
+      r.status === "pending"
+        ? noteButton("transfer-cancel", t("transferCancel"), function () {
             cancelTransfer(r);
           })
         : null;
     return h(
-      'div',
+      "div",
       {
-        class: 'banner info transfer-note',
-        role: 'status',
-        dataset: { transfer: r.status }
+        class: "banner info transfer-note",
+        role: "status",
+        dataset: { transfer: r.status },
       },
       t(key, { team: r.team, who: P.who(r.name, r.code) }),
-      ' ',
+      " ",
       cancel,
-      P.leaderContact(r)
+      P.leaderContact(r),
     );
   }
 
@@ -287,7 +279,7 @@
       .map(incomingNote)
       .concat((tr.outgoing || []).map(outgoingNote))
       .filter(Boolean);
-    return lines.length ? h('div', { class: 'transfer-notes' }, lines) : null;
+    return lines.length ? h("div", { class: "transfer-notes" }, lines) : null;
   }
 
   P.movedView = movedView;

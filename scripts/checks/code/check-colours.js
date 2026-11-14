@@ -6,7 +6,7 @@
  * the name, `var(--name)`. `transparent` and `currentColor` are no colours of
  * their own, so they pass.
  */
-const { select, read } = require('../lib/files.js');
+const { select, read } = require("../lib/files.js");
 
 const HEX = /#(?:[0-9a-f]{8}|[0-9a-f]{6}|[0-9a-f]{3,4})\b/gi;
 const FUNCTION = /\b(?:rgba?|hsla?|hwb|lab|lch|oklab|oklch|color)\(/gi;
@@ -35,7 +35,7 @@ const NAMED = new Set(
   rebeccapurple red rosybrown royalblue saddlebrown salmon sandybrown
   seagreen seashell sienna silver skyblue slateblue slategray slategrey
   snow springgreen steelblue tan teal thistle tomato turquoise violet
-  wheat white whitesmoke yellow yellowgreen`.split(/\s+/)
+  wheat white whitesmoke yellow yellowgreen`.split(/\s+/),
 );
 
 /**
@@ -46,9 +46,8 @@ const NAMED = new Set(
  * @return {string} The same text with those parts turned into spaces.
  */
 function blankQuoted(source) {
-  return source.replace(
-    /\/\*[\s\S]*?\*\/|"[^"]*"|'[^']*'|url\([^)]*\)/g,
-    (part) => part.replace(/[^\n]/g, ' ')
+  return source.replace(/\/\*[\s\S]*?\*\/|"[^"]*"|'[^']*'|url\([^)]*\)/g, (part) =>
+    part.replace(/[^\n]/g, " "),
   );
 }
 
@@ -64,12 +63,12 @@ function declarations(text) {
   const out = [];
   for (const piece of text.matchAll(/[^{};]+(?=[{};]|$)/g)) {
     const end = piece.index + piece[0].length;
-    const colon = piece[0].indexOf(':');
-    if (text[end] === '{' || colon === -1) continue;
+    const colon = piece[0].indexOf(":");
+    if (text[end] === "{" || colon === -1) continue;
     out.push({
       property: piece[0].slice(0, colon).trim(),
       value: piece[0].slice(colon + 1),
-      at: piece.index + colon + 1
+      at: piece.index + colon + 1,
     });
   }
   return out;
@@ -83,12 +82,11 @@ function declarations(text) {
  *     starts in the value.
  */
 function coloursIn(value) {
-  const words = [...value.matchAll(WORD)].filter((m) =>
-    NAMED.has(m[0].toLowerCase())
-  );
-  return [...value.matchAll(HEX), ...value.matchAll(FUNCTION), ...words].map(
-    (m) => ({ text: m[0].replace(/\($/, '()'), index: m.index })
-  );
+  const words = [...value.matchAll(WORD)].filter((m) => NAMED.has(m[0].toLowerCase()));
+  return [...value.matchAll(HEX), ...value.matchAll(FUNCTION), ...words].map((m) => ({
+    text: m[0].replace(/\($/, "()"),
+    index: m.index,
+  }));
 }
 
 /**
@@ -103,16 +101,16 @@ function checkSource(file, source, palette) {
   const text = blankQuoted(source);
   const out = [];
   for (const { property, value, at } of declarations(text)) {
-    if (file === palette && property.startsWith('--')) continue;
+    if (file === palette && property.startsWith("--")) continue;
     for (const colour of coloursIn(value)) {
       const before = text.slice(0, at + colour.index);
       out.push({
         file,
-        line: before.split('\n').length,
-        rule: 'colours',
+        line: before.split("\n").length,
+        rule: "colours",
         message:
           `${colour.text} is a colour without a name; name it in ` +
-          `${palette} and use var(--name)`
+          `${palette} and use var(--name)`,
       });
     }
   }
@@ -129,7 +127,7 @@ function checkSource(file, source, palette) {
  */
 function check(root, files, config) {
   return select(files, config.colours).flatMap((file) =>
-    checkSource(file, read(root, file), config.colours.palette)
+    checkSource(file, read(root, file), config.colours.palette),
   );
 }
 

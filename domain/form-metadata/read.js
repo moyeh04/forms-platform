@@ -3,9 +3,9 @@
  * of a form that may be missing, and academic years from years and terms.
  */
 (function (root) {
-  'use strict';
+  "use strict";
 
-  var node = typeof module === 'object' && module.exports;
+  var node = typeof module === "object" && module.exports;
 
   /** The academic years offered after the current one. */
   var YEARS_AHEAD = 4;
@@ -38,7 +38,7 @@
    * @return {string} The text.
    */
   function text(value) {
-    return String(value == null ? '' : value).trim();
+    return String(value == null ? "" : value).trim();
   }
 
   /**
@@ -59,7 +59,7 @@
    * @return {string} The year, as "2027/2028".
    */
   function span(start) {
-    return String(start) + '/' + String(start + 1);
+    return String(start) + "/" + String(start + 1);
   }
 
   /**
@@ -74,11 +74,11 @@
   function termParts(term) {
     var value = text(term);
     var m = value.match(SEASON_TERM);
-    if (!m) return { season: '', year: '', custom: value };
+    if (!m) return { season: "", year: "", custom: value };
     return {
       season: m[1].charAt(0).toUpperCase() + m[1].slice(1).toLowerCase(),
-      year: m[2].indexOf('/') === -1 ? span(parseInt(m[2], 10)) : m[2],
-      custom: ''
+      year: m[2].indexOf("/") === -1 ? span(parseInt(m[2], 10)) : m[2],
+      custom: "",
     };
   }
 
@@ -92,11 +92,11 @@
   function yearFromTerm(term) {
     var value = text(term);
     var academicYear = value.match(/(?:^|\s)(\d{4})\/(\d{4})$/);
-    if (academicYear) return academicYear[1] + '/' + academicYear[2];
+    if (academicYear) return academicYear[1] + "/" + academicYear[2];
     var season = termParts(value).year;
     if (season) return season;
     var match = value.match(/(?:^|\s)(\d{4})$/);
-    return match ? match[1] + '/' + (parseInt(match[1], 10) + 1) : '';
+    return match ? match[1] + "/" + (parseInt(match[1], 10) + 1) : "";
   }
 
   /**
@@ -127,9 +127,7 @@
    */
   function academicYear(value) {
     var year = text(value).match(/^(\d{4})$/);
-    return year
-      ? year[1] + '/' + (parseInt(year[1], 10) + 1)
-      : yearFromTerm(value);
+    return year ? year[1] + "/" + (parseInt(year[1], 10) + 1) : yearFromTerm(value);
   }
 
   var api = {
@@ -138,8 +136,8 @@
     fieldOf: fieldOf,
     academicYears: academicYears,
     academicYear: academicYear,
-    termParts: termParts
+    termParts: termParts,
   };
   if (node) module.exports = api;
   root.FormMetadataRead = api;
-})(typeof globalThis !== 'undefined' ? globalThis : this);
+})(typeof globalThis !== "undefined" ? globalThis : this);

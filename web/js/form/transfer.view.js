@@ -3,7 +3,7 @@
  * approves or rejects it, and a leader who moves names who leads next.
  */
 (function (App) {
-  'use strict';
+  "use strict";
 
   var P = App.formPage;
   var h = App.ui.h;
@@ -16,7 +16,7 @@
    * @return {?Object} The field, or null.
    */
   function emailQuestion() {
-    var f = Rules.fieldByRole(S.form, 'email');
+    var f = Rules.fieldByRole(S.form, "email");
     return f && f.enabled !== false ? f : null;
   }
 
@@ -44,11 +44,11 @@
       heirs: heirs,
       email: emailQuestion(),
       words: {
-        who: t('handoverWho'),
-        email: t('handoverEmail'),
-        choose: t('handoverPick'),
-        error: errorText
-      }
+        who: t("handoverWho"),
+        email: t("handoverEmail"),
+        choose: t("handoverPick"),
+        error: errorText,
+      },
     });
   }
 
@@ -62,11 +62,7 @@
    * @return {!Element} The button.
    */
   function dialogButton(cls, name, text, act) {
-    return h(
-      'button',
-      { type: 'button', class: 'btn ' + cls, name: name, onclick: act },
-      text
-    );
+    return h("button", { type: "button", class: "btn " + cls, name: name, onclick: act }, text);
   }
 
   /**
@@ -78,10 +74,10 @@
    */
   function sizeAfter(r) {
     var after = r.leader
-      ? t('handoverSizeAfter', { n: r.sizeAfter })
-      : t('transferSizeAfter', { n: r.sizeAfter });
+      ? t("handoverSizeAfter", { n: r.sizeAfter })
+      : t("transferSizeAfter", { n: r.sizeAfter });
     if (r.sizeAfter >= r.min) return after;
-    return after + ' ' + t('transferUnderMin', { min: r.min });
+    return after + " " + t("transferUnderMin", { min: r.min });
   }
 
   /**
@@ -94,7 +90,7 @@
    */
   function askText(r, next) {
     if (!r.leader) return P.askedText(r);
-    return P.askedText(r) + ' ' + t(next ? 'handoverChoose' : 'handoverAlone');
+    return P.askedText(r) + " " + t(next ? "handoverChoose" : "handoverAlone");
   }
 
   /**
@@ -109,13 +105,13 @@
   function approveButton(r, next, done) {
     if (r.leader && !next) return null;
     return dialogButton(
-      'btn-primary',
-      'transfer-approve',
-      t(next ? 'handoverApprove' : 'transferApprove'),
+      "btn-primary",
+      "transfer-approve",
+      t(next ? "handoverApprove" : "transferApprove"),
       function () {
         if (next?.problem()) return;
         done({ approve: true, handover: next ? next.value() : undefined });
-      }
+      },
     );
   }
 
@@ -139,53 +135,37 @@
     }
 
     var next = r.leader ? handoverQuestion(r.heirs || []) : null;
-    var title = t(r.leader ? 'transferAskedYouTitle' : 'transferAskedTitle');
-    var later = dialogButton(
-      'btn-quiet',
-      'transfer-later',
-      t('transferLater'),
-      function () {
-        done(null);
-      }
-    );
-    var reject = dialogButton(
-      'btn-quiet',
-      'transfer-reject',
-      t('transferReject'),
-      function () {
-        done({ approve: false });
-      }
-    );
+    var title = t(r.leader ? "transferAskedYouTitle" : "transferAskedTitle");
+    var later = dialogButton("btn-quiet", "transfer-later", t("transferLater"), function () {
+      done(null);
+    });
+    var reject = dialogButton("btn-quiet", "transfer-reject", t("transferReject"), function () {
+      done({ approve: false });
+    });
     var approve = approveButton(r, next, done);
     overlay = h(
-      'div',
+      "div",
       {
-        class: 'overlay',
+        class: "overlay",
         onclick: function (e) {
           if (e.target === overlay) done(null);
-        }
+        },
       },
       h(
-        'div',
+        "div",
         {
-          class: 'dialog',
-          role: 'dialog',
-          'aria-modal': 'true',
-          'aria-label': title
+          class: "dialog",
+          role: "dialog",
+          "aria-modal": "true",
+          "aria-label": title,
         },
-        h('h2', { class: 'dialog-title' }, title),
-        h('p', null, askText(r, next)),
+        h("h2", { class: "dialog-title" }, title),
+        h("p", null, askText(r, next)),
         P.leaderContact(r),
         next ? next.node : null,
-        approve ? h('p', { class: 'help' }, sizeAfter(r)) : null,
-        h(
-          'div',
-          { class: 'dialog-actions transfer-actions' },
-          later,
-          reject,
-          approve
-        )
-      )
+        approve ? h("p", { class: "help" }, sizeAfter(r)) : null,
+        h("div", { class: "dialog-actions transfer-actions" }, later, reject, approve),
+      ),
     );
     document.body.appendChild(overlay);
     later.focus();

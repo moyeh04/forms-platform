@@ -4,10 +4,10 @@
  * the right number of tests in total and for each test file, and no Markdown
  * link points at a file that is gone.
  */
-const fs = require('node:fs');
-const path = require('node:path');
-const Module = require('node:module');
-const { select, read } = require('../lib/files.js');
+const fs = require("node:fs");
+const path = require("node:path");
+const Module = require("node:module");
+const { select, read } = require("../lib/files.js");
 
 const ROUTE = /\baction: (['"])([A-Za-z.]+)\1,\s*access: Access\.([A-Z]+)/g;
 const SECTION = /^## (.*)$/;
@@ -25,7 +25,7 @@ const LINK = /\]\(([^)#\s]+)(?:#[^)\s]*)?\)/g;
  *     finding.
  */
 function finding(file, message) {
-  return { file, line: 0, rule: 'docs', message };
+  return { file, line: 0, rule: "docs", message };
 }
 
 /**
@@ -42,7 +42,7 @@ function finding(file, message) {
 function pageRows(text, sections) {
   const rows = new Map();
   let access = null;
-  for (const line of text.split('\n')) {
+  for (const line of text.split("\n")) {
     const heading = SECTION.exec(line);
     if (heading) {
       const start = Object.keys(sections).find((s) => heading[1].startsWith(s));
@@ -91,12 +91,12 @@ function apiFindings(root, files, config) {
   const extra = page.filter((name) => !code.has(name));
   const twice = page.filter((name, i) => page.indexOf(name) !== i);
   const misplaced = names.filter(
-    (name) => sections.has(name) && sections.get(name) !== code.get(name)
+    (name) => sections.has(name) && sections.get(name) !== code.get(name),
   );
   const out = [];
-  if (missing.length) out.push(`no row for ${missing.join(', ')}`);
-  if (extra.length) out.push(`a row for a missing action: ${extra.join(', ')}`);
-  if (twice.length) out.push(`listed twice: ${twice.join(', ')}`);
+  if (missing.length) out.push(`no row for ${missing.join(", ")}`);
+  if (extra.length) out.push(`a row for a missing action: ${extra.join(", ")}`);
+  if (twice.length) out.push(`listed twice: ${twice.join(", ")}`);
   for (const name of misplaced) {
     const access = `Access.${code.get(name)}`;
     out.push(`${name} is in the section of another access than ${access}`);
@@ -139,16 +139,16 @@ function loaderWith(load, name, value) {
 function testCounts(dir) {
   const files = fs
     .readdirSync(dir, { recursive: true })
-    .map((file) => file.split(path.sep).join('/'))
-    .filter((file) => file.endsWith('.test.js'))
+    .map((file) => file.split(path.sep).join("/"))
+    .filter((file) => file.endsWith(".test.js"))
     .sort();
   const counts = {};
   const load = Module._load;
-  let current = '';
+  let current = "";
   const counter = standInForTest(() => {
     counts[current]++;
   });
-  Module._load = loaderWith(load, 'node:test', counter);
+  Module._load = loaderWith(load, "node:test", counter);
   try {
     for (const file of files) {
       current = file;
@@ -177,9 +177,7 @@ function testFindings(root, config) {
   for (const m of page.matchAll(TEST_ROW)) rows[m[1]] = Number(m[2]);
   const out = [];
   if (totals.some((n) => n !== total) || !totals.length) {
-    out.push(
-      `gives ${totals.join(' and ')} tests in total; there are ${total}`
-    );
+    out.push(`gives ${totals.join(" and ")} tests in total; there are ${total}`);
   }
   for (const [file, count] of Object.entries(counts)) {
     if (!(file in rows)) out.push(`no row for ${file} (${count} tests)`);
@@ -202,7 +200,7 @@ function testFindings(root, config) {
  */
 function linkFindings(root, files) {
   const out = [];
-  for (const file of files.filter((name) => name.endsWith('.md'))) {
+  for (const file of files.filter((name) => name.endsWith(".md"))) {
     for (const match of read(root, file).matchAll(LINK)) {
       const target = match[1];
       if (/^[a-z]+:/.test(target)) continue;
@@ -227,7 +225,7 @@ function check(root, files, config) {
   return [
     ...apiFindings(root, files, config.docs),
     ...testFindings(root, config.docs),
-    ...linkFindings(root, files)
+    ...linkFindings(root, files),
   ];
 }
 

@@ -5,7 +5,7 @@
  * shares one object, `c`: the page, the new list and its parts.
  */
 (function (App) {
-  'use strict';
+  "use strict";
 
   var A = App.admin;
   var L = A.lists;
@@ -26,13 +26,13 @@
     var form = c.form;
     var out;
     try {
-      out = await A.call('admin.lists.create', {
+      out = await A.call("admin.lists.create", {
         name: form.name,
         kind: form.kind,
-        copyOf: form.copyOf || undefined
+        copyOf: form.copyOf || undefined,
       });
     } catch (e) {
-      if (e.code !== 'list_name_taken' && e.code !== 'list_name') throw e;
+      if (e.code !== "list_name_taken" && e.code !== "list_name") throw e;
       c.err.textContent = e.message;
       c.err.hidden = false;
       return;
@@ -42,16 +42,14 @@
     p.newList = null;
     p.creating = false;
     L.load(p, out.key);
-    A.setHash('#/lists/' + encodeURIComponent(out.key));
+    A.setHash("#/lists/" + encodeURIComponent(out.key));
     ui.toast(
       '"' +
         L.nameOf(p, out.key) +
         (L.kindOf(p, out.key) === ListKind.MILESTONES
-          ? '" is ready. Pick it in Setup, Progress of a team registration' +
-            ' form.'
-          : '" is ready. Pick it for a question in the Questions tab of a' +
-            ' form.'),
-      'ok'
+          ? '" is ready. Pick it in Setup, Progress of a team registration' + " form."
+          : '" is ready. Pick it for a question in the Questions tab of a' + " form."),
+      "ok",
     );
     p.paint();
   }
@@ -65,16 +63,16 @@
     ui.clear(c.actions);
     if (!c.form.name.trim()) return;
     var btn = h(
-      'button',
+      "button",
       {
-        type: 'button',
-        class: 'btn btn-primary',
-        name: 'create-list',
+        type: "button",
+        class: "btn btn-primary",
+        name: "create-list",
         onclick: function () {
           A.busy(btn, create.bind(null, c));
-        }
+        },
       },
-      'Make "' + c.form.name.trim() + '"'
+      'Make "' + c.form.name.trim() + '"',
     );
     c.actions.appendChild(btn);
   }
@@ -89,22 +87,22 @@
   function kindCard(c, k) {
     var kind = L.KINDS[k];
     return h(
-      'button',
+      "button",
       {
-        type: 'button',
-        class: 'kind-card',
-        role: 'radio',
-        name: 'kind-' + k,
-        'aria-checked': c.form.kind === k ? 'true' : 'false',
+        type: "button",
+        class: "kind-card",
+        role: "radio",
+        name: "kind-" + k,
+        "aria-checked": c.form.kind === k ? "true" : "false",
         onclick: function () {
           c.form.kind = k;
-          c.form.copyOf = '';
+          c.form.copyOf = "";
           paintKinds(c);
-        }
+        },
       },
-      h('strong', null, kind.label),
-      h('span', { class: 'kind-example', dir: 'ltr' }, kind.example),
-      h('span', { class: 'muted-note' }, kind.about)
+      h("strong", null, kind.label),
+      h("span", { class: "kind-example", dir: "ltr" }, kind.example),
+      h("span", { class: "muted-note" }, kind.about),
     );
   }
 
@@ -121,30 +119,30 @@
       return L.kindOf(p, k) === c.form.kind;
     });
     return h(
-      'div',
-      { class: 'toggle-chips' },
-      [['', 'Nothing']]
+      "div",
+      { class: "toggle-chips" },
+      [["", "Nothing"]]
         .concat(
           same.map(function (k) {
-            return [k, 'A copy of ' + L.nameOf(p, k)];
-          })
+            return [k, "A copy of " + L.nameOf(p, k)];
+          }),
         )
         .map(function (o) {
           return h(
-            'button',
+            "button",
             {
-              type: 'button',
-              class: 'toggle-chip sm',
-              name: 'copy-' + (o[0] || 'none'),
-              'aria-pressed': c.form.copyOf === o[0] ? 'true' : 'false',
+              type: "button",
+              class: "toggle-chip sm",
+              name: "copy-" + (o[0] || "none"),
+              "aria-pressed": c.form.copyOf === o[0] ? "true" : "false",
               onclick: function () {
                 c.form.copyOf = o[0];
                 paintKinds(c);
-              }
+              },
             },
-            o[1]
+            o[1],
           );
-        })
+        }),
     );
   }
 
@@ -159,7 +157,7 @@
       c.kindBox.appendChild(kindCard(c, k));
     });
     ui.clear(c.fromBox);
-    c.fromBox.appendChild(h('span', { class: 'label' }, 'Start with'));
+    c.fromBox.appendChild(h("span", { class: "label" }, "Start with"));
     c.fromBox.appendChild(copyChips(c));
   }
 
@@ -172,19 +170,19 @@
    */
   L.createPane = function (p) {
     if (!p.newList) {
-      p.newList = { name: '', kind: ListKind.SECTIONS, copyOf: '' };
+      p.newList = { name: "", kind: ListKind.SECTIONS, copyOf: "" };
     }
     var c = {
       p: p,
       form: p.newList,
-      err: h('p', { class: 'error', role: 'alert', hidden: true }),
-      actions: h('div', { class: 'actions' }),
-      kindBox: h('div', {
-        class: 'kind-cards l-grid',
-        role: 'radiogroup',
-        'aria-label': 'Kind of list'
+      err: h("p", { class: "error", role: "alert", hidden: true }),
+      actions: h("div", { class: "actions" }),
+      kindBox: h("div", {
+        class: "kind-cards l-grid",
+        role: "radiogroup",
+        "aria-label": "Kind of list",
       }),
-      fromBox: h('div')
+      fromBox: h("div"),
     };
     var nameInput = A.text(
       c.form.name,
@@ -194,27 +192,27 @@
         paintActions(c);
       },
       {
-        name: 'list-name',
-        placeholder: 'For example: Sections of the third year',
-        maxlength: String(NAME_MAX)
-      }
+        name: "list-name",
+        placeholder: "For example: Sections of the third year",
+        maxlength: String(NAME_MAX),
+      },
     );
     paintKinds(c);
     paintActions(c);
     return [
-      h('h2', null, 'New list'),
+      h("h2", null, "New list"),
       h(
-        'p',
-        { class: 'help' },
-        'A list can be asked by any number of forms. After you make it, pick' +
-          ' it for a question in the Questions tab of a form.'
+        "p",
+        { class: "help" },
+        "A list can be asked by any number of forms. After you make it, pick" +
+          " it for a question in the Questions tab of a form.",
       ),
-      A.field('Name', nameInput),
+      A.field("Name", nameInput),
       c.err,
-      h('span', { class: 'label' }, 'Kind'),
+      h("span", { class: "label" }, "Kind"),
       c.kindBox,
       c.fromBox,
-      c.actions
+      c.actions,
     ];
   };
 })(window.App);

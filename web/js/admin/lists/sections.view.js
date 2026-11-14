@@ -4,7 +4,7 @@
  * sections kept as written because they follow no pattern.
  */
 (function (App) {
-  'use strict';
+  "use strict";
 
   var A = App.admin;
   var L = A.lists;
@@ -43,7 +43,7 @@
    * @param {!Object} p The page.
    */
   function openDraft(p) {
-    p.draft = { year: '', letter: '', typing: false, counts: {}, kinds: [] };
+    p.draft = { year: "", letter: "", typing: false, counts: {}, kinds: [] };
     p.paintRows();
     var first = p.rowsBox.querySelector('[name^="group-year-"]');
     if (first?.focus) first.focus();
@@ -58,28 +58,26 @@
    */
   function topRow(p, count) {
     return h(
-      'div',
-      { class: 'sec-top' },
+      "div",
+      { class: "sec-top" },
       h(
-        'span',
-        { class: 'muted-note' },
-        count
-          ? A.plural(count, 'year group', 'year groups')
-          : 'No year groups yet.'
+        "span",
+        { class: "muted-note" },
+        count ? A.plural(count, "year group", "year groups") : "No year groups yet.",
       ),
       p.draft
         ? null
         : h(
-            'button',
+            "button",
             {
-              type: 'button',
-              class: 'btn sm ' + (count ? 'btn-quiet' : 'btn-primary'),
-              name: 'add-group-open',
-              onclick: openDraft.bind(null, p)
+              type: "button",
+              class: "btn sm " + (count ? "btn-quiet" : "btn-primary"),
+              name: "add-group-open",
+              onclick: openDraft.bind(null, p),
             },
-            icon('plus', A.ICON_SIZE.MENU),
-            'Add a year group'
-          )
+            icon("plus", A.ICON_SIZE.MENU),
+            "Add a year group",
+          ),
     );
   }
 
@@ -93,15 +91,15 @@
    */
   function trash(name, label, onclick) {
     return h(
-      'button',
+      "button",
       {
-        type: 'button',
-        class: 'icon-btn sm danger',
+        type: "button",
+        class: "icon-btn sm danger",
         name: name,
-        'aria-label': label,
-        onclick: onclick
+        "aria-label": label,
+        onclick: onclick,
       },
-      icon('trash', A.ICON_SIZE.MENU)
+      icon("trash", A.ICON_SIZE.MENU),
     );
   }
 
@@ -113,13 +111,7 @@
    * @return {string} The range, such as 4C-TH1 to TH8.
    */
   function rangeText(g, k) {
-    return (
-      g.name +
-      '-' +
-      k.code +
-      '1' +
-      (k.count > 1 ? ' to ' + k.code + k.count : '')
-    );
+    return g.name + "-" + k.code + "1" + (k.count > 1 ? " to " + k.code + k.count : "");
   }
 
   /**
@@ -146,35 +138,35 @@
    */
   function kindRow(gc, k, ki) {
     var g = gc.g;
-    var range = h('span', { class: 'sec-range muted-note' }, rangeText(g, k));
+    var range = h("span", { class: "sec-range muted-note" }, rangeText(g, k));
     return h(
-      'div',
-      { class: 'sec-kind' + (g.kinds.length > 1 ? ' removable' : '') },
-      h('span', { class: 'sec-code' }, k.code),
+      "div",
+      { class: "sec-kind" + (g.kinds.length > 1 ? " removable" : "") },
+      h("span", { class: "sec-code" }, k.code),
       L.stepper({
-        name: 'count-' + g.name + '-' + k.code,
-        label: k.code + ' sections of ' + g.name,
+        name: "count-" + g.name + "-" + k.code,
+        label: k.code + " sections of " + g.name,
         value: k.count,
         lo: 1,
         hi: MAX_COUNT,
         set: function (v) {
           k.count = v;
           range.textContent = rangeText(g, k);
-          gc.sum.textContent = A.plural(total(g), 'section', 'sections');
+          gc.sum.textContent = A.plural(total(g), "section", "sections");
           gc.p.setRows(L.plainRows(L.writeSections(gc.s)), true);
-        }
+        },
       }),
       range,
       g.kinds.length > 1
         ? trash(
-            'remove-kind-' + g.name + '-' + k.code,
-            'Remove ' + k.code + ' from ' + g.name,
+            "remove-kind-" + g.name + "-" + k.code,
+            "Remove " + k.code + " from " + g.name,
             function () {
               g.kinds.splice(ki, 1);
               apply(gc.p, gc.s);
-            }
+            },
           )
-        : null
+        : null,
     );
   }
 
@@ -193,28 +185,28 @@
     });
     var add = addKind.bind(null, gc);
     return h(
-      'div',
-      { class: 'sec-more' },
-      h('span', { class: 'muted-note' }, 'Add a kind:'),
+      "div",
+      { class: "sec-more" },
+      h("span", { class: "muted-note" }, "Add a kind:"),
       parts.kinds
         .filter(function (c) {
           return used.indexOf(c) === -1;
         })
         .map(function (c) {
           return h(
-            'button',
+            "button",
             {
-              type: 'button',
-              class: 'toggle-chip sm',
-              name: 'add-kind-' + g.name + '-' + c,
+              type: "button",
+              class: "toggle-chip sm",
+              name: "add-kind-" + g.name + "-" + c,
               onclick: function () {
                 add(c);
-              }
+              },
             },
-            '+ ' + c
+            "+ " + c,
           );
         }),
-      L.newKindChip('kind-' + g.name, parts.kinds, add)
+      L.newKindChip("kind-" + g.name, parts.kinds, add),
     );
   }
 
@@ -233,37 +225,29 @@
       p: p,
       s: s,
       g: g,
-      sum: h(
-        'span',
-        { class: 'muted-note' },
-        A.plural(total(g), 'section', 'sections')
-      )
+      sum: h("span", { class: "muted-note" }, A.plural(total(g), "section", "sections")),
     };
     return h(
-      'div',
-      { class: 'sec-group', dataset: { group: g.name } },
+      "div",
+      { class: "sec-group", dataset: { group: g.name } },
       h(
-        'div',
-        { class: 'sec-group-head' },
-        h('strong', { class: 'sec-group-name', tabindex: '-1' }, g.name),
+        "div",
+        { class: "sec-group-head" },
+        h("strong", { class: "sec-group-name", tabindex: "-1" }, g.name),
         gc.sum,
-        trash(
-          'remove-group-' + g.name,
-          'Remove the group ' + g.name,
-          function () {
-            s.groups.splice(gi, 1);
-            apply(p, s);
-          }
-        )
+        trash("remove-group-" + g.name, "Remove the group " + g.name, function () {
+          s.groups.splice(gi, 1);
+          apply(p, s);
+        }),
       ),
       h(
-        'div',
-        { class: 'sec-kinds' },
+        "div",
+        { class: "sec-kinds" },
         g.kinds.map(function (k, ki) {
           return kindRow(gc, k, ki);
-        })
+        }),
       ),
-      moreKinds(gc, parts)
+      moreKinds(gc, parts),
     );
   }
 
@@ -276,7 +260,7 @@
   L.sectionsEditor = function (p) {
     var s = p.sections;
     var parts = L.sectionParts(p, s);
-    var box = h('div', { class: 'sec-editor l-stack' });
+    var box = h("div", { class: "sec-editor l-stack" });
     box.appendChild(topRow(p, s.groups.length));
     if (p.draft) box.appendChild(L.groupDraft(p, parts));
     s.groups.forEach(function (g, gi) {

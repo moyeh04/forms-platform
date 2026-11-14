@@ -6,7 +6,7 @@
  * cell one after the other. Each page passes its own `save`.
  */
 (function (App) {
-  'use strict';
+  "use strict";
 
   var ui = App.ui;
   var h = ui.h;
@@ -15,15 +15,15 @@
 
   /** The states in order, with their words. */
   P.STATES = [
-    [ProgressState.NOT_YET, 'Not yet'],
-    [ProgressState.SUBMITTED, 'Submitted'],
-    [ProgressState.DISCUSSED, 'Discussed']
+    [ProgressState.NOT_YET, "Not yet"],
+    [ProgressState.SUBMITTED, "Submitted"],
+    [ProgressState.DISCUSSED, "Discussed"],
   ];
 
   /** The note fields of a mark: its key, the change field and the label. */
   var NOTES = [
-    ['t', 'teamNote', 'Note for the team'],
-    ['p', 'privateNote', 'Private note']
+    ["t", "teamNote", "Note for the team"],
+    ["p", "privateNote", "Private note"],
   ];
 
   /**
@@ -45,10 +45,10 @@
    * @return {string} The day and month, or ''.
    */
   P.day = function (iso) {
-    if (!iso) return '';
-    return new Date(iso).toLocaleDateString('en-GB', {
-      day: 'numeric',
-      month: 'short'
+    if (!iso) return "";
+    return new Date(iso).toLocaleDateString("en-GB", {
+      day: "numeric",
+      month: "short",
     });
   };
 
@@ -64,11 +64,11 @@
    * @return {!Promise<string>} '' once saved, or the reason it was not.
    */
   P.change = function (b, team, id, change) {
-    var key = team.id + ' ' + id;
+    var key = team.id + " " + id;
     var before = Object.assign({}, team.progress);
     team.progress = Rules.applyMark(team.progress, id, change, {
       at: Rules.markOf(team.progress, id).at,
-      by: ''
+      by: "",
     });
     b.paint();
 
@@ -82,11 +82,11 @@
         .save(team, id, change, Rules.markOf(before, id).at)
         .then(function (progress) {
           team.progress = progress;
-          return '';
+          return "";
         })
         .catch(function (e) {
           team.progress = e?.details?.progress || before;
-          return e?.message || 'Not saved.';
+          return e?.message || "Not saved.";
         })
         .then(function (why) {
           b.paint();
@@ -107,26 +107,26 @@
   function stateGroup(m) {
     var now = Rules.markOf(m.team.progress, m.id).s;
     return h(
-      'div',
-      { class: 'progress-states', role: 'radiogroup', 'aria-label': 'State' },
+      "div",
+      { class: "progress-states", role: "radiogroup", "aria-label": "State" },
       P.STATES.map(function (x) {
         return h(
-          'button',
+          "button",
           {
-            type: 'button',
-            role: 'radio',
-            class: 'toggle-chip state-' + x[0],
-            name: 'state-' + x[0],
-            'aria-checked': now === x[0] ? 'true' : 'false',
+            type: "button",
+            role: "radio",
+            class: "toggle-chip state-" + x[0],
+            name: "state-" + x[0],
+            "aria-checked": now === x[0] ? "true" : "false",
             disabled: !m.b.canMark,
             onclick: function () {
               P.change(m.b, m.team, m.id, { state: x[0] }).then(m.said);
               m.paint();
-            }
+            },
           },
-          x[1]
+          x[1],
         );
-      })
+      }),
     );
   }
 
@@ -141,19 +141,19 @@
   function noteField(m, n) {
     var saved = Rules.markOf(m.team.progress, m.id)[n[0]];
     var save = h(
-      'button',
-      { type: 'button', class: 'btn btn-quiet sm', name: 'save-' + n[1] },
-      'Save note'
+      "button",
+      { type: "button", class: "btn btn-quiet sm", name: "save-" + n[1] },
+      "Save note",
     );
-    var area = h('textarea', {
-      class: 'textarea',
-      rows: '3',
+    var area = h("textarea", {
+      class: "textarea",
+      rows: "3",
       name: n[1],
       maxlength: String(Rules.PROGRESS_NOTE_MAX),
-      dir: 'auto',
+      dir: "auto",
       oninput: function () {
         save.hidden = area.value.trim() === saved;
-      }
+      },
     });
     area.value = saved;
     save.hidden = true;
@@ -166,13 +166,7 @@
         if (!why) save.hidden = true;
       });
     };
-    return h(
-      'label',
-      { class: 'field-row' },
-      h('span', { class: 'label' }, n[2]),
-      area,
-      save
-    );
+    return h("label", { class: "field-row" }, h("span", { class: "label" }, n[2]), area, save);
   }
 
   /**
@@ -186,10 +180,10 @@
     var text = Rules.markOf(m.team.progress, m.id)[n[0]];
     if (!text) return null;
     return h(
-      'div',
-      { class: 'field-row' },
-      h('span', { class: 'label' }, n[2]),
-      h('p', { class: 'progress-note', dir: 'auto' }, text)
+      "div",
+      { class: "field-row" },
+      h("span", { class: "label" }, n[2]),
+      h("p", { class: "progress-note", dir: "auto" }, text),
     );
   }
 
@@ -204,13 +198,7 @@
     ui.clear(m.body);
     m.body.appendChild(stateGroup(m));
     if (mark.at) {
-      m.body.appendChild(
-        h(
-          'p',
-          { class: 'muted-note' },
-          P.word(mark.s) + ' on ' + P.day(mark.at)
-        )
-      );
+      m.body.appendChild(h("p", { class: "muted-note" }, P.word(mark.s) + " on " + P.day(mark.at)));
     }
     NOTES.forEach(function (n) {
       var node = m.b.canMark ? noteField(m, n) : noteText(m, n);
@@ -245,17 +233,17 @@
       b: b,
       team: team,
       id: milestone.id,
-      body: h('div'),
-      why: h('p', { class: 'error', role: 'alert', hidden: true })
+      body: h("div"),
+      why: h("p", { class: "error", role: "alert", hidden: true }),
     };
     m.paint = paintBox.bind(null, m);
     m.said = said.bind(null, m);
-    var title = 'Team ' + team.number + ' · ' + milestone.label.en;
+    var title = "Team " + team.number + " · " + milestone.label.en;
     var overlay;
 
     /** Closes the box. */
     function close() {
-      document.removeEventListener('keydown', onKey);
+      document.removeEventListener("keydown", onKey);
       overlay.remove();
     }
 
@@ -265,46 +253,46 @@
      * @param {!KeyboardEvent} e The key pressed.
      */
     function onKey(e) {
-      if (e.key === 'Escape') close();
+      if (e.key === "Escape") close();
     }
 
     overlay = h(
-      'div',
+      "div",
       {
-        class: 'overlay',
+        class: "overlay",
         onclick: function (e) {
           if (e.target === overlay) close();
-        }
+        },
       },
       h(
-        'div',
+        "div",
         {
-          class: 'dialog mark-box',
-          role: 'dialog',
-          'aria-modal': 'true',
-          'aria-label': title
+          class: "dialog mark-box",
+          role: "dialog",
+          "aria-modal": "true",
+          "aria-label": title,
         },
-        h('h2', { class: 'dialog-title' }, title),
+        h("h2", { class: "dialog-title" }, title),
         m.body,
         h(
-          'div',
-          { class: 'dialog-actions' },
+          "div",
+          { class: "dialog-actions" },
           h(
-            'button',
+            "button",
             {
-              type: 'button',
-              class: 'btn btn-primary',
-              name: 'mark-done',
-              onclick: close
+              type: "button",
+              class: "btn btn-primary",
+              name: "mark-done",
+              onclick: close,
             },
-            'Done'
-          )
-        )
-      )
+            "Done",
+          ),
+        ),
+      ),
     );
     m.paint();
     document.body.appendChild(overlay);
-    document.addEventListener('keydown', onKey);
+    document.addEventListener("keydown", onKey);
     var first = overlay.querySelector('[aria-checked="true"]');
     if (first?.focus) first.focus();
   };

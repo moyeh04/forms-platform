@@ -10,19 +10,18 @@
  * with no mark is Not yet with no notes.
  */
 (function (root) {
-  'use strict';
+  "use strict";
 
-  var node = typeof module === 'object' && module.exports;
-  var enums = node ? require('../enums.js') : root;
+  var node = typeof module === "object" && module.exports;
+  var enums = node ? require("../enums.js") : root;
   var ProgressState = enums.ProgressState;
-  var milestonesOf = (node ? require('./progress.js') : root.RulesProgress)
-    .milestonesOf;
+  var milestonesOf = (node ? require("./progress.js") : root.RulesProgress).milestonesOf;
 
   /** The longest note, for the team or private. */
   var PROGRESS_NOTE_MAX = 500;
 
   /** The note fields of a change, by the field of the mark they set. */
-  var NOTE_FIELDS = { t: 'teamNote', p: 'privateNote' };
+  var NOTE_FIELDS = { t: "teamNote", p: "privateNote" };
 
   /**
    * Whether a value is one of the members of an enum.
@@ -45,10 +44,10 @@
    */
   function readProgress(cell) {
     var v;
-    if (cell && typeof cell === 'object') return cell;
+    if (cell && typeof cell === "object") return cell;
     try {
-      v = JSON.parse(String(cell || '{}'));
-      return v && typeof v === 'object' && !Array.isArray(v) ? v : {};
+      v = JSON.parse(String(cell || "{}"));
+      return v && typeof v === "object" && !Array.isArray(v) ? v : {};
     } catch (_e) {
       return {};
     }
@@ -66,10 +65,10 @@
     var m = progress?.[id] || {};
     return {
       s: isMember(ProgressState, m.s) ? m.s : ProgressState.NOT_YET,
-      t: m.t || '',
-      p: m.p || '',
-      at: m.at || '',
-      by: m.by || ''
+      t: m.t || "",
+      p: m.p || "",
+      at: m.at || "",
+      by: m.by || "",
     };
   }
 
@@ -86,15 +85,15 @@
     var known = milestonesOf(form).some(function (m) {
       return m.id === id;
     });
-    if (!known) return 'bad_milestone';
+    if (!known) return "bad_milestone";
     if (change.state !== undefined && !isMember(ProgressState, change.state)) {
-      return 'bad_state';
+      return "bad_state";
     }
     var long = Object.keys(NOTE_FIELDS).some(function (k) {
       var v = change[NOTE_FIELDS[k]];
       return v !== undefined && String(v).trim().length > PROGRESS_NOTE_MAX;
     });
-    return long ? 'note_too_long' : '';
+    return long ? "note_too_long" : "";
   }
 
   /**
@@ -107,7 +106,7 @@
    * @return {boolean} True when the page is behind.
    */
   function markStale(progress, id, baseAt) {
-    return markOf(progress, id).at !== String(baseAt || '');
+    return markOf(progress, id).at !== String(baseAt || "");
   }
 
   /**
@@ -230,8 +229,8 @@
     hasMark: hasMark,
     markCounts: markCounts,
     studentProgress: studentProgress,
-    linkProgress: linkProgress
+    linkProgress: linkProgress,
   };
   if (node) module.exports = api;
   root.RulesProgressMarks = api;
-})(typeof globalThis !== 'undefined' ? globalThis : this);
+})(typeof globalThis !== "undefined" ? globalThis : this);

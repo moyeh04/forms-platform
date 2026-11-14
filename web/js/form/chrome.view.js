@@ -3,7 +3,7 @@
  * head of the form with its title, term, subject and audience.
  */
 (function (App) {
-  'use strict';
+  "use strict";
 
   var P = App.formPage;
   var h = App.ui.h;
@@ -24,7 +24,7 @@
    * @return {string} 'en' on an Arabic page, 'ar' otherwise.
    */
   function otherLang() {
-    return App.i18n.lang === 'ar' ? 'en' : 'ar';
+    return App.i18n.lang === "ar" ? "en" : "ar";
   }
 
   /**
@@ -34,26 +34,26 @@
    * @return {!Element} The bar.
    */
   function topbar() {
-    var bar = h('div', { class: 'topbar' });
+    var bar = h("div", { class: "topbar" });
     var lang = S.form?.lang || {};
     if (lang.allowSwitch !== false) {
       bar.appendChild(
         h(
-          'button',
+          "button",
           {
-            type: 'button',
-            class: 'icon-btn',
+            type: "button",
+            class: "icon-btn",
             lang: otherLang(),
             onclick: function () {
               App.i18n.set(otherLang(), true);
               P.render();
-            }
+            },
           },
-          t('langToggle')
-        )
+          t("langToggle"),
+        ),
       );
     }
-    bar.appendChild(App.ui.themeButton(t('themeToggle')));
+    bar.appendChild(App.ui.themeButton(t("themeToggle")));
     return bar;
   }
 
@@ -82,16 +82,16 @@
     var allowed = S.form?.rules?.majors;
     if (!allowed?.length) return null;
     var mf = (S.form.fields || []).filter(function (f) {
-      return f.list === 'majors';
+      return f.list === "majors";
     })[0];
     var names = allowed.map(function (v) {
       return majorName(mf, v);
     });
     return h(
-      'p',
-      { class: 'audience' },
-      icon('team', AUDIENCE_ICON_SIZE),
-      h('span', null, t('onlyFor', { names: names.join(t('and')) }))
+      "p",
+      { class: "audience" },
+      icon("team", AUDIENCE_ICON_SIZE),
+      h("span", null, t("onlyFor", { names: names.join(t("and")) })),
     );
   }
 
@@ -104,20 +104,20 @@
     var items = S.form ? FormMetadata.display(S.form) : [];
     if (!items.length) return null;
     return h(
-      'div',
-      { class: 'tags' },
+      "div",
+      { class: "tags" },
       items.map(function (item) {
-        var subject = item.variant === 'subject';
+        var subject = item.variant === "subject";
         return h(
-          'span',
+          "span",
           {
-            class: 'tag' + (subject ? ' tag-subject' : ''),
-            lang: subject ? 'en' : null,
-            dir: subject ? 'ltr' : null
+            class: "tag" + (subject ? " tag-subject" : ""),
+            lang: subject ? "en" : null,
+            dir: subject ? "ltr" : null,
           },
-          item.value
+          item.value,
         );
-      })
+      }),
     );
   }
 
@@ -127,15 +127,14 @@
    * @return {!Element} The head.
    */
   function head() {
-    var ic =
-      S.form && S.form.icon !== 'none' ? App.ui.formIcon(S.form.icon) : null;
+    var ic = S.form && S.form.icon !== "none" ? App.ui.formIcon(S.form.icon) : null;
     return h(
-      'header',
-      { class: 'form-head' },
-      ic ? h('span', { class: 'form-icon' }, icon(ic, FORM_ICON_SIZE)) : null,
-      h('h1', { class: 'form-title' }, S.form ? S.form.title : ''),
+      "header",
+      { class: "form-head" },
+      ic ? h("span", { class: "form-icon" }, icon(ic, FORM_ICON_SIZE)) : null,
+      h("h1", { class: "form-title" }, S.form ? S.form.title : ""),
       tags(),
-      audience()
+      audience(),
     );
   }
 

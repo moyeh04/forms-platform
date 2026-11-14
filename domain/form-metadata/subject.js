@@ -3,10 +3,10 @@
  * registrations, task submissions and reservations.
  */
 (function (root) {
-  'use strict';
+  "use strict";
 
-  var node = typeof module === 'object' && module.exports;
-  var read = node ? require('./read.js') : root.FormMetadataRead;
+  var node = typeof module === "object" && module.exports;
+  var read = node ? require("./read.js") : root.FormMetadataRead;
   var own = read.own;
   var text = read.text;
   var fieldOf = read.fieldOf;
@@ -23,8 +23,8 @@
    */
   function subjectCode(value) {
     return text(value)
-      .replace(/\s+/g, '')
-      .replace(/[^A-Za-z0-9-]/g, '')
+      .replace(/\s+/g, "")
+      .replace(/[^A-Za-z0-9-]/g, "")
       .slice(0, MAX_SUBJECT_CODE);
   }
 
@@ -36,8 +36,8 @@
    */
   function subjectTerm(form) {
     return {
-      term: text(fieldOf(form, 'term')),
-      subject: text(fieldOf(form, 'subject'))
+      term: text(fieldOf(form, "term")),
+      subject: text(fieldOf(form, "subject")),
     };
   }
 
@@ -48,7 +48,7 @@
    *     and no subject.
    */
   function subjectDefaults() {
-    return { term: 'Fall ' + academicYears()[0], subject: '' };
+    return { term: "Fall " + academicYears()[0], subject: "" };
   }
 
   /**
@@ -71,10 +71,8 @@
    */
   function subjectDuplicate(form, values) {
     return {
-      term: own(values, 'term') ? text(values.term) : text(form.term),
-      subject: own(values, 'subject')
-        ? subjectCode(values.subject)
-        : text(form.subject)
+      term: own(values, "term") ? text(values.term) : text(form.term),
+      subject: own(values, "subject") ? subjectCode(values.subject) : text(form.subject),
     };
   }
 
@@ -85,8 +83,8 @@
    * @param {!Object} patch The changes.
    */
   function subjectUpdate(form, patch) {
-    if (own(patch, 'term')) form.term = text(patch.term);
-    if (own(patch, 'subject')) form.subject = subjectCode(patch.subject);
+    if (own(patch, "term")) form.term = text(patch.term);
+    if (own(patch, "subject")) form.subject = subjectCode(patch.subject);
   }
 
   /**
@@ -100,10 +98,10 @@
     var metadata = subjectTerm(form);
     var out = [];
     if (metadata.subject) {
-      out.push({ key: 'subject', value: metadata.subject, variant: 'subject' });
+      out.push({ key: "subject", value: metadata.subject, variant: "subject" });
     }
     if (metadata.term) {
-      out.push({ key: 'term', value: metadata.term, variant: 'term' });
+      out.push({ key: "term", value: metadata.term, variant: "term" });
     }
     return out;
   }
@@ -120,9 +118,9 @@
 
   /** The metadata of a form with a term and a subject code. */
   var subjectAdapter = {
-    editor: 'term-subject',
-    duplicateAction: 'Duplicate for a new term',
-    fields: ['term', 'subject'],
+    editor: "term-subject",
+    duplicateAction: "Duplicate for a new term",
+    fields: ["term", "subject"],
     legacyFields: [],
     defaults: subjectDefaults,
     read: subjectTerm,
@@ -134,10 +132,10 @@
     display: subjectDisplay,
     caption: termOf,
     slug: termOf,
-    sheet: termOf
+    sheet: termOf,
   };
 
   var api = subjectAdapter;
   if (node) module.exports = api;
   root.FormMetadataSubject = api;
-})(typeof globalThis !== 'undefined' ? globalThis : this);
+})(typeof globalThis !== "undefined" ? globalThis : this);

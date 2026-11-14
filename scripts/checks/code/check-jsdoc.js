@@ -5,10 +5,10 @@
  * A function passed straight to a call, such as a callback, is exempt, and
  * so is one in an object literal passed straight to a call.
  */
-const walk = require('acorn-walk');
-const { select, read } = require('../lib/files.js');
-const { parse } = require('../lib/parse.js');
-const { readDoc } = require('../lib/jsdoc.js');
+const walk = require("acorn-walk");
+const { select, read } = require("../lib/files.js");
+const { parse } = require("../lib/parse.js");
+const { readDoc } = require("../lib/jsdoc.js");
 
 const FUNCTION = /^(FunctionDeclaration|FunctionExpression|Arrow)/;
 
@@ -22,10 +22,10 @@ const FUNCTION = /^(FunctionDeclaration|FunctionExpression|Arrow)/;
  *     function has no name of its own.
  */
 function anchorOf(node, ancestors) {
-  if (node.type === 'FunctionDeclaration') return node;
+  if (node.type === "FunctionDeclaration") return node;
   const above = ancestors.slice(0, -1);
   const parent = above.pop();
-  if (parent.type === 'MethodDefinition') return parent;
+  if (parent.type === "MethodDefinition") return parent;
   const holds = [parent.init, parent.right, parent.value].includes(node);
   return holds ? holderOf(parent, above) : null;
 }
@@ -41,13 +41,13 @@ function anchorOf(node, ancestors) {
  */
 function holderOf(parent, above) {
   const grand = above.pop();
-  if (parent.type === 'VariableDeclarator') {
+  if (parent.type === "VariableDeclarator") {
     return grand.declarations.length === 1 ? grand : parent;
   }
-  if (parent.type === 'AssignmentExpression') {
-    return grand.type === 'ExpressionStatement' ? grand : null;
+  if (parent.type === "AssignmentExpression") {
+    return grand.type === "ExpressionStatement" ? grand : null;
   }
-  if (parent.type === 'Property') {
+  if (parent.type === "Property") {
     return /Call|New/.test(above.pop()?.type) ? null : parent;
   }
   return null;
@@ -66,12 +66,10 @@ function holderOf(parent, above) {
 function docBefore(anchor, comments, source) {
   const before = comments.filter((c) => c.end <= anchor.start);
   const last = before[before.length - 1];
-  if (last?.type !== 'Block' || !last.value.startsWith('*')) {
+  if (last?.type !== "Block" || !last.value.startsWith("*")) {
     return null;
   }
-  return /^[ \t]*\n?[ \t]*$/.test(source.slice(last.end, anchor.start))
-    ? last
-    : null;
+  return /^[ \t]*\n?[ \t]*$/.test(source.slice(last.end, anchor.start)) ? last : null;
 }
 
 /**
@@ -82,9 +80,9 @@ function docBefore(anchor, comments, source) {
  */
 function paramNames(node) {
   return node.params.map((param) => {
-    if (param.type === 'Identifier') return param.name;
-    if (param.type === 'AssignmentPattern') return param.left.name || null;
-    if (param.type === 'RestElement') return param.argument.name || null;
+    if (param.type === "Identifier") return param.name;
+    if (param.type === "AssignmentPattern") return param.left.name || null;
+    if (param.type === "RestElement") return param.argument.name || null;
     return null;
   });
 }
@@ -99,7 +97,7 @@ function skip() {}
  * @return {boolean} True when some `return` has a value.
  */
 function returnsValue(node) {
-  if (node.body.type !== 'BlockStatement') return true;
+  if (node.body.type !== "BlockStatement") return true;
   let found = false;
   walk.recursive(node.body, null, {
     FunctionDeclaration: skip,
@@ -107,7 +105,7 @@ function returnsValue(node) {
     ArrowFunctionExpression: skip,
     ReturnStatement: (ret) => {
       if (ret.argument) found = true;
-    }
+    },
   });
   return found;
 }
@@ -120,7 +118,7 @@ function returnsValue(node) {
  * @return {!Array<string>} What is wrong.
  */
 function paramProblems(tags, names) {
-  const params = tags.filter((t) => t.tag === 'param' && !t.name.includes('.'));
+  const params = tags.filter((t) => t.tag === "param" && !t.name.includes("."));
   const out = [];
   if (params.length !== names.length) {
     out.push(`${params.length} @param for ${names.length} parameters`);
@@ -143,14 +141,14 @@ function paramProblems(tags, names) {
  * @return {!Array<string>} What is wrong.
  */
 function returnProblems(tags, node) {
-  const returns = tags.filter((t) => t.tag === 'return' || t.tag === 'returns');
+  const returns = tags.filter((t) => t.tag === "return" || t.tag === "returns");
   const out = [];
-  if (tags.some((t) => t.tag === 'returns')) out.push('write @return');
-  if (returnsValue(node) && !returns.length) out.push('no @return');
+  if (tags.some((t) => t.tag === "returns")) out.push("write @return");
+  if (returnsValue(node) && !returns.length) out.push("no @return");
   if (!returnsValue(node) && returns.length && !node.async) {
-    out.push('@return on a function that returns nothing');
+    out.push("@return on a function that returns nothing");
   }
-  if (returns.some((t) => !t.type)) out.push('no {type} on @return');
+  if (returns.some((t) => !t.type)) out.push("no {type} on @return");
   return out;
 }
 
@@ -163,17 +161,13 @@ function returnProblems(tags, node) {
  * @return {!Array<string>} What is wrong; empty when the doc is right.
  */
 function docProblems(comment, node, forbidden) {
-  if (!comment) return ['no JSDoc comment'];
+  if (!comment) return ["no JSDoc comment"];
   const doc = readDoc(comment.value);
-  const out = doc.summary ? [] : ['no summary sentence'];
+  const out = doc.summary ? [] : ["no summary sentence"];
   for (const tag of doc.tags) {
     if (forbidden.includes(tag.tag)) out.push(`no @${tag.tag}: git keeps that`);
   }
-  return [
-    ...out,
-    ...paramProblems(doc.tags, paramNames(node)),
-    ...returnProblems(doc.tags, node)
-  ];
+  return [...out, ...paramProblems(doc.tags, paramNames(node)), ...returnProblems(doc.tags, node)];
 }
 
 /**
@@ -194,7 +188,7 @@ function checkSource(file, source, forbidden) {
     const line = node.loc.start.line;
     const comment = docBefore(anchor, comments, source);
     for (const message of docProblems(comment, node, forbidden)) {
-      out.push({ file, line, rule: 'jsdoc', message });
+      out.push({ file, line, rule: "jsdoc", message });
     }
   });
   return out;
@@ -210,7 +204,7 @@ function checkSource(file, source, forbidden) {
  */
 function check(root, files, config) {
   return select(files, config.jsdoc).flatMap((file) =>
-    checkSource(file, read(root, file), config.jsdoc.forbiddenTags)
+    checkSource(file, read(root, file), config.jsdoc.forbiddenTags),
   );
 }
 

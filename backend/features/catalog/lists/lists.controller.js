@@ -71,6 +71,6 @@ var ListsController = (function () {
     set: listChange_(set),
     create: listChange_(create),
     rename: listChange_(rename),
-    remove: listChange_(remove)
+    remove: listChange_(remove),
   };
 })();

@@ -3,7 +3,7 @@
  * the button that makes the next one.
  */
 (function (App) {
-  'use strict';
+  "use strict";
 
   var A = App.admin;
   var h = App.ui.h;
@@ -12,7 +12,7 @@
   var SIZE = A.ICON_SIZE;
 
   /** Where the unfolded series are kept for the browser tab. */
-  var SERIES_KEY = 'forms.series';
+  var SERIES_KEY = "forms.series";
 
   /**
    * Draws the days a reservation offers. One with no days cannot be
@@ -25,21 +25,19 @@
     var days = f.slots?.days || [];
     if (!days.length) {
       return h(
-        'a',
+        "a",
         {
-          class: 'badge none',
-          name: 'no-days',
-          href: '#/f/' + encodeURIComponent(f.slug) + '/timetable'
+          class: "badge none",
+          name: "no-days",
+          href: "#/f/" + encodeURIComponent(f.slug) + "/timetable",
         },
-        'No days yet'
+        "No days yet",
       );
     }
     return h(
-      'span',
-      { class: 'muted-note' },
-      days.length === 1
-        ? days[0].label
-        : days[0].label + ' to ' + days[days.length - 1].label
+      "span",
+      { class: "muted-note" },
+      days.length === 1 ? days[0].label : days[0].label + " to " + days[days.length - 1].label,
     );
   };
 
@@ -54,7 +52,7 @@
   function seriesOpen(id, open) {
     var all;
     try {
-      all = JSON.parse(window.sessionStorage.getItem(SERIES_KEY) || '{}');
+      all = JSON.parse(window.sessionStorage.getItem(SERIES_KEY) || "{}");
       if (open === undefined) return !!all[id];
       all[id] = open;
       window.sessionStorage.setItem(SERIES_KEY, JSON.stringify(all));
@@ -75,21 +73,20 @@
    */
   function makeBooking(f, title, btn) {
     return A.busy(btn, async function () {
-      var res = await A.call('admin.bookings.next', {
+      var res = await A.call("admin.bookings.next", {
         source: f.id,
-        title: title || ''
+        title: title || "",
       });
       var name = '"' + res.form.title + '"';
       toast(
         res.copied
           ? name +
-              ' is a copy of the last booking, one week later. Check the' +
-              ' days, then set it to Open.'
-          : name + ' created as a draft. Add its days, then set it to Open.',
-        'ok'
+              " is a copy of the last booking, one week later. Check the" +
+              " days, then set it to Open."
+          : name + " created as a draft. Add its days, then set it to Open.",
+        "ok",
       );
-      window.location.hash =
-        '#/f/' + encodeURIComponent(res.form.slug) + '/timetable';
+      window.location.hash = "#/f/" + encodeURIComponent(res.form.slug) + "/timetable";
     });
   }
 
@@ -99,7 +96,7 @@
    * @param {!Object} f The form.
    */
   function firstBooking(f) {
-    var title = 'Discussion - Week 1';
+    var title = "Discussion - Week 1";
 
     /**
      * Makes the booking, or refuses an empty title.
@@ -108,7 +105,7 @@
      */
     function create() {
       if (!title.trim()) {
-        toast('Give the booking a title.', 'err');
+        toast("Give the booking a title.", "err");
         return false;
       }
       return makeBooking(f, title);
@@ -117,31 +114,31 @@
     A.modal(
       'First booking for "' + f.title + '"',
       h(
-        'div',
+        "div",
         null,
         h(
-          'p',
-          { class: 'help' },
-          'Teams book a time with the key they got from this form, so they' +
-            ' do not type their details again. Later bookings are copied' +
-            ' from this one, one week later, and the number in the title' +
-            ' goes up.'
+          "p",
+          { class: "help" },
+          "Teams book a time with the key they got from this form, so they" +
+            " do not type their details again. Later bookings are copied" +
+            " from this one, one week later, and the number in the title" +
+            " goes up.",
         ),
         A.field(
-          'Title',
+          "Title",
           A.text(
             title,
             function (v) {
               title = v;
             },
-            { name: 'booking-title' }
-          )
-        )
+            { name: "booking-title" },
+          ),
+        ),
       ),
       [
-        { text: 'Cancel', kind: 'quiet' },
-        { text: 'Create booking', kind: 'primary', onclick: create }
-      ]
+        { text: "Cancel", kind: "quiet" },
+        { text: "Create booking", kind: "primary", onclick: create },
+      ],
     );
   }
 
@@ -154,20 +151,18 @@
    */
   function nextButton(f, hasBookings) {
     return h(
-      'button',
+      "button",
       {
-        type: 'button',
-        class: 'btn btn-quiet sm',
-        name: 'next-booking',
+        type: "button",
+        class: "btn btn-quiet sm",
+        name: "next-booking",
         onclick: function (e) {
-          if (hasBookings) return makeBooking(f, '', e.currentTarget);
+          if (hasBookings) return makeBooking(f, "", e.currentTarget);
           firstBooking(f);
-        }
+        },
       },
-      icon('plus', SIZE.MENU),
-      hasBookings
-        ? 'New booking, one week later'
-        : 'Add a booking for this form'
+      icon("plus", SIZE.MENU),
+      hasBookings ? "New booking, one week later" : "Add a booking for this form",
     );
   }
 
@@ -180,44 +175,40 @@
   function bookingItem(k) {
     var link = A.formLink(k.slug);
     return h(
-      'li',
+      "li",
       { dataset: { booking: k.slug } },
+      h("a", { class: "series-title", href: "#/f/" + encodeURIComponent(k.slug) }, k.title),
       h(
-        'a',
-        { class: 'series-title', href: '#/f/' + encodeURIComponent(k.slug) },
-        k.title
-      ),
-      h(
-        'span',
-        { class: 'series-meta' },
+        "span",
+        { class: "series-meta" },
         A.badge(A.STATUS_LABEL[k.status] || k.status, k.status),
-        A.daysNote(k)
+        A.daysNote(k),
       ),
       h(
-        'span',
-        { class: 'series-links' },
+        "span",
+        { class: "series-links" },
         h(
-          'a',
+          "a",
           {
-            class: 'link-btn',
-            href: '#/f/' + encodeURIComponent(k.slug) + '/timetable'
+            class: "link-btn",
+            href: "#/f/" + encodeURIComponent(k.slug) + "/timetable",
           },
-          'Timetable'
+          "Timetable",
         ),
         h(
-          'button',
+          "button",
           {
-            type: 'button',
-            class: 'link-btn',
-            'aria-label': 'Copy the link of ' + k.title,
+            type: "button",
+            class: "link-btn",
+            "aria-label": "Copy the link of " + k.title,
             onclick: async function () {
               var copied = await App.ui.copyText(link);
-              toast(copied ? 'Booking link copied' : 'Could not copy', 'ok');
-            }
+              toast(copied ? "Booking link copied" : "Could not copy", "ok");
+            },
           },
-          'Copy link'
-        )
-      )
+          "Copy link",
+        ),
+      ),
     );
   }
 
@@ -230,20 +221,17 @@
    */
   function seriesHead(f, kids) {
     return h(
-      'summary',
-      { name: 'bookings-' + f.slug },
-      icon('calendar', SIZE.LINE),
-      'Bookings',
-      h('span', { class: 'series-count' }, String(kids.length)),
+      "summary",
+      { name: "bookings-" + f.slug },
+      icon("calendar", SIZE.LINE),
+      "Bookings",
+      h("span", { class: "series-count" }, String(kids.length)),
       h(
-        'span',
-        { class: 'series-latest' },
+        "span",
+        { class: "series-latest" },
         kids[0].title,
-        A.badge(
-          A.STATUS_LABEL[kids[0].status] || kids[0].status,
-          kids[0].status
-        )
-      )
+        A.badge(A.STATUS_LABEL[kids[0].status] || kids[0].status, kids[0].status),
+      ),
     );
   }
 
@@ -260,20 +248,20 @@
   A.series = function (f, kids) {
     if (!kids.length && !(A.issuesKeys(f) && A.hasTeams(f))) return null;
     if (!kids.length) {
-      return h('div', { class: 'series' }, nextButton(f, false));
+      return h("div", { class: "series" }, nextButton(f, false));
     }
     var box = h(
-      'details',
+      "details",
       {
-        class: 'series',
+        class: "series",
         open: seriesOpen(f.id),
         ontoggle: function () {
           seriesOpen(f.id, box.open);
-        }
+        },
       },
       seriesHead(f, kids),
-      h('ul', { class: 'series-list' }, kids.map(bookingItem)),
-      A.issuesKeys(f) ? nextButton(f, true) : null
+      h("ul", { class: "series-list" }, kids.map(bookingItem)),
+      A.issuesKeys(f) ? nextButton(f, true) : null,
     );
     return box;
   };

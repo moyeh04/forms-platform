@@ -9,14 +9,14 @@ and checks it with [Biome](https://biomejs.dev/). The settings live in
 
 Biome's formatter owns the layout. Do not lay code out by hand.
 
-| Setting | Value | Source |
-|---|---|---|
-| Indent | 2 spaces | Google §4.2 |
-| Line width | 80 columns; 120 for CSS | Google §4.4; CSS is a list of short declarations that stays readable at 120, so the project gives it the wider width |
-| Quotes | single | Google §5.6.1 |
-| Semicolons | always | Google §4.3.2 |
-| Trailing commas | none | the files run in Apps Script and old browsers alike |
-| Arrow parameters | always in parentheses | one shape for every arrow |
+| Setting          | Value                   | Source                                                                                                               |
+| ---------------- | ----------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| Indent           | 2 spaces                | Google §4.2                                                                                                          |
+| Line width       | 80 columns; 120 for CSS | Google §4.4; CSS is a list of short declarations that stays readable at 120, so the project gives it the wider width |
+| Quotes           | single                  | Google §5.6.1                                                                                                        |
+| Semicolons       | always                  | Google §4.3.2                                                                                                        |
+| Trailing commas  | none                    | the files run in Apps Script and old browsers alike                                                                  |
+| Arrow parameters | always in parentheses   | one shape for every arrow                                                                                            |
 
 Biome wraps code at its width but cannot break a long string or comment;
 `check-lines.js` refuses those (see [CHECKS.md](CHECKS.md)). Split the string
@@ -36,27 +36,27 @@ reports what is wrong without changing anything.
 Biome's recommended preset is on, with these sizes as errors. The numbers are
 Biome's defaults, not chosen by hand:
 
-| Rule | Limit | What it stops |
-|---|---|---|
-| `complexity/noExcessiveCognitiveComplexity` | 15 | a function that does too many things at once |
-| `complexity/noExcessiveLinesPerFunction` | 50 lines, blank lines not counted, the wrapping IIFE not counted | long functions |
-| `style/noExcessiveLinesPerFile` | 300 lines | a file with more than one job |
-| `complexity/useMaxParams` | 4 parameters | long parameter lists; pass one options object instead |
-| `style/noMagicNumbers` | error | unnamed numbers (see [CONSTANTS.md](CONSTANTS.md)) |
+| Rule                                        | Limit                                                            | What it stops                                         |
+| ------------------------------------------- | ---------------------------------------------------------------- | ----------------------------------------------------- |
+| `complexity/noExcessiveCognitiveComplexity` | 15                                                               | a function that does too many things at once          |
+| `complexity/noExcessiveLinesPerFunction`    | 50 lines, blank lines not counted, the wrapping IIFE not counted | long functions                                        |
+| `style/noExcessiveLinesPerFile`             | 300 lines                                                        | a file with more than one job                         |
+| `complexity/useMaxParams`                   | 4 parameters                                                     | long parameter lists; pass one options object instead |
+| `style/noMagicNumbers`                      | error                                                            | unnamed numbers (see [CONSTANTS.md](CONSTANTS.md))    |
 
 Rules turned off, each for a reason:
 
-| Rule | Why it is off |
-|---|---|
-| `complexity/useArrowFunction` | the browser files are classic scripts wrapped in `(function (App) { … })(window.App)`, and the backend files are namespaces wrapped in `var Name = (function () { … })()`; both are written with `function` |
-| `suspicious/noRedundantUseStrict` | the browser files are classic scripts, not modules, so `'use strict'` inside their wrapper is not redundant |
+| Rule                              | Why it is off                                                                                                                                                                                               |
+| --------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `complexity/useArrowFunction`     | the browser files are classic scripts wrapped in `(function (App) { … })(window.App)`, and the backend files are namespaces wrapped in `var Name = (function () { … })()`; both are written with `function` |
+| `suspicious/noRedundantUseStrict` | the browser files are classic scripts, not modules, so `'use strict'` inside their wrapper is not redundant                                                                                                 |
 
 One rule is off for `backend/` only. The bundler joins every backend file into
 one Apps Script file, so they share one global scope that Biome, which reads
 one file at a time, cannot see:
 
-| Rule | Why it is off in `backend/` |
-|---|---|
+| Rule                            | Why it is off in `backend/`                                                                                                                                                                                                  |
+| ------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `correctness/noUnusedVariables` | each file defines one namespace that other backend files call, and `entry-points.js` and `main.js` define the functions Apps Script calls by name (`doGet`, `doPost`, menu items, triggers), so Biome reports them as unused |
 
 Tests are exempt from the size rules and from `noMagicNumbers`: an expected

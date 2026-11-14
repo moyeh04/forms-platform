@@ -24,8 +24,8 @@ var TemplateFields = (function () {
    */
   function nameHelp_() {
     return {
-      en: 'Four-part name, in Arabic letters only',
-      ar: 'الاسم رباعي وبالعربي فقط'
+      en: "Four-part name, in Arabic letters only",
+      ar: "الاسم رباعي وبالعربي فقط",
     };
   }
 
@@ -39,10 +39,7 @@ var TemplateFields = (function () {
    * @return {!Object} The field.
    */
   function field_(id, type, label, extra) {
-    return Object.assign(
-      { id: id, type: type, label: label, required: true },
-      extra || {}
-    );
+    return Object.assign({ id: id, type: type, label: label, required: true }, extra || {});
   }
 
   /**
@@ -52,30 +49,25 @@ var TemplateFields = (function () {
    */
   function personFields_() {
     return [
+      field_("email", "email", { en: "Email", ar: "البريد الإلكتروني" }, { role: "email" }),
       field_(
-        'email',
-        'email',
-        { en: 'Email', ar: 'البريد الإلكتروني' },
-        { role: 'email' }
+        "leader_name",
+        "arabic_name",
+        { en: "Team leader name", ar: "اسم قائد الفريق" },
+        { role: "name", minParts: NAME_PARTS, help: nameHelp_() },
       ),
       field_(
-        'leader_name',
-        'arabic_name',
-        { en: 'Team leader name', ar: 'اسم قائد الفريق' },
-        { role: 'name', minParts: NAME_PARTS, help: nameHelp_() }
+        "leader_code",
+        "code",
+        { en: "Team leader code", ar: "كود قائد الفريق" },
+        { role: "code", length: CODE_LENGTH },
       ),
       field_(
-        'leader_code',
-        'code',
-        { en: 'Team leader code', ar: 'كود قائد الفريق' },
-        { role: 'code', length: CODE_LENGTH }
+        "phone",
+        "phone",
+        { en: "Team leader phone", ar: "رقم تليفون قائد الفريق" },
+        { role: "phone" },
       ),
-      field_(
-        'phone',
-        'phone',
-        { en: 'Team leader phone', ar: 'رقم تليفون قائد الفريق' },
-        { role: 'phone' }
-      )
     ];
   }
 
@@ -86,30 +78,10 @@ var TemplateFields = (function () {
    */
   function studyFields_() {
     return [
-      field_(
-        'major',
-        'select',
-        { en: 'Major', ar: 'التخصص' },
-        { list: 'majors' }
-      ),
-      field_(
-        'level',
-        'select',
-        { en: 'Level / year', ar: 'المستوى / الفرقة' },
-        { list: 'levels' }
-      ),
-      field_(
-        'section',
-        'select',
-        { en: 'Section', ar: 'السكشن' },
-        { list: 'sections' }
-      ),
-      field_(
-        'curriculum',
-        'select',
-        { en: 'Bylaw', ar: 'اللائحة' },
-        { list: 'curricula' }
-      )
+      field_("major", "select", { en: "Major", ar: "التخصص" }, { list: "majors" }),
+      field_("level", "select", { en: "Level / year", ar: "المستوى / الفرقة" }, { list: "levels" }),
+      field_("section", "select", { en: "Section", ar: "السكشن" }, { list: "sections" }),
+      field_("curriculum", "select", { en: "Bylaw", ar: "اللائحة" }, { list: "curricula" }),
     ];
   }
 
@@ -120,16 +92,16 @@ var TemplateFields = (function () {
    */
   function teamSizeField_() {
     return field_(
-      'team_size',
-      'team_size',
-      { en: 'Team size', ar: 'عدد أعضاء الفريق' },
+      "team_size",
+      "team_size",
+      { en: "Team size", ar: "عدد أعضاء الفريق" },
       {
-        role: 'team_size',
+        role: "team_size",
         help: {
-          en: 'How many people are in the team, including you',
-          ar: 'كام فرد في الفريق، شاملًا حضرتك'
-        }
-      }
+          en: "How many people are in the team, including you",
+          ar: "كام فرد في الفريق، شاملًا حضرتك",
+        },
+      },
     );
   }
 
@@ -140,50 +112,35 @@ var TemplateFields = (function () {
    */
   function membersField_() {
     return field_(
-      'members',
-      'members',
-      { en: 'Team members', ar: 'أعضاء الفريق' },
+      "members",
+      "members",
+      { en: "Team members", ar: "أعضاء الفريق" },
       {
-        role: 'members',
+        role: "members",
         fields: [
           field_(
-            'name',
-            'arabic_name',
-            { en: 'Full name', ar: 'الاسم رباعي' },
-            { role: 'name', minParts: NAME_PARTS }
+            "name",
+            "arabic_name",
+            { en: "Full name", ar: "الاسم رباعي" },
+            { role: "name", minParts: NAME_PARTS },
+          ),
+          field_("phone", "phone", { en: "Phone", ar: "رقم التليفون" }, { role: "phone" }),
+          field_(
+            "code",
+            "code",
+            { en: "Code", ar: "الكود" },
+            { role: "code", length: CODE_LENGTH },
           ),
           field_(
-            'phone',
-            'phone',
-            { en: 'Phone', ar: 'رقم التليفون' },
-            { role: 'phone' }
+            "level",
+            "select",
+            { en: "Level / year", ar: "المستوى / الفرقة" },
+            { list: "levels" },
           ),
-          field_(
-            'code',
-            'code',
-            { en: 'Code', ar: 'الكود' },
-            { role: 'code', length: CODE_LENGTH }
-          ),
-          field_(
-            'level',
-            'select',
-            { en: 'Level / year', ar: 'المستوى / الفرقة' },
-            { list: 'levels' }
-          ),
-          field_(
-            'curriculum',
-            'select',
-            { en: 'Bylaw', ar: 'اللائحة' },
-            { list: 'curricula' }
-          ),
-          field_(
-            'section',
-            'select',
-            { en: 'Section', ar: 'السكشن' },
-            { list: 'sections' }
-          )
-        ]
-      }
+          field_("curriculum", "select", { en: "Bylaw", ar: "اللائحة" }, { list: "curricula" }),
+          field_("section", "select", { en: "Section", ar: "السكشن" }, { list: "sections" }),
+        ],
+      },
     );
   }
 
@@ -198,10 +155,10 @@ var TemplateFields = (function () {
     members.required = true;
     members.min = 1;
     members.max = DEFAULT_MAX_TEAMMATES_;
-    members.label = { en: 'Teammates', ar: 'أعضاء الفريق' };
+    members.label = { en: "Teammates", ar: "أعضاء الفريق" };
     members.help = {
-      en: 'Add the other people on your team.',
-      ar: 'أضف باقي أعضاء فريقك.'
+      en: "Add the other people on your team.",
+      ar: "أضف باقي أعضاء فريقك.",
     };
     return members;
   }
@@ -215,14 +172,11 @@ var TemplateFields = (function () {
   function clampTeammates_(members) {
     var min = parseInt(members.min, 10);
     var max = parseInt(members.max, 10);
-    members.min = Math.max(
-      0,
-      Math.min(MAX_TEAMMATES_, Number.isNaN(min) ? 1 : min)
-    );
+    members.min = Math.max(0, Math.min(MAX_TEAMMATES_, Number.isNaN(min) ? 1 : min));
     members.max = Math.max(
       1,
       members.min,
-      Math.min(MAX_TEAMMATES_, Number.isNaN(max) ? DEFAULT_MAX_TEAMMATES_ : max)
+      Math.min(MAX_TEAMMATES_, Number.isNaN(max) ? DEFAULT_MAX_TEAMMATES_ : max),
     );
   }
 
@@ -251,7 +205,7 @@ var TemplateFields = (function () {
     if (form.type !== FormType.RESERVATION) return form;
     form.fields = form.fields || [];
     form.steps = form.steps || [];
-    var members = Rules.fieldByRole(form, 'members');
+    var members = Rules.fieldByRole(form, "members");
     if (!members) {
       members = reservationMembersField_();
       form.fields.push(members);
@@ -259,10 +213,9 @@ var TemplateFields = (function () {
     clampTeammates_(members);
     cleanTeammatesNotice_(members);
     var project = form.steps.filter(function (step) {
-      return step.id === 'project';
+      return step.id === "project";
     })[0];
-    if (project && project.fields.indexOf(members.id) === -1)
-      project.fields.push(members.id);
+    if (project && project.fields.indexOf(members.id) === -1) project.fields.push(members.id);
     return form;
   }
 
@@ -276,6 +229,6 @@ var TemplateFields = (function () {
     teamSizeField: teamSizeField_,
     membersField: membersField_,
     field: field_,
-    reservationMembersField: reservationMembersField_
+    reservationMembersField: reservationMembersField_,
   };
 })();

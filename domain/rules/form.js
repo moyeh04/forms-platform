@@ -4,10 +4,10 @@
  * open.
  */
 (function (root) {
-  'use strict';
+  "use strict";
 
-  var node = typeof module === 'object' && module.exports;
-  var enums = node ? require('../enums.js') : root;
+  var node = typeof module === "object" && module.exports;
+  var enums = node ? require("../enums.js") : root;
 
   var FormStatus = enums.FormStatus;
 
@@ -48,7 +48,7 @@
    * @return {!Array<!Object>} The members as typed.
    */
   function memberList(form, data) {
-    var mf = fieldByRole(form, 'members');
+    var mf = fieldByRole(form, "members");
     if (!mf || mf.enabled === false || !data) return [];
     return Array.isArray(data[mf.id]) ? data[mf.id] : [];
   }
@@ -65,23 +65,23 @@
   function membersOf(form, data) {
     var out = [];
     var answers = data || {};
-    var name = valueByRole(form, data, 'name');
+    var name = valueByRole(form, data, "name");
     if (name) {
       out.push({
         name: name,
-        code: valueByRole(form, data, 'code') || '',
-        phone: valueByRole(form, data, 'phone') || '',
-        section: answers.section || '',
-        leader: true
+        code: valueByRole(form, data, "code") || "",
+        phone: valueByRole(form, data, "phone") || "",
+        section: answers.section || "",
+        leader: true,
       });
     }
     memberList(form, data).forEach(function (m) {
       out.push({
-        name: m.name || '',
-        code: m.code || '',
-        phone: m.phone || '',
-        section: m.section || '',
-        leader: false
+        name: m.name || "",
+        code: m.code || "",
+        phone: m.phone || "",
+        section: m.section || "",
+        leader: false,
       });
     });
     return out;
@@ -101,7 +101,7 @@
     var n = 0;
     (rows || []).forEach(function (r) {
       membersOf(form, r.data).forEach(function (m) {
-        var code = String(m.code || '').trim();
+        var code = String(m.code || "").trim();
         if (code && seen[code]) return;
         if (code) seen[code] = true;
         n++;
@@ -118,10 +118,10 @@
    *     decide.
    */
   function statusState(status) {
-    if (status === FormStatus.DRAFT) return 'draft';
-    if (status === FormStatus.ARCHIVED) return 'archived';
-    if (status === FormStatus.CLOSED) return 'closed';
-    return '';
+    if (status === FormStatus.DRAFT) return "draft";
+    if (status === FormStatus.ARCHIVED) return "archived";
+    if (status === FormStatus.CLOSED) return "closed";
+    return "";
   }
 
   /**
@@ -134,9 +134,9 @@
   function dateState(form, now) {
     var o = form.opensAt ? Date.parse(form.opensAt) : NaN;
     var c = form.closesAt ? Date.parse(form.closesAt) : NaN;
-    if (!Number.isNaN(o) && now < o) return 'not_yet';
-    if (!Number.isNaN(c) && now > c) return 'closed';
-    return 'open';
+    if (!Number.isNaN(o) && now < o) return "not_yet";
+    if (!Number.isNaN(c) && now > c) return "closed";
+    return "open";
   }
 
   /**
@@ -147,7 +147,7 @@
    * @return {string} 'open', 'not_yet', 'closed', 'draft' or 'archived'.
    */
   function formState(form, nowMs) {
-    if (!form) return 'closed';
+    if (!form) return "closed";
     var now = nowMs == null ? Date.now() : nowMs;
     return statusState(form.status) || dateState(form, now);
   }
@@ -157,8 +157,8 @@
     valueByRole: valueByRole,
     membersOf: membersOf,
     countPeople: countPeople,
-    formState: formState
+    formState: formState,
   };
   if (node) module.exports = api;
   root.RulesForm = api;
-})(typeof globalThis !== 'undefined' ? globalThis : this);
+})(typeof globalThis !== "undefined" ? globalThis : this);

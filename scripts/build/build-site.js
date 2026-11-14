@@ -5,29 +5,27 @@
  * from before a publish can tell and load the new one: see siteVersion and
  * stampPage below, and web/js/app/fresh.js.
  */
-const crypto = require('node:crypto');
-const fs = require('node:fs');
-const path = require('node:path');
+const crypto = require("node:crypto");
+const fs = require("node:fs");
+const path = require("node:path");
 
-const { PAGES, FOLDERS, sourceOf } = require('./site-map.js');
+const { PAGES, FOLDERS, sourceOf } = require("./site-map.js");
 
-const ROOT = path.resolve(__dirname, '..', '..');
-const DIRS = ['assets', 'shared'];
-const CONFIG = 'assets/js/config.js';
+const ROOT = path.resolve(__dirname, "..", "..");
+const DIRS = ["assets", "shared"];
+const CONFIG = "assets/js/config.js";
 
 /** How many hex digits of a hash make a fingerprint. */
 const FINGERPRINT_DIGITS = 12;
 
 /** A local script or stylesheet named by a page: its tag start and path. */
-const LOCAL_FILE =
-  /(<script src="|<link rel="stylesheet" href=")((?:assets|shared)\/[^"?#]+)"/g;
+const LOCAL_FILE = /(<script src="|<link rel="stylesheet" href=")((?:assets|shared)\/[^"?#]+)"/g;
 
 /**
  * The address of an Apps Script web app; its one group is the id of the
  * deployment.
  */
-const API_URL_PATTERN =
-  /^https:\/\/script\.google\.com\/macros\/s\/([A-Za-z0-9_-]+)\/exec$/;
+const API_URL_PATTERN = /^https:\/\/script\.google\.com\/macros\/s\/([A-Za-z0-9_-]+)\/exec$/;
 
 /**
  * A short fingerprint of some content.
@@ -36,9 +34,9 @@ const API_URL_PATTERN =
  * @return {string} The fingerprint, in hex.
  */
 function fingerprint(...parts) {
-  const hash = crypto.createHash('sha256');
+  const hash = crypto.createHash("sha256");
   for (const part of parts) hash.update(part);
-  return hash.digest('hex').slice(0, FINGERPRINT_DIGITS);
+  return hash.digest("hex").slice(0, FINGERPRINT_DIGITS);
 }
 
 /**
@@ -53,14 +51,14 @@ function filesUnder(output, dir) {
   return fs
     .readdirSync(path.join(output, dir), {
       recursive: true,
-      withFileTypes: true
+      withFileTypes: true,
     })
     .filter((entry) => entry.isFile())
     .map((entry) =>
       path
         .relative(output, path.join(entry.parentPath || entry.path, entry.name))
         .split(path.sep)
-        .join('/')
+        .join("/"),
     )
     .sort();
 }
@@ -77,12 +75,10 @@ function filesUnder(output, dir) {
  */
 function siteVersion(output, url) {
   const parts = [url];
-  for (const page of PAGES)
-    parts.push(page, fs.readFileSync(path.join(output, page)));
+  for (const page of PAGES) parts.push(page, fs.readFileSync(path.join(output, page)));
   for (const dir of DIRS) {
     for (const file of filesUnder(output, dir)) {
-      if (file !== CONFIG)
-        parts.push(file, fs.readFileSync(path.join(output, file)));
+      if (file !== CONFIG) parts.push(file, fs.readFileSync(path.join(output, file)));
     }
   }
   return fingerprint(...parts);
@@ -102,11 +98,7 @@ function stampPage(html, output) {
   return html.replace(
     LOCAL_FILE,
     (_whole, start, file) =>
-      start +
-      file +
-      '?v=' +
-      fingerprint(fs.readFileSync(path.join(output, file))) +
-      '"'
+      start + file + "?v=" + fingerprint(fs.readFileSync(path.join(output, file))) + '"',
   );
 }
 
@@ -119,21 +111,15 @@ function stampPage(html, output) {
  *     deployment the build names.
  */
 function apiUrl(env) {
-  const value = (env.API_URL || '').trim();
+  const value = (env.API_URL || "").trim();
   const match = API_URL_PATTERN.exec(value);
   if (!match) {
     throw new Error(
-      'API_URL must be set to the Apps Script HTTPS web app URL ending in' +
-        ' /exec.'
+      "API_URL must be set to the Apps Script HTTPS web app URL ending in" + " /exec.",
     );
   }
-  if (
-    env.APPS_SCRIPT_DEPLOYMENT_ID &&
-    match[1] !== env.APPS_SCRIPT_DEPLOYMENT_ID
-  ) {
-    throw new Error(
-      'API_URL and APPS_SCRIPT_DEPLOYMENT_ID must refer to the same deployment.'
-    );
+  if (env.APPS_SCRIPT_DEPLOYMENT_ID && match[1] !== env.APPS_SCRIPT_DEPLOYMENT_ID) {
+    throw new Error("API_URL and APPS_SCRIPT_DEPLOYMENT_ID must refer to the same deployment.");
   }
   return value;
 }
@@ -145,7 +131,7 @@ function apiUrl(env) {
  * @param {string} output The package folder, emptied first.
  * @return {string} The package folder.
  */
-function buildSite(env = process.env, output = path.join(ROOT, '_site')) {
+function buildSite(env = process.env, output = path.join(ROOT, "_site")) {
   // Validate before creating any publishable artifact.
   const url = apiUrl(env);
   // Replace the generated output, including stale assets.
@@ -156,7 +142,7 @@ function buildSite(env = process.env, output = path.join(ROOT, '_site')) {
   }
   for (const { published, source } of FOLDERS) {
     fs.cpSync(path.join(ROOT, source), path.join(output, published), {
-      recursive: true
+      recursive: true,
     });
   }
   // The version is taken from the files as they are in the repository,
@@ -164,29 +150,26 @@ function buildSite(env = process.env, output = path.join(ROOT, '_site')) {
   const version = siteVersion(output, url);
   fs.writeFileSync(
     path.join(output, CONFIG),
-    'window.APP_CONFIG = ' +
+    "window.APP_CONFIG = " +
       JSON.stringify({ API_URL: url, VERSION: version }) +
-      ';\nwindow.App = window.App || {};\n'
+      ";\nwindow.App = window.App || {};\n",
   );
   for (const file of PAGES) {
     fs.writeFileSync(
       path.join(output, file),
-      stampPage(fs.readFileSync(path.join(output, file), 'utf8'), output)
+      stampPage(fs.readFileSync(path.join(output, file), "utf8"), output),
     );
   }
   // An open page asks for this file to learn that a newer site is published.
-  fs.writeFileSync(
-    path.join(output, 'version.json'),
-    JSON.stringify({ version }) + '\n'
-  );
-  fs.writeFileSync(path.join(output, '.nojekyll'), '');
+  fs.writeFileSync(path.join(output, "version.json"), JSON.stringify({ version }) + "\n");
+  fs.writeFileSync(path.join(output, ".nojekyll"), "");
   return output;
 }
 
 if (require.main === module) {
   try {
     buildSite();
-    console.log('Site packaged with the configured API_URL.');
+    console.log("Site packaged with the configured API_URL.");
   } catch (err) {
     console.error(err.message);
     process.exitCode = 1;

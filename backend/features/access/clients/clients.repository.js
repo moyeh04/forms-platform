@@ -3,19 +3,19 @@
 var ClientsRepository = (function () {
   /** The columns of the Clients tab, in sheet order. */
   var CLIENT_COLS_ = [
-    'id',
-    'name',
-    'tokenHash',
-    'forms',
-    'hiddenColumns',
-    'canReview',
-    'active',
-    'createdAt',
-    'keyHash',
-    'keySeal',
-    'expires',
-    'showSizeAlerts',
-    'progress'
+    "id",
+    "name",
+    "tokenHash",
+    "forms",
+    "hiddenColumns",
+    "canReview",
+    "active",
+    "createdAt",
+    "keyHash",
+    "keySeal",
+    "expires",
+    "showSizeAlerts",
+    "progress",
   ];
 
   /**
@@ -35,9 +35,7 @@ var ClientsRepository = (function () {
    * @return {string} A ProgressAccess member.
    */
   function progressAccess_(v) {
-    return Object.values(ProgressAccess).indexOf(v) === -1
-      ? ProgressAccess.SEE
-      : v;
+    return Object.values(ProgressAccess).indexOf(v) === -1 ? ProgressAccess.SEE : v;
   }
 
   /**
@@ -57,11 +55,11 @@ var ClientsRepository = (function () {
       canReview: Cell.readFlag(r.canReview, false),
       active: Cell.readFlag(r.active, true),
       createdAt: String(r.createdAt),
-      keyHash: String(r.keyHash || ''),
-      keySeal: String(r.keySeal || ''),
-      expires: String(r.expires || ''),
+      keyHash: String(r.keyHash || ""),
+      keySeal: String(r.keySeal || ""),
+      expires: String(r.expires || ""),
       showSizeAlerts: Cell.readFlag(r.showSizeAlerts, true),
-      progress: progressAccess_(r.progress)
+      progress: progressAccess_(r.progress),
     };
   }
 
@@ -73,7 +71,7 @@ var ClientsRepository = (function () {
    * @return {boolean} True for a link name.
    */
   function named(s) {
-    return s !== '*' && String(s).indexOf('_') === -1;
+    return s !== "*" && String(s).indexOf("_") === -1;
   }
 
   /**
@@ -83,9 +81,7 @@ var ClientsRepository = (function () {
    * @return {!Array<!Object>} The links.
    */
   function readClients_() {
-    var clients = Table.readTable(clientsSheet_(), CLIENT_COLS_).map(
-      rowToClient_
-    );
+    var clients = Table.readTable(clientsSheet_(), CLIENT_COLS_).map(rowToClient_);
     if (
       !clients.some(function (c) {
         return c.forms.some(named);
@@ -132,7 +128,7 @@ var ClientsRepository = (function () {
       var c = readClients_().filter(function (x) {
         return x.id === id;
       })[0];
-      if (!c) ApiError.fail('client_not_found', 'That client does not exist.');
+      if (!c) ApiError.fail("client_not_found", "That client does not exist.");
       var out = change(c);
       saveClient_(c);
       return out;
@@ -152,14 +148,14 @@ var ClientsRepository = (function () {
       tokenHash: c.tokenHash,
       forms: JSON.stringify(c.forms),
       hiddenColumns: JSON.stringify(c.hiddenColumns),
-      canReview: Cell.writeFlag(c.canReview, '0'),
-      active: Cell.writeFlag(c.active, '0'),
+      canReview: Cell.writeFlag(c.canReview, "0"),
+      active: Cell.writeFlag(c.active, "0"),
       createdAt: c.createdAt,
-      keyHash: c.keyHash || '',
-      keySeal: c.keySeal || '',
-      expires: c.expires || '',
-      showSizeAlerts: Cell.writeFlag(c.showSizeAlerts !== false, '0'),
-      progress: progressAccess_(c.progress)
+      keyHash: c.keyHash || "",
+      keySeal: c.keySeal || "",
+      expires: c.expires || "",
+      showSizeAlerts: Cell.writeFlag(c.showSizeAlerts !== false, "0"),
+      progress: progressAccess_(c.progress),
     };
   }
 
@@ -174,11 +170,7 @@ var ClientsRepository = (function () {
     var sh = clientsSheet_();
     Table.ensureHeaders(sh, CLIENT_COLS_);
     if (c._row) Table.writeRow(sh, c._row, CLIENT_COLS_, clientToRow_(c));
-    else
-      c._row = Table.appendPlain(
-        sh,
-        Table.rowValues(CLIENT_COLS_, clientToRow_(c))
-      );
+    else c._row = Table.appendPlain(sh, Table.rowValues(CLIENT_COLS_, clientToRow_(c)));
     return c;
   }
 
@@ -199,6 +191,6 @@ var ClientsRepository = (function () {
     saveClient: saveClient_,
     changeClient: changeClient_,
     keepClientForms: keepClientForms_,
-    progressAccess: progressAccess_
+    progressAccess: progressAccess_,
   };
 })();

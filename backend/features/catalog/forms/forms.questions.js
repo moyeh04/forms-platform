@@ -8,7 +8,7 @@ var FormsQuestions = (function () {
    * the `data` JSON of the response under the id of the question, so adding
    * or removing a question never changes a sheet column.
    */
-  var CUSTOM_TYPES_ = ['text', 'textarea', 'select'];
+  var CUSTOM_TYPES_ = ["text", "textarea", "select"];
 
   /** The most questions an admin may add. */
   var CUSTOM_LIMIT_ = 30;
@@ -46,7 +46,7 @@ var FormsQuestions = (function () {
   function freshId_(prefix) {
     return Crypto.shortId(prefix)
       .toLowerCase()
-      .replace(/[^a-z0-9_]/g, '');
+      .replace(/[^a-z0-9_]/g, "");
   }
 
   /**
@@ -59,10 +59,10 @@ var FormsQuestions = (function () {
    *     empty.
    */
   function textPair_(text, max) {
-    var en = String(text?.en || '')
+    var en = String(text?.en || "")
       .trim()
       .slice(0, max);
-    var ar = String(text?.ar || '')
+    var ar = String(text?.ar || "")
       .trim()
       .slice(0, max);
     if (!en && !ar) return null;
@@ -78,7 +78,7 @@ var FormsQuestions = (function () {
    */
   function customLabel_(label) {
     var pair = textPair_(label, LABEL_MAX_);
-    if (!pair) ApiError.fail('bad_question', 'A question needs a label.');
+    if (!pair) ApiError.fail("bad_question", "A question needs a label.");
     return pair;
   }
 
@@ -94,10 +94,8 @@ var FormsQuestions = (function () {
     var seen = {};
     var out = [];
     (Array.isArray(options) ? options : []).forEach(function (o) {
-      var isObject = typeof o === 'object';
-      var label = customLabel_(
-        isObject ? o.label || { en: o.value } : { en: o }
-      );
+      var isObject = typeof o === "object";
+      var label = customLabel_(isObject ? o.label || { en: o.value } : { en: o });
       var value = String((isObject && o.value) || label.en)
         .trim()
         .slice(0, LABEL_MAX_);
@@ -106,10 +104,7 @@ var FormsQuestions = (function () {
       out.push({ value: value, label: label });
     });
     if (out.length < CHOICES_MIN_) {
-      ApiError.fail(
-        'bad_question',
-        'A choice question needs at least two different choices.'
-      );
+      ApiError.fail("bad_question", "A choice question needs at least two different choices.");
     }
     return out.slice(0, CHOICES_MAX_);
   }
@@ -124,24 +119,24 @@ var FormsQuestions = (function () {
    */
   function customField_(f, taken) {
     if (CUSTOM_TYPES_.indexOf(f.type) === -1) {
-      ApiError.fail('bad_question', 'That kind of question cannot be added.');
+      ApiError.fail("bad_question", "That kind of question cannot be added.");
     }
     var keep = QUESTION_ID_.test(String(f.id)) && !taken[f.id];
     var out = {
-      id: keep ? String(f.id) : freshId_('q_'),
+      id: keep ? String(f.id) : freshId_("q_"),
       type: f.type,
       custom: true,
       label: customLabel_(f.label),
       required: f.required !== false,
-      enabled: f.enabled !== false
+      enabled: f.enabled !== false,
     };
     if (f.help && (f.help.en || f.help.ar)) {
       out.help = {
-        en: String(f.help.en || '').slice(0, HELP_MAX_),
-        ar: String(f.help.ar || '').slice(0, HELP_MAX_)
+        en: String(f.help.en || "").slice(0, HELP_MAX_),
+        ar: String(f.help.ar || "").slice(0, HELP_MAX_),
       };
     }
-    if (f.type === 'select') out.options = customOptions_(f.options);
+    if (f.type === "select") out.options = customOptions_(f.options);
     return out;
   }
 
@@ -156,10 +151,7 @@ var FormsQuestions = (function () {
   function checkLists_(fields, lists) {
     (fields || []).forEach(function (f) {
       if (f.list && Object.keys(lists).indexOf(f.list) === -1) {
-        ApiError.fail(
-          'list_not_found',
-          'The list "' + f.list + '" does not exist.'
-        );
+        ApiError.fail("list_not_found", 'The list "' + f.list + '" does not exist.');
       }
       checkLists_(f.fields, lists);
     });
@@ -182,8 +174,8 @@ var FormsQuestions = (function () {
       if (!f.custom) return f;
       if (++custom > CUSTOM_LIMIT_) {
         ApiError.fail(
-          'bad_question',
-          'A form can have at most ' + CUSTOM_LIMIT_ + ' added questions.'
+          "bad_question",
+          "A form can have at most " + CUSTOM_LIMIT_ + " added questions.",
         );
       }
       var clean = customField_(f, taken);
@@ -205,11 +197,11 @@ var FormsQuestions = (function () {
    */
   function cleanPage_(step, taken, seen) {
     if (!PAGE_ID_.test(String(step.id)) || seen.pages[step.id]) {
-      step.id = freshId_('p_');
+      step.id = freshId_("p_");
     }
     seen.pages[step.id] = true;
     var title = textPair_(step.title, PAGE_TITLE_MAX_);
-    if (!title) ApiError.fail('bad_question', 'A page needs a title.');
+    if (!title) ApiError.fail("bad_question", "A page needs a title.");
     step.title = title;
     step.fields = (step.fields || []).map(String).filter(function (id) {
       if (!taken[id] || seen.placed[id]) return false;
@@ -231,10 +223,7 @@ var FormsQuestions = (function () {
     var taken = cleanFields_(form);
     checkLists_(form.fields, ListsRepository.readLists());
     if ((form.steps || []).length > PAGE_LIMIT_) {
-      ApiError.fail(
-        'bad_question',
-        'A form can have at most ' + PAGE_LIMIT_ + ' pages.'
-      );
+      ApiError.fail("bad_question", "A form can have at most " + PAGE_LIMIT_ + " pages.");
     }
     var seen = { pages: {}, placed: {} };
     (form.steps || []).forEach(function (step) {

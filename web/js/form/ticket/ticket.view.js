@@ -4,7 +4,7 @@
  * it. Loaded last of the ticket parts.
  */
 (function (App) {
-  'use strict';
+  "use strict";
 
   var T = App.ticket;
   var h = App.ui.h;
@@ -36,7 +36,7 @@
    * @return {!Element} The arrow.
    */
   function arrowCallout() {
-    var s = h('span', { class: 'callout-arrow' });
+    var s = h("span", { class: "callout-arrow" });
     s.innerHTML = CALLOUT_ARROW;
     return s;
   }
@@ -50,12 +50,12 @@
    */
   function digits(key) {
     return h(
-      'div',
-      { class: 'key-digits' },
-      h('span', { class: 'sr-only' }, key.split('').join(' ')),
-      key.split('').map(function (d) {
-        return h('span', { class: 'key-digit code', 'aria-hidden': 'true' }, d);
-      })
+      "div",
+      { class: "key-digits" },
+      h("span", { class: "sr-only" }, key.split("").join(" ")),
+      key.split("").map(function (d) {
+        return h("span", { class: "key-digit code", "aria-hidden": "true" }, d);
+      }),
     );
   }
 
@@ -67,21 +67,17 @@
    */
   function keyBlock(o) {
     return h(
-      'div',
-      { class: 'key-block' },
+      "div",
+      { class: "key-block" },
       h(
-        'div',
-        { class: 'key-note' },
-        h('span', { class: 'key-note-text' }, t('ticketKeyNote')),
-        arrowCallout()
+        "div",
+        { class: "key-note" },
+        h("span", { class: "key-note-text" }, t("ticketKeyNote")),
+        arrowCallout(),
       ),
-      h('p', { class: 'key-label' }, t('ticketKey')),
+      h("p", { class: "key-label" }, t("ticketKey")),
       digits(o.key),
-      h(
-        'p',
-        { class: 'help' },
-        t('ticketValid', { date: App.i18n.fmtDate(o.keyExpires) })
-      )
+      h("p", { class: "help" }, t("ticketValid", { date: App.i18n.fmtDate(o.keyExpires) })),
     );
   }
 
@@ -95,14 +91,12 @@
    */
   function keyPart(o) {
     if (o.key) {
-      return [keyBlock(o), h('p', { class: 'shot-note' }, t('ticketShot'))];
+      return [keyBlock(o), h("p", { class: "shot-note" }, t("ticketShot"))];
     }
     if (o.teamKey) {
-      return [
-        h('p', { class: 'help', name: 'team-key-note' }, t('ticketTeamKey'))
-      ];
+      return [h("p", { class: "help", name: "team-key-note" }, t("ticketTeamKey"))];
     }
-    if (!o.edited && !o.when) return [h('p', null, t('ticketNoKey'))];
+    if (!o.edited && !o.when) return [h("p", null, t("ticketNoKey"))];
     return [];
   }
 
@@ -114,11 +108,11 @@
    */
   function summary(rows) {
     return h(
-      'dl',
-      { class: 'summary' },
+      "dl",
+      { class: "summary" },
       rows.map(function (r) {
-        return [h('dt', null, r.label), h('dd', null, r.value)];
-      })
+        return [h("dt", null, r.label), h("dd", null, r.value)];
+      }),
     );
   }
 
@@ -133,25 +127,21 @@
    */
   function render(o) {
     var kids = [
+      h("h2", { class: "ticket-title" }, t(o.edited ? "savedTitle" : "ticketTitle")),
       h(
-        'h2',
-        { class: 'ticket-title' },
-        t(o.edited ? 'savedTitle' : 'ticketTitle')
+        "p",
+        { class: "ticket-ref" },
+        h("span", { class: "muted" }, t("ticketRef") + "  "),
+        h("span", { class: "code" }, o.ref),
       ),
-      h(
-        'p',
-        { class: 'ticket-ref' },
-        h('span', { class: 'muted' }, t('ticketRef') + '  '),
-        h('span', { class: 'code' }, o.ref)
-      )
     ];
     if (o.when) kids.push(T.when(o.when));
     kids.push(...keyPart(o));
     if (o.email) {
-      kids.push(h('p', { class: 'help' }, t('emailSent', { email: o.email })));
+      kids.push(h("p", { class: "help" }, t("emailSent", { email: o.email })));
     }
     if (o.summary?.length) kids.push(summary(o.summary));
-    return h('section', { class: 'ticket', id: 'ticket' }, kids);
+    return h("section", { class: "ticket", id: "ticket" }, kids);
   }
 
   /**
@@ -165,10 +155,10 @@
    */
   function button(look, iconName, label, onclick) {
     return h(
-      'button',
-      { type: 'button', class: 'btn ' + look, onclick: onclick },
+      "button",
+      { type: "button", class: "btn " + look, onclick: onclick },
       App.ui.icon(iconName, BUTTON_ICON_SIZE),
-      t(label)
+      t(label),
     );
   }
 
@@ -183,16 +173,16 @@
     /** Saves the ticket as an image, or says it could not. */
     async function save() {
       try {
-        await T.saveImage(document.getElementById('ticket'), o.ref);
+        await T.saveImage(document.getElementById("ticket"), o.ref);
       } catch {
-        App.ui.toast(t('imageFail'), 'err');
+        App.ui.toast(t("imageFail"), "err");
       }
     }
 
     /** Copies the key. */
     async function copy() {
       var ok = await App.ui.copyText(o.key);
-      if (ok) App.ui.toast(t('copied'), 'ok');
+      if (ok) App.ui.toast(t("copied"), "ok");
     }
 
     /** Opens the print dialog, where the ticket is kept as a PDF. */
@@ -201,11 +191,11 @@
     }
 
     return h(
-      'div',
-      { class: 'ticket-actions' },
-      button('btn-primary', 'download', 'saveImage', save),
-      button('btn-quiet', 'printer', 'savePdf', print),
-      o.key ? button('btn-quiet', 'copy', 'copyKey', copy) : null
+      "div",
+      { class: "ticket-actions" },
+      button("btn-primary", "download", "saveImage", save),
+      button("btn-quiet", "printer", "savePdf", print),
+      o.key ? button("btn-quiet", "copy", "copyKey", copy) : null,
     );
   }
 

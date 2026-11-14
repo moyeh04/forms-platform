@@ -5,15 +5,35 @@
   background: var(--sheet-2);
   padding: 30px 18px 28px;
   -webkit-mask:
-    conic-gradient(from 135deg at top, var(--mask-clear), var(--mask-solid) 1deg 89deg, var(--mask-clear) 90deg) top /
-    18px 51% repeat-x,
-    conic-gradient(from -45deg at bottom, var(--mask-clear), var(--mask-solid) 1deg 89deg, var(--mask-clear) 90deg)
-    bottom / 18px 51% repeat-x;
+    conic-gradient(
+        from 135deg at top,
+        var(--mask-clear),
+        var(--mask-solid) 1deg 89deg,
+        var(--mask-clear) 90deg
+      )
+      top / 18px 51% repeat-x,
+    conic-gradient(
+        from -45deg at bottom,
+        var(--mask-clear),
+        var(--mask-solid) 1deg 89deg,
+        var(--mask-clear) 90deg
+      )
+      bottom / 18px 51% repeat-x;
   mask:
-    conic-gradient(from 135deg at top, var(--mask-clear), var(--mask-solid) 1deg 89deg, var(--mask-clear) 90deg) top /
-    18px 51% repeat-x,
-    conic-gradient(from -45deg at bottom, var(--mask-clear), var(--mask-solid) 1deg 89deg, var(--mask-clear) 90deg)
-    bottom / 18px 51% repeat-x;
+    conic-gradient(
+        from 135deg at top,
+        var(--mask-clear),
+        var(--mask-solid) 1deg 89deg,
+        var(--mask-clear) 90deg
+      )
+      top / 18px 51% repeat-x,
+    conic-gradient(
+        from -45deg at bottom,
+        var(--mask-clear),
+        var(--mask-solid) 1deg 89deg,
+        var(--mask-clear) 90deg
+      )
+      bottom / 18px 51% repeat-x;
 }
 .ticket-title {
   font-size: var(--fs-title);

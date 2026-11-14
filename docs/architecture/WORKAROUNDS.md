@@ -16,32 +16,32 @@ Each section has the same shape:
 
 ## Quick index
 
-| # | Problem | Solution in one line |
-|---|---|---|
-| 1 | No server | Static pages plus an Apps Script web app |
-| 2 | Visitors have no Google login | Script runs as the owner; three small secrets replace accounts |
-| 3 | Browsers block cross-site calls | Send plain text so there is no preflight |
-| 4 | Apps Script has no modules or npm | A tiny bundler concatenates files into one |
-| 5 | Load order of those files is fragile | Every file is order-independent by construction |
-| 6 | Rules must match in browser, server, tests | One UMD file loaded in all three |
-| 7 | Apps Script cannot be unit tested | An in-memory Google runs the real bundle |
-| 8 | Two students, one slot | A script lock plus a re-check inside it |
-| 9 | Students have no accounts | A 5-digit key, salted, throttled, expiring |
-| 10 | The admin page is public | It is useless without a hashed, rate-limited PIN |
-| 11 | Instructors need a view without a login | Private tokens, only the hash stored, columns stripped server-side |
-| 12 | Colouring sheets is slow | Mark the form and repaint it a minute later, outside the request |
-| 13 | One giant sheet becomes a mess | A registry sheet plus one sheet per form |
-| 14 | New forms should not need code | The form is data in a single cell |
-| 15 | Lists change often | Options are resolved when read, not copied |
-| 16 | WhatsApp has no API | Paste, normalise phones, match |
-| 17 | Browsers cannot check Drive sharing | The server checks it with the owner's Drive access |
-| 18 | PDFs from a script | Export URL with the script's own token, with a fallback |
-| 19 | Excel with real files | Download all reads the files as the owner inside Google, in small steps, and writes the workbook itself |
-| 20 | Updating without breaking links | Actions pushes a new version to the same deployment |
-| 21 | Email problems must not lose data | Mail is best effort and never blocks saving |
-| 22 | Deleting must free a code but keep history | Soft delete: a flag, not a removed row |
-| 23 | Sheets turns `01012345678` into a number | Every data cell is formatted as plain text |
-| 24 | A static host cannot tell browsers to drop an old page | The site carries its version; files are named by their content and an old page reloads itself |
+| #   | Problem                                                | Solution in one line                                                                                    |
+| --- | ------------------------------------------------------ | ------------------------------------------------------------------------------------------------------- |
+| 1   | No server                                              | Static pages plus an Apps Script web app                                                                |
+| 2   | Visitors have no Google login                          | Script runs as the owner; three small secrets replace accounts                                          |
+| 3   | Browsers block cross-site calls                        | Send plain text so there is no preflight                                                                |
+| 4   | Apps Script has no modules or npm                      | A tiny bundler concatenates files into one                                                              |
+| 5   | Load order of those files is fragile                   | Every file is order-independent by construction                                                         |
+| 6   | Rules must match in browser, server, tests             | One UMD file loaded in all three                                                                        |
+| 7   | Apps Script cannot be unit tested                      | An in-memory Google runs the real bundle                                                                |
+| 8   | Two students, one slot                                 | A script lock plus a re-check inside it                                                                 |
+| 9   | Students have no accounts                              | A 5-digit key, salted, throttled, expiring                                                              |
+| 10  | The admin page is public                               | It is useless without a hashed, rate-limited PIN                                                        |
+| 11  | Instructors need a view without a login                | Private tokens, only the hash stored, columns stripped server-side                                      |
+| 12  | Colouring sheets is slow                               | Mark the form and repaint it a minute later, outside the request                                        |
+| 13  | One giant sheet becomes a mess                         | A registry sheet plus one sheet per form                                                                |
+| 14  | New forms should not need code                         | The form is data in a single cell                                                                       |
+| 15  | Lists change often                                     | Options are resolved when read, not copied                                                              |
+| 16  | WhatsApp has no API                                    | Paste, normalise phones, match                                                                          |
+| 17  | Browsers cannot check Drive sharing                    | The server checks it with the owner's Drive access                                                      |
+| 18  | PDFs from a script                                     | Export URL with the script's own token, with a fallback                                                 |
+| 19  | Excel with real files                                  | Download all reads the files as the owner inside Google, in small steps, and writes the workbook itself |
+| 20  | Updating without breaking links                        | Actions pushes a new version to the same deployment                                                     |
+| 21  | Email problems must not lose data                      | Mail is best effort and never blocks saving                                                             |
+| 22  | Deleting must free a code but keep history             | Soft delete: a flag, not a removed row                                                                  |
+| 23  | Sheets turns `01012345678` into a number               | Every data cell is formatted as plain text                                                              |
+| 24  | A static host cannot tell browsers to drop an old page | The site carries its version; files are named by their content and an old page reloads itself           |
 
 ---
 
@@ -155,7 +155,7 @@ is why [SECURITY.md](../backend/SECURITY.md) exists and why secrets are hashed.
 
 **Problem.** The page lives on `github.io`; the backend lives on
 `script.google.com`. Browsers protect users by asking the other site "may I?"
-first (a CORS *preflight*, an `OPTIONS` request) whenever a request looks
+first (a CORS _preflight_, an `OPTIONS` request) whenever a request looks
 unusual. Apps Script web apps cannot answer `OPTIONS`, so an ordinary JSON call
 would fail.
 
@@ -168,10 +168,10 @@ A `POST` whose `Content-Type` is `text/plain` is simple. So the page sends JSON
 
 ```js
 fetch(url, {
-  method: 'POST',
-  headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+  method: "POST",
+  headers: { "Content-Type": "text/plain;charset=utf-8" },
   body: JSON.stringify(payload),
-  redirect: 'follow'
+  redirect: "follow",
 });
 ```
 
@@ -295,7 +295,9 @@ platform file defines one namespace named after it:
 
 ```js
 var ClientsRepository = (function () {
-  function readClients_() { /* calls Table.readTable(...) when it runs */ }
+  function readClients_() {
+    /* calls Table.readTable(...) when it runs */
+  }
   return { readClients: readClients_ };
 })();
 ```
@@ -306,10 +308,13 @@ runs. So the namespaces load in any order. One file, `routes.js`, joins every
 action to its handler:
 
 ```js
-var Routes = Router.create([
-  { action: 'admin.clients.list', access: Access.ADMIN, handler: ClientsController.list },
-  // ...
-], { requireAdmin: AuthService.requireAdmin, requireClient: ClientsAccess.requireClient });
+var Routes = Router.create(
+  [
+    { action: "admin.clients.list", access: Access.ADMIN, handler: ClientsController.list },
+    // ...
+  ],
+  { requireAdmin: AuthService.requireAdmin, requireClient: ClientsAccess.requireClient },
+);
 ```
 
 It reads the namespaces while it loads, so the bundler puts it after them.
@@ -329,15 +334,17 @@ size in range" must behave identically everywhere. Duplicated rules always
 drift, and a student would see "valid" on the page and "invalid" from the
 server.
 
-**What the platform does.** Writes the rules once, as a *UMD module*: a file
+**What the platform does.** Writes the rules once, as a _UMD module_: a file
 that attaches itself correctly wherever it is loaded.
 
 ```js
 (function (root, factory) {
   var api = factory();
-  if (typeof module === 'object' && module.exports) module.exports = api; // Node tests
-  root.Rules = api;                                                        // browser and Apps Script
-})(typeof globalThis !== 'undefined' ? globalThis : this, function () { /* pure rules */ });
+  if (typeof module === "object" && module.exports) module.exports = api; // Node tests
+  root.Rules = api; // browser and Apps Script
+})(typeof globalThis !== "undefined" ? globalThis : this, function () {
+  /* pure rules */
+});
 ```
 
 ```mermaid
@@ -376,7 +383,7 @@ flowchart TD
     classDef cOk fill:#BFD9CF,stroke:#2E5A55,stroke-width:1.5px,color:#17302D
 ```
 
-Because the rules are *pure* (they use no browser and no Google objects), they
+Because the rules are _pure_ (they use no browser and no Google objects), they
 run anywhere unchanged.
 
 **Cost.** The rules file must stay free of environment-specific code. That
@@ -448,7 +455,7 @@ Drive sharing checks, PDF export, and email are on the first-run checklist.
 Both read the sheet, both see the slot free, both write.
 
 **What the platform does.** A **script lock** serialises the critical part, and
-the checks are repeated *inside* the lock:
+the checks are repeated _inside_ the lock:
 
 ```mermaid
 %%{init: {
@@ -508,16 +515,16 @@ copy is refused with `stale` and stays on the page with the reason.
 **Problem.** After submitting, a student must be able to fix a typo or cancel,
 but there are no logins.
 
-**What the platform does.** A 5-digit key, shown once, that *alone* opens the
+**What the platform does.** A 5-digit key, shown once, that _alone_ opens the
 registration. To make a short number safe:
 
-| Measure | Why it helps |
-|---|---|
-| Stored as `sha256(pepper + form id + key)` | A leaked sheet reveals no keys, and the same key in two forms hashes differently |
-| Unique within a form | Two registrations never share a key, so the key identifies exactly one |
-| 10 wrong tries a minute per form | Guessing is slowed to a few hundred tries an hour. It is not stopped: [SECURITY.md](../backend/SECURITY.md#honest-weak-spots) says what is left |
-| Expires after a number of days you set | A stolen old key stops working |
-| Shown once, optionally emailed | A lost key can be read back by the admin from a sealed copy, or replaced |
+| Measure                                    | Why it helps                                                                                                                                    |
+| ------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| Stored as `sha256(pepper + form id + key)` | A leaked sheet reveals no keys, and the same key in two forms hashes differently                                                                |
+| Unique within a form                       | Two registrations never share a key, so the key identifies exactly one                                                                          |
+| 10 wrong tries a minute per form           | Guessing is slowed to a few hundred tries an hour. It is not stopped: [SECURITY.md](../backend/SECURITY.md#honest-weak-spots) says what is left |
+| Expires after a number of days you set     | A stolen old key stops working                                                                                                                  |
+| Shown once, optionally emailed             | A lost key can be read back by the admin from a sealed copy, or replaced                                                                        |
 
 **Cost.** A lost key needs the admin (Details, then Show key or Reset key).
 That is a feature as much as a cost: there is no "forgot key" page to attack.
@@ -692,8 +699,8 @@ steps, rules, slots, and review steps, stored in a single cell. Fields carry a
 exact shape:
 
 ```js
-Rules.valueByRole(form, data, 'code');   // the leader code, whatever the field is called
-Rules.fieldByRole(form, 'team_size');    // the team size question, if the form has one
+Rules.valueByRole(form, data, "code"); // the leader code, whatever the field is called
+Rules.fieldByRole(form, "team_size"); // the team size question, if the form has one
 ```
 
 The four form types are just four template functions in `templates.service.js`. The
@@ -774,7 +781,7 @@ The check runs outside the lock, so it never slows other students.
 **What the platform does.** Builds a dedicated **print tab** on demand (always
 fresh), then calls the spreadsheet's own export address with the script's OAuth
 token and saves the result in a Drive `Exports` folder. If Google refuses, the
-dashboard says so and points to the print tab with *File > Print*, so printing
+dashboard says so and points to the print tab with _File > Print_, so printing
 never fully fails.
 
 **Cost.** PDF export is verified only on a real account.
@@ -811,13 +818,13 @@ desktop Excel only.
 **Problem.** If every backend change produced a new web app address, you would
 have to edit `config.js` and republish every time.
 
-**What the platform does.** Updating means a new version of the *same*
+**What the platform does.** Updating means a new version of the _same_
 deployment, so the address never changes. A push to `master` does it: the
 workflow pushes the tested bundle with clasp and redeploys under the fixed
 `APPS_SCRIPT_DEPLOYMENT_ID`, and it refuses to run when `API_URL` points at a
 different deployment. Pages is published only after that succeeds. The manual
 equivalent is **Deploy > Manage deployments > Edit > New version**; creating a
-*new* deployment instead would change the address.
+_new_ deployment instead would change the address.
 
 The website needs no edit when the backend changes, and the backend needs none
 when the website changes. They only agree on the JSON actions.

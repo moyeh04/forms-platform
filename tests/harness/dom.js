@@ -3,25 +3,23 @@
  * to the in-memory Apps Script world, so browser code and backend code are
  * tested together exactly as a student would use them.
  */
-const fs = require('node:fs');
-const path = require('node:path');
-const { JSDOM } = require('jsdom');
-const { sourceOf } = require('../../scripts/build/site-map.js');
+const fs = require("node:fs");
+const path = require("node:path");
+const { JSDOM } = require("jsdom");
+const { sourceOf } = require("../../scripts/build/site-map.js");
 
-const root = path.resolve(__dirname, '..', '..');
+const root = path.resolve(__dirname, "..", "..");
 
 function scriptsOf(html) {
-  return [...html.matchAll(/<script src="([^"]+)"><\/script>/g)].map(
-    (m) => m[1]
-  );
+  return [...html.matchAll(/<script src="([^"]+)"><\/script>/g)].map((m) => m[1]);
 }
 
-async function openPage(file, world, { query = '', hash = '', lang } = {}) {
-  const html = fs.readFileSync(path.join(root, sourceOf(file)), 'utf8');
+async function openPage(file, world, { query = "", hash = "", lang } = {}) {
+  const html = fs.readFileSync(path.join(root, sourceOf(file)), "utf8");
   const dom = new JSDOM(html, {
     url: `http://localhost/${file}${query}${hash}`,
-    runScripts: 'outside-only',
-    pretendToBeVisual: true
+    runScripts: "outside-only",
+    pretendToBeVisual: true,
   });
   const { window } = dom;
   window.__FORM_NO_AUTOSTART__ = true;
@@ -33,20 +31,20 @@ async function openPage(file, world, { query = '', hash = '', lang } = {}) {
     (() => ({
       matches: false,
       addEventListener() {},
-      removeEventListener() {}
+      removeEventListener() {},
     }));
   window.fetch = async (_url, opts) => ({
-    json: async () => world.api(JSON.parse(opts.body))
+    json: async () => world.api(JSON.parse(opts.body)),
   });
   window.print = () => {
     window.__printed = true;
   };
-  if (lang) window.localStorage.setItem('fp_lang', lang);
+  if (lang) window.localStorage.setItem("fp_lang", lang);
 
   for (const src of scriptsOf(html)) {
-    window.eval(fs.readFileSync(path.join(root, sourceOf(src)), 'utf8'));
+    window.eval(fs.readFileSync(path.join(root, sourceOf(src)), "utf8"));
   }
-  window.APP_CONFIG.API_URL = 'http://api.test/exec';
+  window.APP_CONFIG.API_URL = "http://api.test/exec";
   return dom;
 }
 
@@ -60,66 +58,56 @@ function helpers(window) {
   const $ = (s, el = doc) => el.querySelector(s);
   const $$ = (s, el = doc) => [...el.querySelectorAll(s)];
   const fire = (el, type) =>
-    el.dispatchEvent(
-      new window.Event(type, { bubbles: true, cancelable: true })
-    );
+    el.dispatchEvent(new window.Event(type, { bubbles: true, cancelable: true }));
   return {
     $,
     $$,
     fire,
     type(sel, value) {
-      const el = typeof sel === 'string' ? $(sel) : sel;
-      if (!el) throw new Error('No element for ' + sel);
+      const el = typeof sel === "string" ? $(sel) : sel;
+      if (!el) throw new Error("No element for " + sel);
       el.value = value;
-      fire(el, 'input');
-      fire(el, 'change');
-      fire(el, 'blur');
+      fire(el, "input");
+      fire(el, "change");
+      fire(el, "blur");
       return el;
     },
     pick(path, value) {
       const radio = $(`input[type=radio][name="${path}"][value="${value}"]`);
       if (radio) {
         radio.checked = true;
-        fire(radio, 'change');
+        fire(radio, "change");
         return radio;
       }
       const sel = $(`select[name="${path}"]`);
-      if (!sel) throw new Error('No choice field ' + path);
+      if (!sel) throw new Error("No choice field " + path);
       sel.value = value;
-      fire(sel, 'change');
+      fire(sel, "change");
       return sel;
     },
     click(el) {
-      if (typeof el === 'string') el = $(el);
-      if (!el) throw new Error('Nothing to click');
-      el.dispatchEvent(
-        new window.MouseEvent('click', { bubbles: true, cancelable: true })
-      );
+      if (typeof el === "string") el = $(el);
+      if (!el) throw new Error("Nothing to click");
+      el.dispatchEvent(new window.MouseEvent("click", { bubbles: true, cancelable: true }));
     },
     clickText(text, scope = doc) {
-      const el = $$('button, a', scope).find((b) =>
-        b.textContent.trim().includes(text)
-      );
+      const el = $$("button, a", scope).find((b) => b.textContent.trim().includes(text));
       if (!el)
         throw new Error(
-          'No button with text: ' +
+          "No button with text: " +
             text +
-            ' | have: ' +
-            $$('button', scope)
+            " | have: " +
+            $$("button", scope)
               .map((b) => b.textContent.trim())
-              .join(' / ')
+              .join(" / "),
         );
-      el.dispatchEvent(
-        new window.MouseEvent('click', { bubbles: true, cancelable: true })
-      );
+      el.dispatchEvent(new window.MouseEvent("click", { bubbles: true, cancelable: true }));
     },
     submitForm() {
-      const f = $('form');
-      f.dispatchEvent(
-        new window.Event('submit', { bubbles: true, cancelable: true })
-      );
+      const f = $("form");
+      f.dispatchEvent(new window.Event("submit", { bubbles: true, cancelable: true }));
     },
-    text: () => doc.body.textContent.replace(/\s+/g, ' ').trim()
+    text: () => doc.body.textContent.replace(/\s+/g, " ").trim(),
   };
 }
 

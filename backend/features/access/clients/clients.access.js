@@ -28,20 +28,17 @@ var ClientsAccess = (function () {
    * @throws {ApiError} `too_many_attempts` or `bad_token`.
    */
   function linkByToken_(cache, token) {
-    var fails = parseInt(cache.get(Constants.CACHE.BAD_TOKENS) || '0', 10);
+    var fails = parseInt(cache.get(Constants.CACHE.BAD_TOKENS) || "0", 10);
     if (fails >= TOKEN_TRIES_)
-      ApiError.fail(
-        'too_many_attempts',
-        'Too many tries. Wait a minute and open the link again.'
-      );
-    var h = token ? ClientsService.clientToken(token) : '';
+      ApiError.fail("too_many_attempts", "Too many tries. Wait a minute and open the link again.");
+    var h = token ? ClientsService.clientToken(token) : "";
     var hit = null;
     ClientsRepository.readClients().forEach(function (c) {
       if (h && c.tokenHash === h) hit = c;
     });
     if (!hit) {
       cache.put(Constants.CACHE.BAD_TOKENS, String(fails + 1), TOKEN_WINDOW_S_);
-      ApiError.fail('bad_token', 'This link is not valid.');
+      ApiError.fail("bad_token", "This link is not valid.");
     }
     return hit;
   }
@@ -57,17 +54,14 @@ var ClientsAccess = (function () {
    */
   function checkAccessKey_(cache, link, accessKey) {
     var tag = Constants.CACHE.CLIENT_KEY_PREFIX + link.id;
-    var wrong = parseInt(cache.get(tag) || '0', 10);
+    var wrong = parseInt(cache.get(tag) || "0", 10);
     if (wrong >= CLIENT_KEY_TRIES_)
-      ApiError.fail(
-        'key_locked',
-        'Too many wrong keys. Wait ten minutes and try again.'
-      );
-    var key = String(accessKey || '').replace(/\D/g, '');
-    if (!key) ApiError.fail('key_needed', 'This link needs its access key.');
+      ApiError.fail("key_locked", "Too many wrong keys. Wait ten minutes and try again.");
+    var key = String(accessKey || "").replace(/\D/g, "");
+    if (!key) ApiError.fail("key_needed", "This link needs its access key.");
     if (ClientsService.clientKeyHash(link, key) !== link.keyHash) {
       cache.put(tag, String(wrong + 1), KEY_WINDOW_S_);
-      ApiError.fail('bad_access_key', 'That access key is not right.');
+      ApiError.fail("bad_access_key", "That access key is not right.");
     }
   }
 
@@ -96,14 +90,14 @@ var ClientsAccess = (function () {
    */
   function checkClient_(req) {
     var cache = CacheService.getScriptCache();
-    var hit = linkByToken_(cache, String(req?.token || ''));
-    if (!hit.active) ApiError.fail('revoked', 'This link was turned off.');
+    var hit = linkByToken_(cache, String(req?.token || ""));
+    if (!hit.active) ApiError.fail("revoked", "This link was turned off.");
     if (ClientsService.clientExpired(hit))
       ApiError.fail(
-        'link_expired',
-        'This link ended on ' +
+        "link_expired",
+        "This link ended on " +
           hit.expires.slice(0, ISO_DATE_LENGTH_) +
-          '. Ask whoever sent it to extend it.'
+          ". Ask whoever sent it to extend it.",
       );
     if (hit.keyHash) checkAccessKey_(cache, hit, req?.accessKey);
     return hit;
@@ -117,9 +111,7 @@ var ClientsAccess = (function () {
    * @return {boolean} True when the link names the form or every form.
    */
   function clientAllows_(client, form) {
-    return (
-      client.forms.indexOf('*') !== -1 || client.forms.indexOf(form.id) !== -1
-    );
+    return client.forms.indexOf("*") !== -1 || client.forms.indexOf(form.id) !== -1;
   }
 
   return { requireClient: requireClient_, clientAllows: clientAllows_ };

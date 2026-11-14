@@ -148,14 +148,7 @@
     },
     "fileStructure": "docs/architecture/FILE-STRUCTURE.md",
     "documented": {
-      "include": [
-        "web/js/",
-        "web/css/",
-        "backend/",
-        "domain/",
-        "scripts/",
-        ".githooks/"
-      ],
+      "include": ["web/js/", "web/css/", "backend/", "domain/", "scripts/", ".githooks/"],
       "extensions": [".js", ".css", ".sh", ""]
     },
     "siteMap": "scripts/build/site-map.js",

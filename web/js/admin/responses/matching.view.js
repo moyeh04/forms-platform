@@ -4,7 +4,7 @@
  * reject. The state of the view is one object, `m`, that its parts share.
  */
 (function (App) {
-  'use strict';
+  "use strict";
 
   var A = App.admin;
   var R = A.responses;
@@ -13,16 +13,16 @@
 
   /** What each match status is called. */
   var STATUS_NAMES = {
-    none: 'No match',
-    matched: 'Matched',
-    duplicate: 'Duplicate'
+    none: "No match",
+    matched: "Matched",
+    duplicate: "Duplicate",
   };
 
   /** The toast after each decision. */
   var DECIDED = {
-    approved: 'Approved',
-    rejected: 'Rejected',
-    pending: 'Back to pending'
+    approved: "Approved",
+    rejected: "Rejected",
+    pending: "Back to pending",
   };
 
   /**
@@ -34,7 +34,7 @@
   R.matchBadges = function (r) {
     return [
       A.badge(STATUS_NAMES[r.status] || STATUS_NAMES.duplicate, r.status),
-      A.badge(A.SUB_LABEL[r.decision] || r.decision, r.decision)
+      A.badge(A.SUB_LABEL[r.decision] || r.decision, r.decision),
     ];
   };
 
@@ -47,7 +47,7 @@
   R.visibleRequests = function (m) {
     var f = m.filter;
     return m.data.requests.filter(function (r) {
-      if (f === 'all') return true;
+      if (f === "all") return true;
       if (STATUS_NAMES[f]) return r.status === f;
       return r.decision === f;
     });
@@ -85,7 +85,7 @@
    * @return {!Promise} Settles once it is drawn.
    */
   async function load(m, keepSelection) {
-    m.data = await A.call('admin.matching.list', { slug: m.form.slug });
+    m.data = await A.call("admin.matching.list", { slug: m.form.slug });
     if (
       !keepSelection ||
       !m.data.requests.some(function (r) {
@@ -110,9 +110,7 @@
     });
     var at = order.indexOf(q.id);
     return m.data.requests.filter(function (r) {
-      return (
-        order.indexOf(r.id) > at && r.decision === 'pending' && r.id !== q.id
-      );
+      return order.indexOf(r.id) > at && r.decision === "pending" && r.id !== q.id;
     })[0];
   }
 
@@ -126,18 +124,18 @@
    * @return {!Promise} Settles once it is saved and drawn.
    */
   R.decideMatch = function (m, q, decision) {
-    return A.call('admin.matching.decide', {
+    return A.call("admin.matching.decide", {
       slug: m.form.slug,
       requestId: q.id,
       decision: decision,
-      note: m.note
+      note: m.note,
     })
       .then(function () {
-        ui.toast(DECIDED[decision] || DECIDED.pending, 'ok');
+        ui.toast(DECIDED[decision] || DECIDED.pending, "ok");
         var next = nextPending(m, q);
-        m.note = '';
+        m.note = "";
         return m.load(false).then(function () {
-          if (decision !== 'pending' && next) {
+          if (decision !== "pending" && next) {
             m.sel = next.id;
             m.paint();
           }
@@ -157,15 +155,15 @@
     var m = {
       form: form,
       data: null,
-      filter: 'all',
+      filter: "all",
       sel: null,
-      note: '',
-      left: h('div', { class: 'panel' }),
-      right: h('div', { class: 'panel detail' })
+      note: "",
+      left: h("div", { class: "panel" }),
+      right: h("div", { class: "panel detail" }),
     };
     m.paint = paint.bind(null, m);
     m.load = load.bind(null, m);
-    host.appendChild(h('div', { class: 'split' }, m.left, m.right));
+    host.appendChild(h("div", { class: "split" }, m.left, m.right));
     await m.load(false);
   };
 })(window.App);

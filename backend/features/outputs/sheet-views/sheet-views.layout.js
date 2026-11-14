@@ -20,7 +20,7 @@ var SheetViewsLayout = (function () {
   var LABEL_FONT_ = 13;
 
   /** The colour of the note of an empty view. */
-  var EMPTY_INK_ = '#6B5535';
+  var EMPTY_INK_ = "#6B5535";
 
   /**
    * Opens a view tab empty, making it when it is missing.
@@ -47,11 +47,11 @@ var SheetViewsLayout = (function () {
       .setValues([headers])
       .setBackground(SheetStyle.PALETTE.ink)
       .setFontColor(SheetStyle.PALETTE.onInk)
-      .setFontWeight('bold')
+      .setFontWeight("bold")
       .setFontSize(HEADER_FONT_)
       .setFontFamily(SheetStyle.PALETTE.font)
-      .setHorizontalAlignment('center')
-      .setVerticalAlignment('middle');
+      .setHorizontalAlignment("center")
+      .setVerticalAlignment("middle");
     sh.setRowHeight(1, HEADER_PX_);
     sh.setFrozenRows(1);
   }
@@ -81,7 +81,7 @@ var SheetViewsLayout = (function () {
       .setBackgrounds(shades)
       .setFontFamily(SheetStyle.PALETTE.font)
       .setFontSize(BODY_FONT)
-      .setVerticalAlignment('middle');
+      .setVerticalAlignment("middle");
   }
 
   /**
@@ -95,7 +95,7 @@ var SheetViewsLayout = (function () {
     sh.getRange(FIRST_ROW, 1, 1, cols)
       .merge()
       .setValue(text)
-      .setHorizontalAlignment('center')
+      .setHorizontalAlignment("center")
       .setFontColor(EMPTY_INK_)
       .setFontFamily(SheetStyle.PALETTE.font);
   }
@@ -118,7 +118,7 @@ var SheetViewsLayout = (function () {
       true,
       true,
       SheetStyle.PALETTE.grid,
-      SpreadsheetApp.BorderStyle.SOLID
+      SpreadsheetApp.BorderStyle.SOLID,
     );
     blocks.forEach(function (b) {
       sh.getRange(b.start, 1, b.length, area.cols).setBorder(
@@ -129,7 +129,7 @@ var SheetViewsLayout = (function () {
         false,
         false,
         SheetStyle.PALETTE.ink,
-        SpreadsheetApp.BorderStyle.SOLID_THICK
+        SpreadsheetApp.BorderStyle.SOLID_THICK,
       );
     });
   }
@@ -151,11 +151,11 @@ var SheetViewsLayout = (function () {
     else anchor.setValue(label.value);
     r.setBackground(label.fill)
       .setFontColor(SheetStyle.PALETTE.onInk)
-      .setFontWeight('bold')
+      .setFontWeight("bold")
       .setFontSize(LABEL_FONT_)
       .setFontFamily(SheetStyle.PALETTE.font)
-      .setHorizontalAlignment('center')
-      .setVerticalAlignment('middle')
+      .setHorizontalAlignment("center")
+      .setVerticalAlignment("middle")
       .setWrap(true);
   }
 
@@ -170,7 +170,7 @@ var SheetViewsLayout = (function () {
     var quoted = [url, text].map(function (s) {
       return '"' + String(s).replace(/"/g, '""') + '"';
     });
-    return '=HYPERLINK(' + quoted.join(',') + ')';
+    return "=HYPERLINK(" + quoted.join(",") + ")";
   }
 
   /**
@@ -180,18 +180,12 @@ var SheetViewsLayout = (function () {
    * @param {!SpreadsheetApp.Spreadsheet} ss The form's spreadsheet.
    */
   function styleFormTabs(ss) {
-    SheetStyle.styleDataTab(
-      ss.getSheetByName('Responses'),
-      ResponsesRepository.RESPONSE_COLS
-    );
+    SheetStyle.styleDataTab(ss.getSheetByName("Responses"), ResponsesRepository.RESPONSE_COLS);
     SheetStyle.styleDataTab(
       ss.getSheetByName(TransfersRepository.TRANSFER_TAB),
-      TransfersRepository.TRANSFER_COLS
+      TransfersRepository.TRANSFER_COLS,
     );
-    SheetStyle.styleDataTab(
-      ss.getSheetByName('Requests'),
-      MatchingRepository.REQUEST_COLS
-    );
+    SheetStyle.styleDataTab(ss.getSheetByName("Requests"), MatchingRepository.REQUEST_COLS);
   }
 
   return {
@@ -205,6 +199,6 @@ var SheetViewsLayout = (function () {
     paintHeader: paintHeader_,
     setWidths,
     writeRows,
-    emptyView: emptyView_
+    emptyView: emptyView_,
   };
 })();

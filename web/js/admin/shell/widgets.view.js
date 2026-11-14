@@ -3,7 +3,7 @@
  * labelled field, a checkbox, a text box, a number box and a dropdown.
  */
 (function (App) {
-  'use strict';
+  "use strict";
 
   var A = App.admin;
   var h = App.ui.h;
@@ -16,11 +16,7 @@
    * @return {!Element} The badge.
    */
   A.badge = function (text, kind) {
-    return h(
-      'span',
-      { class: 'badge ' + (kind || String(text).toLowerCase()) },
-      text
-    );
+    return h("span", { class: "badge " + (kind || String(text).toLowerCase()) }, text);
   };
 
   /**
@@ -33,11 +29,11 @@
    */
   A.field = function (label, control, help) {
     return h(
-      'label',
-      { class: 'field-row' },
-      h('span', { class: 'label' }, label),
+      "label",
+      { class: "field-row" },
+      h("span", { class: "label" }, label),
       control,
-      help ? h('span', { class: 'help' }, help) : null
+      help ? h("span", { class: "help" }, help) : null,
     );
   };
 
@@ -54,18 +50,18 @@
   A.check = function (label, checked, onchange, opts) {
     var o = opts || {};
     return h(
-      'label',
-      { class: 'check' },
-      h('input', {
-        type: 'checkbox',
+      "label",
+      { class: "check" },
+      h("input", {
+        type: "checkbox",
         name: o.name || null,
         checked: !!checked,
         disabled: !!o.disabled,
         onchange: function (e) {
           onchange(e.target.checked);
-        }
+        },
       }),
-      label
+      label,
     );
   };
 
@@ -80,18 +76,18 @@
    */
   function box(type, value, onchange, attrs) {
     return h(
-      'input',
+      "input",
       Object.assign(
         {
-          class: 'input',
+          class: "input",
           type: type,
-          value: value == null ? '' : value,
+          value: value == null ? "" : value,
           oninput: function (e) {
             onchange(e.target.value);
-          }
+          },
         },
-        attrs || {}
-      )
+        attrs || {},
+      ),
     );
   }
 
@@ -104,7 +100,7 @@
    * @return {!Element} The box.
    */
   A.text = function (value, onchange, attrs) {
-    return box('text', value, onchange, attrs);
+    return box("text", value, onchange, attrs);
   };
 
   /**
@@ -116,12 +112,7 @@
    * @return {!Element} The box.
    */
   A.number = function (value, onchange, attrs) {
-    return box(
-      'number',
-      value,
-      onchange,
-      Object.assign({ inputmode: 'numeric' }, attrs || {})
-    );
+    return box("number", value, onchange, Object.assign({ inputmode: "numeric" }, attrs || {}));
   };
 
   /**
@@ -134,22 +125,18 @@
    */
   A.select = function (value, options, onchange) {
     return h(
-      'select',
+      "select",
       {
-        class: 'select',
+        class: "select",
         onchange: function (e) {
           onchange(e.target.value);
-        }
+        },
       },
       options.map(function (o) {
         var v = Array.isArray(o) ? o[0] : o;
         var l = Array.isArray(o) ? o[1] : o;
-        return h(
-          'option',
-          { value: v, selected: String(v) === String(value) },
-          l
-        );
-      })
+        return h("option", { value: v, selected: String(v) === String(value) }, l);
+      }),
     );
   };
 })(window.App);

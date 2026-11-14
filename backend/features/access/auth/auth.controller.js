@@ -12,7 +12,7 @@ var AuthController = (function () {
     var pass = req?.admin?.device;
     return {
       admin: true,
-      device: AuthDevices.known(pass) ? pass : AuthDevices.issue()
+      device: AuthDevices.known(pass) ? pass : AuthDevices.issue(),
     };
   }
 

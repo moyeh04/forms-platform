@@ -3,15 +3,15 @@
  * board, or mark it. The dialog of a link picks it and the table names it.
  */
 (function (App) {
-  'use strict';
+  "use strict";
 
   var A = App.admin;
 
   /** Each choice, with the word the dialog and the table show. */
   var PROGRESS = [
-    [ProgressAccess.HIDDEN, 'Hidden'],
-    [ProgressAccess.SEE, 'Can see'],
-    [ProgressAccess.MARK, 'Can mark']
+    [ProgressAccess.HIDDEN, "Hidden"],
+    [ProgressAccess.SEE, "Can see"],
+    [ProgressAccess.MARK, "Can mark"],
   ];
 
   /**
@@ -37,12 +37,12 @@
     var sel = A.select(st.progress, PROGRESS, function (v) {
       st.progress = v;
     });
-    sel.name = 'progress';
+    sel.name = "progress";
     return A.field(
-      'Team progress',
+      "Team progress",
       sel,
-      'Only on team registrations that follow milestones. Can mark lets them' +
-        ' set states and write notes.'
+      "Only on team registrations that follow milestones. Can mark lets them" +
+        " set states and write notes.",
     );
   };
 })(window.App);

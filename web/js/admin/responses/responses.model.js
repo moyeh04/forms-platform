@@ -4,7 +4,7 @@
  * day, the order of WhatsApp registrations and the rows of the CSV file.
  */
 (function (App) {
-  'use strict';
+  "use strict";
 
   var A = App.admin;
   var Rules = window.Rules;
@@ -13,17 +13,17 @@
 
   /** The columns of the CSV file before the questions the admin added. */
   var CSV_HEAD = [
-    'Reference',
-    'Sent',
-    'Status',
-    'Name',
-    'Code',
-    'Phone',
-    'Email',
-    'Title',
-    'Link',
-    'Slot',
-    'Members'
+    "Reference",
+    "Sent",
+    "Status",
+    "Name",
+    "Code",
+    "Phone",
+    "Email",
+    "Title",
+    "Link",
+    "Slot",
+    "Members",
   ];
 
   /**
@@ -34,11 +34,11 @@
    * @return {string} The text, or '' for none.
    */
   R.slotText = function (form, slot) {
-    if (!slot) return '';
+    if (!slot) return "";
     var day = (form.slots?.days || []).filter(function (d) {
       return d.id === slot.day;
     })[0];
-    return (day ? day.label : slot.day) + ' - ' + slot.time;
+    return (day ? day.label : slot.day) + " - " + slot.time;
   };
 
   /**
@@ -52,12 +52,10 @@
   function haystack(form, s) {
     var members = Rules.membersOf(form, s.data)
       .map(function (m) {
-        return m.name + ' ' + m.code + ' ' + m.phone;
+        return m.name + " " + m.code + " " + m.phone;
       })
-      .join(' ');
-    return [s.ref, s.email, s.name, s.code, s.phone, s.title, members]
-      .join(' ')
-      .toLowerCase();
+      .join(" ");
+    return [s.ref, s.email, s.name, s.code, s.phone, s.title, members].join(" ").toLowerCase();
   }
 
   /**
@@ -72,7 +70,7 @@
     var q = state.q.trim().toLowerCase();
     return all.filter(function (s) {
       return (
-        (state.status === 'all' || s.status === state.status) &&
+        (state.status === "all" || s.status === state.status) &&
         (!q || haystack(form, s).indexOf(q) !== -1)
       );
     });
@@ -124,17 +122,17 @@
       g.rows = [];
     });
     rows.forEach(function (s) {
-      var id = s.data.slot ? s.data.slot.day : '';
+      var id = s.data.slot ? s.data.slot.day : "";
       var g = groups.filter(function (x) {
         return x.id === id;
       })[0];
       if (!g) {
         g = {
           id: id,
-          label: 'Slot no longer on the timetable',
-          date: '',
+          label: "Slot no longer on the timetable",
+          date: "",
           times: [],
-          rows: []
+          rows: [],
         };
         groups.push(g);
       }
@@ -142,9 +140,7 @@
     });
     return groups.filter(function (g) {
       g.rows.sort(function (a, b) {
-        return (
-          g.times.indexOf(a.data.slot.time) - g.times.indexOf(b.data.slot.time)
-        );
+        return g.times.indexOf(a.data.slot.time) - g.times.indexOf(b.data.slot.time);
       });
       return g.rows.length;
     });
@@ -161,10 +157,7 @@
       var ga = String(a.data.group);
       var gb = String(b.data.group);
       if (ga !== gb) return ga < gb ? -1 : 1;
-      return (
-        (parseInt(a.data.section, 10) || 0) -
-        (parseInt(b.data.section, 10) || 0)
-      );
+      return (parseInt(a.data.section, 10) || 0) - (parseInt(b.data.section, 10) || 0);
     });
   };
 
@@ -178,12 +171,12 @@
    */
   function membersCell(form, s) {
     if (form.type !== FormType.RESERVATION) return s.members;
-    if (Rules.fieldByRole(form, 'members').enabled === false) return '';
+    if (Rules.fieldByRole(form, "members").enabled === false) return "";
     return (s.data.members || [])
       .map(function (member) {
-        return member.name + ' (' + member.code + ')';
+        return member.name + " (" + member.code + ")";
       })
-      .join('; ');
+      .join("; ");
   }
 
   /**
@@ -201,7 +194,7 @@
     var head = CSV_HEAD.concat(
       added.map(function (fd) {
         return fd.label.en;
-      })
+      }),
     );
     return [head].concat(
       rows.map(function (s) {
@@ -216,13 +209,13 @@
           s.title,
           s.link,
           R.slotText(form, s.data.slot),
-          membersCell(form, s)
+          membersCell(form, s),
         ].concat(
           added.map(function (fd) {
-            return s.data[fd.id] == null ? '' : String(s.data[fd.id]);
-          })
+            return s.data[fd.id] == null ? "" : String(s.data[fd.id]);
+          }),
         );
-      })
+      }),
     );
   };
 })(window.App);

@@ -3,13 +3,13 @@
  * chat of a number, and the numbers inside pasted text.
  */
 (function (root) {
-  'use strict';
+  "use strict";
 
-  var node = typeof module === 'object' && module.exports;
-  var textRules = node ? require('./text.js') : root.RulesText;
+  var node = typeof module === "object" && module.exports;
+  var textRules = node ? require("./text.js") : root.RulesText;
 
   /** The country code of Egypt. */
-  var COUNTRY_CODE = '20';
+  var COUNTRY_CODE = "20";
 
   /** The length of a number written with the country code and no 0. */
   var INTERNATIONAL_LENGTH = 12;
@@ -24,7 +24,7 @@
   var PHONE_LIKE = /\+?\d[\d\s().-]{8,}\d/g;
 
   /** The address of a WhatsApp chat, before the number without its 0. */
-  var WHATSAPP = 'https://wa.me/2';
+  var WHATSAPP = "https://wa.me/2";
 
   /**
    * Gives the canonical Egyptian mobile (01XXXXXXXXX) of a typed number.
@@ -33,15 +33,15 @@
    * @return {string} The canonical number, or '' when it is not one.
    */
   function normalizePhone(raw) {
-    var d = textRules.latinDigits(raw).replace(/[^\d+]/g, '');
-    if (!d) return '';
-    d = d.replace(/^\+/, '').replace(/^00/, '');
+    var d = textRules.latinDigits(raw).replace(/[^\d+]/g, "");
+    if (!d) return "";
+    d = d.replace(/^\+/, "").replace(/^00/, "");
     if (d.indexOf(COUNTRY_CODE) === 0 && d.length === INTERNATIONAL_LENGTH) {
-      d = '0' + d.slice(COUNTRY_CODE.length);
-    } else if (d.length === BARE_LENGTH && d.charAt(0) === '1') {
-      d = '0' + d;
+      d = "0" + d.slice(COUNTRY_CODE.length);
+    } else if (d.length === BARE_LENGTH && d.charAt(0) === "1") {
+      d = "0" + d;
     }
-    return MOBILE.test(d) ? d : '';
+    return MOBILE.test(d) ? d : "";
   }
 
   /**
@@ -52,7 +52,7 @@
    */
   function whatsappLink(raw) {
     var p = normalizePhone(raw);
-    return p ? WHATSAPP + p : '';
+    return p ? WHATSAPP + p : "";
   }
 
   /**
@@ -65,12 +65,10 @@
    */
   function extractPhones(text) {
     var found = [];
-    (textRules.latinDigits(text).match(PHONE_LIKE) || []).forEach(
-      function (raw) {
-        var p = normalizePhone(raw);
-        if (p) found.push({ raw: raw, phone: p });
-      }
-    );
+    (textRules.latinDigits(text).match(PHONE_LIKE) || []).forEach(function (raw) {
+      var p = normalizePhone(raw);
+      if (p) found.push({ raw: raw, phone: p });
+    });
     return found;
   }
 
@@ -82,17 +80,17 @@
    *     `{ok: false, error}`.
    */
   function validatePhone(raw) {
-    if (textRules.isEmpty(raw)) return { ok: false, error: 'required' };
+    if (textRules.isEmpty(raw)) return { ok: false, error: "required" };
     var p = normalizePhone(raw);
-    return p ? { ok: true, value: p } : { ok: false, error: 'invalid_phone' };
+    return p ? { ok: true, value: p } : { ok: false, error: "invalid_phone" };
   }
 
   var api = {
     normalizePhone: normalizePhone,
     whatsappLink: whatsappLink,
     extractPhones: extractPhones,
-    validatePhone: validatePhone
+    validatePhone: validatePhone,
   };
   if (node) module.exports = api;
   root.RulesPhone = api;
-})(typeof globalThis !== 'undefined' ? globalThis : this);
+})(typeof globalThis !== "undefined" ? globalThis : this);

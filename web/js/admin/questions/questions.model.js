@@ -4,20 +4,20 @@
  * draws: the views call these and draw the list again.
  */
 (function (App) {
-  'use strict';
+  "use strict";
 
   var A = App.admin;
   var Q = {};
   A.questions = Q;
 
   /** Questions the form cannot work without: they are always asked. */
-  var LOCKED_ROLES = ['name', 'code', 'team_size', 'members', 'slot'];
+  var LOCKED_ROLES = ["name", "code", "team_size", "members", "slot"];
 
   /**
    * Questions that belong to a page for a reason: the member forms follow
    * the size, and a booking is its own page.
    */
-  var FIXED_ROLES = ['team_size', 'members', 'slot'];
+  var FIXED_ROLES = ["team_size", "members", "slot"];
 
   /** A new id: a prefix and eight letters or digits. */
   var ID = { RADIX: 36, FROM: 2, TO: 10 };
@@ -27,21 +27,21 @@
    * question can be are read from here.
    */
   Q.TYPE_NAMES = {
-    text: 'Short answer',
-    textarea: 'Long answer',
-    select: 'One choice from a list',
-    english_text: 'English text',
-    email: 'Email address',
-    phone: 'Phone number',
-    code: 'Student code',
-    drive_link: 'Drive link',
-    team_size: 'Team size',
-    members: 'Team members',
-    slot: 'Time slot'
+    text: "Short answer",
+    textarea: "Long answer",
+    select: "One choice from a list",
+    english_text: "English text",
+    email: "Email address",
+    phone: "Phone number",
+    code: "Student code",
+    drive_link: "Drive link",
+    team_size: "Team size",
+    members: "Team members",
+    slot: "Time slot",
   };
 
   /** The kinds an added question can be, as select options. */
-  Q.KINDS = ['text', 'textarea', 'select'].map(function (k) {
+  Q.KINDS = ["text", "textarea", "select"].map(function (k) {
     return [k, Q.TYPE_NAMES[k]];
   });
 
@@ -72,7 +72,7 @@
    * @return {string} The name.
    */
   Q.typeName = function (fd) {
-    return Q.TYPE_NAMES[fd.type] || fd.type.replace(/_/g, ' ');
+    return Q.TYPE_NAMES[fd.type] || fd.type.replace(/_/g, " ");
   };
 
   /**
@@ -82,7 +82,7 @@
    * @return {boolean} True when it has one.
    */
   Q.hasHelp = function (fd) {
-    return !!(fd.help?.en || '').trim() || !!(fd.help?.ar || '').trim();
+    return !!(fd.help?.en || "").trim() || !!(fd.help?.ar || "").trim();
   };
 
   /**
@@ -92,7 +92,7 @@
    * @return {string} Its title, or a placeholder.
    */
   Q.pageName = function (st) {
-    return st.title?.en || st.title?.ar || 'Page with no title';
+    return st.title?.en || st.title?.ar || "Page with no title";
   };
 
   /**
@@ -119,11 +119,7 @@
    * @return {boolean} True when it can be moved.
    */
   Q.isMovable = function (f, fd) {
-    return (
-      FIXED_ROLES.indexOf(fd.role) === -1 &&
-      (f.steps || []).length > 1 &&
-      !!Q.pageOf(f, fd)
-    );
+    return FIXED_ROLES.indexOf(fd.role) === -1 && (f.steps || []).length > 1 && !!Q.pageOf(f, fd);
   };
 
   /**
@@ -172,14 +168,14 @@
    * @return {string} The id of the question.
    */
   Q.addQuestion = function (f, st) {
-    var id = newId('q_');
+    var id = newId("q_");
     f.fields.push({
       id: id,
-      type: 'text',
+      type: "text",
       custom: true,
-      label: { en: '', ar: '' },
+      label: { en: "", ar: "" },
       required: false,
-      enabled: true
+      enabled: true,
     });
     st.fields = (st.fields || []).concat([id]);
     return id;
@@ -210,10 +206,10 @@
    */
   Q.addPage = function (f) {
     var st = {
-      id: newId('p_'),
+      id: newId("p_"),
       custom: true,
-      title: { en: '', ar: '' },
-      fields: []
+      title: { en: "", ar: "" },
+      fields: [],
     };
     f.steps = (f.steps || []).concat([st]);
     return st;
@@ -226,16 +222,16 @@
    * @return {!Array<!Object>} The options.
    */
   Q.readChoices = function (text) {
-    return String(text || '')
-      .split('\n')
+    return String(text || "")
+      .split("\n")
       .map(function (line) {
-        var parts = line.split('|').map(function (x) {
+        var parts = line.split("|").map(function (x) {
           return x.trim();
         });
         if (!parts[0]) return null;
         return {
           value: parts[0],
-          label: { en: parts[0], ar: parts[1] || parts[0] }
+          label: { en: parts[0], ar: parts[1] || parts[0] },
         };
       })
       .filter(Boolean);
@@ -252,10 +248,10 @@
     return (options || [])
       .map(function (o) {
         return o.label.ar && o.label.ar !== o.label.en
-          ? o.label.en + ' | ' + o.label.ar
+          ? o.label.en + " | " + o.label.ar
           : o.label.en;
       })
-      .join('\n');
+      .join("\n");
   };
 
   /**
@@ -267,7 +263,7 @@
    */
   Q.listed = function (s) {
     return (s.f.fields || []).filter(function (fd) {
-      return !(s.isReservation && fd.role === 'members');
+      return !(s.isReservation && fd.role === "members");
     });
   };
 
@@ -282,9 +278,7 @@
     var hidden = all.filter(function (fd) {
       return fd.enabled === false;
     }).length;
-    return (
-      all.length - hidden + ' shown' + (hidden ? ', ' + hidden + ' hidden' : '')
-    );
+    return all.length - hidden + " shown" + (hidden ? ", " + hidden + " hidden" : "");
   };
 
   /**
@@ -294,7 +288,7 @@
    * @return {boolean} True when both are empty.
    */
   function blank(t) {
-    return !(t.en || '').trim() && !(t.ar || '').trim();
+    return !(t.en || "").trim() && !(t.ar || "").trim();
   }
 
   /**
@@ -307,7 +301,7 @@
     var untitled = (f.steps || []).some(function (st) {
       return blank(st.title);
     });
-    if (untitled) return 'Give every page a title, or remove the page.';
+    if (untitled) return "Give every page a title, or remove the page.";
     var added = (f.fields || []).filter(function (fd) {
       return fd.custom;
     });
@@ -315,16 +309,14 @@
       return blank(fd.label);
     });
     if (unwritten) {
-      return 'Write the question for every question you added, or remove it.';
+      return "Write the question for every question you added, or remove it.";
     }
     var few = added.filter(function (fd) {
-      return fd.type === 'select' && (fd.options || []).length < 2;
+      return fd.type === "select" && (fd.options || []).length < 2;
     })[0];
     if (few) {
-      return (
-        '"' + (few.label.en || few.label.ar) + '" needs at least two choices.'
-      );
+      return '"' + (few.label.en || few.label.ar) + '" needs at least two choices.';
     }
-    return '';
+    return "";
   };
 })(window.App);

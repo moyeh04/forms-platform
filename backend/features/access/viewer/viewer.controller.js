@@ -16,7 +16,7 @@ var ViewerController = (function () {
       client: { name: client.name, canReview: client.canReview },
       forms: ViewerRules.viewerForms(client).map(function (f) {
         return Object.assign(ViewerRules.viewFormMetadata(f), { icon: f.icon });
-      })
+      }),
     };
   }
 
@@ -31,27 +31,22 @@ var ViewerController = (function () {
     var form = ViewerService.requireClientForm(client, req.slug);
     var vform = FormsPublic.validationForm(form);
     var kind = ViewerRules.viewKind(form);
-    var mode = req.mode === 'today' || req.mode === 'day' ? req.mode : 'all';
+    var mode = req.mode === "today" || req.mode === "day" ? req.mode : "all";
     var out = {
       form: ViewerRules.viewFormMetadata(form),
       kind: kind,
       columns: ViewerRules.visibleColumns(client, form),
       canReview: client.canReview,
       steps: form.review?.steps || [],
-      generatedAt: Time.nowIso()
+      generatedAt: Time.nowIso(),
     };
-    if (kind === 'reservation') {
+    if (kind === "reservation") {
       out.today = Time.todayIso();
       out.days = (form.slots?.days || []).map(function (d) {
         return { id: d.id, label: d.label, date: d.date };
       });
-      out.rows = ViewerService.reservationRows(
-        vform,
-        client,
-        mode,
-        String(req.dayId || '')
-      );
-    } else if (kind === 'team') {
+      out.rows = ViewerService.reservationRows(vform, client, mode, String(req.dayId || ""));
+    } else if (kind === "team") {
       out.groups = ViewerService.teamGroups(vform, client);
       out.sizeAlerts = ViewerService.viewerSizeAlerts(form, client);
       Object.assign(out, ViewerService.progressOf(form, client));
@@ -70,14 +65,8 @@ var ViewerController = (function () {
    */
   function review(req, client) {
     var form = ViewerService.requireClientForm(client, req.slug);
-    if (!client.canReview)
-      ApiError.fail('forbidden', 'This link is read-only.');
-    ViewerService.reviewSubmission(
-      form,
-      req.submissionId,
-      String(req.stepId),
-      String(req.status)
-    );
+    if (!client.canReview) ApiError.fail("forbidden", "This link is read-only.");
+    ViewerService.reviewSubmission(form, req.submissionId, String(req.stepId), String(req.status));
     ResponsesNotify.afterChange(form);
     return { updated: true };
   }

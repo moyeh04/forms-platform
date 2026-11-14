@@ -28,20 +28,17 @@ var KeyBookingService = (function () {
    */
   function normalizeKeyBooking_(form, next) {
     var enabled = !!next?.enabled;
-    var source = String(next?.source || '');
+    var source = String(next?.source || "");
     if (!enabled) return { enabled: false, source: source };
     if (form.type !== FormType.RESERVATION)
-      ApiError.fail(
-        'bad_key_booking',
-        'Only a reservation form can be booked with a key.'
-      );
+      ApiError.fail("bad_key_booking", "Only a reservation form can be booked with a key.");
     var ok = keyBookingSources_(form).some(function (f) {
       return f.id === source;
     });
     if (!ok)
       ApiError.fail(
-        'bad_key_booking',
-        'Choose the registration form whose keys students book with.'
+        "bad_key_booking",
+        "Choose the registration form whose keys students book with.",
       );
     return { enabled: true, source: source };
   }
@@ -55,8 +52,7 @@ var KeyBookingService = (function () {
    */
   function keyBookingSource_(form) {
     var kb = form.keyBooking;
-    if (form.type !== FormType.RESERVATION || !kb?.enabled || !kb.source)
-      return null;
+    if (form.type !== FormType.RESERVATION || !kb?.enabled || !kb.source) return null;
     var source = FormsRepository.findForm(kb.source);
     return source && source.id !== form.id ? source : null;
   }
@@ -70,8 +66,7 @@ var KeyBookingService = (function () {
    */
   function requireKeyBookingSource_(form) {
     var source = keyBookingSource_(form);
-    if (!source)
-      ApiError.fail('key_booking_off', 'This form is not booked with a key.');
+    if (!source) ApiError.fail("key_booking_off", "This form is not booked with a key.");
     return source;
   }
 
@@ -97,11 +92,7 @@ var KeyBookingService = (function () {
    */
   function sharedField_(source, f) {
     var fields = source.fields || [];
-    return (
-      sameBy_(fields, f, 'id') ||
-      (f.role ? sameBy_(fields, f, 'role') : null) ||
-      null
-    );
+    return sameBy_(fields, f, "id") || (f.role ? sameBy_(fields, f, "role") : null) || null;
   }
 
   /**
@@ -132,10 +123,10 @@ var KeyBookingService = (function () {
   function bookingData_(form, source, row, slot) {
     var data = {};
     (form.fields || []).forEach(function (f) {
-      if (f.enabled === false || f.role === 'slot') return;
+      if (f.enabled === false || f.role === "slot") return;
       var from = sharedField_(source, f);
       var value = from ? row.data[from.id] : undefined;
-      if (value !== undefined && value !== '') data[f.id] = Json.clone(value);
+      if (value !== undefined && value !== "") data[f.id] = Json.clone(value);
     });
     return withSlot_(form, data, slot);
   }
@@ -150,12 +141,12 @@ var KeyBookingService = (function () {
    * @throws {ApiError} `invalid` when the slot is not right.
    */
   function withSlot_(form, data, slot) {
-    var slotField = Rules.fieldByRole(form, 'slot');
+    var slotField = Rules.fieldByRole(form, "slot");
     var checked = Rules.validateField(slotField, slot, { form: form });
     var errors = {};
     if (!checked.ok) {
       errors[slotField.id] = { error: checked.error };
-      ApiError.fail('invalid', 'Some answers need fixing.', errors);
+      ApiError.fail("invalid", "Some answers need fixing.", errors);
     }
     data[slotField.id] = checked.value;
     return data;
@@ -171,11 +162,7 @@ var KeyBookingService = (function () {
    * @return {!Object} The answers with the new slot.
    */
   function movedBooking_(form, saved, typed) {
-    return withSlot_(
-      form,
-      Json.clone(saved),
-      typed[Rules.fieldByRole(form, 'slot').id]
-    );
+    return withSlot_(form, Json.clone(saved), typed[Rules.fieldByRole(form, "slot").id]);
   }
 
   /**
@@ -190,9 +177,9 @@ var KeyBookingService = (function () {
     var members = Rules.membersOf(source, row.data);
     return {
       ref: row.ref,
-      leader: String(Rules.valueByRole(source, row.data, 'name') || ''),
-      code: String(Rules.valueByRole(source, row.data, 'code') || ''),
-      title: String(Rules.valueByRole(source, row.data, 'title') || ''),
+      leader: String(Rules.valueByRole(source, row.data, "name") || ""),
+      code: String(Rules.valueByRole(source, row.data, "code") || ""),
+      title: String(Rules.valueByRole(source, row.data, "title") || ""),
       size: members.length,
       teammates: members
         .filter(function (m) {
@@ -200,7 +187,7 @@ var KeyBookingService = (function () {
         })
         .map(function (m) {
           return String(m.name);
-        })
+        }),
     };
   }
 
@@ -213,9 +200,7 @@ var KeyBookingService = (function () {
    */
   function issuesKeys_(f) {
     return (
-      f.type !== FormType.RESERVATION &&
-      !!f.editKey?.enabled &&
-      !!Rules.fieldByRole(f, 'code')
+      f.type !== FormType.RESERVATION && !!f.editKey?.enabled && !!Rules.fieldByRole(f, "code")
     );
   }
 
@@ -231,16 +216,16 @@ var KeyBookingService = (function () {
   function bookingTeam_(form, key) {
     var source = requireKeyBookingSource_(form);
     var row = registrationByKey_(source, key);
-    var code = Rules.fieldByRole(form, 'code');
-    var teamCode = String(row.data[Rules.fieldByRole(source, 'code').id]);
+    var code = Rules.fieldByRole(form, "code");
+    var teamCode = String(row.data[Rules.fieldByRole(source, "code").id]);
     var booking = ResponsesRepository.readResponses(form).filter(function (r) {
       return code && String(r.data[code.id]) === teamCode;
     })[0];
     var out = { team: teamPreview_(source, row), booked: !!booking };
     // The team's own time, so the page can show it beside the way to change it.
     if (booking) {
-      out.slot = booking.data[Rules.fieldByRole(form, 'slot').id] || null;
-      out.canMove = SubmissionsService.editScope(form) === 'slot';
+      out.slot = booking.data[Rules.fieldByRole(form, "slot").id] || null;
+      out.canMove = SubmissionsService.editScope(form) === "slot";
     }
     return out;
   }
@@ -255,6 +240,6 @@ var KeyBookingService = (function () {
     issuesKeys: issuesKeys_,
     bookingData: bookingData_,
     movedBooking: movedBooking_,
-    bookingTeam: bookingTeam_
+    bookingTeam: bookingTeam_,
   };
 })();

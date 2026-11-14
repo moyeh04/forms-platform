@@ -1,6 +1,6 @@
 /** The sample forms and registrations of the local preview. */
 
-const PIN = '4321';
+const PIN = "4321";
 
 /** One day, in milliseconds. */
 const DAY_MS = 86_400_000;
@@ -18,16 +18,16 @@ const HTTP_OK = 200;
 const HTTP_PARTIAL = 206;
 
 /** The times of the seminar: 25 minutes each, 5 minutes apart. */
-const SEMINAR_TIMES = { start: '10:00', end: '11:00', length: 25, gap: 5 };
+const SEMINAR_TIMES = { start: "10:00", end: "11:00", length: 25, gap: 5 };
 
 /** The times of the first discussion day: 20 minutes each, 5 apart. */
-const DISCUSSION_TIMES = { start: '12:30', end: '14:00', length: 20, gap: 5 };
+const DISCUSSION_TIMES = { start: "12:30", end: "14:00", length: 20, gap: 5 };
 
 /** The study details every sample student shares. */
 const STUDY = {
-  level: 'الثاني / الثالثة',
-  curriculum: '2020',
-  section: '4C-TH2'
+  level: "الثاني / الثالثة",
+  curriculum: "2020",
+  section: "4C-TH2",
 };
 
 /**
@@ -38,11 +38,11 @@ const STUDY = {
  */
 function leader(o) {
   return {
-    email: 'student@example.com',
-    phone: '01012345678',
-    major: 'حاسبات',
+    email: "student@example.com",
+    phone: "01012345678",
+    major: "حاسبات",
     ...STUDY,
-    ...o
+    ...o,
   };
 }
 
@@ -78,11 +78,11 @@ function asAdmin(world, body) {
  * @return {!Object} The form.
  */
 function openForm(world, form, patch) {
-  const f = asAdmin(world, { action: 'admin.forms.create', ...form }).form;
+  const f = asAdmin(world, { action: "admin.forms.create", ...form }).form;
   asAdmin(world, {
-    action: 'admin.forms.update',
+    action: "admin.forms.update",
     id: f.id,
-    patch: { status: 'open', ...patch }
+    patch: { status: "open", ...patch },
   });
   return f;
 }
@@ -98,42 +98,41 @@ function openForm(world, form, patch) {
  */
 function seedTeams(world) {
   const team = openForm(world, {
-    type: 'team_registration',
-    title: 'Database Team Project Registration Form',
-    term: 'Fall 2027'
+    type: "team_registration",
+    title: "Database Team Project Registration Form",
+    term: "Fall 2027",
   });
   const teams = [
     leader({
-      leader_name: 'أحمد محمد محمود علي',
-      leader_code: '4230459',
-      title: 'Library System',
-      team_size: '3',
+      leader_name: "أحمد محمد محمود علي",
+      leader_code: "4230459",
+      title: "Library System",
+      team_size: "3",
       members: [
-        member('سارة خالد حسن علي', '4230441', '01112345678'),
-        member('منى أشرف كمال فؤاد', '4230423', '01212345678')
-      ]
+        member("سارة خالد حسن علي", "4230441", "01112345678"),
+        member("منى أشرف كمال فؤاد", "4230423", "01212345678"),
+      ],
     }),
     leader({
-      leader_name: 'يوسف إبراهيم سيد حسن',
-      leader_code: '4230501',
-      phone: '01098765432',
-      title: 'Clinic Booking',
-      team_size: '2',
-      members: [member('عمر طارق عبد الله محمد', '4230502', '01198765432')]
+      leader_name: "يوسف إبراهيم سيد حسن",
+      leader_code: "4230501",
+      phone: "01098765432",
+      title: "Clinic Booking",
+      team_size: "2",
+      members: [member("عمر طارق عبد الله محمد", "4230502", "01198765432")],
     }),
     leader({
-      leader_name: 'نور الدين أحمد فتحي سالم',
-      leader_code: '4230611',
-      phone: '01055512345',
-      title: 'Smart Parking',
-      team_size: '1',
-      members: []
-    })
+      leader_name: "نور الدين أحمد فتحي سالم",
+      leader_code: "4230611",
+      phone: "01055512345",
+      title: "Smart Parking",
+      team_size: "1",
+      members: [],
+    }),
   ];
   const registered = teams.map((data, i) => {
-    if (i === teams.length - 1)
-      world.setNow(Date.now() - EXPIRED_DAYS * DAY_MS);
-    const r = world.api({ action: 'submit', slug: team.slug, data });
+    if (i === teams.length - 1) world.setNow(Date.now() - EXPIRED_DAYS * DAY_MS);
+    const r = world.api({ action: "submit", slug: team.slug, data });
     world.setNow(Date.now());
     return r;
   });
@@ -150,22 +149,22 @@ function seedSeminar(world) {
   openForm(
     world,
     {
-      type: 'reservation',
-      title: 'Microprocessor Project Seminar',
-      term: 'Spring 2028'
+      type: "reservation",
+      title: "Microprocessor Project Seminar",
+      term: "Spring 2028",
     },
     {
       slots: {
         days: [
           {
-            label: 'Tuesday 16 Nov',
-            date: '2027-11-16',
-            times: world.ctx.Rules.generateSlots(SEMINAR_TIMES)
-          }
+            label: "Tuesday 16 Nov",
+            date: "2027-11-16",
+            times: world.ctx.Rules.generateSlots(SEMINAR_TIMES),
+          },
         ],
-        capacity: 2
-      }
-    }
+        capacity: 2,
+      },
+    },
   );
 }
 
@@ -183,37 +182,36 @@ function seedDiscussion(world, team, registered) {
   const discussion = openForm(
     world,
     {
-      type: 'reservation',
-      title: 'Database Project Discussion',
-      term: 'Fall 2027'
+      type: "reservation",
+      title: "Database Project Discussion",
+      term: "Fall 2027",
     },
     {
       slots: {
         days: [
           {
-            label: 'Sunday 14 Nov',
-            date: '2027-11-14',
-            times: world.ctx.Rules.generateSlots(DISCUSSION_TIMES)
+            label: "Sunday 14 Nov",
+            date: "2027-11-14",
+            times: world.ctx.Rules.generateSlots(DISCUSSION_TIMES),
           },
           {
-            label: 'Monday 15 Nov',
-            date: '2027-11-15',
-            times: ['12:30 - 12:50', '12:55 - 1:15']
-          }
+            label: "Monday 15 Nov",
+            date: "2027-11-15",
+            times: ["12:30 - 12:50", "12:55 - 1:15"],
+          },
         ],
-        capacity: 1
+        capacity: 1,
       },
-      keyBooking: { enabled: true, source: team.id }
-    }
+      keyBooking: { enabled: true, source: team.id },
+    },
   );
-  const day = asAdmin(world, { action: 'admin.forms.get', id: discussion.id })
-    .form.slots.days[1];
+  const day = asAdmin(world, { action: "admin.forms.get", id: discussion.id }).form.slots.days[1];
   day.times.forEach((time, i) => {
     world.api({
-      action: 'submit',
+      action: "submit",
       slug: discussion.slug,
       sourceKey: registered[i + 1].key,
-      data: { slot: { day: day.id, time } }
+      data: { slot: { day: day.id, time } },
     });
   });
   return discussion;
@@ -226,29 +224,28 @@ function seedDiscussion(world, team, registered) {
  */
 function seedGroups(world) {
   const groups = openForm(world, {
-    type: 'whatsapp_registration',
-    title: 'Level 2 WhatsApp Groups',
-    term: 'Fall 2027'
+    type: "whatsapp_registration",
+    title: "Level 2 WhatsApp Groups",
+    term: "Fall 2027",
   });
   [
-    ['هدى سامي عادل منصور', '4230710', '01033344455', 'A'],
-    ['كريم وليد حسن جابر', '4230722', '01144455566', 'B']
+    ["هدى سامي عادل منصور", "4230710", "01033344455", "A"],
+    ["كريم وليد حسن جابر", "4230722", "01144455566", "B"],
   ].forEach(([name, code, phone, group]) => {
     world.api({
-      action: 'submit',
+      action: "submit",
       slug: groups.slug,
       data: {
-        email: 'student@example.com',
+        email: "student@example.com",
         name,
         phone,
         code,
         level: STUDY.level,
-        major: 'حاسبات',
+        major: "حاسبات",
         group,
-        section: '21',
-        schedule:
-          'https://drive.google.com/file/d/1AbCdEfGhIjKlMnOpQrStUvWxYz012345/view'
-      }
+        section: "21",
+        schedule: "https://drive.google.com/file/d/1AbCdEfGhIjKlMnOpQrStUvWxYz012345/view",
+      },
     });
   });
 }
@@ -261,32 +258,28 @@ function seedGroups(world) {
  */
 function seedTasks(world) {
   const tasks = openForm(world, {
-    type: 'task_submission',
-    title: 'Software Engineering Tasks',
-    term: 'Fall 2027'
+    type: "task_submission",
+    title: "Software Engineering Tasks",
+    term: "Fall 2027",
   });
   [
-    ['Task 1', 'application/vnd.google-apps.presentation', '', 'k'],
-    ['Task 2.pdf', 'application/pdf', '%PDF-1.4 Task 2', 'l'],
-    ['Task 3', 'application/vnd.google-apps.form', '', 'm']
+    ["Task 1", "application/vnd.google-apps.presentation", "", "k"],
+    ["Task 2.pdf", "application/pdf", "%PDF-1.4 Task 2", "l"],
+    ["Task 3", "application/vnd.google-apps.form", "", "m"],
   ].forEach(([name, mime, bytes, letter], i) => {
     const id = letter.repeat(DRIVE_ID_LENGTH);
     world.drive.addFile({ id, name, mime, bytes });
     world.api({
-      action: 'submit',
+      action: "submit",
       slug: tasks.slug,
       data: leader({
-        leader_name: [
-          'سلمى فؤاد نبيل عيسى',
-          'يوسف ماهر رشدي لطفي',
-          'نادين شريف عزت فهمي'
-        ][i],
-        leader_code: ['4230510', '4230511', '4230512'][i],
-        title: name.replace(/\.pdf$/, ''),
-        team_size: '1',
+        leader_name: ["سلمى فؤاد نبيل عيسى", "يوسف ماهر رشدي لطفي", "نادين شريف عزت فهمي"][i],
+        leader_code: ["4230510", "4230511", "4230512"][i],
+        title: name.replace(/\.pdf$/, ""),
+        team_size: "1",
         members: [],
-        link: `https://docs.google.com/presentation/d/${id}/edit`
-      })
+        link: `https://docs.google.com/presentation/d/${id}/edit`,
+      }),
     });
   });
 }
@@ -315,8 +308,7 @@ function fakeFetch(world, url, o) {
        *
        * @return {!Object} The exported file.
        */
-      getBlob: () =>
-        new world.MockBlob('Exported ' + url, 'application/octet-stream', 'x')
+      getBlob: () => new world.MockBlob("Exported " + url, "application/octet-stream", "x"),
     };
   const [, from, to] = /bytes=(\d+)-(\d+)/.exec(o.headers.Range).map(Number);
   const buf = world.drive.files.get(media[1]).buf.slice(from, to + 1);
@@ -332,7 +324,7 @@ function fakeFetch(world, url, o) {
      *
      * @return {!Array<number>} Its bytes.
      */
-    getContent: () => Array.from(buf)
+    getContent: () => Array.from(buf),
   };
 }
 
@@ -343,8 +335,8 @@ function fakeFetch(world, url, o) {
  */
 function prepareWorld(world) {
   world.setNow(Date.now());
-  world.call('setup');
-  world.call('setAdminPin', PIN);
+  world.call("setup");
+  world.call("setAdminPin", PIN);
 }
 
 /**
@@ -365,18 +357,18 @@ function seed(world) {
   seedTasks(world);
   world.fetch = fakeFetch.bind(null, world);
   const client = asAdmin(world, {
-    action: 'admin.clients.create',
-    name: 'Instructor 1 - Database',
+    action: "admin.clients.create",
+    name: "Instructor 1 - Database",
     forms: [team.slug],
     hiddenColumns: [],
-    canReview: false
+    canReview: false,
   });
   return {
     team,
     viewerToken: client.token,
     viewerKey: client.accessKey,
     discussion,
-    key: registered[0].key
+    key: registered[0].key,
   };
 }
 

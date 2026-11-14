@@ -17,10 +17,10 @@ var TransferDecision = (function () {
    */
   function requirePending_(all, id, fromId) {
     var t = all.filter(function (x) {
-      return x.id === String(id) && x.status === 'pending';
+      return x.id === String(id) && x.status === "pending";
     })[0];
     if (!t || (fromId && t.fromId !== fromId)) {
-      ApiError.fail('transfer_gone', 'This request was already answered.');
+      ApiError.fail("transfer_gone", "This request was already answered.");
     }
     return t;
   }
@@ -39,9 +39,9 @@ var TransferDecision = (function () {
       return r.id === t.toId;
     })[0];
     if (!to) {
-      t.status = 'closed';
+      t.status = "closed";
       TransfersRepository.saveTransfer(form, t);
-      ApiError.fail('transfer_gone', 'The team that asked no longer exists.');
+      ApiError.fail("transfer_gone", "The team that asked no longer exists.");
     }
     return to;
   }
@@ -70,10 +70,10 @@ var TransferDecision = (function () {
    * @throws {ApiError} `transfer_full` when there is no room.
    */
   function checkRoom_(form, toList, t) {
-    var mf = Rules.fieldByRole(form, 'members');
+    var mf = Rules.fieldByRole(form, "members");
     var most = mf.max == null ? Rules.teamSizeRange(form).max - 1 : mf.max;
     if (!holds_(form, toList, t) && toList.length >= most) {
-      ApiError.fail('transfer_full', 'The team that asked is full now.');
+      ApiError.fail("transfer_full", "The team that asked is full now.");
     }
   }
 
@@ -101,7 +101,7 @@ var TransferDecision = (function () {
    *     under its smallest size, and whether a leader moved.
    */
   function takeFromOthers_(form, rows, t, answer) {
-    var mf = Rules.fieldByRole(form, 'members');
+    var mf = Rules.fieldByRole(form, "members");
     var codeId = TransferMembers.codeId(form);
     var min = Rules.teamSizeRange(form).min;
     var out = { underMin: false, handed: false };
@@ -136,8 +136,8 @@ var TransferDecision = (function () {
    */
   function closeOthers_(form, all, t) {
     all.forEach(function (x) {
-      if (x.id !== t.id && x.status === 'pending' && x.code === t.code) {
-        x.status = 'closed';
+      if (x.id !== t.id && x.status === "pending" && x.code === t.code) {
+        x.status = "closed";
         TransfersRepository.saveTransfer(form, x);
       }
     });
@@ -160,12 +160,10 @@ var TransferDecision = (function () {
     checkRoom_(form, toList, t);
     var moved = takeFromOthers_(form, rows, t, answer);
     if (!holds_(form, toList, t)) {
-      to.data[Rules.fieldByRole(form, 'members').id] = toList.concat([
-        t.member
-      ]);
+      to.data[Rules.fieldByRole(form, "members").id] = toList.concat([t.member]);
       saveTeam_(form, to);
     }
-    t.status = 'approved';
+    t.status = "approved";
     t.decidedBy = answer.by;
     TransfersRepository.saveTransfer(form, t);
     closeOthers_(form, all, t);
@@ -192,12 +190,12 @@ var TransferDecision = (function () {
     var all = TransfersRepository.readTransfers(form);
     var t = requirePending_(all, id, answer.fromId);
     if (answer.approve) return approve_(form, all, t, answer);
-    t.status = 'rejected';
+    t.status = "rejected";
     t.decidedBy = answer.by;
     return {
       transfer: TransfersRepository.saveTransfer(form, t),
       underMin: false,
-      handed: false
+      handed: false,
     };
   }
 

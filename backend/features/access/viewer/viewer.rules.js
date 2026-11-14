@@ -4,34 +4,34 @@ var ViewerRules = (function () {
   /** The columns of each kind of view, as `[id, label]`, in page order. */
   var VIEW_COLUMNS_ = {
     reservation: [
-      ['time', 'Time'],
-      ['name', 'Team leader'],
-      ['code', 'Code'],
-      ['phone', 'Phone'],
-      ['email', 'Email'],
-      ['title', 'Project'],
-      ['level', 'Level'],
-      ['section', 'Section'],
-      ['members', 'Teammates']
+      ["time", "Time"],
+      ["name", "Team leader"],
+      ["code", "Code"],
+      ["phone", "Phone"],
+      ["email", "Email"],
+      ["title", "Project"],
+      ["level", "Level"],
+      ["section", "Section"],
+      ["members", "Teammates"],
     ],
     team: [
-      ['name', 'Name'],
-      ['section', 'Section'],
-      ['code', 'Code'],
-      ['phone', 'Phone'],
-      ['title', 'Project or task'],
-      ['link', 'Link']
+      ["name", "Name"],
+      ["section", "Section"],
+      ["code", "Code"],
+      ["phone", "Phone"],
+      ["title", "Project or task"],
+      ["link", "Link"],
     ],
     whatsapp: [
-      ['name', 'Name'],
-      ['code', 'Code'],
-      ['phone', 'Phone'],
-      ['level', 'Level'],
-      ['group', 'Group'],
-      ['section', 'Section'],
-      ['link', 'Timetable'],
-      ['review', 'Review']
-    ]
+      ["name", "Name"],
+      ["code", "Code"],
+      ["phone", "Phone"],
+      ["level", "Level"],
+      ["group", "Group"],
+      ["section", "Section"],
+      ["link", "Timetable"],
+      ["review", "Review"],
+    ],
   };
 
   /**
@@ -42,10 +42,10 @@ var ViewerRules = (function () {
    */
   function viewKind_(form) {
     return form.type === FormType.RESERVATION
-      ? 'reservation'
+      ? "reservation"
       : form.type === FormType.WHATSAPP_REGISTRATION
-        ? 'whatsapp'
-        : 'team';
+        ? "whatsapp"
+        : "team";
   }
 
   /**
@@ -70,8 +70,7 @@ var ViewerRules = (function () {
   function visibleColumns_(client, form) {
     return VIEW_COLUMNS_[viewKind_(form)]
       .filter(function (c) {
-        var members =
-          c[0] === 'members' ? Rules.fieldByRole(form, 'members') : null;
+        var members = c[0] === "members" ? Rules.fieldByRole(form, "members") : null;
         if (members && members.enabled === false) return false;
         return client.hiddenColumns.indexOf(c[0]) === -1;
       })
@@ -115,6 +114,6 @@ var ViewerRules = (function () {
     viewFormMetadata: viewFormMetadata_,
     viewKind: viewKind_,
     visibleColumns: visibleColumns_,
-    stripHidden: stripHidden_
+    stripHidden: stripHidden_,
   };
 })();

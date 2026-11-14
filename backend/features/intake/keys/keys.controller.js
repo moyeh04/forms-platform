@@ -13,10 +13,8 @@ var KeysController = (function () {
    */
   function untilOf_(raw) {
     var t = Date.parse(String(raw));
-    if (Number.isNaN(t))
-      ApiError.fail('bad_date', 'That end date is not a date.');
-    if (t <= Date.now())
-      ApiError.fail('bad_date', 'Pick an end date in the future.');
+    if (Number.isNaN(t)) ApiError.fail("bad_date", "That end date is not a date.");
+    if (t <= Date.now()) ApiError.fail("bad_date", "Pick an end date in the future.");
     return new Date(t).toISOString();
   }
 
@@ -30,10 +28,7 @@ var KeysController = (function () {
   function daysOf_(raw) {
     var days = parseInt(raw, 10);
     if (!(days >= 1 && days <= KEY_EXTEND_MAX_DAYS_))
-      ApiError.fail(
-        'bad_days',
-        'Extend by 1 to ' + KEY_EXTEND_MAX_DAYS_ + ' days.'
-      );
+      ApiError.fail("bad_days", "Extend by 1 to " + KEY_EXTEND_MAX_DAYS_ + " days.");
     return days;
   }
 
@@ -61,11 +56,11 @@ var KeysController = (function () {
     KeysService.requireKeyEnabled(form);
     var span = req.until
       ? { days: 0, until: untilOf_(req.until) }
-      : { days: daysOf_(req.days), until: '' };
-    var which = String(req.which || 'chosen');
+      : { days: daysOf_(req.days), until: "" };
+    var which = String(req.which || "chosen");
     var ids = Array.isArray(req.ids) ? req.ids.map(String) : [];
-    if (which === 'chosen' && !ids.length)
-      ApiError.fail('none_chosen', 'Choose at least one registration.');
+    if (which === "chosen" && !ids.length)
+      ApiError.fail("none_chosen", "Choose at least one registration.");
     var changed = KeysService.extendKeys(form, which, ids, span);
     return { changed: changed, keys: KeysService.listKeys(form) };
   }

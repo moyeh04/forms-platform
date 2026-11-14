@@ -3,14 +3,13 @@
  * drawing library is fetched the first time a student asks.
  */
 (function (App) {
-  'use strict';
+  "use strict";
 
   var T = App.ticket;
 
   /** The library that draws a part of the page onto a canvas. */
   var HTML2CANVAS_URL =
-    'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/' +
-    'html2canvas.min.js';
+    "https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/" + "html2canvas.min.js";
 
   /** The image has this many pixels for each pixel of the page. */
   var IMAGE_SCALE = 2;
@@ -26,7 +25,7 @@
    */
   function loadScript(src) {
     return new Promise(function (resolve, reject) {
-      var s = document.createElement('script');
+      var s = document.createElement("script");
       s.src = src;
       s.onload = resolve;
       s.onerror = reject;
@@ -42,14 +41,14 @@
    * @param {number} scale Its pixels for each pixel of the page.
    */
   function tearEdges(canvas, scale) {
-    var g = canvas.getContext('2d');
+    var g = canvas.getContext("2d");
     var w = canvas.width;
     var tooth = TEAR.TOOTH_PX * scale;
     var deep = TEAR.DEPTH_PX * scale;
     // html2canvas leaves its own scale and page offset on the context; the
     // cut is in canvas pixels.
     g.setTransform(1, 0, 0, 1, 0, 0);
-    g.globalCompositeOperation = 'destination-out';
+    g.globalCompositeOperation = "destination-out";
     g.beginPath();
     for (let x = 0; x < w; x += tooth) {
       g.moveTo(x, 0);
@@ -60,7 +59,7 @@
       g.lineTo(x + tooth, canvas.height);
     }
     g.fill();
-    g.globalCompositeOperation = 'source-over';
+    g.globalCompositeOperation = "source-over";
   }
 
   /**
@@ -70,9 +69,9 @@
    * @param {string} name The file name, without its extension.
    */
   function download(canvas, name) {
-    var a = document.createElement('a');
-    a.download = name + '.png';
-    a.href = canvas.toDataURL('image/png');
+    var a = document.createElement("a");
+    a.download = name + ".png";
+    a.href = canvas.toDataURL("image/png");
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -92,10 +91,10 @@
       backgroundColor: cs.backgroundColor,
       scale: IMAGE_SCALE,
       useCORS: true,
-      onclone: still
+      onclone: still,
     });
     tearEdges(canvas, IMAGE_SCALE);
-    download(canvas, name || 'registration');
+    download(canvas, name || "registration");
   }
 
   /**
@@ -105,7 +104,7 @@
    * @param {!Document} doc The copy.
    */
   function still(doc) {
-    doc.documentElement.classList.add('still');
+    doc.documentElement.classList.add("still");
   }
 
   T.saveImage = saveImage;

@@ -3,7 +3,7 @@
  * a page, and the picker of the list a choice question reads.
  */
 (function (App) {
-  'use strict';
+  "use strict";
 
   var A = App.admin;
   var Q = A.questions;
@@ -22,20 +22,20 @@
   function pageMove(s, st, n, by) {
     var up = by < 0;
     return h(
-      'button',
+      "button",
       {
-        type: 'button',
-        class: 'icon-btn sm',
-        name: (up ? 'page-up-' : 'page-down-') + st.id,
-        'aria-label': 'Move page ' + (n + 1) + (up ? ' up' : ' down'),
+        type: "button",
+        class: "icon-btn sm",
+        name: (up ? "page-up-" : "page-down-") + st.id,
+        "aria-label": "Move page " + (n + 1) + (up ? " up" : " down"),
         disabled: up ? n === 0 : n === s.f.steps.length - 1,
         onclick: function () {
           s.f.steps.splice(n, 1);
           s.f.steps.splice(n + by, 0, st);
           s.paintQuestions();
-        }
+        },
       },
-      up ? '↑' : '↓'
+      up ? "↑" : "↓",
     );
   }
 
@@ -52,18 +52,18 @@
   function pageRemove(s, st, n) {
     if ((st.fields || []).length || s.f.steps.length <= 1) return null;
     return h(
-      'button',
+      "button",
       {
-        type: 'button',
-        class: 'btn btn-quiet sm danger',
-        name: 'remove-page-' + st.id,
+        type: "button",
+        class: "btn btn-quiet sm danger",
+        name: "remove-page-" + st.id,
         onclick: function () {
           s.f.steps.splice(n, 1);
           s.paintQuestions();
-        }
+        },
       },
-      icon('trash', A.ICON_SIZE.MENU),
-      'Remove page'
+      icon("trash", A.ICON_SIZE.MENU),
+      "Remove page",
     );
   }
 
@@ -79,22 +79,22 @@
   Q.pageHead = function (s, st, n) {
     st.title = st.title || { en: st.id, ar: st.id };
     return h(
-      'div',
-      { class: 'q-page', dataset: { page: st.id } },
-      h('span', { class: 'tt-num' }, String(n + 1)),
+      "div",
+      { class: "q-page", dataset: { page: st.id } },
+      h("span", { class: "tt-num" }, String(n + 1)),
       h(
-        'div',
-        { class: 'q-labels' },
+        "div",
+        { class: "q-labels" },
         A.text(
           st.title.en,
           function (v) {
             st.title.en = v;
           },
           {
-            name: 'page-title-en-' + st.id,
-            'aria-label': 'English title of page ' + (n + 1),
-            placeholder: 'Page title, in English'
-          }
+            name: "page-title-en-" + st.id,
+            "aria-label": "English title of page " + (n + 1),
+            placeholder: "Page title, in English",
+          },
         ),
         A.text(
           st.title.ar,
@@ -102,21 +102,21 @@
             st.title.ar = v;
           },
           {
-            name: 'page-title-ar-' + st.id,
-            'aria-label': 'Arabic title of page ' + (n + 1),
-            dir: 'rtl',
-            lang: 'ar',
-            placeholder: 'عنوان الصفحة'
-          }
-        )
+            name: "page-title-ar-" + st.id,
+            "aria-label": "Arabic title of page " + (n + 1),
+            dir: "rtl",
+            lang: "ar",
+            placeholder: "عنوان الصفحة",
+          },
+        ),
       ),
       h(
-        'div',
-        { class: 'q-opts' },
+        "div",
+        { class: "q-opts" },
         pageMove(s, st, n, -1),
         pageMove(s, st, n, 1),
-        pageRemove(s, st, n)
-      )
+        pageRemove(s, st, n),
+      ),
     );
   };
 
@@ -155,9 +155,7 @@
     var same = Object.keys(s.res.lists || {}).filter(function (k) {
       return (
         k === fd.list ||
-        (A.listSwappable(k) &&
-          A.listSwappable(fd.list) &&
-          A.listKind(k, info) === kind)
+        (A.listSwappable(k) && A.listSwappable(fd.list) && A.listKind(k, info) === kind)
       );
     });
     if (same.length < 2) return null;
@@ -168,15 +166,15 @@
       }),
       function (v) {
         pointAt(s, fd, v);
-      }
+      },
     );
-    sel.setAttribute('name', 'list-' + fd.id);
-    sel.setAttribute('aria-label', 'List for ' + fd.label.en);
+    sel.setAttribute("name", "list-" + fd.id);
+    sel.setAttribute("aria-label", "List for " + fd.label.en);
     return h(
-      'label',
-      { class: 'q-list-pick' },
-      h('span', { class: 'muted-note' }, 'Choices from'),
-      sel
+      "label",
+      { class: "q-list-pick" },
+      h("span", { class: "muted-note" }, "Choices from"),
+      sel,
     );
   };
 })(window.App);

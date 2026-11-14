@@ -6,26 +6,26 @@
  *   node scripts/checks/run-checks.js --staged   the staged files (pre-commit)
  *   node scripts/checks/run-checks.js --all      every tracked file (CI)
  */
-const fs = require('node:fs');
-const path = require('node:path');
-const { listFiles } = require('./lib/files.js');
-const exceptions = require('./lib/exceptions.js');
-const { formatFinding, printBlock } = require('./lib/report.js');
+const fs = require("node:fs");
+const path = require("node:path");
+const { listFiles } = require("./lib/files.js");
+const exceptions = require("./lib/exceptions.js");
+const { formatFinding, printBlock } = require("./lib/report.js");
 
-const ROOT = path.resolve(__dirname, '..', '..');
-const CONFIG = require('./config.json');
+const ROOT = path.resolve(__dirname, "..", "..");
+const CONFIG = require("./config.json");
 const CHECKS = [
-  require('./code/check-biome.js'),
-  require('./code/check-lines.js'),
-  require('./code/check-jsdoc.js'),
-  require('./code/check-comments.js'),
-  require('./code/check-numbers.js'),
-  require('./code/check-colours.js'),
-  require('./code/check-flags.js'),
-  require('./code/check-enums.js'),
-  require('./code/check-layers.js'),
-  require('./tree/check-structure.js'),
-  require('./tree/check-docs.js')
+  require("./code/check-biome.js"),
+  require("./code/check-lines.js"),
+  require("./code/check-jsdoc.js"),
+  require("./code/check-comments.js"),
+  require("./code/check-numbers.js"),
+  require("./code/check-colours.js"),
+  require("./code/check-flags.js"),
+  require("./code/check-enums.js"),
+  require("./code/check-layers.js"),
+  require("./tree/check-structure.js"),
+  require("./tree/check-docs.js"),
 ];
 
 /**
@@ -35,7 +35,7 @@ const CHECKS = [
  * @return {*} The parsed content.
  */
 function readJson(name) {
-  return JSON.parse(fs.readFileSync(path.join(__dirname, name), 'utf8'));
+  return JSON.parse(fs.readFileSync(path.join(__dirname, name), "utf8"));
 }
 
 /**
@@ -47,7 +47,7 @@ function readJson(name) {
  */
 function runAll(files, tracked) {
   return CHECKS.flatMap((check) =>
-    check.check(ROOT, check.wholeTree ? tracked : files, CONFIG, tracked)
+    check.check(ROOT, check.wholeTree ? tracked : files, CONFIG, tracked),
   );
 }
 
@@ -58,14 +58,14 @@ function runAll(files, tracked) {
  * @return {boolean} True when nothing failed.
  */
 function main(args) {
-  const staged = args.includes('--staged');
+  const staged = args.includes("--staged");
   const tracked = listFiles(ROOT, false);
   const files = staged ? listFiles(ROOT, true) : tracked;
   const allowed = readJson(CONFIG.exceptions);
   const { kept, unused } = exceptions.apply(runAll(files, tracked), allowed);
-  let problems = printBlock('Not allowed:', kept.map(formatFinding));
-  problems += printBlock('Exceptions:', exceptions.weakReasons(allowed));
-  if (!staged) problems += printBlock('Out of date:', unused);
+  let problems = printBlock("Not allowed:", kept.map(formatFinding));
+  problems += printBlock("Exceptions:", exceptions.weakReasons(allowed));
+  if (!staged) problems += printBlock("Out of date:", unused);
   return problems === 0;
 }
 

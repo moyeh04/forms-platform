@@ -5,7 +5,7 @@
  * how many before the save.
  */
 (function (App) {
-  'use strict';
+  "use strict";
 
   var A = App.admin;
   var ui = App.ui;
@@ -47,18 +47,18 @@
    */
   function copyList(milestones) {
     return h(
-      'ol',
-      { class: 'progress-copy' },
+      "ol",
+      { class: "progress-copy" },
       milestones.map(function (m) {
         return h(
-          'li',
+          "li",
           null,
           m.label.en,
           m.label.ar !== m.label.en
-            ? h('span', { class: 'muted-note', lang: 'ar' }, ' · ' + m.label.ar)
-            : null
+            ? h("span", { class: "muted-note", lang: "ar" }, " · " + m.label.ar)
+            : null,
         );
-      })
+      }),
     );
   }
 
@@ -70,11 +70,11 @@
    */
   function diffText(d) {
     var parts = [];
-    if (d.added.length) parts.push(d.added.length + ' added');
-    if (d.renamed.length) parts.push(d.renamed.length + ' renamed');
-    if (d.removed.length) parts.push(d.removed.length + ' removed');
-    if (d.moved) parts.push('order changed');
-    return parts.join(', ');
+    if (d.added.length) parts.push(d.added.length + " added");
+    if (d.renamed.length) parts.push(d.renamed.length + " renamed");
+    if (d.removed.length) parts.push(d.removed.length + " removed");
+    if (d.moved) parts.push("order changed");
+    return parts.join(", ");
   }
 
   /**
@@ -86,38 +86,34 @@
   function updateBox(g) {
     var now = fromList(g);
     if (!now) {
-      return h(
-        'p',
-        { class: 'muted-note' },
-        'Its list was deleted. The form keeps its copy.'
-      );
+      return h("p", { class: "muted-note" }, "Its list was deleted. The form keeps its copy.");
     }
     var d = Rules.milestonesDiff(g.f.progress.milestones, now);
     if (d.same) return null;
     return h(
-      'div',
-      { class: 'progress-update' },
+      "div",
+      { class: "progress-update" },
       h(
-        'p',
+        "p",
         null,
         A.listName(g.f.progress.from, g.res.listInfo) +
-          ' changed since this form copied it: ' +
+          " changed since this form copied it: " +
           diffText(d) +
-          '.'
+          ".",
       ),
       h(
-        'button',
+        "button",
         {
-          type: 'button',
-          class: 'btn btn-quiet sm',
-          name: 'progress-update',
+          type: "button",
+          class: "btn btn-quiet sm",
+          name: "progress-update",
           onclick: function () {
             g.f.progress.milestones = now;
             g.paint();
-          }
+          },
         },
-        'Update from list'
-      )
+        "Update from list",
+      ),
     );
   }
 
@@ -132,19 +128,13 @@
     var hidden = Rules.marksHidden(g.saved, now, g.res.progressMarks || {});
     if (!hidden.length) return null;
     return h(
-      'div',
-      { class: 'banner', role: 'alert', name: 'progress-hidden' },
+      "div",
+      { class: "banner", role: "alert", name: "progress-hidden" },
       hidden
         .map(function (x) {
-          return (
-            x.label.en +
-            ' has marks for ' +
-            A.plural(x.teams, 'team', 'teams') +
-            '.'
-          );
+          return x.label.en + " has marks for " + A.plural(x.teams, "team", "teams") + ".";
         })
-        .join(' ') +
-        ' Without it they are no longer shown; they stay in the sheet.'
+        .join(" ") + " Without it they are no longer shown; they stay in the sheet.",
     );
   }
 
@@ -158,31 +148,30 @@
   function studentsRow(g) {
     if (!g.f.editKey.enabled) {
       return h(
-        'p',
-        { class: 'muted-note', name: 'progress-students-off' },
-        'Teams can see their progress once edit keys are on. ',
+        "p",
+        { class: "muted-note", name: "progress-students-off" },
+        "Teams can see their progress once edit keys are on. ",
         h(
-          'button',
+          "button",
           {
-            type: 'button',
-            class: 'link-btn',
+            type: "button",
+            class: "link-btn",
             onclick: function () {
               g.s.editKeyPanel.setOpen(true);
-              g.s.editKeyPanel.scrollIntoView({ block: 'start' });
-            }
+              g.s.editKeyPanel.scrollIntoView({ block: "start" });
+            },
           },
-          'Open Edit key'
-        )
+          "Open Edit key",
+        ),
       );
     }
     return A.check(
-      'Teams see their progress when they open their registration with' +
-        ' the edit key',
+      "Teams see their progress when they open their registration with" + " the edit key",
       g.f.progress.students !== false,
       function (v) {
         g.f.progress.students = v;
       },
-      { name: 'progress-students' }
+      { name: "progress-students" },
     );
   }
 
@@ -198,7 +187,7 @@
     if (p) {
       g.box.appendChild(copyList(p.milestones));
       if (upd) g.box.appendChild(upd);
-      g.studentsBox = h('div', { class: 'field-row' }, studentsRow(g));
+      g.studentsBox = h("div", { class: "field-row" }, studentsRow(g));
       g.box.appendChild(g.studentsBox);
       g.keyOn = g.f.editKey.enabled;
     }
@@ -219,7 +208,7 @@
       ? {
           from: key,
           milestones: Rules.milestonesFromList(g.res.lists[key]),
-          students: students
+          students: students,
         }
       : null;
     g.paint();
@@ -233,23 +222,23 @@
    */
   function listPick(g) {
     var lists = milestoneLists(g.res);
-    var from = g.f.progress?.from || '';
+    var from = g.f.progress?.from || "";
     if (!lists.length && !from) {
       return h(
-        'p',
-        { class: 'muted-note', name: 'progress-no-list' },
-        'Make a list of milestones on the Lists page first. ',
-        h('a', { href: '#/lists/new' }, 'Open Lists')
+        "p",
+        { class: "muted-note", name: "progress-no-list" },
+        "Make a list of milestones on the Lists page first. ",
+        h("a", { href: "#/lists/new" }, "Open Lists"),
       );
     }
     var known = lists.some(function (o) {
       return o[0] === from;
     });
-    var options = [['', 'None (no progress)']].concat(lists);
-    if (from && !known) options.push([from, 'The copy this form has']);
+    var options = [["", "None (no progress)"]].concat(lists);
+    if (from && !known) options.push([from, "The copy this form has"]);
     var sel = A.select(from, options, pick.bind(null, g));
-    sel.name = 'progress-from';
-    return A.field('Milestones from', sel);
+    sel.name = "progress-from";
+    return A.field("Milestones from", sel);
   }
 
   /**
@@ -260,13 +249,13 @@
    */
   function summary(g) {
     var p = g.f.progress;
-    if (!p) return 'Off';
+    if (!p) return "Off";
     var seen = g.f.editKey.enabled && p.students !== false;
     return (
       A.listName(p.from, g.res.listInfo) +
-      ' · ' +
+      " · " +
       p.milestones.length +
-      (seen ? ' · teams see it' : '')
+      (seen ? " · teams see it" : "")
     );
   }
 
@@ -284,16 +273,16 @@
       f: s.f,
       res: s.res,
       saved: s.f.progress ? s.f.progress.milestones.slice() : [],
-      box: h('div')
+      box: h("div"),
     };
     g.paint = paint.bind(null, g);
     var panel = A.panel(
-      'Progress',
-      'Follow each team through the milestones of the project: what it' +
-        ' submitted and what was discussed. Review steps are different: they' +
-        ' accept or reject the registration itself.',
+      "Progress",
+      "Follow each team through the milestones of the project: what it" +
+        " submitted and what was discussed. Review steps are different: they" +
+        " accept or reject the registration itself.",
       listPick(g),
-      g.box
+      g.box,
     );
     g.paint();
     panel.summary = summary.bind(null, g);

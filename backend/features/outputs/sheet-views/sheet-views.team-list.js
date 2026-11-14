@@ -20,10 +20,10 @@ var SheetViewsTeamList = (function () {
   var ROW_PX_ = 32;
 
   /** The mark after the name of a team leader. */
-  var LEADER_MARK_ = '  ★';
+  var LEADER_MARK_ = "  ★";
 
   /** What a task without a title shows. */
-  var NO_TITLE_ = '—';
+  var NO_TITLE_ = "—";
 
   /**
    * Makes the rows, their tints and the block of each team.
@@ -38,21 +38,16 @@ var SheetViewsTeamList = (function () {
       var style = SheetStyle.PALETTE.groups[g % 2];
       var start = out.values.length + SheetViewsLayout.FIRST_ROW;
       t.members.forEach(function (m, i) {
-        var mark = m.leader ? LEADER_MARK_ : '';
+        var mark = m.leader ? LEADER_MARK_ : "";
         var tint = style.shades[i % 2];
-        out.values.push([
-          i + 1 + '.  ' + m.name + mark,
-          m.section || '',
-          m.code,
-          ''
-        ]);
+        out.values.push([i + 1 + ".  " + m.name + mark, m.section || "", m.code, ""]);
         out.shades.push([tint, tint, tint, style.solid]);
       });
       out.blocks.push({
         start: start,
         length: t.members.length,
         response: t.response,
-        style: style
+        style: style,
       });
     });
     return out;
@@ -67,13 +62,11 @@ var SheetViewsTeamList = (function () {
   function labelTasks_(sh, blocks) {
     blocks.forEach(function (b) {
       var title = b.response.title || NO_TITLE_;
-      var link = b.response.link
-        ? SheetViewsLayout.hyperlink(b.response.link, title)
-        : '';
+      var link = b.response.link ? SheetViewsLayout.hyperlink(b.response.link, title) : "";
       SheetViewsLayout.mergedLabel(
         sh,
         { row: b.start, col: TASK_COL_, length: b.length },
-        { value: title, formula: link, fill: b.style.solid }
+        { value: title, formula: link, fill: b.style.solid },
       );
     });
   }
@@ -85,36 +78,28 @@ var SheetViewsTeamList = (function () {
    * @param {!SpreadsheetApp.Spreadsheet} ss The form's spreadsheet.
    */
   function build(form, ss) {
-    var sh = SheetViewsLayout.freshView(ss, 'Team Members List');
+    var sh = SheetViewsLayout.freshView(ss, "Team Members List");
     SheetViewsLayout.paintHeader(sh, [
-      'Team member name',
-      'Section',
-      'Code',
-      TeamsService.teamThing(form)
+      "Team member name",
+      "Section",
+      "Code",
+      TeamsService.teamThing(form),
     ]);
     SheetViewsLayout.setWidths(sh, WIDTHS_);
     var teams = TeamsService.teamBlocks(form);
     if (!teams.length) {
-      SheetViewsLayout.emptyView(sh, COLS_, 'No registrations yet.');
+      SheetViewsLayout.emptyView(sh, COLS_, "No registrations yet.");
       return;
     }
     var rows = teamRows_(teams);
     var first = SheetViewsLayout.FIRST_ROW;
     var n = rows.values.length;
     SheetViewsLayout.writeRows(sh, rows.values, rows.shades);
-    sh.getRange(first, 1, n, 1)
-      .setFontWeight('bold')
-      .setHorizontalAlignment('left');
-    sh.getRange(first, 2, n, 2)
-      .setHorizontalAlignment('center')
-      .setFontWeight('bold');
+    sh.getRange(first, 1, n, 1).setFontWeight("bold").setHorizontalAlignment("left");
+    sh.getRange(first, 2, n, 2).setHorizontalAlignment("center").setFontWeight("bold");
     sh.setRowHeights(first, n, ROW_PX_);
     labelTasks_(sh, rows.blocks);
-    SheetViewsLayout.frameBlocks(
-      sh,
-      { cols: COLS_, first: first, last: n + 1 },
-      rows.blocks
-    );
+    SheetViewsLayout.frameBlocks(sh, { cols: COLS_, first: first, last: n + 1 }, rows.blocks);
   }
 
   return { build };

@@ -13,11 +13,8 @@ var AdminSubmissionsController = (function () {
   function submissions(req) {
     var form = FormsService.requireForm(req.slug || req.id);
     return {
-      submissions: AdminSubmissionsService.adminRows(
-        form,
-        !!req.includeDeleted
-      ),
-      transfers: TransfersView.adminTransfers(form)
+      submissions: AdminSubmissionsService.adminRows(form, !!req.includeDeleted),
+      transfers: TransfersView.adminTransfers(form),
     };
   }
 
@@ -33,7 +30,7 @@ var AdminSubmissionsController = (function () {
       form,
       FormsPublic.validationForm(form),
       req.submissionId,
-      req.patch || {}
+      req.patch || {},
     );
     ResponsesNotify.afterChange(form);
     return { updated: true, dataChanged: changedData };
@@ -48,7 +45,7 @@ var AdminSubmissionsController = (function () {
   function remove(req) {
     var form = FormsService.requireForm(req.slug || req.id);
     if (!SubmissionsService.cancelSubmission(form, req.submissionId))
-      ApiError.fail('submission_not_found', 'That submission does not exist.');
+      ApiError.fail("submission_not_found", "That submission does not exist.");
     ResponsesNotify.afterChange(form);
     return { deleted: true };
   }
@@ -64,7 +61,7 @@ var AdminSubmissionsController = (function () {
     return AdminSubmissionsService.resetKey(
       form,
       FormsPublic.validationForm(form),
-      req.submissionId
+      req.submissionId,
     );
   }
 

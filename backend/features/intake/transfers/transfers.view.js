@@ -23,13 +23,9 @@ var TransfersView = (function () {
       var team = rows.filter(function (r) {
         return r.id === teamId;
       })[0];
-      var phone = team
-        ? String(Rules.valueByRole(form, team.data, 'phone') || '')
-        : '';
+      var phone = team ? String(Rules.valueByRole(form, team.data, "phone") || "") : "";
       if (!phone) return {};
-      return rules.transferWhatsapp === true
-        ? { phone: phone, whatsapp: true }
-        : { phone: phone };
+      return rules.transferWhatsapp === true ? { phone: phone, whatsapp: true } : { phone: phone };
     };
   }
 
@@ -57,7 +53,7 @@ var TransfersView = (function () {
         })
         .map(function (m) {
           return { code: String(m.code), name: m.name };
-        })
+        }),
     };
   }
 
@@ -76,7 +72,7 @@ var TransfersView = (function () {
     var people = Rules.membersOf(form, team.data);
     return all
       .filter(function (t) {
-        return t.status === 'pending' && t.fromId === team.id;
+        return t.status === "pending" && t.fromId === team.id;
       })
       .map(function (t) {
         var m =
@@ -87,13 +83,13 @@ var TransfersView = (function () {
           {
             id: t.id,
             code: t.code,
-            name: m.name || '',
+            name: m.name || "",
             team: t.toRef,
             sizeAfter: Math.max(people.length - 1, 0),
-            min: range.min
+            min: range.min,
           },
           leaderAsked(form, team, t.code),
-          contact(t.toId)
+          contact(t.toId),
         );
       });
   }
@@ -110,18 +106,18 @@ var TransfersView = (function () {
   function outgoing_(team, all, contact) {
     return all
       .filter(function (t) {
-        return t.toId === team.id && t.status !== 'cancelled';
+        return t.toId === team.id && t.status !== "cancelled";
       })
       .map(function (t) {
         return Object.assign(
           {
             id: t.id,
             code: t.code,
-            name: t.member.name || '',
+            name: t.member.name || "",
             team: t.fromRef,
-            status: t.status
+            status: t.status,
           },
-          t.status === 'pending' ? contact(t.fromId) : {}
+          t.status === "pending" ? contact(t.fromId) : {},
         );
       });
   }
@@ -140,7 +136,7 @@ var TransfersView = (function () {
     var contact = leaderContacts(form);
     return {
       incoming: incoming_(form, team, all, contact),
-      outgoing: outgoing_(team, all, contact)
+      outgoing: outgoing_(team, all, contact),
     };
   }
 
@@ -153,7 +149,7 @@ var TransfersView = (function () {
    */
   function adminTransfers(form) {
     var waiting = TransfersRepository.readTransfers(form).filter(function (t) {
-      return t.status === 'pending';
+      return t.status === "pending";
     });
     var rows = waiting.length ? ResponsesRepository.readResponses(form) : [];
     return waiting.map(function (t) {
@@ -165,11 +161,11 @@ var TransfersView = (function () {
           id: t.id,
           created: t.created,
           code: t.code,
-          name: t.member.name || '',
+          name: t.member.name || "",
           from: t.fromRef,
-          to: t.toRef
+          to: t.toRef,
         },
-        leaderAsked(form, from, t.code)
+        leaderAsked(form, from, t.code),
       );
     });
   }

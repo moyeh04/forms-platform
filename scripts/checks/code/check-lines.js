@@ -7,8 +7,8 @@
  * vowel sign) sits on the letter before it, so it takes no column, as the
  * formatter measures it.
  */
-const path = require('node:path');
-const { select, read } = require('../lib/files.js');
+const path = require("node:path");
+const { select, read } = require("../lib/files.js");
 
 const URL = /https?:\/\/\S+/g;
 const MARK = /\p{M}/gu;
@@ -21,7 +21,7 @@ const MARK = /\p{M}/gu;
  * @return {number} Its width without URLs.
  */
 function width(line) {
-  return [...line.replace(URL, '').replace(MARK, '')].length;
+  return [...line.replace(URL, "").replace(MARK, "")].length;
 }
 
 /**
@@ -34,14 +34,14 @@ function width(line) {
  */
 function longLines(file, text, limit) {
   const out = [];
-  text.split('\n').forEach((line, i) => {
+  text.split("\n").forEach((line, i) => {
     const columns = width(line);
     if (columns <= limit) return;
     out.push({
       file,
       line: i + 1,
-      rule: 'lines',
-      message: `${columns} columns; the limit is ${limit}`
+      rule: "lines",
+      message: `${columns} columns; the limit is ${limit}`,
     });
   });
   return out;
@@ -69,7 +69,7 @@ function limitOf(file, lines) {
  */
 function check(root, files, config) {
   return select(files, config.lines).flatMap((file) =>
-    longLines(file, read(root, file), limitOf(file, config.lines))
+    longLines(file, read(root, file), limitOf(file, config.lines)),
   );
 }
 

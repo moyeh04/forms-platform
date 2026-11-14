@@ -7,10 +7,10 @@
  * code reads no feature, and a controller asks its service, never a
  * repository.
  */
-const path = require('node:path');
-const walk = require('acorn-walk');
-const { select, read } = require('../lib/files.js');
-const { parse } = require('../lib/parse.js');
+const path = require("node:path");
+const walk = require("acorn-walk");
+const { select, read } = require("../lib/files.js");
+const { parse } = require("../lib/parse.js");
 
 /**
  * Gives the namespace a backend file defines: its name in PascalCase.
@@ -20,10 +20,10 @@ const { parse } = require('../lib/parse.js');
  */
 function namespaceOf(file) {
   return path
-    .basename(file, '.js')
+    .basename(file, ".js")
     .split(/[.-]/)
     .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-    .join('');
+    .join("");
 }
 
 /**
@@ -59,7 +59,7 @@ function checkSource(file, source, rules) {
   if (!apply.length) return [];
   const out = [];
   walk.full(parse(source).ast, (node) => {
-    if (node.type !== 'MemberExpression' || node.object.type !== 'Identifier') {
+    if (node.type !== "MemberExpression" || node.object.type !== "Identifier") {
       return;
     }
     for (const rule of apply) {
@@ -68,8 +68,8 @@ function checkSource(file, source, rules) {
       out.push({
         file,
         line: node.loc.start.line,
-        rule: 'layers',
-        message: `${node.object.name} is in ${home}; ${rule.why}`
+        rule: "layers",
+        message: `${node.object.name} is in ${home}; ${rule.why}`,
       });
     }
   });
@@ -86,13 +86,8 @@ function checkSource(file, source, rules) {
  * @return {!Array<!Object>} One finding for each forbidden read.
  */
 function check(root, files, config, tracked) {
-  const rules = compile(
-    config.layers.rules,
-    select(tracked || files, config.layers)
-  );
-  return select(files, config.layers).flatMap((file) =>
-    checkSource(file, read(root, file), rules)
-  );
+  const rules = compile(config.layers.rules, select(tracked || files, config.layers));
+  return select(files, config.layers).flatMap((file) => checkSource(file, read(root, file), rules));
 }
 
 module.exports = { check, checkSource, compile };

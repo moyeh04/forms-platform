@@ -3,7 +3,7 @@
  * nothing typed on the page is lost.
  */
 (function (App) {
-  'use strict';
+  "use strict";
 
   var ui = App.ui;
 
@@ -16,8 +16,8 @@
    * @return {!Element} A sun on a dark page, a moon on a light one.
    */
   function themeFace() {
-    var dark = App.theme.effective() === 'dark';
-    return ui.icon(dark ? 'sun' : 'moon', THEME_ICON_SIZE);
+    var dark = App.theme.effective() === "dark";
+    return ui.icon(dark ? "sun" : "moon", THEME_ICON_SIZE);
   }
 
   /**
@@ -28,18 +28,18 @@
    */
   function themeButton(label) {
     var btn = ui.h(
-      'button',
+      "button",
       {
-        type: 'button',
-        class: 'icon-btn',
-        name: 'theme',
-        'aria-label': label || 'Switch light and dark',
+        type: "button",
+        class: "icon-btn",
+        name: "theme",
+        "aria-label": label || "Switch light and dark",
         onclick: function () {
           App.theme.toggle();
           ui.clear(btn).appendChild(themeFace());
-        }
+        },
       },
-      themeFace()
+      themeFace(),
     );
     return btn;
   }

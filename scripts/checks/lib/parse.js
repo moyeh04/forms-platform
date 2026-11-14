@@ -1,12 +1,12 @@
 /** Turns a source file into a syntax tree with its comments. */
-const acorn = require('acorn');
+const acorn = require("acorn");
 
 const OPTIONS = {
-  ecmaVersion: 'latest',
-  sourceType: 'script',
+  ecmaVersion: "latest",
+  sourceType: "script",
   locations: true,
   allowHashBang: true,
-  allowReturnOutsideFunction: true
+  allowReturnOutsideFunction: true,
 };
 
 /**

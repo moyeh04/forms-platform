@@ -3,7 +3,7 @@
  * students meet them, then the questions on no page, then Add a page.
  */
 (function (App) {
-  'use strict';
+  "use strict";
 
   var A = App.admin;
   var Q = A.questions;
@@ -12,12 +12,12 @@
   var icon = ui.icon;
 
   var HELP =
-    'Each page of the form and its questions, in the order students see' +
-    ' them. Rename a page, add a page, or move a question to another page' +
-    ' with Page. Rename a question, hide it, make it required, or give it a' +
-    ' description. Add your own questions to any page. Team size, names,' +
-    ' codes, and the booking slot are always required. For names, the' +
-    ' number is how many name parts are needed (4 means a four-part name).';
+    "Each page of the form and its questions, in the order students see" +
+    " them. Rename a page, add a page, or move a question to another page" +
+    " with Page. Rename a question, hide it, make it required, or give it a" +
+    " description. Add your own questions to any page. Team size, names," +
+    " codes, and the booking slot are always required. For names, the" +
+    " number is how many name parts are needed (4 means a four-part name).";
 
   /**
    * Puts the focus on a control of the list, once it is drawn.
@@ -39,20 +39,20 @@
    */
   function addQuestionButton(s, st) {
     return h(
-      'button',
+      "button",
       {
-        type: 'button',
-        class: 'btn btn-quiet sm q-add',
-        name: 'add-question-' + st.id,
+        type: "button",
+        class: "btn btn-quiet sm q-add",
+        name: "add-question-" + st.id,
         onclick: function () {
           var id = Q.addQuestion(s.f, st);
           s.toolsOpen[id] = true;
           s.paintQuestions();
           focus(s, '[data-field="' + id + '"] input[type="text"]');
-        }
+        },
       },
-      icon('plus', A.ICON_SIZE.MENU),
-      'Add a question to this page'
+      icon("plus", A.ICON_SIZE.MENU),
+      "Add a question to this page",
     );
   }
 
@@ -83,11 +83,10 @@
     if (!mine.length) {
       rows.push(
         h(
-          'p',
-          { class: 'muted-note q-empty' },
-          'This page has no questions yet. Students do not see a page with' +
-            ' no questions.'
-        )
+          "p",
+          { class: "muted-note q-empty" },
+          "This page has no questions yet. Students do not see a page with" + " no questions.",
+        ),
       );
     }
     rows.push(addQuestionButton(s, st));
@@ -109,10 +108,10 @@
     if (loose.length && (s.f.steps || []).length) {
       rows.push(
         h(
-          'h3',
-          { class: 'q-page', dataset: { page: '' } },
-          'Not on a page (students do not see these)'
-        )
+          "h3",
+          { class: "q-page", dataset: { page: "" } },
+          "Not on a page (students do not see these)",
+        ),
       );
     }
     loose.forEach(function (fd) {
@@ -129,19 +128,19 @@
    */
   function addPageButton(s) {
     return h(
-      'button',
+      "button",
       {
-        type: 'button',
-        class: 'btn btn-quiet q-add-page',
-        name: 'add-page',
+        type: "button",
+        class: "btn btn-quiet q-add-page",
+        name: "add-page",
         onclick: function () {
           var st = Q.addPage(s.f);
           s.paintQuestions();
           focus(s, '[name="page-title-en-' + st.id + '"]');
-        }
+        },
       },
-      icon('plus', A.ICON_SIZE.LINE),
-      'Add a page'
+      icon("plus", A.ICON_SIZE.LINE),
+      "Add a page",
     );
   }
 
@@ -172,11 +171,11 @@
    * @return {!Element} The panel.
    */
   A.questionsPanel = function (s) {
-    s.qList = h('div', { class: 'q-list' });
+    s.qList = h("div", { class: "q-list" });
     s.toolsOpen = {};
     s.paintQuestions = paint.bind(null, s);
     s.paintQuestions();
-    var panel = A.panel('Questions', HELP, s.qList);
+    var panel = A.panel("Questions", HELP, s.qList);
     panel.summary = Q.summary.bind(null, s);
     return panel;
   };

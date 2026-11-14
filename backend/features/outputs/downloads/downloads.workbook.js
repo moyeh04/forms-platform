@@ -31,23 +31,23 @@ var DownloadsWorkbook = (function () {
         fill: SheetStyle.PALETTE.ink,
         color: SheetStyle.PALETTE.onInk,
         bold: true,
-        align: 'center'
-      }
+        align: "center",
+      },
     ];
     SheetStyle.PALETTE.groups.forEach(function (g) {
       styles.push(
-        { fill: g.shades[0], bold: true, align: 'right', rtl: true },
-        { fill: g.shades[1], bold: true, align: 'right', rtl: true },
-        { fill: g.shades[0], bold: true, align: 'center' },
-        { fill: g.shades[1], bold: true, align: 'center' },
+        { fill: g.shades[0], bold: true, align: "right", rtl: true },
+        { fill: g.shades[1], bold: true, align: "right", rtl: true },
+        { fill: g.shades[0], bold: true, align: "center" },
+        { fill: g.shades[1], bold: true, align: "center" },
         {
           fill: g.solid,
-          color: '#FFFFFF',
+          color: "#FFFFFF",
           bold: true,
           underline: true,
-          align: 'center',
-          wrap: true
-        }
+          align: "center",
+          wrap: true,
+        },
       );
     });
     styles.push({ wrap: true });
@@ -96,13 +96,11 @@ var DownloadsWorkbook = (function () {
    */
   function localLink_(paths, base) {
     var hit = paths.filter(function (p) {
-      return (
-        p === base || p.indexOf(base + '.') === 0 || p.indexOf(base + '/') === 0
-      );
+      return p === base || p.indexOf(base + ".") === 0 || p.indexOf(base + "/") === 0;
     })[0];
-    if (!hit) return '';
-    var target = hit.indexOf(base + '/') === 0 ? base + '/' : hit;
-    return target.split('/').map(encodeURIComponent).join('/');
+    if (!hit) return "";
+    var target = hit.indexOf(base + "/") === 0 ? base + "/" : hit;
+    return target.split("/").map(encodeURIComponent).join("/");
   }
 
   /**
@@ -121,20 +119,18 @@ var DownloadsWorkbook = (function () {
     var code = groupStyle_(g, IN_GROUP_.code + shade);
     var task = groupStyle_(g, IN_GROUP_.task);
     return [
-      { v: first ? t.number : '', style: groupStyle_(g, IN_GROUP_.number) },
+      { v: first ? t.number : "", style: groupStyle_(g, IN_GROUP_.number) },
       {
-        v: i + 1 + '. ' + m.name + (m.leader ? ' ★' : ''),
-        style: groupStyle_(g, IN_GROUP_.name + shade)
+        v: i + 1 + ". " + m.name + (m.leader ? " ★" : ""),
+        style: groupStyle_(g, IN_GROUP_.name + shade),
       },
       // A code that starts with 0 stays text, or Excel would drop the zero.
       {
         v: PLAIN_NUMBER_.test(String(m.code)) ? Number(m.code) : m.code,
-        style: code
+        style: code,
       },
-      { v: m.section || '', style: code },
-      first
-        ? { v: t.title || t.ref, style: task, link: t.localLink }
-        : { v: '', style: task }
+      { v: m.section || "", style: code },
+      first ? { v: t.title || t.ref, style: task, link: t.localLink } : { v: "", style: task },
     ];
   }
 
@@ -149,28 +145,23 @@ var DownloadsWorkbook = (function () {
   function teamsSheet_(form, saved) {
     var paths = Object.keys(saved);
     var rows = [
-      headRow_(
-        ['#', 'Team member', 'Code', 'Section'].concat(
-          TeamsService.teamThing(form)
-        )
-      )
+      headRow_(["#", "Team member", "Code", "Section"].concat(TeamsService.teamThing(form))),
     ];
     var merges = [];
     TeamsService.teamBlocks(form).forEach(function (t, g) {
       var start = rows.length + 1;
       var end = start + t.members.length - 1;
       var linked = Object.assign({}, t, {
-        localLink:
-          localLink_(paths, DownloadsJobs.teamBase(form, t)) || t.link || ''
+        localLink: localLink_(paths, DownloadsJobs.teamBase(form, t)) || t.link || "",
       });
       t.members.forEach(function (m, i) {
         rows.push(memberRow_(linked, g, m, i));
       });
       if (t.members.length > 1) {
-        merges.push('A' + start + ':A' + end, 'E' + start + ':E' + end);
+        merges.push("A" + start + ":A" + end, "E" + start + ":E" + end);
       }
     });
-    return { name: 'Teams', rows: rows, merges: merges, heights: ROW_HEIGHT_ };
+    return { name: "Teams", rows: rows, merges: merges, heights: ROW_HEIGHT_ };
   }
 
   /**
@@ -182,26 +173,20 @@ var DownloadsWorkbook = (function () {
    */
   function failedSheet_(form, failed) {
     var wrap = wrapStyle_();
-    var head = headRow_([
-      '#',
-      TeamsService.teamThing(form),
-      'File',
-      'Why',
-      'Open in Drive'
-    ]);
+    var head = headRow_(["#", TeamsService.teamThing(form), "File", "Why", "Open in Drive"]);
     return {
-      name: 'Not downloaded',
+      name: "Not downloaded",
       rows: [head].concat(
         failed.map(function (f) {
           return [
             f.number,
-            { v: f.title || '', style: wrap },
+            { v: f.title || "", style: wrap },
             { v: f.path, style: wrap },
             { v: f.reason, style: wrap },
-            f.url ? { v: 'Open', link: f.url } : ''
+            f.url ? { v: "Open", link: f.url } : "",
           ];
-        })
-      )
+        }),
+      ),
     };
   }
 
@@ -217,7 +202,7 @@ var DownloadsWorkbook = (function () {
   function build(form, job, saved) {
     var sheets = [teamsSheet_(form, saved)];
     if (job.failed.length) sheets.push(failedSheet_(form, job.failed));
-    return Workbook.xlsxBlob('Teams.xlsx', sheets, styles_());
+    return Workbook.xlsxBlob("Teams.xlsx", sheets, styles_());
   }
 
   return { build };

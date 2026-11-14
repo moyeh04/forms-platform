@@ -3,7 +3,7 @@
  * timetable, another click removes it. Dates with bookings are marked.
  */
 (function (App) {
-  'use strict';
+  "use strict";
 
   var A = App.admin;
   var TT = A.tt;
@@ -12,7 +12,7 @@
   var Rules = window.Rules;
 
   /** The teaching week starts on Saturday. */
-  var WEEK = ['Sat', 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
+  var WEEK = ["Sat", "Sun", "Mon", "Tue", "Wed", "Thu", "Fri"];
 
   /** How far Saturday is from Sunday, the first day of a Date week. */
   var SATURDAY_SHIFT = 1;
@@ -21,18 +21,18 @@
   var ISO = { YEAR_END: 4, MONTH_START: 5, MONTH_END: 7 };
 
   var MONTHS = [
-    'January',
-    'February',
-    'March',
-    'April',
-    'May',
-    'June',
-    'July',
-    'August',
-    'September',
-    'October',
-    'November',
-    'December'
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
   ];
 
   /**
@@ -49,7 +49,7 @@
     var start = dated.pop()?.date || TT.today();
     return {
       y: +start.slice(0, ISO.YEAR_END),
-      m: +start.slice(ISO.MONTH_START, ISO.MONTH_END) - 1
+      m: +start.slice(ISO.MONTH_START, ISO.MONTH_END) - 1,
     };
   };
 
@@ -67,25 +67,20 @@
     })[0];
     var has = day ? TT.bookedOn(t, day) : 0;
     return h(
-      'button',
+      "button",
       {
-        type: 'button',
-        class:
-          'tt-cal-day' +
-          (date === TT.today() ? ' today' : '') +
-          (has ? ' has-bookings' : ''),
-        name: 'cal-' + date,
-        'aria-pressed': day ? 'true' : 'false',
-        'aria-label': Rules.dayLabel(date) + (day ? ', in the timetable' : ''),
-        title: has
-          ? A.plural(has, 'booking', 'bookings') + ' on this day'
-          : null,
+        type: "button",
+        class: "tt-cal-day" + (date === TT.today() ? " today" : "") + (has ? " has-bookings" : ""),
+        name: "cal-" + date,
+        "aria-pressed": day ? "true" : "false",
+        "aria-label": Rules.dayLabel(date) + (day ? ", in the timetable" : ""),
+        title: has ? A.plural(has, "booking", "bookings") + " on this day" : null,
         onclick: function () {
           TT.toggleDate(t, date);
           t.paint();
-        }
+        },
       },
-      String(n)
+      String(n),
     );
   }
 
@@ -101,7 +96,7 @@
     var count = new Date(Date.UTC(t.view.y, t.view.m + 1, 0)).getUTCDate();
     var cells = [];
     var i;
-    for (i = 0; i < lead; i++) cells.push(h('span', { class: 'tt-cal-gap' }));
+    for (i = 0; i < lead; i++) cells.push(h("span", { class: "tt-cal-gap" }));
     for (i = 1; i <= count; i++) cells.push(dateCell(t, i));
     return cells;
   }
@@ -116,19 +111,19 @@
   function monthButton(t, by) {
     var back = by < 0;
     return h(
-      'button',
+      "button",
       {
-        type: 'button',
-        class: 'icon-btn sm',
-        name: back ? 'cal-prev' : 'cal-next',
-        'aria-label': back ? 'Month before' : 'Month after',
+        type: "button",
+        class: "icon-btn sm",
+        name: back ? "cal-prev" : "cal-next",
+        "aria-label": back ? "Month before" : "Month after",
         onclick: function () {
           var d = new Date(Date.UTC(t.view.y, t.view.m + by, 1));
           t.view = { y: d.getUTCFullYear(), m: d.getUTCMonth() };
           TT.paintCalendar(t);
-        }
+        },
       },
-      back ? '‹' : '›'
+      back ? "‹" : "›",
     );
   }
 
@@ -141,26 +136,26 @@
     ui.clear(t.calBox);
     t.calBox.appendChild(
       h(
-        'div',
-        { class: 'tt-cal-head' },
+        "div",
+        { class: "tt-cal-head" },
         monthButton(t, -1),
         h(
-          'strong',
-          { class: 'tt-cal-month', 'aria-live': 'polite' },
-          MONTHS[t.view.m] + ' ' + t.view.y
+          "strong",
+          { class: "tt-cal-month", "aria-live": "polite" },
+          MONTHS[t.view.m] + " " + t.view.y,
         ),
-        monthButton(t, 1)
-      )
+        monthButton(t, 1),
+      ),
     );
     t.calBox.appendChild(
       h(
-        'div',
-        { class: 'tt-cal-grid' },
+        "div",
+        { class: "tt-cal-grid" },
         WEEK.map(function (w) {
-          return h('span', { class: 'tt-cal-dow' }, w);
+          return h("span", { class: "tt-cal-dow" }, w);
         }),
-        monthCells(t)
-      )
+        monthCells(t),
+      ),
     );
   };
 })(window.App);

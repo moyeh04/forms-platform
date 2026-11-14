@@ -5,12 +5,12 @@
  * the one file `flags.exclude` lets through. Anywhere else, a field compared
  * with '1' or '0', or a choice that writes '1' or '0', is refused.
  */
-const walk = require('acorn-walk');
-const { select, read } = require('../lib/files.js');
-const { parse } = require('../lib/parse.js');
+const walk = require("acorn-walk");
+const { select, read } = require("../lib/files.js");
+const { parse } = require("../lib/parse.js");
 
-const FLAGS = ['1', '0'];
-const EQUALITY = ['===', '!==', '==', '!='];
+const FLAGS = ["1", "0"];
+const EQUALITY = ["===", "!==", "==", "!="];
 
 /**
  * Says whether a node is a string flag literal.
@@ -19,7 +19,7 @@ const EQUALITY = ['===', '!==', '==', '!='];
  * @return {boolean} True for '1' or '0'.
  */
 function isFlag(node) {
-  return node.type === 'Literal' && FLAGS.includes(node.value);
+  return node.type === "Literal" && FLAGS.includes(node.value);
 }
 
 /**
@@ -29,11 +29,11 @@ function isFlag(node) {
  * @return {boolean} True when it reads a member, raw or as a string.
  */
 function readsField(node) {
-  if (node.type === 'MemberExpression') return true;
+  if (node.type === "MemberExpression") return true;
   return (
-    node.type === 'CallExpression' &&
-    node.callee.name === 'String' &&
-    node.arguments[0]?.type === 'MemberExpression'
+    node.type === "CallExpression" &&
+    node.callee.name === "String" &&
+    node.arguments[0]?.type === "MemberExpression"
   );
 }
 
@@ -44,21 +44,21 @@ function readsField(node) {
  * @return {string} The problem, or an empty string.
  */
 function flagProblem(node) {
-  if (node.type === 'BinaryExpression' && EQUALITY.includes(node.operator)) {
+  if (node.type === "BinaryExpression" && EQUALITY.includes(node.operator)) {
     const pairs = [
       [node.left, node.right],
-      [node.right, node.left]
+      [node.right, node.left],
     ];
     if (pairs.some(([a, b]) => isFlag(a) && readsField(b))) {
-      return 'a field compared with a flag string';
+      return "a field compared with a flag string";
     }
   }
-  if (node.type === 'ConditionalExpression') {
+  if (node.type === "ConditionalExpression") {
     const sides = [node.consequent, node.alternate];
-    const strings = sides.every((side) => typeof side.value === 'string');
-    if (strings && sides.some(isFlag)) return 'a flag string written';
+    const strings = sides.every((side) => typeof side.value === "string");
+    if (strings && sides.some(isFlag)) return "a flag string written";
   }
-  return '';
+  return "";
 }
 
 /**
@@ -76,8 +76,8 @@ function checkSource(file, source) {
     out.push({
       file,
       line: node.loc.start.line,
-      rule: 'flags',
-      message: `${problem}; use Cell.readFlag or Cell.writeFlag`
+      rule: "flags",
+      message: `${problem}; use Cell.readFlag or Cell.writeFlag`,
     });
   });
   return out;
@@ -92,9 +92,7 @@ function checkSource(file, source) {
  * @return {!Array<!Object>} One finding for each flag string.
  */
 function check(root, files, config) {
-  return select(files, config.flags).flatMap((file) =>
-    checkSource(file, read(root, file))
-  );
+  return select(files, config.flags).flatMap((file) => checkSource(file, read(root, file)));
 }
 
 module.exports = { check, checkSource };

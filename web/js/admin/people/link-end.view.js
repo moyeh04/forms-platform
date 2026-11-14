@@ -3,7 +3,7 @@
  * to move the end of one, and the dialog that moves it.
  */
 (function (App) {
-  'use strict';
+  "use strict";
 
   var A = App.admin;
   var ui = App.ui;
@@ -11,9 +11,9 @@
   var toast = ui.toast;
 
   var LINK_PERIODS = [
-    { days: 7, label: '1 week' },
-    { days: 30, label: '1 month' },
-    { days: 90, label: '3 months' }
+    { days: 7, label: "1 week" },
+    { days: 30, label: "1 month" },
+    { days: 90, label: "3 months" },
   ];
 
   /**
@@ -24,8 +24,8 @@
    * @return {string} An ISO time, or '' for no end.
    */
   A.linkEnd = function (choice) {
-    if (!choice || choice.none) return '';
-    return choice.until || A.extendedEnd('', choice);
+    if (!choice || choice.none) return "";
+    return choice.until || A.extendedEnd("", choice);
   };
 
   /**
@@ -35,11 +35,11 @@
    * @return {string} The line.
    */
   function endText(c) {
-    if (!c) return 'Pick the date the link ends.';
+    if (!c) return "Pick the date the link ends.";
     var end = A.linkEnd(c);
     return end
-      ? 'The link and its key work until ' + A.day(end) + '.'
-      : 'The link works until you turn it off.';
+      ? "The link and its key work until " + A.day(end) + "."
+      : "The link works until you turn it off.";
   }
 
   /**
@@ -51,22 +51,18 @@
    * @return {!Element} The picker.
    */
   A.linkEndPicker = function (start, onchange) {
-    var preview = h(
-      'p',
-      { class: 'extend-preview', role: 'status' },
-      endText(start)
-    );
+    var preview = h("p", { class: "extend-preview", role: "status" }, endText(start));
     var picker = A.untilPicker({
-      name: 'link-end',
-      none: 'No end date',
+      name: "link-end",
+      none: "No end date",
       periods: LINK_PERIODS,
       start: start,
       onchange: function (c) {
         preview.textContent = endText(c);
         onchange(c);
-      }
+      },
     });
-    return h('div', null, picker.node, preview);
+    return h("div", null, picker.node, preview);
   };
 
   /**
@@ -97,38 +93,33 @@
      */
     async function save() {
       if (!choice) {
-        toast('Pick the date the link ends.', 'err');
+        toast("Pick the date the link ends.", "err");
         return false;
       }
-      await A.call('admin.clients.update', {
+      await A.call("admin.clients.update", {
         id: c.id,
-        patch: { expires: A.linkEnd(choice) }
+        patch: { expires: A.linkEnd(choice) },
       });
-      toast('Saved', 'ok');
+      toast("Saved", "ok");
       A.render();
     }
 
     A.modal(
-      'When the link of ' + c.name + ' ends',
+      "When the link of " + c.name + " ends",
       h(
-        'div',
-        { class: 'l-stack' },
+        "div",
+        { class: "l-stack" },
         c.expired
-          ? h(
-              'p',
-              null,
-              A.untilText(c.expires),
-              '. Pick a new end to open it again.'
-            )
+          ? h("p", null, A.untilText(c.expires), ". Pick a new end to open it again.")
           : null,
         A.linkEndPicker(choice, function (v) {
           choice = v;
-        })
+        }),
       ),
       [
-        { text: 'Cancel', kind: 'quiet' },
-        { text: 'Save', kind: 'primary', onclick: save }
-      ]
+        { text: "Cancel", kind: "quiet" },
+        { text: "Save", kind: "primary", onclick: save },
+      ],
     );
   };
 })(window.App);

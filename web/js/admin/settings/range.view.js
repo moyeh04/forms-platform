@@ -7,7 +7,7 @@
  * numbers.
  */
 (function (App) {
-  'use strict';
+  "use strict";
 
   var ui = App.ui,
     h = ui.h,
@@ -31,9 +31,7 @@
    * @return {boolean} True when they are inside the floor and the ceiling.
    */
   function valid(c, b) {
-    return (
-      b.min >= c.o.floor && b.max >= Math.max(b.min, 1) && b.max <= c.o.ceiling
-    );
+    return b.min >= c.o.floor && b.max >= Math.max(b.min, 1) && b.max <= c.o.ceiling;
   }
 
   /**
@@ -45,13 +43,13 @@
   function ruleOf(o) {
     return (
       o.words.name +
-      ' needs a minimum of at least ' +
+      " needs a minimum of at least " +
       o.floor +
-      ' and a maximum that is not lower' +
-      (o.floor < 1 ? ' and at least 1' : '') +
-      ', up to ' +
+      " and a maximum that is not lower" +
+      (o.floor < 1 ? " and at least 1" : "") +
+      ", up to " +
       o.ceiling +
-      '.'
+      "."
     );
   }
 
@@ -80,15 +78,15 @@
     var w = c.o.words;
     ui.clear(c.choices);
     if (!valid(c, b)) {
-      c.choices.appendChild(h('span', { class: 'muted-note' }, c.rule));
+      c.choices.appendChild(h("span", { class: "muted-note" }, c.rule));
       return;
     }
-    c.choices.appendChild(h('span', { class: 'muted-note' }, w.choose + ': '));
+    c.choices.appendChild(h("span", { class: "muted-note" }, w.choose + ": "));
     numbers(b).forEach(function (n) {
-      c.choices.appendChild(h('span', { class: 'num-chip' }, String(n)));
+      c.choices.appendChild(h("span", { class: "num-chip" }, String(n)));
     });
     if (w.unit) {
-      c.choices.appendChild(h('span', { class: 'muted-note' }, ' ' + w.unit));
+      c.choices.appendChild(h("span", { class: "muted-note" }, " " + w.unit));
     }
   }
 
@@ -103,19 +101,19 @@
   function outsideText(w, b, n) {
     var one = n === 1;
     return (
-      A.plural(n, w.one + ' is', w.many + ' are') +
-      ' outside ' +
-      (b.min === b.max ? String(b.min) : b.min + ' to ' + b.max) +
-      '. ' +
-      (one ? 'It stays ' : 'They stay ') +
+      A.plural(n, w.one + " is", w.many + " are") +
+      " outside " +
+      (b.min === b.max ? String(b.min) : b.min + " to " + b.max) +
+      ". " +
+      (one ? "It stays " : "They stay ") +
       w.stay +
-      ' as ' +
-      (one ? 'it is' : 'they are') +
-      '. Widen the range, or ask ' +
-      (one ? 'that team' : 'those teams') +
-      ' ' +
+      " as " +
+      (one ? "it is" : "they are") +
+      ". Widen the range, or ask " +
+      (one ? "that team" : "those teams") +
+      " " +
       w.fix +
-      '.'
+      "."
     );
   }
 
@@ -136,7 +134,7 @@
       }, 0);
     }
     c.outside.hidden = !n;
-    c.outside.textContent = n ? outsideText(c.o.words, b, n) : '';
+    c.outside.textContent = n ? outsideText(c.o.words, b, n) : "";
   }
 
   /**
@@ -156,8 +154,8 @@
       {
         name: c.o.names[key],
         min: String(c.o.floor),
-        max: String(c.o.ceiling)
-      }
+        max: String(c.o.ceiling),
+      },
     );
     return A.field(c.o.words[key], input);
   }
@@ -171,18 +169,10 @@
   function problemOf(c) {
     var text = c.notice.text;
     if (!valid(c, bounds(c.range))) return c.rule;
-    if (
-      c.notice.sizes.length &&
-      !(text.en || '').trim() &&
-      !(text.ar || '').trim()
-    ) {
-      return (
-        'Write the note for ' +
-        c.o.words.name.toLowerCase() +
-        ', or switch off its numbers.'
-      );
+    if (c.notice.sizes.length && !(text.en || "").trim() && !(text.ar || "").trim()) {
+      return "Write the note for " + c.o.words.name.toLowerCase() + ", or switch off its numbers.";
     }
-    return '';
+    return "";
   }
 
   /**
@@ -204,8 +194,8 @@
    * @return {!Object} Its note.
    */
   function noticeOf(range) {
-    range.notice = range.notice || { sizes: [], text: { en: '', ar: '' } };
-    range.notice.text = range.notice.text || { en: '', ar: '' };
+    range.notice = range.notice || { sizes: [], text: { en: "", ar: "" } };
+    range.notice.text = range.notice.text || { en: "", ar: "" };
     return range.notice;
   }
 
@@ -229,28 +219,28 @@
       o: o,
       notice: noticeOf(range),
       rule: ruleOf(o),
-      choices: h('div', { class: 'size-preview', 'aria-live': 'polite' }),
-      outside: h('div', {
-        class: 'banner',
-        role: 'alert',
+      choices: h("div", { class: "size-preview", "aria-live": "polite" }),
+      outside: h("div", {
+        class: "banner",
+        role: "alert",
         name: o.names.outside,
-        hidden: true
+        hidden: true,
       }),
-      noteChips: h('div', {
-        class: 'toggle-chips',
-        role: 'group',
-        'aria-label': o.words.noteFor
+      noteChips: h("div", {
+        class: "toggle-chips",
+        role: "group",
+        "aria-label": o.words.noteFor,
       }),
-      notePreview: h('div', { class: 'notice-preview', 'aria-live': 'polite' })
+      notePreview: h("div", { class: "notice-preview", "aria-live": "polite" }),
     };
     c.paint = paint.bind(null, c);
     var node = h(
-      'div',
-      { class: 'size-range l-stack' },
-      h('div', { class: 'row' }, boundField(c, 'min'), boundField(c, 'max')),
+      "div",
+      { class: "size-range l-stack" },
+      h("div", { class: "row" }, boundField(c, "min"), boundField(c, "max")),
       c.choices,
       c.outside,
-      A.rangeNoteBox(c)
+      A.rangeNoteBox(c),
     );
     c.paint();
 

@@ -3,7 +3,7 @@
  * its name, its kind, its first choices and how many forms ask it.
  */
 (function (App) {
-  'use strict';
+  "use strict";
 
   var A = App.admin;
   var L = A.lists;
@@ -26,7 +26,7 @@
         .map(function (o) {
           return o.label?.en || o.value;
         })
-        .join(', ') + (values.length > PEEK ? ' …' : '')
+        .join(", ") + (values.length > PEEK ? " …" : "")
     );
   }
 
@@ -42,10 +42,10 @@
   function badgeOf(p, k, current) {
     var kindLabel = L.KINDS[L.kindOf(p, k)].label;
     if (current && L.dirty(p)) {
-      return h('span', { class: 'badge draft' }, 'Not saved');
+      return h("span", { class: "badge draft" }, "Not saved");
     }
     if (L.nameOf(p, k) !== kindLabel) {
-      return h('span', { class: 'list-card-kind' }, kindLabel);
+      return h("span", { class: "list-card-kind" }, kindLabel);
     }
     return null;
   }
@@ -62,36 +62,27 @@
     var values = current ? L.fromRows(p.rows, L.kindOf(p)) : p.lists[k] || [];
     var users = L.formsUsing(p.forms, k).length;
     return h(
-      'button',
+      "button",
       {
-        type: 'button',
-        class: 'list-card',
-        name: 'pick-' + k,
-        'aria-current': current ? 'true' : null,
+        type: "button",
+        class: "list-card",
+        name: "pick-" + k,
+        "aria-current": current ? "true" : null,
         onclick: function () {
           p.select(k);
-        }
+        },
       },
+      h("span", { class: "list-card-name" }, L.nameOf(p, k), badgeOf(p, k, current)),
+      h("span", { class: "list-card-peek", dir: "auto" }, peekOf(values) || "No choices yet"),
       h(
-        'span',
-        { class: 'list-card-name' },
-        L.nameOf(p, k),
-        badgeOf(p, k, current)
-      ),
-      h(
-        'span',
-        { class: 'list-card-peek', dir: 'auto' },
-        peekOf(values) || 'No choices yet'
-      ),
-      h(
-        'span',
-        { class: 'list-card-meta' },
+        "span",
+        { class: "list-card-meta" },
         (L.kindOf(p, k) === ListKind.MILESTONES
-          ? A.plural(values.length, 'milestone', 'milestones')
-          : A.plural(values.length, 'choice', 'choices')) +
-          ' · ' +
-          (users ? A.plural(users, 'form', 'forms') : 'no form yet')
-      )
+          ? A.plural(values.length, "milestone", "milestones")
+          : A.plural(values.length, "choice", "choices")) +
+          " · " +
+          (users ? A.plural(users, "form", "forms") : "no form yet"),
+      ),
     );
   }
 
@@ -104,19 +95,19 @@
     ui.clear(p.index);
     p.index.appendChild(
       h(
-        'button',
+        "button",
         {
-          type: 'button',
-          class: 'btn btn-quiet list-new',
-          name: 'new-list',
-          'aria-current': p.creating ? 'true' : null,
+          type: "button",
+          class: "btn btn-quiet list-new",
+          name: "new-list",
+          "aria-current": p.creating ? "true" : null,
           onclick: function () {
             p.startNew();
-          }
+          },
         },
-        ui.icon('plus', A.ICON_SIZE.LINE),
-        'New list'
-      )
+        ui.icon("plus", A.ICON_SIZE.LINE),
+        "New list",
+      ),
     );
     L.keys(p).forEach(function (k) {
       p.index.appendChild(card(p, k));

@@ -3,7 +3,7 @@
  * for each review step.
  */
 (function (App) {
-  'use strict';
+  "use strict";
 
   var A = App.admin;
   var R = A.responses;
@@ -11,15 +11,7 @@
   var h = ui.h;
 
   /** The columns before the review steps. */
-  var FIRST_COLUMNS = [
-    'No.',
-    'Name',
-    'Code',
-    'Phone',
-    'Group',
-    'Section',
-    'Timetable'
-  ];
+  var FIRST_COLUMNS = ["No.", "Name", "Code", "Phone", "Group", "Section", "Timetable"];
 
   /**
    * Draws a registration as a row of the table.
@@ -34,33 +26,27 @@
     var L = R.labelled;
     var steps = form.review?.steps || [];
     return h(
-      'tr',
+      "tr",
       { dataset: { ref: s.ref } },
-      h('td', { class: 'num' }, String(i + 1)),
-      h('td', { class: 'nm' }, R.bdi(s.name)),
-      L('Code', h('td', { class: 'mono' }, s.code)),
-      L('Phone', h('td', { class: 'mono' }, s.phone)),
-      L('Group', h('td', null, s.data.group || '')),
-      L('Section', h('td', null, s.data.section || '')),
+      h("td", { class: "num" }, String(i + 1)),
+      h("td", { class: "nm" }, R.bdi(s.name)),
+      L("Code", h("td", { class: "mono" }, s.code)),
+      L("Phone", h("td", { class: "mono" }, s.phone)),
+      L("Group", h("td", null, s.data.group || "")),
+      L("Section", h("td", null, s.data.section || "")),
       L(
-        'Timetable',
+        "Timetable",
         h(
-          'td',
+          "td",
           null,
-          s.link
-            ? h(
-                'a',
-                { href: s.link, target: '_blank', rel: 'noopener' },
-                'Open'
-              )
-            : ''
-        )
+          s.link ? h("a", { href: s.link, target: "_blank", rel: "noopener" }, "Open") : "",
+        ),
       ),
       steps.map(function (st) {
-        return L(st.label.en, h('td', null, R.reviewSelect(form, s, st)));
+        return L(st.label.en, h("td", null, R.reviewSelect(form, s, st)));
       }),
-      L('Status', h('td', null, R.statusSelect(form, s))),
-      h('td', null, R.detailsButton(form, s, reload))
+      L("Status", h("td", null, R.statusSelect(form, s))),
+      h("td", null, R.detailsButton(form, s, reload)),
     );
   }
 
@@ -77,33 +63,33 @@
     var columns = FIRST_COLUMNS.concat(
       steps.map(function (s) {
         return s.label.en;
-      })
-    ).concat(['Status', '']);
+      }),
+    ).concat(["Status", ""]);
     return h(
-      'div',
-      { class: 'scroll-x' },
+      "div",
+      { class: "scroll-x" },
       h(
-        'table',
-        { class: 'data-table cards' },
+        "table",
+        { class: "data-table cards" },
         h(
-          'thead',
+          "thead",
           null,
           h(
-            'tr',
+            "tr",
             null,
             columns.map(function (c) {
-              return h('th', null, c);
-            })
-          )
+              return h("th", null, c);
+            }),
+          ),
         ),
         h(
-          'tbody',
+          "tbody",
           null,
           R.byGroup(rows).map(function (s, i) {
             return registrationRow(form, s, i, reload);
-          })
-        )
-      )
+          }),
+        ),
+      ),
     );
   };
 })(window.App);

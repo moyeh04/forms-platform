@@ -16,7 +16,7 @@ var SubmissionsService = (function () {
       status: r.status,
       created: r.created,
       updated: r.updated,
-      data: r.data
+      data: r.data,
     };
   }
 
@@ -29,9 +29,7 @@ var SubmissionsService = (function () {
    * @return {boolean} True for a task form that is not open.
    */
   function taskLocked_(form) {
-    return (
-      form.type === FormType.TASK_SUBMISSION && Rules.formState(form) !== 'open'
-    );
+    return form.type === FormType.TASK_SUBMISSION && Rules.formState(form) !== "open";
   }
 
   /**
@@ -43,8 +41,8 @@ var SubmissionsService = (function () {
   function assertTaskOpen_(form) {
     if (taskLocked_(form))
       ApiError.fail(
-        'deadline_passed',
-        'The deadline has passed, so this task can no longer be changed.'
+        "deadline_passed",
+        "The deadline has passed, so this task can no longer be changed.",
       );
   }
 
@@ -58,12 +56,12 @@ var SubmissionsService = (function () {
    * @return {string} `all`, `slot`, or an empty string for nothing.
    */
   function editScope_(form) {
-    if (taskLocked_(form)) return '';
+    if (taskLocked_(form)) return "";
     var edit = !!form.editKey.allowEdit;
-    if (form.type !== FormType.RESERVATION) return edit ? 'all' : '';
+    if (form.type !== FormType.RESERVATION) return edit ? "all" : "";
     var keyBooking = !!KeyBookingService.keyBookingSource(form);
-    if (edit && !keyBooking) return 'all';
-    return edit || form.editKey.allowDelete ? 'slot' : '';
+    if (edit && !keyBooking) return "all";
+    return edit || form.editKey.allowDelete ? "slot" : "";
   }
 
   /**
@@ -76,7 +74,7 @@ var SubmissionsService = (function () {
    */
   function checkedAnswers_(vform, answers) {
     var v = Rules.validateSubmission(vform, answers || {});
-    if (!v.ok) ApiError.fail('invalid', 'Some answers need fixing.', v.errors);
+    if (!v.ok) ApiError.fail("invalid", "Some answers need fixing.", v.errors);
     DriveLinks.checkDriveFields(vform, v.data);
     return v.data;
   }
@@ -94,13 +92,8 @@ var SubmissionsService = (function () {
    */
   function keyBookingAnswers_(vform, source, sourceKey, answers) {
     var registration = KeyBookingService.registrationByKey(source, sourceKey);
-    var slotField = Rules.fieldByRole(vform, 'slot');
-    var data = KeyBookingService.bookingData(
-      vform,
-      source,
-      registration,
-      answers?.[slotField.id]
-    );
+    var slotField = Rules.fieldByRole(vform, "slot");
+    var data = KeyBookingService.bookingData(vform, source, registration, answers?.[slotField.id]);
     data._source = { form: source.id, ref: registration.ref };
     return data;
   }
@@ -119,11 +112,10 @@ var SubmissionsService = (function () {
     try {
       ResponsesRules.checkLimits(vform, data, live, null);
     } catch (e) {
-      if (keyBooking && e.code === 'duplicate')
+      if (keyBooking && e.code === "duplicate")
         ApiError.fail(
-          'already_booked',
-          'Your team already has a booking. ' +
-            'Open it with your key to change its time.'
+          "already_booked",
+          "Your team already has a booking. " + "Open it with your key to change its time.",
         );
       throw e;
     }
@@ -144,13 +136,13 @@ var SubmissionsService = (function () {
       id: id,
       ref: ResponsesRepository.nextRef(form),
       created: Time.nowIso(),
-      status: 'new',
+      status: "new",
       review: ResponsesReview.defaultReview(form),
       data: data,
       keyHash: k.hash,
       keyExpires: KeysService.keyExpiry(form),
       deleted: false,
-      keySeal: KeysService.sealKey(form, id, k.key)
+      keySeal: KeysService.sealKey(form, id, k.key),
     });
   }
 
@@ -175,7 +167,7 @@ var SubmissionsService = (function () {
         ? []
         : TransfersService.takeOutTransfers(vform, data, live, {
             selfId: null,
-            asked: how.transfer
+            asked: how.transfer,
           });
       checkNewLimits_(vform, data, live, !!how.source);
       var k = how.source
@@ -188,9 +180,9 @@ var SubmissionsService = (function () {
       return {
         id: r.id,
         ref: r.ref,
-        key: form.editKey.enabled ? k.key : '',
+        key: form.editKey.enabled ? k.key : "",
         keyExpires: r.keyExpires,
-        asked: TransfersService.recordTransfers(form, r, wants)
+        asked: TransfersService.recordTransfers(form, r, wants),
       };
     });
   }
@@ -213,10 +205,10 @@ var SubmissionsService = (function () {
       var current = live.filter(function (r) {
         return r.id === id;
       })[0];
-      if (!current) ApiError.fail('bad_key', 'That key is not right.');
+      if (!current) ApiError.fail("bad_key", "That key is not right.");
       var wants = TransfersService.takeOutTransfers(vform, data, live, {
         selfId: current.id,
-        asked: change.transfer
+        asked: change.transfer,
       });
       ResponsesRules.checkLimits(vform, data, live, current.id);
       current.data = data;
@@ -240,14 +232,14 @@ var SubmissionsService = (function () {
     delete result.asked;
     if (!asked.length) return result;
     asked.forEach(function (t) {
-      TransfersMail.mailTransfer(form, t, 'asked');
+      TransfersMail.mailTransfer(form, t, "asked");
     });
     var contact = TransfersView.leaderContacts(form);
     result.data = data;
     result.transfers = asked.map(function (t) {
       return Object.assign(
-        { code: t.code, name: t.member.name || '', team: t.fromRef },
-        contact(t.fromId)
+        { code: t.code, name: t.member.name || "", team: t.fromRef },
+        contact(t.fromId),
       );
     });
     return result;
@@ -271,8 +263,8 @@ var SubmissionsService = (function () {
     if (!r) return null;
     TeamNumbers.keepTeamNumbers(form, rows);
     r.deleted = true;
-    r.keyHash = '';
-    r.keySeal = '';
+    r.keyHash = "";
+    r.keySeal = "";
     ResponsesRepository.saveResponse(form, r);
     TransfersService.closeTransfersOf(form, r.id);
     return r;
@@ -302,6 +294,6 @@ var SubmissionsService = (function () {
     editSubmission: editSubmission_,
     transferResult: transferResult_,
     cancelResponse: cancelResponse_,
-    cancelSubmission: cancelSubmission_
+    cancelSubmission: cancelSubmission_,
   };
 })();

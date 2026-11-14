@@ -7,278 +7,278 @@
 var Routes = Router.create(
   [
     {
-      action: 'admin.login',
+      action: "admin.login",
       access: Access.ADMIN,
-      handler: AuthController.login
+      handler: AuthController.login,
     },
     {
-      action: 'admin.clients.list',
+      action: "admin.clients.list",
       access: Access.ADMIN,
-      handler: ClientsController.list
+      handler: ClientsController.list,
     },
     {
-      action: 'admin.clients.create',
+      action: "admin.clients.create",
       access: Access.ADMIN,
-      handler: ClientsController.create
+      handler: ClientsController.create,
     },
     {
-      action: 'admin.clients.update',
+      action: "admin.clients.update",
       access: Access.ADMIN,
-      handler: ClientsController.update
+      handler: ClientsController.update,
     },
     {
-      action: 'admin.clients.regenerate',
+      action: "admin.clients.regenerate",
       access: Access.ADMIN,
-      handler: ClientsController.regenerate
+      handler: ClientsController.regenerate,
     },
     {
-      action: 'admin.clients.key',
+      action: "admin.clients.key",
       access: Access.ADMIN,
-      handler: ClientsController.setKey
+      handler: ClientsController.setKey,
     },
     {
-      action: 'admin.clients.showKey',
+      action: "admin.clients.showKey",
       access: Access.ADMIN,
-      handler: ClientsController.showKey
+      handler: ClientsController.showKey,
     },
     {
-      action: 'admin.clients.remove',
+      action: "admin.clients.remove",
       access: Access.ADMIN,
-      handler: ClientsController.remove
+      handler: ClientsController.remove,
     },
     {
-      action: 'viewer.me',
+      action: "viewer.me",
       access: Access.CLIENT,
-      handler: ViewerController.me
+      handler: ViewerController.me,
     },
     {
-      action: 'viewer.data',
+      action: "viewer.data",
       access: Access.CLIENT,
-      handler: ViewerController.data
+      handler: ViewerController.data,
     },
     {
-      action: 'viewer.review',
+      action: "viewer.review",
       access: Access.CLIENT,
-      handler: ViewerController.review
+      handler: ViewerController.review,
     },
     {
-      action: 'viewer.progress.mark',
+      action: "viewer.progress.mark",
       access: Access.CLIENT,
-      handler: ProgressController.viewerMark
+      handler: ProgressController.viewerMark,
     },
     {
-      action: 'getForm',
+      action: "getForm",
       access: Access.PUBLIC,
-      handler: FormsController.getForm
+      handler: FormsController.getForm,
     },
     {
-      action: 'admin.forms.list',
+      action: "admin.forms.list",
       access: Access.ADMIN,
-      handler: FormsController.list
+      handler: FormsController.list,
     },
     {
-      action: 'admin.forms.get',
+      action: "admin.forms.get",
       access: Access.ADMIN,
-      handler: FormsController.get
+      handler: FormsController.get,
     },
     {
-      action: 'admin.forms.create',
+      action: "admin.forms.create",
       access: Access.ADMIN,
-      handler: FormsController.create
+      handler: FormsController.create,
     },
     {
-      action: 'admin.forms.update',
+      action: "admin.forms.update",
       access: Access.ADMIN,
-      handler: FormsController.update
+      handler: FormsController.update,
     },
     {
-      action: 'admin.forms.duplicate',
+      action: "admin.forms.duplicate",
       access: Access.ADMIN,
-      handler: FormsController.duplicate
+      handler: FormsController.duplicate,
     },
     {
-      action: 'admin.forms.delete',
+      action: "admin.forms.delete",
       access: Access.ADMIN,
-      handler: FormsController.remove
+      handler: FormsController.remove,
     },
     {
-      action: 'admin.lists.get',
+      action: "admin.lists.get",
       access: Access.ADMIN,
-      handler: ListsController.get
+      handler: ListsController.get,
     },
     {
-      action: 'admin.lists.set',
+      action: "admin.lists.set",
       access: Access.ADMIN,
-      handler: ListsController.set
+      handler: ListsController.set,
     },
     {
-      action: 'admin.lists.create',
+      action: "admin.lists.create",
       access: Access.ADMIN,
-      handler: ListsController.create
+      handler: ListsController.create,
     },
     {
-      action: 'admin.lists.rename',
+      action: "admin.lists.rename",
       access: Access.ADMIN,
-      handler: ListsController.rename
+      handler: ListsController.rename,
     },
     {
-      action: 'admin.lists.delete',
+      action: "admin.lists.delete",
       access: Access.ADMIN,
-      handler: ListsController.remove
+      handler: ListsController.remove,
     },
     {
-      action: 'admin.keys.list',
+      action: "admin.keys.list",
       access: Access.ADMIN,
-      handler: KeysController.list
+      handler: KeysController.list,
     },
     {
-      action: 'admin.keys.extend',
+      action: "admin.keys.extend",
       access: Access.ADMIN,
-      handler: KeysController.extend
+      handler: KeysController.extend,
     },
     {
-      action: 'transfer.decide',
+      action: "transfer.decide",
       access: Access.KEY,
-      handler: TransfersController.transferDecide
+      handler: TransfersController.transferDecide,
     },
     {
-      action: 'transfer.cancel',
+      action: "transfer.cancel",
       access: Access.KEY,
-      handler: TransfersController.cancel
+      handler: TransfersController.cancel,
     },
     {
-      action: 'admin.transfer.decide',
+      action: "admin.transfer.decide",
       access: Access.ADMIN,
-      handler: TransfersController.adminTransferDecide
+      handler: TransfersController.adminTransferDecide,
     },
     {
-      action: 'bookingTeam',
+      action: "bookingTeam",
       access: Access.KEY,
-      handler: KeyBookingController.bookingTeam
+      handler: KeyBookingController.bookingTeam,
     },
     {
-      action: 'admin.bookings.next',
+      action: "admin.bookings.next",
       access: Access.ADMIN,
-      handler: KeyBookingController.next
+      handler: KeyBookingController.next,
     },
     {
-      action: 'admin.submissions',
+      action: "admin.submissions",
       access: Access.ADMIN,
-      handler: AdminSubmissionsController.submissions
+      handler: AdminSubmissionsController.submissions,
     },
     {
-      action: 'admin.submission.update',
+      action: "admin.submission.update",
       access: Access.ADMIN,
-      handler: AdminSubmissionsController.update
+      handler: AdminSubmissionsController.update,
     },
     {
-      action: 'admin.submission.delete',
+      action: "admin.submission.delete",
       access: Access.ADMIN,
-      handler: AdminSubmissionsController.remove
+      handler: AdminSubmissionsController.remove,
     },
     {
-      action: 'admin.submission.resetKey',
+      action: "admin.submission.resetKey",
       access: Access.ADMIN,
-      handler: AdminSubmissionsController.resetKey
+      handler: AdminSubmissionsController.resetKey,
     },
     {
-      action: 'admin.submission.key',
+      action: "admin.submission.key",
       access: Access.ADMIN,
-      handler: AdminSubmissionsController.submissionKey
+      handler: AdminSubmissionsController.submissionKey,
     },
     {
-      action: 'admin.progress.mark',
+      action: "admin.progress.mark",
       access: Access.ADMIN,
-      handler: ProgressController.adminMark
+      handler: ProgressController.adminMark,
     },
     {
-      action: 'submit',
+      action: "submit",
       access: Access.PUBLIC,
-      handler: SubmissionsController.submit
+      handler: SubmissionsController.submit,
     },
     {
-      action: 'lookup',
+      action: "lookup",
       access: Access.KEY,
-      handler: SubmissionsController.lookup
+      handler: SubmissionsController.lookup,
     },
     {
-      action: 'progress.mine',
+      action: "progress.mine",
       access: Access.KEY,
-      handler: ProgressController.mine
+      handler: ProgressController.mine,
     },
     {
-      action: 'update',
+      action: "update",
       access: Access.KEY,
-      handler: SubmissionsController.update
+      handler: SubmissionsController.update,
     },
     {
-      action: 'remove',
+      action: "remove",
       access: Access.KEY,
-      handler: SubmissionsController.remove
+      handler: SubmissionsController.remove,
     },
     {
-      action: 'admin.matching.import',
+      action: "admin.matching.import",
       access: Access.ADMIN,
-      handler: MatchingController.importNumbers
+      handler: MatchingController.importNumbers,
     },
     {
-      action: 'admin.matching.list',
+      action: "admin.matching.list",
       access: Access.ADMIN,
-      handler: MatchingController.list
+      handler: MatchingController.list,
     },
     {
-      action: 'admin.matching.decide',
+      action: "admin.matching.decide",
       access: Access.ADMIN,
-      handler: MatchingController.decide
+      handler: MatchingController.decide,
     },
     {
-      action: 'admin.matching.remove',
+      action: "admin.matching.remove",
       access: Access.ADMIN,
-      handler: MatchingController.remove
+      handler: MatchingController.remove,
     },
     {
-      action: 'admin.views.rebuild',
+      action: "admin.views.rebuild",
       access: Access.ADMIN,
-      handler: SheetViewsController.rebuild
+      handler: SheetViewsController.rebuild,
     },
     {
-      action: 'admin.download.start',
+      action: "admin.download.start",
       access: Access.ADMIN,
-      handler: DownloadsController.start
+      handler: DownloadsController.start,
     },
     {
-      action: 'admin.download.team',
+      action: "admin.download.team",
       access: Access.ADMIN,
-      handler: DownloadsController.downloadTeam
+      handler: DownloadsController.downloadTeam,
     },
     {
-      action: 'admin.download.finish',
+      action: "admin.download.finish",
       access: Access.ADMIN,
-      handler: DownloadsController.finish
+      handler: DownloadsController.finish,
     },
     {
-      action: 'admin.download.pack',
+      action: "admin.download.pack",
       access: Access.ADMIN,
-      handler: DownloadsController.pack
+      handler: DownloadsController.pack,
     },
     {
-      action: 'admin.download.chunk',
+      action: "admin.download.chunk",
       access: Access.ADMIN,
-      handler: DownloadsController.chunk
+      handler: DownloadsController.chunk,
     },
     {
-      action: 'admin.print.reservations',
+      action: "admin.print.reservations",
       access: Access.ADMIN,
-      handler: PrintController.reservations
+      handler: PrintController.reservations,
     },
     {
-      action: 'admin.print.teamList',
+      action: "admin.print.teamList",
       access: Access.ADMIN,
-      handler: PrintController.teamList
-    }
+      handler: PrintController.teamList,
+    },
   ],
   {
     requireAdmin: AuthService.requireAdmin,
-    requireClient: ClientsAccess.requireClient
-  }
+    requireClient: ClientsAccess.requireClient,
+  },
 );

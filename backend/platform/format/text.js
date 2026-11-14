@@ -9,11 +9,11 @@ var Text = (function () {
    * @return {string} The link name, or `form` when nothing of it is left.
    */
   function slugify(s) {
-    var out = String(s || '')
+    var out = String(s || "")
       .toLowerCase()
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/^-+|-+$/g, '');
-    return out || 'form';
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "");
+    return out || "form";
   }
 
   /**
@@ -24,10 +24,10 @@ var Text = (function () {
    */
   function esc_(s) {
     return String(s)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;');
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
   }
 
   return { slugify, esc: esc_ };

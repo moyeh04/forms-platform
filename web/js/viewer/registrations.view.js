@@ -4,7 +4,7 @@
  * of each step, which a link with review rights can change.
  */
 (function (App) {
-  'use strict';
+  "use strict";
 
   var V = App.viewer;
   var S = V.state;
@@ -13,7 +13,7 @@
   var toast = ui.toast;
 
   /** The review states a step can take. */
-  var REVIEWS = ['pending', 'approved', 'rejected'];
+  var REVIEWS = ["pending", "approved", "rejected"];
 
   /**
    * Saves the review of a step of a registration.
@@ -23,18 +23,18 @@
    * @param {string} v The review.
    */
   function saveReview(r, st, v) {
-    V.call('viewer.review', {
+    V.call("viewer.review", {
       slug: S.slug,
       submissionId: r.id,
       stepId: st.id,
-      status: v
+      status: v,
     })
       .then(function () {
         r.review[st.id] = v;
-        toast(st.label.en + ': ' + v, 'ok');
+        toast(st.label.en + ": " + v, "ok");
       })
       .catch(function (e) {
-        toast(e.message, 'err');
+        toast(e.message, "err");
       });
   }
 
@@ -48,29 +48,19 @@
    * @return {!Element} The review.
    */
   function stepReview(d, r, st) {
-    var cur = r.review?.[st.id] || 'pending';
+    var cur = r.review?.[st.id] || "pending";
     if (!d.canReview) {
-      return h(
-        'span',
-        null,
-        st.label.en + ': ',
-        h('span', { class: 'badge ' + cur }, cur)
-      );
+      return h("span", null, st.label.en + ": ", h("span", { class: "badge " + cur }, cur));
     }
     var sel = V.select(
       cur,
       REVIEWS.map(function (x) {
         return [x, x[0].toUpperCase() + x.slice(1)];
       }),
-      saveReview.bind(null, r, st)
+      saveReview.bind(null, r, st),
     );
-    sel.setAttribute('aria-label', st.label.en);
-    return h(
-      'label',
-      null,
-      h('span', { class: 'muted-note' }, st.label.en + ' '),
-      sel
-    );
+    sel.setAttribute("aria-label", st.label.en);
+    return h("label", null, h("span", { class: "muted-note" }, st.label.en + " "), sel);
   }
 
   /**
@@ -82,15 +72,15 @@
    */
   function reviewCell(d, r) {
     return h(
-      'td',
+      "td",
       null,
       h(
-        'div',
-        { class: 'actions' },
+        "div",
+        { class: "actions" },
         d.steps.map(function (st) {
           return stepReview(d, r, st);
-        })
-      )
+        }),
+      ),
     );
   }
 
@@ -103,30 +93,30 @@
   V.registrations = function (d) {
     var rows = d.rows.filter(V.matches);
     if (!rows.length) {
-      return h('div', { class: 'empty' }, 'No registrations to show.');
+      return h("div", { class: "empty" }, "No registrations to show.");
     }
     var cols = d.columns;
     return h(
-      'div',
-      { class: 'scroll-x' },
+      "div",
+      { class: "scroll-x" },
       h(
-        'table',
-        { class: 'data-table' },
+        "table",
+        { class: "data-table" },
         V.tableHead(cols),
         h(
-          'tbody',
+          "tbody",
           null,
           rows.map(function (r) {
             return h(
-              'tr',
+              "tr",
               { dataset: { id: r.id } },
               cols.map(function (c) {
-                return c.id === 'review' ? reviewCell(d, r) : V.cell(c.id, r);
-              })
+                return c.id === "review" ? reviewCell(d, r) : V.cell(c.id, r);
+              }),
             );
-          })
-        )
-      )
+          }),
+        ),
+      ),
     );
   };
 })(window.App);

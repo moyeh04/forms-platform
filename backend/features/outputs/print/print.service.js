@@ -9,17 +9,17 @@ var PrintService = (function () {
   var HTTP_OK_ = 200;
 
   /** The Drive folder the PDFs go to. */
-  var EXPORTS_FOLDER_ = 'Exports';
+  var EXPORTS_FOLDER_ = "Exports";
 
   /** The PDF layout of a print tab, as export URL parameters. */
   var PDF_OPTIONS_ = [
-    'size=A4',
-    'fitw=true',
-    'gridlines=false',
-    'printtitle=false',
-    'sheetnames=false',
-    'pagenumbers=true',
-    'attachment=false'
+    "size=A4",
+    "fitw=true",
+    "gridlines=false",
+    "printtitle=false",
+    "sheetnames=false",
+    "pagenumbers=true",
+    "attachment=false",
   ];
 
   /**
@@ -29,7 +29,7 @@ var PrintService = (function () {
    * @return {string} The link, without a page.
    */
   function sheetBase_(form) {
-    return 'https://docs.google.com/spreadsheets/d/' + form.sheetId;
+    return "https://docs.google.com/spreadsheets/d/" + form.sheetId;
   }
 
   /**
@@ -52,12 +52,12 @@ var PrintService = (function () {
    */
   function pdfLink_(form, printed) {
     var params = [
-      'format=pdf',
-      'gid=' + printed.gid,
+      "format=pdf",
+      "gid=" + printed.gid,
       PDF_OPTIONS_[0],
-      'portrait=' + (printed.landscape ? 'false' : 'true')
+      "portrait=" + (printed.landscape ? "false" : "true"),
     ].concat(PDF_OPTIONS_.slice(1));
-    return sheetBase_(form) + '/export?' + params.join('&');
+    return sheetBase_(form) + "/export?" + params.join("&");
   }
 
   /**
@@ -73,14 +73,14 @@ var PrintService = (function () {
     var name;
     try {
       resp = UrlFetchApp.fetch(pdfLink_(form, printed), {
-        headers: { Authorization: 'Bearer ' + ScriptApp.getOAuthToken() },
-        muteHttpExceptions: true
+        headers: { Authorization: "Bearer " + ScriptApp.getOAuthToken() },
+        muteHttpExceptions: true,
       });
       if (resp.getResponseCode() !== HTTP_OK_) return null;
-      name = printed.sheetName.replace(/^Print - /, '') + '.pdf';
+      name = printed.sheetName.replace(/^Print - /, "") + ".pdf";
       return exportsFolder_().createFile(resp.getBlob().setName(name)).getUrl();
     } catch (e) {
-      Logger.log('PDF export failed: ' + e.message);
+      Logger.log("PDF export failed: " + e.message);
       return null;
     }
   }
@@ -98,8 +98,8 @@ var PrintService = (function () {
     return {
       count: printed.count,
       sheetName: printed.sheetName,
-      sheetUrl: sheetBase_(form) + '/edit#gid=' + printed.gid,
-      pdfUrl: exportPdf_(form, printed)
+      sheetUrl: sheetBase_(form) + "/edit#gid=" + printed.gid,
+      pdfUrl: exportPdf_(form, printed),
     };
   }
 
@@ -129,6 +129,6 @@ var PrintService = (function () {
     exportsFolder: exportsFolder_,
     printReservations: printReservations_,
     printTeamList: printTeamList_,
-    printResult: printResult_
+    printResult: printResult_,
   };
 })();

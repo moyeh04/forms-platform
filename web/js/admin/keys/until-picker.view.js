@@ -4,7 +4,7 @@
  * Extend keys dialog, so the three read the same way.
  */
 (function (App) {
-  'use strict';
+  "use strict";
 
   var A = App.admin;
   var h = App.ui.h;
@@ -18,10 +18,10 @@
    * @return {!Element} The line.
    */
   A.untilText = function (iso, none) {
-    if (!iso) return h('span', { class: 'until' }, none || 'No end date');
+    if (!iso) return h("span", { class: "until" }, none || "No end date");
     return A.ended(iso)
-      ? h('span', { class: 'until warn-text' }, 'Ended ' + A.day(iso))
-      : h('span', { class: 'until' }, 'Until ' + A.day(iso));
+      ? h("span", { class: "until warn-text" }, "Ended " + A.day(iso))
+      : h("span", { class: "until" }, "Until " + A.day(iso));
   };
 
   /**
@@ -35,14 +35,14 @@
    */
   function chip(p, name, text, pick) {
     return h(
-      'button',
+      "button",
       {
-        type: 'button',
-        class: 'toggle-chip',
-        name: p.opts.name + '-' + name,
-        onclick: pick
+        type: "button",
+        class: "toggle-chip",
+        name: p.opts.name + "-" + name,
+        onclick: pick,
       },
-      text
+      text,
     );
   }
 
@@ -55,9 +55,9 @@
    */
   function isOn(p, name) {
     var c = p.choice;
-    if (name === 'date') return p.picking;
+    if (name === "date") return p.picking;
     if (p.picking || !c) return false;
-    if (name === 'none') return !!c.none;
+    if (name === "none") return !!c.none;
     return String(c.days) === name;
   }
 
@@ -69,7 +69,7 @@
   function paint(p) {
     Array.prototype.forEach.call(p.chips.children, function (c) {
       var name = c.name.slice(p.opts.name.length + 1);
-      c.setAttribute('aria-pressed', isOn(p, name) ? 'true' : 'false');
+      c.setAttribute("aria-pressed", isOn(p, name) ? "true" : "false");
     });
     p.date.hidden = !p.picking;
   }
@@ -106,23 +106,23 @@
   function addChips(p) {
     if (p.opts.none) {
       p.chips.appendChild(
-        chip(p, 'none', p.opts.none, function () {
+        chip(p, "none", p.opts.none, function () {
           choose(p, { none: true }, false);
-        })
+        }),
       );
     }
     p.opts.periods.forEach(function (period) {
       p.chips.appendChild(
         chip(p, String(period.days), period.label, function () {
           choose(p, { days: period.days }, false);
-        })
+        }),
       );
     });
     p.chips.appendChild(
-      chip(p, 'date', 'Pick a date', function () {
+      chip(p, "date", "Pick a date", function () {
         choose(p, dateChoice(p), true);
         p.date.focus();
-      })
+      }),
     );
   }
 
@@ -139,20 +139,20 @@
   A.untilPicker = function (opts) {
     var p = { opts: opts, choice: opts.start || null };
     p.picking = !!p.choice?.until;
-    p.chips = h('div', {
-      class: 'toggle-chips',
-      role: 'group',
-      'aria-label': 'How long'
+    p.chips = h("div", {
+      class: "toggle-chips",
+      role: "group",
+      "aria-label": "How long",
     });
-    p.date = h('input', {
-      class: 'input until-date',
-      type: 'date',
-      name: opts.name + '-until',
+    p.date = h("input", {
+      class: "input until-date",
+      type: "date",
+      name: opts.name + "-until",
       min: A.dateValue(new Date(Date.now() + A.DAY_MS)),
-      'aria-label': 'End date',
+      "aria-label": "End date",
       oninput: function () {
         choose(p, dateChoice(p), p.picking);
-      }
+      },
     });
     if (p.picking) p.date.value = A.dateValue(new Date(p.choice.until));
     addChips(p);
@@ -168,8 +168,8 @@
     }
 
     return {
-      node: h('div', { class: 'until-picker' }, p.chips, p.date),
-      value: value
+      node: h("div", { class: "until-picker" }, p.chips, p.date),
+      value: value,
     };
   };
 })(window.App);

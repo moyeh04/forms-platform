@@ -4,7 +4,7 @@
  * `v.changed()` of the dialog.
  */
 (function (App) {
-  'use strict';
+  "use strict";
 
   var A = App.admin;
   var h = App.ui.h;
@@ -12,10 +12,10 @@
 
   /** The groups of keys the admin can pick, with their labels. */
   var WHICH = [
-    { id: 'all', label: 'All' },
-    { id: 'expired', label: 'Expired' },
-    { id: 'soon', label: 'Ending in 3 days' },
-    { id: 'chosen', label: 'Choose teams' }
+    { id: "all", label: "All" },
+    { id: "expired", label: "Expired" },
+    { id: "soon", label: "Ending in 3 days" },
+    { id: "chosen", label: "Choose teams" },
   ];
 
   /**
@@ -26,7 +26,7 @@
    */
   function shown(v) {
     return v.keys.filter(function (k) {
-      var text = (k.ref + ' ' + k.name + ' ' + k.title).toLowerCase();
+      var text = (k.ref + " " + k.name + " " + k.title).toLowerCase();
       return !v.search || text.indexOf(v.search) !== -1;
     });
   }
@@ -40,28 +40,26 @@
   A.paintKeyWhich = function (v) {
     clear(v.whichBox);
     WHICH.forEach(function (w) {
-      var count = w.id === 'chosen' ? null : v.groups[w.id].length;
-      if (count === 0 && w.id !== 'all') return;
+      var count = w.id === "chosen" ? null : v.groups[w.id].length;
+      if (count === 0 && w.id !== "all") return;
       v.whichBox.appendChild(
         h(
-          'button',
+          "button",
           {
-            type: 'button',
-            class: 'toggle-chip',
-            name: 'which-' + w.id,
-            'aria-pressed': v.which === w.id ? 'true' : 'false',
+            type: "button",
+            class: "toggle-chip",
+            name: "which-" + w.id,
+            "aria-pressed": v.which === w.id ? "true" : "false",
             onclick: function () {
               v.which = w.id;
               A.paintKeyWhich(v);
               A.paintKeyList(v);
               v.changed();
-            }
+            },
           },
           w.label,
-          count === null
-            ? null
-            : h('span', { class: 'chip-count' }, String(count))
-        )
+          count === null ? null : h("span", { class: "chip-count" }, String(count)),
+        ),
       );
     });
   };
@@ -76,11 +74,11 @@
   function keyRow(v, k) {
     var on = v.chosen.indexOf(k.id) !== -1;
     return h(
-      'label',
-      { class: 'key-row' + (on ? ' on' : '') },
-      h('input', {
-        type: 'checkbox',
-        name: 'key-' + k.ref,
+      "label",
+      { class: "key-row" + (on ? " on" : "") },
+      h("input", {
+        type: "checkbox",
+        name: "key-" + k.ref,
         checked: on,
         onchange: function (e) {
           v.chosen = v.chosen.filter(function (x) {
@@ -89,16 +87,16 @@
           if (e.target.checked) v.chosen.push(k.id);
           A.paintKeyRows(v);
           v.changed();
-        }
+        },
       }),
-      h('span', { class: 'mono' }, k.ref),
+      h("span", { class: "mono" }, k.ref),
       h(
-        'span',
-        { class: 'key-row-name' },
-        h('bdi', null, k.name || '-'),
-        k.title ? h('span', { class: 'muted-note' }, ' · ' + k.title) : null
+        "span",
+        { class: "key-row-name" },
+        h("bdi", null, k.name || "-"),
+        k.title ? h("span", { class: "muted-note" }, " · " + k.title) : null,
       ),
-      A.untilText(k.keyExpires, 'No end date')
+      A.untilText(k.keyExpires, "No end date"),
     );
   }
 
@@ -111,9 +109,7 @@
     clear(v.rowsBox);
     var list = shown(v);
     if (!list.length) {
-      v.rowsBox.appendChild(
-        h('p', { class: 'muted-note' }, 'No team matches.')
-      );
+      v.rowsBox.appendChild(h("p", { class: "muted-note" }, "No team matches."));
       return;
     }
     list.forEach(function (k) {
@@ -132,18 +128,18 @@
    */
   function listButton(v, name, text, act) {
     return h(
-      'button',
+      "button",
       {
-        type: 'button',
-        class: 'link-btn',
+        type: "button",
+        class: "link-btn",
         name: name,
         onclick: function () {
           act();
           A.paintKeyRows(v);
           v.changed();
-        }
+        },
       },
-      text
+      text,
     );
   }
 
@@ -154,21 +150,21 @@
    */
   A.paintKeyList = function (v) {
     clear(v.listBox);
-    if (v.which !== 'chosen') return;
+    if (v.which !== "chosen") return;
     v.listBox.appendChild(
       h(
-        'div',
-        { class: 'key-tools' },
+        "div",
+        { class: "key-tools" },
         v.searchInput,
-        listButton(v, 'choose-shown', 'Choose all shown', function () {
+        listButton(v, "choose-shown", "Choose all shown", function () {
           shown(v).forEach(function (k) {
             if (v.chosen.indexOf(k.id) === -1) v.chosen.push(k.id);
           });
         }),
-        listButton(v, 'choose-none', 'Clear', function () {
+        listButton(v, "choose-none", "Clear", function () {
           v.chosen = [];
-        })
-      )
+        }),
+      ),
     );
     v.listBox.appendChild(v.rowsBox);
     A.paintKeyRows(v);

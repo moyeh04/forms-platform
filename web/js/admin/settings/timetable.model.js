@@ -11,7 +11,7 @@
  * `d.times` is always the slots that are on.
  */
 (function (App) {
-  'use strict';
+  "use strict";
 
   var A = App.admin;
   var Rules = window.Rules;
@@ -19,7 +19,7 @@
   A.tt = TT;
 
   /** The general hours of a timetable that has none yet. */
-  var DEFAULT_PATTERN = { start: '12:30', end: '15:30', length: 20, gap: 5 };
+  var DEFAULT_PATTERN = { start: "12:30", end: "15:30", length: 20, gap: 5 };
 
   /** How many teams can book the same slot. */
   TT.CAPACITY = { MIN: 1, MAX: 50 };
@@ -31,7 +31,7 @@
    * @return {string} "07", "12".
    */
   function p2(n) {
-    return ('0' + n).slice(-2);
+    return ("0" + n).slice(-2);
   }
 
   /**
@@ -43,7 +43,7 @@
    * @return {string} The day.
    */
   TT.iso = function (y, m, d) {
-    return y + '-' + p2(m + 1) + '-' + p2(d);
+    return y + "-" + p2(m + 1) + "-" + p2(d);
   };
 
   /**
@@ -76,9 +76,7 @@
    */
   TT.offered = function (t, d) {
     if (d._kept) return d._kept;
-    return Rules.generateSlots(
-      d._own ? Object.assign({}, t.pat, d._own) : t.pat
-    );
+    return Rules.generateSlots(d._own ? Object.assign({}, t.pat, d._own) : t.pat);
   };
 
   /**
@@ -170,7 +168,7 @@
   TT.bookedOn = function (t, d) {
     return Object.keys(t.taken)
       .filter(function (k) {
-        return d.id && k.indexOf(d.id + '|') === 0;
+        return d.id && k.indexOf(d.id + "|") === 0;
       })
       .reduce(function (n, k) {
         return n + t.taken[k];
@@ -237,14 +235,14 @@
    * @return {string} The days, the slots and the bookings per slot.
    */
   TT.summary = function (t) {
-    if (!t.days.length) return 'No days yet';
+    if (!t.days.length) return "No days yet";
     return (
-      A.plural(t.days.length, 'day', 'days') +
-      ' · ' +
-      A.plural(TT.slotCount(t), 'slot', 'slots') +
-      ' · ' +
-      A.plural(TT.capacity(t), 'booking', 'bookings') +
-      ' per slot'
+      A.plural(t.days.length, "day", "days") +
+      " · " +
+      A.plural(TT.slotCount(t), "slot", "slots") +
+      " · " +
+      A.plural(TT.capacity(t), "booking", "bookings") +
+      " per slot"
     );
   };
 
@@ -256,13 +254,13 @@
    */
   TT.problem = function (t) {
     var unnamed = t.days.some(function (d) {
-      return !String(d.label || '').trim();
+      return !String(d.label || "").trim();
     });
-    if (unnamed) return 'Give every day a name.';
+    if (unnamed) return "Give every day a name.";
     var empty = t.days.filter(function (d) {
       return !d.times.length;
     })[0];
-    return empty ? '"' + empty.label + '" has no time slots.' : '';
+    return empty ? '"' + empty.label + '" has no time slots.' : "";
   };
 
   /**
@@ -279,16 +277,16 @@
         start: pat.start,
         end: pat.end,
         length: pat.length,
-        gap: pat.gap
+        gap: pat.gap,
       },
       days: t.days.map(function (d) {
         return {
           id: d.id,
           label: d.label,
           date: d.date,
-          times: d.times.slice()
+          times: d.times.slice(),
         };
-      })
+      }),
     };
   };
 
@@ -307,7 +305,7 @@
       f: f,
       pat: f.slots.pattern,
       days: f.slots.days,
-      taken: taken || {}
+      taken: taken || {},
     };
     var all = Rules.generateSlots(t.pat);
     t.days.forEach(function (d) {

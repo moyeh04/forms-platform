@@ -11,7 +11,7 @@ var PrintReservations = (function () {
     time: 150,
     leader: 300,
     code: 110,
-    project: 260
+    project: 260,
   };
 
   /** The widths in column order. */
@@ -42,7 +42,7 @@ var PrintReservations = (function () {
       return d.id === dayId;
     })[0];
     if (!day) {
-      ApiError.fail('day_not_found', 'That day is not in the timetable.');
+      ApiError.fail("day_not_found", "That day is not in the timetable.");
     }
     return day;
   }
@@ -75,7 +75,7 @@ var PrintReservations = (function () {
    * @return {!Array<*>} The row.
    */
   function bookingRow_(time, r, withMembers) {
-    var row = ['', time, r.name, r.code, r.title];
+    var row = ["", time, r.name, r.code, r.title];
     if (withMembers) {
       row.push(
         (r.data.members || [])
@@ -83,10 +83,10 @@ var PrintReservations = (function () {
             return m.name;
           })
           .filter(Boolean)
-          .join(', ')
+          .join(", "),
       );
     }
-    row.push('');
+    row.push("");
     return row;
   }
 
@@ -98,7 +98,7 @@ var PrintReservations = (function () {
    * @return {!Array<string>} The row.
    */
   function emptyRow_(time, cols) {
-    var row = new Array(cols).fill('');
+    var row = new Array(cols).fill("");
     row[1] = time;
     return row;
   }
@@ -141,15 +141,13 @@ var PrintReservations = (function () {
       .setValues(values)
       .setFontFamily(SheetStyle.PALETTE.font)
       .setFontSize(PrintLayout.BODY_FONT)
-      .setVerticalAlignment('middle');
-    sh.getRange(first, 1, values.length, 2).setHorizontalAlignment('center');
-    sh.getRange(first, CODE_COL_, values.length, 1).setHorizontalAlignment(
-      'center'
-    );
+      .setVerticalAlignment("middle");
+    sh.getRange(first, 1, values.length, 2).setHorizontalAlignment("center");
+    sh.getRange(first, CODE_COL_, values.length, 1).setHorizontalAlignment("center");
     sh.setRowHeights(first, values.length, ROW_PX_);
     PrintLayout.frame(
       sh.getRange(PrintLayout.HEADER_ROW, 1, values.length + 1, cols),
-      PrintLayout.BLACK
+      PrintLayout.BLACK,
     );
   }
 
@@ -165,29 +163,22 @@ var PrintReservations = (function () {
   function printDay(form, dayId, includeEmpty) {
     var vform = FormsPublic.validationForm(form);
     var day = requireDay_(vform, dayId);
-    var withMembers = Rules.fieldByRole(vform, 'members').enabled !== false;
+    var withMembers = Rules.fieldByRole(vform, "members").enabled !== false;
     var values = dayRows_(day, bookingsByTime_(form, vform, dayId), {
       withMembers: withMembers,
-      includeEmpty: includeEmpty
+      includeEmpty: includeEmpty,
     });
     var ss = SpreadsheetApp.openById(form.sheetId);
     var sh = SheetViewsLayout.freshView(ss, PrintLayout.sheetName(day.label));
-    var headers = ['No.', 'Time', 'Team leader', 'Code', 'Project'];
-    if (withMembers) headers.push('Teammates');
-    headers.push('Signature');
-    var date = day.date ? '  (' + day.date + ')' : '';
-    PrintLayout.paintHeader(
-      sh,
-      form.title + '  -  ' + day.label + date,
-      headers
-    );
-    PrintLayout.setWidths(
-      sh,
-      WIDTHS_.concat(withMembers ? [TEAMMATES_PX_] : [], [SIGNATURE_PX_])
-    );
+    var headers = ["No.", "Time", "Team leader", "Code", "Project"];
+    if (withMembers) headers.push("Teammates");
+    headers.push("Signature");
+    var date = day.date ? "  (" + day.date + ")" : "";
+    PrintLayout.paintHeader(sh, form.title + "  -  " + day.label + date, headers);
+    PrintLayout.setWidths(sh, WIDTHS_.concat(withMembers ? [TEAMMATES_PX_] : [], [SIGNATURE_PX_]));
     if (values.length) writeRows_(sh, values, headers.length);
     else {
-      PrintLayout.emptyNote(sh, headers.length, 'No bookings for this day.');
+      PrintLayout.emptyNote(sh, headers.length, "No bookings for this day.");
     }
     return PrintLayout.printed(sh, values.length);
   }

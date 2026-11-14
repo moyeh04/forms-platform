@@ -57,24 +57,24 @@ Script deployment. Google continues to run the backend and store the data.
 
 ## What GitHub does for this project
 
-| Job | How it helps |
-|---|---|
-| **Hosts the website (GitHub Pages)** | Serves `index.html`, `admin.html`, `viewer.html`, and `assets/` as static files over HTTPS, from a global CDN, for free. |
+| Job                                   | How it helps                                                                                                                                                                   |
+| ------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Hosts the website (GitHub Pages)**  | Serves `index.html`, `admin.html`, `viewer.html`, and `assets/` as static files over HTTPS, from a global CDN, for free.                                                       |
 | **Tests and publishes on every push** | A push to `master` runs the workflow in `.github/workflows/pages.yml`: all the tests, then a Pages deploy of the website files only. A failing test keeps the old site online. |
-| **Keeps the full history** | Every change is a commit. A bad change is undone by reverting it. Old versions of any file are one click away. |
-| **Gives you a safety net** | The repository is a complete copy of the project. If your laptop dies, `git clone` brings everything back. |
-| **Documents why things changed** | The commit convention (`feat(admin): ...`, merge commits that summarise a branch) makes the history readable. |
-| **Makes sharing and review possible** | Others can read the code, open issues, or propose changes with pull requests. |
+| **Keeps the full history**            | Every change is a commit. A bad change is undone by reverting it. Old versions of any file are one click away.                                                                 |
+| **Gives you a safety net**            | The repository is a complete copy of the project. If your laptop dies, `git clone` brings everything back.                                                                     |
+| **Documents why things changed**      | The commit convention (`feat(admin): ...`, merge commits that summarise a branch) makes the history readable.                                                                  |
+| **Makes sharing and review possible** | Others can read the code, open issues, or propose changes with pull requests.                                                                                                  |
 
-### What GitHub does *not* do here
+### What GitHub does _not_ do here
 
-| Not done by GitHub | Who does it instead |
-|---|---|
-| Run backend code | Google Apps Script |
-| Store registrations | Google Sheets |
-| Keep secrets (PIN, keys, tokens) | Google (script properties and hashed values in sheets) |
-| Execute backend requests | Apps Script runs the bundle that Actions deploys with clasp |
-| Send email | Google MailApp |
+| Not done by GitHub               | Who does it instead                                         |
+| -------------------------------- | ----------------------------------------------------------- |
+| Run backend code                 | Google Apps Script                                          |
+| Store registrations              | Google Sheets                                               |
+| Keep secrets (PIN, keys, tokens) | Google (script properties and hashed values in sheets)      |
+| Execute backend requests         | Apps Script runs the bundle that Actions deploys with clasp |
+| Send email                       | Google MailApp                                              |
 
 Because GitHub only serves files, **nothing secret ever belongs in the
 repository**. Nothing is secret there by design: the one value the website
@@ -143,7 +143,7 @@ Why it suits this project:
   that moves is published only at its new path: a page a browser kept from
   before asks for the old one and needs a reload. Backend code, tests,
   scripts, and docs never go online.
-- **Tested before it is public.** Pages' source is *GitHub Actions*, so a push
+- **Tested before it is public.** Pages' source is _GitHub Actions_, so a push
   that breaks a test is never published.
 - **No special folders.** Nothing starts with an underscore, so GitHub's
   default processing does not hide or change any file.
@@ -156,16 +156,16 @@ Why it suits this project:
 
 ## What Google does for this project
 
-| Google service | Role |
-|---|---|
-| **Apps Script web app** | Runs all backend logic. Its address is the API. Runs as the owner so visitors need no login. |
-| **Google Sheets** | The database: one registry sheet plus one sheet per form. Also the admin's spreadsheet view of the data. |
-| **Drive** | Holds the `Forms Platform` folder, the form sheets, and exported PDFs. Students' project files stay in their own Drive and are only linked. |
-| **MailApp** | Sends confirmation emails with the edit key. |
-| **LockService** | Lets one request at a time change the data, so two students cannot take the same slot and two saves cannot overwrite each other. |
-| **CacheService** | Counts wrong PIN, key, and token attempts for throttling. |
-| **PropertiesService** | Stores the private pepper, the PIN hash, and the registry id. |
-| **Triggers** | Runs `processDirtyViews` once, a minute after a change, to repaint the sheet views. |
+| Google service          | Role                                                                                                                                        |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Apps Script web app** | Runs all backend logic. Its address is the API. Runs as the owner so visitors need no login.                                                |
+| **Google Sheets**       | The database: one registry sheet plus one sheet per form. Also the admin's spreadsheet view of the data.                                    |
+| **Drive**               | Holds the `Forms Platform` folder, the form sheets, and exported PDFs. Students' project files stay in their own Drive and are only linked. |
+| **MailApp**             | Sends confirmation emails with the edit key.                                                                                                |
+| **LockService**         | Lets one request at a time change the data, so two students cannot take the same slot and two saves cannot overwrite each other.            |
+| **CacheService**        | Counts wrong PIN, key, and token attempts for throttling.                                                                                   |
+| **PropertiesService**   | Stores the private pepper, the PIN hash, and the registry id.                                                                               |
+| **Triggers**            | Runs `processDirtyViews` once, a minute after a change, to repaint the sheet views.                                                         |
 
 ## Who is allowed to do what
 
@@ -221,12 +221,12 @@ flowchart TD
 
 ## Why split hosting this way
 
-| Alternative | Why it was not chosen |
-|---|---|
-| Everything on Apps Script (HtmlService pages) | The pages would be served inside a Google iframe with a long address, harder to style, and slower to iterate. Static files are simpler and faster. |
-| A rented server or a platform with a free tier that sleeps | Costs money, or needs patching, or has cold starts. |
-| Firebase or a similar backend service | Would work, but adds another account, another bill risk, and moves data out of Sheets, where admins already work. |
-| Google Forms | Cannot do slots, team size, edit keys, tinted team blocks, or WhatsApp matching. |
+| Alternative                                                | Why it was not chosen                                                                                                                              |
+| ---------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Everything on Apps Script (HtmlService pages)              | The pages would be served inside a Google iframe with a long address, harder to style, and slower to iterate. Static files are simpler and faster. |
+| A rented server or a platform with a free tier that sleeps | Costs money, or needs patching, or has cold starts.                                                                                                |
+| Firebase or a similar backend service                      | Would work, but adds another account, another bill risk, and moves data out of Sheets, where admins already work.                                  |
+| Google Forms                                               | Cannot do slots, team size, edit keys, tinted team blocks, or WhatsApp matching.                                                                   |
 
 The deciding factor: the owner and the instructors already live in Google
 Sheets. Keeping the data there means the "database" is a tool they can already
@@ -234,12 +234,12 @@ read, filter, and print.
 
 ## Failure behaviour
 
-| What fails | What visitors see | What still works |
-|---|---|---|
-| GitHub Pages is down | The site does not load | Google Sheets and the admin's direct access to the data |
-| Apps Script is down or over quota | The pages load, then say "Could not reach the server" and let the student try again | Draft answers are kept in the tab; instructors' printed copies |
-| A wrong web app address in `config.js` | "The website is not connected to the backend yet" | Nothing submits until it is fixed |
-| Student's connection drops mid-submit | A clear retry message. A registration is one row written in one locked step, so it is saved whole or not at all | Their draft stays in the tab |
+| What fails                             | What visitors see                                                                                               | What still works                                               |
+| -------------------------------------- | --------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------- |
+| GitHub Pages is down                   | The site does not load                                                                                          | Google Sheets and the admin's direct access to the data        |
+| Apps Script is down or over quota      | The pages load, then say "Could not reach the server" and let the student try again                             | Draft answers are kept in the tab; instructors' printed copies |
+| A wrong web app address in `config.js` | "The website is not connected to the backend yet"                                                               | Nothing submits until it is fixed                              |
+| Student's connection drops mid-submit  | A clear retry message. A registration is one row written in one locked step, so it is saved whole or not at all | Their draft stays in the tab                                   |
 
 ## Updating
 

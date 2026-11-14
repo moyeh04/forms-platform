@@ -36,7 +36,7 @@ jobs:
       # can skip a deploy without saying so.
       - uses: actions/setup-go@v5
         with:
-          go-version: '1.23.x'
+          go-version: "1.23.x"
       - name: Validate GitHub Actions workflow
         run: go run github.com/rhysd/actionlint/cmd/actionlint@v1.7.7
       - uses: pnpm/action-setup@v6

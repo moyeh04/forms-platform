@@ -3,10 +3,10 @@
  * device only.
  */
 (function (App) {
-  'use strict';
+  "use strict";
 
   /** The browser storage key of the theme a visitor chose. */
-  var KEY = 'fp_theme';
+  var KEY = "fp_theme";
 
   /**
    * Finds the browser storage, which a locked-down browser may refuse.
@@ -37,10 +37,10 @@
    * @return {string} 'dark' or 'light'.
    */
   function effective() {
-    var t = document.documentElement.getAttribute('data-theme');
+    var t = document.documentElement.getAttribute("data-theme");
     if (t) return t;
-    var dark = window.matchMedia?.('(prefers-color-scheme: dark)').matches;
-    return dark ? 'dark' : 'light';
+    var dark = window.matchMedia?.("(prefers-color-scheme: dark)").matches;
+    return dark ? "dark" : "light";
   }
 
   /**
@@ -49,9 +49,9 @@
    * @param {?string} t 'light' or 'dark'.
    */
   function apply(t) {
-    if (t === 'light' || t === 'dark') {
-      document.documentElement.setAttribute('data-theme', t);
-    } else document.documentElement.removeAttribute('data-theme');
+    if (t === "light" || t === "dark") {
+      document.documentElement.setAttribute("data-theme", t);
+    } else document.documentElement.removeAttribute("data-theme");
   }
 
   /** Shows the theme kept on this device. */
@@ -65,7 +65,7 @@
    * @return {string} The theme now shown.
    */
   function toggle() {
-    var next = effective() === 'dark' ? 'light' : 'dark';
+    var next = effective() === "dark" ? "light" : "dark";
     apply(next);
     var s = store();
     if (s) s.setItem(KEY, next);

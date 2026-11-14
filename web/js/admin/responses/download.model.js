@@ -5,7 +5,7 @@
  * read through the API.
  */
 (function (App) {
-  'use strict';
+  "use strict";
 
   var A = App.admin;
   var R = A.responses;
@@ -24,8 +24,8 @@
    */
   R.sizeText = function (bytes) {
     return bytes < MB
-      ? Math.max(1, Math.round(bytes / KB)) + ' KB'
-      : (bytes / MB).toFixed(1) + ' MB';
+      ? Math.max(1, Math.round(bytes / KB)) + " KB"
+      : (bytes / MB).toFixed(1) + " MB";
   };
 
   /**
@@ -49,10 +49,8 @@
    * @param {string} name The name of the file.
    */
   function saveFile(pieces, name) {
-    var url = URL.createObjectURL(
-      new Blob(pieces, { type: 'application/zip' })
-    );
-    var a = App.ui.h('a', { href: url, download: name, hidden: true });
+    var url = URL.createObjectURL(new Blob(pieces, { type: "application/zip" }));
+    var a = App.ui.h("a", { href: url, download: name, hidden: true });
     document.body.appendChild(a);
     a.click();
     setTimeout(function () {
@@ -78,11 +76,11 @@
     var size = part.size;
     var c;
     while (offset !== null) {
-      c = await A.call('admin.download.chunk', {
+      c = await A.call("admin.download.chunk", {
         slug: form.slug,
         job: job,
         file: part.file,
-        offset: offset
+        offset: offset,
       });
       pieces.push(bytesOf(c.data));
       size = c.size;
@@ -110,12 +108,12 @@
     for (i = 0; i < n; i++) {
       t = start.teams[i];
       d.progress.team(t, n, files);
-      for (done = false; !done; ) {
+      for (done = false; !done;) {
         if (!d.open()) return false;
-        r = await A.call('admin.download.team', {
+        r = await A.call("admin.download.team", {
           slug: d.form.slug,
           job: start.job,
-          ref: t.ref
+          ref: t.ref,
         });
         files += r.saved;
         done = r.done;
@@ -141,11 +139,11 @@
       if (!d.open()) return null;
       d.progress.pack(p, count);
       parts.push(
-        await A.call('admin.download.pack', {
+        await A.call("admin.download.pack", {
           slug: d.form.slug,
           job: job,
-          part: p
-        })
+          part: p,
+        }),
       );
     }
     return parts;
@@ -160,13 +158,13 @@
    *     null when the window was closed.
    */
   R.runDownload = async function (d) {
-    var start = await A.call('admin.download.start', { slug: d.form.slug });
+    var start = await A.call("admin.download.start", { slug: d.form.slug });
     d.progress.begin(start.teams.length);
     if (!(await saveTeams(d, start))) return null;
     d.progress.writing();
-    var fin = await A.call('admin.download.finish', {
+    var fin = await A.call("admin.download.finish", {
       slug: d.form.slug,
-      job: start.job
+      job: start.job,
     });
     var parts = await packParts(d, start.job, fin.parts);
     return parts && { start: start, fin: fin, parts: parts };

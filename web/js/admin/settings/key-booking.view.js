@@ -4,7 +4,7 @@
  * details.
  */
 (function (App) {
-  'use strict';
+  "use strict";
 
   var A = App.admin;
   var ui = App.ui;
@@ -12,13 +12,12 @@
 
   /** What booking with a key does, in the words of the page. */
   var HOW = [
-    'Name, code, phone and every other question the two forms share are' +
-      ' copied from the registration. Students are not asked them again.',
-    'The Questions section below still decides which answers are kept and' +
-      ' shown.',
-    'The same key opens and cancels the booking. A key that has expired for' +
-      ' editing still books.',
-    'Each team books once.'
+    "Name, code, phone and every other question the two forms share are" +
+      " copied from the registration. Students are not asked them again.",
+    "The Questions section below still decides which answers are kept and" + " shown.",
+    "The same key opens and cancels the booking. A key that has expired for" +
+      " editing still books.",
+    "Each team books once.",
   ];
 
   /**
@@ -32,18 +31,18 @@
     var pick = A.select(
       kb.source,
       k.sources.map(function (s) {
-        return [s.id, s.title + (s.term ? ' (' + s.term + ')' : '')];
+        return [s.id, s.title + (s.term ? " (" + s.term + ")" : "")];
       }),
       function (v) {
         kb.source = v;
-      }
+      },
     );
-    pick.name = 'keySource';
+    pick.name = "keySource";
     return A.field(
-      'Registration form',
+      "Registration form",
       pick,
-      'The student types the 5-digit key from that form, checks the team' +
-        ' shown, and picks a slot.'
+      "The student types the 5-digit key from that form, checks the team" +
+        " shown, and picks a slot.",
     );
   }
 
@@ -60,11 +59,11 @@
     if (!k.sources.length) {
       k.body.appendChild(
         h(
-          'p',
-          { class: 'muted-note' },
-          'No form gives its students a key yet. Create a team registration' +
-            ' form first, then come back here.'
-        )
+          "p",
+          { class: "muted-note" },
+          "No form gives its students a key yet. Create a team registration" +
+            " form first, then come back here.",
+        ),
       );
       return;
     }
@@ -73,37 +72,36 @@
     });
     k.body.appendChild(
       A.check(
-        'Students book with the key from their registration',
+        "Students book with the key from their registration",
         kb.enabled,
         function (v) {
           kb.enabled = v;
           if (v && !known) kb.source = k.sources[0].id;
           paint(k);
         },
-        { name: 'keyBooking' }
-      )
+        { name: "keyBooking" },
+      ),
     );
     if (!kb.enabled) return;
     if (!known) {
       k.body.appendChild(
         h(
-          'p',
-          { class: 'error', role: 'alert' },
-          'The registration form this used no longer gives keys. Choose' +
-            ' another one.'
-        )
+          "p",
+          { class: "error", role: "alert" },
+          "The registration form this used no longer gives keys. Choose" + " another one.",
+        ),
       );
       kb.source = k.sources[0].id;
     }
     k.body.appendChild(sourceField(k));
     k.body.appendChild(
       h(
-        'ul',
-        { class: 'help plain-list' },
+        "ul",
+        { class: "help plain-list" },
         HOW.map(function (line) {
-          return h('li', null, line);
-        })
-      )
+          return h("li", null, line);
+        }),
+      ),
     );
   }
 
@@ -115,11 +113,11 @@
    */
   function summary(k) {
     var kb = k.f.keyBooking;
-    if (!kb.enabled) return 'Off';
+    if (!kb.enabled) return "Off";
     var from = k.sources.filter(function (x) {
       return x.id === kb.source;
     })[0];
-    return 'On' + (from ? ', keys of ' + from.title : ', no form chosen');
+    return "On" + (from ? ", keys of " + from.title : ", no form chosen");
   }
 
   /**
@@ -130,14 +128,13 @@
    * @return {!Element} The panel.
    */
   A.keyBookingPanel = function (s) {
-    s.f.keyBooking = s.f.keyBooking || { enabled: false, source: '' };
-    var k = { f: s.f, sources: s.res.keySources || [], body: h('div') };
+    s.f.keyBooking = s.f.keyBooking || { enabled: false, source: "" };
+    var k = { f: s.f, sources: s.res.keySources || [], body: h("div") };
     paint(k);
     var panel = A.panel(
-      'Booking with a key',
-      'Let teams that already registered book a slot without typing their' +
-        ' details again.',
-      k.body
+      "Booking with a key",
+      "Let teams that already registered book a slot without typing their" + " details again.",
+      k.body,
     );
     panel.summary = summary.bind(null, k);
     return panel;

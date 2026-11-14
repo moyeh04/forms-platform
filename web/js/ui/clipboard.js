@@ -1,6 +1,6 @@
 /** Copies text to the clipboard, with a fallback for older browsers. */
 (function (App) {
-  'use strict';
+  "use strict";
 
   var h = App.ui.h;
 
@@ -12,16 +12,16 @@
    * @return {boolean} True when the browser copied it.
    */
   function copyByCommand(text) {
-    var ta = h('textarea', {
-      'aria-hidden': 'true',
-      style: { position: 'fixed', opacity: '0' }
+    var ta = h("textarea", {
+      "aria-hidden": "true",
+      style: { position: "fixed", opacity: "0" },
     });
     ta.value = text;
     document.body.appendChild(ta);
     ta.select();
     var ok = false;
     try {
-      ok = document.execCommand('copy');
+      ok = document.execCommand("copy");
     } catch {
       ok = false;
     }

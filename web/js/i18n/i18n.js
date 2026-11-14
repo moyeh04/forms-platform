@@ -4,17 +4,17 @@
  * questions carry their own `{en, ar}` labels.
  */
 (function (App) {
-  'use strict';
+  "use strict";
 
   var STR = App.strings;
 
   /** The browser storage key of the language a visitor chose. */
-  var KEY = 'fp_lang';
+  var KEY = "fp_lang";
 
   /** The length of the date part of an ISO date and time. */
   var ISO_DATE_LENGTH = 10;
 
-  var lang = 'en';
+  var lang = "en";
 
   /**
    * Finds the browser storage, which a locked-down browser may refuse.
@@ -67,7 +67,7 @@
    * @return {*} The text, or the key itself when neither has it.
    */
   function lookup(path) {
-    var parts = path.split('.');
+    var parts = path.split(".");
     var cur = walk(STR[lang], parts);
     if (cur === undefined) cur = walk(STR.en, parts);
     return cur === undefined ? path : cur;
@@ -80,9 +80,9 @@
    * @param {boolean=} remember True to keep the choice on this device.
    */
   function setLang(l, remember) {
-    lang = l === 'ar' ? 'ar' : 'en';
+    lang = l === "ar" ? "ar" : "en";
     document.documentElement.lang = lang;
-    document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+    document.documentElement.dir = lang === "ar" ? "rtl" : "ltr";
     var s = store();
     if (remember && s) s.setItem(KEY, lang);
   }
@@ -115,9 +115,9 @@
    * @return {string} The text in the page language, or the other one.
    */
   function label(obj) {
-    if (obj == null) return '';
-    if (typeof obj === 'string') return obj;
-    return obj[lang] || obj.en || obj.ar || '';
+    if (obj == null) return "";
+    if (typeof obj === "string") return obj;
+    return obj[lang] || obj.en || obj.ar || "";
   }
 
   /**
@@ -127,10 +127,10 @@
    * @return {string} The sentence, or '' without an error.
    */
   function err(e) {
-    if (!e) return '';
-    var code = e.error || e.code || 'server_error';
+    if (!e) return "";
+    var code = e.error || e.code || "server_error";
     var params = Object.assign({}, e.params);
-    return fill(lookup('errors.' + code), params);
+    return fill(lookup("errors." + code), params);
   }
 
   /**
@@ -141,12 +141,12 @@
    */
   function fmtDate(iso) {
     var d = new Date(iso);
-    if (Number.isNaN(d.getTime())) return String(iso || '');
+    if (Number.isNaN(d.getTime())) return String(iso || "");
     try {
-      return d.toLocaleDateString(lang === 'ar' ? 'ar-EG' : 'en-GB', {
-        day: 'numeric',
-        month: 'short',
-        year: 'numeric'
+      return d.toLocaleDateString(lang === "ar" ? "ar-EG" : "en-GB", {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
       });
     } catch {
       return d.toISOString().slice(0, ISO_DATE_LENGTH);
@@ -167,6 +167,6 @@
     t: t,
     L: label,
     err: err,
-    fmtDate: fmtDate
+    fmtDate: fmtDate,
   };
 })(window.App);

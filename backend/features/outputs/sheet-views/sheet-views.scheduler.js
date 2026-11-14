@@ -19,7 +19,7 @@ var SheetViewsScheduler = (function () {
   var BOOKED_NOTE_S_ = 300;
 
   /** The function the booked run calls. */
-  var RUN_HANDLER_ = 'processDirtyViews';
+  var RUN_HANDLER_ = "processDirtyViews";
 
   /**
    * Paints the views now, and gives the form's data tabs their look when
@@ -69,12 +69,9 @@ var SheetViewsScheduler = (function () {
     if (cache.get(Constants.CACHE.VIEWS_BOOKED)) return;
     Lock.withLock(function () {
       if (viewRunBooked_()) return;
-      ScriptApp.newTrigger(RUN_HANDLER_)
-        .timeBased()
-        .after(VIEW_DELAY_MS_)
-        .create();
+      ScriptApp.newTrigger(RUN_HANDLER_).timeBased().after(VIEW_DELAY_MS_).create();
     });
-    cache.put(Constants.CACHE.VIEWS_BOOKED, '1', BOOKED_NOTE_S_);
+    cache.put(Constants.CACHE.VIEWS_BOOKED, "1", BOOKED_NOTE_S_);
   }
 
   /** Removes the trigger of the run and the note that it is booked. */
@@ -109,7 +106,7 @@ var SheetViewsScheduler = (function () {
       rebuildViews(form);
       return true;
     } catch (e) {
-      Logger.log('Views of ' + form.slug + ' not rebuilt: ' + e.message);
+      Logger.log("Views of " + form.slug + " not rebuilt: " + e.message);
       return false;
     }
   }
@@ -152,7 +149,7 @@ var SheetViewsScheduler = (function () {
       store: store,
       marks: store.getProperties(),
       forms: formsById_(),
-      started: Date.now()
+      started: Date.now(),
     };
     var again = false;
     Object.keys(run.marks).forEach(function (k) {

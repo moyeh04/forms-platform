@@ -3,7 +3,7 @@
  * review steps, and the buttons that reset the key or delete it.
  */
 (function (App) {
-  'use strict';
+  "use strict";
 
   var A = App.admin;
   var R = A.responses;
@@ -23,32 +23,28 @@
    * @return {*} The answer as shown.
    */
   function answerNode(form, f, v) {
-    if (f.type === 'members') {
+    if (f.type === "members") {
       return h(
-        'div',
+        "div",
         null,
         v.map(function (m) {
           return h(
-            'div',
+            "div",
             null,
             R.bdi(m.name),
-            ' ',
-            h('span', { class: 'mono' }, m.code),
-            ' ',
-            h('span', { class: 'mono' }, m.phone)
+            " ",
+            h("span", { class: "mono" }, m.code),
+            " ",
+            h("span", { class: "mono" }, m.phone),
           );
-        })
+        }),
       );
     }
-    if (f.type === 'slot') return R.slotText(form, v);
-    if (f.type === 'drive_link') {
-      return h(
-        'a',
-        { href: v, target: '_blank', rel: 'noopener' },
-        'Open link'
-      );
+    if (f.type === "slot") return R.slotText(form, v);
+    if (f.type === "drive_link") {
+      return h("a", { href: v, target: "_blank", rel: "noopener" }, "Open link");
     }
-    if (f.type === 'arabic_name') return R.bdi(v);
+    if (f.type === "arabic_name") return R.bdi(v);
     return String(v);
   }
 
@@ -62,14 +58,10 @@
    * @return {boolean} True to leave it out.
    */
   function skipped(form, f, v) {
-    if (
-      form.type === FormType.RESERVATION &&
-      f.role === 'members' &&
-      f.enabled === false
-    ) {
+    if (form.type === FormType.RESERVATION && f.role === "members" && f.enabled === false) {
       return true;
     }
-    return v === undefined || v === '' || (Array.isArray(v) && !v.length);
+    return v === undefined || v === "" || (Array.isArray(v) && !v.length);
   }
 
   /**
@@ -81,18 +73,15 @@
    */
   function answerRows(form, s) {
     var rows = [
-      h('dt', null, 'Reference'),
-      h('dd', null, s.ref),
-      h('dt', null, 'Sent'),
-      h('dd', null, A.fmtDate(s.created))
+      h("dt", null, "Reference"),
+      h("dd", null, s.ref),
+      h("dt", null, "Sent"),
+      h("dd", null, A.fmtDate(s.created)),
     ];
     (form.fields || []).forEach(function (f) {
       var v = s.data[f.id];
       if (skipped(form, f, v)) return;
-      rows.push(
-        h('dt', null, f.label.en),
-        h('dd', null, answerNode(form, f, v))
-      );
+      rows.push(h("dt", null, f.label.en), h("dd", null, answerNode(form, f, v)));
     });
     return rows;
   }
@@ -106,22 +95,22 @@
    * @return {!Promise<boolean>} False to keep the dialog open.
    */
   async function resetKey(form, s, key) {
-    var r = await A.call('admin.submission.resetKey', {
+    var r = await A.call("admin.submission.resetKey", {
       slug: form.slug,
-      submissionId: s.id
+      submissionId: s.id,
     });
     s.keyKnown = true;
     s.keyExpires = r.keyExpires;
     if (key) key.paintUntil();
     A.reveal(
-      'New key for ' + r.ref,
-      'Give this key to the student. They open the form link and choose' +
+      "New key for " + r.ref,
+      "Give this key to the student. They open the form link and choose" +
         ' "Edit or cancel with your key". It works until ' +
         A.fmtDate(r.keyExpires) +
-        '. The old key stops working. You can see it again any time under' +
-        ' Details.',
+        ". The old key stops working. You can see it again any time under" +
+        " Details.",
       r.key,
-      true
+      true,
     );
     return false;
   }
@@ -138,20 +127,20 @@
   async function remove(form, s, reload, close) {
     close();
     var ok = await ui.confirm({
-      title: 'Delete ' + s.ref + '?',
+      title: "Delete " + s.ref + "?",
       body:
-        'This frees its code' +
-        (s.slot ? ' and its slot' : '') +
-        ' so the team can register again.',
-      confirmText: 'Delete',
-      danger: true
+        "This frees its code" +
+        (s.slot ? " and its slot" : "") +
+        " so the team can register again.",
+      confirmText: "Delete",
+      danger: true,
     });
     if (!ok) return false;
-    await A.call('admin.submission.delete', {
+    await A.call("admin.submission.delete", {
       slug: form.slug,
-      submissionId: s.id
+      submissionId: s.id,
     });
-    toast('Deleted', 'ok');
+    toast("Deleted", "ok");
     reload();
     return false;
   }
@@ -168,25 +157,21 @@
     var key = form.editKey?.enabled ? R.keyRows(form, s) : null;
     if (key) rows.splice(KEY_ROWS_AT, 0, ...key.rows);
     var steps = (form.review?.steps || []).map(function (st) {
-      return h(
-        'div',
-        { class: 'row' },
-        A.field(st.label.en, R.reviewSelect(form, s, st))
-      );
+      return h("div", { class: "row" }, A.field(st.label.en, R.reviewSelect(form, s, st)));
     });
-    var body = h('div', { class: 'detail' }, h('dl', null, rows), steps);
-    A.modal('Registration ' + s.ref, body, [
+    var body = h("div", { class: "detail" }, h("dl", null, rows), steps);
+    A.modal("Registration " + s.ref, body, [
       {
-        text: 'Reset key',
-        kind: 'quiet',
-        onclick: resetKey.bind(null, form, s, key)
+        text: "Reset key",
+        kind: "quiet",
+        onclick: resetKey.bind(null, form, s, key),
       },
       {
-        text: 'Delete',
-        kind: 'danger',
-        onclick: remove.bind(null, form, s, reload)
+        text: "Delete",
+        kind: "danger",
+        onclick: remove.bind(null, form, s, reload),
       },
-      { text: 'Close', kind: 'quiet' }
+      { text: "Close", kind: "quiet" },
     ]);
   };
 })(window.App);

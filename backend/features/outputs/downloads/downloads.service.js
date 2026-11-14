@@ -15,7 +15,7 @@ var DownloadsService = (function () {
   var DECIMAL_ = 10;
 
   /** The name of the workbook in the zip. */
-  var WORKBOOK_ = 'Teams.xlsx';
+  var WORKBOOK_ = "Teams.xlsx";
 
   /**
    * Moves the form's older work folders to the trash and makes a new one.
@@ -29,12 +29,12 @@ var DownloadsService = (function () {
     var f;
     while (old.hasNext()) {
       f = old.next();
-      if (String(f.getName()).indexOf(form.slug + ' ') === 0) {
+      if (String(f.getName()).indexOf(form.slug + " ") === 0) {
         f.setTrashed(true);
       }
     }
-    var when = Time.nowIso().slice(0, TO_MINUTES_).replace('T', ' ');
-    return downloads.createFolder(form.slug + ' ' + when);
+    var when = Time.nowIso().slice(0, TO_MINUTES_).replace("T", " ");
+    return downloads.createFolder(form.slug + " " + when);
   }
 
   /**
@@ -48,21 +48,18 @@ var DownloadsService = (function () {
    */
   function start(form) {
     if (!TeamsService.isTeamForm(form)) {
-      ApiError.fail(
-        'wrong_type',
-        'Only team and task forms can be downloaded.'
-      );
+      ApiError.fail("wrong_type", "Only team and task forms can be downloaded.");
     }
     var teams = TeamsService.teamBlocks(form);
     if (!teams.length) {
-      ApiError.fail('nothing_to_download', 'Nobody has registered yet.');
+      ApiError.fail("nothing_to_download", "Nobody has registered yet.");
     }
     var folder = freshFolder_(form);
     var job = {
       id: folder.getId(),
       form: form.id,
       folderId: folder.getId(),
-      failed: []
+      failed: [],
     };
     DownloadsJobs.save(job);
     return {
@@ -74,9 +71,9 @@ var DownloadsService = (function () {
           ref: t.ref,
           number: t.number,
           title: t.title,
-          kind: p.ok ? p.kind : ''
+          kind: p.ok ? p.kind : "",
         };
-      })
+      }),
     };
   }
 
@@ -121,16 +118,14 @@ var DownloadsService = (function () {
       if (/\.zip$/.test(n) && !/\//.test(n)) delete saved[n];
     });
     delete saved[WORKBOOK_];
-    var book = job.folder.createFile(
-      DownloadsWorkbook.build(form, job, saved).setName(WORKBOOK_)
-    );
+    var book = job.folder.createFile(DownloadsWorkbook.build(form, job, saved).setName(WORKBOOK_));
     job.parts = splitParts_(book, saved);
     job.zips = [];
     DownloadsJobs.save(job);
     return {
       parts: job.parts.length,
       files: Object.keys(saved).length,
-      failed: job.failed
+      failed: job.failed,
     };
   }
 
@@ -145,7 +140,7 @@ var DownloadsService = (function () {
   function partIndex_(job, part) {
     var i = parseInt(part, DECIMAL_);
     if (!(i >= 0 && i < job.parts.length)) {
-      ApiError.fail('bad_part', 'That part does not exist.');
+      ApiError.fail("bad_part", "That part does not exist.");
     }
     return i;
   }
@@ -167,11 +162,11 @@ var DownloadsService = (function () {
       return DriveApp.getFileById(id);
     });
     var blobs = files.map(function (f) {
-      return f.getBlob().setName(root + '/' + f.getName());
+      return f.getBlob().setName(root + "/" + f.getName());
     });
     var count = job.parts.length;
-    var suffix = count > 1 ? ' - part ' + (i + 1) + ' of ' + count : '';
-    var name = root + suffix + '.zip';
+    var suffix = count > 1 ? " - part " + (i + 1) + " of " + count : "";
+    var name = root + suffix + ".zip";
     var zip = job.folder.createFile(Utilities.zip(blobs, name));
     files.forEach(function (f) {
       f.setTrashed(true);
@@ -193,14 +188,14 @@ var DownloadsService = (function () {
   function readRange_(fileId, from, to) {
     return DownloadsFiles.retry(function () {
       var r = UrlFetchApp.fetch(
-        'https://www.googleapis.com/drive/v3/files/' + fileId + '?alt=media',
+        "https://www.googleapis.com/drive/v3/files/" + fileId + "?alt=media",
         {
           headers: {
-            Authorization: 'Bearer ' + ScriptApp.getOAuthToken(),
-            Range: 'bytes=' + from + '-' + (to - 1)
+            Authorization: "Bearer " + ScriptApp.getOAuthToken(),
+            Range: "bytes=" + from + "-" + (to - 1),
           },
-          muteHttpExceptions: true
-        }
+          muteHttpExceptions: true,
+        },
       );
       var code = r.getResponseCode();
       if (DownloadsFiles.busyStatus(code)) {
@@ -208,8 +203,8 @@ var DownloadsService = (function () {
       }
       if (code !== HTTP_PARTIAL_ && code !== DownloadsFiles.HTTP_OK) {
         ApiError.fail(
-          'download_failed',
-          'Drive would not give the file (' + code + '). Try again.'
+          "download_failed",
+          "Drive would not give the file (" + code + "). Try again.",
         );
       }
       return r;
@@ -230,7 +225,7 @@ var DownloadsService = (function () {
    */
   function chunk(job, fileId, offset) {
     if (job.zips.indexOf(fileId) === -1) {
-      ApiError.fail('bad_part', 'That part does not exist.');
+      ApiError.fail("bad_part", "That part does not exist.");
     }
     var size = DriveApp.getFileById(fileId).getSize();
     var from = Math.max(0, parseInt(offset, DECIMAL_) || 0);
@@ -239,7 +234,7 @@ var DownloadsService = (function () {
     return {
       data: Utilities.base64Encode(resp.getContent()),
       size: size,
-      next: to < size ? to : null
+      next: to < size ? to : null,
     };
   }
 

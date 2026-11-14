@@ -24,7 +24,7 @@ var MatchingController = (function () {
     return {
       requests: match.requests,
       submissions: match.submissions.map(AdminSubmissionsService.adminView),
-      notRequested: match.notRequested
+      notRequested: match.notRequested,
     };
   }
 
@@ -38,16 +38,8 @@ var MatchingController = (function () {
     var form = MatchingService.requireMatchingForm(req.slug || req.id);
     var decision = String(req.decision);
     if (Object.values(ReviewStatus).indexOf(decision) === -1)
-      ApiError.fail(
-        'bad_status',
-        'Decision must be pending, approved, or rejected.'
-      );
-    var linked = MatchingService.decide(
-      form,
-      req.requestId,
-      decision,
-      req.note
-    );
+      ApiError.fail("bad_status", "Decision must be pending, approved, or rejected.");
+    var linked = MatchingService.decide(form, req.requestId, decision, req.note);
     if (linked) ResponsesNotify.afterChange(form);
     return { decided: true, submissionId: linked };
   }

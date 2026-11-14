@@ -16,7 +16,7 @@ var ResponsesNotify = (function () {
    */
   function siteLink_(form) {
     var base = Properties.getProp(Constants.PROPS.SITE_URL);
-    return base ? base.replace(/\/+$/, '') + '/?f=' + form.slug : '';
+    return base ? base.replace(/\/+$/, "") + "/?f=" + form.slug : "";
   }
 
   /**
@@ -29,27 +29,24 @@ var ResponsesNotify = (function () {
   function confirmationBody_(form, result) {
     var caption = FormMetadata.caption(form);
     var lines = [
-      'Your registration was received.',
-      '',
-      'Form: ' + form.title + (caption ? ' (' + caption + ')' : ''),
-      'Reference: ' + result.ref
+      "Your registration was received.",
+      "",
+      "Form: " + form.title + (caption ? " (" + caption + ")" : ""),
+      "Reference: " + result.ref,
     ];
     var keyed = form.editKey?.enabled;
-    var link = keyed ? siteLink_(form) : '';
+    var link = keyed ? siteLink_(form) : "";
     if (keyed)
       lines.push(
-        'Edit key: ' + result.key,
-        'The key works until ' +
-          result.keyExpires.slice(0, ISO_DATE_LENGTH_) +
-          '.'
+        "Edit key: " + result.key,
+        "The key works until " + result.keyExpires.slice(0, ISO_DATE_LENGTH_) + ".",
       );
-    if (link) lines.push('Edit or delete here: ' + link);
+    if (link) lines.push("Edit or delete here: " + link);
     lines.push(
-      '',
-      'تم استلام تسجيلك. ' +
-        (keyed ? 'احتفظ بالرقم المرجعي والمفتاح.' : 'احتفظ بالرقم المرجعي.')
+      "",
+      "تم استلام تسجيلك. " + (keyed ? "احتفظ بالرقم المرجعي والمفتاح." : "احتفظ بالرقم المرجعي."),
     );
-    return lines.join('\n');
+    return lines.join("\n");
   }
 
   /**
@@ -66,23 +63,23 @@ var ResponsesNotify = (function () {
     var sent = false;
     var to;
     try {
-      to = Rules.valueByRole(form, data, 'email');
+      to = Rules.valueByRole(form, data, "email");
       if (n.confirmEmail !== false && to) {
         MailApp.sendEmail({
           to: to,
-          subject: '[' + form.title + '] Registration received - ' + result.ref,
-          body: confirmationBody_(form, result)
+          subject: "[" + form.title + "] Registration received - " + result.ref,
+          body: confirmationBody_(form, result),
         });
         sent = true;
       }
       if (n.alertEmail)
         MailApp.sendEmail({
           to: n.alertEmail,
-          subject: '[' + form.title + '] New submission ' + result.ref,
-          body: 'A new submission arrived: ' + result.ref
+          subject: "[" + form.title + "] New submission " + result.ref,
+          body: "A new submission arrived: " + result.ref,
         });
     } catch (e) {
-      Logger.log('Email not sent: ' + e.message);
+      Logger.log("Email not sent: " + e.message);
     }
     return sent;
   }
@@ -97,13 +94,13 @@ var ResponsesNotify = (function () {
     try {
       SheetViewsScheduler.refreshViews(form);
     } catch (e) {
-      Logger.log('Views not marked: ' + e.message);
+      Logger.log("Views not marked: " + e.message);
     }
   }
 
   return {
     afterChange: afterChange_,
     sendConfirmation: sendConfirmation_,
-    siteLink: siteLink_
+    siteLink: siteLink_,
   };
 })();

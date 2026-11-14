@@ -28,10 +28,10 @@ var DownloadsJobs = (function () {
    * @return {string} The path.
    */
   function teamBase(form, team) {
-    var top = form.type === FormType.TASK_SUBMISSION ? 'Tasks/' : 'Projects/';
+    var top = form.type === FormType.TASK_SUBMISSION ? "Tasks/" : "Projects/";
     var n = team.number;
-    var number = n < TWO_DIGITS_ ? '0' + n : String(n);
-    return top + number + ' - ' + DownloadsFiles.safeName(team.title, team.ref);
+    var number = n < TWO_DIGITS_ ? "0" + n : String(n);
+    return top + number + " - " + DownloadsFiles.safeName(team.title, team.ref);
   }
 
   /**
@@ -41,8 +41,8 @@ var DownloadsJobs = (function () {
    */
   function downloadsFolder() {
     var exp = PrintService.exportsFolder();
-    var it = exp.getFoldersByName('Downloads');
-    return it.hasNext() ? it.next() : exp.createFolder('Downloads');
+    var it = exp.getFoldersByName("Downloads");
+    return it.hasNext() ? it.next() : exp.createFolder("Downloads");
   }
 
   /**
@@ -55,15 +55,10 @@ var DownloadsJobs = (function () {
    */
   function load(req) {
     var form = FormsService.requireForm(req.slug || req.id);
-    var raw = CacheService.getScriptCache().get(
-      Constants.CACHE.DL_JOB_PREFIX + req.job
-    );
+    var raw = CacheService.getScriptCache().get(Constants.CACHE.DL_JOB_PREFIX + req.job);
     var job = raw ? Json.parseJson(raw, null) : null;
     if (!job || job.form !== form.id) {
-      ApiError.fail(
-        'download_gone',
-        'This download has expired. Start it again.'
-      );
+      ApiError.fail("download_gone", "This download has expired. Start it again.");
     }
     job.id = req.job;
     job.folder = DriveApp.getFolderById(job.folderId);
@@ -81,12 +76,12 @@ var DownloadsJobs = (function () {
       folderId: job.folderId,
       failed: job.failed || [],
       zips: job.zips || [],
-      parts: job.parts || []
+      parts: job.parts || [],
     };
     CacheService.getScriptCache().put(
       Constants.CACHE.DL_JOB_PREFIX + job.id,
       JSON.stringify(keep),
-      JOB_SECONDS_
+      JOB_SECONDS_,
     );
   }
 
@@ -117,6 +112,6 @@ var DownloadsJobs = (function () {
     downloadsFolder,
     load,
     save,
-    savedFiles
+    savedFiles,
   };
 })();

@@ -13,9 +13,9 @@ pnpm run build
 
 runs `scripts/build/bundle-backend.js`, which writes two files into `dist/`:
 
-| Output | Made from | You do |
-|---|---|---|
-| `dist/Code.gs` | `domain/rules/` + every `backend/*.js` | Actions pushes it with pinned clasp |
+| Output                 | Made from                                | You do                              |
+| ---------------------- | ---------------------------------------- | ----------------------------------- |
+| `dist/Code.gs`         | `domain/rules/` + every `backend/*.js`   | Actions pushes it with pinned clasp |
 | `dist/appsscript.json` | `backend/appsscript.json` (copied as-is) | Actions pushes it with pinned clasp |
 
 `dist/` is listed in `.gitignore`, so it is **not committed**. It is regenerated
@@ -221,11 +221,11 @@ flowchart TD
 
 Google calls three kinds of function by name:
 
-| Function | Called when | Defined in |
-|---|---|---|
-| `doPost(e)` / `doGet()` | A request reaches the web app address | `main.js` |
-| `onOpen()` | The registry sheet opens (draws the **Forms Platform** menu) | `menu.service.js` |
-| `processDirtyViews()` | Once, a minute after a change (a time trigger it books and removes itself) | `sheet-views.scheduler.js` |
+| Function                | Called when                                                                | Defined in                 |
+| ----------------------- | -------------------------------------------------------------------------- | -------------------------- |
+| `doPost(e)` / `doGet()` | A request reaches the web app address                                      | `main.js`                  |
+| `onOpen()`              | The registry sheet opens (draws the **Forms Platform** menu)               | `menu.service.js`          |
+| `processDirtyViews()`   | Once, a minute after a change (a time trigger it books and removes itself) | `sheet-views.scheduler.js` |
 
 ## The same bundle is what the tests run
 
@@ -272,11 +272,11 @@ similar copy. The workflow pushes the same `backend-dist` artifact the tests ran
 
 ## When to rebuild
 
-| You changed | Rebuild? | Then |
-|---|---|---|
-| Anything in `backend/` or `domain/rules/` | Yes, Actions does it | Push to `master`; clasp pushes the bundle and updates the existing deployment |
-| `backend/appsscript.json` (scopes, time zone) | Yes, Actions does it | The same push carries the manifest |
-| Only files under `web/` | No | Push to `master`; GitHub Pages updates |
+| You changed                                   | Rebuild?             | Then                                                                          |
+| --------------------------------------------- | -------------------- | ----------------------------------------------------------------------------- |
+| Anything in `backend/` or `domain/rules/`     | Yes, Actions does it | Push to `master`; clasp pushes the bundle and updates the existing deployment |
+| `backend/appsscript.json` (scopes, time zone) | Yes, Actions does it | The same push carries the manifest                                            |
+| Only files under `web/`                       | No                   | Push to `master`; GitHub Pages updates                                        |
 
 Run `pnpm run build` yourself only to inspect the bundle or to run the tests
 locally; a routine update needs no local build.
@@ -317,11 +317,11 @@ source placeholder and never runs the configuration generator. See
 
 ## Troubleshooting
 
-| Symptom | Cause | Fix |
-|---|---|---|
-| `pnpm run build` prints a syntax error with a line | A real typo in a source file | Fix it; the line number refers to the joined file |
-| `dist/` is missing | It is git-ignored and was not built on this machine | `pnpm install` then `pnpm run build` |
-| Backend change is not live after a push | The **Deploy Google Apps Script** job failed or was skipped (not `master`, or a pull request) | Open the run in the Actions tab and fix the reported variable or credential |
-| Manual recovery: pasted code has no effect | You saved but did not create a **New version** of the deployment | Deploy > Manage deployments > pencil > New version |
-| Manual recovery: `Rules is not defined` in Apps Script | the rules were not pasted (partial paste) | Paste the whole `Code.gs` from the `backend-dist` artifact |
-| Menu **Forms Platform** missing | Sheet not reloaded after saving the script | Reload the sheet and wait a few seconds |
+| Symptom                                                | Cause                                                                                         | Fix                                                                         |
+| ------------------------------------------------------ | --------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
+| `pnpm run build` prints a syntax error with a line     | A real typo in a source file                                                                  | Fix it; the line number refers to the joined file                           |
+| `dist/` is missing                                     | It is git-ignored and was not built on this machine                                           | `pnpm install` then `pnpm run build`                                        |
+| Backend change is not live after a push                | The **Deploy Google Apps Script** job failed or was skipped (not `master`, or a pull request) | Open the run in the Actions tab and fix the reported variable or credential |
+| Manual recovery: pasted code has no effect             | You saved but did not create a **New version** of the deployment                              | Deploy > Manage deployments > pencil > New version                          |
+| Manual recovery: `Rules is not defined` in Apps Script | the rules were not pasted (partial paste)                                                     | Paste the whole `Code.gs` from the `backend-dist` artifact                  |
+| Menu **Forms Platform** missing                        | Sheet not reloaded after saving the script                                                    | Reload the sheet and wait a few seconds                                     |

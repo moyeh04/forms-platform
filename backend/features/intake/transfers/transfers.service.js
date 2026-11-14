@@ -44,7 +44,7 @@ var TransfersService = (function () {
           id: r.id,
           ref: r.ref,
           leader: m.leader,
-          alone: people.length === 1
+          alone: people.length === 1,
         };
       });
     });
@@ -71,8 +71,8 @@ var TransfersService = (function () {
       });
     if (askedAll) return;
     ApiError.fail(
-      'duplicate_member',
-      'Someone on this team is already registered in another team.',
+      "duplicate_member",
+      "Someone on this team is already registered in another team.",
       {
         codes: clash.map(function (m) {
           return m[codeId];
@@ -82,8 +82,8 @@ var TransfersService = (function () {
           return holder.leader
             ? { code: m[codeId], team: holder.ref, leader: true }
             : { code: m[codeId], team: holder.ref };
-        })
-      }
+        }),
+      },
     );
   }
 
@@ -103,7 +103,7 @@ var TransfersService = (function () {
    */
   function takeOutTransfers_(form, data, rows, ask) {
     if (!TransfersRepository.transfersOn(form)) return [];
-    var mf = Rules.fieldByRole(form, 'members');
+    var mf = Rules.fieldByRole(form, "members");
     var codeId = TransferMembers.codeId(form);
     var list = TransferMembers.listOf(form, data);
     var holders = holdersOf_(form, rows, ask.selfId);
@@ -117,7 +117,7 @@ var TransfersService = (function () {
     refuseUnasked_(clash, movable, {
       codeId: codeId,
       holders: holders,
-      asked: ask.asked
+      asked: ask.asked,
     });
     data[mf.id] = list.filter(function (m) {
       return !holders[m[codeId]];
@@ -128,7 +128,7 @@ var TransfersService = (function () {
         code: String(m[codeId]),
         member: m,
         fromId: holders[m[codeId]].id,
-        fromRef: holders[m[codeId]].ref
+        fromRef: holders[m[codeId]].ref,
       };
     });
   }
@@ -145,7 +145,7 @@ var TransfersService = (function () {
   function recordTransfers_(form, team, wants) {
     if (!wants.length) return [];
     var waiting = TransfersRepository.readTransfers(form).filter(function (t) {
-      return t.status === 'pending' && t.toId === team.id;
+      return t.status === "pending" && t.toId === team.id;
     });
     return wants
       .filter(function (w) {
@@ -157,14 +157,14 @@ var TransfersService = (function () {
         return TransfersRepository.saveTransfer(form, {
           id: Crypto.uuid(),
           created: Time.nowIso(),
-          status: 'pending',
+          status: "pending",
           code: w.code,
           member: w.member,
           fromId: w.fromId,
           fromRef: w.fromRef,
           toId: team.id,
           toRef: team.ref,
-          decidedBy: ''
+          decidedBy: "",
         });
       });
   }
@@ -178,8 +178,8 @@ var TransfersService = (function () {
   function closeTransfersOf_(form, teamId) {
     TransfersRepository.readTransfers(form).forEach(function (t) {
       var mine = t.toId === teamId || t.fromId === teamId;
-      if (t.status === 'pending' && mine) {
-        t.status = 'closed';
+      if (t.status === "pending" && mine) {
+        t.status = "closed";
         TransfersRepository.saveTransfer(form, t);
       }
     });
@@ -195,11 +195,10 @@ var TransfersService = (function () {
    */
   function cancelTransfer_(form, id, teamId) {
     var t = TransfersRepository.readTransfers(form).filter(function (x) {
-      return x.id === String(id) && x.status === 'pending' && x.toId === teamId;
+      return x.id === String(id) && x.status === "pending" && x.toId === teamId;
     })[0];
-    if (!t)
-      ApiError.fail('transfer_gone', 'This request was already answered.');
-    t.status = 'cancelled';
+    if (!t) ApiError.fail("transfer_gone", "This request was already answered.");
+    t.status = "cancelled";
     TransfersRepository.saveTransfer(form, t);
   }
 
@@ -221,6 +220,6 @@ var TransfersService = (function () {
     takeOutTransfers: takeOutTransfers_,
     recordTransfers: recordTransfers_,
     closeTransfersOf: closeTransfersOf_,
-    cancelTransfer: cancelTransfer_
+    cancelTransfer: cancelTransfer_,
   };
 })();

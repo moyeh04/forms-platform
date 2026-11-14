@@ -3,7 +3,7 @@
  * note the admin gets for every new submission.
  */
 (function (App) {
-  'use strict';
+  "use strict";
 
   var A = App.admin;
   var h = App.ui.h;
@@ -16,10 +16,8 @@
    */
   function summary(n) {
     return (
-      (n.confirmEmail !== false
-        ? 'Confirmation to students'
-        : 'No confirmation') +
-      (n.alertEmail ? ' · note to ' + n.alertEmail : '')
+      (n.confirmEmail !== false ? "Confirmation to students" : "No confirmation") +
+      (n.alertEmail ? " · note to " + n.alertEmail : "")
     );
   }
 
@@ -33,36 +31,36 @@
     var n = s.f.notifications || {};
     s.f.notifications = n;
     var panel = A.panel(
-      'Emails',
-      'Emails go out from your Google account. Students always see their key' +
-        ' on the success page, and you can look any key up under Responses,' +
-        ' Details.',
+      "Emails",
+      "Emails go out from your Google account. Students always see their key" +
+        " on the success page, and you can look any key up under Responses," +
+        " Details.",
       A.check(
-        'Send each student a confirmation email with their reference and key',
+        "Send each student a confirmation email with their reference and key",
         n.confirmEmail !== false,
         function (v) {
           n.confirmEmail = v;
         },
-        { name: 'confirmEmail' }
+        { name: "confirmEmail" },
       ),
       h(
-        'p',
-        { class: 'muted-note' },
-        'Turned off, nothing is emailed to students. If you do not need their' +
-          ' email address at all, also untick Show for the Email question' +
-          ' above.'
+        "p",
+        { class: "muted-note" },
+        "Turned off, nothing is emailed to students. If you do not need their" +
+          " email address at all, also untick Show for the Email question" +
+          " above.",
       ),
       A.field(
-        'Email me a note for every new submission',
+        "Email me a note for every new submission",
         A.text(
-          n.alertEmail || '',
+          n.alertEmail || "",
           function (v) {
             n.alertEmail = v.trim();
           },
-          { name: 'alertEmail', type: 'email', placeholder: 'you@example.com' }
+          { name: "alertEmail", type: "email", placeholder: "you@example.com" },
         ),
-        'Optional. Leave empty for no alerts.'
-      )
+        "Optional. Leave empty for no alerts.",
+      ),
     );
     panel.summary = summary.bind(null, n);
     return panel;

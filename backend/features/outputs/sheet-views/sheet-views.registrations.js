@@ -13,7 +13,7 @@ var SheetViewsRegistrations = (function () {
     group: 80,
     section: 90,
     timetable: 120,
-    review: 320
+    review: 320,
   };
 
   /** The widths in column order. */
@@ -57,9 +57,9 @@ var SheetViewsRegistrations = (function () {
   function reviewText_(form, r) {
     return (form.review?.steps || [])
       .map(function (s) {
-        return s.label.en + ': ' + (r.review[s.id] || 'pending');
+        return s.label.en + ": " + (r.review[s.id] || "pending");
       })
-      .join('  |  ');
+      .join("  |  ");
   }
 
   /**
@@ -79,10 +79,10 @@ var SheetViewsRegistrations = (function () {
         r.name,
         r.code,
         r.phone,
-        r.data.group || '',
-        r.data.section || '',
-        '',
-        reviewText_(form, r)
+        r.data.group || "",
+        r.data.section || "",
+        "",
+        reviewText_(form, r),
       ]);
       var tint = SheetStyle.PALETTE.groups[i % 2].shades[0];
       out.shades.push(new Array(COLS_).fill(tint));
@@ -97,21 +97,21 @@ var SheetViewsRegistrations = (function () {
    * @param {!SpreadsheetApp.Spreadsheet} ss The form's spreadsheet.
    */
   function build(form, ss) {
-    var sh = SheetViewsLayout.freshView(ss, 'Registrations');
+    var sh = SheetViewsLayout.freshView(ss, "Registrations");
     SheetViewsLayout.paintHeader(sh, [
-      'No.',
-      'Name',
-      'Code',
-      'Phone',
-      'Group',
-      'Section',
-      'Timetable',
-      'Review'
+      "No.",
+      "Name",
+      "Code",
+      "Phone",
+      "Group",
+      "Section",
+      "Timetable",
+      "Review",
     ]);
     SheetViewsLayout.setWidths(sh, WIDTHS_);
     var rows = ResponsesRepository.readResponses(form).sort(byGroup_);
     if (!rows.length) {
-      SheetViewsLayout.emptyView(sh, COLS_, 'No registrations yet.');
+      SheetViewsLayout.emptyView(sh, COLS_, "No registrations yet.");
       return;
     }
     var out = registrationRows_(form, rows);
@@ -119,17 +119,11 @@ var SheetViewsRegistrations = (function () {
     SheetViewsLayout.writeRows(sh, out.values, out.shades);
     rows.forEach(function (r, i) {
       if (!r.link) return;
-      sh.getRange(i + first, LINK_COL_).setFormula(
-        SheetViewsLayout.hyperlink(r.link, 'Open')
-      );
+      sh.getRange(i + first, LINK_COL_).setFormula(SheetViewsLayout.hyperlink(r.link, "Open"));
     });
-    sh.getRange(first, 2, rows.length, 1).setFontWeight('bold');
+    sh.getRange(first, 2, rows.length, 1).setFontWeight("bold");
     sh.setRowHeights(first, rows.length, ROW_PX_);
-    SheetViewsLayout.frameBlocks(
-      sh,
-      { cols: COLS_, first: first, last: rows.length + 1 },
-      []
-    );
+    SheetViewsLayout.frameBlocks(sh, { cols: COLS_, first: first, last: rows.length + 1 }, []);
   }
 
   return { build };

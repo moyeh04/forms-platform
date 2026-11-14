@@ -3,7 +3,7 @@
  * of the timetable.
  */
 (function (App) {
-  'use strict';
+  "use strict";
 
   var A = App.admin;
   var R = A.responses;
@@ -27,18 +27,18 @@
         return member.name;
       })
       .filter(Boolean)
-      .join(', ');
+      .join(", ");
     return h(
-      'tr',
+      "tr",
       null,
-      L('Time', h('td', { class: 'mono' }, s.data.slot.time)),
-      L('Team leader', h('td', { class: 'nm' }, R.bdi(s.name))),
-      L('Code', h('td', { class: 'mono' }, s.code)),
-      L('Phone', h('td', { class: 'mono' }, s.phone)),
-      L('Project', h('td', null, s.title)),
-      showTeammates ? L('Teammates', h('td', null, teammates)) : null,
-      L('Status', h('td', null, R.statusSelect(form, s))),
-      h('td', null, R.detailsButton(form, s, reload))
+      L("Time", h("td", { class: "mono" }, s.data.slot.time)),
+      L("Team leader", h("td", { class: "nm" }, R.bdi(s.name))),
+      L("Code", h("td", { class: "mono" }, s.code)),
+      L("Phone", h("td", { class: "mono" }, s.phone)),
+      L("Project", h("td", null, s.title)),
+      showTeammates ? L("Teammates", h("td", null, teammates)) : null,
+      L("Status", h("td", null, R.statusSelect(form, s))),
+      h("td", null, R.detailsButton(form, s, reload)),
     );
   }
 
@@ -50,20 +50,20 @@
    */
   function tableHead(showTeammates) {
     return h(
-      'thead',
+      "thead",
       null,
       h(
-        'tr',
+        "tr",
         null,
-        h('th', null, 'Time'),
-        h('th', null, 'Team leader'),
-        h('th', null, 'Code'),
-        h('th', null, 'Phone'),
-        h('th', null, 'Project'),
-        showTeammates ? h('th', null, 'Teammates') : null,
-        h('th', null, 'Status'),
-        h('th', null)
-      )
+        h("th", null, "Time"),
+        h("th", null, "Team leader"),
+        h("th", null, "Code"),
+        h("th", null, "Phone"),
+        h("th", null, "Project"),
+        showTeammates ? h("th", null, "Teammates") : null,
+        h("th", null, "Status"),
+        h("th", null),
+      ),
     );
   }
 
@@ -76,42 +76,42 @@
    * @return {!Element} The list.
    */
   R.bookings = function (form, rows, reload) {
-    var members = Rules.fieldByRole(form, 'members');
+    var members = Rules.fieldByRole(form, "members");
     var showTeammates = !!members && members.enabled !== false;
     return h(
-      'div',
+      "div",
       null,
       R.dayGroups(form, rows).map(function (g, i) {
         return h(
-          'section',
+          "section",
           {
-            class: 'block single ' + (i % 2 ? 'tint-b' : 'tint-a'),
-            dataset: { day: g.id }
+            class: "block single " + (i % 2 ? "tint-b" : "tint-a"),
+            dataset: { day: g.id },
           },
           h(
-            'div',
-            { class: 'day-head' },
-            h('span', null, g.label + (g.date ? ' (' + g.date + ')' : '')),
-            h('span', null, g.rows.length + ' booked')
+            "div",
+            { class: "day-head" },
+            h("span", null, g.label + (g.date ? " (" + g.date + ")" : "")),
+            h("span", null, g.rows.length + " booked"),
           ),
           h(
-            'div',
-            { class: 'scroll-x' },
+            "div",
+            { class: "scroll-x" },
             h(
-              'table',
-              { class: 'mini' },
+              "table",
+              { class: "mini" },
               tableHead(showTeammates),
               h(
-                'tbody',
+                "tbody",
                 null,
                 g.rows.map(function (s) {
                   return bookingRow(form, s, showTeammates, reload);
-                })
-              )
-            )
-          )
+                }),
+              ),
+            ),
+          ),
         );
-      })
+      }),
     );
   };
 })(window.App);

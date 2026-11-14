@@ -5,14 +5,12 @@
  * backend all load it, as the global FormMetadata, after its parts.
  */
 (function (root) {
-  'use strict';
+  "use strict";
 
-  var node = typeof module === 'object' && module.exports;
-  var reading = node ? require('./read.js') : root.FormMetadataRead;
-  var subjectAdapter = node
-    ? require('./subject.js')
-    : root.FormMetadataSubject;
-  var batchAdapter = node ? require('./batch.js') : root.FormMetadataBatch;
+  var node = typeof module === "object" && module.exports;
+  var reading = node ? require("./read.js") : root.FormMetadataRead;
+  var subjectAdapter = node ? require("./subject.js") : root.FormMetadataSubject;
+  var batchAdapter = node ? require("./batch.js") : root.FormMetadataBatch;
   var own = reading.own;
   var fieldOf = reading.fieldOf;
 
@@ -21,7 +19,7 @@
     team_registration: subjectAdapter,
     task_submission: subjectAdapter,
     reservation: subjectAdapter,
-    whatsapp_registration: batchAdapter
+    whatsapp_registration: batchAdapter,
   };
 
   /**
@@ -42,7 +40,7 @@
    * @return {!Object} The metadata.
    */
   function forForm(form) {
-    return forType(fieldOf(form, 'type'));
+    return forType(fieldOf(form, "type"));
   }
 
   /**
@@ -194,8 +192,8 @@
     display: display,
     caption: caption,
     slug: slug,
-    sheet: sheet
+    sheet: sheet,
   };
   if (node) module.exports = api;
   root.FormMetadata = api;
-})(typeof globalThis !== 'undefined' ? globalThis : this);
+})(typeof globalThis !== "undefined" ? globalThis : this);

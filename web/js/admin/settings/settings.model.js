@@ -5,7 +5,7 @@
  * `size`, `teammates`, `timetable`, each with its panel).
  */
 (function (App) {
-  'use strict';
+  "use strict";
 
   var A = App.admin;
 
@@ -36,8 +36,8 @@
       teamSize: {
         min: parseInt(size.min, 10),
         max: parseInt(size.max, 10),
-        notice: note?.sizes.length ? note : null
-      }
+        notice: note?.sizes.length ? note : null,
+      },
     });
   }
 
@@ -51,7 +51,7 @@
   function addReservation(s, patch) {
     var kb = s.f.keyBooking;
     if (s.members) settleMembers(s.members);
-    patch.keyBooking = { enabled: !!kb.enabled, source: kb.source || '' };
+    patch.keyBooking = { enabled: !!kb.enabled, source: kb.source || "" };
     if (s.timetable) patch.slots = s.timetable.slots();
   }
 
@@ -68,15 +68,15 @@
     var patch = {
       title: f.title,
       slug: f.slug,
-      opensAt: f.opensAt || '',
-      closesAt: f.closesAt || '',
+      opensAt: f.opensAt || "",
+      closesAt: f.closesAt || "",
       lang: f.lang,
       icon: f.icon,
       editKey: f.editKey,
       rules: f.rules,
       notifications: f.notifications,
       fields: f.fields,
-      review: f.review
+      review: f.review,
     };
     if (f.steps) patch.steps = f.steps;
     Object.assign(patch, s.metadata);
@@ -101,7 +101,7 @@
     if (s.size) {
       checks.push(
         { panel: s.size.sizePanel, control: s.size.sizeRange },
-        { panel: s.size.alertsPanel, control: s.size.sizeAlerts }
+        { panel: s.size.alertsPanel, control: s.size.sizeAlerts },
       );
     }
     if (s.teammates && s.members.enabled !== false) {

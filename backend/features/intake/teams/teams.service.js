@@ -8,10 +8,7 @@ var TeamsService = (function () {
    * @return {boolean} True for team registrations and task submissions.
    */
   function isTeamForm_(form) {
-    return (
-      form.type === FormType.TEAM_REGISTRATION ||
-      form.type === FormType.TASK_SUBMISSION
-    );
+    return form.type === FormType.TEAM_REGISTRATION || form.type === FormType.TASK_SUBMISSION;
   }
 
   /**
@@ -32,7 +29,7 @@ var TeamsService = (function () {
           link: r.link,
           created: r.created,
           response: r,
-          members: Rules.membersOf(vform, r.data)
+          members: Rules.membersOf(vform, r.data),
         };
       });
   }
@@ -44,12 +41,12 @@ var TeamsService = (function () {
    * @return {string} "Task" or "Project".
    */
   function teamThing_(form) {
-    return form.type === FormType.TASK_SUBMISSION ? 'Task' : 'Project';
+    return form.type === FormType.TASK_SUBMISSION ? "Task" : "Project";
   }
 
   return {
     isTeamForm: isTeamForm_,
     teamBlocks: teamBlocks_,
-    teamThing: teamThing_
+    teamThing: teamThing_,
   };
 })();

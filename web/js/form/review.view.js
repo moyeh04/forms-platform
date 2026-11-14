@@ -3,7 +3,7 @@
  * summary on the ticket.
  */
 (function (App) {
-  'use strict';
+  "use strict";
 
   var P = App.formPage;
   var h = App.ui.h;
@@ -12,7 +12,7 @@
   var S = P.S;
 
   /** The roles of the questions the ticket repeats. */
-  var TICKET_ROLES = ['name', 'code', 'team_size', 'title', 'slot'];
+  var TICKET_ROLES = ["name", "code", "team_size", "title", "slot"];
 
   /**
    * Gives the label of a picked choice.
@@ -35,7 +35,7 @@
    * @return {boolean} True for nothing, '' or an empty list.
    */
   function isEmpty(value) {
-    if (value === undefined || value === null || value === '') return true;
+    if (value === undefined || value === null || value === "") return true;
     return Array.isArray(value) && !value.length;
   }
 
@@ -51,7 +51,7 @@
     var day = (slots.days || []).filter(function (d) {
       return d.id === value.day;
     })[0];
-    return P.ltr((day ? day.label : value.day) + ' - ' + value.time);
+    return P.ltr((day ? day.label : value.day) + " - " + value.time);
   }
 
   /**
@@ -62,20 +62,18 @@
    */
   function membersValue(value) {
     var people = h(
-      'ul',
-      { class: 'plain' },
+      "ul",
+      { class: "plain" },
       value.map(function (m) {
         return h(
-          'li',
-          { class: 'person' },
-          h('bdi', null, m.name || ''),
-          m.code ? h('span', { class: 'code' }, m.code) : null
+          "li",
+          { class: "person" },
+          h("bdi", null, m.name || ""),
+          m.code ? h("span", { class: "code" }, m.code) : null,
         );
-      })
+      }),
     );
-    var mates = P.sizeField()
-      ? ''
-      : Rules.teammateNotice(S.form, value.length, App.i18n.lang);
+    var mates = P.sizeField() ? "" : Rules.teammateNotice(S.form, value.length, App.i18n.lang);
     return P.withNote(people, mates);
   }
 
@@ -87,21 +85,18 @@
    * @return {*} Text or a node; '-' when there is no answer.
    */
   function displayValue(field, value) {
-    if (isEmpty(value)) return '-';
+    if (isEmpty(value)) return "-";
     switch (field.type) {
-      case 'select':
+      case "select":
         return optionLabel(field, value);
-      case 'slot':
+      case "slot":
         return slotValue(value);
-      case 'members':
+      case "members":
         return membersValue(value);
-      case 'code':
-        return h('span', { class: 'code' }, value);
-      case 'team_size':
-        return P.withNote(
-          String(value),
-          Rules.teamSizeNotice(S.form, value, App.i18n.lang)
-        );
+      case "code":
+        return h("span", { class: "code" }, value);
+      case "team_size":
+        return P.withNote(String(value), Rules.teamSizeNotice(S.form, value, App.i18n.lang));
       default:
         return String(value);
     }
@@ -115,11 +110,11 @@
    */
   function matesList(mates) {
     return h(
-      'ul',
-      { class: 'plain' },
+      "ul",
+      { class: "plain" },
       mates.map(function (n) {
-        return h('li', { class: 'person' }, h('bdi', null, n));
-      })
+        return h("li", { class: "person" }, h("bdi", null, n));
+      }),
     );
   }
 
@@ -130,16 +125,16 @@
    */
   function teamRows() {
     var rows = [
-      [t('teamLeader'), S.team.leader],
-      [t('teamCode'), S.team.code]
+      [t("teamLeader"), S.team.leader],
+      [t("teamCode"), S.team.code],
     ];
-    if (S.team.title) rows.push([t('teamProject'), S.team.title]);
+    if (S.team.title) rows.push([t("teamProject"), S.team.title]);
     rows.push([
-      t('teamPeople'),
-      S.team.size > 1 ? t('teamPeopleN', { n: S.team.size }) : t('teamSolo')
+      t("teamPeople"),
+      S.team.size > 1 ? t("teamPeopleN", { n: S.team.size }) : t("teamSolo"),
     ]);
     var mates = S.team.teammates || [];
-    if (mates.length) rows.push([t('teamMates'), matesList(mates)]);
+    if (mates.length) rows.push([t("teamMates"), matesList(mates)]);
     return rows;
   }
 
@@ -150,11 +145,11 @@
    */
   function teamSummary() {
     return h(
-      'dl',
-      { class: 'summary' },
+      "dl",
+      { class: "summary" },
       teamRows().map(function (r) {
-        return [h('dt', null, r[0]), h('dd', null, r[1])];
-      })
+        return [h("dt", null, r[0]), h("dd", null, r[1])];
+      }),
     );
   }
 
@@ -168,12 +163,9 @@
     if (step.team) return teamSummary();
     var rows = [];
     step.fields.forEach(function (f) {
-      rows.push(
-        h('dt', null, L(f.label)),
-        h('dd', null, displayValue(f, S.data[f.id]))
-      );
+      rows.push(h("dt", null, L(f.label)), h("dd", null, displayValue(f, S.data[f.id])));
     });
-    return h('dl', { class: 'summary' }, rows);
+    return h("dl", { class: "summary" }, rows);
   }
 
   /**
@@ -188,27 +180,27 @@
     var canChange = !P.slotOnly() || s.fields.indexOf(P.slotField()) !== -1;
     var change = canChange
       ? h(
-          'button',
+          "button",
           {
-            type: 'button',
-            class: 'link-btn',
+            type: "button",
+            class: "link-btn",
             onclick: function () {
               P.go(i);
-            }
+            },
           },
-          t('change')
+          t("change"),
         )
       : null;
     return h(
-      'div',
-      { class: 'review-group' },
+      "div",
+      { class: "review-group" },
       h(
-        'div',
-        { class: 'member-head' },
-        h('h3', { class: 'member-title' }, P.stepTitle(s)),
-        change
+        "div",
+        { class: "member-head" },
+        h("h3", { class: "member-title" }, P.stepTitle(s)),
+        change,
       ),
-      summaryList(s)
+      summaryList(s),
     );
   }
 
@@ -255,7 +247,7 @@
    * @return {!Array<{label: string, value: *}>} The rows.
    */
   function ticketSummary() {
-    if (S.team && S.form.keyBooking && S.mode === 'new') {
+    if (S.team && S.form.keyBooking && S.mode === "new") {
       return keyTicketRows();
     }
     var rows = S.form.fields
@@ -263,7 +255,7 @@
         return f.enabled !== false && TICKET_ROLES.indexOf(f.role) !== -1;
       })
       .map(ticketRow);
-    var mf = Rules.fieldByRole(S.form, 'members');
+    var mf = Rules.fieldByRole(S.form, "members");
     var members = mf ? S.data[mf.id] : null;
     if (Array.isArray(members) && members.length) rows.push(ticketRow(mf));
     return rows;

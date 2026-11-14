@@ -3,7 +3,7 @@
  * and the reason a link cannot be opened.
  */
 (function (App) {
-  'use strict';
+  "use strict";
 
   var V = App.viewer;
   var S = V.state;
@@ -20,10 +20,10 @@
    */
   function loginTop() {
     return h(
-      'div',
-      { class: 'login-top' },
-      h('span', { class: 'tool-label' }, 'Instructor view'),
-      ui.themeButton()
+      "div",
+      { class: "login-top" },
+      h("span", { class: "tool-label" }, "Instructor view"),
+      ui.themeButton(),
     );
   }
 
@@ -35,10 +35,10 @@
    */
   function screen(...content) {
     return h(
-      'div',
-      { class: 'login' },
+      "div",
+      { class: "login" },
       loginTop(),
-      h('div', { class: 'sheet' }, h('div', { class: 'wrap' }, content))
+      h("div", { class: "sheet" }, h("div", { class: "wrap" }, content)),
     );
   }
 
@@ -53,9 +53,9 @@
   async function submitKey(k, e) {
     e.preventDefault();
     if (k.busy) return;
-    S.key = k.input.value.replace(/\D/g, '');
+    S.key = k.input.value.replace(/\D/g, "");
     if (S.key.length !== KEY_DIGITS) {
-      S.keyError = 'The key has six digits.';
+      S.keyError = "The key has six digits.";
       return V.render();
     }
     k.busy = true;
@@ -70,37 +70,29 @@
   function keyForm() {
     var k = {
       busy: false,
-      input: h('input', {
-        class: 'input key-input',
-        id: 'access-key',
-        type: 'text',
-        inputmode: 'numeric',
+      input: h("input", {
+        class: "input key-input",
+        id: "access-key",
+        type: "text",
+        inputmode: "numeric",
         maxlength: String(KEY_DIGITS),
-        autocomplete: 'one-time-code',
-        placeholder: '0'.repeat(KEY_DIGITS),
-        'aria-label': 'Access key',
-        'aria-describedby': 'access-key-err',
-        value: S.key
-      })
+        autocomplete: "one-time-code",
+        placeholder: "0".repeat(KEY_DIGITS),
+        "aria-label": "Access key",
+        "aria-describedby": "access-key-err",
+        value: S.key,
+      }),
     };
     return h(
-      'form',
-      { novalidate: 'novalidate', onsubmit: submitKey.bind(null, k) },
+      "form",
+      { novalidate: "novalidate", onsubmit: submitKey.bind(null, k) },
       k.input,
+      h("p", { class: "error", id: "access-key-err", role: "alert" }, S.keyError || ""),
       h(
-        'p',
-        { class: 'error', id: 'access-key-err', role: 'alert' },
-        S.keyError || ''
+        "div",
+        { class: "nav" },
+        h("button", { type: "submit", class: "btn btn-primary", name: "open-view" }, "Open"),
       ),
-      h(
-        'div',
-        { class: 'nav' },
-        h(
-          'button',
-          { type: 'submit', class: 'btn btn-primary', name: 'open-view' },
-          'Open'
-        )
-      )
     );
   }
 
@@ -112,15 +104,15 @@
    */
   V.keyView = function () {
     return screen(
-      h('h1', { class: 'step-title' }, 'Enter the access key'),
+      h("h1", { class: "step-title" }, "Enter the access key"),
       h(
-        'p',
+        "p",
         null,
-        'This is a private page for an instructor: the teams, bookings or' +
-          ' registrations of the forms shared with you. It also needs the' +
-          ' six-digit key that was sent to you separately.'
+        "This is a private page for an instructor: the teams, bookings or" +
+          " registrations of the forms shared with you. It also needs the" +
+          " six-digit key that was sent to you separately.",
       ),
-      keyForm()
+      keyForm(),
     );
   };
 
@@ -132,8 +124,8 @@
    */
   V.closedView = function (reason) {
     return screen(
-      h('h1', { class: 'step-title' }, 'This link cannot be opened'),
-      h('p', null, reason)
+      h("h1", { class: "step-title" }, "This link cannot be opened"),
+      h("p", null, reason),
     );
   };
 })(window.App);

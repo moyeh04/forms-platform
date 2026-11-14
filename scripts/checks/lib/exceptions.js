@@ -5,7 +5,7 @@
  */
 
 const MIN_REASON_WORDS = 4;
-const WEAK_REASONS = ['allow', 'exception', 'legacy', 'needed', 'todo'];
+const WEAK_REASONS = ["allow", "exception", "legacy", "needed", "todo"];
 
 /**
  * Says whether an exception covers a finding.
@@ -28,17 +28,13 @@ function covers(exception, finding) {
 function weakReasons(exceptions) {
   return exceptions
     .filter((entry) => {
-      const words = String(entry.reason || '')
+      const words = String(entry.reason || "")
         .trim()
         .split(/\s+/);
-      const weak = words.every((word) =>
-        WEAK_REASONS.includes(word.toLowerCase())
-      );
+      const weak = words.every((word) => WEAK_REASONS.includes(word.toLowerCase()));
       return words.length < MIN_REASON_WORDS || weak;
     })
-    .map(
-      (entry) => `${entry.path}: the ${entry.rule} exception needs a reason`
-    );
+    .map((entry) => `${entry.path}: the ${entry.rule} exception needs a reason`);
 }
 
 /**
@@ -52,14 +48,10 @@ function weakReasons(exceptions) {
  *     and one line for each entry that matched nothing.
  */
 function apply(findings, exceptions) {
-  const kept = findings.filter(
-    (finding) => !exceptions.some((entry) => covers(entry, finding))
-  );
+  const kept = findings.filter((finding) => !exceptions.some((entry) => covers(entry, finding)));
   const unused = exceptions
     .filter((entry) => !findings.some((finding) => covers(entry, finding)))
-    .map(
-      (entry) => `${entry.path}: the ${entry.rule} exception matches nothing`
-    );
+    .map((entry) => `${entry.path}: the ${entry.rule} exception matches nothing`);
   return { kept, unused };
 }
 

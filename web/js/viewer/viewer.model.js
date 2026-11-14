@@ -4,7 +4,7 @@
  * the data of the open form.
  */
 (function (App) {
-  'use strict';
+  "use strict";
 
   var V = {};
   App.viewer = V;
@@ -18,27 +18,27 @@
    * was refused.
    */
   V.state = {
-    token: '',
-    slug: '',
+    token: "",
+    slug: "",
     me: null,
     data: null,
-    mode: 'auto',
-    dayId: '',
-    q: '',
+    mode: "auto",
+    dayId: "",
+    q: "",
     views: {},
     board: {},
-    error: '',
-    key: '',
+    error: "",
+    key: "",
     askKey: false,
-    keyError: ''
+    keyError: "",
   };
   var S = V.state;
 
   /** The access key is kept for this tab only, under the link it opens. */
-  var KEY_STORE = 'fp_viewer_key_';
+  var KEY_STORE = "fp_viewer_key_";
 
   /** The errors that mean the link needs its key, or a right one. */
-  V.KEY_ERRORS = ['key_needed', 'bad_access_key', 'key_locked'];
+  V.KEY_ERRORS = ["key_needed", "bad_access_key", "key_locked"];
 
   /**
    * Reads the key kept for this link in this tab.
@@ -47,9 +47,9 @@
    */
   V.storedKey = function () {
     try {
-      return window.sessionStorage.getItem(KEY_STORE + S.token) || '';
+      return window.sessionStorage.getItem(KEY_STORE + S.token) || "";
     } catch {
-      return '';
+      return "";
     }
   };
 
@@ -79,7 +79,7 @@
     return App.api.viewer(
       action,
       S.token,
-      Object.assign({ accessKey: S.key || undefined }, extra || {})
+      Object.assign({ accessKey: S.key || undefined }, extra || {}),
     );
   };
 
@@ -90,7 +90,7 @@
    */
   V.params = function () {
     var u = new URLSearchParams(window.location.search);
-    return { t: u.get('t') || '', f: u.get('f') || '' };
+    return { t: u.get("t") || "", f: u.get("f") || "" };
   };
 
   /**
@@ -101,7 +101,7 @@
    */
   function hasToday(d) {
     return (
-      d.kind === 'reservation' &&
+      d.kind === "reservation" &&
       (d.days || []).some(function (x) {
         return x.date && x.date === d.today;
       })
@@ -115,15 +115,15 @@
    * @return {!Promise} Settles once the data is in the state.
    */
   V.load = async function () {
-    S.data = await V.call('viewer.data', {
+    S.data = await V.call("viewer.data", {
       slug: S.slug,
-      mode: S.mode === 'auto' ? 'all' : S.mode,
-      dayId: S.dayId
+      mode: S.mode === "auto" ? "all" : S.mode,
+      dayId: S.dayId,
     });
-    if (S.mode !== 'auto') return;
-    S.mode = hasToday(S.data) ? 'today' : 'all';
-    if (S.mode === 'today') {
-      S.data = await V.call('viewer.data', { slug: S.slug, mode: 'today' });
+    if (S.mode !== "auto") return;
+    S.mode = hasToday(S.data) ? "today" : "all";
+    if (S.mode === "today") {
+      S.data = await V.call("viewer.data", { slug: S.slug, mode: "today" });
     }
   };
 

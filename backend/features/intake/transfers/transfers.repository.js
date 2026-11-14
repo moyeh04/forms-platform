@@ -3,21 +3,21 @@
 var TransfersRepository = (function () {
   /** The columns of the Transfers tab, in order. */
   var TRANSFER_COLS = [
-    'id',
-    'created',
-    'updated',
-    'status',
-    'code',
-    'member',
-    'fromId',
-    'fromRef',
-    'toId',
-    'toRef',
-    'decidedBy'
+    "id",
+    "created",
+    "updated",
+    "status",
+    "code",
+    "member",
+    "fromId",
+    "fromRef",
+    "toId",
+    "toRef",
+    "decidedBy",
   ];
 
   /** The name of the tab of the requests. */
-  var TRANSFER_TAB_ = 'Transfers';
+  var TRANSFER_TAB_ = "Transfers";
 
   /**
    * Says whether a form lets a leader ask for a member of another team:
@@ -29,11 +29,7 @@ var TransfersRepository = (function () {
    */
   function transfersOn_(form) {
     var rules = form.rules || {};
-    return !!(
-      rules.transfers &&
-      rules.uniqueAcrossForm &&
-      Rules.fieldByRole(form, 'members')
-    );
+    return !!(rules.transfers && rules.uniqueAcrossForm && Rules.fieldByRole(form, "members"));
   }
 
   /**
@@ -74,7 +70,7 @@ var TransfersRepository = (function () {
         fromRef: String(r.fromRef),
         toId: String(r.toId),
         toRef: String(r.toRef),
-        decidedBy: String(r.decidedBy || '')
+        decidedBy: String(r.decidedBy || ""),
       };
     });
   }
@@ -102,6 +98,6 @@ var TransfersRepository = (function () {
     TRANSFER_COLS,
     readTransfers: readTransfers_,
     saveTransfer: saveTransfer_,
-    transfersOn: transfersOn_
+    transfersOn: transfersOn_,
   };
 })();

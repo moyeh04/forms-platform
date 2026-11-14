@@ -3,7 +3,7 @@
  * the admin made, what it is for, and the forms that ask it.
  */
 (function (App) {
-  'use strict';
+  "use strict";
 
   var A = App.admin;
   var L = A.lists;
@@ -21,47 +21,47 @@
    */
   function renameRow(p) {
     var input = A.text(L.nameOf(p), function () {}, {
-      name: 'rename-input',
-      'aria-label': 'Name of the list',
-      maxlength: String(NAME_MAX)
+      name: "rename-input",
+      "aria-label": "Name of the list",
+      maxlength: String(NAME_MAX),
     });
     var renameBtn = h(
-      'button',
+      "button",
       {
-        type: 'button',
-        class: 'btn btn-quiet sm',
-        name: 'rename-save',
+        type: "button",
+        class: "btn btn-quiet sm",
+        name: "rename-save",
         onclick: function () {
           A.busy(renameBtn, async function () {
-            var out = await A.call('admin.lists.rename', {
+            var out = await A.call("admin.lists.rename", {
               key: p.key,
-              name: input.value
+              name: input.value,
             });
             p.info = out.info;
             p.renaming = false;
             p.paint();
           });
-        }
+        },
       },
-      'Rename'
+      "Rename",
     );
     return h(
-      'div',
-      { class: 'list-rename' },
+      "div",
+      { class: "list-rename" },
       input,
       renameBtn,
       h(
-        'button',
+        "button",
         {
-          type: 'button',
-          class: 'link-btn',
+          type: "button",
+          class: "link-btn",
           onclick: function () {
             p.renaming = false;
             p.paint();
-          }
+          },
         },
-        'Cancel'
-      )
+        "Cancel",
+      ),
     );
   }
 
@@ -75,20 +75,20 @@
   async function deleteList(p, e) {
     var btn = e.currentTarget;
     var yes = await ui.confirm({
-      title: 'Delete ' + L.nameOf(p) + '?',
-      body: 'No form asks this list. It is removed for good.',
-      confirmText: 'Delete',
-      danger: true
+      title: "Delete " + L.nameOf(p) + "?",
+      body: "No form asks this list. It is removed for good.",
+      confirmText: "Delete",
+      danger: true,
     });
     if (!yes) return;
     A.busy(btn, async function () {
-      var out = await A.call('admin.lists.delete', { key: p.key });
+      var out = await A.call("admin.lists.delete", { key: p.key });
       p.lists = out.lists;
       p.info = out.info;
       A.unsaved = false;
       L.load(p, L.keys(p)[0]);
       p.open = false;
-      A.setHash('#/lists');
+      A.setHash("#/lists");
       p.paint();
     });
   }
@@ -106,39 +106,37 @@
   function titleRow(p, custom, users) {
     var kindLabel = L.KINDS[L.kindOf(p)].label;
     return h(
-      'div',
-      { class: 'list-title' },
-      h('h2', null, L.nameOf(p)),
-      L.nameOf(p) !== kindLabel
-        ? h('span', { class: 'list-card-kind' }, kindLabel)
-        : null,
+      "div",
+      { class: "list-title" },
+      h("h2", null, L.nameOf(p)),
+      L.nameOf(p) !== kindLabel ? h("span", { class: "list-card-kind" }, kindLabel) : null,
       custom
         ? h(
-            'button',
+            "button",
             {
-              type: 'button',
-              class: 'link-btn',
-              name: 'rename-list',
+              type: "button",
+              class: "link-btn",
+              name: "rename-list",
               onclick: function () {
                 p.renaming = true;
                 p.paint();
-              }
+              },
             },
-            'Rename'
+            "Rename",
           )
         : null,
       custom && !users
         ? h(
-            'button',
+            "button",
             {
-              type: 'button',
-              class: 'link-btn danger-link',
-              name: 'delete-list',
-              onclick: deleteList.bind(null, p)
+              type: "button",
+              class: "link-btn danger-link",
+              name: "delete-list",
+              onclick: deleteList.bind(null, p),
             },
-            'Delete'
+            "Delete",
           )
-        : null
+        : null,
     );
   }
 
@@ -150,24 +148,19 @@
    */
   function usedBy(users) {
     return h(
-      'p',
-      { class: 'used-by' },
+      "p",
+      { class: "used-by" },
       users.length
         ? users.reduce(
             function (out, f, i) {
               return out.concat(
-                i ? ', ' : [],
-                h(
-                  'a',
-                  { href: '#/f/' + encodeURIComponent(f.slug) + '/questions' },
-                  f.title
-                )
+                i ? ", " : [],
+                h("a", { href: "#/f/" + encodeURIComponent(f.slug) + "/questions" }, f.title),
               );
             },
-            ['Asked by ']
+            ["Asked by "],
           )
-        : 'No form asks it yet. Pick it for a question in the Questions tab' +
-            ' of a form.'
+        : "No form asks it yet. Pick it for a question in the Questions tab" + " of a form.",
     );
   }
 
@@ -182,11 +175,11 @@
     var users = L.formsUsing(p.forms, p.key);
     var about = L.BUILTIN[p.key]?.about || L.KINDS[L.kindOf(p)].about;
     return h(
-      'div',
-      { class: 'list-head' },
+      "div",
+      { class: "list-head" },
       p.renaming ? renameRow(p) : titleRow(p, custom, users.length),
-      h('p', { class: 'help' }, about),
-      L.kindOf(p) === ListKind.MILESTONES ? null : usedBy(users)
+      h("p", { class: "help" }, about),
+      L.kindOf(p) === ListKind.MILESTONES ? null : usedBy(users),
     );
   };
 })(window.App);

@@ -6,27 +6,27 @@ var FormsPublic = (function () {
    * list, and rules.sections for whichever list of sections the section
    * question reads.
    */
-  var LIMITED_LISTS_ = ['majors', 'sections'];
+  var LIMITED_LISTS_ = ["majors", "sections"];
 
   /** The settings of a form the public may read. */
   var PUBLIC_KEYS_ = [
-    'slug',
-    'type',
-    'title',
-    'lang',
-    'icon',
-    'steps',
-    'fields',
-    'slots',
-    'editKey',
-    'messages',
-    'status',
-    'opensAt',
-    'closesAt'
+    "slug",
+    "type",
+    "title",
+    "lang",
+    "icon",
+    "steps",
+    "fields",
+    "slots",
+    "editKey",
+    "messages",
+    "status",
+    "opensAt",
+    "closesAt",
   ];
 
   /** The states in which the public sees only the form's name. */
-  var CLOSED_STATES_ = ['draft', 'archived'];
+  var CLOSED_STATES_ = ["draft", "archived"];
 
   /**
    * Gives the rule that limits the choices of a list.
@@ -36,10 +36,8 @@ var FormsPublic = (function () {
    * @return {string} `majors`, `sections`, or empty when none does.
    */
   function limitRuleOf_(list, info) {
-    if (list === 'majors') return 'majors';
-    return ListsRepository.listKind(list, info) === ListKind.SECTIONS
-      ? 'sections'
-      : '';
+    if (list === "majors") return "majors";
+    return ListsRepository.listKind(list, info) === ListKind.SECTIONS ? "sections" : "";
   }
 
   /**
@@ -115,7 +113,7 @@ var FormsPublic = (function () {
     var rules = full.rules || {};
     var out = { maxSubmissions: full.rules ? rules.maxSubmissions : null };
     if (rules.teamSize) out.teamSize = rules.teamSize;
-    var majors = allowedValues_(full, 'majors');
+    var majors = allowedValues_(full, "majors");
     if (majors.length) out.majors = majors;
     return out;
   }
@@ -137,7 +135,7 @@ var FormsPublic = (function () {
       enabled: !!full.editKey.enabled,
       days: full.editKey.days,
       allowEdit: !!full.editKey.allowEdit,
-      allowDelete: !!full.editKey.allowDelete
+      allowDelete: !!full.editKey.allowDelete,
     };
     out.rules = publicRules_(full);
     var source = KeyBookingService.keyBookingSource(form);
@@ -146,7 +144,7 @@ var FormsPublic = (function () {
     if (folderName?.enabled) {
       out.rules.folderName = {
         enabled: true,
-        subject: String(folderName.subject || '')
+        subject: String(folderName.subject || ""),
       };
     }
     return out;
@@ -165,7 +163,7 @@ var FormsPublic = (function () {
       title: form.title,
       lang: form.lang,
       icon: form.icon,
-      messages: form.messages
+      messages: form.messages,
     };
     return Object.assign(draft, FormMetadata.public(form));
   }
@@ -186,7 +184,7 @@ var FormsPublic = (function () {
     var out = {
       state: state,
       form: publicForm(form),
-      serverTime: Time.nowIso()
+      serverTime: Time.nowIso(),
     };
     if (form.type === FormType.RESERVATION) {
       out.taken = SlotsRules.slotAvailability(form);
@@ -209,6 +207,6 @@ var FormsPublic = (function () {
     validationForm,
     publicForm,
     publicState,
-    LIMITED_LISTS: LIMITED_LISTS_
+    LIMITED_LISTS: LIMITED_LISTS_,
   };
 })();

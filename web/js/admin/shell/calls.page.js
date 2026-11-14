@@ -3,7 +3,7 @@
  * fails.
  */
 (function (App) {
-  'use strict';
+  "use strict";
 
   var A = App.admin;
 
@@ -19,8 +19,8 @@
     try {
       return await App.api.admin(action, extra);
     } catch (e) {
-      if (e.code === 'bad_pin') {
-        App.api.setPin('');
+      if (e.code === "bad_pin") {
+        App.api.setPin("");
         A.start();
       }
       throw e;
@@ -34,9 +34,9 @@
    * @return {string} The message, with the names of the fields refused.
    */
   A.message = function (e) {
-    var msg = e?.message || 'Something went wrong.';
-    if (e && e.code === 'invalid' && e.details) {
-      msg += ' (' + Object.keys(e.details).join(', ') + ')';
+    var msg = e?.message || "Something went wrong.";
+    if (e && e.code === "invalid" && e.details) {
+      msg += " (" + Object.keys(e.details).join(", ") + ")";
     }
     return msg;
   };
@@ -47,7 +47,7 @@
    * @param {?Object} e The error.
    */
   A.fail = function (e) {
-    App.ui.toast(A.message(e), 'err');
+    App.ui.toast(A.message(e), "err");
   };
 
   /**

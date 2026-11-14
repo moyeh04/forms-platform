@@ -3,7 +3,7 @@
  * jumping to the first one.
  */
 (function (App) {
-  'use strict';
+  "use strict";
 
   var P = App.formPage;
   var t = P.t;
@@ -26,7 +26,7 @@
         return;
       }
       Object.keys(e.nested).forEach(function (k) {
-        out[id + '.' + k] = e.nested[k];
+        out[id + "." + k] = e.nested[k];
       });
     });
     return out;
@@ -44,7 +44,7 @@
     var out = {
       ok: r.ok,
       errors: {},
-      data: P.keyMode() ? {} : Object.assign({}, S.data)
+      data: P.keyMode() ? {} : Object.assign({}, S.data),
     };
     if (r.ok) out.data[sf.id] = r.value;
     else out.errors[sf.id] = { error: r.error };
@@ -67,7 +67,7 @@
    * Moves the focus to the title of the step, without scrolling.
    */
   function focusTitle() {
-    var title = document.getElementById('step-title');
+    var title = document.getElementById("step-title");
     if (title?.focus) title.focus({ preventScroll: true });
   }
 
@@ -91,14 +91,14 @@
 
   /** Scrolls to the first question with an error and focuses it. */
   function focusFirstError() {
-    var node = root.querySelector('.field.has-error');
+    var node = root.querySelector(".field.has-error");
     if (!node) return;
     try {
-      node.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      node.scrollIntoView({ block: "center", behavior: "smooth" });
     } catch {
       /* not available */
     }
-    var input = node.querySelector('input, select, textarea, button');
+    var input = node.querySelector("input, select, textarea, button");
     if (input?.focus) input.focus({ preventScroll: true });
   }
 
@@ -121,7 +121,7 @@
      * @return {boolean} True when its question is on the step.
      */
     function onStep(k) {
-      return ids.indexOf(k.split('.')[0]) !== -1;
+      return ids.indexOf(k.split(".")[0]) !== -1;
     }
     Object.keys(S.errors)
       .filter(onStep)
@@ -160,7 +160,7 @@
       return;
     }
     if (takeStepErrors(step, validateAll().errors)) {
-      S.banner = { kind: 'err', text: t('fixErrors') };
+      S.banner = { kind: "err", text: t("fixErrors") };
       P.render();
       focusFirstError();
       return;
@@ -177,7 +177,7 @@
     S.errors = errs;
     var first = Object.keys(errs)[0];
     S.stepIndex = first ? P.stepOfPath(first) : S.stepIndex;
-    S.banner = { kind: 'err', text: t('fixErrors') };
+    S.banner = { kind: "err", text: t("fixErrors") };
     P.render();
     focusFirstError();
   }

@@ -14,7 +14,7 @@ var Crypto = (function () {
   var DECIMAL_ = 10;
 
   /** The letter a sealed digit string starts with. */
-  var SEAL_MARK_ = 'S';
+  var SEAL_MARK_ = "S";
 
   /**
    * Makes a fresh random id.
@@ -32,7 +32,7 @@ var Crypto = (function () {
    * @return {string} The prefix and eight hex digits.
    */
   function shortId(prefix) {
-    return prefix + uuid().replace(/-/g, '').slice(0, SHORT_ID_DIGITS_);
+    return prefix + uuid().replace(/-/g, "").slice(0, SHORT_ID_DIGITS_);
   }
 
   /**
@@ -42,16 +42,13 @@ var Crypto = (function () {
    * @return {string} The hash as 64 lower-case hex digits.
    */
   function sha256Hex(s) {
-    var bytes = Utilities.computeDigest(
-      Utilities.DigestAlgorithm.SHA_256,
-      String(s)
-    );
+    var bytes = Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, String(s));
     return bytes
       .map(function (b) {
         var value = (b + BYTE_VALUES_) % BYTE_VALUES_;
-        return ('0' + value.toString(HEX_)).slice(-2);
+        return ("0" + value.toString(HEX_)).slice(-2);
       })
-      .join('');
+      .join("");
   }
 
   /**
@@ -61,7 +58,7 @@ var Crypto = (function () {
    * @return {string} The digits.
    */
   function randomDigits(n) {
-    var s = '';
+    var s = "";
     var i;
     for (i = 0; i < n; i++) s += Math.floor(Math.random() * DECIMAL_);
     return s;
@@ -80,12 +77,12 @@ var Crypto = (function () {
     return (
       SEAL_MARK_ +
       String(key)
-        .split('')
+        .split("")
         .map(function (d, i) {
           var shift = parseInt(pad.charAt(i), HEX_);
           return String((parseInt(d, DECIMAL_) + shift) % DECIMAL_);
         })
-        .join('')
+        .join("")
     );
   }
 
@@ -99,19 +96,19 @@ var Crypto = (function () {
    *     seal of that length.
    */
   function unsealDigits_(pad, seal, length) {
-    var s = String(seal || '');
-    if (!new RegExp('^' + SEAL_MARK_ + '\\d{' + length + '}$').test(s)) {
-      return '';
+    var s = String(seal || "");
+    if (!new RegExp("^" + SEAL_MARK_ + "\\d{" + length + "}$").test(s)) {
+      return "";
     }
     return s
       .slice(1)
-      .split('')
+      .split("")
       .map(function (d, i) {
         var shift = parseInt(pad.charAt(i), HEX_);
         var back = (parseInt(d, DECIMAL_) - shift) % DECIMAL_;
         return String((back + DECIMAL_) % DECIMAL_);
       })
-      .join('');
+      .join("");
   }
 
   return {
@@ -120,6 +117,6 @@ var Crypto = (function () {
     shortId,
     unsealDigits: unsealDigits_,
     sealDigits: sealDigits_,
-    randomDigits
+    randomDigits,
   };
 })();

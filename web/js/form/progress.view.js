@@ -4,7 +4,7 @@
  * ended key it is the only thing the page shows of the registration.
  */
 (function (App) {
-  'use strict';
+  "use strict";
 
   var P = App.formPage;
   var h = App.ui.h;
@@ -21,33 +21,23 @@
   P.progressBlock = function (lines, note) {
     if (!lines?.length) return null;
     return h(
-      'section',
-      { class: 'progress-mine', 'aria-labelledby': 'progress-mine-title' },
+      "section",
+      { class: "progress-mine", "aria-labelledby": "progress-mine-title" },
+      h("h3", { class: "member-title", id: "progress-mine-title" }, t("progressTitle")),
+      note ? h("p", { class: "step-help" }, note) : null,
       h(
-        'h3',
-        { class: 'member-title', id: 'progress-mine-title' },
-        t('progressTitle')
-      ),
-      note ? h('p', { class: 'step-help' }, note) : null,
-      h(
-        'ol',
-        { class: 'progress-mine-list' },
+        "ol",
+        { class: "progress-mine-list" },
         lines.map(function (m) {
           return h(
-            'li',
+            "li",
             { dataset: { milestone: m.id } },
-            h('span', { dir: 'auto' }, App.i18n.L(m.label)),
-            h(
-              'span',
-              { class: 'pstate is-' + m.state },
-              t('progressStates.' + m.state)
-            ),
-            m.note
-              ? h('p', { class: 'progress-note', dir: 'auto' }, m.note)
-              : null
+            h("span", { dir: "auto" }, App.i18n.L(m.label)),
+            h("span", { class: "pstate is-" + m.state }, t("progressStates." + m.state)),
+            m.note ? h("p", { class: "progress-note", dir: "auto" }, m.note) : null,
           );
-        })
-      )
+        }),
+      ),
     );
   };
 
@@ -62,9 +52,9 @@
     var res;
     try {
       res = await App.api.call({
-        action: 'progress.mine',
+        action: "progress.mine",
         slug: S.slug,
-        key: key
+        key: key,
       });
       S.expiredProgress = res.progress;
     } catch (_e) {

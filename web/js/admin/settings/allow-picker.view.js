@@ -3,7 +3,7 @@
  * every value, and choosing every value is stored as the empty choice.
  */
 (function (App) {
-  'use strict';
+  "use strict";
 
   var A = App.admin;
   var ui = App.ui;
@@ -18,7 +18,7 @@
    */
   A.sectionGroup = function (o) {
     var v = String(o.value);
-    return v.indexOf('-') > 0 ? v.slice(0, v.indexOf('-')) : 'Other';
+    return v.indexOf("-") > 0 ? v.slice(0, v.indexOf("-")) : "Other";
   };
 
   /**
@@ -42,7 +42,7 @@
   function groupsOf(opts) {
     var groups = [];
     opts.options.forEach(function (o) {
-      var id = opts.groupOf ? opts.groupOf(o) : '';
+      var id = opts.groupOf ? opts.groupOf(o) : "";
       var g = groups.filter(function (x) {
         return x.id === id;
       })[0];
@@ -64,19 +64,19 @@
    */
   function chip(p, c) {
     return h(
-      'button',
+      "button",
       {
-        type: 'button',
-        class: 'toggle-chip',
+        type: "button",
+        class: "toggle-chip",
         name: c.name,
-        'aria-pressed': c.on ? 'true' : 'false',
+        "aria-pressed": c.on ? "true" : "false",
         onclick: function () {
           c.click();
           p.paint();
-        }
+        },
       },
       c.text,
-      c.sub ? h('span', { class: 'chip-sub', lang: 'ar' }, c.sub) : null
+      c.sub ? h("span", { class: "chip-sub", lang: "ar" }, c.sub) : null,
     );
   }
 
@@ -102,7 +102,7 @@
     var value = String(o.value);
     var on = chosen.indexOf(value) !== -1;
     return chip(p, {
-      name: p.opts.name + '-' + o.value,
+      name: p.opts.name + "-" + o.value,
       text: o.label?.en || o.value,
       on: on,
       sub: arabicOf(o),
@@ -113,9 +113,9 @@
             ? chosen.filter(function (v) {
                 return v !== value;
               })
-            : chosen.concat([value])
+            : chosen.concat([value]),
         );
-      }
+      },
     });
   }
 
@@ -137,28 +137,28 @@
     });
     var all = g.id
       ? chip(p, {
-          name: p.opts.name + '-group-' + g.id,
-          text: 'All ' + g.id,
+          name: p.opts.name + "-group-" + g.id,
+          text: "All " + g.id,
           on: whole,
           click: function () {
             var rest = chosen.filter(function (v) {
               return values.indexOf(v) === -1;
             });
             put(p.opts, whole ? rest : rest.concat(values));
-          }
+          },
         })
       : null;
     return h(
-      'div',
+      "div",
       {
-        class: 'toggle-chips',
-        role: 'group',
-        'aria-label': g.id || p.opts.all
+        class: "toggle-chips",
+        role: "group",
+        "aria-label": g.id || p.opts.all,
       },
       all,
       g.options.map(function (o) {
         return optionChip(p, chosen, o);
-      })
+      }),
     );
   }
 
@@ -173,17 +173,17 @@
     ui.clear(p.box);
     p.box.appendChild(
       h(
-        'div',
-        { class: 'toggle-chips' },
+        "div",
+        { class: "toggle-chips" },
         chip(p, {
-          name: opts.name + '-all',
+          name: opts.name + "-all",
           text: opts.all,
           on: !chosen.length,
           click: function () {
             opts.set([]);
-          }
-        })
-      )
+          },
+        }),
+      ),
     );
     p.groups.forEach(function (g) {
       p.box.appendChild(groupChips(p, chosen, g));
@@ -200,7 +200,7 @@
    * @return {!Element} The picker.
    */
   A.allowPicker = function (opts) {
-    var p = { opts: opts, box: h('div', { class: 'allow-picker' }) };
+    var p = { opts: opts, box: h("div", { class: "allow-picker" }) };
     p.groups = groupsOf(opts);
     p.paint = paint.bind(null, p);
     p.paint();

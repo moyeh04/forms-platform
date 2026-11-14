@@ -7,8 +7,8 @@
  * is published at other paths than its sources, the configured site map
  * turns each `src` back into its source path.
  */
-const path = require('node:path');
-const { select, read } = require('../lib/files.js');
+const path = require("node:path");
+const { select, read } = require("../lib/files.js");
 
 const ASSET = /<(?:script|link)\b[^>]*\b(?:src|href)="([^"]+\.(?:js|css))"/g;
 
@@ -28,9 +28,9 @@ function testFindings(files, tests) {
     files
       .filter((file) => !file.startsWith(tests.root))
       .flatMap((file) => {
-        const parts = file.split('/').slice(0, -1);
-        return parts.map((_, i) => parts.slice(0, i + 1).join('/'));
-      })
+        const parts = file.split("/").slice(0, -1);
+        return parts.map((_, i) => parts.slice(0, i + 1).join("/"));
+      }),
   );
   const stray = new Set();
   for (const file of files) {
@@ -38,12 +38,10 @@ function testFindings(files, tests) {
     const rel = file.slice(tests.root.length);
     if (tests.own.some((dir) => rel.startsWith(dir))) continue;
     const dir = path.posix.dirname(rel);
-    if (dir !== '.' && !sources.has(dir)) stray.add(`${tests.root}${dir}/`);
+    if (dir !== "." && !sources.has(dir)) stray.add(`${tests.root}${dir}/`);
   }
-  const message =
-    'mirrors no source folder; move each test to the path of ' +
-    'the code it checks';
-  return [...stray].map((dir) => finding(dir, 'tests', message));
+  const message = "mirrors no source folder; move each test to the path of " + "the code it checks";
+  return [...stray].map((dir) => finding(dir, "tests", message));
 }
 
 /**
@@ -67,7 +65,7 @@ function finding(file, rule, message, line = 0) {
  * @return {string} Its first part, with `/` when it is a folder.
  */
 function topOf(file) {
-  const [first, ...rest] = file.split('/');
+  const [first, ...rest] = file.split("/");
   return rest.length ? `${first}/` : first;
 }
 
@@ -81,8 +79,8 @@ function topOf(file) {
 function rootFindings(files, allowed) {
   const tops = [...new Set(files.map(topOf))];
   return tops
-    .filter((top) => !allowed.includes(top.replace(/\/$/, '')))
-    .map((top) => finding(top, 'root', 'not allowed at the root'));
+    .filter((top) => !allowed.includes(top.replace(/\/$/, "")))
+    .map((top) => finding(top, "root", "not allowed at the root"));
 }
 
 /**
@@ -95,16 +93,16 @@ function rootFindings(files, allowed) {
 function nameFindings(files, names) {
   const found = new Set();
   for (const file of files) {
-    const parts = file.split('/');
+    const parts = file.split("/");
     parts.forEach((part, i) => {
-      const stem = part.replace(/\..*$/, '');
+      const stem = part.replace(/\..*$/, "");
       if (!names.includes(stem.toLowerCase())) return;
       const last = i === parts.length - 1;
-      found.add(parts.slice(0, i + 1).join('/') + (last ? '' : '/'));
+      found.add(parts.slice(0, i + 1).join("/") + (last ? "" : "/"));
     });
   }
   return [...found].map((name) =>
-    finding(name, 'name', 'a catch-all name; name it by what it does')
+    finding(name, "name", "a catch-all name; name it by what it does"),
   );
 }
 
@@ -123,10 +121,8 @@ function pageAssets(page, html, sourceOf) {
     .filter((match) => !/^[a-z]+:|^\/\//.test(match[1]))
     .map((match) => ({
       src: match[1],
-      file: sourceOf
-        ? sourceOf(match[1])
-        : path.posix.join(path.posix.dirname(page), match[1]),
-      line: html.slice(0, match.index).split('\n').length
+      file: sourceOf ? sourceOf(match[1]) : path.posix.join(path.posix.dirname(page), match[1]),
+      line: html.slice(0, match.index).split("\n").length,
     }));
 }
 
@@ -139,9 +135,7 @@ function pageAssets(page, html, sourceOf) {
  * @return {!Array<!Object>} One finding for each.
  */
 function pageFindings(root, files, config) {
-  const sourceOf = config.siteMap
-    ? require(path.join(root, config.siteMap)).sourceOf
-    : null;
+  const sourceOf = config.siteMap ? require(path.join(root, config.siteMap)).sourceOf : null;
   const loaded = new Set();
   const out = [];
   for (const page of config.pages) {
@@ -149,12 +143,12 @@ function pageFindings(root, files, config) {
       loaded.add(asset.file);
       if (files.includes(asset.file)) continue;
       const message = `loads ${asset.src}, which does not exist`;
-      out.push(finding(page, 'pages', message, asset.line));
+      out.push(finding(page, "pages", message, asset.line));
     }
   }
   for (const file of select(files, config.loaded)) {
     if (loaded.has(file)) continue;
-    out.push(finding(file, 'pages', 'no page loads it'));
+    out.push(finding(file, "pages", "no page loads it"));
   }
   return out;
 }
@@ -174,9 +168,7 @@ function documentedFindings(root, files, config) {
       const name = path.posix.basename(file);
       return !doc.includes(`\`${file}\``) && !doc.includes(`\`${name}\``);
     })
-    .map((file) =>
-      finding(file, 'documented', `${config.fileStructure} does not name it`)
-    );
+    .map((file) => finding(file, "documented", `${config.fileStructure} does not name it`));
 }
 
 /**
@@ -194,7 +186,7 @@ function check(root, files, config) {
     ...nameFindings(files, rules.catchAllNames),
     ...pageFindings(root, files, rules),
     ...documentedFindings(root, files, rules),
-    ...testFindings(files, rules.tests)
+    ...testFindings(files, rules.tests),
   ];
 }
 

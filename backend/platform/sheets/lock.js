@@ -22,7 +22,7 @@ var Lock = (function () {
     try {
       lock.waitLock(LOCK_WAIT_MS_);
     } catch (e) {
-      ApiError.fail('busy', 'The server is busy. Try again in a moment.');
+      ApiError.fail("busy", "The server is busy. Try again in a moment.");
     }
     LOCK_DEPTH_++;
     try {
