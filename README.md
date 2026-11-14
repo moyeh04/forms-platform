@@ -107,12 +107,12 @@ flowchart LR
 ## Quick start
 
 ```
-npm install          # once, installs the browser test library, Biome and the git hooks
-npm run dev          # local preview on http://localhost:8080 (PIN 4321), in memory, no Google needed
-npm run check        # Biome, line width, JSDoc, constants and structure checks
-npm test             # rules, backend, form page, dashboard, instructor page, deployment
-npm run build        # writes dist/Code.gs and dist/appsscript.json for clasp
-npm run setup        # first deployment: creates the sheet, pushes the backend, creates the web app, configures GitHub
+pnpm install          # once, installs the browser test library, Biome and the git hooks
+pnpm run dev          # local preview on http://localhost:8080 (PIN 4321), in memory, no Google needed
+pnpm run check        # Biome, line width, JSDoc, constants and structure checks
+pnpm test             # rules, backend, form page, dashboard, instructor page, deployment
+pnpm run build        # writes dist/Code.gs and dist/appsscript.json for clasp
+pnpm run setup        # first deployment: creates the sheet, pushes the backend, creates the web app, configures GitHub
 ```
 
 To put it online, follow [docs/operations/DEPLOY.md](docs/operations/DEPLOY.md). After that, a push to `master`
@@ -125,7 +125,7 @@ Script deployment and the configured website.
 |---|---|
 | `web/` | The website: the student form, the dashboard and the instructor page, with their scripts, styles and pictures |
 | `domain/` | The validation rules and form metadata shared by the pages, the backend and the tests |
-| `backend/` | The Apps Script modules, joined into `dist/Code.gs` by `npm run build` |
+| `backend/` | The Apps Script modules, joined into `dist/Code.gs` by `pnpm run build` |
 | `scripts/` | The bundler and the site build (`build/`), the local preview (`dev/`), the first-deployment setup (`deploy/`), and the checks (`checks/`) |
 | `tests/` | The automated tests and the in-memory copy of Google's services |
 | `docs/` | Architecture, data model, security, testing and deployment |

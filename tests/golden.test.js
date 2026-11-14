@@ -5,7 +5,7 @@
  * stored cells of legacy rows, and every sheet, property and cache entry after
  * one scripted run.
  *
- * The fixtures were written from the code as it is. `GOLDEN_UPDATE=1 npm test`
+ * The fixtures were written from the code as it is. `GOLDEN_UPDATE=1 pnpm test`
  * writes them again; do that only for a change that is meant to alter them.
  */
 const test = require('node:test');

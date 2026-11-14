@@ -5,7 +5,7 @@ They run the **real** backend and the **real** pages. This page explains how
 that works and what it can and cannot prove.
 
 ```
-npm test    # 419 tests
+pnpm test    # 419 tests
 ```
 
 ## The layers
@@ -244,7 +244,7 @@ exercised on every run.
 
 ## Looking at the pages in a real browser
 
-jsdom does not draw anything, so `npm run dev` starts a local preview
+jsdom does not draw anything, so `pnpm run dev` starts a local preview
 (`scripts/dev/dev-server.js`). It serves the real pages and routes their API calls
 into the same in-memory Google the tests use, seeded with a team form, a
 reservation form, a WhatsApp form, three teams, and a viewer link. The admin PIN

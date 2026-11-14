@@ -3,13 +3,14 @@
 You need a Google account, a free GitHub account, and about 15 minutes.
 Nothing here needs a credit card.
 
-On your computer you need three tools:
+On your computer you need four tools:
 
 - **Node.js** 22 or newer, for the build and the Google command-line client (clasp)
+- **pnpm**, the version `packageManager` in `package.json` names (`corepack enable` installs it)
 - **git**
 - **GitHub CLI** (`gh`), signed in once with `gh auth login`
 
-One command, `npm run setup`, does the first deployment: it creates the Google
+One command, `pnpm run setup`, does the first deployment: it creates the Google
 Sheet with its Apps Script project, pushes the backend into it, creates the web app, and writes the IDs, the
 credential and the Pages setting into your GitHub repository. Nothing is pasted
 into the Apps Script editor and nothing is typed into GitHub settings.
@@ -46,7 +47,7 @@ flowchart TD
     end
     a2 --> b1
     subgraph P2["Part 2: deploy, by command"]
-        b1["3. npm run setup<br/>sheet, backend, web app,<br/>variables, secret, Pages"] --> b2["4. In the sheet: First-time setup<br/>and Set admin PIN"]
+        b1["3. pnpm run setup<br/>sheet, backend, web app,<br/>variables, secret, Pages"] --> b2["4. In the sheet: First-time setup<br/>and Set admin PIN"]
         b2 --> b3["5. git push: Actions tests<br/>and publishes the website"]
         b3 --> b4["6. In the sheet: Set website address"]
     end
@@ -93,11 +94,11 @@ repository already exists, skip this step.
 In the project folder:
 
 ```bash
-npm ci
+pnpm install --frozen-lockfile
 ```
 
 ```bash
-npm run setup
+pnpm run setup
 ```
 
 The first time, a browser window opens for Google sign-in: choose the account
@@ -129,7 +130,7 @@ address does not change.
 **Already have a sheet?** Answer **2** and paste its **Script ID**, found in the
 sheet under **Extensions > Apps Script > Project Settings** (gear icon). If you
 do not have the ID at hand, press Enter: the command stops without creating
-anything, and you run `npm run setup -- YOUR_SCRIPT_ID` later. The question is
+anything, and you run `pnpm run setup YOUR_SCRIPT_ID` later. The question is
 not asked again once a sheet is linked.
 
 ### 4. First-time setup and admin PIN (in the sheet)
@@ -233,7 +234,7 @@ and serves the placeholder in `web/js/config.js` directly.
 
 ### What the setup stored, and how to renew it
 
-`npm run setup` wrote three Variables (`API_URL`, `APPS_SCRIPT_ID`,
+`pnpm run setup` wrote three Variables (`API_URL`, `APPS_SCRIPT_ID`,
 `APPS_SCRIPT_DEPLOYMENT_ID`) and one Secret (`CLASPRC_JSON`). Variables are
 readable configuration; secrets are credentials that GitHub masks in logs. The
 web app URL becomes public in the published browser configuration regardless of
@@ -260,7 +261,7 @@ refresh token to renew access tokens. If Google rejects the saved authorization,
 sign in again and replace the **whole** secret:
 
 ```bash
-npx --yes @google/clasp@3.4.1 login
+pnpm dlx @google/clasp@3.4.1 login
 ```
 
 ```bash
@@ -274,9 +275,9 @@ is not evidence that this configured workflow succeeded.
 ### Local preview
 
 GitHub variables are available inside Actions; they do not configure a raw
-local checkout. Use `npm run dev` for the in-memory preview (admin PIN `4321`).
+local checkout. Use `pnpm run dev` for the in-memory preview (admin PIN `4321`).
 To package a site locally, set `API_URL` in your shell and run
-`npm run build:site`; serve `_site/`. Keep the source placeholder unchanged.
+`pnpm run build:site`; serve `_site/`. Keep the source placeholder unchanged.
 
 ### Going back to an earlier backend
 
@@ -293,7 +294,7 @@ misbehaves, put the web app back on the one before it:
 The same from a terminal that is signed in with clasp:
 
 ```bash
-npx @google/clasp@3.4.1 deploy -i <deployment id> -V <earlier version> --description "Back to <earlier version>"
+pnpm dlx @google/clasp@3.4.1 deploy -i <deployment id> -V <earlier version> --description "Back to <earlier version>"
 ```
 
 Going back changes the code only. Rows that the newer version wrote stay as
@@ -312,9 +313,9 @@ Deploy**. This is a recovery path; routine updates use the configured workflow.
 |---|---|
 | Website says it is not connected to the backend | Verify Pages Source is **GitHub Actions** and `API_URL` is set under repository Variables. |
 | Page says it could not reach the server | Run **First-time setup** in the sheet (step 4); the web app answers only after you allow the permissions. If it still fails, check under **Deploy > Manage deployments** that access is **Anyone**. |
-| `npm run setup` stops at "Creating the Forms Registry sheet" | Turn on the Apps Script API (step 1), wait a minute, and run it again. If an empty **Forms Registry** sheet was left in Google Drive by the failed attempt, delete it. |
-| `npm run setup` stops at "Pushing the backend" | Turn on the Apps Script API (step 1). If you passed a Script ID, check that it is the one from Project Settings. |
-| `npm run setup` stops at a GitHub step | Run `gh auth login`, and check that the folder has an `origin` remote on GitHub (step 2). |
+| `pnpm run setup` stops at "Creating the Forms Registry sheet" | Turn on the Apps Script API (step 1), wait a minute, and run it again. If an empty **Forms Registry** sheet was left in Google Drive by the failed attempt, delete it. |
+| `pnpm run setup` stops at "Pushing the backend" | Turn on the Apps Script API (step 1). If you passed a Script ID, check that it is the one from Project Settings. |
+| `pnpm run setup` stops at a GitHub step | Run `gh auth login`, and check that the folder has an `origin` remote on GitHub (step 2). |
 | "That PIN is not correct" | Type it again; the field keeps what you typed. To choose a new PIN, run **Forms Platform > 2. Set admin PIN...** in the sheet. |
 | "Too many wrong PINs. Try again in 00:29:58." | Eight wrong PINs locked the dashboard for 30 minutes for every browser that has not signed in before. A browser you signed in on keeps working. Wait for the time it gives, or click **Forms Platform > Unlock the admin page** in the sheet, which lifts the lock at once and keeps your PIN. |
 | "Too many wrong PINs on this device. Try again in 00:29:58, ..." | Eight wrong PINs were typed on this trusted browser. Wait for the time it gives, or click **Forms Platform > Unlock the admin page**. |

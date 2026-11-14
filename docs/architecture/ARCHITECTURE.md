@@ -1255,7 +1255,7 @@ labels of the current tables.
 
 | I want to... | Edit |
 |---|---|
-| Change a colour, font, or size | `web/css/theme.css` (variables only); `npm test` checks the contrast |
+| Change a colour, font, or size | `web/css/theme.css` (variables only); `pnpm test` checks the contrast |
 | Reword a message or translate | `web/js/i18n/en.js` and `ar.js` |
 | Add a question to a form | Admin dashboard, or `template-fields.js` for new forms by default |
 | Add a new form type | A new function in `templates.service.js`, a label in `web/js/admin/shell/admin.model.js` |
@@ -1265,7 +1265,7 @@ labels of the current tables.
 | Change the downloaded Excel list | `DownloadsWorkbook.build` in `downloads.workbook.js` (the file format is in `backend/platform/xlsx/`) |
 | Change the Drive folder name rule | `Rules.checkFolderName` in `domain/rules/drive-link.js` |
 | Change the tab icon | `web/img/favicon.svg`, then regenerate the PNGs in `web/img/` |
-| See a change in a real browser before deploying | `npm run dev` (`scripts/dev/dev-server.js`) |
+| See a change in a real browser before deploying | `pnpm run dev` (`scripts/dev/dev-server.js`) |
 | Change what CI runs or publishes | `.github/workflows/pages.yml` |
 
 ## Documents

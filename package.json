@@ -18,5 +18,6 @@
     "acorn-walk": "8.3.4",
     "jsdom": "^24.1.0"
   },
-  "license": "UNLICENSED"
+  "license": "UNLICENSED",
+  "packageManager": "pnpm@12.18.0"
 }

@@ -280,7 +280,7 @@ shows up on your computer instead of in the Apps Script editor. Full details in
 **Cost.** A build step between the source and Apps Script. The workflow runs it
 on every push to `master` and hands `dist/` to clasp when a backend file
 changed, so an update needs no command and no paste. The first deploy runs the same build on your computer:
-`npm run setup` creates the sheet, bundles, pushes with clasp and creates the web app, so nothing
+`pnpm run setup` creates the sheet, bundles, pushes with clasp and creates the web app, so nothing
 is ever pasted into the Apps Script editor.
 
 ---
@@ -823,7 +823,7 @@ The website needs no edit when the backend changes, and the backend needs none
 when the website changes. They only agree on the JSON actions.
 
 **Cost.** Three repository variables and one credential secret, written once
-by `npm run setup` ([DEPLOY.md](../operations/DEPLOY.md#updating-later)). If Google rejects the saved clasp
+by `pnpm run setup` ([DEPLOY.md](../operations/DEPLOY.md#updating-later)). If Google rejects the saved clasp
 login, the secret has to be replaced before the next deploy can run.
 
 ---

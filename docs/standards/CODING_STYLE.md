@@ -24,11 +24,11 @@ with `+`, or move it into a constant.
 
 The whole tree was laid out by Biome once, one commit per folder. Those
 commits change only layout, and `.git-blame-ignore-revs` lists them so
-`git blame` shows who wrote a line, not who formatted it. `npm install` sets
+`git blame` shows who wrote a line, not who formatted it. `pnpm install` sets
 `blame.ignoreRevsFile`; GitHub reads the file by itself. A later commit that
 only changes layout is added to the list.
 
-`npx biome format --write <file>` lays a file out. `npx biome check <file>`
+`pnpm exec biome format --write <file>` lays a file out. `pnpm exec biome check <file>`
 reports what is wrong without changing anything.
 
 ## Lint rules

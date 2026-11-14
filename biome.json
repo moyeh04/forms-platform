@@ -10,7 +10,7 @@
       "scripts/**",
       "tests/**",
       "*.json",
-      "!package-lock.json",
+      "!pnpm-lock.yaml",
       "!tests/fixtures"
     ]
   },

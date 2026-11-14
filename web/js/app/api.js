@@ -19,7 +19,7 @@
   var NOT_CONFIGURED =
     'The website is not connected to the backend yet. Set the GitHub ' +
     'Actions API_URL variable and publish through GitHub Actions. For ' +
-    'local preview, run npm run dev.';
+    'local preview, run pnpm run dev.';
 
   /**
    * Makes the error a call throws.

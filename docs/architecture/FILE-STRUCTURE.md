@@ -40,7 +40,7 @@ flowchart TD
     shared -- "script tag" --> gh
     shared -- "bundled in" --> dist["dist/Code.gs<br/>git-ignored, rebuilt on demand"]
     be -- "bundled in" --> dist
-    sc -- "npm run build" --> dist
+    sc -- "pnpm run build" --> dist
     dist -- "Actions pushes it<br/>with clasp" --> gas["Apps Script<br/>the backend"]
     ts -. "run the real bundle in memory" .-> dist
     classDef cDb fill:#F3E2B3,stroke:#B8892D,stroke-width:1.5px,color:#2F2418
@@ -475,7 +475,7 @@ the file name says the role:
 | `backend/entry-points.js` | The functions Apps Script calls by name (the sheet menu, its print dialog, setup, the PIN commands and the view trigger), each handing the call to its namespace. |
 | `backend/main.js` | The web app: every request arrives here, is read as JSON, and goes to the router. |
 
-`npm run build` joins `domain/enums.js`, the parts of `domain/rules/` and
+`pnpm run build` joins `domain/enums.js`, the parts of `domain/rules/` and
 `domain/form-metadata/` and every backend file into `dist/Code.gs`: `platform/` first, then `features/`, then
 `routes.js`, `entry-points.js` and `main.js`.
 
@@ -485,7 +485,7 @@ the file name says the role:
 |---|---|
 | `scripts/build/bundle-backend.js` | The bundler. |
 | `scripts/build/site-map.js` | Where each published path of the site comes from: the pages from `web/`, `assets/js`, `assets/css` and `assets/img` from `web/js`, `web/css` and `web/img`, and `shared/` from `domain/`. The site packager, the preview server, the page tests and the structure check read it. |
-| `scripts/checks/run-checks.js`, `.githooks/pre-commit`, `.githooks/pre-push` | Runs every check, on the staged files before each commit (`--staged`) or on the whole tree before each push and in CI (`--all`, `npm run check`), and the git hooks that call it. `npm install` points git at `.githooks`. [CHECKS.md](../standards/CHECKS.md) lists the checks. |
+| `scripts/checks/run-checks.js`, `.githooks/pre-commit`, `.githooks/pre-push` | Runs every check, on the staged files before each commit (`--staged`) or on the whole tree before each push and in CI (`--all`, `pnpm run check`), and the git hooks that call it. `pnpm install` points git at `.githooks`. [CHECKS.md](../standards/CHECKS.md) lists the checks. |
 | `scripts/checks/config.json`, `exceptions.json` | What each check covers and its limits, and the paths allowed to break a structure rule, each with its reason. |
 | `scripts/checks/lib/` | `files.js` (which files a run looks at), `parse.js` (acorn with comments), `jsdoc.js` (reads a JSDoc comment into its summary and tags), `exceptions.js`, `report.js`. |
 | `scripts/checks/code/check-biome.js` | Runs Biome on the files of a run and turns what it reports into findings. |
@@ -501,10 +501,10 @@ the file name says the role:
 | `scripts/checks/tree/check-docs.js` | [API.md](../backend/API.md) names exactly the actions the backend has, [TESTING.md](../process/TESTING.md) gives the real number of tests, and no Markdown link points at a file that is gone. |
 | `scripts/deploy/prepare-clasp.js` | Checks the deployment variables of the workflow and writes the clasp configuration git ignores. |
 | `scripts/deploy/backend-changed.js` | Tells the workflow whether a push changed a backend file, so a push of pages or documents alone does not deploy the backend. |
-| `scripts/deploy/setup-deployment.js` | First deployment from your computer (`npm run setup`): creates the sheet and its script, pushes the bundle, creates the web app, and stores the IDs, the credential and the Pages setting in GitHub. |
+| `scripts/deploy/setup-deployment.js` | First deployment from your computer (`pnpm run setup`): creates the sheet and its script, pushes the bundle, creates the web app, and stores the IDs, the credential and the Pages setting in GitHub. |
 | `scripts/deploy/clasp-output.js` | Reads the Script ID and the deployment ID from what clasp prints, for the first deployment. |
-| `scripts/dev/setup-git.sh` | Run by `npm install`: points git at `.githooks/` and at `.git-blame-ignore-revs`, the layout-only commits `git blame` skips. |
-| `scripts/dev/dev-server.js` | `npm run dev`: serves the site and answers its API calls from the in-memory Google, with sample forms, so pages can be opened in a real browser. |
+| `scripts/dev/setup-git.sh` | Run by `pnpm install`: points git at `.githooks/` and at `.git-blame-ignore-revs`, the layout-only commits `git blame` skips. |
+| `scripts/dev/dev-server.js` | `pnpm run dev`: serves the site and answers its API calls from the in-memory Google, with sample forms, so pages can be opened in a real browser. |
 | `scripts/dev/sample-world.js` | The admin PIN and the sample forms and registrations of the preview, made through the API as a person would. |
 | `tests/harness/appsscript-mock.js` | An in-memory Sheets, Drive, Mail, Cache, and clock, so the real backend code runs in tests. |
 | `tests/harness/dom.js` | Opens the real pages in jsdom wired to that backend. |
@@ -519,7 +519,7 @@ paths and limits are under `structure` in `scripts/checks/config.json`.
 
 | Rule | What it means |
 |---|---|
-| Root allow-list | The root holds `README.md`, `package.json`, `package-lock.json`, `biome.json`, `.gitignore`, `.git-blame-ignore-revs`, `.githooks/`, `.github/`, `backend/`, `web/`, `domain/`, `scripts/`, `tests/` and `docs/`. Pages, notes and requirements live in their folders. |
+| Root allow-list | The root holds `README.md`, `package.json`, `pnpm-lock.yaml`, `pnpm-workspace.yaml`, `biome.json`, `.gitignore`, `.git-blame-ignore-revs`, `.githooks/`, `.github/`, `backend/`, `web/`, `domain/`, `scripts/`, `tests/` and `docs/`. Pages, notes and requirements live in their folders. |
 | No catch-all names | No file or folder is named `utils`, `helpers`, `common`, `misc`, `manager`, `stuff` or `shared`. Code is named by what it does, so a reader finds it by its subject. |
 | One subject per folder | A folder holds the files of one subject, so its name says what is inside. No number decides when a folder is too full; the reviewer splits a folder when it holds two subjects. No published JavaScript standard sets a file count, so none is checked. |
 | Pages and assets | Every script and stylesheet a page loads exists, and every file under `web/js/` and `web/css/` is loaded by a page. |

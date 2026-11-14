@@ -108,7 +108,7 @@ function chooseSheet(prompt, log) {
     throw new Error(
       'The Script ID is missing or incorrect. Nothing was created. ' +
         'When you have the Script ID, run this command:' +
-        ' npm run setup -- <SCRIPT_ID>'
+        ' pnpm run setup <SCRIPT_ID>'
     );
   }
   return id;
@@ -143,7 +143,7 @@ function must(ctx, label, argv, extra) {
  * @return {string} What it printed, trimmed.
  */
 function clasp(ctx, label, args, extra) {
-  return must(ctx, label, ['npx', '--yes', CLASP, ...args], extra);
+  return must(ctx, label, ['pnpm', 'dlx', CLASP, ...args], extra);
 }
 
 /**

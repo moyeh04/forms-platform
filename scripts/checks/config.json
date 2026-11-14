@@ -44,7 +44,7 @@
       "package.json"
     ],
     "extensions": [".js", ".css", ".html", ".sh", ".yml", ".json", ""],
-    "exclude": ["tests/fixtures/", "package-lock.json"]
+    "exclude": ["tests/fixtures/", "pnpm-lock.yaml"]
   },
   "jsdoc": {
     "include": ["web/js/", "backend/", "domain/", "scripts/"],
@@ -115,7 +115,8 @@
     "root": [
       "README.md",
       "package.json",
-      "package-lock.json",
+      "pnpm-lock.yaml",
+      "pnpm-workspace.yaml",
       "biome.json",
       ".gitignore",
       ".git-blame-ignore-revs",

@@ -4,10 +4,10 @@
  * in-memory Google the tests use, so every page can be opened in a real
  * browser without a Google account and without touching real data.
  *
- *   npm run dev            # http://localhost:8080  (admin PIN 4321)
- *   npm run dev -- 9000    # another port
- *   npm run dev -- --empty # no sample forms
- *   npm run dev -- --folder <id>=<name>   # name a pretend Drive folder
+ *   pnpm run dev            # http://localhost:8080  (admin PIN 4321)
+ *   pnpm run dev 9000    # another port
+ *   pnpm run dev --empty # no sample forms
+ *   pnpm run dev --folder <id>=<name>   # name a pretend Drive folder
  *                                         # (repeatable)
  *
  * Everything lives in memory and disappears when the server stops.
